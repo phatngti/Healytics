@@ -20,14 +20,8 @@ class RoleToggleSelector extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow,
-            blurRadius: 2,
-            offset: const Offset(0, 1),
-          ),
-        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -86,15 +80,6 @@ class _RoleButton extends StatelessWidget {
                   ? colorScheme.outlineVariant
                   : colorScheme.surface.withAlpha(0),
             ),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: colorScheme.shadow,
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

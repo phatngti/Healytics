@@ -23,7 +23,6 @@ class BusinessInfo(DtoModel):
     taxRegistrationCode: UpdatedField | None = None
     serviceTags: UpdatedField | None = None
     address: AddressDto | None = None
-    username: UpdatedField | None = None
     email: UpdatedField | None = None
     phoneNumber: UpdatedField | None = None
 
@@ -115,7 +114,6 @@ class PublicProfileBusinessInfoDto(DtoModel):
     businessType: list[str]
     phoneNumber: dict[str, Any] | None = None
     email: dict[str, Any] | None = None
-    username: dict[str, Any] | None = None
 
 
 @dataclass(slots=True)

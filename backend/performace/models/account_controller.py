@@ -16,7 +16,6 @@ class AccountMeResponseDto(DtoModel):
     isActive: bool
     createdAt: datetime
     updatedAt: datetime
-    username: str | None = None
     userProfile: UserProfileDto | None = None
 
 

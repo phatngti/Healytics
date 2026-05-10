@@ -5,6 +5,14 @@ import 'package:common/widgets/adaptive_root_scaffold/adaptive_root_scraffold.da
 import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/ai_health_assistant/presentation/screens/chat.screen.dart';
 import 'package:user_app/features/ai_health_assistant/presentation/screens/conversation_history.screen.dart';
+import 'package:user_app/features/home/presentation/screens/'
+    'home_premium_treatments.screen.dart';
+import 'package:user_app/features/home/presentation/screens/'
+    'home_recent_activity.screen.dart';
+import 'package:user_app/features/home/presentation/screens/'
+    'home_recommendations.screen.dart';
+import 'package:user_app/features/home/presentation/screens/'
+    'home_specialists.screen.dart';
 import 'package:user_app/features/home/presentation/screens/home_page.screen.dart';
 import 'package:user_app/features/service_details/presentation/screens/service_details.screen.dart';
 import 'package:user_app/features/service_details/presentation/screens/reviews.screen.dart';
@@ -131,8 +139,7 @@ class _MobileWrapperBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final unreadCount =
-        ref.watch(unreadCountProvider).value ?? 0;
+    final unreadCount = ref.watch(unreadCountProvider).value ?? 0;
 
     return AdaptiveRootScraffold(
       navigationShell: navigationShell,
@@ -160,6 +167,77 @@ class HomeRoute extends GoRouteData with $HomeRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const HomeUpdatePage(),
+    );
+  }
+}
+
+@TypedGoRoute<HomeRecommendationsRoute>(
+  path: '/home/recommendations',
+  name: HomeRecommendationsRoute.name,
+)
+class HomeRecommendationsRoute extends GoRouteData
+    with $HomeRecommendationsRoute {
+  const HomeRecommendationsRoute();
+  static const name = 'home_recommendations';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const HomeRecommendationsScreen(),
+    );
+  }
+}
+
+@TypedGoRoute<HomeRecentActivityRoute>(
+  path: '/home/recent-activity',
+  name: HomeRecentActivityRoute.name,
+)
+class HomeRecentActivityRoute extends GoRouteData
+    with $HomeRecentActivityRoute {
+  const HomeRecentActivityRoute();
+  static const name = 'home_recent_activity';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const HomeRecentActivityScreen(),
+    );
+  }
+}
+
+@TypedGoRoute<HomeSpecialistsRoute>(
+  path: '/home/specialists',
+  name: HomeSpecialistsRoute.name,
+)
+class HomeSpecialistsRoute extends GoRouteData with $HomeSpecialistsRoute {
+  const HomeSpecialistsRoute();
+  static const name = 'home_specialists';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const HomeSpecialistsScreen(),
+    );
+  }
+}
+
+@TypedGoRoute<HomePremiumTreatmentsRoute>(
+  path: '/home/premium-treatments',
+  name: HomePremiumTreatmentsRoute.name,
+)
+class HomePremiumTreatmentsRoute extends GoRouteData
+    with $HomePremiumTreatmentsRoute {
+  const HomePremiumTreatmentsRoute();
+  static const name = 'home_premium_treatments';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const HomePremiumTreatmentsScreen(),
     );
   }
 }
@@ -865,8 +943,7 @@ class ReviewSpecialistRoute extends GoRouteData with $ReviewSpecialistRoute {
   path: '/review_facility',
   name: ReviewFacilityRoute.name,
 )
-class ReviewFacilityRoute extends GoRouteData
-    with $ReviewFacilityRoute {
+class ReviewFacilityRoute extends GoRouteData with $ReviewFacilityRoute {
   final String appointmentId;
   final String facilityId;
   final String facilityName;
@@ -888,10 +965,7 @@ class ReviewFacilityRoute extends GoRouteData
   static const name = 'review_facility';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ReviewFacilityScreen(
@@ -900,8 +974,7 @@ class ReviewFacilityRoute extends GoRouteData
         facilityName: facilityName,
         facilityAddress: facilityAddress,
         specialistName: specialistName,
-        specialistAvatarUrl:
-            specialistAvatarUrl,
+        specialistAvatarUrl: specialistAvatarUrl,
         specialistRating: specialistRating,
       ),
     );
@@ -993,20 +1066,13 @@ class ClinicInfoRoute extends GoRouteData with $ClinicInfoRoute {
 
 // --- CART ROUTE (No Navigation Bar) ---
 
-@TypedGoRoute<CartRoute>(
-  path: '/cart',
-  name: CartRoute.name,
-)
-class CartRoute extends GoRouteData
-    with $CartRoute {
+@TypedGoRoute<CartRoute>(path: '/cart', name: CartRoute.name)
+class CartRoute extends GoRouteData with $CartRoute {
   const CartRoute();
   static const name = 'cart';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const CartScreen(),
