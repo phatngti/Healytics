@@ -138,21 +138,30 @@ class HealyticsSocketIOUser(SocketIOUser):
         path, build_dto = login_map[fn_name]
         payload = build_dto()
 
-        try:
-            resp = requests.post(
-                f"{BASE_URL}{path}",
-                json=payload.to_dict(),
-                timeout=10,
-            )
-            if resp.status_code in (200, 201):
-                data = resp.json()
-                return data.get("access_token")
-            else:
-                logger.error("Login failed (%s): HTTP %s", path, resp.status_code)
+        for attempt in range(3):
+            try:
+                resp = requests.post(
+                    f"{BASE_URL}{path}",
+                    json=payload.to_dict(),
+                    timeout=10,
+                )
+                if resp.status_code in (200, 201):
+                    data = resp.json()
+                    return data.get("access_token")
+                elif resp.status_code == 429:
+                    # Rate-limited — wait and retry
+                    import time
+                    time.sleep(2 * (attempt + 1))
+                    continue
+                else:
+                    logger.error("Login failed (%s): HTTP %s", path, resp.status_code)
+                    return None
+            except Exception as e:
+                logger.error("Login request error: %s", e)
                 return None
-        except Exception as e:
-            logger.error("Login request error: %s", e)
-            return None
+
+        logger.error("Login failed (%s): rate-limited after retries", path)
+        return None
 
     # ── Server→Client event registration ─────────────────────────────────────
 
@@ -190,7 +199,7 @@ class HealyticsSocketIOUser(SocketIOUser):
         except Exception as e:
             logger.warning("[%s] Emit '%s' failed: %s", self.__class__.__name__, event, e)
 
-    def ws_call(self, event: str, data: dict | None = None, timeout: int = 5):
+    def ws_call(self, event: str, data: dict | None = None, timeout: int = 10):
         """
         Emit with acknowledgement — measures round-trip time via sio.call().
         Returns the server response or None on failure.

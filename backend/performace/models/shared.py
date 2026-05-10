@@ -99,7 +99,6 @@ class BusinessInfoDto(DtoModel):
     address: AddressInfoDto | None = None
     email: VerifiedField | None = None
     phoneNumber: VerifiedField | None = None
-    username: VerifiedField | None = None
 
 
 @dataclass(slots=True)

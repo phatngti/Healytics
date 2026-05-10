@@ -8,6 +8,10 @@ part of 'routes.dart';
 
 List<RouteBase> get $appRoutes => [
   $mobileWrapperRoutes,
+  $homeRecommendationsRoute,
+  $homeRecentActivityRoute,
+  $homeSpecialistsRoute,
+  $homePremiumTreatmentsRoute,
   $chatRoute,
   $serviceDetailsRoute,
   $reviewsRoute,
@@ -189,6 +193,114 @@ mixin $ProfileRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/profile');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $homeRecommendationsRoute => GoRouteData.$route(
+  path: '/home/recommendations',
+  name: 'home_recommendations',
+  factory: $HomeRecommendationsRoute._fromState,
+);
+
+mixin $HomeRecommendationsRoute on GoRouteData {
+  static HomeRecommendationsRoute _fromState(GoRouterState state) =>
+      const HomeRecommendationsRoute();
+
+  @override
+  String get location => GoRouteData.$location('/home/recommendations');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $homeRecentActivityRoute => GoRouteData.$route(
+  path: '/home/recent-activity',
+  name: 'home_recent_activity',
+  factory: $HomeRecentActivityRoute._fromState,
+);
+
+mixin $HomeRecentActivityRoute on GoRouteData {
+  static HomeRecentActivityRoute _fromState(GoRouterState state) =>
+      const HomeRecentActivityRoute();
+
+  @override
+  String get location => GoRouteData.$location('/home/recent-activity');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $homeSpecialistsRoute => GoRouteData.$route(
+  path: '/home/specialists',
+  name: 'home_specialists',
+  factory: $HomeSpecialistsRoute._fromState,
+);
+
+mixin $HomeSpecialistsRoute on GoRouteData {
+  static HomeSpecialistsRoute _fromState(GoRouterState state) =>
+      const HomeSpecialistsRoute();
+
+  @override
+  String get location => GoRouteData.$location('/home/specialists');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $homePremiumTreatmentsRoute => GoRouteData.$route(
+  path: '/home/premium-treatments',
+  name: 'home_premium_treatments',
+  factory: $HomePremiumTreatmentsRoute._fromState,
+);
+
+mixin $HomePremiumTreatmentsRoute on GoRouteData {
+  static HomePremiumTreatmentsRoute _fromState(GoRouterState state) =>
+      const HomePremiumTreatmentsRoute();
+
+  @override
+  String get location => GoRouteData.$location('/home/premium-treatments');
 
   @override
   void go(BuildContext context) => context.go(location);

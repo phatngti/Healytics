@@ -71,7 +71,6 @@ class _EmployeeWorkHistoryCardState extends State<EmployeeWorkHistoryCard> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
                 shape: BoxShape.circle,
                 border: Border.all(color: colorScheme.primary.withAlpha(75)),
               ),
