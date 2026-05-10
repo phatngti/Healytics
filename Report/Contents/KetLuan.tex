@@ -100,44 +100,44 @@ Uptime 99.9\% & $\leq 43$ phút downtime/tháng & Chưa có môi trường produ
 
 \section{Nhận xét chung}
 
-Qua quá trình thực hiện, đồ án đã hoàn thành \textbf{14/18 yêu cầu chức năng ở mức đầy đủ hoặc cơ bản}, tương đương khoảng 78\% phạm vi ban đầu. Những điểm nổi bật đáng chú ý:
+Qua quá trình thực hiện, đồ án đã hoàn thành \textbf{14/18 yêu cầu chức năng ở mức đầy đủ hoặc cơ bản}. Những điểm nổi bật chính:
 
 \begin{itemize}
-    \item \textbf{Về kiến trúc:} Hệ thống được xây dựng theo mô hình Microservices thực thụ — không chỉ tách module mà còn triển khai message queue (RabbitMQ), distributed cache (Redis), và file storage tách biệt (Cloudflare R2). Đặc biệt, cơ chế \textit{Async Checkout Queue} với Redis distributed lock giải quyết bài toán race condition đặt lịch — vốn là điểm yếu cốt lõi của các hệ thống booking truyền thống.
+    \item \textbf{Về kiến trúc:} Hệ thống theo mô hình Microservices, có message queue (RabbitMQ), cache (Redis) và storage tách biệt (Cloudflare R2). Cơ chế \textit{Async Checkout Queue} với Redis distributed lock xử lý race condition đặt lịch.
 
-    \item \textbf{Về AI Pipeline:} Hệ thống tích hợp ba tầng AI hoạt động phối hợp: NER Service (trích xuất thực thể từ truy vấn tự nhiên), Recommender (vector search + profile-based), và RAG Chatbot (LangChain + ChromaDB + Gemini). Đây là điểm khác biệt so với các ứng dụng booking thông thường chỉ cung cấp tìm kiếm keyword.
+    \item \textbf{Về AI Pipeline:} Hệ thống tích hợp NER, Recommender và RAG Chatbot để xử lý truy vấn tự nhiên và gợi ý dịch vụ.
 
-    \item \textbf{Về kiểm thử:} Bộ kiểm thử đơn vị gồm \textbf{408 test case, 100\% pass} trên 23 module backend, bao gồm các kịch bản race condition phức tạp — đảm bảo độ tin cậy của các luồng nghiệp vụ cốt lõi.
+    \item \textbf{Về kiểm thử:} Bộ kiểm thử đơn vị có \textbf{408 test case, 100\% pass} trên 23 module backend.
 
-    \item \textbf{Về thanh toán:} Tích hợp đồng thời MoMo (server-to-server IPN) và Stripe (on-device SDK confirm + webhook) theo đúng chuẩn bảo mật của từng cổng, có xử lý refund và PartnerRefundCase.
+    \item \textbf{Về thanh toán:} Tích hợp MoMo và Stripe, có xử lý refund và PartnerRefundCase.
 \end{itemize}
 
-Các chức năng còn ở mức \textit{một phần} (quản lý khuyến mãi, voucher toàn hệ thống, ticket hỗ trợ) chủ yếu là các tính năng marketing và vận hành nâng cao, không ảnh hưởng đến luồng nghiệp vụ cốt lõi của hệ thống.
+Các chức năng còn ở mức \textit{một phần} chủ yếu là nhóm marketing và vận hành nâng cao, không ảnh hưởng luồng nghiệp vụ cốt lõi.
 
 \section{Hạn chế}
 
 \begin{itemize}
     \item \textbf{Dữ liệu AI còn hạn chế:} Corpus tri thức phục vụ RAG chủ yếu là tài liệu tổng hợp, chưa có dữ liệu chuyên sâu về y học cổ truyền và spa trị liệu tại Việt Nam. Relevance của chatbot đạt khoảng 82\%, thấp hơn mục tiêu 85\% và vẫn có nguy cơ hallucination trong các tình huống niche.
 
-    \item \textbf{Độ trễ AI Inference:} Khi chạy trên phần cứng hạn chế (không có GPU chuyên dụng), thời gian sinh văn bản của chatbot có thể vượt ngưỡng 5 giây trong giờ cao điểm. Streaming SSE giúp giảm cảm nhận độ trễ nhưng không giải quyết triệt để vấn đề throughput.
+    \item \textbf{Độ trễ AI Inference:} Khi thiếu GPU, thời gian sinh có thể vượt 5 giây; SSE chỉ giảm cảm nhận độ trễ.
 
-    \item \textbf{Thiếu CI/CD và Monitoring:} Hệ thống chưa có pipeline tự động hóa build/test/deploy và chưa tích hợp công cụ giám sát (Prometheus, Grafana), khiến việc phát hiện sự cố trong môi trường production còn thủ công.
+    \item \textbf{CI/CD và Monitoring chưa hoàn thiện ở mức production:} Có pipeline và dashboard cơ bản nhưng chưa có cảnh báo tự động/SLO rõ ràng.
 
-    \item \textbf{Chức năng marketing chưa hoàn chỉnh:} Quản lý khuyến mãi và voucher toàn hệ thống mới ở mức cơ bản, chưa đủ để vận hành các chiến dịch marketing quy mô lớn.
+    \item \textbf{Chức năng marketing chưa hoàn chỉnh:} Khuyến mãi và voucher mới ở mức cơ bản.
 
-    \item \textbf{Phụ thuộc bên thứ ba:} Các dịch vụ cốt lõi như thanh toán (MoMo, Stripe), bản đồ (Mapbox), và lưu trữ (Cloudflare R2) phụ thuộc vào API bên ngoài — bất kỳ thay đổi chính sách nào đều có thể ảnh hưởng trực tiếp đến hệ thống.
+    \item \textbf{Phụ thuộc bên thứ ba:} Thanh toán, bản đồ và lưu trữ phụ thuộc API bên ngoài.
 \end{itemize}
 
 \section{Hướng phát triển tiếp theo}
 
 \begin{itemize}
-    \item \textbf{Hoàn thiện phạm vi còn thiếu:} Ưu tiên xây dựng hệ thống voucher/khuyến mãi toàn hệ thống, ticket hỗ trợ, và tính năng xuất báo cáo Excel/CSV cho đối tác — các tính năng đang ở mức một phần.
+    \item \textbf{Hoàn thiện phạm vi còn thiếu:} Xây dựng voucher, ticket hỗ trợ và xuất báo cáo Excel/CSV.
 
-    \item \textbf{Nâng cấp AI Pipeline:} Mở rộng corpus tri thức chuyên ngành y tế Việt Nam; nghiên cứu áp dụng các mô hình chuyên biệt nhỏ hơn (Small Language Models như Phi-3, Gemma) để giảm chi phí inference; tối ưu hóa RAG retrieval bằng hybrid search (dense + sparse).
+    \item \textbf{Nâng cấp AI Pipeline:} Mở rộng corpus y tế Việt Nam và tối ưu retrieval bằng hybrid search.
 
-    \item \textbf{Triển khai DevOps \& Monitoring:} Xây dựng pipeline CI/CD (GitHub Actions/Jenkins), tích hợp Prometheus + Grafana để giám sát sức khỏe hệ thống, thiết lập alerting tự động khi error rate vượt ngưỡng.
+    \item \textbf{Triển khai DevOps \& Monitoring:} Hoàn thiện CI/CD, thêm Prometheus/Grafana và alerting tự động.
 
-    \item \textbf{Tích hợp Telehealth:} Bổ sung tính năng Video Call (WebRTC) cho tư vấn y tế từ xa, cho phép bác sĩ/chuyên gia thăm khám trực tiếp qua ứng dụng.
+    \item \textbf{Tích hợp Telehealth:} Bổ sung Video Call (WebRTC) cho tư vấn từ xa.
 
-    \item \textbf{Mở rộng hệ sinh thái IoT:} Kết nối với thiết bị đeo thông minh (Smartwatch) để thu thập chỉ số sức khỏe (nhịp tim, giấc ngủ, bước chân) tự động, làm giàu thêm dữ liệu đầu vào cho AI gợi ý cá nhân hóa.
+    \item \textbf{Mở rộng hệ sinh thái IoT:} Kết nối smartwatch để thu thập chỉ số sức khỏe tự động.
 \end{itemize}

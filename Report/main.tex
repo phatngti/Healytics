@@ -45,6 +45,7 @@
 \hypersetup{urlcolor=blue,linkcolor=black,citecolor=black,colorlinks=true} 
 \usepackage{listings}
 \usepackage{float}
+\usepackage{pdflscape}
 \usepackage{pdfpages}
 \usepackage[export]{adjustbox} % Cho phép ảnh tự cắt khi hết trang
 \usepackage{tocloft}
@@ -57,6 +58,8 @@
 \usepackage{enumitem} % Put this in the preamble
 \usepackage[normalem]{ulem}
 \usepackage{lastpage}   % Load this LAST
+
+\newcommand{\autofitgraphics}[2][]{\includegraphics[#1]{#2}}
 
 \renewcommand{\bibname}{Tài liệu tham khảo}
 
@@ -268,13 +271,13 @@ morekeywords={}
 % \vspace{0.5cm}
 \begin{table}[h]
 \begin{tabular}{rll}
-\hspace{4 cm} &  \textbf{\Large HỘI ĐỒNG:} & {\Large Hội đồng 24L Đồ án chuyên ngành}
+\hspace{4 cm} &  \textbf{\Large HỘI ĐỒNG:} & {\Large Hội đồng 11L Khoa học Máy tính}
 \\[0.3cm]
 \hspace{4 cm} &   \textbf{\Large GVHD:} & {\Large TS. Trương Tuấn Anh}
 \\[0.3cm]
 \hspace{4 cm}  &    & {\Large CN. Dương Huỳnh Anh Đức}
 \\[0.3cm]
-\hspace{4 cm}  &   \textbf{\Large GVPB:} & {\Large CN. Nguyễn Minh Tâm}
+\hspace{4 cm}  &   \textbf{\Large GVPB:} & {\Large 002890 - ThS. Trần Thị Quế Nguyệt}
 \\[0.3cm]
 % TKHĐ là THƯ KÝ HỘI ĐỒNG
 \hspace{4 cm} &     \multicolumn{2}{l}{\textbf{$\;$ $\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$ \Large ---o0o---}} 
