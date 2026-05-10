@@ -8,16 +8,158 @@ Phần này trình bày kết quả kiểm thử chức năng của hệ thống
 
 \subsubsection{Kiểm thử đơn vị (Unit Tests)}
 
-Kiểm thử đơn vị nhằm đảm bảo từng thành phần nhỏ (Controller, Service) hoạt động đúng khi được tách riêng khỏi phần còn lại của hệ thống. Hệ thống sử dụng \textbf{Jest} làm công cụ kiểm thử chính, với tổng cộng \textbf{23 tệp kiểm thử} bao phủ toàn bộ các module:
+Kiểm thử đơn vị nhằm đảm bảo từng thành phần nhỏ (Controller, Service, Handler) hoạt động đúng khi được tách biệt hoàn toàn khỏi cơ sở dữ liệu, Redis, và các dịch vụ ngoài. Hệ thống sử dụng \textbf{Jest} làm công cụ kiểm thử chính, với tổng cộng \textbf{63 tệp kiểm thử} trải rộng trên toàn bộ các module của backend. Để sinh báo cáo trực quan, dự án tích hợp thêm \textbf{jest-html-reporters} --- plugin Jest xuất báo cáo HTML tương tác gồm dashboard tổng hợp, biểu đồ thời gian thực thi từng suite và biểu đồ tỉ lệ theo thời gian (Timing Ratio).
 
+Hình~\ref{fig:unit_test_result} thể hiện kết quả chạy toàn bộ bộ kiểm thử ngày 09/05/2026: \textbf{63 test suite}, \textbf{408 test case}, \textbf{0 thất bại}, hoàn thành trong \textbf{15,329 giây}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Images/unit_test_result.png}
+\caption{Báo cáo kết quả kiểm thử đơn vị -- Healytics Test Report (jest-html-reporters, 09/05/2026)}
+\label{fig:unit_test_result}
+\end{figure}
+
+% TODO: Thêm ảnh chụp màn hình terminal kết quả chạy \texttt{npm test} (Jest summary: test suites passed, tests passed)
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=\textwidth]{Images/unit_test_terminal.png}
+% \caption{Kết quả chạy \texttt{npm test} trên terminal -- Jest summary}
+% \label{fig:unit_test_terminal}
+% \end{figure}
+
+\paragraph{Cấu trúc và quy ước kiểm thử}
+
+Mỗi bài kiểm thử tuân theo mô hình \textbf{Arrange -- Act -- Assert} (AAA):
 \begin{itemize}
-    \item \texttt{auth}: Kiểm tra đăng ký, đăng nhập, làm mới token và xác thực JWT.
-    \item \texttt{partners}: Kiểm tra đăng ký đối tác, cập nhật hồ sơ, chuyển đổi trạng thái xác minh.
-    \item \texttt{admin}: Kiểm tra quy trình xét duyệt, xác định kết quả duyệt và ghi nhận lịch sử xét duyệt.
-    \item \texttt{employees}, \texttt{products}, \texttt{categories}, \texttt{locations}, \texttt{service-tags}, \texttt{s3}: Kiểm tra các thao tác thêm/sửa/xóa và logic nghiệp vụ.
+    \item \textbf{Arrange:} Khởi tạo mock repository/service thay thế phụ thuộc thực (\texttt{jest.fn()}, \texttt{createMockRepository()}).
+    \item \textbf{Act:} Gọi hàm/phương thức cần kiểm tra với dữ liệu đầu vào đã chuẩn bị.
+    \item \textbf{Assert:} Xác nhận giá trị trả về, ngoại lệ ném ra, hoặc số lần mock được gọi bằng \texttt{expect().toEqual()}, \texttt{rejects.toThrow()}, \texttt{toHaveBeenCalledWith()}.
 \end{itemize}
 
-Để cô lập từng thành phần, các bài kiểm thử sử dụng đối tượng giả lập (mock) thay thế cho cơ sở dữ liệu thực. Mỗi bài kiểm thử tuân theo mô hình 3 bước: \textbf{Chuẩn bị} dữ liệu đầu vào, \textbf{Thực thi} hàm cần kiểm tra, và \textbf{Xác nhận} kết quả đầu ra.
+Hệ thống cung cấp các tiện ích dùng chung trong \texttt{test/mocks/mock-types.ts}:
+\begin{itemize}
+    \item \texttt{createMockRepository<T>()}: Tạo mock TypeORM repository với đầy đủ phương thức (\texttt{findOne}, \texttt{save}, \texttt{create}, \texttt{find}, v.v.).
+    \item \texttt{createMockQueryRunner()}: Tạo mock \texttt{QueryRunner} cho kiểm thử transaction.
+    \item \texttt{createMockDataSource()}: Tạo mock \texttt{DataSource} phục vụ các handler dùng transaction.
+    \item \texttt{createMockHandler()}: Tạo mock Command Handler cho Service-layer delegation tests.
+\end{itemize}
+
+\paragraph{Phạm vi bao phủ theo module}
+
+Bảng~\ref{tab:unittest_coverage} tóm tắt phạm vi kiểm thử đơn vị theo từng nhóm module:
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.22\textwidth}|p{0.14\textwidth}|X|}
+\hline
+\textbf{Module} & \textbf{Số file spec} & \textbf{Kịch bản tiêu biểu} \\
+\hline
+\texttt{auth} & 2 & Tạo token JWT có claim \texttt{role}, \texttt{verificationStatus}; xử lý sai mật khẩu; làm mới token. \\
+\hline
+\texttt{partners} & 2 & Đăng ký partner; cập nhật hồ sơ; kiểm tra trạng thái xác minh; ném \texttt{NotFoundException} khi không tìm thấy. \\
+\hline
+\texttt{admin} & 1 & Quy trình xét duyệt hồ sơ; ghi nhận lịch sử xét duyệt; chuyển trạng thái \texttt{APPROVED}/\texttt{REJECTED}. \\
+\hline
+\texttt{booking} & 12 & Delegate đến Command Handlers; kiểm thử race condition với Redis lock; xử lý slot trùng; thanh toán hết hạn; webhook. \\
+\hline
+\texttt{payment-gateway} & 3 & Xử lý thanh toán Momo/Stripe; cập nhật trạng thái booking sau webhook; ném lỗi khi không tìm thấy booking. \\
+\hline
+\texttt{notification} & 5 & Xử lý RabbitMQ message; ACK/NACK đúng trường hợp; push thông báo; broadcast. \\
+\hline
+\texttt{categories} & 4 & CRUD danh mục; phân quyền admin vs. user endpoint. \\
+\hline
+\texttt{employees} & 3 & Tạo/cập nhật hồ sơ nhân viên; phân quyền partner vs. user endpoint. \\
+\hline
+\texttt{clinic} & 2 & Cập nhật hồ sơ phòng khám; truy vấn thông tin công khai. \\
+\hline
+\texttt{account} & 2 & Cập nhật thông tin tài khoản; lấy thông tin cá nhân. \\
+\hline
+\texttt{audit} & 4 & Decorator ghi log; interceptor audit; service lưu sự kiện. \\
+\hline
+Các module khác & 23 & \texttt{cart}, \texttt{health-service}, \texttt{locations}, \texttt{mapbox}, \texttt{redis}, \texttt{review}, \texttt{s3}, \texttt{service-tags}, \texttt{ai-service}, v.v. \\
+\hline
+\end{tabularx}
+\caption{Phạm vi kiểm thử đơn vị theo module}
+\label{tab:unittest_coverage}
+\end{table}
+
+\paragraph{Thống kê số lượng test case theo module}
+
+Bảng~\ref{tab:unittest_stats} thống kê số file spec, số test case và kết quả thực thi của từng module, dựa trên lần chạy ngày 09/05/2026:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Module} & \textbf{File spec} & \textbf{Test case} & \textbf{Pass} & \textbf{Fail} \\
+\hline
+\texttt{booking} & 13 & 59 & 59 & 0 \\
+\hline
+\texttt{employees} & 3 & 33 & 33 & 0 \\
+\hline
+\texttt{payment-gateway} & 3 & 31 & 31 & 0 \\
+\hline
+\texttt{notification} & 6 & 24 & 24 & 0 \\
+\hline
+\texttt{health-service} & 3 & 24 & 24 & 0 \\
+\hline
+\texttt{audit} & 4 & 24 & 24 & 0 \\
+\hline
+\texttt{categories} & 4 & 21 & 21 & 0 \\
+\hline
+\texttt{service-tags} & 2 & 21 & 21 & 0 \\
+\hline
+\texttt{partners} & 2 & 20 & 20 & 0 \\
+\hline
+\texttt{locations} & 2 & 16 & 16 & 0 \\
+\hline
+\texttt{redis} & 1 & 15 & 15 & 0 \\
+\hline
+\texttt{account} & 2 & 13 & 13 & 0 \\
+\hline
+\texttt{mapbox} & 2 & 12 & 12 & 0 \\
+\hline
+\texttt{appointment} & 2 & 12 & 12 & 0 \\
+\hline
+\texttt{clinic} & 2 & 12 & 12 & 0 \\
+\hline
+\texttt{chat} & 1 & 12 & 12 & 0 \\
+\hline
+\texttt{dashboard-partner} & 1 & 11 & 11 & 0 \\
+\hline
+\texttt{cart} & 2 & 11 & 11 & 0 \\
+\hline
+\texttt{auth} & 2 & 8 & 8 & 0 \\
+\hline
+\texttt{s3} & 2 & 7 & 7 & 0 \\
+\hline
+\texttt{ai-service} & 2 & 7 & 7 & 0 \\
+\hline
+\texttt{admin} & 1 & 5 & 5 & 0 \\
+\hline
+\texttt{review} & 1 & 3 & 3 & 0 \\
+\hline
+\textbf{Tổng} & \textbf{63} & \textbf{408} & \textbf{408} & \textbf{0} \\
+\hline
+\end{tabular}
+\caption{Thống kê kết quả kiểm thử đơn vị theo module (09/05/2026)}
+\label{tab:unittest_stats}
+\end{table}
+
+\paragraph{Kiểm thử race condition trong Booking}
+
+Module \texttt{booking} có nhóm kiểm thử chuyên biệt về race condition (thư mục \texttt{handlers/\_\_tests\_\_/}) nhằm đảm bảo tính đúng đắn khi nhiều người dùng đặt cùng một khung giờ đồng thời. Các kịch bản chính bao gồm:
+
+\begin{itemize}
+    \item \textbf{Slot đã bị đặt trong DB:} \texttt{CheckSlotAvailabilityHandler} trả về \texttt{false} ngay khi tìm thấy booking ở trạng thái không phải \texttt{CANCELLED} trong cơ sở dữ liệu, không kiểm tra Redis.
+    \item \textbf{Redis checkout lock đang hoạt động:} Nếu \texttt{getLockTTL()} trả về giá trị dương, slot cũng bị coi là không khả dụng, ngăn chặn đặt trùng trong giai đoạn chờ xử lý thanh toán.
+    \item \textbf{Tranh chấp Redis intent lock:} \texttt{AcquireMicroLockHandler} kiểm tra khi hai request cùng cố gắng acquire lock cho cùng một \texttt{(staffId, startTime)}; bên không giành được lock bị từ chối ngay lập tức.
+    \item \textbf{Xử lý checkout song song:} \texttt{ProcessCheckoutHandler} dùng transaction (\texttt{QueryRunner}) để đảm bảo chỉ một booking được tạo ngay cả khi hai ticket được xử lý đồng thời.
+\end{itemize}
+
+\paragraph{Kết luận kiểm thử đơn vị}
+
+Bộ kiểm thử đơn vị của hệ thống Healytics đạt kết quả \textbf{100\% test case thành công}: toàn bộ 408 test case phân bổ trên 63 test suite đều PASS, không có test case thất bại hay ở trạng thái pending. Module \texttt{booking} có mức độ kiểm thử cao nhất với 59 test case (chiếm ~14,5\%), phản ánh tính phức tạp của nghiệp vụ đặt lịch, race condition và tích hợp thanh toán. Các module cốt lõi như \texttt{payment-gateway}, \texttt{notification} và \texttt{employees} đều được phủ kiểm thử đầy đủ. Kết quả này khẳng định rằng từng thành phần của hệ thống (Controller, Service, Command Handler) hoạt động đúng theo đặc tả trong môi trường độc lập, không phụ thuộc cơ sở dữ liệu hay dịch vụ ngoài.
 
 \subsubsection{Kiểm thử tích hợp (End-to-End Tests)}
 
