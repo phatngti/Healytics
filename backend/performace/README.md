@@ -20,8 +20,8 @@ pip install -r requirements.txt
 # 3. Run with web UI (default: http://localhost:8089)
 locust
 
-# 4. Or run headless
-locust --headless -u 10 -r 2 --run-time 60s
+# 4. Or run headless without stats-table output in the terminal
+locust --headless --only-summary --loglevel ERROR -u 10 -r 2 --run-time 60s > reports/locust_stdout.log
 ```
 
 ## Configuration
@@ -30,18 +30,40 @@ locust --headless -u 10 -r 2 --run-time 60s
 
 | Variable | Default | Description |
 |---|---|---|
-| `TARGET_HOST` | `http://localhost:3000` | Backend base URL |
-| `TEST_USER_EMAIL` | `testuser@example.com` | End-user login email |
-| `TEST_USER_PASSWORD` | `s3cureP@ssw0rd` | End-user login password |
-| `TEST_PARTNER_EMAIL` | `partner@clinic.com` | Partner login email |
-| `TEST_PARTNER_PASSWORD` | `StrongP@ssw0rd!` | Partner login password |
-| `TEST_ADMIN_EMAIL` | `admin@healytics.com` | Admin login email |
-| `TEST_ADMIN_PASSWORD` | `s3cureP@ssw0rd` | Admin login password |
+| `TARGET_HOST` | `http://localhost:8080` | Backend base URL |
+| `TEST_USER_EMAIL` | `user@healytics.vn` | End-user login email |
+| `TEST_USER_PASSWORD` | `user@123` | End-user login password |
+| `TEST_PARTNER_EMAIL` | `partner@healytics.vn` | Partner login email |
+| `TEST_PARTNER_PASSWORD` | `partner@123` | Partner login password |
+| `TEST_ADMIN_EMAIL` | `admin@healytics.vn` | Admin login email |
+| `TEST_ADMIN_PASSWORD` | `admin@123` | Admin login password |
+| `TEST_EMPLOYEE_EMAIL` | `employee.coordinator@healytics.vn` | Employee login email |
+| `TEST_EMPLOYEE_PASSWORD` | `employee@123` | Employee login password |
 | `MIN_WAIT` | `1` | Min wait between tasks (seconds) |
 | `MAX_WAIT` | `3` | Max wait between tasks (seconds) |
 | `PERF_ENABLE_MUTATIONS` | `0` | Enables controlled finance mutation tasks when set to `1` |
+| `PERF_ENABLE_EMPLOYEE_MUTATIONS` | `0` | Enables controlled employee appointment mutation tasks when set to `1` |
 | `DISCOVERY_PAGE_LIMIT` | `100` | Max rows fetched during seeded runtime discovery |
 | `FINANCE_STRESS_PERIODS` | `sevenDays,thirtyDays,ninetyDays` | Comma-separated partner finance periods used by stress tasks |
+
+#### Target thresholds and external observations
+
+| Variable | Default | Description |
+|---|---|---|
+| `PERF_API_P95_MS` | `200` | API response-time target, evaluated against aggregate p95 |
+| `PERF_TARGET_USERS` | `1000` | Concurrent-user target for target runs |
+| `PERF_TARGET_SPAWN_RATE` | `100` | Spawn rate used by `make perf-test-targets` |
+| `PERF_RUN_TIME` | `300s` | Run time used by `make perf-test-targets` |
+| `PERF_TARGET_TPS` | `500` | Throughput target in transactions/requests per second |
+| `PERF_MAX_ERROR_RATE_PERCENT` | `0.01` | Maximum allowed error rate percentage |
+| `PERF_APP_LOAD_MS` | `2000` | Application page-load target in milliseconds |
+| `PERF_APP_LOAD_RESULT_MS` | _(empty)_ | Optional externally measured page-load result |
+| `PERF_MAX_CPU_PERCENT` | `80` | Maximum CPU usage target |
+| `PERF_CPU_RESULT_PERCENT` | _(empty)_ | Optional externally measured maximum CPU usage |
+| `PERF_MAX_RAM_PERCENT` | `80` | Maximum RAM usage target |
+| `PERF_RAM_RESULT_PERCENT` | _(empty)_ | Optional externally measured maximum RAM usage |
+| `PERF_MAX_NETWORK_LATENCY_MS` | `100` | Network-latency target in milliseconds |
+| `PERF_NETWORK_LATENCY_RESULT_MS` | _(empty)_ | Optional externally measured network-latency result |
 
 #### WebSocket-specific
 
@@ -61,6 +83,10 @@ locust --host https://staging.healytics.com
 ## Viewing Reports
 
 After a test run completes, results are available through **three channels**:
+
+Headless Makefile runs keep Locust's stats-table stdout in
+`reports/locust_<timestamp>.stdout.log` and leave stderr visible so ERROR-level
+logs still appear in the terminal.
 
 ### 1. Web UI Dashboard (Interactive)
 
@@ -124,6 +150,8 @@ CSV files are auto-generated with the prefix `reports/stats`:
 | `reports/stats_stats_history.csv` | Time-series stats data |
 | `reports/stats_failures.csv` | Failed request details |
 | `reports/stats_exceptions.csv` | Exception traces |
+| `reports/target_report.md` | English performance target summary table |
+| `reports/target_report.csv` | CSV version of the target summary table |
 
 Import into Excel, Google Sheets, or use pandas for analysis:
 
@@ -174,6 +202,10 @@ Use `--tags` to run subsets:
 ```bash
 # HTTP API tests
 locust --tags auth             # Only auth flows
+locust --tags health           # Only health check
+locust --tags employee         # Employee app read-heavy flows
+locust --tags new-api          # Current new/updated API coverage
+locust --tags target           # Target-measured API mix
 locust --tags admin            # Only admin operations
 locust --tags products         # Only product CRUD
 locust --tags locations        # Only location browsing
@@ -183,7 +215,7 @@ locust --tags partner-finance  # Partner finance read-heavy stress
 locust --tags employee-analytics  # Partner employee analytics stress
 
 # Controlled finance mutations (disabled unless explicitly enabled)
-PERF_ENABLE_MUTATIONS=1 locust --tags finance-mutation -u 2 -r 1 --run-time 60s
+PERF_ENABLE_MUTATIONS=1 locust --headless --only-summary --tags finance-mutation -u 2 -r 1 --run-time 60s
 
 # WebSocket tests
 locust --tags ws               # All WebSocket tests
@@ -216,8 +248,29 @@ Make helpers:
 make perf-test-updated-stress
 make perf-test-partner-finance-stress
 make perf-test-employee-analytics-stress
+make perf-test-new-apis
+make perf-test-health
+make perf-test-employee
+make perf-test-targets
 PERF_ENABLE_MUTATIONS=1 make perf-test-updated-mutations
+PERF_ENABLE_EMPLOYEE_MUTATIONS=1 make perf-test-employee-mutations
 ```
+
+### English target report
+
+Every Locust run writes `reports/target_report.md` and
+`reports/target_report.csv` with these rows:
+
+| Criterion | Requirement | Result |
+|---|---:|---:|
+| API Response Time | `< 200 ms` | Locust aggregate p95 |
+| Application Page Load | `< 2,000 ms` | `PERF_APP_LOAD_RESULT_MS` or `Not measured` |
+| Concurrent Users | `>= 1,000` | Max observed Locust users |
+| Throughput | `>= 500 TPS` | Aggregate Locust requests per second |
+| Error Rate | `< 0.01%` | Aggregate Locust failure percentage |
+| Maximum CPU Usage | `< 80%` | `PERF_CPU_RESULT_PERCENT` or `Not measured` |
+| Maximum RAM Usage | `< 80%` | `PERF_RAM_RESULT_PERCENT` or `Not measured` |
+| Network Latency | `< 100 ms` | `PERF_NETWORK_LATENCY_RESULT_MS` or `Not measured` |
 
 ## WebSocket Testing
 

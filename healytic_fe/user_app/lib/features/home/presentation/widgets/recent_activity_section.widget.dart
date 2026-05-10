@@ -9,6 +9,9 @@ import 'package:user_app/features/orders/domain/entities/'
     'appointment.entity.dart';
 import 'package:user_app/theme/app_theme.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/features/home/presentation/widgets/'
+    'home_section_header.widget.dart';
+import 'package:user_app/router/routes.dart';
 
 /// Neutral card colour from the surface-container
 /// tier so cards stand out slightly without
@@ -23,19 +26,17 @@ class RecentActivitySection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final titleGap = AppDimens.titleGap(context);
     final asyncActivities = ref.watch(recentActivityProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Recent Activity',
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            letterSpacing: -0.5,
-          ),
+        HomeSectionHeader(
+          title: 'Recent Activity',
+          onViewAll: () {
+            const HomeRecentActivityRoute().push(context);
+          },
         ),
         SizedBox(height: titleGap),
         asyncActivities.when(
@@ -339,11 +340,9 @@ class _ActivityCard extends StatelessWidget {
         return _StatusStyle(
           icon: Symbols.payment,
           iconColor: semantic.warning!,
-          iconBgColor: semantic.warning!
-              .withValues(alpha: 0.1),
+          iconBgColor: semantic.warning!.withValues(alpha: 0.1),
           statusColor: semantic.warning!,
-          statusBgColor: semantic.warning!
-              .withValues(alpha: 0.1),
+          statusBgColor: semantic.warning!.withValues(alpha: 0.1),
           label: 'Pending Payment',
         );
       case 'completed':

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PartnersService } from '@/partners/partners.service';
+import { AccountService } from '@/account/account.service';
 import { RegisterDto } from './dto/request/register.dto';
 import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto';
 import { MockType } from '../../test/mocks/mock-types';
@@ -23,11 +24,16 @@ describe('AuthController', () => {
       registerPartner: jest.fn(),
     };
 
+    const mockAccountService: MockType<AccountService> = {
+      checkEmailExists: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
         { provide: AuthService, useValue: mockAuthService },
         { provide: PartnersService, useValue: mockPartnersService },
+        { provide: AccountService, useValue: mockAccountService },
       ],
     }).compile();
 

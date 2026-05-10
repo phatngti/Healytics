@@ -8,6 +8,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ## [Unreleased]
 
 ### Added
+- **Current/new API performance coverage**
+  - Refreshed generated DTOs from the synced OpenAPI contract.
+  - `locustfiles/health_api.py` — `/health` liveness checks.
+  - `locustfiles/auth_api.py` — `/auth/check-email`, user/partner/admin/employee login, and employee refresh coverage.
+  - `locustfiles/employee_api.py` — employee profile, revenue, appointment list/detail, and guarded appointment mutations.
+  - New tags: `health`, `auth`, `employee`, `employee-revenue`, `employee-appointments`, `new-api`, `target`, `employee-mutation`.
+  - English target reports: `reports/target_report.md` and `reports/target_report.csv`.
+  - New Make targets: `perf-test-new-apis`, `perf-test-health`, `perf-test-employee`, `perf-test-targets`, `perf-test-employee-mutations`.
 - **Updated-module stress tests** for the current backend OpenAPI contract
   - Refreshed `api_docs/openapi.json` from the root `openapi/openapi.json`
   - Regenerated Python DTOs for current modules, including Partner Finance and Partner Employee Analytics
