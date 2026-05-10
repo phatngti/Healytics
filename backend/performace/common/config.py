@@ -8,9 +8,16 @@ import os
 from pathlib import Path
 from datetime import datetime
 
+from dotenv import load_dotenv
+
 # ── Paths ─────────────────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 REPORTS_DIR = PROJECT_ROOT / "reports"
+
+# Load .env from the performance test root (won't override existing env vars)
+_ENV_FILE = PROJECT_ROOT / ".env"
+if _ENV_FILE.exists():
+    load_dotenv(_ENV_FILE, override=False)
 
 # ── Base URL ──────────────────────────────────────────────────────────────────
 BASE_URL = os.getenv("TARGET_HOST", "http://localhost:8080")
