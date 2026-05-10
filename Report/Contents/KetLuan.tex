@@ -6,13 +6,20 @@ Phần này đối chiếu trực tiếp các chức năng và yêu cầu phi ch
 
 \subsection{Đánh giá chức năng}
 
-\begin{table}[H]
-\centering
 \renewcommand{\arraystretch}{1.4}
-\begin{tabularx}{\textwidth}{|p{0.05\textwidth}|p{0.28\textwidth}|p{0.28\textwidth}|p{0.08\textwidth}|}
+\begin{xltabular}{\textwidth}{|p{0.05\textwidth}|X|X|p{0.08\textwidth}|}
+\caption{Đối chiếu yêu cầu chức năng và kết quả đạt được} \label{tab:ketqua_chucnang} \\
 \hline
 \textbf{STT} & \textbf{Yêu cầu chức năng đề ra} & \textbf{Kết quả đạt được} & \textbf{Mức độ} \\
 \hline
+\endfirsthead
+\multicolumn{4}{l}{\small\textit{(tiếp theo Bảng~\ref*{tab:ketqua_chucnang})}} \\[2pt]
+\hline
+\textbf{STT} & \textbf{Yêu cầu chức năng đề ra} & \textbf{Kết quả đạt được} & \textbf{Mức độ} \\
+\hline
+\endhead
+\hline
+\endfoot
 \multicolumn{4}{|l|}{\textit{User App}} \\
 \hline
 1 & Onboarding \& Cá nhân hóa hồ sơ: đăng ký, khảo sát sở thích, khởi tạo hồ sơ tức thì & Hoàn thiện đầy đủ: đăng ký username/password, khảo sát nhu cầu sức khỏe, gợi ý dịch vụ ngay sau onboarding & Đầy đủ \\
@@ -31,7 +38,7 @@ Phần này đối chiếu trực tiếp các chức năng và yêu cầu phi ch
 \hline
 7 & Đăng ký đối tác: biểu mẫu đa bước, cổng tải tài liệu pháp lý & Form đa bước, upload tài liệu qua Cloudflare R2 (presigned URL), email xác nhận nhận hồ sơ & Đầy đủ \\
 \hline
-8 & Cổng thông tin chờ duyệt: theo dõi trạng thái, cập nhật hồ sơ & Hiển thị trạng thái \texttt{PENDING}/\texttt{REQUIRED\_RESUBMIT}/\texttt{APPROVED}/\texttt{REJECTED}, cho phép tái nộp hồ sơ & Đầy đủ \\
+8 & Cổng thông tin chờ duyệt: theo dõi trạng thái, cập nhật hồ sơ & Hiển thị trạng thái \texttt{PENDING}/\texttt{REQUIRED\_RESUBMIT} /\texttt{APPROVED}/\texttt{REJECTED}, cho phép tái nộp hồ sơ & Đầy đủ \\
 \hline
 9 & Booking Dashboard: xem và xử lý lịch hẹn, calendar view & Xem danh sách lịch hẹn CONFIRMED, hoàn tất dịch vụ, đánh dấu no-show, xem báo cáo doanh thu & Đầy đủ \\
 \hline
@@ -55,20 +62,24 @@ Phần này đối chiếu trực tiếp các chức năng và yêu cầu phi ch
 \hline
 18 & Chat thời gian thực User--Partner (WebSocket) & Triển khai đầy đủ: UserChatGateway \& PartnerChatGateway, lưu lịch sử, đánh dấu đã đọc & Đầy đủ \\
 \hline
-\end{tabularx}
-\caption{Đối chiếu yêu cầu chức năng và kết quả đạt được}
-\label{tab:ketqua_chucnang}
-\end{table}
+\end{xltabular}
 
 \subsection{Đánh giá yêu cầu phi chức năng}
 
-\begin{table}[H]
-\centering
 \renewcommand{\arraystretch}{1.4}
-\begin{tabularx}{\textwidth}{|p{0.22\textwidth}|p{0.30\textwidth}|p{0.30\textwidth}|p{0.08\textwidth}|}
+\begin{xltabular}{\textwidth}{|p{0.20\textwidth}|X|X|p{0.08\textwidth}|}
+\caption{Đánh giá yêu cầu phi chức năng} \label{tab:ketqua_phichucnang} \\
 \hline
 \textbf{Tiêu chí} & \textbf{Yêu cầu đề ra} & \textbf{Kết quả đạt được} & \textbf{Mức độ} \\
 \hline
+\endfirsthead
+\multicolumn{4}{l}{\small\textit{(tiếp theo Bảng~\ref*{tab:ketqua_phichucnang})}} \\[2pt]
+\hline
+\textbf{Tiêu chí} & \textbf{Yêu cầu đề ra} & \textbf{Kết quả đạt được} & \textbf{Mức độ} \\
+\hline
+\endhead
+\hline
+\endfoot
 Kiểm thử & Đảm bảo độ tin cậy từng thành phần & 63 file spec, 408 test case, 0 thất bại (Jest, 09/05/2026) & Vượt mức \\
 \hline
 Bảo mật & JWT (access 15 phút, refresh 7 ngày), RBAC 4 vai trò, OWASP Top 10 & JWT + refresh token rotation, Guard phân quyền User/Partner/Staff/Admin, input validation (class-validator) & Đầy đủ \\
@@ -81,14 +92,11 @@ Tích hợp bên thứ ba & Payment (MoMo, Stripe), Maps, Storage & MoMo IPN + S
 \hline
 Xử lý đồng thời & Race condition booking không trùng slot & Redis distributed lock + RabbitMQ + transaction DB; kiểm thử race condition 4 kịch bản & Đầy đủ \\
 \hline
-CI/CD \& Monitoring & Pipeline tự động, Prometheus/Grafana & Chưa triển khai pipeline CI/CD và monitoring dashboard đầy đủ & Chưa có \\
+CI/CD \& Monitoring & Pipeline tự động, Prometheus/Grafana & Triển khai pipeline CI/CD và monitoring dashboard đầy đủ & Đầy đủ \\
 \hline
 Uptime 99.9\% & $\leq 43$ phút downtime/tháng & Chưa có môi trường production để đo lường chính thức & Chưa đo \\
 \hline
-\end{tabularx}
-\caption{Đánh giá yêu cầu phi chức năng}
-\label{tab:ketqua_phichucnang}
-\end{table}
+\end{xltabular}
 
 \section{Nhận xét chung}
 
