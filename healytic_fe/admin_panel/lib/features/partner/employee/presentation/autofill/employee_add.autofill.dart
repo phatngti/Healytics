@@ -7,15 +7,14 @@ import 'package:admin_panel/features/partner/employee/domain/therapist_level.dar
 import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
 import 'package:admin_panel/features/partner/employee/domain/work_history_key.dart';
 
-/// Dev-only autofill defaults for the Employee
+/// UAT-only autofill defaults for the Employee
 /// Add form.
 ///
 /// Activate via `?autofill=true`
 /// (e.g. `/provider/employee/add?autofill=true`).
 ///
 /// Uses the [forRole] factory to return
-/// role-appropriate autofill data. Only active
-/// when [kDebugMode] is `true`.
+/// role-appropriate autofill data.
 abstract final class EmployeeAddAutofill {
   /// Avatar URL shared across all roles.
   static const avatarUrl =

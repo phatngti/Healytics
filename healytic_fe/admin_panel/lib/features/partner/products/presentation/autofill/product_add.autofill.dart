@@ -1,13 +1,12 @@
 import 'package:admin_panel/features/partner/products/domain/facility_image_key.dart';
 
-/// Dev-only autofill defaults for the Product Add form.
+/// UAT-only autofill defaults for the Product Add form.
 ///
 /// Used when navigating to the Add Product screen with
 /// `?autofill=true`
 /// (e.g. `/provider/products/add?autofill=true`).
 ///
-/// Only active when [kDebugMode] is `true` — the
-/// guard lives in [ProductAddScreen], not here,
+/// The UAT guard lives in [ProductAddScreen],
 /// so this class stays pure.
 abstract final class ProductAddAutofill {
   static const name = 'Signature Rejuvenating Facial';

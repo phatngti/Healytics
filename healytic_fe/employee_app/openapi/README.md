@@ -100,6 +100,7 @@ Class | Method | HTTP request | Description
 *AdminNotificationsApi* | [**adminNotificationControllerCreateBroadcast**](doc//AdminNotificationsApi.md#adminnotificationcontrollercreatebroadcast) | **POST** /admin/notifications/broadcast | Create and send a system-wide broadcast notification
 *AdminNotificationsApi* | [**adminNotificationControllerGetBroadcasts**](doc//AdminNotificationsApi.md#adminnotificationcontrollergetbroadcasts) | **GET** /admin/notifications/broadcasts | List sent broadcast notifications (audit)
 *AdminPartnersApi* | [**adminPartnersControllerGetPartnerDetail**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartnerdetail) | **GET** /admin/partners/{id} | Get partner details including documents
+*AdminPartnersApi* | [**adminPartnersControllerGetPartnerStats**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartnerstats) | **GET** /admin/partners/stats | Get partner dashboard statistics
 *AdminPartnersApi* | [**adminPartnersControllerGetPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartners) | **GET** /admin/partners | List all partners
 *AdminPartnersApi* | [**adminPartnersControllerGetTotalPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergettotalpartners) | **GET** /admin/partners/total | Get total number of partners
 *AdminPartnersApi* | [**adminPartnersControllerReviewPartner**](doc//AdminPartnersApi.md#adminpartnerscontrollerreviewpartner) | **PUT** /admin/partners/{id}/review | Review partner profile
@@ -301,6 +302,12 @@ Class | Method | HTTP request | Description
  - [AdminFinanceTrendPointDto](doc//AdminFinanceTrendPointDto.md)
  - [AdminLoginDto](doc//AdminLoginDto.md)
  - [AdminPartnerDetailResponseDto](doc//AdminPartnerDetailResponseDto.md)
+ - [AdminPartnerItemDto](doc//AdminPartnerItemDto.md)
+ - [AdminPartnerScope](doc//AdminPartnerScope.md)
+ - [AdminPartnerSortBy](doc//AdminPartnerSortBy.md)
+ - [AdminPartnerSortDirection](doc//AdminPartnerSortDirection.md)
+ - [AdminPartnerStatsResponseDto](doc//AdminPartnerStatsResponseDto.md)
+ - [AdminPartnersResponseDto](doc//AdminPartnersResponseDto.md)
  - [AiRecommendationItemDto](doc//AiRecommendationItemDto.md)
  - [AnalyticsAlertDto](doc//AnalyticsAlertDto.md)
  - [AnalyticsBookingMetricsDto](doc//AnalyticsBookingMetricsDto.md)
@@ -460,7 +467,6 @@ Class | Method | HTTP request | Description
  - [PartnerHealthServiceEmployeeEligibilityDto](doc//PartnerHealthServiceEmployeeEligibilityDto.md)
  - [PartnerHealthServiceMediaDto](doc//PartnerHealthServiceMediaDto.md)
  - [PartnerHealthServiceResponseDto](doc//PartnerHealthServiceResponseDto.md)
- - [PartnerItemDto](doc//PartnerItemDto.md)
  - [PartnerLoginDto](doc//PartnerLoginDto.md)
  - [PartnerPayoutRecordDto](doc//PartnerPayoutRecordDto.md)
  - [PartnerPayoutStatus](doc//PartnerPayoutStatus.md)
@@ -486,7 +492,6 @@ Class | Method | HTTP request | Description
  - [PartnerTransactionTimelineEventDto](doc//PartnerTransactionTimelineEventDto.md)
  - [PartnerTransactionType](doc//PartnerTransactionType.md)
  - [PartnerVerificationStatus](doc//PartnerVerificationStatus.md)
- - [PartnersResponseDto](doc//PartnersResponseDto.md)
  - [PresignRequestDto](doc//PresignRequestDto.md)
  - [PresignResponseDto](doc//PresignResponseDto.md)
  - [PriceBreakdownDto](doc//PriceBreakdownDto.md)

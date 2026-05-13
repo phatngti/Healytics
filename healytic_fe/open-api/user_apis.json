@@ -3264,7 +3264,7 @@
             "name": "page",
             "required": false,
             "in": "query",
-            "description": "Page number",
+            "description": "Page number (1-indexed)",
             "schema": {
               "default": 1,
               "example": 1,
@@ -3283,19 +3283,21 @@
             }
           },
           {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerScope"
+            }
+          },
+          {
             "name": "verificationStatus",
             "required": false,
             "in": "query",
-            "description": "Filter by verification status (PENDING, REQUIRED_RESUBMIT, APPROVED, REJECTED)",
+            "description": "Explicit status filter",
             "schema": {
-              "example": "PENDING",
-              "enum": [
-                "PENDING",
-                "APPROVED",
-                "REJECTED",
-                "REQUIRED_RESUBMIT"
-              ],
-              "type": "string"
+              "$ref": "#/components/schemas/PartnerVerificationStatus"
             }
           },
           {
@@ -3307,15 +3309,129 @@
               "example": "spa",
               "type": "string"
             }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Column to sort by",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortBy"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortDirection"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of partners.",
+            "description": "Paginated list of partners.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PartnersResponseDto"
+                  "$ref": "#/components/schemas/AdminPartnersResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners/stats": {
+      "get": {
+        "operationId": "AdminPartnersController_getPartnerStats",
+        "summary": "Get partner dashboard statistics",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerScope"
+            }
+          },
+          {
+            "name": "verificationStatus",
+            "required": false,
+            "in": "query",
+            "description": "Explicit status filter",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerVerificationStatus"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by tax code, brand name, legal name, or email",
+            "schema": {
+              "example": "spa",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Column to sort by",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortBy"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortDirection"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "KPI card values.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPartnerStatsResponseDto"
                 }
               }
             }
@@ -3335,10 +3451,79 @@
       "get": {
         "operationId": "AdminPartnersController_getTotalPartners",
         "summary": "Get total number of partners",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerScope"
+            }
+          },
+          {
+            "name": "verificationStatus",
+            "required": false,
+            "in": "query",
+            "description": "Explicit status filter",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerVerificationStatus"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by tax code, brand name, legal name, or email",
+            "schema": {
+              "example": "spa",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Column to sort by",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortBy"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortDirection"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Total partner count.",
+            "description": "Filtered total partner count.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10099,7 +10284,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-12T16:42:03.066Z"
+              "submittedAt": "2026-05-13T08:51:30.593Z"
             }
           }
         },
@@ -16403,24 +16588,57 @@
           "createdAt"
         ]
       },
-      "PartnerItemDto": {
+      "AdminPartnerScope": {
+        "type": "string",
+        "enum": [
+          "VERIFICATION_QUEUE",
+          "ALL_PROVIDERS"
+        ]
+      },
+      "AdminPartnerSortBy": {
+        "type": "string",
+        "enum": [
+          "createdAt",
+          "brandName",
+          "legalName",
+          "verificationStatus",
+          "priority"
+        ]
+      },
+      "AdminPartnerSortDirection": {
+        "type": "string",
+        "enum": [
+          "ASC",
+          "DESC"
+        ]
+      },
+      "PartnerPriority": {
+        "type": "string",
+        "enum": [
+          "low",
+          "normal",
+          "high",
+          "urgent"
+        ]
+      },
+      "AdminPartnerItemDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "example": "uuid"
+            "example": "uuid-123"
           },
           "taxCode": {
             "type": "string",
             "example": "0123456789"
           },
-          "brandName": {
-            "type": "string",
-            "example": "Hanoi Spa"
-          },
           "legalName": {
             "type": "string",
             "example": "Hanoi Spa Co., Ltd"
+          },
+          "brandName": {
+            "type": "string",
+            "example": "Hanoi Spa"
           },
           "email": {
             "type": "string",
@@ -16439,30 +16657,46 @@
             "example": "PENDING",
             "$ref": "#/components/schemas/PartnerVerificationStatus"
           },
+          "priority": {
+            "example": "normal",
+            "$ref": "#/components/schemas/PartnerPriority"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string",
             "example": "2024-01-15T10:30:00Z"
+          },
+          "verificationCompletedAt": {
+            "type": "object",
+            "example": "2024-01-20T12:00:00Z",
+            "nullable": true
+          },
+          "isAccountActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the linked account is active"
           }
         },
         "required": [
           "id",
           "taxCode",
-          "brandName",
           "legalName",
+          "brandName",
           "email",
           "businessType",
           "verificationStatus",
-          "createdAt"
+          "priority",
+          "createdAt",
+          "isAccountActive"
         ]
       },
-      "PartnersResponseDto": {
+      "AdminPartnersResponseDto": {
         "type": "object",
         "properties": {
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PartnerItemDto"
+              "$ref": "#/components/schemas/AdminPartnerItemDto"
             }
           },
           "total": {
@@ -16485,6 +16719,67 @@
           "limit"
         ]
       },
+      "AdminPartnerStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "pendingReview": {
+            "type": "number",
+            "example": 12,
+            "description": "Partners awaiting admin review"
+          },
+          "highPriority": {
+            "type": "number",
+            "example": 3,
+            "description": "Review-queue partners with HIGH or URGENT priority"
+          },
+          "activeToday": {
+            "type": "number",
+            "example": 42,
+            "description": "Approved providers (active today v1)"
+          },
+          "avgWaitSeconds": {
+            "type": "number",
+            "example": 15120,
+            "description": "Average wait time in seconds"
+          },
+          "avgWaitTime": {
+            "type": "string",
+            "example": "4h 12m",
+            "description": "Formatted average wait time"
+          },
+          "totalProviders": {
+            "type": "number",
+            "example": 150,
+            "description": "Total providers across all statuses"
+          },
+          "requiredResubmit": {
+            "type": "number",
+            "example": 5,
+            "description": "Partners in REQUIRED_RESUBMIT status"
+          },
+          "approved": {
+            "type": "number",
+            "example": 100,
+            "description": "Partners with APPROVED status"
+          },
+          "rejected": {
+            "type": "number",
+            "example": 3,
+            "description": "Partners with REJECTED status"
+          }
+        },
+        "required": [
+          "pendingReview",
+          "highPriority",
+          "activeToday",
+          "avgWaitSeconds",
+          "avgWaitTime",
+          "totalProviders",
+          "requiredResubmit",
+          "approved",
+          "rejected"
+        ]
+      },
       "TotalPartnersResponseDto": {
         "type": "object",
         "properties": {
@@ -16496,15 +16791,6 @@
         },
         "required": [
           "total"
-        ]
-      },
-      "PartnerPriority": {
-        "type": "string",
-        "enum": [
-          "low",
-          "normal",
-          "high",
-          "urgent"
         ]
       },
       "AdminPartnerDetailResponseDto": {

@@ -7,43 +7,67 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'partner_verification_impl.repository.g.dart';
 
-/// Implementation of [PartnerVerificationRepository] delegating to data source
+/// Implementation of [PartnerVerificationRepository]
+/// delegating to the remote data source.
 class PartnerVerificationRepositoryImpl
     implements PartnerVerificationRepository {
   final PartnerVerificationRemoteDataSource dataSource;
 
-  PartnerVerificationRepositoryImpl({required this.dataSource});
+  PartnerVerificationRepositoryImpl({
+    required this.dataSource,
+  });
 
   @override
-  Future<List<PartnerVerificationEntity>> getPartnerVerifications({
+  Future<List<PartnerVerificationEntity>>
+      getPartnerVerifications({
     required int startingAt,
     required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
-  }) => dataSource.getPartnerVerifications(
-    startingAt: startingAt,
-    count: count,
-    sortedBy: sortedBy,
-    sortedAsc: sortedAsc,
-    statusFilter: statusFilter,
-  );
+  }) =>
+          dataSource.getPartnerVerifications(
+            startingAt: startingAt,
+            count: count,
+            scope: scope,
+            searchQuery: searchQuery,
+            sortedBy: sortedBy,
+            sortedAsc: sortedAsc,
+            statusFilter: statusFilter,
+          );
 
   @override
-  Future<int> getTotalRows({PartnerVerificationStatus? statusFilter}) =>
-      dataSource.getTotalRows(statusFilter: statusFilter);
+  Future<int> getTotalRows({
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    PartnerVerificationStatus? statusFilter,
+  }) =>
+      dataSource.getTotalRows(
+        scope: scope,
+        searchQuery: searchQuery,
+        statusFilter: statusFilter,
+      );
 
   @override
-  Future<PartnerVerificationDetailEntity> getPartnerDetailById(
+  Future<PartnerVerificationDetailEntity>
+      getPartnerDetailById(
     PartnerVerificationId id,
-  ) => dataSource.getPartnerDetailById(id);
+  ) =>
+          dataSource.getPartnerDetailById(id);
 
   @override
-  Future<void> approvePartner(PartnerVerificationId id) =>
+  Future<void> approvePartner(
+    PartnerVerificationId id,
+  ) =>
       dataSource.approvePartner(id);
 
   @override
-  Future<void> rejectPartner(PartnerVerificationId id, {String? reason}) =>
+  Future<void> rejectPartner(
+    PartnerVerificationId id, {
+    String? reason,
+  }) =>
       dataSource.rejectPartner(id, reason: reason);
 
   @override
@@ -52,19 +76,33 @@ class PartnerVerificationRepositoryImpl
     required String decision,
     String? generalComment,
     Map<String, String?>? fieldFeedback,
-  }) => dataSource.reviewPartner(
-    id,
-    decision: decision,
-    generalComment: generalComment,
-    fieldFeedback: fieldFeedback,
-  );
+  }) =>
+      dataSource.reviewPartner(
+        id,
+        decision: decision,
+        generalComment: generalComment,
+        fieldFeedback: fieldFeedback,
+      );
 
   @override
-  Future<PartnerVerificationStats> getStats() => dataSource.getStats();
+  Future<PartnerVerificationStats> getStats({
+    PartnerManagerScope scope =
+        PartnerManagerScope.verificationQueue,
+    String? searchQuery,
+  }) =>
+      dataSource.getStats(
+        scope: scope,
+        searchQuery: searchQuery,
+      );
 }
 
 @riverpod
-PartnerVerificationRepository partnerVerificationRepository(Ref ref) {
-  final dataSource = ref.read(partnerVerificationRemoteDataSourceProvider);
-  return PartnerVerificationRepositoryImpl(dataSource: dataSource);
+PartnerVerificationRepository
+    partnerVerificationRepository(Ref ref) {
+  final dataSource = ref.read(
+    partnerVerificationRemoteDataSourceProvider,
+  );
+  return PartnerVerificationRepositoryImpl(
+    dataSource: dataSource,
+  );
 }

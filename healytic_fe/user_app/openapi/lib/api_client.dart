@@ -272,6 +272,18 @@ class ApiClient {
           return AdminLoginDto.fromJson(value);
         case 'AdminPartnerDetailResponseDto':
           return AdminPartnerDetailResponseDto.fromJson(value);
+        case 'AdminPartnerItemDto':
+          return AdminPartnerItemDto.fromJson(value);
+        case 'AdminPartnerScope':
+          return AdminPartnerScopeTypeTransformer().decode(value);
+        case 'AdminPartnerSortBy':
+          return AdminPartnerSortByTypeTransformer().decode(value);
+        case 'AdminPartnerSortDirection':
+          return AdminPartnerSortDirectionTypeTransformer().decode(value);
+        case 'AdminPartnerStatsResponseDto':
+          return AdminPartnerStatsResponseDto.fromJson(value);
+        case 'AdminPartnersResponseDto':
+          return AdminPartnersResponseDto.fromJson(value);
         case 'AiRecommendationItemDto':
           return AiRecommendationItemDto.fromJson(value);
         case 'AnalyticsAlertDto':
@@ -590,8 +602,6 @@ class ApiClient {
           return PartnerHealthServiceMediaDto.fromJson(value);
         case 'PartnerHealthServiceResponseDto':
           return PartnerHealthServiceResponseDto.fromJson(value);
-        case 'PartnerItemDto':
-          return PartnerItemDto.fromJson(value);
         case 'PartnerLoginDto':
           return PartnerLoginDto.fromJson(value);
         case 'PartnerPayoutRecordDto':
@@ -642,8 +652,6 @@ class ApiClient {
           return PartnerTransactionTypeTypeTransformer().decode(value);
         case 'PartnerVerificationStatus':
           return PartnerVerificationStatusTypeTransformer().decode(value);
-        case 'PartnersResponseDto':
-          return PartnersResponseDto.fromJson(value);
         case 'PresignRequestDto':
           return PresignRequestDto.fromJson(value);
         case 'PresignResponseDto':
