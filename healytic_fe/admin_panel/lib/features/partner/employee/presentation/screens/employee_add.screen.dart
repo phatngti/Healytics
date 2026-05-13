@@ -1,5 +1,4 @@
-import 'package:admin_panel/core/entities/store.entity.dart';
-import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/config/autofill_config.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee_form_field.dart';
@@ -14,7 +13,6 @@ import 'package:admin_panel/features/partner/employee/presentation/layouts/emplo
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee.provider.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:admin_panel/theme/app_theme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,8 +21,8 @@ import 'package:uuid/uuid.dart';
 class EmployeeAddScreen extends ConsumerStatefulWidget {
   const EmployeeAddScreen({super.key, this.autofill = false});
 
-  /// Pre-fill all fields in debug builds
-  /// when `?autofill=true` is in URL.
+  /// Pre-fill all fields in UAT when
+  /// `?autofill=true` is in URL.
   final bool autofill;
 
   @override
@@ -404,9 +402,9 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final shouldAutofill =
-        kDebugMode &&
-        (widget.autofill || (Store.tryGet(StoreKey.autoFill) ?? false));
+    final shouldAutofill = AutofillConfig.isUatAutofillEnabled(
+      routeAutofill: widget.autofill,
+    );
     final initialValue = shouldAutofill
         ? _buildAutofillValues()
         : const <String, dynamic>{};

@@ -22,7 +22,7 @@ class EmployeeAddDesktop extends StatefulWidget {
   final Map<String, dynamic> initialValue;
 
   /// Whether to re-fill form fields on role change.
-  /// Only active in debug/staging builds.
+  /// Only active when UAT autofill is enabled.
   final bool shouldAutofill;
 
   /// Builds role-specific autofill values.
@@ -72,7 +72,7 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
       _selectedTherapistType = TherapistType.massage;
 
       // Rebuild FormBuilder with role-specific
-      // autofill data in debug / staging builds.
+      // autofill data in UAT.
       if (widget.shouldAutofill) {
         final values = widget.onBuildAutofillValues?.call(role.apiValue);
         if (values != null) {
@@ -110,9 +110,7 @@ class _EmployeeAddDesktopState extends State<EmployeeAddDesktop> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           final state = _formKey.currentState;
           if (state == null) return;
-          final isValid = state.fields.values.every(
-            (f) => f.isValid,
-          );
+          final isValid = state.fields.values.every((f) => f.isValid);
           if (isValid != _isFormValid) {
             setState(() => _isFormValid = isValid);
           }

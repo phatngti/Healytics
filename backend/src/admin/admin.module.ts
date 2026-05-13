@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AdminPartnersController } from './controllers/admin-partners.controller';
+import { AdminDashboardController } from './dashboard/admin-dashboard.controller';
+import { AdminDashboardService } from './dashboard/admin-dashboard.service';
 import { AdminFinanceController } from './finance/admin-finance.controller';
 import { AdminFinanceService } from './finance/admin-finance.service';
+import { ReconciliationJobService } from './finance/reconciliation-job.service';
 import { AdminPartnersService } from './services/admin-partners.service';
 import { ReviewPartnerHandler } from './application/handlers/review-partner.handler';
 import { Partner } from '@/common/entities/partner.entity';
@@ -24,6 +28,7 @@ import { PartnerTransactionTimeline } from '@/common/entities/partner-transactio
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([
       Partner,
       PartnerDocument,
@@ -43,10 +48,16 @@ import { PartnerTransactionTimeline } from '@/common/entities/partner-transactio
     AuditModule,
     PartnersModule,
   ],
-  controllers: [AdminPartnersController, AdminFinanceController],
+  controllers: [
+    AdminPartnersController,
+    AdminDashboardController,
+    AdminFinanceController,
+  ],
   providers: [
     AdminPartnersService,
+    AdminDashboardService,
     AdminFinanceService,
+    ReconciliationJobService,
     ReviewPartnerHandler, // ← handler registered
   ],
   exports: [AdminPartnersService],
