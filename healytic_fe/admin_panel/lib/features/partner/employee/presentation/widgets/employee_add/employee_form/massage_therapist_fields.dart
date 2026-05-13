@@ -6,9 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class MassageTherapistFields extends StatefulWidget {
+  final String? initialTherapistLevel;
+  final double? initialCommissionRate;
+  final String? initialHealthCheckDate;
+  final List<String> initialSkills;
   final String? initialStrengthLevel;
 
-  const MassageTherapistFields({super.key, this.initialStrengthLevel});
+  const MassageTherapistFields({
+    super.key,
+    this.initialTherapistLevel,
+    this.initialCommissionRate,
+    this.initialHealthCheckDate,
+    this.initialSkills = const [],
+    this.initialStrengthLevel,
+  });
 
   @override
   State<MassageTherapistFields> createState() => _MassageTherapistFieldsState();
@@ -42,6 +53,11 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final formEnabled = FormBuilder.of(context)?.enabled ?? true;
+    final initialLevel =
+        TherapistLevel.fromApiValue(
+          widget.initialTherapistLevel,
+        )?.displayName ??
+        widget.initialTherapistLevel;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,6 +71,7 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
                 label: 'Therapist Level',
                 items: _therapistLevels,
                 fieldKey: 'therapist_level',
+                initialValue: initialLevel,
               ),
             ),
             AppDimens.horizontalLarge,
@@ -69,6 +86,7 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
                   Icons.percent,
                   color: colorScheme.onSurfaceVariant,
                 ),
+                initialValue: widget.initialCommissionRate?.toString(),
               ),
             ),
           ],
@@ -183,6 +201,7 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
           searchHint: 'Search massage skills...',
           allowCreate: true,
           width: double.infinity,
+          initialValue: widget.initialSkills,
         ),
       ],
     );
@@ -216,7 +235,7 @@ class _StrengthButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
               color: isSelected
-                  ? colorScheme.primaryContainer.withOpacity(0.5)
+                  ? colorScheme.primaryContainer.withValues(alpha: 0.5)
                   : null,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
@@ -234,7 +253,9 @@ class _StrengthButton extends StatelessWidget {
                     ? colorScheme.primary
                     : (isEnabled
                           ? colorScheme.onSurfaceVariant
-                          : colorScheme.onSurfaceVariant.withOpacity(0.5)),
+                          : colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.5,
+                            )),
               ),
             ),
           ),

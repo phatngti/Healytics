@@ -176,37 +176,56 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   @override
-  Future<void> updateProduct(
-    UpdateProductRequest request,
-  ) async {
-    final dto = UpdatePartnerHealthServiceDto(
+  Future<void> updateProduct(UpdateProductRequest request) async {
+    final hasProductDefinitionChanges =
+        request.duration != null ||
+        request.buffer != null ||
+        request.capacity != null ||
+        request.leadTime != null ||
+        request.staffAllocation != null;
+    final dto = _SparseUpdatePartnerHealthServiceDto(
       name: request.name,
+      type: request.productType != null
+          ? _mapProductType(request.productType!)
+          : null,
       basePrice: request.basePrice,
+      salePrice: request.salePrice,
+      includeSalePrice: request.salePrice != null || request.clearSalePrice,
       description: request.description,
+      status: request.status != null ? _mapUpdateStatus(request.status!) : null,
+      isVisibleOnline: request.onlineStore,
       categoryId: request.category,
       employeeIds: request.staffIds,
+      productDefinition: hasProductDefinitionChanges
+          ? CreatePartnerHealthServiceDefinitionDto(
+              durationMinutes: request.duration ?? 60,
+              bufferMinutes: request.buffer ?? 0,
+              maxCapacity: request.capacity ?? 1,
+              minLeadTimeHours: request.leadTime ?? 0,
+              staffAssignmentType: request.staffAllocation != null
+                  ? _mapStaffAssignment(request.staffAllocation!)
+                  : CreatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum
+                        .any,
+            )
+          : null,
       media: request.images
           ?.asMap()
           .entries
           .map(
-            (entry) =>
-                CreatePartnerHealthServiceMediaDto(
+            (entry) => CreatePartnerHealthServiceMediaDto(
               url: entry.value,
-              mediaType:
-                  CreatePartnerHealthServiceMediaDtoMediaTypeEnum
-                      .image,
+              mediaType: CreatePartnerHealthServiceMediaDtoMediaTypeEnum.image,
               isThumbnail: entry.key == 0,
               sortOrder: entry.key,
             ),
           )
           .toList(),
-      serviceManual: _mapServiceManual(
-        request.serviceManual,
-      ),
+      serviceManual: _mapServiceManual(request.serviceManual),
+      includeServiceManual:
+          request.serviceManual != null || request.clearServiceManual,
     );
 
-    await _partnerHealthServicesApi
-        .partnerHealthServiceControllerUpdate(
+    await _partnerHealthServicesApi.partnerHealthServiceControllerUpdate(
       request.id.value.toString(),
       dto,
     );
@@ -247,6 +266,9 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       capacity: service?.maxCapacity?.toInt(),
       leadTime: service?.minLeadTimeHours?.toInt(),
       staffAllocation: service?.staffAssignmentType?.toLowerCase() ?? 'any',
+      staffIds: dto.productEmployeeEligibilities
+          .map((eligibility) => eligibility.employeeId)
+          .toList(),
 
       // Service Manual
       serviceManual: _mapServiceManualFromDto(dto.serviceManual),
@@ -270,6 +292,18 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       case 'draft':
       default:
         return CreatePartnerHealthServiceDtoStatusEnum.draft;
+    }
+  }
+
+  UpdatePartnerHealthServiceDtoStatusEnum _mapUpdateStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return UpdatePartnerHealthServiceDtoStatusEnum.active;
+      case 'archived':
+        return UpdatePartnerHealthServiceDtoStatusEnum.archived;
+      case 'draft':
+      default:
+        return UpdatePartnerHealthServiceDtoStatusEnum.draft;
     }
   }
 
@@ -347,6 +381,59 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   Future<List<ServiceTagResponseDto>> getServiceTags() async {
     final response = await _serviceTagsApi.serviceTagsControllerFindActive();
     return response ?? [];
+  }
+}
+
+class _SparseUpdatePartnerHealthServiceDto
+    extends UpdatePartnerHealthServiceDto {
+  _SparseUpdatePartnerHealthServiceDto({
+    super.categoryId,
+    super.description,
+    super.salePrice,
+    super.name,
+    super.type,
+    super.basePrice,
+    super.status,
+    super.isVisibleOnline,
+    super.employeeIds,
+    super.media,
+    super.productDefinition,
+    super.serviceManual,
+    this.includeSalePrice = false,
+    this.includeServiceManual = false,
+  });
+
+  final bool includeSalePrice;
+  final bool includeServiceManual;
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = <String, dynamic>{};
+
+    void addIfPresent(String key, Object? value) {
+      if (value != null) {
+        json[key] = value;
+      }
+    }
+
+    addIfPresent(r'categoryId', categoryId);
+    addIfPresent(r'description', description);
+    if (includeSalePrice) {
+      json[r'salePrice'] = salePrice;
+    }
+    addIfPresent(r'name', name);
+    addIfPresent(r'type', type);
+    addIfPresent(r'basePrice', basePrice);
+    addIfPresent(r'status', status);
+    addIfPresent(r'isVisibleOnline', isVisibleOnline);
+    addIfPresent(r'employeeIds', employeeIds);
+    addIfPresent(r'media', media);
+    addIfPresent(r'productDefinition', productDefinition);
+    if (includeServiceManual) {
+      json[r'serviceManual'] = serviceManual;
+    }
+
+    return json;
   }
 }
 

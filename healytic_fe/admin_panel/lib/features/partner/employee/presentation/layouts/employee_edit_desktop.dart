@@ -5,12 +5,12 @@ import 'package:admin_panel/features/partner/employee/domain/employee_role.dart'
 import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/doctor_fields_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/doctor_experience_card.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_documents_certifications_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_professional_role_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_work_schedule_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/employee_work_history_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/therapist_fields_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/employee_details_profile_section.dart';
-import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_details_documents_card.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -193,6 +193,7 @@ class _RightColumn extends StatelessWidget {
           initialRole: selectedRole,
           onRoleChanged: onRoleChanged,
           readOnly: !isEditing,
+          roleReadOnly: true,
           employee: employee,
         ),
 
@@ -203,6 +204,11 @@ class _RightColumn extends StatelessWidget {
             EmployeeRoleType.therapist => TherapistFieldsCard(
               key: const ValueKey('therapist'),
               initialTherapistType: _getTherapistType(employee),
+              initialTherapistLevel: _getTherapistLevel(employee),
+              initialCommissionRate: _getCommissionRate(employee),
+              initialHealthCheckDate: _getHealthCheckDate(employee),
+              initialSkills: _getTherapistSkills(employee),
+              initialDeviceProficiency: _getDeviceProficiency(employee),
               initialStrengthLevel: _getStrengthLevel(employee),
             ),
             EmployeeRoleType.doctor => Column(
@@ -227,9 +233,12 @@ class _RightColumn extends StatelessWidget {
           },
         ),
         AppDimens.verticalMedium,
-        EmployeeWorkHistoryCard(initialEntries: employee.workHistory),
+        EmployeeWorkHistoryCard(
+          initialEntries: employee.workHistory,
+          isEditing: isEditing,
+        ),
         AppDimens.verticalMedium,
-        EmployeeDetailsDocumentsCard(isEditing: isEditing),
+        const EmployeeDocumentsCertificationsCard(),
         AppDimens.verticalMedium,
         EmployeeWorkScheduleCard(initialSchedule: employee.workSchedule),
       ],
@@ -245,5 +254,34 @@ class _RightColumn extends StatelessWidget {
   String? _getStrengthLevel(EmployeeEntity employee) {
     if (employee is MassageTherapistEntity) return employee.strengthLevel;
     return null;
+  }
+
+  String? _getTherapistLevel(EmployeeEntity employee) {
+    if (employee is SpaTherapistEntity) return employee.therapistLevel;
+    if (employee is MassageTherapistEntity) return employee.therapistLevel;
+    return null;
+  }
+
+  double? _getCommissionRate(EmployeeEntity employee) {
+    if (employee is SpaTherapistEntity) return employee.commissionRate;
+    if (employee is MassageTherapistEntity) return employee.commissionRate;
+    return null;
+  }
+
+  String? _getHealthCheckDate(EmployeeEntity employee) {
+    if (employee is SpaTherapistEntity) return employee.healthCheckDate;
+    if (employee is MassageTherapistEntity) return employee.healthCheckDate;
+    return null;
+  }
+
+  List<String> _getTherapistSkills(EmployeeEntity employee) {
+    if (employee is SpaTherapistEntity) return employee.skills;
+    if (employee is MassageTherapistEntity) return employee.skills;
+    return const [];
+  }
+
+  List<String> _getDeviceProficiency(EmployeeEntity employee) {
+    if (employee is SpaTherapistEntity) return employee.deviceProficiency;
+    return const [];
   }
 }

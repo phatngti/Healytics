@@ -27,6 +27,7 @@ class PartnerPayoutStatus {
   static const inPayout = PartnerPayoutStatus._(r'inPayout');
   static const paidOut = PartnerPayoutStatus._(r'paidOut');
   static const failed = PartnerPayoutStatus._(r'failed');
+  static const held = PartnerPayoutStatus._(r'held');
 
   /// List of all possible values in this [enum][PartnerPayoutStatus].
   static const values = <PartnerPayoutStatus>[
@@ -34,6 +35,7 @@ class PartnerPayoutStatus {
     inPayout,
     paidOut,
     failed,
+    held,
   ];
 
   static PartnerPayoutStatus? fromJson(dynamic value) => PartnerPayoutStatusTypeTransformer().decode(value);
@@ -76,6 +78,7 @@ class PartnerPayoutStatusTypeTransformer {
         case r'inPayout': return PartnerPayoutStatus.inPayout;
         case r'paidOut': return PartnerPayoutStatus.paidOut;
         case r'failed': return PartnerPayoutStatus.failed;
+        case r'held': return PartnerPayoutStatus.held;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

@@ -196,6 +196,78 @@ class ApiClient {
           return AddressInfoDto.fromJson(value);
         case 'AdminCategoryResponseDto':
           return AdminCategoryResponseDto.fromJson(value);
+        case 'AdminFinanceAlertDto':
+          return AdminFinanceAlertDto.fromJson(value);
+        case 'AdminFinanceAuditEventDto':
+          return AdminFinanceAuditEventDto.fromJson(value);
+        case 'AdminFinanceCreateExportDto':
+          return AdminFinanceCreateExportDto.fromJson(value);
+        case 'AdminFinanceCreateNoteDto':
+          return AdminFinanceCreateNoteDto.fromJson(value);
+        case 'AdminFinanceExportJobDto':
+          return AdminFinanceExportJobDto.fromJson(value);
+        case 'AdminFinanceExportStatus':
+          return AdminFinanceExportStatusTypeTransformer().decode(value);
+        case 'AdminFinanceExportType':
+          return AdminFinanceExportTypeTypeTransformer().decode(value);
+        case 'AdminFinanceNoteActionDto':
+          return AdminFinanceNoteActionDto.fromJson(value);
+        case 'AdminFinanceNoteDto':
+          return AdminFinanceNoteDto.fromJson(value);
+        case 'AdminFinanceNoteEntityType':
+          return AdminFinanceNoteEntityTypeTypeTransformer().decode(value);
+        case 'AdminFinanceOverviewDto':
+          return AdminFinanceOverviewDto.fromJson(value);
+        case 'AdminFinancePageMetaDto':
+          return AdminFinancePageMetaDto.fromJson(value);
+        case 'AdminFinancePartnerExposureDto':
+          return AdminFinancePartnerExposureDto.fromJson(value);
+        case 'AdminFinancePayoutAttemptDto':
+          return AdminFinancePayoutAttemptDto.fromJson(value);
+        case 'AdminFinancePayoutDetailDto':
+          return AdminFinancePayoutDetailDto.fromJson(value);
+        case 'AdminFinancePayoutPageDto':
+          return AdminFinancePayoutPageDto.fromJson(value);
+        case 'AdminFinancePayoutRecordDto':
+          return AdminFinancePayoutRecordDto.fromJson(value);
+        case 'AdminFinancePeriod':
+          return AdminFinancePeriodTypeTransformer().decode(value);
+        case 'AdminFinanceProvider':
+          return AdminFinanceProviderTypeTransformer().decode(value);
+        case 'AdminFinanceProviderEventDto':
+          return AdminFinanceProviderEventDto.fromJson(value);
+        case 'AdminFinanceReconciliationDetailDto':
+          return AdminFinanceReconciliationDetailDto.fromJson(value);
+        case 'AdminFinanceReconciliationExceptionDto':
+          return AdminFinanceReconciliationExceptionDto.fromJson(value);
+        case 'AdminFinanceReconciliationPageDto':
+          return AdminFinanceReconciliationPageDto.fromJson(value);
+        case 'AdminFinanceReconciliationStatus':
+          return AdminFinanceReconciliationStatusTypeTransformer().decode(value);
+        case 'AdminFinanceReconciliationType':
+          return AdminFinanceReconciliationTypeTypeTransformer().decode(value);
+        case 'AdminFinanceRefundCaseDetailDto':
+          return AdminFinanceRefundCaseDetailDto.fromJson(value);
+        case 'AdminFinanceRefundCasePageDto':
+          return AdminFinanceRefundCasePageDto.fromJson(value);
+        case 'AdminFinanceRefundCaseRecordDto':
+          return AdminFinanceRefundCaseRecordDto.fromJson(value);
+        case 'AdminFinanceRequiredNoteActionDto':
+          return AdminFinanceRequiredNoteActionDto.fromJson(value);
+        case 'AdminFinanceReviewFlagActionDto':
+          return AdminFinanceReviewFlagActionDto.fromJson(value);
+        case 'AdminFinanceRiskTone':
+          return AdminFinanceRiskToneTypeTransformer().decode(value);
+        case 'AdminFinanceSettlementActionDto':
+          return AdminFinanceSettlementActionDto.fromJson(value);
+        case 'AdminFinanceTransactionDetailDto':
+          return AdminFinanceTransactionDetailDto.fromJson(value);
+        case 'AdminFinanceTransactionPageDto':
+          return AdminFinanceTransactionPageDto.fromJson(value);
+        case 'AdminFinanceTransactionRecordDto':
+          return AdminFinanceTransactionRecordDto.fromJson(value);
+        case 'AdminFinanceTrendPointDto':
+          return AdminFinanceTrendPointDto.fromJson(value);
         case 'AdminLoginDto':
           return AdminLoginDto.fromJson(value);
         case 'AdminPartnerDetailResponseDto':
@@ -474,8 +546,12 @@ class ApiClient {
           return MyProfileResponseDto.fromJson(value);
         case 'NotificationResponseDto':
           return NotificationResponseDto.fromJson(value);
+        case 'PaginatedEmployeeAppointmentsResponseDto':
+          return PaginatedEmployeeAppointmentsResponseDto.fromJson(value);
         case 'PaginationMeta':
           return PaginationMeta.fromJson(value);
+        case 'PaginationMetaResponseDto':
+          return PaginationMetaResponseDto.fromJson(value);
         case 'ParticipantInfoDto':
           return ParticipantInfoDto.fromJson(value);
         case 'PartnerCategorySummaryDto':

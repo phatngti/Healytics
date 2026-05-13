@@ -135,6 +135,10 @@ services:
       RABBITMQ_CA_CERT: /app/certs/ca_certificate.pem
       RABBITMQ_CLIENT_CERT: /app/certs/client_localhost_certificate.pem
       RABBITMQ_CLIENT_KEY: /app/certs/client_localhost_key.pem
+      # Elasticsearch (full-text search)
+      ELASTICSEARCH_NODE: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: elastic
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD:-elastic@123}
       # Enable test report at /test-report (HTML test results)
       SERVE_TEST_REPORT: '${SERVE_TEST_REPORT:-true}'
     volumes:
@@ -623,6 +627,99 @@ services:
       cloudflare-token-reader:
         condition: service_completed_successfully
 
+  # =============================================================================
+  # Elasticsearch + Kibana (full-text search)
+  # =============================================================================
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION:-8.17.0}
+    container_name: healytics-elasticsearch
+    profiles: ["dev", "prod"]
+    restart: unless-stopped
+    environment:
+      # Single-node discovery (no clustering overhead for dev/small-scale prod)
+      discovery.type: single-node
+      # JVM heap — tune via .env; defaults to 512m (good for dev)
+      ES_JAVA_OPTS: ${ES_JAVA_OPTS:--Xms512m -Xmx512m}
+      # Security (basic auth)
+      xpack.security.enabled: "true"
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-elastic@123}
+      # Disable enrollment token workflow (not needed for single-node)
+      xpack.security.enrollment.enabled: "false"
+      # Disable HTTPS on transport/http layer for Docker-internal traffic
+      xpack.security.http.ssl.enabled: "false"
+      xpack.security.transport.ssl.enabled: "false"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - "${ES_PORT:-9200}:9200"
+    networks:
+      - services
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS -u elastic:${ELASTIC_PASSWORD:-elastic@123} http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"'"
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 45s
+    # Elasticsearch needs vm.max_map_count >= 262144 on the Docker host.
+    # On macOS Docker Desktop this is set automatically.
+    # On Linux: sysctl -w vm.max_map_count=262144
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ES_VERSION:-8.17.0}
+    container_name: healytics-kibana
+    profiles: ["dev", "prod"]
+    restart: unless-stopped
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: kibana_system
+      ELASTICSEARCH_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-kibana@123}
+      # Disable telemetry
+      TELEMETRY_ENABLED: "false"
+    ports:
+      - "${KIBANA_PORT:-5601}:5601"
+    networks:
+      - services
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5601/api/status | grep -q 'available'"]
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 60s
+
+  # One-shot init container: sets the kibana_system password so Kibana can
+  # connect to Elasticsearch with xpack.security.enabled=true.
+  elasticsearch-init:
+    image: curlimages/curl:latest
+    container_name: elasticsearch-init
+    profiles: ["dev", "prod"]
+    restart: "no"
+    networks:
+      - services
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    command:
+      - /bin/sh
+      - -c
+      - |
+        curl -fsS -X POST -u elastic:${ELASTIC_PASSWORD:-elastic@123} \
+          -H 'Content-Type: application/json' \
+          http://elasticsearch:9200/_security/user/kibana_system/_password \
+          -d '{"password":"${KIBANA_SYSTEM_PASSWORD:-kibana@123}"}'
+        echo "\n✅ kibana_system password configured"
+
 volumes:
   pgdata:
   redisdata:
@@ -636,3 +733,4 @@ volumes:
   jenkins_agent_workdir:
   tunnel-token:
   tunnel-token-dev:
+  esdata:

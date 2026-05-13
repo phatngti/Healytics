@@ -6,7 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SpaTherapistFields extends ConsumerStatefulWidget {
-  const SpaTherapistFields({super.key});
+  final String? initialTherapistLevel;
+  final double? initialCommissionRate;
+  final String? initialHealthCheckDate;
+  final List<String> initialSkills;
+  final List<String> initialDeviceProficiency;
+
+  const SpaTherapistFields({
+    super.key,
+    this.initialTherapistLevel,
+    this.initialCommissionRate,
+    this.initialHealthCheckDate,
+    this.initialSkills = const [],
+    this.initialDeviceProficiency = const [],
+  });
 
   @override
   ConsumerState<SpaTherapistFields> createState() => _SpaTherapistFieldsState();
@@ -31,6 +44,12 @@ class _SpaTherapistFieldsState extends ConsumerState<SpaTherapistFields> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final initialLevel =
+        TherapistLevel.fromApiValue(
+          widget.initialTherapistLevel,
+        )?.displayName ??
+        widget.initialTherapistLevel ??
+        _therapistLevels.first;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +63,7 @@ class _SpaTherapistFieldsState extends ConsumerState<SpaTherapistFields> {
                 label: 'Therapist Level',
                 items: _therapistLevels,
                 fieldKey: 'therapist_level',
-                initialValue: _therapistLevels.first,
+                initialValue: initialLevel,
               ),
             ),
             AppDimens.horizontalLarge,
@@ -59,6 +78,7 @@ class _SpaTherapistFieldsState extends ConsumerState<SpaTherapistFields> {
                   Icons.percent,
                   color: colorScheme.onSurfaceVariant,
                 ),
+                initialValue: widget.initialCommissionRate?.toString(),
               ),
             ),
           ],
@@ -88,6 +108,7 @@ class _SpaTherapistFieldsState extends ConsumerState<SpaTherapistFields> {
               searchHint: 'Search spa skills...',
               allowCreate: true,
               width: double.infinity,
+              initialValue: widget.initialSkills,
             );
           },
         ),
@@ -107,6 +128,7 @@ class _SpaTherapistFieldsState extends ConsumerState<SpaTherapistFields> {
               label: 'Device Proficiency',
               items: snapshot.data ?? {},
               searchHint: 'Search device proficiency...',
+              initialValue: widget.initialDeviceProficiency,
             );
           },
         ),

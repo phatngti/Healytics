@@ -160,7 +160,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **employeeAppointmentsControllerListMyAppointments**
-> employeeAppointmentsControllerListMyAppointments(status, page, limit)
+> PaginatedEmployeeAppointmentsResponseDto employeeAppointmentsControllerListMyAppointments(status, page, limit)
 
 List my appointments
 
@@ -180,7 +180,8 @@ final page = 8.14; // num | Page number
 final limit = 8.14; // num | Items per page
 
 try {
-    api_instance.employeeAppointmentsControllerListMyAppointments(status, page, limit);
+    final result = api_instance.employeeAppointmentsControllerListMyAppointments(status, page, limit);
+    print(result);
 } catch (e) {
     print('Exception when calling EmployeeAppointmentsApi->employeeAppointmentsControllerListMyAppointments: $e\n');
 }
@@ -196,7 +197,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-void (empty response body)
+[**PaginatedEmployeeAppointmentsResponseDto**](PaginatedEmployeeAppointmentsResponseDto.md)
 
 ### Authorization
 
@@ -205,7 +206,7 @@ void (empty response body)
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
+ - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

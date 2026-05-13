@@ -21,5 +21,8 @@ abstract class EmployeeAppointmentRepository {
   Future<bool> completeService(String id);
 
   /// Cancels an upcoming appointment.
-  Future<bool> cancelAppointment(String id);
+  Future<bool> cancelAppointment(
+    String id, {
+    String? reason,
+  });
 }
