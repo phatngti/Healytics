@@ -47,6 +47,43 @@ class _EmployeeDocsCertCardState
   bool _isExpanded = true;
   bool _isUploading = false;
 
+  // ── Validation ──────────────────────────────
+
+  /// Validates that both required documents
+  /// (license and identity card) are uploaded.
+  String? _validateRequiredDocuments(List<Map<String, dynamic>>? value) {
+    final groups = value ?? [];
+    final hasLicense = _hasDocInGroup(groups, DocFieldKey.license);
+    final hasIdCard = _hasDocInGroup(groups, DocFieldKey.idCard);
+    if (!hasLicense && !hasIdCard) {
+      return 'Both Professional License and '
+          'Identity Card are required';
+    }
+    if (!hasLicense) {
+      return 'Professional License / '
+          'Practice Permit is required';
+    }
+    if (!hasIdCard) {
+      return 'Identity Card / Passport '
+          'is required';
+    }
+    return null;
+  }
+
+  /// Checks whether a group identified by
+  /// [fieldKey] has at least one document.
+  bool _hasDocInGroup(List<Map<String, dynamic>> groups, String fieldKey) {
+    for (final g in groups) {
+      if (g['fieldKey'] == fieldKey) {
+        final docs = g['documents'];
+        if (docs is List && docs.isNotEmpty) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   // ── Document list helpers ────────────────────
 
   /// Returns the current grouped doc list from the
@@ -383,9 +420,11 @@ class _EmployeeDocsCertCardState
       child: FormBuilderField<List<Map<String, dynamic>>>(
         name: EmployeeFormField.verificationDocuments.key,
         enabled: FormBuilder.of(context)?.enabled ?? true,
+        validator: _validateRequiredDocuments,
         builder: (field) {
           final groups = _currentGroups(field);
           final formEnabled = field.widget.enabled;
+          final hasError = field.errorText != null;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -402,6 +441,15 @@ class _EmployeeDocsCertCardState
               _buildRequiredSection(context, groups, field, formEnabled),
               AppDimens.verticalLarge,
               _buildOtherDocumentsSection(context, groups, field, formEnabled),
+              if (hasError) ...[
+                AppDimens.verticalSmall,
+                Text(
+                  field.errorText!,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: colorScheme.error),
+                ),
+              ],
             ],
           );
         },
@@ -420,11 +468,24 @@ class _EmployeeDocsCertCardState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'REQUIRED DOCUMENTS',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
+        Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: 'REQUIRED DOCUMENTS',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const TextSpan(
+                text: ' *',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
         AppDimens.verticalMedium,
@@ -440,6 +501,7 @@ class _EmployeeDocsCertCardState
           uploadIcon: Icons.badge,
           typeLabel: 'License / Permit',
           formEnabled: formEnabled,
+          isRequired: true,
         ),
         AppDimens.verticalMedium,
         _buildSingleDocRow(
@@ -452,6 +514,7 @@ class _EmployeeDocsCertCardState
           uploadIcon: Icons.perm_identity,
           typeLabel: 'Identity Card',
           formEnabled: formEnabled,
+          isRequired: true,
         ),
       ],
     );
@@ -469,6 +532,7 @@ class _EmployeeDocsCertCardState
     required IconData uploadIcon,
     required String typeLabel,
     required bool formEnabled,
+    bool isRequired = false,
   }) {
     final group = _findGroup(groups, fieldKey);
     final docs = _docsFromGroup(group);
@@ -479,6 +543,7 @@ class _EmployeeDocsCertCardState
         icon: uploadIcon,
         title: _isUploading ? 'Uploading...' : uploadTitle,
         subtitle: uploadSubtitle,
+        isRequired: isRequired,
         onUpload: !formEnabled || _isUploading
             ? null
             : () => _pickAndUpload((fileName, url) {
@@ -499,6 +564,7 @@ class _EmployeeDocsCertCardState
     return _UploadedDocumentTile(
       fileName: _fileNameFromUrl(url, name),
       typeLabel: typeLabel,
+      isRequired: isRequired,
       onView: url.isNotEmpty ? () => _viewDocument(url) : null,
       onReplace: formEnabled
           ? () => _pickAndUpload((fileName, newUrl) {
@@ -695,12 +761,14 @@ class _DocumentUploadTile extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onUpload,
+    this.isRequired = false,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback? onUpload;
+  final bool isRequired;
 
   @override
   Widget build(BuildContext context) {
@@ -719,11 +787,19 @@ class _DocumentUploadTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    if (isRequired)
+                      Text(' *', style: TextStyle(color: Colors.red)),
+                  ],
                 ),
                 Text(
                   subtitle,
@@ -753,6 +829,7 @@ class _UploadedDocumentTile extends StatelessWidget {
   const _UploadedDocumentTile({
     required this.fileName,
     required this.typeLabel,
+    this.isRequired = false,
     this.onView,
     this.onReplace,
     this.onRemove,
@@ -760,6 +837,7 @@ class _UploadedDocumentTile extends StatelessWidget {
 
   final String fileName;
   final String typeLabel;
+  final bool isRequired;
   final VoidCallback? onView;
   final VoidCallback? onReplace;
   final VoidCallback? onRemove;
@@ -781,13 +859,26 @@ class _UploadedDocumentTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  fileName,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        fileName,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (isRequired)
+                      Text(
+                        ' *',
+                        style: TextStyle(
+                          color: cs.error,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                  ],
                 ),
                 _typeBadge(context, cs),
               ],

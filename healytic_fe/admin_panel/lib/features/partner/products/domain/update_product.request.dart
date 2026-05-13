@@ -22,7 +22,7 @@ abstract class UpdateProductRequest with _$UpdateProductRequest {
     int? duration,
     int? buffer,
     int? capacity,
-    int? leadTime,
+
     String? staffAllocation,
     List<String>? images,
     String? category,

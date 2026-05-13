@@ -7,28 +7,48 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'account_me.provider.g.dart';
 
-/// Fetches the current authenticated user's account
-/// details from the `/account/me` endpoint.
+/// Manages the current authenticated user's account
+/// fetched from `/account/me`.
 ///
-/// In mock mode, returns synthetic data to avoid
-/// hitting the real API with an invalid mock token
-/// (which would trigger a 401 → session clear →
-/// redirect back to login).
-///
-/// Kept alive so the header doesn't refetch on every
-/// rebuild. Invalidate manually after profile edits.
+/// Lifecycle:
+/// - **Login**: call [refresh] after successful sign-in
+///   to eagerly fetch and cache account data.
+/// - **Logout**: call [clear] to reset state
+///   synchronously (avoids disposed-ref crashes).
+/// - **Header**: watches this provider to display
+///   user name / role; kept alive so it persists
+///   across rebuilds.
 @Riverpod(keepAlive: true)
-Future<AccountMeResponseDto?> accountMe(Ref ref) async {
-  final isMock =
-      Store.tryGet(StoreKey.mockFlag) ?? false;
+class AccountMe extends _$AccountMe {
+  @override
+  Future<AccountMeResponseDto?> build() async {
+    final isMock =
+        Store.tryGet(StoreKey.mockFlag) ?? false;
 
-  if (isMock) {
-    return _buildMockAccount();
+    if (isMock) {
+      return _buildMockAccount();
+    }
+
+    final apiService = ref.watch(apiServiceProvider);
+    return apiService.accountApi
+        .accountControllerGetMe();
   }
 
-  final apiService = ref.watch(apiServiceProvider);
-  return apiService.accountApi
-      .accountControllerGetMe();
+  /// Re-fetches account data from the API.
+  ///
+  /// Call after login succeeds so the header
+  /// immediately shows the new user's info.
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() => build());
+  }
+
+  /// Resets state to `null` without triggering a
+  /// new fetch. Safe to call even after async gaps
+  /// because it only mutates local notifier state.
+  void clear() {
+    state = const AsyncData(null);
+  }
 }
 
 /// Builds a synthetic [AccountMeResponseDto] for

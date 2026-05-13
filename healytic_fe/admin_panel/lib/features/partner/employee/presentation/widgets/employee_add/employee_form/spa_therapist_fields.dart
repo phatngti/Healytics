@@ -64,6 +64,7 @@ class _SpaTherapistFieldsState extends ConsumerState<SpaTherapistFields> {
                 items: _therapistLevels,
                 fieldKey: 'therapist_level',
                 initialValue: initialLevel,
+                isRequired: true,
               ),
             ),
             AppDimens.horizontalLarge,
@@ -79,6 +80,7 @@ class _SpaTherapistFieldsState extends ConsumerState<SpaTherapistFields> {
                   color: colorScheme.onSurfaceVariant,
                 ),
                 initialValue: widget.initialCommissionRate?.toString(),
+                isRequired: true,
               ),
             ),
           ],
@@ -89,6 +91,7 @@ class _SpaTherapistFieldsState extends ConsumerState<SpaTherapistFields> {
           fieldKey: 'health_check_date',
           label: 'Last Health Check',
           hintText: 'Select date',
+          isRequired: true,
         ),
         AppDimens.verticalMedium,
         FutureBuilder<Map<String, String>>(
@@ -109,6 +112,7 @@ class _SpaTherapistFieldsState extends ConsumerState<SpaTherapistFields> {
               allowCreate: true,
               width: double.infinity,
               initialValue: widget.initialSkills,
+              isRequired: true,
             );
           },
         ),
@@ -129,6 +133,7 @@ class _SpaTherapistFieldsState extends ConsumerState<SpaTherapistFields> {
               items: snapshot.data ?? {},
               searchHint: 'Search device proficiency...',
               initialValue: widget.initialDeviceProficiency,
+              isRequired: true,
             );
           },
         ),

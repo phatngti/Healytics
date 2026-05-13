@@ -578,6 +578,7 @@ class FormFieldBuilders {
   /// [height] - Height of the editor container.
   /// [labelStyle] - Optional custom label style.
   /// [enabled] - Whether the field is enabled.
+  /// [isRequired] - Whether the field is required.
   static Widget buildQuillEditor(
     BuildContext context, {
     required String label,
@@ -587,6 +588,7 @@ class FormFieldBuilders {
     double height = 250,
     TextStyle? labelStyle,
     bool enabled = true,
+    bool isRequired = false,
     Key? widgetKey,
   }) {
     final widget = _AppQuillEditorField(
@@ -597,6 +599,7 @@ class FormFieldBuilders {
       height: height,
       labelStyle: labelStyle,
       enabled: enabled,
+      isRequired: isRequired,
     );
 
     if (widgetKey != null) {

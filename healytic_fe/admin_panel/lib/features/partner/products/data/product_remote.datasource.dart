@@ -122,7 +122,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
         durationMinutes: request.duration ?? 60,
         bufferMinutes: request.buffer,
         maxCapacity: request.capacity,
-        minLeadTimeHours: request.leadTime,
+
         staffAssignmentType: _mapStaffAssignment(request.staffAllocation),
       );
     }
@@ -181,7 +181,6 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
         request.duration != null ||
         request.buffer != null ||
         request.capacity != null ||
-        request.leadTime != null ||
         request.staffAllocation != null;
     final dto = _SparseUpdatePartnerHealthServiceDto(
       name: request.name,
@@ -201,7 +200,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
               durationMinutes: request.duration ?? 60,
               bufferMinutes: request.buffer ?? 0,
               maxCapacity: request.capacity ?? 1,
-              minLeadTimeHours: request.leadTime ?? 0,
+
               staffAssignmentType: request.staffAllocation != null
                   ? _mapStaffAssignment(request.staffAllocation!)
                   : CreatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum
@@ -519,7 +518,7 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
       duration: request.duration,
       buffer: request.buffer,
       capacity: request.capacity,
-      leadTime: request.leadTime,
+
       staffAllocation: request.staffAllocation,
     );
   }
