@@ -3451,6 +3451,2408 @@
         ]
       }
     },
+    "/admin/finance/summary": {
+      "get": {
+        "operationId": "AdminFinanceController_getSummary",
+        "summary": "Get platform-wide admin finance summary metrics",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceOverviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/trend": {
+      "get": {
+        "operationId": "AdminFinanceController_getTrend",
+        "summary": "Get platform-wide finance trend data",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFinanceTrendPointDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/alerts": {
+      "get": {
+        "operationId": "AdminFinanceController_getAlerts",
+        "summary": "Get derived operational finance alerts",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFinanceAlertDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/transactions": {
+      "get": {
+        "operationId": "AdminFinanceController_getTransactions",
+        "summary": "List platform ledger transactions",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceTransactionPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/transactions/{id}": {
+      "get": {
+        "operationId": "AdminFinanceController_getTransactionDetail",
+        "summary": "Get platform ledger transaction detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceTransactionDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/transactions/{id}/settlement": {
+      "patch": {
+        "operationId": "AdminFinanceController_markSettlement",
+        "summary": "Mark transaction settlement status with an admin note",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceSettlementActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceTransactionRecordDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid settlement transition or missing note"
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/transactions/{id}/review-flag": {
+      "patch": {
+        "operationId": "AdminFinanceController_flagTransaction",
+        "summary": "Flag or unflag a transaction for finance review",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceReviewFlagActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceTransactionRecordDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/payouts": {
+      "get": {
+        "operationId": "AdminFinanceController_getPayouts",
+        "summary": "List platform payouts",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinancePayoutPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/payouts/{id}": {
+      "get": {
+        "operationId": "AdminFinanceController_getPayoutDetail",
+        "summary": "Get payout detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinancePayoutDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payout not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/payouts/{id}/retry": {
+      "post": {
+        "operationId": "AdminFinanceController_retryPayout",
+        "summary": "Retry a failed or held payout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinancePayoutDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/payouts/{id}/hold": {
+      "post": {
+        "operationId": "AdminFinanceController_holdPayout",
+        "summary": "Place an admin hold on a payout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceRequiredNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinancePayoutDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/payouts/{id}/release-hold": {
+      "post": {
+        "operationId": "AdminFinanceController_releasePayoutHold",
+        "summary": "Release an admin hold from a payout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinancePayoutDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/refund-cases": {
+      "get": {
+        "operationId": "AdminFinanceController_getRefundCases",
+        "summary": "List platform refund and dispute cases",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceRefundCasePageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/refund-cases/{id}": {
+      "get": {
+        "operationId": "AdminFinanceController_getRefundCaseDetail",
+        "summary": "Get refund or dispute case detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceRefundCaseDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Refund case not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/refund-cases/{id}/approve": {
+      "post": {
+        "operationId": "AdminFinanceController_approveRefundCase",
+        "summary": "Approve a refund or dispute case",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceRefundCaseDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/refund-cases/{id}/reject": {
+      "post": {
+        "operationId": "AdminFinanceController_rejectRefundCase",
+        "summary": "Reject a refund or dispute case",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceRequiredNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceRefundCaseDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/reconciliation": {
+      "get": {
+        "operationId": "AdminFinanceController_getReconciliation",
+        "summary": "List reconciliation exceptions",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceReconciliationPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/reconciliation/{id}": {
+      "get": {
+        "operationId": "AdminFinanceController_getReconciliationDetail",
+        "summary": "Get reconciliation exception detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceReconciliationDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reconciliation exception not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/reconciliation/{id}/resolve": {
+      "post": {
+        "operationId": "AdminFinanceController_resolveReconciliation",
+        "summary": "Resolve a reconciliation exception",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceRequiredNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceReconciliationDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/reconciliation/{id}/reopen": {
+      "post": {
+        "operationId": "AdminFinanceController_reopenReconciliation",
+        "summary": "Reopen a reconciliation exception",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceReconciliationDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/partner-exposure": {
+      "get": {
+        "operationId": "AdminFinanceController_getPartnerExposure",
+        "summary": "Rank partner financial exposure",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFinancePartnerExposureDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/exports": {
+      "get": {
+        "operationId": "AdminFinanceController_getExports",
+        "summary": "List finance export jobs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFinanceExportJobDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "AdminFinanceController_createExport",
+        "summary": "Create a finance export job",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceCreateExportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceExportJobDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/notes": {
+      "post": {
+        "operationId": "AdminFinanceController_addNote",
+        "summary": "Add a note to a finance entity",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceCreateNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceNoteDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/admin/audit-logs": {
       "get": {
         "operationId": "AuditController_getAuditLogs",
@@ -3766,7 +6168,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Return paginated list of employee appointments."
+            "description": "Return paginated list of employee appointments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedEmployeeAppointmentsResponseDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -7690,7 +10099,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-07T13:13:24.747Z"
+              "submittedAt": "2026-05-12T16:42:03.066Z"
             }
           }
         },
@@ -14198,6 +16607,1044 @@
           "message"
         ]
       },
+      "AdminFinancePeriod": {
+        "type": "string",
+        "enum": [
+          "sevenDays",
+          "thirtyDays",
+          "ninetyDays",
+          "thisMonth",
+          "lastMonth",
+          "custom"
+        ]
+      },
+      "PartnerCommerceSourceType": {
+        "type": "string",
+        "enum": [
+          "serviceBooking",
+          "productOrder"
+        ]
+      },
+      "PartnerTransactionType": {
+        "type": "string",
+        "enum": [
+          "charge",
+          "refund",
+          "adjustment",
+          "payout",
+          "fee"
+        ]
+      },
+      "PartnerTransactionStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "paid",
+          "refunded",
+          "failed",
+          "canceled"
+        ]
+      },
+      "PartnerSettlementStatus": {
+        "type": "string",
+        "enum": [
+          "unsettled",
+          "scheduled",
+          "settled",
+          "held"
+        ]
+      },
+      "PartnerPayoutStatus": {
+        "type": "string",
+        "enum": [
+          "notAssigned",
+          "inPayout",
+          "paidOut",
+          "failed",
+          "held"
+        ]
+      },
+      "PartnerRefundCaseStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "underReview",
+          "approved",
+          "rejected"
+        ]
+      },
+      "PartnerRefundCaseType": {
+        "type": "string",
+        "enum": [
+          "refund",
+          "dispute"
+        ]
+      },
+      "AdminFinanceReconciliationStatus": {
+        "type": "string",
+        "enum": [
+          "open",
+          "underReview",
+          "resolved",
+          "reopened"
+        ]
+      },
+      "AdminFinanceProvider": {
+        "type": "string",
+        "enum": [
+          "stripe",
+          "momo",
+          "vnpay",
+          "bankTransfer",
+          "manual"
+        ]
+      },
+      "AdminFinanceOverviewDto": {
+        "type": "object",
+        "properties": {
+          "grossVolume": {
+            "type": "number"
+          },
+          "netRevenue": {
+            "type": "number"
+          },
+          "platformFeeRevenue": {
+            "type": "number"
+          },
+          "refundExposure": {
+            "type": "number"
+          },
+          "failedPaymentAmount": {
+            "type": "number"
+          },
+          "pendingPayoutAmount": {
+            "type": "number"
+          },
+          "heldPayoutAmount": {
+            "type": "number"
+          },
+          "unreconciledAmount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          }
+        },
+        "required": [
+          "grossVolume",
+          "netRevenue",
+          "platformFeeRevenue",
+          "refundExposure",
+          "failedPaymentAmount",
+          "pendingPayoutAmount",
+          "heldPayoutAmount",
+          "unreconciledAmount",
+          "currency"
+        ]
+      },
+      "AdminFinanceTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-05-12"
+          },
+          "grossAmount": {
+            "type": "number"
+          },
+          "netAmount": {
+            "type": "number"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "payoutAmount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "grossAmount",
+          "netAmount",
+          "refundAmount",
+          "payoutAmount"
+        ]
+      },
+      "AdminFinanceRiskTone": {
+        "type": "string",
+        "enum": [
+          "neutral",
+          "positive",
+          "warning",
+          "critical"
+        ]
+      },
+      "AdminFinanceAlertDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "tone": {
+            "$ref": "#/components/schemas/AdminFinanceRiskTone"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "tone",
+          "createdAt"
+        ]
+      },
+      "AdminFinanceTransactionRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "sourceType": {
+            "$ref": "#/components/schemas/PartnerCommerceSourceType"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PartnerTransactionType"
+          },
+          "grossAmount": {
+            "type": "number"
+          },
+          "feeAmount": {
+            "type": "number"
+          },
+          "netAmount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "transactionStatus": {
+            "$ref": "#/components/schemas/PartnerTransactionStatus"
+          },
+          "settlementStatus": {
+            "$ref": "#/components/schemas/PartnerSettlementStatus"
+          },
+          "payoutStatus": {
+            "$ref": "#/components/schemas/PartnerPayoutStatus"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/AdminFinanceProvider"
+          },
+          "isFlagged": {
+            "type": "boolean"
+          },
+          "notesCount": {
+            "type": "number"
+          },
+          "payoutId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "reference",
+          "partnerName",
+          "customerName",
+          "sourceType",
+          "type",
+          "grossAmount",
+          "feeAmount",
+          "netAmount",
+          "currency",
+          "transactionStatus",
+          "settlementStatus",
+          "payoutStatus",
+          "provider",
+          "isFlagged",
+          "notesCount"
+        ]
+      },
+      "AdminFinancePageMetaDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "limit",
+          "totalPages"
+        ]
+      },
+      "AdminFinanceTransactionPageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceTransactionRecordDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AdminFinancePageMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminFinanceProviderEventDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/AdminFinanceProvider"
+          },
+          "occurredAt": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "rawPayload": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "eventType",
+          "provider",
+          "occurredAt",
+          "detail",
+          "rawPayload"
+        ]
+      },
+      "AdminFinanceAuditEventDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "performedBy": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string"
+          },
+          "isError": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "detail",
+          "performedBy",
+          "occurredAt",
+          "isError"
+        ]
+      },
+      "AdminFinanceNoteDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "content",
+          "createdBy",
+          "createdAt"
+        ]
+      },
+      "AdminFinanceRefundCaseRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "requestedAt": {
+            "type": "string"
+          },
+          "transactionId": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "caseType": {
+            "$ref": "#/components/schemas/PartnerRefundCaseType"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+          },
+          "slaHours": {
+            "type": "number"
+          },
+          "slaBreached": {
+            "type": "boolean"
+          },
+          "riskTone": {
+            "$ref": "#/components/schemas/AdminFinanceRiskTone"
+          }
+        },
+        "required": [
+          "id",
+          "requestedAt",
+          "transactionId",
+          "partnerName",
+          "customerName",
+          "caseType",
+          "amount",
+          "currency",
+          "reason",
+          "owner",
+          "status",
+          "slaHours",
+          "slaBreached",
+          "riskTone"
+        ]
+      },
+      "AdminFinanceTransactionDetailDto": {
+        "type": "object",
+        "properties": {
+          "record": {
+            "$ref": "#/components/schemas/AdminFinanceTransactionRecordDto"
+          },
+          "providerEvents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceProviderEventDto"
+            }
+          },
+          "auditTrail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceAuditEventDto"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceNoteDto"
+            }
+          },
+          "relatedRefundCases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceRefundCaseRecordDto"
+            }
+          }
+        },
+        "required": [
+          "record",
+          "providerEvents",
+          "auditTrail",
+          "notes",
+          "relatedRefundCases"
+        ]
+      },
+      "AdminFinanceSettlementActionDto": {
+        "type": "object",
+        "properties": {
+          "settlementStatus": {
+            "$ref": "#/components/schemas/PartnerSettlementStatus"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "settlementStatus",
+          "note"
+        ]
+      },
+      "AdminFinanceReviewFlagActionDto": {
+        "type": "object",
+        "properties": {
+          "flagged": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "flagged"
+        ]
+      },
+      "AdminFinancePayoutRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "scheduledDate": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "periodLabel": {
+            "type": "string"
+          },
+          "includedVolume": {
+            "type": "number"
+          },
+          "feesAndAdjustments": {
+            "type": "number"
+          },
+          "netPayout": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PartnerPayoutStatus"
+          },
+          "attemptCount": {
+            "type": "number"
+          },
+          "notesCount": {
+            "type": "number"
+          },
+          "failureReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "holdReason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "scheduledDate",
+          "partnerName",
+          "periodLabel",
+          "includedVolume",
+          "feesAndAdjustments",
+          "netPayout",
+          "currency",
+          "method",
+          "status",
+          "attemptCount",
+          "notesCount"
+        ]
+      },
+      "AdminFinancePayoutPageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinancePayoutRecordDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AdminFinancePageMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminFinancePayoutAttemptDto": {
+        "type": "object",
+        "properties": {
+          "attemptNumber": {
+            "type": "number"
+          },
+          "attemptedAt": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "failureReason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "attemptNumber",
+          "attemptedAt",
+          "status"
+        ]
+      },
+      "AdminFinancePayoutDetailDto": {
+        "type": "object",
+        "properties": {
+          "record": {
+            "$ref": "#/components/schemas/AdminFinancePayoutRecordDto"
+          },
+          "includedTransactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceTransactionRecordDto"
+            }
+          },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinancePayoutAttemptDto"
+            }
+          },
+          "maskedDestination": {
+            "type": "string"
+          },
+          "auditTrail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceAuditEventDto"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceNoteDto"
+            }
+          }
+        },
+        "required": [
+          "record",
+          "includedTransactions",
+          "attempts",
+          "maskedDestination",
+          "auditTrail",
+          "notes"
+        ]
+      },
+      "AdminFinanceNoteActionDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        }
+      },
+      "AdminFinanceRequiredNoteActionDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "note"
+        ]
+      },
+      "AdminFinanceRefundCasePageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceRefundCaseRecordDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AdminFinancePageMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminFinanceRefundCaseDetailDto": {
+        "type": "object",
+        "properties": {
+          "record": {
+            "$ref": "#/components/schemas/AdminFinanceRefundCaseRecordDto"
+          },
+          "customerRequest": {
+            "type": "string"
+          },
+          "partnerResponse": {
+            "type": "string"
+          },
+          "evidenceLinks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "decisionNote": {
+            "type": "string"
+          },
+          "auditTrail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceAuditEventDto"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceNoteDto"
+            }
+          }
+        },
+        "required": [
+          "record",
+          "customerRequest",
+          "partnerResponse",
+          "evidenceLinks",
+          "decisionNote",
+          "auditTrail",
+          "notes"
+        ]
+      },
+      "AdminFinanceReconciliationType": {
+        "type": "string",
+        "enum": [
+          "missingProviderEvent",
+          "missingLedgerRecord",
+          "amountMismatch",
+          "currencyMismatch",
+          "duplicateProviderEvent",
+          "payoutMismatch",
+          "refundMismatch",
+          "stalePendingPayment"
+        ]
+      },
+      "AdminFinanceReconciliationExceptionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "detectedAt": {
+            "type": "string"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/AdminFinanceProvider"
+          },
+          "providerEventId": {
+            "type": "string"
+          },
+          "relatedTransactionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "expectedAmount": {
+            "type": "number"
+          },
+          "providerAmount": {
+            "type": "number"
+          },
+          "difference": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AdminFinanceReconciliationType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "detectedAt",
+          "provider",
+          "providerEventId",
+          "expectedAmount",
+          "providerAmount",
+          "difference",
+          "currency",
+          "type",
+          "status",
+          "owner",
+          "summary"
+        ]
+      },
+      "AdminFinanceReconciliationPageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationExceptionDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AdminFinancePageMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminFinanceReconciliationDetailDto": {
+        "type": "object",
+        "properties": {
+          "exception": {
+            "$ref": "#/components/schemas/AdminFinanceReconciliationExceptionDto"
+          },
+          "providerEventContext": {
+            "type": "string"
+          },
+          "ledgerContext": {
+            "type": "string"
+          },
+          "resolutionNotes": {
+            "type": "string"
+          },
+          "auditTrail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceAuditEventDto"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceNoteDto"
+            }
+          }
+        },
+        "required": [
+          "exception",
+          "providerEventContext",
+          "ledgerContext",
+          "resolutionNotes",
+          "auditTrail",
+          "notes"
+        ]
+      },
+      "AdminFinancePartnerExposureDto": {
+        "type": "object",
+        "properties": {
+          "partnerId": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "totalVolume": {
+            "type": "number"
+          },
+          "pendingPayouts": {
+            "type": "number"
+          },
+          "refundExposure": {
+            "type": "number"
+          },
+          "failedPayments": {
+            "type": "number"
+          },
+          "heldFunds": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "riskTone": {
+            "$ref": "#/components/schemas/AdminFinanceRiskTone"
+          }
+        },
+        "required": [
+          "partnerId",
+          "partnerName",
+          "totalVolume",
+          "pendingPayouts",
+          "refundExposure",
+          "failedPayments",
+          "heldFunds",
+          "currency",
+          "riskTone"
+        ]
+      },
+      "AdminFinanceExportType": {
+        "type": "string",
+        "enum": [
+          "transactions",
+          "payouts",
+          "refundCases",
+          "reconciliation",
+          "partnerExposure",
+          "monthlySummary"
+        ]
+      },
+      "AdminFinanceExportStatus": {
+        "type": "string",
+        "enum": [
+          "queued",
+          "processing",
+          "ready",
+          "failed",
+          "expired"
+        ]
+      },
+      "AdminFinanceExportJobDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AdminFinanceExportType"
+          },
+          "requestedBy": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AdminFinanceExportStatus"
+          },
+          "rowCount": {
+            "type": "number"
+          },
+          "downloadUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "type",
+          "requestedBy",
+          "status",
+          "rowCount"
+        ]
+      },
+      "AdminFinanceCreateExportDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/AdminFinanceExportType"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "AdminFinanceNoteEntityType": {
+        "type": "string",
+        "enum": [
+          "transaction",
+          "payout",
+          "refundCase",
+          "reconciliation"
+        ]
+      },
+      "AdminFinanceCreateNoteDto": {
+        "type": "object",
+        "properties": {
+          "entityType": {
+            "$ref": "#/components/schemas/AdminFinanceNoteEntityType"
+          },
+          "entityId": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "entityType",
+          "entityId",
+          "content"
+        ]
+      },
       "AuditLog": {
         "type": "object",
         "properties": {}
@@ -14564,6 +18011,61 @@
           "checkInTime",
           "checkOutTime",
           "duration"
+        ]
+      },
+      "PaginationMetaResponseDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "example": 1,
+            "description": "Current page number"
+          },
+          "limit": {
+            "type": "number",
+            "example": 20,
+            "description": "Items per page"
+          },
+          "total": {
+            "type": "number",
+            "example": 42,
+            "description": "Total number of items"
+          },
+          "totalPages": {
+            "type": "number",
+            "example": 3,
+            "description": "Total number of pages"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "PaginatedEmployeeAppointmentsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "List of appointments",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeAppointmentResponseDto"
+            }
+          },
+          "meta": {
+            "description": "Pagination metadata",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaginationMetaResponseDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
         ]
       },
       "CancelEmployeeAppointmentDto": {
@@ -16383,51 +19885,6 @@
           "ninetyDays"
         ]
       },
-      "PartnerCommerceSourceType": {
-        "type": "string",
-        "enum": [
-          "serviceBooking",
-          "productOrder"
-        ]
-      },
-      "PartnerTransactionType": {
-        "type": "string",
-        "enum": [
-          "charge",
-          "refund",
-          "adjustment",
-          "payout",
-          "fee"
-        ]
-      },
-      "PartnerTransactionStatus": {
-        "type": "string",
-        "enum": [
-          "pending",
-          "paid",
-          "refunded",
-          "failed",
-          "canceled"
-        ]
-      },
-      "PartnerSettlementStatus": {
-        "type": "string",
-        "enum": [
-          "unsettled",
-          "scheduled",
-          "settled",
-          "held"
-        ]
-      },
-      "PartnerPayoutStatus": {
-        "type": "string",
-        "enum": [
-          "notAssigned",
-          "inPayout",
-          "paidOut",
-          "failed"
-        ]
-      },
       "PartnerFinanceSummaryDto": {
         "type": "object",
         "properties": {
@@ -16690,22 +20147,6 @@
           "status",
           "currency",
           "includedTransactionIds"
-        ]
-      },
-      "PartnerRefundCaseType": {
-        "type": "string",
-        "enum": [
-          "refund",
-          "dispute"
-        ]
-      },
-      "PartnerRefundCaseStatus": {
-        "type": "string",
-        "enum": [
-          "pending",
-          "underReview",
-          "approved",
-          "rejected"
         ]
       },
       "PartnerRefundCaseRecordDto": {

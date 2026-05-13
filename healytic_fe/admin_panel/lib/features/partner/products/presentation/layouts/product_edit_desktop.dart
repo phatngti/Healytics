@@ -72,7 +72,10 @@ class ProductEditDesktop extends StatelessWidget {
                             initialDescription: product.description,
                           ),
                           AppDimens.verticalMedium,
-                          const ProductOperationsCard(),
+                          ProductOperationsCard(
+                            initialStaffAllocation: product.staffAllocation,
+                            initialStaffIds: product.staffIds,
+                          ),
                           AppDimens.verticalMedium,
                           const ProductPricingCard(),
                           AppDimens.verticalMedium,

@@ -43,6 +43,7 @@ class ApiService implements Authentication {
 
   // ── Appointments ──────────────────────────────
   late UserAppointmentsApi userAppointmentsApi;
+  late EmployeeAppointmentsApi employeeAppointmentsApi;
 
   ApiService({AuthHttpClient? httpClient}) : _authHttpClient = httpClient {
     setEndpoint('');
@@ -98,6 +99,8 @@ class ApiService implements Authentication {
     authenticateApi = AuthenticationApi(backend);
     accountApi = AccountApi(backend);
     userAppointmentsApi = UserAppointmentsApi(backend);
+    employeeAppointmentsApi =
+        EmployeeAppointmentsApi(backend);
   }
 
   Future<void> _setUserAgentHeaders() async {

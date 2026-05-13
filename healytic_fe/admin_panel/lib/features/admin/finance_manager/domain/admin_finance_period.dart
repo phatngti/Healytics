@@ -32,10 +32,8 @@ enum AdminFinanceWorkspaceTab {
     AdminFinanceWorkspaceTab.ledger => 'Ledger',
     AdminFinanceWorkspaceTab.payouts => 'Payouts',
     AdminFinanceWorkspaceTab.refunds => 'Refunds',
-    AdminFinanceWorkspaceTab.reconciliation =>
-      'Reconciliation',
-    AdminFinanceWorkspaceTab.partnerExposure =>
-      'Partner Exposure',
+    AdminFinanceWorkspaceTab.reconciliation => 'Reconciliation',
+    AdminFinanceWorkspaceTab.partnerExposure => 'Partner Exposure',
     AdminFinanceWorkspaceTab.exports => 'Exports',
   };
 }
@@ -46,10 +44,8 @@ enum AdminFinanceSourceType {
   productOrder;
 
   String get label => switch (this) {
-    AdminFinanceSourceType.serviceBooking =>
-      'Service Booking',
-    AdminFinanceSourceType.productOrder =>
-      'Product Order',
+    AdminFinanceSourceType.serviceBooking => 'Service Booking',
+    AdminFinanceSourceType.productOrder => 'Product Order',
   };
 }
 
@@ -111,8 +107,7 @@ enum AdminFinancePayoutStatus {
   held;
 
   String get label => switch (this) {
-    AdminFinancePayoutStatus.notAssigned =>
-      'Not Assigned',
+    AdminFinancePayoutStatus.notAssigned => 'Not Assigned',
     AdminFinancePayoutStatus.inPayout => 'In Payout',
     AdminFinancePayoutStatus.paidOut => 'Paid Out',
     AdminFinancePayoutStatus.failed => 'Failed',
@@ -129,8 +124,7 @@ enum AdminFinanceRefundCaseStatus {
 
   String get label => switch (this) {
     AdminFinanceRefundCaseStatus.pending => 'Pending',
-    AdminFinanceRefundCaseStatus.underReview =>
-      'Under Review',
+    AdminFinanceRefundCaseStatus.underReview => 'Under Review',
     AdminFinanceRefundCaseStatus.approved => 'Approved',
     AdminFinanceRefundCaseStatus.rejected => 'Rejected',
   };
@@ -156,12 +150,9 @@ enum AdminFinanceReconciliationStatus {
 
   String get label => switch (this) {
     AdminFinanceReconciliationStatus.open => 'Open',
-    AdminFinanceReconciliationStatus.underReview =>
-      'Under Review',
-    AdminFinanceReconciliationStatus.resolved =>
-      'Resolved',
-    AdminFinanceReconciliationStatus.reopened =>
-      'Reopened',
+    AdminFinanceReconciliationStatus.underReview => 'Under Review',
+    AdminFinanceReconciliationStatus.resolved => 'Resolved',
+    AdminFinanceReconciliationStatus.reopened => 'Reopened',
   };
 }
 
@@ -181,16 +172,12 @@ enum AdminFinanceReconciliationType {
       'Missing Provider Event',
     AdminFinanceReconciliationType.missingLedgerRecord =>
       'Missing Ledger Record',
-    AdminFinanceReconciliationType.amountMismatch =>
-      'Amount Mismatch',
-    AdminFinanceReconciliationType.currencyMismatch =>
-      'Currency Mismatch',
+    AdminFinanceReconciliationType.amountMismatch => 'Amount Mismatch',
+    AdminFinanceReconciliationType.currencyMismatch => 'Currency Mismatch',
     AdminFinanceReconciliationType.duplicateProviderEvent =>
       'Duplicate Provider Event',
-    AdminFinanceReconciliationType.payoutMismatch =>
-      'Payout Mismatch',
-    AdminFinanceReconciliationType.refundMismatch =>
-      'Refund Mismatch',
+    AdminFinanceReconciliationType.payoutMismatch => 'Payout Mismatch',
+    AdminFinanceReconciliationType.refundMismatch => 'Refund Mismatch',
     AdminFinanceReconciliationType.stalePendingPayment =>
       'Stale Pending Payment',
   };
@@ -200,24 +187,21 @@ enum AdminFinanceReconciliationType {
 enum AdminFinanceProvider {
   stripe,
   momo,
+  vnpay,
   bankTransfer,
   manual;
 
   String get label => switch (this) {
     AdminFinanceProvider.stripe => 'Stripe',
     AdminFinanceProvider.momo => 'MoMo',
+    AdminFinanceProvider.vnpay => 'VNPay',
     AdminFinanceProvider.bankTransfer => 'Bank Transfer',
     AdminFinanceProvider.manual => 'Manual',
   };
 }
 
 /// Visual risk / severity tone used for status chips.
-enum AdminFinanceRiskTone {
-  neutral,
-  positive,
-  warning,
-  critical;
-}
+enum AdminFinanceRiskTone { neutral, positive, warning, critical }
 
 /// Export job status.
 enum AdminFinanceExportStatus {
@@ -249,11 +233,8 @@ enum AdminFinanceExportType {
     AdminFinanceExportType.transactions => 'Transactions',
     AdminFinanceExportType.payouts => 'Payouts',
     AdminFinanceExportType.refundCases => 'Refund Cases',
-    AdminFinanceExportType.reconciliation =>
-      'Reconciliation',
-    AdminFinanceExportType.partnerExposure =>
-      'Partner Exposure',
-    AdminFinanceExportType.monthlySummary =>
-      'Monthly Summary',
+    AdminFinanceExportType.reconciliation => 'Reconciliation',
+    AdminFinanceExportType.partnerExposure => 'Partner Exposure',
+    AdminFinanceExportType.monthlySummary => 'Monthly Summary',
   };
 }

@@ -25,22 +25,15 @@ class AdminFinanceFilterBar extends StatelessWidget {
 
   final AdminFinanceWorkspaceState state;
   final ValueChanged<String> onSearchChanged;
-  final ValueChanged<AdminFinanceSourceType?>
-      onSourceTypeChanged;
-  final ValueChanged<AdminFinanceTransactionType?>
-      onTransactionTypeChanged;
-  final ValueChanged<AdminFinanceTransactionStatus?>
-      onTransactionStatusChanged;
-  final ValueChanged<AdminFinanceSettlementStatus?>
-      onSettlementStatusChanged;
-  final ValueChanged<AdminFinancePayoutStatus?>
-      onPayoutStatusChanged;
-  final ValueChanged<AdminFinanceRefundCaseStatus?>
-      onRefundCaseStatusChanged;
+  final ValueChanged<AdminFinanceSourceType?> onSourceTypeChanged;
+  final ValueChanged<AdminFinanceTransactionType?> onTransactionTypeChanged;
+  final ValueChanged<AdminFinanceTransactionStatus?> onTransactionStatusChanged;
+  final ValueChanged<AdminFinanceSettlementStatus?> onSettlementStatusChanged;
+  final ValueChanged<AdminFinancePayoutStatus?> onPayoutStatusChanged;
+  final ValueChanged<AdminFinanceRefundCaseStatus?> onRefundCaseStatusChanged;
   final ValueChanged<AdminFinanceReconciliationStatus?>
-      onReconciliationStatusChanged;
-  final ValueChanged<AdminFinanceProvider?>
-      onProviderChanged;
+  onReconciliationStatusChanged;
+  final ValueChanged<AdminFinanceProvider?> onProviderChanged;
   final ValueChanged<String?> onCurrencyChanged;
   final ValueChanged<bool> onFlaggedChanged;
   final ValueChanged<bool> onSlaBreachedChanged;
@@ -63,15 +56,9 @@ class AdminFinanceFilterBar extends StatelessWidget {
             decoration: InputDecoration(
               isDense: true,
               hintText: 'Search...',
-              prefixIcon: const Icon(
-                Icons.search,
-                size: 18,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: AppDimens.radiusSm,
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(
+              prefixIcon: const Icon(Icons.search, size: 18),
+              border: OutlineInputBorder(borderRadius: AppDimens.radiusSm),
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppDimens.spaceSmMd,
                 vertical: AppDimens.spaceSmMd,
               ),
@@ -138,8 +125,7 @@ class AdminFinanceFilterBar extends StatelessWidget {
         _EnumDropdown<AdminFinanceReconciliationStatus>(
           hint: 'Recon',
           value: filter.reconciliationStatus,
-          values:
-              AdminFinanceReconciliationStatus.values,
+          values: AdminFinanceReconciliationStatus.values,
           labelOf: (v) => v.label,
           onChanged: onReconciliationStatusChanged,
         ),
@@ -181,15 +167,8 @@ class AdminFinanceFilterBar extends StatelessWidget {
         // Reset
         if (filter.hasActiveFilters)
           TextButton.icon(
-            icon: Icon(
-              Icons.clear_all_rounded,
-              color: cs.error,
-              size: 18,
-            ),
-            label: Text(
-              'Reset',
-              style: TextStyle(color: cs.error),
-            ),
+            icon: Icon(Icons.clear_all_rounded, color: cs.error, size: 18),
+            label: Text('Reset', style: TextStyle(color: cs.error)),
             onPressed: onReset,
           ),
       ],
@@ -222,33 +201,24 @@ class _EnumDropdown<T> extends StatelessWidget {
         decoration: InputDecoration(
           isDense: true,
           hintText: hint,
-          border: OutlineInputBorder(
-            borderRadius: AppDimens.radiusSm,
-          ),
+          border: OutlineInputBorder(borderRadius: AppDimens.radiusSm),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: AppDimens.spaceSmMd,
             vertical: AppDimens.spaceSmMd,
           ),
         ),
-        value: value,
+        initialValue: value,
         items: [
           DropdownMenuItem<T>(
             value: null,
-            child: Text(
-              'All',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall,
-            ),
+            child: Text('All', style: Theme.of(context).textTheme.bodySmall),
           ),
           ...values.map(
             (v) => DropdownMenuItem<T>(
               value: v,
               child: Text(
                 labelOf(v),
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall,
+                style: Theme.of(context).textTheme.bodySmall,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

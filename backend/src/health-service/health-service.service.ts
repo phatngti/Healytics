@@ -109,8 +109,15 @@ export class HealthServiceService {
   /**
    * Facade: Delegates to CreateHealthServiceHandler
    */
-  async create(createDto: CreatePartnerHealthServiceDto): Promise<Product> {
-    return this.createHealthServiceHandler.execute(createDto);
+  async create(
+    accountId: string,
+    createDto: CreatePartnerHealthServiceDto,
+  ): Promise<Product> {
+    const partnerId = await this.resolvePartnerId(accountId);
+    return this.createHealthServiceHandler.execute({
+      ...createDto,
+      partnerId,
+    });
   }
 
   async findAll(): Promise<Product[]> {
@@ -589,10 +596,12 @@ export class HealthServiceService {
    * Facade: Delegates to UpdateHealthServiceHandler
    */
   async update(
+    accountId: string,
     id: string,
     updateDto: UpdatePartnerHealthServiceDto,
   ): Promise<Product> {
-    return this.updateHealthServiceHandler.execute(id, updateDto);
+    const partnerId = await this.resolvePartnerId(accountId);
+    return this.updateHealthServiceHandler.execute(id, updateDto, partnerId);
   }
 
   /**

@@ -82,4 +82,8 @@ export { PartnerLedgerTransaction } from './partner-ledger-transaction.entity';
 export { PartnerTransactionTimeline } from './partner-transaction-timeline.entity';
 export { PartnerPayout } from './partner-payout.entity';
 export { PartnerPayoutTransaction } from './partner-payout-transaction.entity';
+export { PartnerPayoutAttempt } from './partner-payout-attempt.entity';
 export { PartnerRefundCase } from './partner-refund-case.entity';
+export { AdminFinanceNote } from './admin-finance-note.entity';
+export { AdminFinanceExportJob } from './admin-finance-export-job.entity';
+export { AdminFinanceReconciliationException } from './admin-finance-reconciliation-exception.entity';

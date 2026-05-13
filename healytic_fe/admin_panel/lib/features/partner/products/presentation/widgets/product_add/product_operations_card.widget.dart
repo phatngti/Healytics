@@ -10,7 +10,14 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProductOperationsCard extends ConsumerStatefulWidget {
-  const ProductOperationsCard({super.key});
+  const ProductOperationsCard({
+    super.key,
+    this.initialStaffAllocation,
+    this.initialStaffIds = const [],
+  });
+
+  final String? initialStaffAllocation;
+  final List<String> initialStaffIds;
 
   @override
   ConsumerState<ProductOperationsCard> createState() =>
@@ -18,7 +25,7 @@ class ProductOperationsCard extends ConsumerStatefulWidget {
 }
 
 class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
-  String _staffAllocation = StaffAllocation.any.apiValue;
+  late String _staffAllocation;
   String _staffRole = EmployeeRoleType.doctor.apiValue;
   List<EmployeeEntity> _selectedStaff = [];
   List<EmployeeEntity> _allStaff = [];
@@ -27,17 +34,39 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
   @override
   void initState() {
     super.initState();
-    _loadStaff();
+    _staffAllocation =
+        widget.initialStaffAllocation ?? StaffAllocation.any.apiValue;
+    _loadStaff(includeInitialSelection: widget.initialStaffIds.isNotEmpty);
   }
 
-  Future<void> _loadStaff() async {
+  Future<void> _loadStaff({bool includeInitialSelection = false}) async {
     try {
-      final staff = await ref
-          .read(productProvider.notifier)
-          .getStaffForProduct(role: _staffRole);
+      final notifier = ref.read(productProvider.notifier);
+      final staff = await notifier.getStaffForProduct(role: _staffRole);
+      final allStaff = includeInitialSelection
+          ? await notifier.getStaffForProduct()
+          : staff;
+      final selectedIds = widget.initialStaffIds.toSet();
+      final selectedStaff = includeInitialSelection
+          ? allStaff
+                .where((employee) => selectedIds.contains(employee.id.value))
+                .toList()
+          : _selectedStaff;
+      final selectedRole = selectedStaff.isNotEmpty
+          ? EmployeeRoleType.fromApiValue(selectedStaff.first.role)?.apiValue
+          : null;
+      final staffRole = selectedRole ?? _staffRole;
+      final visibleStaff = includeInitialSelection && selectedRole != null
+          ? allStaff
+                .where((employee) => employee.role.toUpperCase() == staffRole)
+                .toList()
+          : staff;
+
       if (mounted) {
         setState(() {
-          _allStaff = staff;
+          _staffRole = staffRole;
+          _allStaff = visibleStaff.isNotEmpty ? visibleStaff : staff;
+          _selectedStaff = selectedStaff;
           _isLoadingStaff = false;
         });
       }
@@ -55,7 +84,9 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
     final formState = FormBuilder.of(context);
     if (formState != null) {
       // Store staff IDs as a list
-      final staffIds = _selectedStaff.map((s) => s.id).toList();
+      final staffIds = _staffAllocation == StaffAllocation.specific.apiValue
+          ? _selectedStaff.map((s) => s.id.value).toList()
+          : <String>[];
       formState.fields[ProductFormField.selectedStaffIds.key]?.didChange(
         staffIds,
       );
@@ -76,7 +107,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
         // Hidden FormBuilder fields to store staff data
         FormBuilderField<List<dynamic>>(
           name: ProductFormField.selectedStaffIds.key,
-          initialValue: _selectedStaff.map((s) => s.id).toList(),
+          initialValue: widget.initialStaffIds,
           builder: (field) => const SizedBox.shrink(),
         ),
         FormBuilderField<String>(
@@ -212,7 +243,10 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
           subtitle: 'Auto-assign based on availability',
           isSelected: _staffAllocation == StaffAllocation.any.apiValue,
           onTap: () {
-            setState(() => _staffAllocation = StaffAllocation.any.apiValue);
+            setState(() {
+              _staffAllocation = StaffAllocation.any.apiValue;
+              _selectedStaff = [];
+            });
             _updateFormBuilderStaff();
           },
         ),
@@ -414,7 +448,6 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                     key: const ValueKey('formfield_lead_time'),
                     name: ProductFormField.leadTime.key,
                     keyboardType: TextInputType.number,
-                    initialValue: '2',
                     decoration: InputDecoration(
                       hintText: '2',
                       filled: true,
@@ -552,7 +585,9 @@ class _StaffAllocationOption extends StatelessWidget {
         children: [
           Radio<bool>(
             value: true,
+            // ignore: deprecated_member_use
             groupValue: isSelected,
+            // ignore: deprecated_member_use
             onChanged: (_) => onTap(),
             activeColor: colorScheme.primary,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

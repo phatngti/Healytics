@@ -9,6 +9,11 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 /// Form fields specific to therapists
 class TherapistFieldsCard extends StatefulWidget {
   final TherapistType? initialTherapistType;
+  final String? initialTherapistLevel;
+  final double? initialCommissionRate;
+  final String? initialHealthCheckDate;
+  final List<String> initialSkills;
+  final List<String> initialDeviceProficiency;
   final String? initialStrengthLevel;
 
   /// Called when the therapist type toggle
@@ -18,6 +23,11 @@ class TherapistFieldsCard extends StatefulWidget {
   const TherapistFieldsCard({
     super.key,
     this.initialTherapistType,
+    this.initialTherapistLevel,
+    this.initialCommissionRate,
+    this.initialHealthCheckDate,
+    this.initialSkills = const [],
+    this.initialDeviceProficiency = const [],
     this.initialStrengthLevel,
     this.onTherapistTypeChanged,
   });
@@ -35,6 +45,15 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
     super.initState();
     _selectedTherapistType =
         widget.initialTherapistType ?? TherapistType.massage;
+  }
+
+  @override
+  void didUpdateWidget(TherapistFieldsCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final nextType = widget.initialTherapistType;
+    if (nextType != null && nextType != oldWidget.initialTherapistType) {
+      _selectedTherapistType = nextType;
+    }
   }
 
   @override
@@ -194,9 +213,19 @@ class _TherapistFieldsCardState extends State<TherapistFieldsCard> {
           ),
 
           if (_selectedTherapistType == TherapistType.spa)
-            const SpaTherapistFields()
+            SpaTherapistFields(
+              initialTherapistLevel: widget.initialTherapistLevel,
+              initialCommissionRate: widget.initialCommissionRate,
+              initialHealthCheckDate: widget.initialHealthCheckDate,
+              initialSkills: widget.initialSkills,
+              initialDeviceProficiency: widget.initialDeviceProficiency,
+            )
           else
             MassageTherapistFields(
+              initialTherapistLevel: widget.initialTherapistLevel,
+              initialCommissionRate: widget.initialCommissionRate,
+              initialHealthCheckDate: widget.initialHealthCheckDate,
+              initialSkills: widget.initialSkills,
               initialStrengthLevel: widget.initialStrengthLevel,
             ),
         ],
@@ -230,7 +259,7 @@ class _TherapistTypeOption extends StatelessWidget {
     return Material(
       color: isEnabled
           ? null
-          : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+          : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       borderRadius: AppDimens.radiusMedium,
       child: InkWell(
         onTap: isEnabled ? onTap : null,
@@ -245,7 +274,7 @@ class _TherapistTypeOption extends StatelessWidget {
                   ? colorScheme.primary
                   : (isEnabled
                         ? colorScheme.outlineVariant
-                        : colorScheme.outlineVariant.withOpacity(0.5)),
+                        : colorScheme.outlineVariant.withValues(alpha: 0.5)),
             ),
           ),
           child: Row(
@@ -258,7 +287,9 @@ class _TherapistTypeOption extends StatelessWidget {
                       ? colorScheme.surface
                       : (isEnabled
                             ? colorScheme.outlineVariant
-                            : colorScheme.outlineVariant.withOpacity(0.5)),
+                            : colorScheme.outlineVariant.withValues(
+                                alpha: 0.5,
+                              )),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -278,7 +309,7 @@ class _TherapistTypeOption extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: isEnabled
                             ? null
-                            : colorScheme.onSurface.withOpacity(0.5),
+                            : colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ),
                     Text(
@@ -286,7 +317,9 @@ class _TherapistTypeOption extends StatelessWidget {
                       style: textTheme.labelSmall?.copyWith(
                         color: isEnabled
                             ? null
-                            : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                            : colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.5,
+                              ),
                       ),
                     ),
                   ],
