@@ -199,6 +199,7 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
                     hintText: 'e.g. BS CKI, Thạc sĩ',
                     enabled: widget.isEditing,
                     initialValue: _titleAt(i),
+                    isRequired: true,
                   ),
                 ),
                 AppDimens.horizontalLarge,
@@ -275,6 +276,7 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
       initialValue: widget.doctor?.education,
       searchHint: 'Search education...',
       enabled: widget.isEditing,
+      isRequired: true,
     );
   }
 
@@ -291,6 +293,7 @@ class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
       initialValue: widget.doctor?.certifications,
       searchHint: 'Search certification...',
       enabled: widget.isEditing,
+      isRequired: true,
     );
   }
 }

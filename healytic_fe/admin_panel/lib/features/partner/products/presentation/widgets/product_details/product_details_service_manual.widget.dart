@@ -1,5 +1,6 @@
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/service_manual.entity.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/service_rule_icon_data.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
@@ -182,6 +183,8 @@ class ProductDetailsServiceManualCard extends StatelessWidget {
   }
 
   Widget _buildRuleRow(ThemeData theme, ServiceRuleEntity rule) {
+    final icon = serviceRuleIconData(rule.iconSlug) ?? Icons.rule;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -196,7 +199,7 @@ class ProductDetailsServiceManualCard extends StatelessWidget {
               borderRadius: AppDimens.radiusSmall,
             ),
             child: Icon(
-              Icons.rule,
+              icon,
               size: 16,
               color: theme.colorScheme.onSecondaryContainer,
             ),

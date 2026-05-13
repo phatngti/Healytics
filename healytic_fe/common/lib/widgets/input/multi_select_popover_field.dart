@@ -83,14 +83,30 @@ class _MultiSelectPickerFieldState<T> extends State<MultiSelectPickerField<T>> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              widget.label.toUpperCase(),
-              style:
-                  widget.labelStyle ??
-                  Theme.of(context).textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: widget.label.toUpperCase(),
+                    style:
+                        widget.labelStyle ??
+                        Theme.of(
+                          context,
+                        ).textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
                   ),
+                  if (widget.isRequired)
+                    const TextSpan(
+                      text: ' *',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                ],
+              ),
             ),
             AppDimens.verticalSmall,
             InkWell(

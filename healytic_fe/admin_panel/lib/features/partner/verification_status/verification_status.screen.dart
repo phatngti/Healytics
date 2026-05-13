@@ -1,9 +1,7 @@
-import 'package:admin_panel/core/entities/store.entity.dart';
-import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/utils/user_role_helper.dart';
 import 'package:admin_panel/features/authenticate/domain/location.entity.dart';
+import 'package:admin_panel/features/authenticate/presentation/providers/logout.provider.dart';
 import 'package:admin_panel/features/authenticate/presentation/providers/location.provider.dart';
-import 'package:admin_panel/features/common/providers/authen_token.provider.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
 import 'package:go_router/go_router.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/verification_status.provider.dart';
@@ -111,8 +109,6 @@ class _VerificationStatusScreenState
       addField(doc);
     }
 
-    print('kycDocuments: ${status.kycDocuments}');
-
     return initialValues;
   }
 
@@ -194,11 +190,7 @@ class _VerificationStatusScreenState
               // TODO: Navigate to help center
             },
             onLogout: () async {
-              // Clear auth tokens and navigate to login
-              await ref.read(authenTokenProvider.notifier).removeToken();
-              await Store.delete(StoreKey.accessToken);
-              await Store.delete(StoreKey.refreshToken);
-              await UserRoleHelper.clearSession();
+              await ref.read(logoutProviderProvider.notifier).logout();
               if (context.mounted) {
                 context.go('/');
               }

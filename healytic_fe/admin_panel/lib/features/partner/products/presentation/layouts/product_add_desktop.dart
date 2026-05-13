@@ -22,6 +22,9 @@ class ProductAddDesktop extends ConsumerStatefulWidget {
     this.initialOnlineStore = false,
     this.initialDescription,
     this.serviceManualKey,
+    this.initialGuidelines = const [],
+    this.initialRules = const [],
+    this.initialSteps = const [],
   });
 
   /// Whether all form fields are currently valid.
@@ -35,8 +38,21 @@ class ProductAddDesktop extends ConsumerStatefulWidget {
   /// Initial Quill Delta JSON for the description editor.
   final String? initialDescription;
 
-  /// Key to access the service manual card for data extraction.
-  final GlobalKey<ProductServiceManualCardState>? serviceManualKey;
+  /// Key to access the service manual card
+  /// for data extraction.
+  final GlobalKey<ProductServiceManualCardState>?
+      serviceManualKey;
+
+  /// Pre-populated service manual guidelines.
+  final List<String> initialGuidelines;
+
+  /// Pre-populated service manual rules.
+  /// Each map: {iconSlug, title, description}.
+  final List<Map<String, String>> initialRules;
+
+  /// Pre-populated procedure steps.
+  /// Each map: {title, description}.
+  final List<Map<String, String>> initialSteps;
 
   @override
   ConsumerState<ProductAddDesktop> createState() => _ProductAddDesktopState();
@@ -86,6 +102,12 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                           AppDimens.verticalMedium,
                           ProductServiceManualCard(
                             key: widget.serviceManualKey,
+                            initialGuidelines:
+                                widget.initialGuidelines,
+                            initialRules:
+                                widget.initialRules,
+                            initialSteps:
+                                widget.initialSteps,
                           ),
                           AppDimens.verticalMedium,
                           const ProductPricingCard(),
@@ -183,30 +205,30 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                     AnimatedSize(
                       duration: const Duration(milliseconds: 250),
                       curve: Curves.easeInOut,
-                      child: widget.isFormValid
-                          ? Row(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AppDimens.horizontalSmall,
+                          AppButton(
+                            buttonType: ButtonType.elevated,
+                            onPressed: widget.isFormValid
+                                ? widget.onSubmit
+                                : null,
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                AppDimens.horizontalSmall,
-                                AppButton(
-                                  buttonType: ButtonType.elevated,
-                                  onPressed: widget.onSubmit,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.save_outlined,
-                                        size: 18,
-                                        color: colorScheme.onPrimary,
-                                      ),
-                                      AppDimens.horizontalSmall,
-                                      const Text('Save & Publish'),
-                                    ],
-                                  ),
+                                Icon(
+                                  Icons.save_outlined,
+                                  size: 18,
+                                  color: colorScheme.onPrimary,
                                 ),
+                                AppDimens.horizontalSmall,
+                                const Text('Save & Publish'),
                               ],
-                            )
-                          : const SizedBox.shrink(),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

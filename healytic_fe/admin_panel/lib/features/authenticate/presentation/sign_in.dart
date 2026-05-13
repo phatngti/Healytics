@@ -52,11 +52,13 @@ class SignInScreen extends HookConsumerWidget {
         routeAutofill: autofill,
       );
       if (shouldAutofill) {
-        emailController.text = SignInAutofill.email;
-        passwordController.text = SignInAutofill.password;
+        emailController.text = SignInAutofill.getEmail(selectedRole.value);
+        passwordController.text = SignInAutofill.getPassword(
+          selectedRole.value,
+        );
       }
       return null;
-    }, []);
+    }, [selectedRole.value]);
 
     ref.listen(signInProviderProvider, (previous, next) {
       next.whenOrNull(

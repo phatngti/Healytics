@@ -72,6 +72,7 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
                 items: _therapistLevels,
                 fieldKey: 'therapist_level',
                 initialValue: initialLevel,
+                isRequired: true,
               ),
             ),
             AppDimens.horizontalLarge,
@@ -87,6 +88,7 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
                   color: colorScheme.onSurfaceVariant,
                 ),
                 initialValue: widget.initialCommissionRate?.toString(),
+                isRequired: true,
               ),
             ),
           ],
@@ -101,11 +103,18 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Massage Strength',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurfaceVariant,
+              Text.rich(
+                TextSpan(
+                  text: 'Massage Strength'.toUpperCase(),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
+                  children: [
+                    TextSpan(
+                      text: ' *',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ],
                 ),
               ),
               AppDimens.verticalMediumSmall,
@@ -172,6 +181,12 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
               FormBuilderField<String>(
                 name: 'strength_level',
                 initialValue: _selectedStrength,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Massage strength is required';
+                  }
+                  return null;
+                },
                 builder: (field) {
                   // Update field when selection changes
                   if (field.value != _selectedStrength) {
@@ -191,6 +206,7 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
           fieldKey: 'health_check_date',
           label: 'Last Health Check',
           hintText: 'Select date',
+          isRequired: true,
         ),
         AppDimens.verticalMedium,
         FormFieldBuilders.buildMultiSelectChipField(
@@ -202,6 +218,7 @@ class _MassageTherapistFieldsState extends State<MassageTherapistFields> {
           allowCreate: true,
           width: double.infinity,
           initialValue: widget.initialSkills,
+          isRequired: true,
         ),
       ],
     );

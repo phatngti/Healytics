@@ -131,14 +131,30 @@ class _AppMultiSelectChipFieldState<T>
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.label.toUpperCase(),
-              style:
-                  widget.labelStyle ??
-                  Theme.of(context).textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: widget.label.toUpperCase(),
+                    style:
+                        widget.labelStyle ??
+                        Theme.of(
+                          context,
+                        ).textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
                   ),
+                  if (widget.isRequired)
+                    const TextSpan(
+                      text: ' *',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                ],
+              ),
             ),
             AppDimens.verticalSmall,
             Container(
