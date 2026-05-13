@@ -55,6 +55,30 @@ String parameterToString(dynamic value) {
   if (value is DateTime) {
     return value.toUtc().toIso8601String();
   }
+  if (value is AdminFinanceExportStatus) {
+    return AdminFinanceExportStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceExportType) {
+    return AdminFinanceExportTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceNoteEntityType) {
+    return AdminFinanceNoteEntityTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinancePeriod) {
+    return AdminFinancePeriodTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceProvider) {
+    return AdminFinanceProviderTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceReconciliationStatus) {
+    return AdminFinanceReconciliationStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceReconciliationType) {
+    return AdminFinanceReconciliationTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceRiskTone) {
+    return AdminFinanceRiskToneTypeTransformer().encode(value).toString();
+  }
   if (value is AppointmentStatus) {
     return AppointmentStatusTypeTransformer().encode(value).toString();
   }

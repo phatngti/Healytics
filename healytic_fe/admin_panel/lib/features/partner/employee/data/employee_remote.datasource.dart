@@ -154,15 +154,37 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   @override
   Future<void> updateEmployee(UpdateEmployeeRequest request) async {
     final dto = UpdateEmployeeDto(
+      employeeCode: request.employeeCode,
+      firstName: request.firstName,
+      lastName: request.lastName,
       fullName: request.fullName,
       email: request.email,
       phone: request.phone,
       avatarUrl: request.avatar,
+      dob: request.dateOfBirth,
+      gender: _toUpdateGender(request.gender),
       role: _toUpdateRole(EmployeeRoleType.fromApiValue(request.role)),
       status: _toUpdateStatus(EmployeeStatusType.fromApiValue(request.status)),
+      jobTitle: request.jobTitle,
+      startDate: request.startDate,
+      employmentType: request.employmentType,
+      emergencyContactName: request.emergencyContactName,
+      emergencyContactPhone: request.emergencyContactPhone,
+      description: request.description,
       verificationDocuments: _toVerificationDocumentDtos(
         request.verificationDocuments,
       ),
+      schedule: _toScheduleEntries(request.schedule),
+      workHistory: _toWorkHistoryEntries(request.workHistory),
+      doctorProfile:
+          EmployeeRoleType.fromApiValue(request.role) == EmployeeRoleType.doctor
+          ? _toDoctorProfileDto(request)
+          : null,
+      therapistProfile:
+          EmployeeRoleType.fromApiValue(request.role) ==
+              EmployeeRoleType.therapist
+          ? _toTherapistProfileDto(request)
+          : null,
     );
 
     await _employeesApi.partnerEmployeesControllerUpdate(
@@ -210,8 +232,8 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         request.medicalTitles,
         request.medicalLicenses,
       ),
-      experienceYears: request.experienceYears,
-      consultationFee: request.consultationFee,
+      experienceYears: request.experienceYears ?? 0,
+      consultationFee: request.consultationFee ?? 0,
       specializations: request.specializations,
       education: request.education,
       certifications: request.certifications,
@@ -426,7 +448,8 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         education: profile.education,
         certifications: [],
       );
-    } else if (role == EmployeeRoleType.therapist && dto.therapistProfile != null) {
+    } else if (role == EmployeeRoleType.therapist &&
+        dto.therapistProfile != null) {
       final profile = dto.therapistProfile!;
       final therapistType = TherapistType.fromApiValue(profile.type);
 
@@ -563,28 +586,85 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   }
 
   /// Maps [EmployeeRoleType] to OpenAPI [EmployeeRole].
-  EmployeeRole? _toUpdateRole(EmployeeRoleType? role) =>
-      switch (role) {
-        EmployeeRoleType.doctor => EmployeeRole.DOCTOR,
-        EmployeeRoleType.therapist => EmployeeRole.THERAPIST,
-        EmployeeRoleType.receptionist =>
-          EmployeeRole.RECEPTIONIST,
-        EmployeeRoleType.manager => EmployeeRole.MANAGER,
+  EmployeeRole? _toUpdateRole(EmployeeRoleType? role) => switch (role) {
+    EmployeeRoleType.doctor => EmployeeRole.DOCTOR,
+    EmployeeRoleType.therapist => EmployeeRole.THERAPIST,
+    EmployeeRoleType.receptionist => EmployeeRole.RECEPTIONIST,
+    EmployeeRoleType.manager => EmployeeRole.MANAGER,
+    null => null,
+  };
+
+  /// Maps [EmployeeStatusType] to OpenAPI [EmployeeStatus].
+  EmployeeStatus? _toUpdateStatus(EmployeeStatusType? status) =>
+      switch (status) {
+        EmployeeStatusType.active => EmployeeStatus.ACTIVE,
+        EmployeeStatusType.inactive => EmployeeStatus.INACTIVE,
+        EmployeeStatusType.onLeave => EmployeeStatus.ON_LEAVE,
         null => null,
       };
 
-  /// Maps [EmployeeStatusType] to OpenAPI [EmployeeStatus].
-  EmployeeStatus? _toUpdateStatus(
-    EmployeeStatusType? status,
-  ) =>
-      switch (status) {
-        EmployeeStatusType.active => EmployeeStatus.ACTIVE,
-        EmployeeStatusType.inactive =>
-          EmployeeStatus.INACTIVE,
-        EmployeeStatusType.onLeave =>
-          EmployeeStatus.ON_LEAVE,
-        null => null,
-      };
+  /// Maps gender API values to OpenAPI update gender enum.
+  UpdateEmployeeDtoGenderEnum? _toUpdateGender(String? gender) {
+    return switch (gender?.toUpperCase()) {
+      'MALE' => UpdateEmployeeDtoGenderEnum.MALE,
+      'FEMALE' => UpdateEmployeeDtoGenderEnum.FEMALE,
+      'OTHER' => UpdateEmployeeDtoGenderEnum.OTHER,
+      _ => null,
+    };
+  }
+
+  /// Builds the nested doctor profile payload for employee updates.
+  CreateDoctorProfileDto _toDoctorProfileDto(UpdateEmployeeRequest request) {
+    return CreateDoctorProfileDto(
+      title: request.jobTitle,
+      medicalCredentials: _toMedicalCredentials(
+        request.medicalTitles,
+        request.medicalLicenses,
+      ),
+      experienceYears: request.experienceYears,
+      consultationFee: request.consultationFee,
+      specializations: request.specializations,
+      education: request.education,
+      certifications: request.certifications,
+    );
+  }
+
+  /// Builds the nested therapist profile payload for employee updates.
+  CreateTherapistProfileDto _toTherapistProfileDto(
+    UpdateEmployeeRequest request,
+  ) {
+    return CreateTherapistProfileDto(
+      level:
+          _toProfileTherapistLevel(request.therapistLevel) ??
+          CreateTherapistProfileDtoLevelEnum.JUNIOR,
+      type: request.therapistType,
+      strengthLevel: _toProfileStrengthLevel(request.strengthLevel),
+      commissionRate: request.commissionRate ?? 0,
+      healthCheckDate: request.healthCheckDate,
+      skills: request.skills,
+      deviceProficiency: request.deviceProficiency,
+    );
+  }
+
+  CreateTherapistProfileDtoLevelEnum? _toProfileTherapistLevel(String? level) {
+    return switch (level?.toUpperCase()) {
+      'JUNIOR' => CreateTherapistProfileDtoLevelEnum.JUNIOR,
+      'SENIOR' => CreateTherapistProfileDtoLevelEnum.SENIOR,
+      'MASTER' => CreateTherapistProfileDtoLevelEnum.MASTER,
+      _ => null,
+    };
+  }
+
+  CreateTherapistProfileDtoStrengthLevelEnum? _toProfileStrengthLevel(
+    String? level,
+  ) {
+    return switch (level?.toUpperCase()) {
+      'SOFT' => CreateTherapistProfileDtoStrengthLevelEnum.SOFT,
+      'MEDIUM' => CreateTherapistProfileDtoStrengthLevelEnum.MEDIUM,
+      'STRONG' => CreateTherapistProfileDtoStrengthLevelEnum.STRONG,
+      _ => null,
+    };
+  }
 
   /// Converts schedule maps to [WorkScheduleEntryDto].
   List<WorkScheduleEntryDto> _toScheduleEntries(

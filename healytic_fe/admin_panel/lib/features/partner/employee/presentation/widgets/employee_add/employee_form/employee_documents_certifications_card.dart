@@ -4,6 +4,7 @@ import 'package:admin_panel/features/partner/employee/domain/verification_docume
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/button/button.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,9 +41,11 @@ class EmployeeDocumentsCertificationsCard extends ConsumerStatefulWidget {
 
 class _EmployeeDocsCertCardState
     extends ConsumerState<EmployeeDocumentsCertificationsCard> {
+  static const _allowedDocumentExtensions = ['jpg', 'jpeg', 'png', 'pdf'];
+  static const _maxDocumentSizeBytes = 10 * 1024 * 1024;
+
   bool _isExpanded = true;
   bool _isUploading = false;
-  final ImagePicker _picker = ImagePicker();
 
   // ── Document list helpers ────────────────────
 
@@ -173,7 +176,11 @@ class _EmployeeDocsCertCardState
     final existing = _findGroup(groups, DocFieldKey.others);
     final docs = _docsFromGroup(existing);
     if (index >= 0 && index < docs.length) {
-      docs[index] = DocumentEntry(name: name, url: url).toJson();
+      docs[index] = DocumentEntry(
+        name: name,
+        url: url,
+        updatedTime: DateTime.now().toIso8601String(),
+      ).toJson();
     }
 
     final updated = groups
@@ -191,11 +198,39 @@ class _EmployeeDocsCertCardState
   // ── Upload / View ───────────────────────────
 
   /// Picks and uploads a file, then calls
-  /// [onUploaded] with the resulting URL.
-  Future<void> _pickAndUpload(void Function(String url) onUploaded) async {
+  /// [onUploaded] with the original file name and
+  /// resulting URL.
+  Future<void> _pickAndUpload(
+    void Function(String fileName, String url) onUploaded,
+  ) async {
     try {
-      final picked = await _picker.pickImage(source: ImageSource.gallery);
-      if (picked == null) return;
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: _allowedDocumentExtensions,
+        allowMultiple: false,
+        withData: true,
+      );
+      final file = result?.files.single;
+      if (file == null) return;
+
+      if (file.size > _maxDocumentSizeBytes) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('File must be 10MB or smaller.')),
+          );
+        }
+        return;
+      }
+
+      final picked = _toUploadFile(file);
+      if (picked == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not read selected file.')),
+          );
+        }
+        return;
+      }
 
       setState(() => _isUploading = true);
 
@@ -204,7 +239,7 @@ class _EmployeeDocsCertCardState
       if (key != null) {
         final url = await s3.getFileUrl(key);
         if (mounted && url != null) {
-          onUploaded(url);
+          onUploaded(file.name, url);
         }
       }
     } catch (e) {
@@ -219,6 +254,27 @@ class _EmployeeDocsCertCardState
         setState(() => _isUploading = false);
       }
     }
+  }
+
+  XFile? _toUploadFile(PlatformFile file) {
+    final mimeType = _mimeTypeFor(file.extension);
+    final path = file.path;
+    if (path != null && path.isNotEmpty) {
+      return XFile(path, name: file.name, mimeType: mimeType);
+    }
+
+    final bytes = file.bytes;
+    if (bytes == null) return null;
+    return XFile.fromData(bytes, name: file.name, mimeType: mimeType);
+  }
+
+  String? _mimeTypeFor(String? extension) {
+    return switch (extension?.toLowerCase()) {
+      'pdf' => 'application/pdf',
+      'jpg' || 'jpeg' => 'image/jpeg',
+      'png' => 'image/png',
+      _ => null,
+    };
   }
 
   /// Opens a URL in the external browser.
@@ -326,9 +382,10 @@ class _EmployeeDocsCertCardState
       ),
       child: FormBuilderField<List<Map<String, dynamic>>>(
         name: EmployeeFormField.verificationDocuments.key,
-        initialValue: const [],
+        enabled: FormBuilder.of(context)?.enabled ?? true,
         builder: (field) {
           final groups = _currentGroups(field);
+          final formEnabled = field.widget.enabled;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -342,9 +399,9 @@ class _EmployeeDocsCertCardState
                 ),
               ),
               AppDimens.verticalLarge,
-              _buildRequiredSection(context, groups, field),
+              _buildRequiredSection(context, groups, field, formEnabled),
               AppDimens.verticalLarge,
-              _buildOtherDocumentsSection(context, groups, field),
+              _buildOtherDocumentsSection(context, groups, field, formEnabled),
             ],
           );
         },
@@ -358,6 +415,7 @@ class _EmployeeDocsCertCardState
     BuildContext context,
     List<Map<String, dynamic>> groups,
     FormFieldState<List<Map<String, dynamic>>> field,
+    bool formEnabled,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,6 +439,7 @@ class _EmployeeDocsCertCardState
           uploadSubtitle: 'PDF or JPG • Max 10MB',
           uploadIcon: Icons.badge,
           typeLabel: 'License / Permit',
+          formEnabled: formEnabled,
         ),
         AppDimens.verticalMedium,
         _buildSingleDocRow(
@@ -392,6 +451,7 @@ class _EmployeeDocsCertCardState
           uploadSubtitle: 'PDF, JPG, or PNG • Max 10MB',
           uploadIcon: Icons.perm_identity,
           typeLabel: 'Identity Card',
+          formEnabled: formEnabled,
         ),
       ],
     );
@@ -408,6 +468,7 @@ class _EmployeeDocsCertCardState
     required String uploadSubtitle,
     required IconData uploadIcon,
     required String typeLabel,
+    required bool formEnabled,
   }) {
     final group = _findGroup(groups, fieldKey);
     final docs = _docsFromGroup(group);
@@ -418,13 +479,13 @@ class _EmployeeDocsCertCardState
         icon: uploadIcon,
         title: _isUploading ? 'Uploading...' : uploadTitle,
         subtitle: uploadSubtitle,
-        onUpload: _isUploading
+        onUpload: !formEnabled || _isUploading
             ? null
-            : () => _pickAndUpload((url) {
+            : () => _pickAndUpload((fileName, url) {
                 final updated = _upsertSingleDoc(
                   _currentGroups(field),
                   fieldKey: fieldKey,
-                  name: uploadTitle,
+                  name: fileName,
                   url: url,
                 );
                 field.didChange(updated);
@@ -439,19 +500,23 @@ class _EmployeeDocsCertCardState
       fileName: _fileNameFromUrl(url, name),
       typeLabel: typeLabel,
       onView: url.isNotEmpty ? () => _viewDocument(url) : null,
-      onReplace: () => _pickAndUpload((newUrl) {
-        final updated = _upsertSingleDoc(
-          _currentGroups(field),
-          fieldKey: fieldKey,
-          name: name,
-          url: newUrl,
-        );
-        field.didChange(updated);
-      }),
-      onRemove: () {
-        final updated = _removeGroup(_currentGroups(field), fieldKey);
-        field.didChange(updated);
-      },
+      onReplace: formEnabled
+          ? () => _pickAndUpload((fileName, newUrl) {
+              final updated = _upsertSingleDoc(
+                _currentGroups(field),
+                fieldKey: fieldKey,
+                name: fileName,
+                url: newUrl,
+              );
+              field.didChange(updated);
+            })
+          : null,
+      onRemove: formEnabled
+          ? () {
+              final updated = _removeGroup(_currentGroups(field), fieldKey);
+              field.didChange(updated);
+            }
+          : null,
     );
   }
 
@@ -464,6 +529,7 @@ class _EmployeeDocsCertCardState
     BuildContext context,
     List<Map<String, dynamic>> groups,
     FormFieldState<List<Map<String, dynamic>>> field,
+    bool formEnabled,
   ) {
     final otherGroup = _findGroup(groups, DocFieldKey.others);
     final otherDocs = _docsFromGroup(otherGroup);
@@ -493,29 +559,32 @@ class _EmployeeDocsCertCardState
               fileName: _fileNameFromUrl(url, name),
               typeLabel: name,
               onView: url.isNotEmpty ? () => _viewDocument(url) : null,
-              onReplace: () => _pickAndUpload((newUrl) {
-                final fileName = _fileNameFromUrl(newUrl, name);
-                final updated = _replaceInOtherDocs(
-                  _currentGroups(field),
-                  index,
-                  name: fileName,
-                  url: newUrl,
-                );
-                field.didChange(updated);
-              }),
-              onRemove: () {
-                final updated = _removeFromOtherDocs(
-                  _currentGroups(field),
-                  index,
-                );
-                field.didChange(updated);
-              },
+              onReplace: formEnabled
+                  ? () => _pickAndUpload((fileName, newUrl) {
+                      final updated = _replaceInOtherDocs(
+                        _currentGroups(field),
+                        index,
+                        name: fileName,
+                        url: newUrl,
+                      );
+                      field.didChange(updated);
+                    })
+                  : null,
+              onRemove: formEnabled
+                  ? () {
+                      final updated = _removeFromOtherDocs(
+                        _currentGroups(field),
+                        index,
+                      );
+                      field.didChange(updated);
+                    }
+                  : null,
             ),
           );
         }),
 
         // Upload zone
-        _buildUploadZone(context, colorScheme, field),
+        _buildUploadZone(context, colorScheme, field, formEnabled),
       ],
     );
   }
@@ -526,12 +595,12 @@ class _EmployeeDocsCertCardState
     BuildContext context,
     ColorScheme colorScheme,
     FormFieldState<List<Map<String, dynamic>>> field,
+    bool formEnabled,
   ) {
     return InkWell(
-      onTap: _isUploading
+      onTap: !formEnabled || _isUploading
           ? null
-          : () => _pickAndUpload((url) {
-              final fileName = _fileNameFromUrl(url, 'Document');
+          : () => _pickAndUpload((fileName, url) {
               final updated = _addToOtherDocs(
                 _currentGroups(field),
                 name: fileName,
@@ -685,15 +754,15 @@ class _UploadedDocumentTile extends StatelessWidget {
     required this.fileName,
     required this.typeLabel,
     this.onView,
-    required this.onReplace,
-    required this.onRemove,
+    this.onReplace,
+    this.onRemove,
   });
 
   final String fileName;
   final String typeLabel;
   final VoidCallback? onView;
-  final VoidCallback onReplace;
-  final VoidCallback onRemove;
+  final VoidCallback? onReplace;
+  final VoidCallback? onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -766,32 +835,35 @@ class _UploadedDocumentTile extends StatelessWidget {
           ),
           AppDimens.horizontalSmall,
         ],
-        AppButton(
-          onPressed: onReplace,
-          buttonType: ButtonType.outline,
-          customStyle: OutlinedButton.styleFrom(
-            foregroundColor: cs.onSurfaceVariant,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            side: BorderSide(color: cs.outlineVariant),
-          ),
-          child: Text(
-            'Replace',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: cs.onSurfaceVariant,
+        if (onReplace != null) ...[
+          AppButton(
+            onPressed: onReplace,
+            buttonType: ButtonType.outline,
+            customStyle: OutlinedButton.styleFrom(
+              foregroundColor: cs.onSurfaceVariant,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              side: BorderSide(color: cs.outlineVariant),
+            ),
+            child: Text(
+              'Replace',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: cs.onSurfaceVariant,
+              ),
             ),
           ),
-        ),
-        AppDimens.horizontalMedium,
-        InkWell(
-          onTap: onRemove,
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-            child: Icon(Icons.delete, size: 20, color: cs.onSurfaceVariant),
+          AppDimens.horizontalMedium,
+        ],
+        if (onRemove != null)
+          InkWell(
+            onTap: onRemove,
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+              child: Icon(Icons.delete, size: 20, color: cs.onSurfaceVariant),
+            ),
           ),
-        ),
       ],
     );
   }

@@ -1,0 +1,1 @@
+scripts/docker-push.sh 72bd97ecd1dc nonameaaaa/healytics_backend nonameaaaa/healytics_backend-migrate

@@ -73,6 +73,30 @@ Class | Method | HTTP request | Description
 *AdminCategoriesApi* | [**adminCategoriesControllerFindOne**](doc//AdminCategoriesApi.md#admincategoriescontrollerfindone) | **GET** /admin/categories/{id} | Get a category by id (admin view)
 *AdminCategoriesApi* | [**adminCategoriesControllerRemove**](doc//AdminCategoriesApi.md#admincategoriescontrollerremove) | **DELETE** /admin/categories/{id} | Delete a category
 *AdminCategoriesApi* | [**adminCategoriesControllerUpdate**](doc//AdminCategoriesApi.md#admincategoriescontrollerupdate) | **PATCH** /admin/categories/{id} | Update a category
+*AdminFinanceApi* | [**adminFinanceControllerAddNote**](doc//AdminFinanceApi.md#adminfinancecontrolleraddnote) | **POST** /admin/finance/notes | Add a note to a finance entity
+*AdminFinanceApi* | [**adminFinanceControllerApproveRefundCase**](doc//AdminFinanceApi.md#adminfinancecontrollerapproverefundcase) | **POST** /admin/finance/refund-cases/{id}/approve | Approve a refund or dispute case
+*AdminFinanceApi* | [**adminFinanceControllerCreateExport**](doc//AdminFinanceApi.md#adminfinancecontrollercreateexport) | **POST** /admin/finance/exports | Create a finance export job
+*AdminFinanceApi* | [**adminFinanceControllerFlagTransaction**](doc//AdminFinanceApi.md#adminfinancecontrollerflagtransaction) | **PATCH** /admin/finance/transactions/{id}/review-flag | Flag or unflag a transaction for finance review
+*AdminFinanceApi* | [**adminFinanceControllerGetAlerts**](doc//AdminFinanceApi.md#adminfinancecontrollergetalerts) | **GET** /admin/finance/alerts | Get derived operational finance alerts
+*AdminFinanceApi* | [**adminFinanceControllerGetExports**](doc//AdminFinanceApi.md#adminfinancecontrollergetexports) | **GET** /admin/finance/exports | List finance export jobs
+*AdminFinanceApi* | [**adminFinanceControllerGetPartnerExposure**](doc//AdminFinanceApi.md#adminfinancecontrollergetpartnerexposure) | **GET** /admin/finance/partner-exposure | Rank partner financial exposure
+*AdminFinanceApi* | [**adminFinanceControllerGetPayoutDetail**](doc//AdminFinanceApi.md#adminfinancecontrollergetpayoutdetail) | **GET** /admin/finance/payouts/{id} | Get payout detail
+*AdminFinanceApi* | [**adminFinanceControllerGetPayouts**](doc//AdminFinanceApi.md#adminfinancecontrollergetpayouts) | **GET** /admin/finance/payouts | List platform payouts
+*AdminFinanceApi* | [**adminFinanceControllerGetReconciliation**](doc//AdminFinanceApi.md#adminfinancecontrollergetreconciliation) | **GET** /admin/finance/reconciliation | List reconciliation exceptions
+*AdminFinanceApi* | [**adminFinanceControllerGetReconciliationDetail**](doc//AdminFinanceApi.md#adminfinancecontrollergetreconciliationdetail) | **GET** /admin/finance/reconciliation/{id} | Get reconciliation exception detail
+*AdminFinanceApi* | [**adminFinanceControllerGetRefundCaseDetail**](doc//AdminFinanceApi.md#adminfinancecontrollergetrefundcasedetail) | **GET** /admin/finance/refund-cases/{id} | Get refund or dispute case detail
+*AdminFinanceApi* | [**adminFinanceControllerGetRefundCases**](doc//AdminFinanceApi.md#adminfinancecontrollergetrefundcases) | **GET** /admin/finance/refund-cases | List platform refund and dispute cases
+*AdminFinanceApi* | [**adminFinanceControllerGetSummary**](doc//AdminFinanceApi.md#adminfinancecontrollergetsummary) | **GET** /admin/finance/summary | Get platform-wide admin finance summary metrics
+*AdminFinanceApi* | [**adminFinanceControllerGetTransactionDetail**](doc//AdminFinanceApi.md#adminfinancecontrollergettransactiondetail) | **GET** /admin/finance/transactions/{id} | Get platform ledger transaction detail
+*AdminFinanceApi* | [**adminFinanceControllerGetTransactions**](doc//AdminFinanceApi.md#adminfinancecontrollergettransactions) | **GET** /admin/finance/transactions | List platform ledger transactions
+*AdminFinanceApi* | [**adminFinanceControllerGetTrend**](doc//AdminFinanceApi.md#adminfinancecontrollergettrend) | **GET** /admin/finance/trend | Get platform-wide finance trend data
+*AdminFinanceApi* | [**adminFinanceControllerHoldPayout**](doc//AdminFinanceApi.md#adminfinancecontrollerholdpayout) | **POST** /admin/finance/payouts/{id}/hold | Place an admin hold on a payout
+*AdminFinanceApi* | [**adminFinanceControllerMarkSettlement**](doc//AdminFinanceApi.md#adminfinancecontrollermarksettlement) | **PATCH** /admin/finance/transactions/{id}/settlement | Mark transaction settlement status with an admin note
+*AdminFinanceApi* | [**adminFinanceControllerRejectRefundCase**](doc//AdminFinanceApi.md#adminfinancecontrollerrejectrefundcase) | **POST** /admin/finance/refund-cases/{id}/reject | Reject a refund or dispute case
+*AdminFinanceApi* | [**adminFinanceControllerReleasePayoutHold**](doc//AdminFinanceApi.md#adminfinancecontrollerreleasepayouthold) | **POST** /admin/finance/payouts/{id}/release-hold | Release an admin hold from a payout
+*AdminFinanceApi* | [**adminFinanceControllerReopenReconciliation**](doc//AdminFinanceApi.md#adminfinancecontrollerreopenreconciliation) | **POST** /admin/finance/reconciliation/{id}/reopen | Reopen a reconciliation exception
+*AdminFinanceApi* | [**adminFinanceControllerResolveReconciliation**](doc//AdminFinanceApi.md#adminfinancecontrollerresolvereconciliation) | **POST** /admin/finance/reconciliation/{id}/resolve | Resolve a reconciliation exception
+*AdminFinanceApi* | [**adminFinanceControllerRetryPayout**](doc//AdminFinanceApi.md#adminfinancecontrollerretrypayout) | **POST** /admin/finance/payouts/{id}/retry | Retry a failed or held payout
 *AdminNotificationsApi* | [**adminNotificationControllerCreateBroadcast**](doc//AdminNotificationsApi.md#adminnotificationcontrollercreatebroadcast) | **POST** /admin/notifications/broadcast | Create and send a system-wide broadcast notification
 *AdminNotificationsApi* | [**adminNotificationControllerGetBroadcasts**](doc//AdminNotificationsApi.md#adminnotificationcontrollergetbroadcasts) | **GET** /admin/notifications/broadcasts | List sent broadcast notifications (audit)
 *AdminPartnersApi* | [**adminPartnersControllerGetPartnerDetail**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartnerdetail) | **GET** /admin/partners/{id} | Get partner details including documents
@@ -239,6 +263,42 @@ Class | Method | HTTP request | Description
  - [AddressDto](doc//AddressDto.md)
  - [AddressInfoDto](doc//AddressInfoDto.md)
  - [AdminCategoryResponseDto](doc//AdminCategoryResponseDto.md)
+ - [AdminFinanceAlertDto](doc//AdminFinanceAlertDto.md)
+ - [AdminFinanceAuditEventDto](doc//AdminFinanceAuditEventDto.md)
+ - [AdminFinanceCreateExportDto](doc//AdminFinanceCreateExportDto.md)
+ - [AdminFinanceCreateNoteDto](doc//AdminFinanceCreateNoteDto.md)
+ - [AdminFinanceExportJobDto](doc//AdminFinanceExportJobDto.md)
+ - [AdminFinanceExportStatus](doc//AdminFinanceExportStatus.md)
+ - [AdminFinanceExportType](doc//AdminFinanceExportType.md)
+ - [AdminFinanceNoteActionDto](doc//AdminFinanceNoteActionDto.md)
+ - [AdminFinanceNoteDto](doc//AdminFinanceNoteDto.md)
+ - [AdminFinanceNoteEntityType](doc//AdminFinanceNoteEntityType.md)
+ - [AdminFinanceOverviewDto](doc//AdminFinanceOverviewDto.md)
+ - [AdminFinancePageMetaDto](doc//AdminFinancePageMetaDto.md)
+ - [AdminFinancePartnerExposureDto](doc//AdminFinancePartnerExposureDto.md)
+ - [AdminFinancePayoutAttemptDto](doc//AdminFinancePayoutAttemptDto.md)
+ - [AdminFinancePayoutDetailDto](doc//AdminFinancePayoutDetailDto.md)
+ - [AdminFinancePayoutPageDto](doc//AdminFinancePayoutPageDto.md)
+ - [AdminFinancePayoutRecordDto](doc//AdminFinancePayoutRecordDto.md)
+ - [AdminFinancePeriod](doc//AdminFinancePeriod.md)
+ - [AdminFinanceProvider](doc//AdminFinanceProvider.md)
+ - [AdminFinanceProviderEventDto](doc//AdminFinanceProviderEventDto.md)
+ - [AdminFinanceReconciliationDetailDto](doc//AdminFinanceReconciliationDetailDto.md)
+ - [AdminFinanceReconciliationExceptionDto](doc//AdminFinanceReconciliationExceptionDto.md)
+ - [AdminFinanceReconciliationPageDto](doc//AdminFinanceReconciliationPageDto.md)
+ - [AdminFinanceReconciliationStatus](doc//AdminFinanceReconciliationStatus.md)
+ - [AdminFinanceReconciliationType](doc//AdminFinanceReconciliationType.md)
+ - [AdminFinanceRefundCaseDetailDto](doc//AdminFinanceRefundCaseDetailDto.md)
+ - [AdminFinanceRefundCasePageDto](doc//AdminFinanceRefundCasePageDto.md)
+ - [AdminFinanceRefundCaseRecordDto](doc//AdminFinanceRefundCaseRecordDto.md)
+ - [AdminFinanceRequiredNoteActionDto](doc//AdminFinanceRequiredNoteActionDto.md)
+ - [AdminFinanceReviewFlagActionDto](doc//AdminFinanceReviewFlagActionDto.md)
+ - [AdminFinanceRiskTone](doc//AdminFinanceRiskTone.md)
+ - [AdminFinanceSettlementActionDto](doc//AdminFinanceSettlementActionDto.md)
+ - [AdminFinanceTransactionDetailDto](doc//AdminFinanceTransactionDetailDto.md)
+ - [AdminFinanceTransactionPageDto](doc//AdminFinanceTransactionPageDto.md)
+ - [AdminFinanceTransactionRecordDto](doc//AdminFinanceTransactionRecordDto.md)
+ - [AdminFinanceTrendPointDto](doc//AdminFinanceTrendPointDto.md)
  - [AdminLoginDto](doc//AdminLoginDto.md)
  - [AdminPartnerDetailResponseDto](doc//AdminPartnerDetailResponseDto.md)
  - [AiRecommendationItemDto](doc//AiRecommendationItemDto.md)
@@ -378,7 +438,9 @@ Class | Method | HTTP request | Description
  - [MyProfileCompletionResponseDto](doc//MyProfileCompletionResponseDto.md)
  - [MyProfileResponseDto](doc//MyProfileResponseDto.md)
  - [NotificationResponseDto](doc//NotificationResponseDto.md)
+ - [PaginatedEmployeeAppointmentsResponseDto](doc//PaginatedEmployeeAppointmentsResponseDto.md)
  - [PaginationMeta](doc//PaginationMeta.md)
+ - [PaginationMetaResponseDto](doc//PaginationMetaResponseDto.md)
  - [ParticipantInfoDto](doc//ParticipantInfoDto.md)
  - [PartnerCategorySummaryDto](doc//PartnerCategorySummaryDto.md)
  - [PartnerClinicDto](doc//PartnerClinicDto.md)

@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:user_app/core/entities/app_exception.dart';
 import 'package:user_app/features/authenticate/presentation/providers/authenticate.provider.dart';
 import 'package:common/widgets/button/button.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
@@ -36,10 +37,11 @@ class LoginForm extends HookConsumerWidget {
     ref.listen(authenticateProvider, (previous, next) {
       _log.fine('Auth state: $next');
       if (next.hasError && !next.isLoading && context.mounted) {
-        AppToast.error(
-          context,
-          'Unable to sign in. Please check your credentials.',
+        final error = next.error;
+        final appEx = AppException.fromError(
+          error ?? 'An unknown error occurred',
         );
+        _showSignInError(context, appEx);
       }
 
       isLoading.value = next.isLoading;
@@ -51,10 +53,7 @@ class LoginForm extends HookConsumerWidget {
           next.value?.authenticate != null;
 
       if (hasCompletedSignIn && context.mounted) {
-        AppToast.success(
-          context,
-          'Signed in successfully.',
-        );
+        AppToast.success(context, 'Signed in successfully.');
         context.pushReplacementNamed(HomeRoute.name);
       }
     });
@@ -63,10 +62,7 @@ class LoginForm extends HookConsumerWidget {
       final isValid = formKey.currentState?.saveAndValidate() ?? false;
       if (!isValid) {
         if (context.mounted) {
-          AppToast.warning(
-            context,
-            'Please fix the highlighted fields.',
-          );
+          AppToast.warning(context, 'Please fix the highlighted fields.');
         }
         return;
       }
@@ -138,8 +134,7 @@ class LoginForm extends HookConsumerWidget {
                 widthFactor: 0.8,
                 child: AppButton(
                   key: keys.signInPage.signInButton,
-                  onPressed:
-                      (isLoading.value || !hasValidInput)
+                  onPressed: (isLoading.value || !hasValidInput)
                       ? null
                       : signIn,
                   buttonType: ButtonType.elevated,
@@ -163,5 +158,26 @@ class LoginForm extends HookConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+/// Shows the appropriate [AppToast] based on the
+/// [AppException] subtype and HTTP status code.
+///
+/// - 401/403 → [AppToast.warning] (auth issue).
+/// - 5xx / network → [AppToast.error] (server issue).
+/// - Other → [AppToast.error] (generic).
+void _showSignInError(BuildContext context, AppException exception) {
+  switch (exception) {
+    case ServerException(:final statusCode):
+      if (statusCode == 401 || statusCode == 403) {
+        AppToast.warning(context, exception.userMessage);
+      } else {
+        AppToast.error(context, exception.userMessage);
+      }
+    case NetworkException():
+      AppToast.error(context, exception.userMessage);
+    case UnexpectedException():
+      AppToast.error(context, exception.userMessage);
   }
 }

@@ -4,9 +4,9 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/core/entities/store.entity.dart';
+import 'package:user_app/core/entities/app_exception.dart';
 import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/services/push_notification_flutter.service.dart';
-import 'package:user_app/core/utils/error_message_code.dart';
 import 'package:user_app/features/authenticate/data/repositories/authenticate_repository_impl.dart';
 import 'package:user_app/features/authenticate/domain/entities/authenticate.entity.dart';
 import 'package:user_openapi/api.dart';
@@ -53,7 +53,7 @@ class AuthenticateNotifier extends _$AuthenticateNotifier {
       unawaited(_initializePushNotifications());
     } on ApiException catch (e) {
       state = AsyncError<AuthenticateStateData>(
-        errorMessageCode(e.code),
+        AppException.fromError(e),
         e.stackTrace ?? StackTrace.current,
       );
       rethrow;

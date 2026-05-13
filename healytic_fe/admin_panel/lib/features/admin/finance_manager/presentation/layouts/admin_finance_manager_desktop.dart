@@ -45,13 +45,10 @@ class _AdminFinanceManagerDesktopState
   @override
   Widget build(BuildContext context) {
     final ws = ref.watch(adminFinanceWorkspaceProvider);
-    final notifier = ref.read(
-      adminFinanceWorkspaceProvider.notifier,
-    );
+    final notifier = ref.read(adminFinanceWorkspaceProvider.notifier);
 
     // Reload table data when tab or reloadToken changes.
-    if (ws.reloadToken != _lastReloadToken ||
-        ws.activeTab != _lastTab) {
+    if (ws.reloadToken != _lastReloadToken || ws.activeTab != _lastTab) {
       _lastReloadToken = ws.reloadToken;
       _lastTab = ws.activeTab;
       _loadTabData(ws);
@@ -63,10 +60,7 @@ class _AdminFinanceManagerDesktopState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AdminFinanceHeader(
-              onExport: () =>
-                  _showExportDialog(context),
-            ),
+            AdminFinanceHeader(onExport: () => _showExportDialog(context)),
             AppDimens.verticalLarge,
             AdminFinancePeriodSelector(
               selected: ws.period,
@@ -82,23 +76,16 @@ class _AdminFinanceManagerDesktopState
               state: ws,
               onSearchChanged: notifier.setSearchQuery,
               onSourceTypeChanged: notifier.setSourceType,
-              onTransactionTypeChanged:
-                  notifier.setTransactionType,
-              onTransactionStatusChanged:
-                  notifier.setTransactionStatus,
-              onSettlementStatusChanged:
-                  notifier.setSettlementStatus,
-              onPayoutStatusChanged:
-                  notifier.setPayoutStatus,
-              onRefundCaseStatusChanged:
-                  notifier.setRefundCaseStatus,
-              onReconciliationStatusChanged:
-                  notifier.setReconciliationStatus,
+              onTransactionTypeChanged: notifier.setTransactionType,
+              onTransactionStatusChanged: notifier.setTransactionStatus,
+              onSettlementStatusChanged: notifier.setSettlementStatus,
+              onPayoutStatusChanged: notifier.setPayoutStatus,
+              onRefundCaseStatusChanged: notifier.setRefundCaseStatus,
+              onReconciliationStatusChanged: notifier.setReconciliationStatus,
               onProviderChanged: notifier.setProvider,
               onCurrencyChanged: notifier.setCurrency,
               onFlaggedChanged: notifier.setOnlyFlagged,
-              onSlaBreachedChanged:
-                  notifier.setOnlySlaBreached,
+              onSlaBreachedChanged: notifier.setOnlySlaBreached,
               onReset: notifier.resetFilters,
             ),
             AppDimens.verticalLarge,
@@ -109,76 +96,48 @@ class _AdminFinanceManagerDesktopState
     );
   }
 
-  Widget _buildActiveTabContent(
-    AdminFinanceWorkspaceState ws,
-  ) {
+  Widget _buildActiveTabContent(AdminFinanceWorkspaceState ws) {
     return switch (ws.activeTab) {
-      AdminFinanceWorkspaceTab.overview =>
-        _buildOverview(),
-      AdminFinanceWorkspaceTab.ledger =>
-        _buildLedger(),
-      AdminFinanceWorkspaceTab.payouts =>
-        _buildPayouts(),
-      AdminFinanceWorkspaceTab.refunds =>
-        _buildRefunds(),
-      AdminFinanceWorkspaceTab.reconciliation =>
-        _buildReconciliation(),
-      AdminFinanceWorkspaceTab.partnerExposure =>
-        _buildPartnerExposure(),
-      AdminFinanceWorkspaceTab.exports =>
-        _buildExports(),
+      AdminFinanceWorkspaceTab.overview => _buildOverview(),
+      AdminFinanceWorkspaceTab.ledger => _buildLedger(),
+      AdminFinanceWorkspaceTab.payouts => _buildPayouts(),
+      AdminFinanceWorkspaceTab.refunds => _buildRefunds(),
+      AdminFinanceWorkspaceTab.reconciliation => _buildReconciliation(),
+      AdminFinanceWorkspaceTab.partnerExposure => _buildPartnerExposure(),
+      AdminFinanceWorkspaceTab.exports => _buildExports(),
     };
   }
 
   Widget _buildOverview() {
-    final overviewAsync = ref.watch(
-      adminFinanceOverviewProvider,
-    );
-    final trendAsync = ref.watch(
-      adminFinanceTrendProvider,
-    );
-    final alertsAsync = ref.watch(
-      adminFinanceAlertsProvider,
-    );
-    final exposureAsync = ref.watch(
-      adminFinancePartnerExposureProvider,
-    );
+    final overviewAsync = ref.watch(adminFinanceOverviewProvider);
+    final trendAsync = ref.watch(adminFinanceTrendProvider);
+    final alertsAsync = ref.watch(adminFinanceAlertsProvider);
+    final exposureAsync = ref.watch(adminFinancePartnerExposureProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         overviewAsync.when(
           data: (o) => AdminFinanceKpiGrid(overview: o),
-          loading: () =>
-              const LinearProgressIndicator(),
+          loading: () => const LinearProgressIndicator(),
           error: (e, _) => _errorWidget(e),
         ),
         AppDimens.verticalLarge,
         trendAsync.when(
-          data: (data) => AdminFinanceTrendPanel(
-            data: data,
-            currency: 'VND',
-          ),
-          loading: () =>
-              const LinearProgressIndicator(),
+          data: (data) => AdminFinanceTrendPanel(data: data, currency: 'VND'),
+          loading: () => const LinearProgressIndicator(),
           error: (e, _) => _errorWidget(e),
         ),
         AppDimens.verticalLarge,
         alertsAsync.when(
-          data: (alerts) =>
-              AdminFinanceAlertsPanel(alerts: alerts),
-          loading: () =>
-              const LinearProgressIndicator(),
+          data: (alerts) => AdminFinanceAlertsPanel(alerts: alerts),
+          loading: () => const LinearProgressIndicator(),
           error: (e, _) => _errorWidget(e),
         ),
         AppDimens.verticalLarge,
         exposureAsync.when(
-          data: (data) =>
-              AdminFinancePartnerExposurePanel(
-            exposures: data,
-          ),
-          loading: () =>
-              const LinearProgressIndicator(),
+          data: (data) => AdminFinancePartnerExposurePanel(exposures: data),
+          loading: () => const LinearProgressIndicator(),
           error: (e, _) => _errorWidget(e),
         ),
       ],
@@ -202,9 +161,7 @@ class _AdminFinanceManagerDesktopState
       records: _payouts,
       totalRows: _payoutTotal,
       onRowTap: (id) {
-        AdminFinancePayoutDetailRoute(
-          payoutId: id.value,
-        ).push(context);
+        AdminFinancePayoutDetailRoute(payoutId: id.value).push(context);
       },
     );
   }
@@ -214,9 +171,7 @@ class _AdminFinanceManagerDesktopState
       records: _refunds,
       totalRows: _refundTotal,
       onRowTap: (id) {
-        AdminFinanceRefundCaseDetailRoute(
-          caseId: id.value,
-        ).push(context);
+        AdminFinanceRefundCaseDetailRoute(caseId: id.value).push(context);
       },
     );
   }
@@ -234,44 +189,31 @@ class _AdminFinanceManagerDesktopState
   }
 
   Widget _buildPartnerExposure() {
-    final exposureAsync = ref.watch(
-      adminFinancePartnerExposureProvider,
-    );
+    final exposureAsync = ref.watch(adminFinancePartnerExposureProvider);
     return exposureAsync.when(
-      data: (data) => AdminFinancePartnerExposurePanel(
-        exposures: data,
-      ),
+      data: (data) => AdminFinancePartnerExposurePanel(exposures: data),
       loading: () => const LinearProgressIndicator(),
       error: (e, _) => _errorWidget(e),
     );
   }
 
   Widget _buildExports() {
-    final exportsAsync = ref.watch(
-      adminFinanceExportsProvider,
-    );
+    final exportsAsync = ref.watch(adminFinanceExportsProvider);
     return exportsAsync.when(
-      data: (data) => AdminFinanceExportTable(
-        records: data,
-      ),
+      data: (data) => AdminFinanceExportTable(records: data),
       loading: () => const LinearProgressIndicator(),
       error: (e, _) => _errorWidget(e),
     );
   }
 
-  Future<void> _loadTabData(
-    AdminFinanceWorkspaceState ws,
-  ) async {
-    final repo = ref.read(
-      adminFinanceRepositoryProvider,
-    );
+  Future<void> _loadTabData(AdminFinanceWorkspaceState ws) async {
+    final repo = ref.read(adminFinanceRepositoryProvider);
     final filter = ws.filter;
     const pageSize = 50;
 
     switch (ws.activeTab) {
       case AdminFinanceWorkspaceTab.ledger:
-        final total = await repo
-            .getTransactionTotalRows(filter);
+        final total = await repo.getTransactionTotalRows(filter);
         final rows = await repo.getTransactions(
           filter: filter,
           startingAt: 0,
@@ -284,8 +226,7 @@ class _AdminFinanceManagerDesktopState
           });
         }
       case AdminFinanceWorkspaceTab.payouts:
-        final total = await repo
-            .getPayoutTotalRows(filter);
+        final total = await repo.getPayoutTotalRows(filter);
         final rows = await repo.getPayouts(
           filter: filter,
           startingAt: 0,
@@ -298,8 +239,7 @@ class _AdminFinanceManagerDesktopState
           });
         }
       case AdminFinanceWorkspaceTab.refunds:
-        final total = await repo
-            .getRefundCaseTotalRows(filter);
+        final total = await repo.getRefundCaseTotalRows(filter);
         final rows = await repo.getRefundCases(
           filter: filter,
           startingAt: 0,
@@ -312,10 +252,8 @@ class _AdminFinanceManagerDesktopState
           });
         }
       case AdminFinanceWorkspaceTab.reconciliation:
-        final total = await repo
-            .getReconciliationTotalRows(filter);
-        final rows =
-            await repo.getReconciliationExceptions(
+        final total = await repo.getReconciliationTotalRows(filter);
+        final rows = await repo.getReconciliationExceptions(
           filter: filter,
           startingAt: 0,
           count: pageSize,
@@ -332,14 +270,10 @@ class _AdminFinanceManagerDesktopState
   }
 
   void _showExportDialog(BuildContext context) async {
-    final result =
-        await showAdminFinanceCreateExportDialog(
-      context,
-    );
-    if (result != null) {
-      ref
-          .read(adminFinanceWorkspaceProvider.notifier)
-          .bumpReload();
+    final type = await showAdminFinanceCreateExportDialog(context);
+    if (type != null && context.mounted) {
+      await ref.read(adminFinanceRepositoryProvider).createExport(type);
+      ref.read(adminFinanceWorkspaceProvider.notifier).bumpReload();
     }
   }
 
@@ -358,24 +292,16 @@ class _AdminFinanceManagerDesktopState
             AppDimens.verticalSmall,
             Text(
               'Something went wrong. Please try again.',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurfaceVariant,
-                  ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             AppDimens.verticalSmall,
             TextButton.icon(
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
-              onPressed: () => ref
-                  .read(
-                    adminFinanceWorkspaceProvider.notifier,
-                  )
-                  .bumpReload(),
+              onPressed: () =>
+                  ref.read(adminFinanceWorkspaceProvider.notifier).bumpReload(),
             ),
           ],
         ),
