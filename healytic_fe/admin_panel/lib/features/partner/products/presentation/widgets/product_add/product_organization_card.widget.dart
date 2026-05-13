@@ -103,9 +103,19 @@ class _ProductOrganizationCardState
           hintText: 'Select category...',
           initialValue: _category,
           label: 'Category',
+          isRequired: true,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Category is required';
+            }
+            return null;
+          },
           items: categories
               .map(
-                (cat) => DropdownMenuItem(value: cat.id, child: Text(cat.name)),
+                (cat) => DropdownMenuItem(
+                  value: cat.id,
+                  child: Text(cat.name),
+                ),
               )
               .toList(),
           onChanged: (val) {

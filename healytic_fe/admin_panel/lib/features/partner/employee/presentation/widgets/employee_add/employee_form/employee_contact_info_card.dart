@@ -132,7 +132,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                 FormFieldBuilders.buildTextField(
                   context,
                   fieldKey: 'emergency_contact_name',
-                  label: '',
+                  label: 'Emergency Name',
                   hintText: 'Contact Name',
                   isRequired: true,
                 ),
@@ -140,7 +140,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                 FormFieldBuilders.buildTextField(
                   context,
                   fieldKey: 'emergency_contact_phone',
-                  label: '',
+                  label: 'Emergency Phone',
                   hintText: 'Contact Phone',
                   isRequired: true,
                   prefixIcon: Icons.phone_in_talk_outlined,

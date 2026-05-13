@@ -250,6 +250,7 @@ class _EmployeeProfessionalRoleCardState
                           .toUpperCase();
                     });
                   },
+                  isRequired: true,
                 ),
               ),
             ],
@@ -288,6 +289,7 @@ class _EmployeeProfessionalRoleCardState
             fieldKey: 'description',
             readOnly: isReadOnly,
             initialValue: widget.employee?.description,
+            isRequired: true,
           ),
         ],
       ),

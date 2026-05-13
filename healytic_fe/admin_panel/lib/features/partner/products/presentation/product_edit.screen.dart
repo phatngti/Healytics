@@ -80,31 +80,49 @@ class _ProductEditContent extends HookConsumerWidget {
 
     Future<void> handleSave() async {
       final state = formKey.currentState;
-      if (state == null || !state.saveAndValidate()) {
-        return;
-      }
+      final isFormValid =
+          state?.saveAndValidate() ?? false;
+      final isManualValid =
+          serviceManualKey.currentState?.validate() ??
+          true;
+
+      if (!isFormValid || !isManualValid) return;
 
       isSubmitting.value = true;
       try {
-        final data = state.value;
-        final request = _buildDeltaRequest(product, data, serviceManualKey);
+        final data = state!.value;
+        final request = _buildDeltaRequest(
+          product,
+          data,
+          serviceManualKey,
+        );
 
-        await ref.read(productProvider.notifier).updateProduct(request);
+        await ref
+            .read(productProvider.notifier)
+            .updateProduct(request);
 
         // Invalidate cache so details refresh
-        ref.invalidate(productDetailsProvider(product.id.value));
+        ref.invalidate(
+          productDetailsProvider(product.id.value),
+        );
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Product updated successfully!')),
+            const SnackBar(
+              content: Text(
+                'Product updated successfully!',
+              ),
+            ),
           );
           context.goNamed(ProductHomeRoute.name);
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Failed to update: $e')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update: $e'),
+            ),
+          );
         }
       } finally {
         isSubmitting.value = false;
@@ -166,7 +184,7 @@ class _ProductEditContent extends HookConsumerWidget {
     final newDuration = _parseInt(data[ProductFormField.duration.key]);
     final newBuffer = _parseInt(data[ProductFormField.buffer.key]);
     final newCapacity = _parseInt(data[ProductFormField.capacity.key]);
-    final newLeadTime = _parseInt(data[ProductFormField.leadTime.key]);
+
     final newStaffAllocation =
         data[ProductFormField.staffAllocation.key] as String?;
     final newImages = (data[ProductFormField.productImages.key] as List?)
@@ -180,7 +198,6 @@ class _ProductEditContent extends HookConsumerWidget {
         newDuration != product.duration ||
         newBuffer != product.buffer ||
         newCapacity != product.capacity ||
-        newLeadTime != product.leadTime ||
         newStaffAllocation != product.staffAllocation;
 
     const listEq = DeepCollectionEquality();
@@ -207,7 +224,7 @@ class _ProductEditContent extends HookConsumerWidget {
           : null,
       buffer: definitionChanged ? (newBuffer ?? 0) : null,
       capacity: definitionChanged ? (newCapacity ?? 1) : null,
-      leadTime: definitionChanged ? (newLeadTime ?? 0) : null,
+
       staffAllocation: definitionChanged
           ? (newStaffAllocation ?? product.staffAllocation)
           : null,
@@ -276,7 +293,7 @@ class _ProductEditContent extends HookConsumerWidget {
       ProductFormField.duration.key: product.duration?.toString(),
       ProductFormField.buffer.key: product.buffer?.toString(),
       ProductFormField.capacity.key: product.capacity?.toString(),
-      ProductFormField.leadTime.key: product.leadTime?.toString(),
+
       ProductFormField.staffAllocation.key: product.staffAllocation,
       ProductFormField.selectedStaffIds.key: product.staffIds,
       ProductFormField.productImages.key: product.images,

@@ -3,6 +3,7 @@ import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/facility_image.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/facility_image_key.dart';
+import 'package:admin_panel/features/partner/products/domain/service_manual_key.dart';
 import 'package:admin_panel/features/partner/products/domain/product_form_field.dart';
 import 'package:admin_panel/features/partner/products/domain/product_status.dart';
 import 'package:admin_panel/features/partner/products/domain/product_type.dart';
@@ -23,6 +24,22 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProductAddScreen extends HookConsumerWidget {
   const ProductAddScreen({super.key, this.autofill = false});
+
+  static final List<String> _requiredFields = [
+    ProductFormField.productName.key,
+    ProductFormField.basePrice.key,
+    ProductFormField.productImages.key,
+    ProductFormField.facilityImages.key,
+    // Visibility
+    ProductFormField.visibilityStatus.key,
+    // Organization
+    ProductFormField.category.key,
+    // Operations & Scheduling
+    ProductFormField.duration.key,
+    ProductFormField.buffer.key,
+    ProductFormField.capacity.key,
+    ProductFormField.staffAllocation.key,
+  ];
 
   /// When `true` in UAT, the
   /// form is pre-populated with sample data.
@@ -47,44 +64,77 @@ class ProductAddScreen extends HookConsumerWidget {
       () => shouldAutofill ? _buildAutofillValues() : const <String, dynamic>{},
     );
 
+    void updateFormValidity() {
+      final state = formKey.currentState;
+      if (state == null) return;
+      isFormValid.value = _requiredFields.every(
+        (fieldKey) => _hasValue(state.fields[fieldKey]?.value),
+      );
+    }
+
+    void scheduleFormValidityUpdate() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        updateFormValidity();
+      });
+    }
+
+    useEffect(() {
+      scheduleFormValidityUpdate();
+      return null;
+    }, [initialValue]);
+
     Future<void> handleSubmit() async {
-      if (formKey.currentState?.saveAndValidate() ?? false) {
-        final formData = formKey.currentState!.value;
-        debugPrint('Form Data: $formData');
+      final isFormValid =
+          formKey.currentState?.saveAndValidate() ?? false;
+      final isManualValid =
+          serviceManualKey.currentState?.validate() ??
+          true;
 
-        isSubmitting.value = true;
+      if (!isFormValid || !isManualValid) return;
 
-        try {
-          await _submitForm(
-            ref: ref,
-            formData: formData,
-            serviceManualKey: serviceManualKey,
+      final formData = formKey.currentState!.value;
+      debugPrint('Form Data: $formData');
+
+      isSubmitting.value = true;
+
+      try {
+        await _submitForm(
+          ref: ref,
+          formData: formData,
+          serviceManualKey: serviceManualKey,
+        );
+
+        if (context.mounted) {
+          final semantic =
+              Theme.of(context)
+                  .extension<SemanticColors>()!;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'Product created successfully!',
+              ),
+              backgroundColor: semantic.success,
+            ),
           );
-
-          if (context.mounted) {
-            final semantic = Theme.of(context).extension<SemanticColors>()!;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Product created successfully!'),
-                backgroundColor: semantic.success,
+          context.goNamed(ProductHomeRoute.name);
+        }
+      } catch (e) {
+        if (context.mounted) {
+          final semantic =
+              Theme.of(context)
+                  .extension<SemanticColors>()!;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to create product: $e',
               ),
-            );
-            context.goNamed(ProductHomeRoute.name);
-          }
-        } catch (e) {
-          if (context.mounted) {
-            final semantic = Theme.of(context).extension<SemanticColors>()!;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Failed to create product: $e'),
-                backgroundColor: semantic.error,
-              ),
-            );
-          }
-        } finally {
-          if (context.mounted) {
-            isSubmitting.value = false;
-          }
+              backgroundColor: semantic.error,
+            ),
+          );
+        }
+      } finally {
+        if (context.mounted) {
+          isSubmitting.value = false;
         }
       }
     }
@@ -97,19 +147,16 @@ class ProductAddScreen extends HookConsumerWidget {
       key: formKey,
       initialValue: initialValue,
       onChanged: () {
-        // Delay so fields finish updating before we check.
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final state = formKey.currentState;
-          if (state == null) return;
-          isFormValid.value = state.fields.values.every((f) => f.isValid);
-        });
+        scheduleFormValidityUpdate();
       },
       child: ResponsiveWrapper(
         useLayout: true,
         desktop: ProductAddDesktop(
           isFormValid: isFormValid.value,
           onCancel: handleCancel,
-          onSubmit: isSubmitting.value ? null : () => handleSubmit(),
+          onSubmit: isSubmitting.value
+              ? null
+              : () => handleSubmit(),
           initialStatus: shouldAutofill
               ? ProductAddAutofill.status
               : ProductStatus.draft.apiValue,
@@ -120,6 +167,15 @@ class ProductAddScreen extends HookConsumerWidget {
               ? ProductAddAutofill.description
               : null,
           serviceManualKey: serviceManualKey,
+          initialGuidelines: shouldAutofill
+              ? ProductAddAutofill.guidelines
+              : const [],
+          initialRules: shouldAutofill
+              ? ProductAddAutofill.rules
+              : const [],
+          initialSteps: shouldAutofill
+              ? ProductAddAutofill.steps
+              : const [],
         ),
       ),
     );
@@ -169,9 +225,7 @@ class ProductAddScreen extends HookConsumerWidget {
     final capacity = int.tryParse(
       formData[ProductFormField.capacity.key]?.toString() ?? '',
     );
-    final leadTime = int.tryParse(
-      formData[ProductFormField.leadTime.key]?.toString() ?? '',
-    );
+
     final staffAllocation =
         formData[ProductFormField.staffAllocation.key] as String? ??
         StaffAllocation.any.apiValue;
@@ -205,7 +259,7 @@ class ProductAddScreen extends HookConsumerWidget {
       duration: duration,
       buffer: buffer,
       capacity: capacity,
-      leadTime: leadTime,
+
       staffAllocation: staffAllocation,
       staffIds: selectedStaffIds,
       images: productImages,
@@ -219,17 +273,37 @@ class ProductAddScreen extends HookConsumerWidget {
   /// Sample data map for all `FormBuilder` fields.
   /// Only used when autofill is active.
   static Map<String, dynamic> _buildAutofillValues() => {
-    ProductFormField.productName.key: ProductAddAutofill.name,
-    ProductFormField.productType.key: ProductAddAutofill.productType,
-    ProductFormField.basePrice.key: ProductAddAutofill.basePrice,
-    ProductFormField.salePrice.key: ProductAddAutofill.salePrice,
-    ProductFormField.duration.key: ProductAddAutofill.duration,
-    ProductFormField.buffer.key: ProductAddAutofill.buffer,
-    ProductFormField.capacity.key: ProductAddAutofill.capacity,
-    ProductFormField.leadTime.key: ProductAddAutofill.leadTime,
-    ProductFormField.productImages.key: ProductAddAutofill.productImages,
-    ProductFormField.facilityImages.key: ProductAddAutofill.facilityImages,
+    ProductFormField.productName.key:
+        ProductAddAutofill.name,
+    ProductFormField.productType.key:
+        ProductAddAutofill.productType,
+    ProductFormField.basePrice.key:
+        ProductAddAutofill.basePrice,
+    ProductFormField.salePrice.key:
+        ProductAddAutofill.salePrice,
+    // Visibility
+    ProductFormField.visibilityStatus.key:
+        ProductAddAutofill.status,
+    // Operations & Scheduling
+    ProductFormField.duration.key:
+        ProductAddAutofill.duration,
+    ProductFormField.buffer.key:
+        ProductAddAutofill.buffer,
+    ProductFormField.capacity.key:
+        ProductAddAutofill.capacity,
+    ProductFormField.staffAllocation.key:
+        StaffAllocation.any.apiValue,
+
+    ProductFormField.facilityImages.key:
+        ProductAddAutofill.facilityImages,
   };
+
+  static bool _hasValue(dynamic value) {
+    if (value == null) return false;
+    if (value is String) return value.trim().isNotEmpty;
+    if (value is Iterable) return value.isNotEmpty;
+    return true;
+  }
 
   /// Extract facility images from form data.
   static List<FacilityImageEntity> _extractFacilityImages(dynamic raw) {

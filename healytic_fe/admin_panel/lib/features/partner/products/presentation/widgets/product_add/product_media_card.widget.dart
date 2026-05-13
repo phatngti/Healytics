@@ -23,14 +23,23 @@ class _ProductMediaCardState extends ConsumerState<ProductMediaCard> {
 
     return FormBuilderField<List<dynamic>>(
       name: ProductFormField.productImages.key,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'At least one image is required';
+        }
+        return null;
+      },
       builder: (FormFieldState<List<dynamic>> field) {
         final currentImages = field.value ?? [];
+        final hasError = field.errorText != null;
 
         return Container(
           decoration: BoxDecoration(
             color: colorScheme.surface,
             borderRadius: AppDimens.radiusMediumSmall,
-            border: Border.all(color: colorScheme.outlineVariant),
+            border: Border.all(
+              color: hasError ? colorScheme.error : colorScheme.outlineVariant,
+            ),
             boxShadow: [
               BoxShadow(
                 color: colorScheme.shadow.withAlpha(5),
@@ -57,30 +66,31 @@ class _ProductMediaCardState extends ConsumerState<ProductMediaCard> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Media Gallery',
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Media Gallery',
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              const TextSpan(
+                                text: ' *',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         AppDimens.verticalExtraSmall,
                         Text(
-                          'Upload images or videos.',
+                          'Upload at least one image.',
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: colorScheme.onSurfaceVariant),
                         ),
                       ],
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        _showAddFromUrlDialog(context, field);
-                      },
-                      child: Text(
-                        'Add from URL',
-                        style: TextStyle(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                     ),
                   ],
                 ),
@@ -88,27 +98,38 @@ class _ProductMediaCardState extends ConsumerState<ProductMediaCard> {
               // Content
               Padding(
                 padding: AppDimens.paddingAllLarge,
-                child: ImageUploadWidget(
-                  initialImages: currentImages.whereType<String>().toList(),
-                  onImagesChanged: (images) {
-                    field.didChange(images);
-                  },
-                  onUpload: (XFile file) async {
-                    // Upload file to S3 and return the URL
-                    final key = await ref
-                        .read(s3ServiceProvider)
-                        .uploadFile(file);
-                    if (key != null) {
-                      final url = await ref
-                          .read(s3ServiceProvider)
-                          .getFileUrl(key);
-                      if (url != null) {
-                        return url;
-                      }
-                      return key;
-                    }
-                    throw Exception('Upload failed');
-                  },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ImageUploadWidget(
+                      initialImages: currentImages.whereType<String>().toList(),
+                      onImagesChanged: (images) {
+                        field.didChange(images);
+                      },
+                      onUpload: (XFile file) async {
+                        final key = await ref
+                            .read(s3ServiceProvider)
+                            .uploadFile(file);
+                        if (key != null) {
+                          final url = await ref
+                              .read(s3ServiceProvider)
+                              .getFileUrl(key);
+                          if (url != null) return url;
+                          return key;
+                        }
+                        throw Exception('Upload failed');
+                      },
+                    ),
+                    if (hasError)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          field.errorText!,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: colorScheme.error),
+                        ),
+                      ),
+                  ],
                 ),
               ),
             ],

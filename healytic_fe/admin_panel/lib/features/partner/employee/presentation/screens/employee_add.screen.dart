@@ -11,6 +11,7 @@ import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart
 import 'package:admin_panel/features/partner/employee/presentation/autofill/employee_add.autofill.dart';
 import 'package:admin_panel/features/partner/employee/presentation/layouts/employee_add_desktop.dart';
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee.provider.dart';
+import 'package:admin_panel/features/partner/employee/presentation/validation/employee_create_form_validation.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -31,12 +32,22 @@ class EmployeeAddScreen extends ConsumerStatefulWidget {
 
 class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
   Future<void> _handleSubmit(Map<String, dynamic> values) async {
-    final description = values[EmployeeFormField.description.key]?.toString();
-    if (description == null || description.isEmpty) {
+    final roleType = EmployeeCreateFormValidation.roleFromValues(values);
+    final therapistType = EmployeeCreateFormValidation.therapistTypeFromValues(
+      values,
+    );
+    final missingFields = EmployeeCreateFormValidation.missingRequiredFields(
+      values,
+      role: roleType,
+      therapistType: therapistType,
+    );
+    if (missingFields.isNotEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Description is required'),
+            content: const Text(
+              'Please complete all required fields before creating employee',
+            ),
             backgroundColor: Theme.of(
               context,
             ).extension<SemanticColors>()!.error,
@@ -47,11 +58,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
     }
 
     try {
-      final role =
-          values[EmployeeFormField.employeeRole.key]
-              ?.toString()
-              .toUpperCase() ??
-          EmployeeRoleType.therapist.apiValue;
+      final role = roleType.apiValue;
 
       if (role == EmployeeRoleType.doctor.apiValue) {
         await _createDoctor(values);

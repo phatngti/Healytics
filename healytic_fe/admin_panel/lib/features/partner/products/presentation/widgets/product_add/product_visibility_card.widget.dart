@@ -85,6 +85,13 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
                 fieldKey: ProductFormField.visibilityStatus.key,
                 label: 'Status',
                 initialValue: _status,
+                isRequired: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Status is required';
+                  }
+                  return null;
+                },
                 items: ProductStatus.values
                     .map(
                       (s) => DropdownMenuItem(
@@ -98,7 +105,8 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
                     setState(() {
                       _status = value.toString();
                     });
-                    widget.onStatusChanged?.call(value.toString());
+                    widget.onStatusChanged
+                        ?.call(value.toString());
                   }
                 },
               ),
