@@ -1,5 +1,4 @@
-import 'package:admin_panel/core/entities/store.entity.dart';
-import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/config/autofill_config.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/facility_image.entity.dart';
@@ -16,7 +15,6 @@ import 'package:admin_panel/features/partner/products/presentation/autofill/prod
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:admin_panel/theme/app_theme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart' hide Store;
@@ -26,7 +24,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class ProductAddScreen extends HookConsumerWidget {
   const ProductAddScreen({super.key, this.autofill = false});
 
-  /// When `true` (and in debug builds only), the
+  /// When `true` in UAT, the
   /// form is pre-populated with sample data.
   /// Activate via `?autofill=true` in the URL.
   final bool autofill;
@@ -40,10 +38,11 @@ class ProductAddScreen extends HookConsumerWidget {
     final isSubmitting = useState(false);
     final isFormValid = useState(false);
 
-    // Build initial values in debug mode only.
-    // Triggered by URL param OR store config flag.
-    final shouldAutofill =
-        kDebugMode && (autofill || (Store.tryGet(StoreKey.autoFill) ?? false));
+    // Build initial values in UAT only.
+    // Triggered by URL param OR UAT store config flag.
+    final shouldAutofill = AutofillConfig.isUatAutofillEnabled(
+      routeAutofill: autofill,
+    );
     final initialValue = useMemoized(
       () => shouldAutofill ? _buildAutofillValues() : const <String, dynamic>{},
     );
@@ -102,9 +101,7 @@ class ProductAddScreen extends HookConsumerWidget {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           final state = formKey.currentState;
           if (state == null) return;
-          isFormValid.value = state.fields.values.every(
-            (f) => f.isValid,
-          );
+          isFormValid.value = state.fields.values.every((f) => f.isValid);
         });
       },
       child: ResponsiveWrapper(
@@ -112,9 +109,7 @@ class ProductAddScreen extends HookConsumerWidget {
         desktop: ProductAddDesktop(
           isFormValid: isFormValid.value,
           onCancel: handleCancel,
-          onSubmit: isSubmitting.value
-              ? null
-              : () => handleSubmit(),
+          onSubmit: isSubmitting.value ? null : () => handleSubmit(),
           initialStatus: shouldAutofill
               ? ProductAddAutofill.status
               : ProductStatus.draft.apiValue,

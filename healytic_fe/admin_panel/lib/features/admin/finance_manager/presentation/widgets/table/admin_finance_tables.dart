@@ -1,670 +1,662 @@
-import 'package:admin_panel/features/admin/finance_manager/domain/admin_finance.entity.dart';
-import 'package:admin_panel/features/admin/finance_manager/presentation/widgets/admin_finance_ui_helpers.dart';
-import 'package:common/utils/demensions.dart';
-import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
-/// Paginated data table for admin ledger transactions.
-class AdminFinanceTransactionTable extends StatelessWidget {
+import 'package:admin_panel/features/admin/finance_manager/domain/admin_finance.entity.dart';
+import 'package:admin_panel/features/admin/finance_manager/domain/admin_finance_filter.dart';
+import 'package:admin_panel/features/admin/finance_manager/datasource/admin_finance_impl.repository.dart';
+import 'package:admin_panel/features/admin/finance_manager/presentation/widgets/admin_finance_ui_helpers.dart';
+import 'package:common/widgets/table/helper.dart';
+import 'package:common/widgets/table/table.dart';
+import 'package:data_table_2/data_table_2.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+const _defaultRowsPerPage = 10;
+const _tableChromeWidth = 136.0;
+
+const _transactionColumns = [
+  _FinanceTableColumn('Date', 152),
+  _FinanceTableColumn('ID', 116),
+  _FinanceTableColumn('Reference', 148),
+  _FinanceTableColumn('Partner', 156),
+  _FinanceTableColumn('Customer', 156),
+  _FinanceTableColumn('Source', 136),
+  _FinanceTableColumn('Type', 104),
+  _FinanceTableColumn('Gross', 132),
+  _FinanceTableColumn('Fee', 124),
+  _FinanceTableColumn('Net', 132),
+  _FinanceTableColumn('Currency', 96),
+  _FinanceTableColumn('Payment', 132),
+  _FinanceTableColumn('Settlement', 154),
+  _FinanceTableColumn('Payout', 154),
+  _FinanceTableColumn('Provider', 108),
+  _FinanceTableColumn('Flag', 72),
+];
+
+const _payoutColumns = [
+  _FinanceTableColumn('Scheduled', 128),
+  _FinanceTableColumn('ID', 116),
+  _FinanceTableColumn('Partner', 168),
+  _FinanceTableColumn('Period', 144),
+  _FinanceTableColumn('Volume', 132),
+  _FinanceTableColumn('Fees', 132),
+  _FinanceTableColumn('Net', 132),
+  _FinanceTableColumn('Currency', 96),
+  _FinanceTableColumn('Method', 132),
+  _FinanceTableColumn('Status', 136),
+  _FinanceTableColumn('Attempts', 96),
+  _FinanceTableColumn('Failure', 220),
+  _FinanceTableColumn('Hold', 220),
+];
+
+const _refundColumns = [
+  _FinanceTableColumn('Requested', 128),
+  _FinanceTableColumn('Case ID', 116),
+  _FinanceTableColumn('Type', 124),
+  _FinanceTableColumn('Txn ID', 116),
+  _FinanceTableColumn('Partner', 160),
+  _FinanceTableColumn('Customer', 160),
+  _FinanceTableColumn('Amount', 132),
+  _FinanceTableColumn('Currency', 96),
+  _FinanceTableColumn('Reason', 240),
+  _FinanceTableColumn('Owner', 132),
+  _FinanceTableColumn('Status', 144),
+  _FinanceTableColumn('SLA', 80),
+  _FinanceTableColumn('Risk', 72),
+];
+
+const _reconciliationColumns = [
+  _FinanceTableColumn('Detected', 128),
+  _FinanceTableColumn('ID', 116),
+  _FinanceTableColumn('Provider', 112),
+  _FinanceTableColumn('Event ID', 164),
+  _FinanceTableColumn('Related Txn', 128),
+  _FinanceTableColumn('Expected', 132),
+  _FinanceTableColumn('Provider Amt', 144),
+  _FinanceTableColumn('Diff', 132),
+  _FinanceTableColumn('Currency', 96),
+  _FinanceTableColumn('Type', 220),
+  _FinanceTableColumn('Status', 144),
+  _FinanceTableColumn('Owner', 132),
+];
+
+const _exportColumns = [
+  _FinanceTableColumn('Created', 152),
+  _FinanceTableColumn('ID', 116),
+  _FinanceTableColumn('Type', 132),
+  _FinanceTableColumn('Requested By', 168),
+  _FinanceTableColumn('Status', 136),
+  _FinanceTableColumn('Rows', 88),
+  _FinanceTableColumn('Download', 104),
+  _FinanceTableColumn('Expires', 128),
+];
+
+/// Paginated AppTable for admin ledger transactions.
+class AdminFinanceTransactionTable extends ConsumerWidget {
   const AdminFinanceTransactionTable({
     super.key,
-    required this.records,
-    required this.totalRows,
+    required this.filter,
+    required this.reloadToken,
+    required this.height,
     required this.onRowTap,
-    this.emptyMessage =
-        'No transactions match the selected filters.',
   });
 
-  final List<AdminFinanceTransactionRecord> records;
-  final int totalRows;
+  final AdminFinanceFilter filter;
+  final int reloadToken;
+  final double height;
   final ValueChanged<AdminFinanceTransactionId> onRowTap;
-  final String emptyMessage;
 
   @override
-  Widget build(BuildContext context) {
-    if (records.isEmpty) {
-      return _EmptyState(message: emptyMessage);
-    }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final repository = ref.read(adminFinanceRepositoryProvider);
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columnSpacing: AppDimens.spaceMd,
-        headingRowHeight: 40,
-        dataRowMinHeight: 36,
-        dataRowMaxHeight: 44,
-        showCheckboxColumn: false,
-        columns: const [
-          DataColumn(label: Text('Date')),
-          DataColumn(label: Text('ID')),
-          DataColumn(label: Text('Reference')),
-          DataColumn(label: Text('Partner')),
-          DataColumn(label: Text('Customer')),
-          DataColumn(label: Text('Source')),
-          DataColumn(label: Text('Type')),
-          DataColumn(label: Text('Gross'), numeric: true),
-          DataColumn(label: Text('Fee'), numeric: true),
-          DataColumn(label: Text('Net'), numeric: true),
-          DataColumn(label: Text('Currency')),
-          DataColumn(label: Text('Payment')),
-          DataColumn(label: Text('Settlement')),
-          DataColumn(label: Text('Payout')),
-          DataColumn(label: Text('Provider')),
-          DataColumn(label: Text('Flag')),
-        ],
-        rows: records
-            .map(
-              (r) => DataRow(
-                onSelectChanged: (_) => onRowTap(r.id),
-                cells: [
-                  DataCell(
-                    Text(formatAdminDateTime(r.createdAt)),
-                  ),
-                  DataCell(
-                    Text(
-                      r.id.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(Text(r.reference)),
-                  DataCell(
-                    Text(
-                      r.partnerName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      r.customerName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(Text(r.sourceType.label)),
-                  DataCell(Text(r.type.label)),
-                  DataCell(
-                    Text(
-                      formatAdminCurrency(
-                        r.grossAmount,
-                        r.currency,
-                      ),
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      formatAdminCurrency(
-                        r.feeAmount,
-                        r.currency,
-                      ),
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      formatAdminCurrency(
-                        r.netAmount,
-                        r.currency,
-                      ),
-                    ),
-                  ),
-                  DataCell(Text(r.currency)),
-                  DataCell(
-                    AdminFinanceStatusChip(
-                      label: r.transactionStatus.label,
-                    ),
-                  ),
-                  DataCell(
-                    AdminFinanceStatusChip(
-                      label: r.settlementStatus.label,
-                    ),
-                  ),
-                  DataCell(
-                    AdminFinanceStatusChip(
-                      label: r.payoutStatus.label,
-                    ),
-                  ),
-                  DataCell(Text(r.provider.label)),
-                  DataCell(
-                    r.isFlagged
-                        ? Icon(
-                            Icons.flag_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .error,
-                            size: 18,
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ],
-              ),
-            )
-            .toList(),
+    return _ContentSizedFinanceTable(
+      height: height,
+      contentWidth: _transactionColumns.tableWidth,
+      child: AppTable(
+        key: ValueKey(
+          'admin-finance-transactions-$reloadToken-${filter.hashCode}',
+        ),
+        columns: _transactionColumns.dataColumns(context),
+        getTotalRows: () => repository.getTransactionTotalRows(filter),
+        getData: (setRowSelection, startingAt, count) async {
+          final records = await repository.getTransactions(
+            filter: filter,
+            startingAt: startingAt,
+            count: count,
+          );
+
+          return records
+              .map(
+                (record) => _transactionRow(context, record, setRowSelection),
+              )
+              .toList();
+        },
+        defaultRowsPerPage: _defaultRowsPerPage,
       ),
+    );
+  }
+
+  DataRow _transactionRow(
+    BuildContext context,
+    AdminFinanceTransactionRecord record,
+    SetRowSelectionCallback setRowSelection,
+  ) {
+    final rowKey = ValueKey<String>(
+      'admin-finance-transaction-${record.id.value}',
+    );
+
+    return DataRow(
+      key: rowKey,
+      onSelectChanged: (selected) {
+        if (selected == null) {
+          return;
+        }
+        setRowSelection(rowKey, selected);
+        onRowTap(record.id);
+      },
+      cells: [
+        DataCell(_TextCell(formatAdminDateTime(record.createdAt))),
+        DataCell(_TextCell(record.id.value)),
+        DataCell(_TextCell(record.reference)),
+        DataCell(_TextCell(record.partnerName)),
+        DataCell(_TextCell(record.customerName)),
+        DataCell(_TextCell(record.sourceType.label)),
+        DataCell(_TextCell(record.type.label)),
+        DataCell(
+          _TextCell(formatAdminCurrency(record.grossAmount, record.currency)),
+        ),
+        DataCell(
+          _TextCell(formatAdminCurrency(record.feeAmount, record.currency)),
+        ),
+        DataCell(
+          _TextCell(formatAdminCurrency(record.netAmount, record.currency)),
+        ),
+        DataCell(_TextCell(record.currency)),
+        DataCell(AdminFinanceStatusChip(label: record.transactionStatus.label)),
+        DataCell(AdminFinanceStatusChip(label: record.settlementStatus.label)),
+        DataCell(AdminFinanceStatusChip(label: record.payoutStatus.label)),
+        DataCell(_TextCell(record.provider.label)),
+        DataCell(
+          record.isFlagged
+              ? Tooltip(
+                  message: 'Flagged',
+                  child: Icon(
+                    Icons.flag_rounded,
+                    color: Theme.of(context).colorScheme.error,
+                    size: 18,
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
     );
   }
 }
 
-/// Paginated data table for admin payouts.
-class AdminFinancePayoutTable extends StatelessWidget {
+/// Paginated AppTable for admin payouts.
+class AdminFinancePayoutTable extends ConsumerWidget {
   const AdminFinancePayoutTable({
     super.key,
-    required this.records,
-    required this.totalRows,
+    required this.filter,
+    required this.reloadToken,
+    required this.height,
     required this.onRowTap,
-    this.emptyMessage =
-        'No payout batches match the selected filters.',
   });
 
-  final List<AdminFinancePayoutRecord> records;
-  final int totalRows;
+  final AdminFinanceFilter filter;
+  final int reloadToken;
+  final double height;
   final ValueChanged<AdminFinancePayoutId> onRowTap;
-  final String emptyMessage;
 
   @override
-  Widget build(BuildContext context) {
-    if (records.isEmpty) {
-      return _EmptyState(message: emptyMessage);
-    }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final repository = ref.read(adminFinanceRepositoryProvider);
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columnSpacing: AppDimens.spaceMd,
-        headingRowHeight: 40,
-        dataRowMinHeight: 36,
-        dataRowMaxHeight: 44,
-        showCheckboxColumn: false,
-        columns: const [
-          DataColumn(label: Text('Scheduled')),
-          DataColumn(label: Text('ID')),
-          DataColumn(label: Text('Partner')),
-          DataColumn(label: Text('Period')),
-          DataColumn(
-            label: Text('Volume'),
-            numeric: true,
-          ),
-          DataColumn(
-            label: Text('Fees'),
-            numeric: true,
-          ),
-          DataColumn(
-            label: Text('Net'),
-            numeric: true,
-          ),
-          DataColumn(label: Text('Currency')),
-          DataColumn(label: Text('Method')),
-          DataColumn(label: Text('Status')),
-          DataColumn(
-            label: Text('Attempts'),
-            numeric: true,
-          ),
-          DataColumn(label: Text('Failure')),
-          DataColumn(label: Text('Hold')),
-        ],
-        rows: records
-            .map(
-              (r) => DataRow(
-                onSelectChanged: (_) => onRowTap(r.id),
-                cells: [
-                  DataCell(
-                    Text(
-                      formatAdminDate(r.scheduledDate),
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      r.id.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      r.partnerName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(Text(r.periodLabel)),
-                  DataCell(
-                    Text(
-                      formatAdminCurrency(
-                        r.includedVolume,
-                        r.currency,
-                      ),
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      formatAdminCurrency(
-                        r.feesAndAdjustments,
-                        r.currency,
-                      ),
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      formatAdminCurrency(
-                        r.netPayout,
-                        r.currency,
-                      ),
-                    ),
-                  ),
-                  DataCell(Text(r.currency)),
-                  DataCell(Text(r.method)),
-                  DataCell(
-                    AdminFinanceStatusChip(
-                      label: r.status.label,
-                    ),
-                  ),
-                  DataCell(
-                    Text(r.attemptCount.toString()),
-                  ),
-                  DataCell(
-                    Text(
-                      r.failureReason ?? '—',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      r.holdReason ?? '—',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            )
-            .toList(),
+    return _ContentSizedFinanceTable(
+      height: height,
+      contentWidth: _payoutColumns.tableWidth,
+      child: AppTable(
+        key: ValueKey('admin-finance-payouts-$reloadToken-${filter.hashCode}'),
+        columns: _payoutColumns.dataColumns(context),
+        getTotalRows: () => repository.getPayoutTotalRows(filter),
+        getData: (setRowSelection, startingAt, count) async {
+          final records = await repository.getPayouts(
+            filter: filter,
+            startingAt: startingAt,
+            count: count,
+          );
+
+          return records
+              .map((record) => _payoutRow(record, setRowSelection))
+              .toList();
+        },
+        defaultRowsPerPage: _defaultRowsPerPage,
       ),
+    );
+  }
+
+  DataRow _payoutRow(
+    AdminFinancePayoutRecord record,
+    SetRowSelectionCallback setRowSelection,
+  ) {
+    final rowKey = ValueKey<String>('admin-finance-payout-${record.id.value}');
+
+    return DataRow(
+      key: rowKey,
+      onSelectChanged: (selected) {
+        if (selected == null) {
+          return;
+        }
+        setRowSelection(rowKey, selected);
+        onRowTap(record.id);
+      },
+      cells: [
+        DataCell(_TextCell(formatAdminDate(record.scheduledDate))),
+        DataCell(_TextCell(record.id.value)),
+        DataCell(_TextCell(record.partnerName)),
+        DataCell(_TextCell(record.periodLabel)),
+        DataCell(
+          _TextCell(
+            formatAdminCurrency(record.includedVolume, record.currency),
+          ),
+        ),
+        DataCell(
+          _TextCell(
+            formatAdminCurrency(record.feesAndAdjustments, record.currency),
+          ),
+        ),
+        DataCell(
+          _TextCell(formatAdminCurrency(record.netPayout, record.currency)),
+        ),
+        DataCell(_TextCell(record.currency)),
+        DataCell(_TextCell(record.method)),
+        DataCell(AdminFinanceStatusChip(label: record.status.label)),
+        DataCell(_TextCell(record.attemptCount.toString())),
+        DataCell(_TextCell(record.failureReason ?? '-')),
+        DataCell(_TextCell(record.holdReason ?? '-')),
+      ],
     );
   }
 }
 
-/// Paginated data table for refund cases.
-class AdminFinanceRefundCaseTable extends StatelessWidget {
+/// Paginated AppTable for refund cases.
+class AdminFinanceRefundCaseTable extends ConsumerWidget {
   const AdminFinanceRefundCaseTable({
     super.key,
-    required this.records,
-    required this.totalRows,
+    required this.filter,
+    required this.reloadToken,
+    required this.height,
     required this.onRowTap,
-    this.emptyMessage =
-        'No refund or dispute cases match '
-        'the selected filters.',
   });
 
-  final List<AdminFinanceRefundCaseRecord> records;
-  final int totalRows;
+  final AdminFinanceFilter filter;
+  final int reloadToken;
+  final double height;
   final ValueChanged<AdminFinanceRefundCaseId> onRowTap;
-  final String emptyMessage;
 
   @override
-  Widget build(BuildContext context) {
-    if (records.isEmpty) {
-      return _EmptyState(message: emptyMessage);
-    }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final repository = ref.read(adminFinanceRepositoryProvider);
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columnSpacing: AppDimens.spaceMd,
-        headingRowHeight: 40,
-        dataRowMinHeight: 36,
-        dataRowMaxHeight: 44,
-        showCheckboxColumn: false,
-        columns: const [
-          DataColumn(label: Text('Requested')),
-          DataColumn(label: Text('Case ID')),
-          DataColumn(label: Text('Type')),
-          DataColumn(label: Text('Txn ID')),
-          DataColumn(label: Text('Partner')),
-          DataColumn(label: Text('Customer')),
-          DataColumn(
-            label: Text('Amount'),
-            numeric: true,
-          ),
-          DataColumn(label: Text('Currency')),
-          DataColumn(label: Text('Reason')),
-          DataColumn(label: Text('Owner')),
-          DataColumn(label: Text('Status')),
-          DataColumn(label: Text('SLA')),
-          DataColumn(label: Text('Risk')),
-        ],
-        rows: records
-            .map(
-              (r) => DataRow(
-                onSelectChanged: (_) => onRowTap(r.id),
-                cells: [
-                  DataCell(
-                    Text(
-                      formatAdminDate(r.requestedAt),
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      r.id.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(Text(r.caseType.label)),
-                  DataCell(
-                    Text(
-                      r.transactionId.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      r.partnerName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      r.customerName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      formatAdminCurrency(
-                        r.amount,
-                        r.currency,
-                      ),
-                    ),
-                  ),
-                  DataCell(Text(r.currency)),
-                  DataCell(
-                    Text(
-                      r.reason,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(Text(r.owner)),
-                  DataCell(
-                    AdminFinanceStatusChip(
-                      label: r.status.label,
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      '${r.slaHours}h${r.slaBreached ? ' ⚠' : ''}',
-                    ),
-                  ),
-                  DataCell(
-                    AdminFinanceRiskDot(
-                      tone: r.riskTone,
-                    ),
-                  ),
-                ],
-              ),
-            )
-            .toList(),
+    return _ContentSizedFinanceTable(
+      height: height,
+      contentWidth: _refundColumns.tableWidth,
+      child: AppTable(
+        key: ValueKey('admin-finance-refunds-$reloadToken-${filter.hashCode}'),
+        columns: _refundColumns.dataColumns(context),
+        getTotalRows: () => repository.getRefundCaseTotalRows(filter),
+        getData: (setRowSelection, startingAt, count) async {
+          final records = await repository.getRefundCases(
+            filter: filter,
+            startingAt: startingAt,
+            count: count,
+          );
+
+          return records
+              .map((record) => _refundCaseRow(record, setRowSelection))
+              .toList();
+        },
+        defaultRowsPerPage: _defaultRowsPerPage,
       ),
+    );
+  }
+
+  DataRow _refundCaseRow(
+    AdminFinanceRefundCaseRecord record,
+    SetRowSelectionCallback setRowSelection,
+  ) {
+    final rowKey = ValueKey<String>('admin-finance-refund-${record.id.value}');
+
+    return DataRow(
+      key: rowKey,
+      onSelectChanged: (selected) {
+        if (selected == null) {
+          return;
+        }
+        setRowSelection(rowKey, selected);
+        onRowTap(record.id);
+      },
+      cells: [
+        DataCell(_TextCell(formatAdminDate(record.requestedAt))),
+        DataCell(_TextCell(record.id.value)),
+        DataCell(_TextCell(record.caseType.label)),
+        DataCell(_TextCell(record.transactionId.value)),
+        DataCell(_TextCell(record.partnerName)),
+        DataCell(_TextCell(record.customerName)),
+        DataCell(
+          _TextCell(formatAdminCurrency(record.amount, record.currency)),
+        ),
+        DataCell(_TextCell(record.currency)),
+        DataCell(_TextCell(record.reason, maxLines: 2)),
+        DataCell(_TextCell(record.owner)),
+        DataCell(AdminFinanceStatusChip(label: record.status.label)),
+        DataCell(
+          _SlaCell(hours: record.slaHours, breached: record.slaBreached),
+        ),
+        DataCell(AdminFinanceRiskDot(tone: record.riskTone)),
+      ],
     );
   }
 }
 
-/// Data table for reconciliation exceptions.
-class AdminFinanceReconciliationTable
-    extends StatelessWidget {
+/// Paginated AppTable for reconciliation exceptions.
+class AdminFinanceReconciliationTable extends ConsumerWidget {
   const AdminFinanceReconciliationTable({
     super.key,
-    required this.records,
-    required this.totalRows,
+    required this.filter,
+    required this.reloadToken,
+    required this.height,
     required this.onRowTap,
-    this.emptyMessage =
-        'No reconciliation exceptions match '
-        'the selected filters.',
   });
 
-  final List<AdminFinanceReconciliationException> records;
-  final int totalRows;
-  final ValueChanged<AdminFinanceReconciliationId>
-      onRowTap;
-  final String emptyMessage;
+  final AdminFinanceFilter filter;
+  final int reloadToken;
+  final double height;
+  final ValueChanged<AdminFinanceReconciliationId> onRowTap;
 
   @override
-  Widget build(BuildContext context) {
-    if (records.isEmpty) {
-      return _EmptyState(message: emptyMessage);
-    }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final repository = ref.read(adminFinanceRepositoryProvider);
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columnSpacing: AppDimens.spaceMd,
-        headingRowHeight: 40,
-        dataRowMinHeight: 36,
-        dataRowMaxHeight: 44,
-        showCheckboxColumn: false,
-        columns: const [
-          DataColumn(label: Text('Detected')),
-          DataColumn(label: Text('ID')),
-          DataColumn(label: Text('Provider')),
-          DataColumn(label: Text('Event ID')),
-          DataColumn(label: Text('Related Txn')),
-          DataColumn(
-            label: Text('Expected'),
-            numeric: true,
-          ),
-          DataColumn(
-            label: Text('Provider Amt'),
-            numeric: true,
-          ),
-          DataColumn(
-            label: Text('Diff'),
-            numeric: true,
-          ),
-          DataColumn(label: Text('Currency')),
-          DataColumn(label: Text('Type')),
-          DataColumn(label: Text('Status')),
-          DataColumn(label: Text('Owner')),
-        ],
-        rows: records
-            .map(
-              (r) => DataRow(
-                onSelectChanged: (_) => onRowTap(r.id),
-                cells: [
-                  DataCell(
-                    Text(
-                      formatAdminDate(r.detectedAt),
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      r.id.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(Text(r.provider.label)),
-                  DataCell(
-                    Text(
-                      r.providerEventId,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      r.relatedTransactionId?.value ??
-                          '—',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      formatAdminCurrency(
-                        r.expectedAmount,
-                        r.currency,
-                      ),
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      formatAdminCurrency(
-                        r.providerAmount,
-                        r.currency,
-                      ),
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      formatAdminCurrency(
-                        r.difference,
-                        r.currency,
-                      ),
-                    ),
-                  ),
-                  DataCell(Text(r.currency)),
-                  DataCell(Text(r.type.label)),
-                  DataCell(
-                    AdminFinanceStatusChip(
-                      label: r.status.label,
-                    ),
-                  ),
-                  DataCell(Text(r.owner)),
-                ],
-              ),
-            )
-            .toList(),
+    return _ContentSizedFinanceTable(
+      height: height,
+      contentWidth: _reconciliationColumns.tableWidth,
+      child: AppTable(
+        key: ValueKey(
+          'admin-finance-reconciliation-$reloadToken-${filter.hashCode}',
+        ),
+        columns: _reconciliationColumns.dataColumns(context),
+        getTotalRows: () => repository.getReconciliationTotalRows(filter),
+        getData: (setRowSelection, startingAt, count) async {
+          final records = await repository.getReconciliationExceptions(
+            filter: filter,
+            startingAt: startingAt,
+            count: count,
+          );
+
+          return records
+              .map((record) => _reconciliationRow(record, setRowSelection))
+              .toList();
+        },
+        defaultRowsPerPage: _defaultRowsPerPage,
       ),
+    );
+  }
+
+  DataRow _reconciliationRow(
+    AdminFinanceReconciliationException record,
+    SetRowSelectionCallback setRowSelection,
+  ) {
+    final rowKey = ValueKey<String>(
+      'admin-finance-reconciliation-${record.id.value}',
+    );
+
+    return DataRow(
+      key: rowKey,
+      onSelectChanged: (selected) {
+        if (selected == null) {
+          return;
+        }
+        setRowSelection(rowKey, selected);
+        onRowTap(record.id);
+      },
+      cells: [
+        DataCell(_TextCell(formatAdminDate(record.detectedAt))),
+        DataCell(_TextCell(record.id.value)),
+        DataCell(_TextCell(record.provider.label)),
+        DataCell(_TextCell(record.providerEventId)),
+        DataCell(_TextCell(record.relatedTransactionId?.value ?? '-')),
+        DataCell(
+          _TextCell(
+            formatAdminCurrency(record.expectedAmount, record.currency),
+          ),
+        ),
+        DataCell(
+          _TextCell(
+            formatAdminCurrency(record.providerAmount, record.currency),
+          ),
+        ),
+        DataCell(
+          _TextCell(formatAdminCurrency(record.difference, record.currency)),
+        ),
+        DataCell(_TextCell(record.currency)),
+        DataCell(_TextCell(record.type.label, maxLines: 2)),
+        DataCell(AdminFinanceStatusChip(label: record.status.label)),
+        DataCell(_TextCell(record.owner)),
+      ],
     );
   }
 }
 
-/// Data table for export jobs.
+/// AppTable for export jobs.
 class AdminFinanceExportTable extends StatelessWidget {
   const AdminFinanceExportTable({
     super.key,
     required this.records,
-    this.emptyMessage =
-        'No finance exports have been created yet.',
+    required this.height,
   });
 
   final List<AdminFinanceExportJob> records;
-  final String emptyMessage;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
-    if (records.isEmpty) {
-      return _EmptyState(message: emptyMessage);
-    }
+    return _ContentSizedFinanceTable(
+      height: height,
+      contentWidth: _exportColumns.tableWidth,
+      child: AppTable(
+        key: ValueKey('admin-finance-exports-${records.hashCode}'),
+        columns: _exportColumns.dataColumns(context),
+        getTotalRows: () async => records.length,
+        getData: (_, startingAt, count) async {
+          if (startingAt >= records.length) {
+            return [];
+          }
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columnSpacing: AppDimens.spaceMd,
-        headingRowHeight: 40,
-        dataRowMinHeight: 36,
-        dataRowMaxHeight: 44,
-        columns: const [
-          DataColumn(label: Text('Created')),
-          DataColumn(label: Text('ID')),
-          DataColumn(label: Text('Type')),
-          DataColumn(label: Text('Requested By')),
-          DataColumn(label: Text('Status')),
-          DataColumn(
-            label: Text('Rows'),
-            numeric: true,
+          final end = (startingAt + count).clamp(0, records.length);
+          return records
+              .sublist(startingAt, end)
+              .map((record) => _exportRow(context, record))
+              .toList();
+        },
+        defaultRowsPerPage: _defaultRowsPerPage,
+      ),
+    );
+  }
+
+  DataRow _exportRow(BuildContext context, AdminFinanceExportJob record) {
+    return DataRow(
+      key: ValueKey<String>('admin-finance-export-${record.id.value}'),
+      cells: [
+        DataCell(_TextCell(formatAdminDateTime(record.createdAt))),
+        DataCell(_TextCell(record.id.value)),
+        DataCell(_TextCell(record.type.label)),
+        DataCell(_TextCell(record.requestedBy)),
+        DataCell(AdminFinanceStatusChip(label: record.status.label)),
+        DataCell(_TextCell(record.rowCount.toString())),
+        DataCell(
+          record.downloadUrl != null
+              ? Tooltip(
+                  message: 'Download ready',
+                  child: Icon(
+                    Icons.download_rounded,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                )
+              : const Text('-'),
+        ),
+        DataCell(
+          _TextCell(
+            record.expiresAt != null ? formatAdminDate(record.expiresAt!) : '-',
           ),
-          DataColumn(label: Text('Download')),
-          DataColumn(label: Text('Expires')),
-        ],
-        rows: records
-            .map(
-              (r) => DataRow(
-                cells: [
-                  DataCell(
-                    Text(
-                      formatAdminDateTime(r.createdAt),
-                    ),
-                  ),
-                  DataCell(Text(r.id.value)),
-                  DataCell(Text(r.type.label)),
-                  DataCell(Text(r.requestedBy)),
-                  DataCell(
-                    AdminFinanceStatusChip(
-                      label: r.status.label,
-                    ),
-                  ),
-                  DataCell(
-                    Text(r.rowCount.toString()),
-                  ),
-                  DataCell(
-                    r.downloadUrl != null
-                        ? Icon(
-                            Icons.download_rounded,
-                            size: 18,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary,
-                          )
-                        : const Text('—'),
-                  ),
-                  DataCell(
-                    Text(
-                      r.expiresAt != null
-                          ? formatAdminDate(
-                              r.expiresAt!,
-                            )
-                          : '—',
-                    ),
-                  ),
-                ],
+        ),
+      ],
+    );
+  }
+}
+
+class _FinanceTableColumn {
+  const _FinanceTableColumn(this.label, this.width);
+
+  final String label;
+  final double width;
+}
+
+extension _FinanceTableColumns on List<_FinanceTableColumn> {
+  double get tableWidth {
+    return fold<double>(
+      _tableChromeWidth,
+      (width, column) => width + column.width,
+    );
+  }
+
+  List<DataColumn> dataColumns(BuildContext context) {
+    return map(
+      (column) => DataColumn2(
+        fixedWidth: column.width,
+        headingRowAlignment: MainAxisAlignment.start,
+        label: _HeaderCell(column.label),
+      ),
+    ).toList();
+  }
+}
+
+class _ContentSizedFinanceTable extends StatefulWidget {
+  const _ContentSizedFinanceTable({
+    required this.height,
+    required this.contentWidth,
+    required this.child,
+  });
+
+  final double height;
+  final double contentWidth;
+  final Widget child;
+
+  @override
+  State<_ContentSizedFinanceTable> createState() =>
+      _ContentSizedFinanceTableState();
+}
+
+class _ContentSizedFinanceTableState extends State<_ContentSizedFinanceTable> {
+  late final ScrollController _horizontalController = ScrollController();
+
+  @override
+  void dispose() {
+    _horizontalController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: widget.height,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final viewportWidth = constraints.hasBoundedWidth
+              ? constraints.maxWidth
+              : widget.contentWidth;
+          final tableWidth = math.max(viewportWidth, widget.contentWidth);
+          final hasOverflow = tableWidth > viewportWidth;
+
+          return Scrollbar(
+            controller: _horizontalController,
+            thumbVisibility: hasOverflow,
+            interactive: true,
+            scrollbarOrientation: ScrollbarOrientation.bottom,
+            child: SingleChildScrollView(
+              controller: _horizontalController,
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                width: tableWidth,
+                height: widget.height,
+                child: widget.child,
               ),
-            )
-            .toList(),
+            ),
+          );
+        },
       ),
     );
   }
 }
 
-/// Empty state placeholder.
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.message});
-  final String message;
+class _HeaderCell extends StatelessWidget {
+  const _HeaderCell(this.label);
+
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: AppDimens.paddingAllLarge,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.inbox_rounded,
-              size: 48,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurfaceVariant,
-            ),
-            AppDimens.verticalSmall,
-            Text(
-              message,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurfaceVariant,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return Text(
+      label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      softWrap: false,
+      style: Theme.of(
+        context,
+      ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+    );
+  }
+}
+
+class _TextCell extends StatelessWidget {
+  const _TextCell(this.value, {this.maxLines = 1});
+
+  final String value;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      value,
+      maxLines: maxLines,
+      overflow: TextOverflow.ellipsis,
+      softWrap: false,
+    );
+  }
+}
+
+class _SlaCell extends StatelessWidget {
+  const _SlaCell({required this.hours, required this.breached});
+
+  final int hours;
+  final bool breached;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('${hours}h'),
+        if (breached) ...[
+          const SizedBox(width: 4),
+          Icon(
+            Icons.warning_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.error,
+          ),
+        ],
+      ],
     );
   }
 }

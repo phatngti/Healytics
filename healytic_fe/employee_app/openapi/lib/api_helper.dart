@@ -79,6 +79,15 @@ String parameterToString(dynamic value) {
   if (value is AdminFinanceRiskTone) {
     return AdminFinanceRiskToneTypeTransformer().encode(value).toString();
   }
+  if (value is AdminPartnerScope) {
+    return AdminPartnerScopeTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminPartnerSortBy) {
+    return AdminPartnerSortByTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminPartnerSortDirection) {
+    return AdminPartnerSortDirectionTypeTransformer().encode(value).toString();
+  }
   if (value is AppointmentStatus) {
     return AppointmentStatusTypeTransformer().encode(value).toString();
   }

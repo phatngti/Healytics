@@ -1,15 +1,17 @@
 import 'package:admin_panel/features/admin/finance_manager/domain/admin_finance.entity.dart';
 import 'package:admin_panel/features/admin/finance_manager/presentation/widgets/admin_finance_ui_helpers.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:common/widgets/table/helper.dart';
+import 'package:common/widgets/table/table.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 
+const _exposureRowsPerPage = 10;
+const _exposureTableHeight = 520.0;
+
 /// Ranks partners by financial risk exposure.
-class AdminFinancePartnerExposurePanel
-    extends StatelessWidget {
-  const AdminFinancePartnerExposurePanel({
-    super.key,
-    required this.exposures,
-  });
+class AdminFinancePartnerExposurePanel extends StatelessWidget {
+  const AdminFinancePartnerExposurePanel({super.key, required this.exposures});
 
   final List<AdminFinancePartnerExposure> exposures;
 
@@ -25,131 +27,115 @@ class AdminFinancePartnerExposurePanel
           child: Text(
             'No partner exposure data matches '
             'the selected filters.',
-            style: tt.bodyMedium?.copyWith(
-              color: cs.onSurfaceVariant,
-            ),
+            style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
           ),
         ),
       );
     }
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: AppDimens.radiusMd,
-        side: BorderSide(
-          color: cs.outlineVariant.withValues(alpha: 0.5),
+    final rowsPerPage = exposures.length < _exposureRowsPerPage
+        ? exposures.length
+        : _exposureRowsPerPage;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Partner Exposure',
+          style: tt.titleMedium?.copyWith(fontWeight: AppDimens.fontWeightBold),
         ),
-      ),
-      child: Padding(
-        padding: AppDimens.paddingAllMedium,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Partner Exposure',
-              style: tt.titleMedium?.copyWith(
-                fontWeight: AppDimens.fontWeightBold,
-              ),
+        AppDimens.verticalSmall,
+        SizedBox(
+          height: _exposureTableHeight,
+          child: AppTable(
+            key: ValueKey(
+              'admin-finance-partner-exposure-${exposures.length}'
+              '-${exposures.first.partnerId.value}'
+              '-${exposures.last.partnerId.value}',
             ),
-            AppDimens.verticalSmall,
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columnSpacing: AppDimens.spaceLg,
-                headingRowHeight: 36,
-                dataRowMinHeight: 32,
-                dataRowMaxHeight: 36,
-                columns: const [
-                  DataColumn(label: Text('Partner')),
-                  DataColumn(
-                    label: Text('Volume'),
-                    numeric: true,
-                  ),
-                  DataColumn(
-                    label: Text('Pending'),
-                    numeric: true,
-                  ),
-                  DataColumn(
-                    label: Text('Refunds'),
-                    numeric: true,
-                  ),
-                  DataColumn(
-                    label: Text('Failed'),
-                    numeric: true,
-                  ),
-                  DataColumn(
-                    label: Text('Held'),
-                    numeric: true,
-                  ),
-                  DataColumn(label: Text('Risk')),
-                ],
-                rows: exposures
-                    .map(
-                      (e) => DataRow(
-                        cells: [
-                          DataCell(
-                            Text(
-                              e.partnerName,
-                              maxLines: 1,
-                              overflow:
-                                  TextOverflow.ellipsis,
-                            ),
-                          ),
-                          DataCell(
-                            Text(
-                              formatAdminCurrencyCompact(
-                                e.totalVolume,
-                                e.currency,
-                              ),
-                            ),
-                          ),
-                          DataCell(
-                            Text(
-                              formatAdminCurrencyCompact(
-                                e.pendingPayouts,
-                                e.currency,
-                              ),
-                            ),
-                          ),
-                          DataCell(
-                            Text(
-                              formatAdminCurrencyCompact(
-                                e.refundExposure,
-                                e.currency,
-                              ),
-                            ),
-                          ),
-                          DataCell(
-                            Text(
-                              formatAdminCurrencyCompact(
-                                e.failedPayments,
-                                e.currency,
-                              ),
-                            ),
-                          ),
-                          DataCell(
-                            Text(
-                              formatAdminCurrencyCompact(
-                                e.heldFunds,
-                                e.currency,
-                              ),
-                            ),
-                          ),
-                          DataCell(
-                            AdminFinanceRiskDot(
-                              tone: e.riskTone,
-                            ),
-                          ),
-                        ],
+            columns: const TableColumns(
+              columns: [
+                TableColumnData(label: 'Partner', size: ColumnSize.L),
+                TableColumnData(label: 'Volume', size: ColumnSize.S),
+                TableColumnData(label: 'Pending', size: ColumnSize.S),
+                TableColumnData(label: 'Refunds', size: ColumnSize.S),
+                TableColumnData(label: 'Failed', size: ColumnSize.S),
+                TableColumnData(label: 'Held', size: ColumnSize.S),
+                TableColumnData(label: 'Risk', size: ColumnSize.S),
+              ],
+            ).dataColumns(context),
+            getTotalRows: () async => exposures.length,
+            getData: (_, startingAt, count) async {
+              if (startingAt >= exposures.length) {
+                return [];
+              }
+
+              final end = (startingAt + count).clamp(0, exposures.length);
+              return exposures
+                  .sublist(startingAt, end)
+                  .map(
+                    (exposure) => DataRow(
+                      key: ValueKey(
+                        'partner-exposure-${exposure.partnerId.value}',
                       ),
-                    )
-                    .toList(),
-              ),
-            ),
-          ],
+                      cells: [
+                        DataCell(
+                          Text(
+                            exposure.partnerName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        DataCell(
+                          Text(
+                            formatAdminCurrencyCompact(
+                              exposure.totalVolume,
+                              exposure.currency,
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          Text(
+                            formatAdminCurrencyCompact(
+                              exposure.pendingPayouts,
+                              exposure.currency,
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          Text(
+                            formatAdminCurrencyCompact(
+                              exposure.refundExposure,
+                              exposure.currency,
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          Text(
+                            formatAdminCurrencyCompact(
+                              exposure.failedPayments,
+                              exposure.currency,
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          Text(
+                            formatAdminCurrencyCompact(
+                              exposure.heldFunds,
+                              exposure.currency,
+                            ),
+                          ),
+                        ),
+                        DataCell(AdminFinanceRiskDot(tone: exposure.riskTone)),
+                      ],
+                    ),
+                  )
+                  .toList();
+            },
+            defaultRowsPerPage: rowsPerPage,
+          ),
         ),
-      ),
+      ],
     );
   }
 }

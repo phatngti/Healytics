@@ -3264,7 +3264,7 @@
             "name": "page",
             "required": false,
             "in": "query",
-            "description": "Page number",
+            "description": "Page number (1-indexed)",
             "schema": {
               "default": 1,
               "example": 1,
@@ -3283,19 +3283,21 @@
             }
           },
           {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerScope"
+            }
+          },
+          {
             "name": "verificationStatus",
             "required": false,
             "in": "query",
-            "description": "Filter by verification status (PENDING, REQUIRED_RESUBMIT, APPROVED, REJECTED)",
+            "description": "Explicit status filter",
             "schema": {
-              "example": "PENDING",
-              "enum": [
-                "PENDING",
-                "APPROVED",
-                "REJECTED",
-                "REQUIRED_RESUBMIT"
-              ],
-              "type": "string"
+              "$ref": "#/components/schemas/PartnerVerificationStatus"
             }
           },
           {
@@ -3307,15 +3309,129 @@
               "example": "spa",
               "type": "string"
             }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Column to sort by",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortBy"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortDirection"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of partners.",
+            "description": "Paginated list of partners.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PartnersResponseDto"
+                  "$ref": "#/components/schemas/AdminPartnersResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners/stats": {
+      "get": {
+        "operationId": "AdminPartnersController_getPartnerStats",
+        "summary": "Get partner dashboard statistics",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerScope"
+            }
+          },
+          {
+            "name": "verificationStatus",
+            "required": false,
+            "in": "query",
+            "description": "Explicit status filter",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerVerificationStatus"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by tax code, brand name, legal name, or email",
+            "schema": {
+              "example": "spa",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Column to sort by",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortBy"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortDirection"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "KPI card values.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPartnerStatsResponseDto"
                 }
               }
             }
@@ -3335,10 +3451,79 @@
       "get": {
         "operationId": "AdminPartnersController_getTotalPartners",
         "summary": "Get total number of partners",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerScope"
+            }
+          },
+          {
+            "name": "verificationStatus",
+            "required": false,
+            "in": "query",
+            "description": "Explicit status filter",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerVerificationStatus"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by tax code, brand name, legal name, or email",
+            "schema": {
+              "example": "spa",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Column to sort by",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortBy"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortDirection"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Total partner count.",
+            "description": "Filtered total partner count.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3443,6 +3628,358 @@
         },
         "tags": [
           "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/overview": {
+      "get": {
+        "operationId": "AdminDashboardController_getOverview",
+        "summary": "Get admin dashboard overview metrics",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardOverviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/revenue-trend": {
+      "get": {
+        "operationId": "AdminDashboardController_getRevenueTrend",
+        "summary": "Get admin revenue trend data points",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminDashboardRevenueTrendPointDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/booking-outcomes": {
+      "get": {
+        "operationId": "AdminDashboardController_getBookingOutcomeSummary",
+        "summary": "Get booking outcome summary",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardBookingOutcomeSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/transaction-health": {
+      "get": {
+        "operationId": "AdminDashboardController_getTransactionHealth",
+        "summary": "Get transaction health breakdown",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardTransactionHealthDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/top-partners": {
+      "get": {
+        "operationId": "AdminDashboardController_getTopPartners",
+        "summary": "Get top performing partners by revenue",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminPartnerRankingItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/top-services": {
+      "get": {
+        "operationId": "AdminDashboardController_getTopServices",
+        "summary": "Get top performing services by revenue",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminServiceRankingItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/notifications": {
+      "get": {
+        "operationId": "AdminDashboardController_getNotifications",
+        "summary": "Get admin dashboard notifications",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminDashboardNotificationItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/category-health": {
+      "get": {
+        "operationId": "AdminDashboardController_getCategoryHealth",
+        "summary": "Get service category health overview",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryHealthDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
         ],
         "security": [
           {
@@ -9166,245 +9703,16 @@
     },
     "/health": {
       "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Backend liveness check."
+          }
+        },
         "tags": [
           "Health"
-        ],
-        "summary": "Health",
-        "operationId": "health_health_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
-    "/generative_ai/stream": {
-      "post": {
-        "tags": [
-          "Chatbot"
-        ],
-        "summary": "Generative Ai Stream",
-        "operationId": "generative_ai_stream_generative_ai_stream_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChatbotRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
-    "/chatbot/conversations": {
-      "get": {
-        "tags": [
-          "Chatbot"
-        ],
-        "summary": "Get Conversations",
-        "operationId": "get_conversations_chatbot_conversations_get",
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "description": "Account / user UUID",
-              "title": "User Id"
-            },
-            "description": "Account / user UUID"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "default": 1,
-              "title": "Page"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "default": 10,
-              "title": "Limit"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConversationsPageResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/chatbot/conversations/{conversation_id}/messages": {
-      "get": {
-        "tags": [
-          "Chatbot"
-        ],
-        "summary": "Get Messages",
-        "operationId": "get_messages_chatbot_conversations__conversation_id__messages_get",
-        "parameters": [
-          {
-            "name": "conversation_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Conversation Id"
-            }
-          },
-          {
-            "name": "user_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Must match conversation owner",
-              "title": "User Id"
-            },
-            "description": "Must match conversation owner"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "default": 1,
-              "title": "Page"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "default": 20,
-              "title": "Limit"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessagesPageResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/recommender/home": {
-      "post": {
-        "tags": [
-          "Recommender"
-        ],
-        "summary": "Recommend Home",
-        "description": "Home recommender (non-stream).",
-        "operationId": "recommend_home_recommender_home_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/HomeRecommenderRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RecommendationResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/recommender/chatbot": {
-      "post": {
-        "tags": [
-          "Recommender"
-        ],
-        "summary": "Recommend Chatbot",
-        "description": "Chatbot recommender (non-stream).",
-        "operationId": "recommend_chatbot_recommender_chatbot_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChatbotRecommenderRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ChatbotRecommendationResponse"
-                }
-              }
-            }
-          }
-        }
+        ]
       }
     }
   },
@@ -10099,7 +10407,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-12T16:42:03.066Z"
+              "submittedAt": "2026-05-13T10:03:53.999Z"
             }
           }
         },
@@ -16403,24 +16711,57 @@
           "createdAt"
         ]
       },
-      "PartnerItemDto": {
+      "AdminPartnerScope": {
+        "type": "string",
+        "enum": [
+          "VERIFICATION_QUEUE",
+          "ALL_PROVIDERS"
+        ]
+      },
+      "AdminPartnerSortBy": {
+        "type": "string",
+        "enum": [
+          "createdAt",
+          "brandName",
+          "legalName",
+          "verificationStatus",
+          "priority"
+        ]
+      },
+      "AdminPartnerSortDirection": {
+        "type": "string",
+        "enum": [
+          "ASC",
+          "DESC"
+        ]
+      },
+      "PartnerPriority": {
+        "type": "string",
+        "enum": [
+          "low",
+          "normal",
+          "high",
+          "urgent"
+        ]
+      },
+      "AdminPartnerItemDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "example": "uuid"
+            "example": "uuid-123"
           },
           "taxCode": {
             "type": "string",
             "example": "0123456789"
           },
-          "brandName": {
-            "type": "string",
-            "example": "Hanoi Spa"
-          },
           "legalName": {
             "type": "string",
             "example": "Hanoi Spa Co., Ltd"
+          },
+          "brandName": {
+            "type": "string",
+            "example": "Hanoi Spa"
           },
           "email": {
             "type": "string",
@@ -16439,30 +16780,46 @@
             "example": "PENDING",
             "$ref": "#/components/schemas/PartnerVerificationStatus"
           },
+          "priority": {
+            "example": "normal",
+            "$ref": "#/components/schemas/PartnerPriority"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string",
             "example": "2024-01-15T10:30:00Z"
+          },
+          "verificationCompletedAt": {
+            "type": "object",
+            "example": "2024-01-20T12:00:00Z",
+            "nullable": true
+          },
+          "isAccountActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the linked account is active"
           }
         },
         "required": [
           "id",
           "taxCode",
-          "brandName",
           "legalName",
+          "brandName",
           "email",
           "businessType",
           "verificationStatus",
-          "createdAt"
+          "priority",
+          "createdAt",
+          "isAccountActive"
         ]
       },
-      "PartnersResponseDto": {
+      "AdminPartnersResponseDto": {
         "type": "object",
         "properties": {
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PartnerItemDto"
+              "$ref": "#/components/schemas/AdminPartnerItemDto"
             }
           },
           "total": {
@@ -16485,6 +16842,67 @@
           "limit"
         ]
       },
+      "AdminPartnerStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "pendingReview": {
+            "type": "number",
+            "example": 12,
+            "description": "Partners awaiting admin review"
+          },
+          "highPriority": {
+            "type": "number",
+            "example": 3,
+            "description": "Review-queue partners with HIGH or URGENT priority"
+          },
+          "activeToday": {
+            "type": "number",
+            "example": 42,
+            "description": "Approved providers (active today v1)"
+          },
+          "avgWaitSeconds": {
+            "type": "number",
+            "example": 15120,
+            "description": "Average wait time in seconds"
+          },
+          "avgWaitTime": {
+            "type": "string",
+            "example": "4h 12m",
+            "description": "Formatted average wait time"
+          },
+          "totalProviders": {
+            "type": "number",
+            "example": 150,
+            "description": "Total providers across all statuses"
+          },
+          "requiredResubmit": {
+            "type": "number",
+            "example": 5,
+            "description": "Partners in REQUIRED_RESUBMIT status"
+          },
+          "approved": {
+            "type": "number",
+            "example": 100,
+            "description": "Partners with APPROVED status"
+          },
+          "rejected": {
+            "type": "number",
+            "example": 3,
+            "description": "Partners with REJECTED status"
+          }
+        },
+        "required": [
+          "pendingReview",
+          "highPriority",
+          "activeToday",
+          "avgWaitSeconds",
+          "avgWaitTime",
+          "totalProviders",
+          "requiredResubmit",
+          "approved",
+          "rejected"
+        ]
+      },
       "TotalPartnersResponseDto": {
         "type": "object",
         "properties": {
@@ -16496,15 +16914,6 @@
         },
         "required": [
           "total"
-        ]
-      },
-      "PartnerPriority": {
-        "type": "string",
-        "enum": [
-          "low",
-          "normal",
-          "high",
-          "urgent"
         ]
       },
       "AdminPartnerDetailResponseDto": {
@@ -16605,6 +17014,384 @@
         },
         "required": [
           "message"
+        ]
+      },
+      "AdminDashboardOverviewDto": {
+        "type": "object",
+        "properties": {
+          "grossRevenue": {
+            "type": "number"
+          },
+          "netRevenue": {
+            "type": "number"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "failedPaymentAmount": {
+            "type": "number"
+          },
+          "averageBookingValue": {
+            "type": "number"
+          },
+          "successfulTransactions": {
+            "type": "number"
+          },
+          "pendingTransactions": {
+            "type": "number"
+          },
+          "refundedTransactions": {
+            "type": "number"
+          },
+          "failedTransactions": {
+            "type": "number"
+          },
+          "canceledTransactions": {
+            "type": "number"
+          },
+          "totalPartners": {
+            "type": "number"
+          },
+          "pendingPartnerReviews": {
+            "type": "number"
+          },
+          "bookingSuccessRate": {
+            "type": "number"
+          },
+          "bookingFailedRate": {
+            "type": "number"
+          },
+          "bookingCanceledRate": {
+            "type": "number"
+          },
+          "notificationVolume": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "grossRevenue",
+          "netRevenue",
+          "refundAmount",
+          "failedPaymentAmount",
+          "averageBookingValue",
+          "successfulTransactions",
+          "pendingTransactions",
+          "refundedTransactions",
+          "failedTransactions",
+          "canceledTransactions",
+          "totalPartners",
+          "pendingPartnerReviews",
+          "bookingSuccessRate",
+          "bookingFailedRate",
+          "bookingCanceledRate",
+          "notificationVolume"
+        ]
+      },
+      "AdminDashboardRevenueTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-05-13"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "netRevenue": {
+            "type": "number"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "transactionCount": {
+            "type": "number"
+          },
+          "successfulBookingCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "grossRevenue",
+          "netRevenue",
+          "refundAmount",
+          "transactionCount",
+          "successfulBookingCount"
+        ]
+      },
+      "AdminOutcomeMetricDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number"
+          },
+          "rate": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "count",
+          "rate"
+        ]
+      },
+      "AdminDashboardBookingOutcomeSummaryDto": {
+        "type": "object",
+        "properties": {
+          "totalBookings": {
+            "type": "number"
+          },
+          "success": {
+            "$ref": "#/components/schemas/AdminOutcomeMetricDto"
+          },
+          "failed": {
+            "$ref": "#/components/schemas/AdminOutcomeMetricDto"
+          },
+          "canceled": {
+            "$ref": "#/components/schemas/AdminOutcomeMetricDto"
+          }
+        },
+        "required": [
+          "totalBookings",
+          "success",
+          "failed",
+          "canceled"
+        ]
+      },
+      "AdminDashboardTransactionHealthDto": {
+        "type": "object",
+        "properties": {
+          "totalTransactions": {
+            "type": "number"
+          },
+          "paid": {
+            "type": "number"
+          },
+          "pending": {
+            "type": "number"
+          },
+          "refunded": {
+            "type": "number"
+          },
+          "failed": {
+            "type": "number"
+          },
+          "canceled": {
+            "type": "number"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "failedAmount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "totalTransactions",
+          "paid",
+          "pending",
+          "refunded",
+          "failed",
+          "canceled",
+          "grossRevenue",
+          "refundAmount",
+          "failedAmount"
+        ]
+      },
+      "AdminPartnerRankingVerificationStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "changesRequired",
+          "approved",
+          "rejected"
+        ]
+      },
+      "AdminPartnerRankingItemDto": {
+        "type": "object",
+        "properties": {
+          "partnerId": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "number"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "bookingCount": {
+            "type": "number"
+          },
+          "successfulBookingRate": {
+            "type": "number"
+          },
+          "verificationStatus": {
+            "$ref": "#/components/schemas/AdminPartnerRankingVerificationStatus"
+          }
+        },
+        "required": [
+          "partnerId",
+          "partnerName",
+          "rank",
+          "grossRevenue",
+          "bookingCount",
+          "successfulBookingRate",
+          "verificationStatus"
+        ]
+      },
+      "AdminServiceRankingItemDto": {
+        "type": "object",
+        "properties": {
+          "serviceId": {
+            "type": "string"
+          },
+          "serviceName": {
+            "type": "string"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "number"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "bookingCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "serviceId",
+          "serviceName",
+          "categoryName",
+          "partnerName",
+          "rank",
+          "grossRevenue",
+          "bookingCount"
+        ]
+      },
+      "AdminDashboardNotificationType": {
+        "type": "string",
+        "enum": [
+          "broadcast",
+          "payment",
+          "review",
+          "category",
+          "operations"
+        ]
+      },
+      "AdminDashboardNotificationPriority": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high",
+          "critical"
+        ]
+      },
+      "AdminDashboardNotificationItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AdminDashboardNotificationType"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/AdminDashboardNotificationPriority"
+          },
+          "isRead": {
+            "type": "boolean"
+          },
+          "isBroadcast": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "body",
+          "createdAt",
+          "type",
+          "priority",
+          "isRead",
+          "isBroadcast"
+        ]
+      },
+      "AdminCategorySnapshotDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "serviceCount": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "serviceCount",
+          "isActive"
+        ]
+      },
+      "AdminCategoryHealthDto": {
+        "type": "object",
+        "properties": {
+          "totalCategories": {
+            "type": "number"
+          },
+          "activeCategories": {
+            "type": "number"
+          },
+          "inactiveCategories": {
+            "type": "number"
+          },
+          "emptyCategories": {
+            "type": "number"
+          },
+          "totalMappedServices": {
+            "type": "number"
+          },
+          "topCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminCategorySnapshotDto"
+            }
+          }
+        },
+        "required": [
+          "totalCategories",
+          "activeCategories",
+          "inactiveCategories",
+          "emptyCategories",
+          "totalMappedServices",
+          "topCategories"
         ]
       },
       "AdminFinancePeriod": {
@@ -20293,483 +21080,6 @@
             "example": "Approved from partner transaction manager."
           }
         }
-      },
-      "AiRecommendationItemDto": {
-        "properties": {
-          "service_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Service Id"
-          },
-          "name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Name"
-          },
-          "slug": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Slug"
-          },
-          "imageUrl": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Imageurl"
-          },
-          "category": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Category"
-          },
-          "duration": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Duration"
-          },
-          "price": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Price"
-          },
-          "rating": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Rating"
-          },
-          "vendorName": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Vendorname"
-          },
-          "location": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Location"
-          },
-          "staffAvatars": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Staffavatars"
-          },
-          "type": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Type"
-          }
-        },
-        "additionalProperties": true,
-        "type": "object",
-        "title": "AiRecommendationItemDto",
-        "description": "Pass-through DTO, match 1:1 với backend `/backend/ai/recommendations`.\n\n- Chấp nhận cả \"service_id\" và \"id\" ở input (backend hiện trả \"id\",\n  mock fallback trả \"service_id\").\n- Output luôn dùng tên field Python (service_id, imageUrl, vendorName, staffAvatars)\n  để khớp spec frontend.\n- `extra=\"allow\"` để backend thêm field mới không cần update DTO."
-      },
-      "ChatbotRecommendationResponse": {
-        "properties": {
-          "conversation_id": {
-            "type": "string",
-            "title": "Conversation Id"
-          },
-          "recommendations": {
-            "items": {
-              "$ref": "#/components/schemas/AiRecommendationItemDto"
-            },
-            "type": "array",
-            "title": "Recommendations"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "timestamp": {
-            "type": "string",
-            "title": "Timestamp"
-          }
-        },
-        "type": "object",
-        "required": [
-          "conversation_id",
-          "recommendations",
-          "total",
-          "timestamp"
-        ],
-        "title": "ChatbotRecommendationResponse"
-      },
-      "ChatbotRecommenderRequest": {
-        "properties": {
-          "conversation_id": {
-            "type": "string",
-            "title": "Conversation Id"
-          },
-          "query": {
-            "type": "string",
-            "minLength": 1,
-            "title": "Query"
-          },
-          "top_k": {
-            "type": "integer",
-            "maximum": 20,
-            "minimum": 1,
-            "title": "Top K",
-            "default": 3
-          },
-          "filtered_ids": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Filtered Ids"
-          }
-        },
-        "type": "object",
-        "required": [
-          "conversation_id",
-          "query"
-        ],
-        "title": "ChatbotRecommenderRequest"
-      },
-      "ChatbotRequest": {
-        "properties": {
-          "conversation_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Conversation Id"
-          },
-          "user_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "User Id"
-          },
-          "message": {
-            "type": "string",
-            "minLength": 1,
-            "title": "Message"
-          },
-          "current_lat": {
-            "anyOf": [
-              {
-                "type": "number",
-                "maximum": 90,
-                "minimum": -90
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Current Lat",
-            "description": "User's current latitude"
-          },
-          "current_lng": {
-            "anyOf": [
-              {
-                "type": "number",
-                "maximum": 180,
-                "minimum": -180
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Current Lng",
-            "description": "User's current longitude"
-          },
-          "top_k": {
-            "type": "integer",
-            "maximum": 20,
-            "minimum": 1,
-            "title": "Top K",
-            "default": 3
-          }
-        },
-        "type": "object",
-        "required": [
-          "user_id",
-          "message"
-        ],
-        "title": "ChatbotRequest",
-        "description": "POST /generative_ai/stream"
-      },
-      "ConversationResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "userId": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Userid"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Createdat"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Updatedat"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "userId",
-          "title",
-          "createdAt",
-          "updatedAt"
-        ],
-        "title": "ConversationResponse"
-      },
-      "ConversationsPageResponse": {
-        "properties": {
-          "conversations": {
-            "items": {
-              "$ref": "#/components/schemas/ConversationResponse"
-            },
-            "type": "array",
-            "title": "Conversations"
-          },
-          "meta": {
-            "$ref": "#/components/schemas/PaginationMeta"
-          }
-        },
-        "type": "object",
-        "required": [
-          "conversations",
-          "meta"
-        ],
-        "title": "ConversationsPageResponse"
-      },
-      "HomeRecommenderRequest": {
-        "properties": {
-          "user_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "User Id"
-          },
-          "top_k": {
-            "type": "integer",
-            "maximum": 20,
-            "minimum": 1,
-            "title": "Top K",
-            "default": 5
-          }
-        },
-        "type": "object",
-        "required": [
-          "user_id"
-        ],
-        "title": "HomeRecommenderRequest"
-      },
-      "MessageResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "conversationId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Conversationid"
-          },
-          "role": {
-            "type": "string",
-            "title": "Role"
-          },
-          "content": {
-            "type": "string",
-            "title": "Content"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Createdat"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "conversationId",
-          "role",
-          "content",
-          "createdAt"
-        ],
-        "title": "MessageResponse"
-      },
-      "MessagesPageResponse": {
-        "properties": {
-          "messages": {
-            "items": {
-              "$ref": "#/components/schemas/MessageResponse"
-            },
-            "type": "array",
-            "title": "Messages"
-          },
-          "meta": {
-            "$ref": "#/components/schemas/PaginationMeta"
-          }
-        },
-        "type": "object",
-        "required": [
-          "messages",
-          "meta"
-        ],
-        "title": "MessagesPageResponse"
-      },
-      "PaginationMeta": {
-        "properties": {
-          "page": {
-            "type": "integer",
-            "title": "Page"
-          },
-          "limit": {
-            "type": "integer",
-            "title": "Limit"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "totalPages": {
-            "type": "integer",
-            "title": "Totalpages"
-          }
-        },
-        "type": "object",
-        "required": [
-          "page",
-          "limit",
-          "total",
-          "totalPages"
-        ],
-        "title": "PaginationMeta"
-      },
-      "RecommendationResponse": {
-        "properties": {
-          "recommendations": {
-            "items": {
-              "$ref": "#/components/schemas/AiRecommendationItemDto"
-            },
-            "type": "array",
-            "title": "Recommendations"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "timestamp": {
-            "type": "string",
-            "title": "Timestamp"
-          }
-        },
-        "type": "object",
-        "required": [
-          "recommendations",
-          "total",
-          "timestamp"
-        ],
-        "title": "RecommendationResponse"
       }
     }
   }
