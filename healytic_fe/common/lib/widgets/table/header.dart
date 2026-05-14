@@ -1,4 +1,5 @@
 import 'package:common/widgets/button/button.dart';
+import 'package:common/widgets/input/search_field.dart';
 import 'package:common/widgets/table/function_button.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/utils/responsive.dart';
@@ -17,12 +18,16 @@ class TableHeaderWidget extends StatefulWidget {
   const TableHeaderWidget({
     super.key,
     required this.onSearchChanged,
+    this.searchFieldKey,
     this.functionButtons,
     this.buttons,
   });
 
   /// Callback invoked when the search text changes.
   final ValueChanged<String>? onSearchChanged;
+
+  /// Optional key applied to the search [TextField].
+  final Key? searchFieldKey;
 
   /// Optional list of function buttons (dropdown popup menus).
   final List<TableFunctionButtonWidget>? functionButtons;
@@ -50,33 +55,9 @@ class _TableHeaderWidgetState extends State<TableHeaderWidget> {
                 tablet: 250,
                 web: 300,
               ),
-              // height: double.maxFinite,
-              child: TextField(
+              child: AppSearchField(
+                fieldKey: widget.searchFieldKey,
                 onChanged: widget.onSearchChanged,
-                style: Theme.of(context).textTheme.bodySmall,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: AppDimens.radiusSmall,
-                    borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.outline,
-                      width: 0.5,
-                    ),
-                  ),
-                  hintText: 'Search...',
-                  hintStyle: Theme.of(context).textTheme.bodyMedium,
-                  prefixIcon: Icon(
-                    Icons.search,
-                    size: AppDimens.sizeMedium.height,
-                  ),
-                  isDense: true,
-                  contentPadding: AppDimens.paddingAllSmall,
-                  prefixIconConstraints: const BoxConstraints(
-                    minWidth: 30,
-                    minHeight: 30,
-                  ),
-                  fillColor: Theme.of(context).colorScheme.surface,
-                  focusColor: Theme.of(context).focusColor,
-                ),
               ),
             ),
           ),

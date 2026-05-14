@@ -24,6 +24,8 @@ abstract class ProductRemoteDataSource {
     bool? sortedAsc,
   );
 
+  Future<List<Product>> getAllProducts({String? sortedBy, bool? sortedAsc});
+
   Future<int> getTotalRows();
 
   Future<Product> getProductById(ProductId id);
@@ -70,14 +72,10 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    final response = await _partnerHealthServicesApi
-        .partnerHealthServiceControllerFindAll();
-
-    if (response == null) {
-      return [];
-    }
-
-    final products = response.map(_mapToProduct).toList();
+    final products = await getAllProducts(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
 
     // Local pagination since API doesn't support it
     if (startingAt >= products.length) return [];
@@ -85,6 +83,21 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     if (end > products.length) end = products.length;
 
     return products.sublist(startingAt, end);
+  }
+
+  @override
+  Future<List<Product>> getAllProducts({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
+    final response = await _partnerHealthServicesApi
+        .partnerHealthServiceControllerFindAll();
+
+    if (response == null) {
+      return [];
+    }
+
+    return response.map(_mapToProduct).toList();
   }
 
   @override
@@ -437,6 +450,33 @@ class _SparseUpdatePartnerHealthServiceDto
 }
 
 class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
+  final List<Product> _products = List.generate(100, _mockProductAt);
+
+  static Product _mockProductAt(int index) {
+    return Product(
+      id: ProductId('mock-id-$index'),
+      name: 'Mock Product $index',
+      description: 'Description for mock product $index',
+      basePrice: 100.0 + index,
+      salePrice: 90.0 + index,
+      productType: index % 2 == 0 ? 'service' : 'physical',
+      status: index % 5 == 0 ? 'draft' : 'active',
+      category: CategoryEntity(
+        id: 'cat-${index % 5}',
+        name: 'Category ${index % 5}',
+        slug: 'category-${index % 5}',
+      ),
+      onlineStore: true,
+      images: ['https://picsum.photos/200/300?random=$index'],
+      costPerItem: index % 2 != 0 ? 50.0 : null,
+      duration: index % 2 == 0 ? 60 : null,
+      buffer: index % 2 == 0 ? 15 : null,
+      capacity: index % 2 == 0 ? 1 : null,
+      leadTime: index % 2 == 0 ? 24 : null,
+      staffAllocation: 'any',
+    );
+  }
+
   @override
   Future<List<Product>> getProducts(
     int startingAt,
@@ -444,48 +484,36 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return List.generate(
-      count,
-      (index) => Product(
-        id: ProductId('mock-id-${startingAt + index}'),
-        name: 'Mock Product ${startingAt + index}',
-        description:
-            'Description for mock product '
-            '${startingAt + index}',
-        basePrice: 100.0 + index,
-        salePrice: 90.0 + index,
-        productType: index % 2 == 0 ? 'service' : 'physical',
-        status: 'active',
-        category: CategoryEntity(
-          id: 'cat-${index % 5}',
-          name: 'Category ${index % 5}',
-          slug: 'category-${index % 5}',
-        ),
-        onlineStore: true,
-        images: [
-          'https://picsum.photos/200/300'
-              '?random=${startingAt + index}',
-        ],
-        costPerItem: index % 2 != 0 ? 50.0 : null,
-        duration: index % 2 == 0 ? 60 : null,
-        buffer: index % 2 == 0 ? 15 : null,
-        capacity: index % 2 == 0 ? 1 : null,
-        leadTime: index % 2 == 0 ? 24 : null,
-        staffAllocation: 'any',
-      ),
+    final products = await getAllProducts(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
     );
+    final end = (startingAt + count).clamp(0, products.length);
+    return products.sublist(startingAt.clamp(0, products.length), end);
+  }
+
+  @override
+  Future<List<Product>> getAllProducts({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return [..._products];
   }
 
   @override
   Future<int> getTotalRows() async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return 100;
+    return _products.length;
   }
 
   @override
   Future<Product> getProductById(ProductId id) async {
     await Future.delayed(const Duration(seconds: 1));
+    final existing = _products.where((product) => product.id == id);
+    if (existing.isNotEmpty) {
+      return existing.first;
+    }
 
     final product = productMockData[id.value] ?? productMockDefault;
 
@@ -499,8 +527,8 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
   @override
   Future<Product> createProduct(CreateProductRequest request) async {
     await Future.delayed(const Duration(seconds: 1));
-    return Product(
-      id: ProductId('new-mock-id'),
+    final product = Product(
+      id: ProductId('new-mock-id-${DateTime.now().millisecondsSinceEpoch}'),
       name: request.name,
       description: request.description,
       basePrice: request.basePrice,
@@ -521,6 +549,8 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
 
       staffAllocation: request.staffAllocation,
     );
+    _products.insert(0, product);
+    return product;
   }
 
   @override
@@ -532,6 +562,7 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
   @override
   Future<void> deleteProduct(ProductId id) async {
     await Future.delayed(const Duration(seconds: 1));
+    _products.removeWhere((product) => product.id == id);
     debugPrint('Mock delete product: $id');
   }
 

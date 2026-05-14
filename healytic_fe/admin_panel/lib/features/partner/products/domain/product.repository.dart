@@ -14,6 +14,9 @@ abstract class ProductRepository {
     bool? sortedAsc,
   );
 
+  /// Get all products for client-side filtering/sorting.
+  Future<List<Product>> getAllProducts({String? sortedBy, bool? sortedAsc});
+
   /// Get total count of products
   Future<int> getTotalRows();
 

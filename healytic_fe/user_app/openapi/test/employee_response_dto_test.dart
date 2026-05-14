@@ -29,13 +29,13 @@ void main() {
     });
 
     // First name
-    // Object firstName
+    // String firstName
     test('to test the property `firstName`', () async {
       // TODO
     });
 
     // Last name
-    // Object lastName
+    // String lastName
     test('to test the property `lastName`', () async {
       // TODO
     });
@@ -53,49 +53,49 @@ void main() {
     });
 
     // Phone number
-    // Object phone
+    // String phone
     test('to test the property `phone`', () async {
       // TODO
     });
 
     // Avatar URL
-    // Object avatarUrl
+    // String avatarUrl
     test('to test the property `avatarUrl`', () async {
       // TODO
     });
 
     // Job title
-    // Object jobTitle
+    // String jobTitle
     test('to test the property `jobTitle`', () async {
       // TODO
     });
 
     // Start date
-    // Object startDate
+    // DateTime startDate
     test('to test the property `startDate`', () async {
       // TODO
     });
 
     // Employment type
-    // Object employmentType
+    // String employmentType
     test('to test the property `employmentType`', () async {
       // TODO
     });
 
     // Description/bio
-    // Object description
+    // String description
     test('to test the property `description`', () async {
       // TODO
     });
 
     // Emergency contact name
-    // Object emergencyContactName
+    // String emergencyContactName
     test('to test the property `emergencyContactName`', () async {
       // TODO
     });
 
     // Emergency contact phone
-    // Object emergencyContactPhone
+    // String emergencyContactPhone
     test('to test the property `emergencyContactPhone`', () async {
       // TODO
     });
@@ -119,25 +119,22 @@ void main() {
     });
 
     // Date of birth
-    // Object dob
+    // DateTime dob
     test('to test the property `dob`', () async {
       // TODO
     });
 
-    // Gender
-    // String gender
+    // Gender gender
     test('to test the property `gender`', () async {
       // TODO
     });
 
-    // Employee role
-    // String role
+    // EmployeeRole role
     test('to test the property `role`', () async {
       // TODO
     });
 
-    // Employee status
-    // String status
+    // EmployeeStatus status
     test('to test the property `status`', () async {
       // TODO
     });
@@ -155,7 +152,7 @@ void main() {
     });
 
     // Partner ID the employee belongs to
-    // Object partnerId
+    // String partnerId
     test('to test the property `partnerId`', () async {
       // TODO
     });

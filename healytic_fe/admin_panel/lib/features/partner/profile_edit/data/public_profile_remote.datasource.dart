@@ -11,7 +11,7 @@ abstract class PublicProfileRemoteDataSource {
   /// Persists storefront updates and returns the
   /// refreshed profile aggregate.
   Future<PartnerPublicProfileEntity> updatePublicProfile(
-    PublicProfileUpdateRequest request,
+    PublicProfileUpdatePatch request,
   );
 }
 
@@ -37,7 +37,7 @@ class PublicProfileRemoteDataSourceImpl
 
   @override
   Future<PartnerPublicProfileEntity> updatePublicProfile(
-    PublicProfileUpdateRequest request,
+    PublicProfileUpdatePatch request,
   ) async {
     final updateDto = _mapRequestToDto(request);
 
@@ -163,16 +163,21 @@ class PublicProfileRemoteDataSourceImpl
   // ── Entity → Update DTO mapping ──────────────
 
   UpdatePartnerPublicProfileDto _mapRequestToDto(
-    PublicProfileUpdateRequest request,
+    PublicProfileUpdatePatch request,
   ) {
-    return UpdatePartnerPublicProfileDto(
+    return _SparseUpdatePartnerPublicProfileDto(
       coverImageUrl: request.coverImageUrl,
+      includeCoverImageUrl: request.includeCoverImageUrl,
       logoImageUrl: request.logoImageUrl,
+      includeLogoImageUrl: request.includeLogoImageUrl,
       description: request.description,
+      includeDescription: request.includeDescription,
       gallery: request.gallery ?? const [],
+      includeGallery: request.includeGallery,
       certifications: (request.certifications ?? const [])
           .map(_mapCertToDto)
           .toList(),
+      includeCertifications: request.includeCertifications,
     );
   }
 
@@ -184,6 +189,51 @@ class PublicProfileRemoteDataSourceImpl
       iconName: item.iconName,
       sortOrder: item.sortOrder,
     );
+  }
+}
+
+class _SparseUpdatePartnerPublicProfileDto
+    extends UpdatePartnerPublicProfileDto {
+  _SparseUpdatePartnerPublicProfileDto({
+    super.coverImageUrl,
+    super.logoImageUrl,
+    super.description,
+    super.gallery,
+    super.certifications,
+    this.includeCoverImageUrl = false,
+    this.includeLogoImageUrl = false,
+    this.includeDescription = false,
+    this.includeGallery = false,
+    this.includeCertifications = false,
+  });
+
+  final bool includeCoverImageUrl;
+  final bool includeLogoImageUrl;
+  final bool includeDescription;
+  final bool includeGallery;
+  final bool includeCertifications;
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = <String, dynamic>{};
+
+    if (includeCoverImageUrl) {
+      json[r'coverImageUrl'] = coverImageUrl;
+    }
+    if (includeLogoImageUrl) {
+      json[r'logoImageUrl'] = logoImageUrl;
+    }
+    if (includeDescription) {
+      json[r'description'] = description;
+    }
+    if (includeGallery) {
+      json[r'gallery'] = gallery;
+    }
+    if (includeCertifications) {
+      json[r'certifications'] = certifications;
+    }
+
+    return json;
   }
 }
 
@@ -290,16 +340,26 @@ class PublicProfileRemoteDataSourceMock
 
   @override
   Future<PartnerPublicProfileEntity> updatePublicProfile(
-    PublicProfileUpdateRequest request,
+    PublicProfileUpdatePatch request,
   ) async {
     await Future.delayed(const Duration(milliseconds: 600));
 
     final sf = _entity.storefront;
-    final cover = request.coverImageUrl ?? sf.coverImageUrl;
-    final logo = request.logoImageUrl ?? sf.logoImageUrl;
-    final desc = request.description ?? sf.description;
-    final gallery = request.gallery ?? sf.gallery;
-    final certs = request.certifications ?? sf.certifications;
+    final cover = request.includeCoverImageUrl
+        ? request.coverImageUrl
+        : sf.coverImageUrl;
+    final logo = request.includeLogoImageUrl
+        ? request.logoImageUrl
+        : sf.logoImageUrl;
+    final desc = request.includeDescription
+        ? request.description
+        : sf.description;
+    final gallery = request.includeGallery
+        ? request.gallery ?? const <String>[]
+        : sf.gallery;
+    final certs = request.includeCertifications
+        ? request.certifications ?? const <PublicProfileCertification>[]
+        : sf.certifications;
 
     final checklist = _deriveChecklist(
       cover: cover,

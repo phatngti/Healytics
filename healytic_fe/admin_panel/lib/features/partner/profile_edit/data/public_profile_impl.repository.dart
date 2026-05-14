@@ -17,7 +17,7 @@ class PublicProfileRepositoryImpl implements PublicProfileRepository {
 
   @override
   Future<PartnerPublicProfileEntity> updatePublicProfile(
-    PublicProfileUpdateRequest request,
+    PublicProfileUpdatePatch request,
   ) {
     return dataSource.updatePublicProfile(request);
   }

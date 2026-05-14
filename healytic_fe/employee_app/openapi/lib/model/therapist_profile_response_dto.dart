@@ -25,57 +25,21 @@ class TherapistProfileResponseDto {
 
 
   /// Employee ID (primary key)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   String? employeeId;
 
   /// Therapist level (junior, senior, etc.)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   String? level;
 
   /// Therapist type
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   String? type;
 
   /// Strength level
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   String? strengthLevel;
 
   /// Commission rate (percentage)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   num? commissionRate;
 
   /// Health check date
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   DateTime? healthCheckDate;
 
   /// List of skills
@@ -170,7 +134,9 @@ class TherapistProfileResponseDto {
         level: mapValueOfType<String>(json, r'level'),
         type: mapValueOfType<String>(json, r'type'),
         strengthLevel: mapValueOfType<String>(json, r'strengthLevel'),
-        commissionRate: num.parse('${json[r'commissionRate']}'),
+        commissionRate: json[r'commissionRate'] == null
+            ? null
+            : num.parse('${json[r'commissionRate']}'),
         healthCheckDate: mapDateTime(json, r'healthCheckDate', r''),
         skills: json[r'skills'] is Iterable
             ? (json[r'skills'] as Iterable).cast<String>().toList(growable: false)

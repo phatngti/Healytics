@@ -124,3 +124,43 @@ abstract class PublicProfileUpdateRequest with _$PublicProfileUpdateRequest {
     List<PublicProfileCertification>? certifications,
   }) = _PublicProfileUpdateRequest;
 }
+
+/// Sparse request payload for `PUT /public-profile`.
+///
+/// The generated OpenAPI DTO cannot represent "omitted"
+/// separately from `null`, but this screen needs both:
+/// omitted means "leave the backend value unchanged", while
+/// included `null` means "clear this field".
+class PublicProfileUpdatePatch {
+  const PublicProfileUpdatePatch({
+    this.coverImageUrl,
+    this.logoImageUrl,
+    this.description,
+    this.gallery,
+    this.certifications,
+    this.includeCoverImageUrl = false,
+    this.includeLogoImageUrl = false,
+    this.includeDescription = false,
+    this.includeGallery = false,
+    this.includeCertifications = false,
+  });
+
+  final String? coverImageUrl;
+  final String? logoImageUrl;
+  final String? description;
+  final List<String>? gallery;
+  final List<PublicProfileCertification>? certifications;
+
+  final bool includeCoverImageUrl;
+  final bool includeLogoImageUrl;
+  final bool includeDescription;
+  final bool includeGallery;
+  final bool includeCertifications;
+
+  bool get hasChanges =>
+      includeCoverImageUrl ||
+      includeLogoImageUrl ||
+      includeDescription ||
+      includeGallery ||
+      includeCertifications;
+}

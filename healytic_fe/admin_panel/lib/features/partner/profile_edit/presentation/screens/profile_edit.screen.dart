@@ -71,6 +71,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   bool _isUploadingCover = false;
   bool _isUploadingLogo = false;
   bool _isUploadingGallery = false;
+  bool _showValidationErrors = false;
 
   // Local draft state
   String? _coverImageUrl;
@@ -103,6 +104,9 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   bool get _isGalleryValid =>
       _gallery.length >= _minGalleryImages &&
       _gallery.length <= _maxGalleryImages;
+
+  bool get _isProfilePublishable =>
+      _hasCover && _hasLogo && _isDescValid && _isGalleryValid;
 
   // ── Hydration ────────────────────────────────
 
@@ -146,8 +150,18 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
 
   Future<void> _save() async {
     if (_isSaving) return;
-    setState(() => _isSaving = true);
     _syncDraft();
+
+    if (!_isProfilePublishable) {
+      setState(() => _showValidationErrors = true);
+      _snack(
+        'Complete cover, logo, description, and gallery before saving.',
+        isError: true,
+      );
+      return;
+    }
+
+    setState(() => _isSaving = true);
 
     try {
       final result = await ref.read(publicProfileEditProvider.notifier).save();
@@ -155,6 +169,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       if (!mounted) return;
       setState(() {
         _hydrateFrom(result.storefront, overwrite: true);
+        _showValidationErrors = false;
       });
       _snack('Profile saved successfully.');
     } catch (e) {
@@ -174,6 +189,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
 
     setState(() {
       _hydrateFrom(current.storefront, overwrite: true);
+      _showValidationErrors = false;
     });
     _snack('Changes discarded.');
   }
@@ -370,7 +386,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     ),
                     AppDimens.verticalMediumSmall,
                     DropdownButtonFormField<String>(
-                      value: selectedIcon,
+                      initialValue: selectedIcon,
                       decoration: const InputDecoration(
                         labelText: 'Badge icon',
                       ),
@@ -436,7 +452,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   Future<void> _editDescription() async {
     final initialContent = _tryParseQuillContent(_descRaw);
     // Tracks the latest Delta JSON from the editor.
-    String? latestDeltaJson;
+    String? latestDeltaJson = _descRaw;
     int latestPlainLength = _trimmedDesc.length;
 
     final result = await showDialog<String>(
@@ -477,7 +493,6 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                           latestPlainLength = plain.length;
                         });
                       },
-
                     ),
                     AppDimens.verticalSmall,
                     Text(
@@ -725,7 +740,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
           logoImageUrl: _logoImageUrl,
           isUploadingCover: _isUploadingCover,
           isUploadingLogo: _isUploadingLogo,
-          showValidationErrors: false,
+          showValidationErrors: _showValidationErrors,
           hasCoverImage: _hasCover,
           hasLogoImage: _hasLogo,
           onUploadCover: () => _uploadSingleImage(isCover: true),
@@ -746,7 +761,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
         AppDimens.verticalLarge,
         DescriptionSectionWidget(
           description: _trimmedDesc,
-          showValidationErrors: false,
+          showValidationErrors: _showValidationErrors,
           isDescriptionValid: _isDescValid,
           trimmedLength: _trimmedDesc.length,
           minLength: _minDescLength,
@@ -757,7 +772,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
         GallerySectionWidget(
           gallery: _gallery,
           isUploadingGallery: _isUploadingGallery,
-          showValidationErrors: false,
+          showValidationErrors: _showValidationErrors,
           isGalleryValid: _isGalleryValid,
           minImages: _minGalleryImages,
           maxImages: _maxGalleryImages,

@@ -15,10 +15,7 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
   const Header({super.key});
 
   /// Clears auth tokens and navigates to the login page.
-  Future<void> _logout(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
+  Future<void> _logout(BuildContext context, WidgetRef ref) async {
     await ref.read(logoutProviderProvider.notifier).logout();
     if (context.mounted) {
       context.go('/');
@@ -47,16 +44,6 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
             : null,
         title: null,
         actions: [
-          // Notification
-          IconButton(
-            onPressed: () {
-              if (UserRoleHelper.isAdmin()) {
-                const AdminNotificationCampaignIndexRoute().go(context);
-              }
-            },
-            icon: const Icon(Icons.notifications, size: 16),
-          ),
-          AppDimens.horizontalSmall,
           // Profile with logout popup
           PopupMenuButton<String>(
             offset: const Offset(0, 48),

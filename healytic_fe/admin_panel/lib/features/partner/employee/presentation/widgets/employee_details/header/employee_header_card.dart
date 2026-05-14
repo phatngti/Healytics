@@ -10,12 +10,16 @@ class EmployeeHeaderCard extends StatelessWidget {
   final EmployeeEntity employee;
   final bool isEditing;
   final VoidCallback? onEdit;
+  final VoidCallback? onDeactivate;
+  final bool isDeactivating;
 
   const EmployeeHeaderCard({
     super.key,
     required this.employee,
     this.isEditing = false,
     this.onEdit,
+    this.onDeactivate,
+    this.isDeactivating = false,
   });
 
   @override
@@ -58,6 +62,8 @@ class EmployeeHeaderCard extends StatelessWidget {
               dateOfBirth: employee.dateOfBirth,
               isEditing: isEditing,
               onEdit: onEdit,
+              onDeactivate: onDeactivate,
+              isDeactivating: isDeactivating,
             ),
           ),
         ],
