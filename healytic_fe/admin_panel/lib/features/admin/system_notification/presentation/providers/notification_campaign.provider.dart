@@ -36,24 +36,23 @@ class NotificationCampaignIndexState {
 
 class NotificationCampaignIndexNotifier
     extends Notifier<NotificationCampaignIndexState> {
+  int? _campaignsCacheKey;
+  Future<List<NotificationCampaign>>? _campaignsCache;
+
   @override
   NotificationCampaignIndexState build() {
     return const NotificationCampaignIndexState();
   }
 
-  Future<int> getTotalRows() {
-    return ref
-        .read(notificationCampaignRepositoryProvider)
-        .getCampaignTotalRows(filter: state.effectiveFilter);
+  Future<int> getTotalRows() async {
+    return (await _getCampaigns()).length;
   }
 
   Future<List<NotificationCampaign>> getCampaigns({
     int? startingAt,
     int? count,
   }) async {
-    final campaigns = await ref
-        .read(notificationCampaignRepositoryProvider)
-        .listCampaigns(filter: state.effectiveFilter);
+    final campaigns = await _getCampaigns();
 
     final offset = startingAt ?? 0;
     final limit = count ?? campaigns.length;
@@ -130,6 +129,51 @@ class NotificationCampaignIndexNotifier
 
   void bumpReload() {
     state = state.copyWith(reloadToken: state.reloadToken + 1);
+  }
+
+  Future<List<NotificationCampaign>> _getCampaigns() async {
+    final cacheKey = _campaignsKey(state);
+    final cached = _campaignsCache;
+    if (_campaignsCacheKey == cacheKey && cached != null) {
+      return cached;
+    }
+
+    final future = _loadCampaigns(cacheKey);
+    _campaignsCacheKey = cacheKey;
+    _campaignsCache = future;
+    return future;
+  }
+
+  Future<List<NotificationCampaign>> _loadCampaigns(int cacheKey) async {
+    try {
+      return await ref
+          .read(notificationCampaignRepositoryProvider)
+          .listCampaigns(filter: state.effectiveFilter);
+    } catch (_) {
+      if (_campaignsCacheKey == cacheKey) {
+        _invalidateCampaignsCache();
+      }
+      rethrow;
+    }
+  }
+
+  int _campaignsKey(NotificationCampaignIndexState state) {
+    final filter = state.effectiveFilter;
+    return Object.hash(
+      filter.searchQuery,
+      Object.hashAllUnordered(filter.statuses),
+      Object.hashAllUnordered(filter.channels),
+      filter.audiencePreset,
+      filter.startDate,
+      filter.endDate,
+      filter.createdBy,
+      state.reloadToken,
+    );
+  }
+
+  void _invalidateCampaignsCache() {
+    _campaignsCacheKey = null;
+    _campaignsCache = null;
   }
 }
 

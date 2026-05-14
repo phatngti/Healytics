@@ -2,7 +2,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  ForbiddenException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, Not, In, Between } from 'typeorm';
@@ -18,7 +18,12 @@ import { Employee } from '@/common/entities/employee.entity';
 import { Partner } from '@/common/entities/partner.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { Booking } from '@/common/entities/booking.entity';
+import { SkillCatalog } from '@/common/entities/skill-catalog.entity';
 import { BookingServiceResponseDto } from './dto/booking-service-response.dto';
+import {
+  CreateSkillDto,
+  SkillCatalogResponseDto,
+} from './dto/skill-catalog.dto';
 import { FeaturedSpecialistResponseDto } from './dto/featured-specialist-response.dto';
 import {
   EmployeeTimeSlotsResponseDto,
@@ -38,6 +43,7 @@ import { GetEmployeeDetailAnalyticsHandler } from './application/handlers/get-em
 import { DashboardTimePeriod } from '@/dashboard-partner/dto/query/dashboard-period-query.dto';
 import { EmployeeOverviewAnalyticsResponseDto } from './dto/analytics/employee-overview-analytics.dto';
 import { EmployeeDetailAnalyticsResponseDto } from './dto/analytics/employee-detail-analytics.dto';
+import { EmployeeAssignedServiceDto } from './dto/employee-assigned-service.dto';
 
 /**
  * Service facade for managing employees (doctors, therapists, staff).
@@ -72,6 +78,8 @@ export class EmployeesService {
     private readonly eligibilityRepository: Repository<ProductEmployeeEligibility>,
     @InjectRepository(Booking)
     private readonly bookingRepository: Repository<Booking>,
+    @InjectRepository(SkillCatalog)
+    private readonly skillCatalogRepository: Repository<SkillCatalog>,
     private readonly partnersService: PartnersService,
     private readonly createDoctorHandler: CreateDoctorHandler,
     private readonly createTherapistHandler: CreateTherapistHandler,
@@ -161,10 +169,13 @@ export class EmployeesService {
     if (partnerId) {
       where.partnerId = partnerId;
     }
-    return this.employeeRepository.find({
+    const employees = await this.employeeRepository.find({
       where,
       relations: ['doctorProfile', 'therapistProfile'],
     });
+    return employees.map((employee) =>
+      this.normalizeEmployeeResponse(employee),
+    );
   }
 
   /**
@@ -179,7 +190,7 @@ export class EmployeesService {
       this.logger.warn(`Employee not found: ${id}`);
       throw new NotFoundException(`Employee with ID ${id} not found`);
     }
-    return employee;
+    return this.normalizeEmployeeResponse(employee);
   }
 
   /**
@@ -194,7 +205,41 @@ export class EmployeesService {
       this.logger.warn(`Employee ${id} not found for partner ${partnerId}`);
       throw new NotFoundException(`Employee with ID ${id} not found`);
     }
-    return employee;
+    return this.normalizeEmployeeResponse(employee);
+  }
+
+  /**
+   * Returns service assignments for a partner-owned employee.
+   *
+   * An existing employee with no assignments returns an empty list; unknown or
+   * cross-partner employees still fail through findOneForPartner.
+   */
+  async findAssignedServicesForPartner(
+    employeeId: string,
+    partnerId: string,
+  ): Promise<EmployeeAssignedServiceDto[]> {
+    await this.findOneForPartner(employeeId, partnerId);
+
+    const eligibilities = await this.eligibilityRepository
+      .createQueryBuilder('eligibility')
+      .innerJoinAndSelect(
+        'eligibility.product',
+        'product',
+        'product.partner_id = :partnerId AND product.deleted_at IS NULL',
+        { partnerId },
+      )
+      .leftJoinAndSelect('product.productDefinition', 'productDefinition')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.media', 'media')
+      .where('eligibility.employee_id = :employeeId', { employeeId })
+      .orderBy('eligibility.is_primary', 'DESC')
+      .addOrderBy('product.name', 'ASC')
+      .addOrderBy('media.sort_order', 'ASC')
+      .getMany();
+
+    return eligibilities.map((eligibility) =>
+      EmployeeAssignedServiceDto.fromEligibility(eligibility),
+    );
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -208,7 +253,11 @@ export class EmployeesService {
     id: string,
     updateEmployeeDto: UpdateEmployeeDto,
   ): Promise<Employee> {
-    return this.updateEmployeeHandler.execute(id, updateEmployeeDto);
+    const employee = await this.updateEmployeeHandler.execute(
+      id,
+      updateEmployeeDto,
+    );
+    return this.normalizeEmployeeResponse(employee);
   }
 
   /**
@@ -221,7 +270,11 @@ export class EmployeesService {
     updateEmployeeDto: UpdateEmployeeDto,
   ): Promise<Employee> {
     await this.findOneForPartner(id, partnerId);
-    return this.updateEmployeeHandler.execute(id, updateEmployeeDto);
+    const employee = await this.updateEmployeeHandler.execute(
+      id,
+      updateEmployeeDto,
+    );
+    return this.normalizeEmployeeResponse(employee);
   }
 
   /**
@@ -238,6 +291,59 @@ export class EmployeesService {
   async removeForPartner(id: string, partnerId: string): Promise<void> {
     await this.findOneForPartner(id, partnerId);
     return this.removeEmployeeHandler.execute(id);
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // Skill catalog operations
+  // ──────────────────────────────────────────────────────────────
+
+  /**
+   * Returns all skills of a given type for the partner.
+   */
+  async getSkillsByType(
+    partnerId: string,
+    type: string,
+  ): Promise<SkillCatalogResponseDto[]> {
+    const skills = await this.skillCatalogRepository.find({
+      where: { partnerId, type },
+      order: { label: 'ASC' },
+    });
+    return skills.map((s) => ({ key: s.slug, label: s.label }));
+  }
+
+  /**
+   * Creates a new skill in the catalog for the partner.
+   * Normalizes the name to a slug and checks for duplicates.
+   */
+  async createSkill(
+    partnerId: string,
+    dto: CreateSkillDto,
+    type: string,
+  ): Promise<SkillCatalogResponseDto> {
+    const slug = dto.name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_|_$/g, '');
+
+    const existing = await this.skillCatalogRepository.findOne({
+      where: { partnerId, slug, type },
+    });
+    if (existing) {
+      throw new ConflictException(`Skill '${dto.name}' already exists`);
+    }
+
+    const skill = this.skillCatalogRepository.create({
+      partnerId,
+      slug,
+      label: dto.name.trim(),
+      type,
+    });
+    const saved = await this.skillCatalogRepository.save(skill);
+    this.logger.log(
+      `Created ${type} skill '${saved.label}' ` + `for partner ${partnerId}`,
+    );
+    return { key: saved.slug, label: saved.label };
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -269,6 +375,30 @@ export class EmployeesService {
       employeeId,
       period,
     );
+  }
+
+  private normalizeEmployeeResponse(employee: Employee): Employee {
+    employee.verificationDocuments = employee.verificationDocuments ?? [];
+    employee.schedule = employee.schedule ?? [];
+    employee.workHistory = employee.workHistory ?? [];
+
+    if (employee.doctorProfile) {
+      employee.doctorProfile.medicalCredentials =
+        employee.doctorProfile.medicalCredentials ?? [];
+      employee.doctorProfile.specializations =
+        employee.doctorProfile.specializations ?? [];
+      employee.doctorProfile.education = employee.doctorProfile.education ?? [];
+      employee.doctorProfile.certifications =
+        employee.doctorProfile.certifications ?? [];
+    }
+
+    if (employee.therapistProfile) {
+      employee.therapistProfile.skills = employee.therapistProfile.skills ?? [];
+      employee.therapistProfile.deviceProficiency =
+        employee.therapistProfile.deviceProficiency ?? [];
+    }
+
+    return employee;
   }
 
   // ──────────────────────────────────────────────────────────────

@@ -9,6 +9,7 @@ import { Employee } from '@/common/entities/employee.entity';
 import { Partner } from '@/common/entities/partner.entity';
 import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
 import { TherapistProfile } from '@/common/entities/therapist-profile.entity';
+import { SkillCatalog } from '@/common/entities/skill-catalog.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { Product } from '@/common/entities/product.entity';
 import { ProductDefinition } from '@/common/entities/product-definition.entity';
@@ -33,6 +34,7 @@ import { GetEmployeeRevenueBreakdownHandler } from './application/handlers/get-e
       Partner,
       DoctorProfile,
       TherapistProfile,
+      SkillCatalog,
       ProductEmployeeEligibility,
       Product,
       ProductDefinition,

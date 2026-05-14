@@ -24,6 +24,12 @@ class EmployeeStatsActionsSection extends StatelessWidget {
   /// Callback when Edit button is pressed.
   final VoidCallback? onEdit;
 
+  /// Callback when Deactivate button is pressed.
+  final VoidCallback? onDeactivate;
+
+  /// Whether the Deactivate action is currently submitting.
+  final bool isDeactivating;
+
   const EmployeeStatsActionsSection({
     super.key,
     required this.rating,
@@ -32,6 +38,8 @@ class EmployeeStatsActionsSection extends StatelessWidget {
     this.dateOfBirth,
     this.isEditing = false,
     this.onEdit,
+    this.onDeactivate,
+    this.isDeactivating = false,
   });
 
   @override
@@ -109,8 +117,9 @@ class EmployeeStatsActionsSection extends StatelessWidget {
             ),
             AppDimens.horizontalMediumSmall,
             AppButton(
-              onPressed: () {},
+              onPressed: isDeactivating ? null : onDeactivate,
               buttonType: ButtonType.elevated,
+              isLoading: isDeactivating,
               customStyle: OutlinedButton.styleFrom(
                 backgroundColor: Theme.of(
                   context,

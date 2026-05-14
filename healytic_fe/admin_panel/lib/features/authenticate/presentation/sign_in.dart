@@ -14,6 +14,7 @@ import 'package:admin_panel/router/admin_routes.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
 import 'package:admin_panel/core/entities/role.entity.dart';
+import 'package:admin_panel/core/keys/integration_test_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart' hide Store;
@@ -160,6 +161,7 @@ class SignInScreen extends HookConsumerWidget {
                           fieldKey: "email",
                           label: "Email",
                           controller: emailController,
+                          widgetKey: keys.signInPage.emailTextField,
                           suffixIcon: const Icon(Icons.email),
                           labelStyle: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
@@ -175,6 +177,7 @@ class SignInScreen extends HookConsumerWidget {
                           fieldKey: "password",
                           label: "Password",
                           controller: passwordController,
+                          widgetKey: keys.signInPage.passwordTextField,
                           suffixIcon: IconButton(
                             icon: Icon(
                               isPasswordVisible.value
@@ -200,6 +203,7 @@ class SignInScreen extends HookConsumerWidget {
                           alignment: Alignment.bottomRight,
                           child: AppButton(
                             buttonType: ButtonType.text,
+                            key: keys.signInPage.forgotPasswordButton,
                             onPressed: () {
                               context.pushReplacementNamed(
                                 ForgotPasswordRoute.name,
@@ -227,6 +231,7 @@ class SignInScreen extends HookConsumerWidget {
                             buttonType: ButtonType.elevated,
                             onPressed: submit,
                             isLoading: signInState.isLoading,
+                            key: keys.signInPage.loginButton,
                             child: Text(
                               'Login',
                               style: Theme.of(context).textTheme.bodyMedium
@@ -244,6 +249,7 @@ class SignInScreen extends HookConsumerWidget {
                           width: double.infinity,
                           child: AppButton(
                             buttonType: ButtonType.text,
+                            key: keys.signInPage.joinProviderButton,
                             onPressed: () {
                               context.go(SignUpRoute().location);
                             },

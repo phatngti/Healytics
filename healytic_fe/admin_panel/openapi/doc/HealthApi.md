@@ -9,13 +9,13 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**healthHealthGet**](HealthApi.md#healthhealthget) | **GET** /health | Health
+[**healthControllerCheck**](HealthApi.md#healthcontrollercheck) | **GET** /health | 
 
 
-# **healthHealthGet**
-> Object healthHealthGet()
+# **healthControllerCheck**
+> healthControllerCheck()
 
-Health
+
 
 ### Example
 ```dart
@@ -24,10 +24,9 @@ import 'package:admin_openapi/api.dart';
 final api_instance = HealthApi();
 
 try {
-    final result = api_instance.healthHealthGet();
-    print(result);
+    api_instance.healthControllerCheck();
 } catch (e) {
-    print('Exception when calling HealthApi->healthHealthGet: $e\n');
+    print('Exception when calling HealthApi->healthControllerCheck: $e\n');
 }
 ```
 
@@ -36,7 +35,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**Object**](Object.md)
+void (empty response body)
 
 ### Authorization
 
@@ -45,7 +44,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: application/json
+ - **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

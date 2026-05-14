@@ -16,10 +16,8 @@ class HealthApi {
 
   final ApiClient apiClient;
 
-  /// Health
-  ///
-  /// Note: This method returns the HTTP [Response].
-  Future<Response> healthHealthGetWithHttpInfo() async {
+  /// Performs an HTTP 'GET /health' operation and returns the [Response].
+  Future<Response> healthControllerCheckWithHttpInfo() async {
     // ignore: prefer_const_declarations
     final path = r'/health';
 
@@ -44,19 +42,10 @@ class HealthApi {
     );
   }
 
-  /// Health
-  Future<Object?> healthHealthGet() async {
-    final response = await healthHealthGetWithHttpInfo();
+  Future<void> healthControllerCheck() async {
+    final response = await healthControllerCheckWithHttpInfo();
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
-    
-    }
-    return null;
   }
 }

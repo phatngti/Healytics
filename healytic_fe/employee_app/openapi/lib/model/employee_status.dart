@@ -10,7 +10,7 @@
 
 part of openapi.api;
 
-
+/// Employee status
 class EmployeeStatus {
   /// Instantiate a new enum with the provided [value].
   const EmployeeStatus._(this.value);
