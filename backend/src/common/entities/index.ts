@@ -16,6 +16,7 @@ export { Category } from './category.entity';
 export { Employee } from './employee.entity';
 export { DoctorProfile } from './doctor-profile.entity';
 export { TherapistProfile } from './therapist-profile.entity';
+export { SkillCatalog } from './skill-catalog.entity';
 
 // Locations
 export { Location } from './location.entity';

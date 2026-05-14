@@ -61,6 +61,10 @@ class AdminFinanceFilterBar extends StatelessWidget {
         SizedBox(
           width: 200,
           child: TextField(
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Colors.transparent,
+            ),
+            cursorColor: Colors.transparent,
             decoration: InputDecoration(
               isDense: true,
               labelText: 'Search',

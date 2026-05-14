@@ -1,3 +1,4 @@
+import 'package:admin_panel/core/keys/integration_test_keys.dart';
 import 'package:admin_panel/features/admin/category/domain/category.entity.dart';
 import 'package:admin_panel/features/admin/category/presentation/providers/category.provider.dart';
 import 'package:common/widgets/table/helper.dart';
@@ -8,11 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class CategoryTableSource {
-  static Future<int> getTotalRows(WidgetRef ref) async {
-    final notifier = ref.read(categoryProvider.notifier);
-    return notifier.getTotalRows();
-  }
-
   static Future<List<DataRow>> getData(
     BuildContext context,
     WidgetRef ref,
@@ -21,17 +17,25 @@ class CategoryTableSource {
     int count,
   ) async {
     final notifier = ref.read(categoryProvider.notifier);
-    final categories = await notifier.getCategories(
+    final categories = await notifier.getVisiblePage(
       startingAt: startingAt,
       count: count,
     );
+    if (!context.mounted) return [];
+
+    final selectedIds =
+        ref.read(categoryProvider).value?.selectedIds ?? const <String>{};
 
     final rows = categories.map((category) {
       return DataRow(
         key: ValueKey<String>(category.id.value),
+        selected: selectedIds.contains(category.id.value),
         onSelectChanged: (value) {
           if (value != null) {
             setRowSelection(ValueKey<String>(category.id.value), value);
+            ref
+                .read(categoryProvider.notifier)
+                .toggleSelection(category.id.value, value);
           }
         },
         cells: [
@@ -105,9 +109,13 @@ class CategoryTableSource {
     }).toList();
 
     // Add action button cells to each row
-    final actionButtons = CategoryTableActions.buildRowActionButtons(context);
+    final actionButtons = CategoryTableActions.buildRowActionButtons(
+      context,
+      ref,
+    );
     if (actionButtons.isNotEmpty) {
       for (final row in rows) {
+        final rowId = (row.key as ValueKey<String>).value;
         row.cells.add(
           DataCell(
             Center(
@@ -116,6 +124,12 @@ class CategoryTableSource {
                 children: actionButtons
                     .map(
                       (action) => IconButton(
+                        key: action.icon == Icons.delete
+                            ? keys.managementTables.rowDeleteButton(
+                                'category',
+                                rowId,
+                              )
+                            : null,
                         onPressed: () => action.onPressed(row.key),
                         icon: Icon(action.icon, size: 20),
                         padding: AppDimens.paddingAllExtraSmall,

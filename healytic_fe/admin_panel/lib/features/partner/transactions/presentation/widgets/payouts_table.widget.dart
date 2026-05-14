@@ -27,7 +27,7 @@ class PayoutsTable extends ConsumerWidget {
     return SizedBox(
       height: height,
       child: AppTable(
-        key: ValueKey('payouts-$reloadToken-$filterHash'),
+        refreshToken: Object.hash(reloadToken, filterHash),
         columns: TableColumns(
           columns: [
             TableColumnData(label: 'Payout ID', size: ColumnSize.S),

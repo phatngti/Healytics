@@ -30,7 +30,7 @@ class RefundCasesTable extends ConsumerWidget {
     return SizedBox(
       height: height,
       child: AppTable(
-        key: ValueKey('refunds-$reloadToken-$filterHash'),
+        refreshToken: Object.hash(reloadToken, filterHash),
         columns: TableColumns(
           columns: [
             TableColumnData(label: 'Case ID', size: ColumnSize.S),

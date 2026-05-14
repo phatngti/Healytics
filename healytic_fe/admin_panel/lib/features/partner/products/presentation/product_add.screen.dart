@@ -8,7 +8,6 @@ import 'package:admin_panel/features/partner/products/domain/product_form_field.
 import 'package:admin_panel/features/partner/products/domain/product_status.dart';
 import 'package:admin_panel/features/partner/products/domain/product_type.dart';
 import 'package:admin_panel/features/partner/products/domain/service_manual.entity.dart';
-import 'package:admin_panel/features/partner/products/domain/service_manual_key.dart';
 import 'package:admin_panel/features/partner/products/domain/staff_allocation.dart';
 import 'package:admin_panel/features/partner/products/presentation/layouts/product_add_desktop.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_service_manual_card.widget.dart';
@@ -84,11 +83,8 @@ class ProductAddScreen extends HookConsumerWidget {
     }, [initialValue]);
 
     Future<void> handleSubmit() async {
-      final isFormValid =
-          formKey.currentState?.saveAndValidate() ?? false;
-      final isManualValid =
-          serviceManualKey.currentState?.validate() ??
-          true;
+      final isFormValid = formKey.currentState?.saveAndValidate() ?? false;
+      final isManualValid = serviceManualKey.currentState?.validate() ?? true;
 
       if (!isFormValid || !isManualValid) return;
 
@@ -105,14 +101,10 @@ class ProductAddScreen extends HookConsumerWidget {
         );
 
         if (context.mounted) {
-          final semantic =
-              Theme.of(context)
-                  .extension<SemanticColors>()!;
+          final semantic = Theme.of(context).extension<SemanticColors>()!;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text(
-                'Product created successfully!',
-              ),
+              content: const Text('Product created successfully!'),
               backgroundColor: semantic.success,
             ),
           );
@@ -120,14 +112,10 @@ class ProductAddScreen extends HookConsumerWidget {
         }
       } catch (e) {
         if (context.mounted) {
-          final semantic =
-              Theme.of(context)
-                  .extension<SemanticColors>()!;
+          final semantic = Theme.of(context).extension<SemanticColors>()!;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                'Failed to create product: $e',
-              ),
+              content: Text('Failed to create product: $e'),
               backgroundColor: semantic.error,
             ),
           );
@@ -154,9 +142,7 @@ class ProductAddScreen extends HookConsumerWidget {
         desktop: ProductAddDesktop(
           isFormValid: isFormValid.value,
           onCancel: handleCancel,
-          onSubmit: isSubmitting.value
-              ? null
-              : () => handleSubmit(),
+          onSubmit: isSubmitting.value ? null : () => handleSubmit(),
           initialStatus: shouldAutofill
               ? ProductAddAutofill.status
               : ProductStatus.draft.apiValue,
@@ -170,12 +156,8 @@ class ProductAddScreen extends HookConsumerWidget {
           initialGuidelines: shouldAutofill
               ? ProductAddAutofill.guidelines
               : const [],
-          initialRules: shouldAutofill
-              ? ProductAddAutofill.rules
-              : const [],
-          initialSteps: shouldAutofill
-              ? ProductAddAutofill.steps
-              : const [],
+          initialRules: shouldAutofill ? ProductAddAutofill.rules : const [],
+          initialSteps: shouldAutofill ? ProductAddAutofill.steps : const [],
         ),
       ),
     );
@@ -273,29 +255,19 @@ class ProductAddScreen extends HookConsumerWidget {
   /// Sample data map for all `FormBuilder` fields.
   /// Only used when autofill is active.
   static Map<String, dynamic> _buildAutofillValues() => {
-    ProductFormField.productName.key:
-        ProductAddAutofill.name,
-    ProductFormField.productType.key:
-        ProductAddAutofill.productType,
-    ProductFormField.basePrice.key:
-        ProductAddAutofill.basePrice,
-    ProductFormField.salePrice.key:
-        ProductAddAutofill.salePrice,
+    ProductFormField.productName.key: ProductAddAutofill.name,
+    ProductFormField.productType.key: ProductAddAutofill.productType,
+    ProductFormField.basePrice.key: ProductAddAutofill.basePrice,
+    ProductFormField.salePrice.key: ProductAddAutofill.salePrice,
     // Visibility
-    ProductFormField.visibilityStatus.key:
-        ProductAddAutofill.status,
+    ProductFormField.visibilityStatus.key: ProductAddAutofill.status,
     // Operations & Scheduling
-    ProductFormField.duration.key:
-        ProductAddAutofill.duration,
-    ProductFormField.buffer.key:
-        ProductAddAutofill.buffer,
-    ProductFormField.capacity.key:
-        ProductAddAutofill.capacity,
-    ProductFormField.staffAllocation.key:
-        StaffAllocation.any.apiValue,
+    ProductFormField.duration.key: ProductAddAutofill.duration,
+    ProductFormField.buffer.key: ProductAddAutofill.buffer,
+    ProductFormField.capacity.key: ProductAddAutofill.capacity,
+    ProductFormField.staffAllocation.key: StaffAllocation.any.apiValue,
 
-    ProductFormField.facilityImages.key:
-        ProductAddAutofill.facilityImages,
+    ProductFormField.facilityImages.key: ProductAddAutofill.facilityImages,
   };
 
   static bool _hasValue(dynamic value) {

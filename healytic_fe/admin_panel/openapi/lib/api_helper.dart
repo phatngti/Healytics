@@ -55,6 +55,12 @@ String parameterToString(dynamic value) {
   if (value is DateTime) {
     return value.toUtc().toIso8601String();
   }
+  if (value is AdminDashboardNotificationPriority) {
+    return AdminDashboardNotificationPriorityTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminDashboardNotificationType) {
+    return AdminDashboardNotificationTypeTypeTransformer().encode(value).toString();
+  }
   if (value is AdminFinanceExportStatus) {
     return AdminFinanceExportStatusTypeTransformer().encode(value).toString();
   }
@@ -78,6 +84,9 @@ String parameterToString(dynamic value) {
   }
   if (value is AdminFinanceRiskTone) {
     return AdminFinanceRiskToneTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminPartnerRankingVerificationStatus) {
+    return AdminPartnerRankingVerificationStatusTypeTransformer().encode(value).toString();
   }
   if (value is AdminPartnerScope) {
     return AdminPartnerScopeTypeTransformer().encode(value).toString();
@@ -117,6 +126,9 @@ String parameterToString(dynamic value) {
   }
   if (value is EmployeeStatus) {
     return EmployeeStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is Gender) {
+    return GenderTypeTransformer().encode(value).toString();
   }
   if (value is HealthServiceStatus) {
     return HealthServiceStatusTypeTransformer().encode(value).toString();

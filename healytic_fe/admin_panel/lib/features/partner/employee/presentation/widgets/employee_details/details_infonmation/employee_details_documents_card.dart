@@ -27,6 +27,7 @@ class _EmployeeDetailsDocumentsCardState
         type: FileType.custom,
         allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
       );
+      if (!mounted) return;
 
       if (result != null && result.files.single.path != null) {
         final XFile pickedFile = XFile(result.files.single.path!);
@@ -453,8 +454,7 @@ class _EmployeeDetailsDocumentsCardState
                     Flexible(
                       child: Text(
                         title,
-                        style: textTheme.bodyMedium
-                            ?.copyWith(
+                        style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -544,8 +544,7 @@ class _EmployeeDetailsDocumentsCardState
                     Flexible(
                       child: Text(
                         fileName,
-                        style: textTheme.bodyMedium
-                            ?.copyWith(
+                        style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                         overflow: TextOverflow.ellipsis,

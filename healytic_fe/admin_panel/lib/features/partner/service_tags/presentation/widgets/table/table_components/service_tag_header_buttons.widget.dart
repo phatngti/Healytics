@@ -1,3 +1,5 @@
+import 'package:admin_panel/core/keys/integration_test_keys.dart';
+import 'package:admin_panel/features/common/widgets/table/management_table_controls.dart';
 import 'package:admin_panel/features/partner/service_tags/presentation/providers/service_tag.provider.dart';
 import 'package:admin_panel/features/partner/service_tags/presentation/widgets/add_service_tag_dialog.widget.dart';
 import 'package:common/widgets/button/button.dart';
@@ -14,7 +16,11 @@ class ServiceTagHeaderButtons {
   static List<AppButton> buildTableButtons(
     BuildContext context,
     WidgetRef ref,
-  ) => [_buildAddButton(context, ref), _buildDeleteAllButton(context)];
+    ServiceTagState state,
+  ) => [
+    _buildAddButton(context, ref),
+    _buildDeleteSelectedButton(context, ref, state),
+  ];
 
   static AppButton _buildAddButton(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -46,15 +52,45 @@ class ServiceTagHeaderButtons {
     );
   }
 
-  static AppButton _buildDeleteAllButton(BuildContext context) {
+  static AppButton _buildDeleteSelectedButton(
+    BuildContext context,
+    WidgetRef ref,
+    ServiceTagState state,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final selectedCount = state.selectedIds.length;
 
     return AppButton(
+      key: keys.managementTables.serviceTagDeleteSelectedButton,
       buttonType: ButtonType.elevated,
-      onPressed: () {
-        // TODO: Implement delete all functionality
-      },
+      onPressed: selectedCount == 0
+          ? null
+          : () async {
+              final confirmed = await confirmManagementTableDelete(
+                context,
+                title: 'Delete selected service tags?',
+                message:
+                    'This will delete $selectedCount selected service tag(s).',
+              );
+              if (!confirmed) return;
+
+              try {
+                await ref.read(serviceTagProvider.notifier).deleteSelected();
+                if (!context.mounted) return;
+                showManagementTableSnackBar(
+                  context,
+                  message: 'Deleted $selectedCount service tag(s).',
+                );
+              } catch (error) {
+                if (!context.mounted) return;
+                showManagementTableSnackBar(
+                  context,
+                  message: 'Failed to delete service tags: $error',
+                  isError: true,
+                );
+              }
+            },
       customStyle: ButtonStyle(
         backgroundColor: WidgetStatePropertyAll(colorScheme.error),
         foregroundColor: WidgetStatePropertyAll(colorScheme.onError),
@@ -64,7 +100,7 @@ class ServiceTagHeaderButtons {
           Icon(Icons.delete, color: colorScheme.onError),
           AppDimens.horizontalSmall,
           Text(
-            'Delete All',
+            selectedCount == 0 ? 'Delete Selected' : 'Delete $selectedCount',
             style: textTheme.bodyMedium?.copyWith(color: colorScheme.onError),
           ),
         ],

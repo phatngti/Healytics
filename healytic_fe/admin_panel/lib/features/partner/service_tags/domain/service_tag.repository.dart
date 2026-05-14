@@ -12,6 +12,12 @@ abstract class ServiceTagRepository {
     bool? sortedAsc,
   });
 
+  /// Get all service tags for client-side filtering/sorting.
+  Future<List<ServiceTagEntity>> getAllServiceTags({
+    String? sortedBy,
+    bool? sortedAsc,
+  });
+
   /// Get total count of service tags
   Future<int> getTotalRows();
 

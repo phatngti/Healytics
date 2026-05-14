@@ -1242,6 +1242,136 @@
         ]
       }
     },
+    "/partner/employees/massage-skills": {
+      "get": {
+        "operationId": "PartnerEmployeesController_getMassageSkills",
+        "summary": "Get massage skill catalog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return all massage skills for the partner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SkillCatalogResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "PartnerEmployeesController_createMassageSkill",
+        "summary": "Create a massage skill",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSkillDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The massage skill has been created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillCatalogResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/employees/spa-skills": {
+      "get": {
+        "operationId": "PartnerEmployeesController_getSpaSkills",
+        "summary": "Get spa skill catalog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return all spa skills for the partner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SkillCatalogResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "PartnerEmployeesController_createSpaSkill",
+        "summary": "Create a spa skill",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSkillDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The spa skill has been created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillCatalogResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/partner/employees": {
       "get": {
         "operationId": "PartnerEmployeesController_findAll",
@@ -1275,6 +1405,48 @@
                 }
               }
             }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/employees/{id}/services": {
+      "get": {
+        "operationId": "PartnerEmployeesController_findAssignedServices",
+        "summary": "Get services assigned to an employee",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return services assigned to the employee.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmployeeAssignedServiceDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found."
           }
         },
         "tags": [
@@ -3628,6 +3800,358 @@
         },
         "tags": [
           "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/overview": {
+      "get": {
+        "operationId": "AdminDashboardController_getOverview",
+        "summary": "Get admin dashboard overview metrics",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardOverviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/revenue-trend": {
+      "get": {
+        "operationId": "AdminDashboardController_getRevenueTrend",
+        "summary": "Get admin revenue trend data points",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminDashboardRevenueTrendPointDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/booking-outcomes": {
+      "get": {
+        "operationId": "AdminDashboardController_getBookingOutcomeSummary",
+        "summary": "Get booking outcome summary",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardBookingOutcomeSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/transaction-health": {
+      "get": {
+        "operationId": "AdminDashboardController_getTransactionHealth",
+        "summary": "Get transaction health breakdown",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardTransactionHealthDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/top-partners": {
+      "get": {
+        "operationId": "AdminDashboardController_getTopPartners",
+        "summary": "Get top performing partners by revenue",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminPartnerRankingItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/top-services": {
+      "get": {
+        "operationId": "AdminDashboardController_getTopServices",
+        "summary": "Get top performing services by revenue",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminServiceRankingItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/notifications": {
+      "get": {
+        "operationId": "AdminDashboardController_getNotifications",
+        "summary": "Get admin dashboard notifications",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminDashboardNotificationItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/category-health": {
+      "get": {
+        "operationId": "AdminDashboardController_getCategoryHealth",
+        "summary": "Get service category health overview",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryHealthDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
         ],
         "security": [
           {
@@ -10284,7 +10808,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-13T08:51:30.593Z"
+              "submittedAt": "2026-05-14T08:35:39.597Z"
             }
           }
         },
@@ -12126,10 +12650,12 @@
         "properties": {
           "title": {
             "type": "string",
+            "nullable": true,
             "description": "Title"
           },
           "license": {
             "type": "string",
+            "nullable": true,
             "description": "License"
           }
         }
@@ -12350,15 +12876,45 @@
           "description"
         ]
       },
+      "Gender": {
+        "type": "string",
+        "description": "Gender",
+        "enum": [
+          "MALE",
+          "FEMALE",
+          "OTHER"
+        ]
+      },
+      "EmployeeRole": {
+        "type": "string",
+        "description": "Employee role",
+        "enum": [
+          "DOCTOR",
+          "THERAPIST",
+          "RECEPTIONIST",
+          "MANAGER"
+        ]
+      },
+      "EmployeeStatus": {
+        "type": "string",
+        "description": "Employee status",
+        "enum": [
+          "ACTIVE",
+          "INACTIVE",
+          "ON_LEAVE"
+        ]
+      },
       "DoctorProfileResponseDto": {
         "type": "object",
         "properties": {
           "employeeId": {
             "type": "string",
+            "nullable": true,
             "description": "Employee ID (primary key)"
           },
           "title": {
             "type": "string",
+            "nullable": true,
             "description": "Doctor title"
           },
           "medicalCredentials": {
@@ -12370,10 +12926,12 @@
           },
           "experienceYears": {
             "type": "number",
+            "nullable": true,
             "description": "Years of experience"
           },
           "consultationFee": {
             "type": "number",
+            "nullable": true,
             "description": "Consultation fee"
           },
           "specializations": {
@@ -12389,6 +12947,13 @@
             "items": {
               "type": "string"
             }
+          },
+          "certifications": {
+            "description": "Certifications",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -12397,27 +12962,33 @@
         "properties": {
           "employeeId": {
             "type": "string",
+            "nullable": true,
             "description": "Employee ID (primary key)"
           },
           "level": {
             "type": "string",
+            "nullable": true,
             "description": "Therapist level (junior, senior, etc.)"
           },
           "type": {
             "type": "string",
+            "nullable": true,
             "description": "Therapist type"
           },
           "strengthLevel": {
             "type": "string",
+            "nullable": true,
             "description": "Strength level"
           },
           "commissionRate": {
             "type": "number",
+            "nullable": true,
             "description": "Commission rate (percentage)"
           },
           "healthCheckDate": {
             "format": "date-time",
             "type": "string",
+            "nullable": true,
             "description": "Health check date"
           },
           "skills": {
@@ -12448,11 +13019,13 @@
             "description": "Employee code"
           },
           "firstName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "First name"
           },
           "lastName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Last name"
           },
           "fullName": {
@@ -12464,35 +13037,44 @@
             "description": "Email address"
           },
           "phone": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Phone number"
           },
           "avatarUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Avatar URL"
           },
           "jobTitle": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Job title"
           },
           "startDate": {
-            "type": "object",
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
             "description": "Start date"
           },
           "employmentType": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Employment type"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Description/bio"
           },
           "emergencyContactName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Emergency contact name"
           },
           "emergencyContactPhone": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Emergency contact phone"
           },
           "verificationDocuments": {
@@ -12517,36 +13099,20 @@
             }
           },
           "dob": {
-            "type": "object",
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
             "description": "Date of birth"
           },
           "gender": {
-            "type": "string",
-            "enum": [
-              "MALE",
-              "FEMALE",
-              "OTHER"
-            ],
-            "description": "Gender"
+            "nullable": true,
+            "$ref": "#/components/schemas/Gender"
           },
           "role": {
-            "type": "string",
-            "enum": [
-              "DOCTOR",
-              "THERAPIST",
-              "RECEPTIONIST",
-              "MANAGER"
-            ],
-            "description": "Employee role"
+            "$ref": "#/components/schemas/EmployeeRole"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE",
-              "ON_LEAVE"
-            ],
-            "description": "Employee status"
+            "$ref": "#/components/schemas/EmployeeStatus"
           },
           "rating": {
             "type": "number",
@@ -12557,7 +13123,8 @@
             "description": "Number of reviews"
           },
           "partnerId": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Partner ID the employee belongs to"
           },
           "createdAt": {
@@ -12571,6 +13138,7 @@
             "description": "Last update timestamp"
           },
           "doctorProfile": {
+            "nullable": true,
             "description": "Doctor profile",
             "allOf": [
               {
@@ -12579,6 +13147,7 @@
             ]
           },
           "therapistProfile": {
+            "nullable": true,
             "description": "Therapist profile",
             "allOf": [
               {
@@ -13021,21 +13590,102 @@
           "description"
         ]
       },
-      "EmployeeRole": {
-        "type": "string",
-        "enum": [
-          "DOCTOR",
-          "THERAPIST",
-          "RECEPTIONIST",
-          "MANAGER"
+      "SkillCatalogResponseDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique slug identifier",
+            "example": "deep_tissue"
+          },
+          "label": {
+            "type": "string",
+            "description": "Display label",
+            "example": "Deep Tissue"
+          }
+        },
+        "required": [
+          "key",
+          "label"
         ]
       },
-      "EmployeeStatus": {
+      "CreateSkillDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Display name of the skill",
+            "example": "Deep Tissue",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "HealthServiceStatus": {
         "type": "string",
+        "description": "Status",
         "enum": [
-          "ACTIVE",
-          "INACTIVE",
-          "ON_LEAVE"
+          "draft",
+          "active",
+          "archived"
+        ]
+      },
+      "EmployeeAssignedServiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Assigned service/product ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Service name"
+          },
+          "status": {
+            "$ref": "#/components/schemas/HealthServiceStatus"
+          },
+          "basePrice": {
+            "type": "number",
+            "description": "Base price in service currency"
+          },
+          "salePrice": {
+            "type": "number",
+            "nullable": true,
+            "description": "Sale price in service currency, when configured"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "nullable": true,
+            "description": "Service duration in minutes"
+          },
+          "categoryName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Service category name"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "Preferred service image URL"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this employee is primary for this service"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "status",
+          "basePrice",
+          "currency",
+          "isPrimary"
         ]
       },
       "CreateDoctorProfileDto": {
@@ -14346,15 +14996,6 @@
         "description": "Type",
         "enum": [
           "service"
-        ]
-      },
-      "HealthServiceStatus": {
-        "type": "string",
-        "description": "Status",
-        "enum": [
-          "draft",
-          "active",
-          "archived"
         ]
       },
       "PartnerCategorySummaryDto": {
@@ -16891,6 +17532,384 @@
         },
         "required": [
           "message"
+        ]
+      },
+      "AdminDashboardOverviewDto": {
+        "type": "object",
+        "properties": {
+          "grossRevenue": {
+            "type": "number"
+          },
+          "netRevenue": {
+            "type": "number"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "failedPaymentAmount": {
+            "type": "number"
+          },
+          "averageBookingValue": {
+            "type": "number"
+          },
+          "successfulTransactions": {
+            "type": "number"
+          },
+          "pendingTransactions": {
+            "type": "number"
+          },
+          "refundedTransactions": {
+            "type": "number"
+          },
+          "failedTransactions": {
+            "type": "number"
+          },
+          "canceledTransactions": {
+            "type": "number"
+          },
+          "totalPartners": {
+            "type": "number"
+          },
+          "pendingPartnerReviews": {
+            "type": "number"
+          },
+          "bookingSuccessRate": {
+            "type": "number"
+          },
+          "bookingFailedRate": {
+            "type": "number"
+          },
+          "bookingCanceledRate": {
+            "type": "number"
+          },
+          "notificationVolume": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "grossRevenue",
+          "netRevenue",
+          "refundAmount",
+          "failedPaymentAmount",
+          "averageBookingValue",
+          "successfulTransactions",
+          "pendingTransactions",
+          "refundedTransactions",
+          "failedTransactions",
+          "canceledTransactions",
+          "totalPartners",
+          "pendingPartnerReviews",
+          "bookingSuccessRate",
+          "bookingFailedRate",
+          "bookingCanceledRate",
+          "notificationVolume"
+        ]
+      },
+      "AdminDashboardRevenueTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-05-13"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "netRevenue": {
+            "type": "number"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "transactionCount": {
+            "type": "number"
+          },
+          "successfulBookingCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "grossRevenue",
+          "netRevenue",
+          "refundAmount",
+          "transactionCount",
+          "successfulBookingCount"
+        ]
+      },
+      "AdminOutcomeMetricDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number"
+          },
+          "rate": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "count",
+          "rate"
+        ]
+      },
+      "AdminDashboardBookingOutcomeSummaryDto": {
+        "type": "object",
+        "properties": {
+          "totalBookings": {
+            "type": "number"
+          },
+          "success": {
+            "$ref": "#/components/schemas/AdminOutcomeMetricDto"
+          },
+          "failed": {
+            "$ref": "#/components/schemas/AdminOutcomeMetricDto"
+          },
+          "canceled": {
+            "$ref": "#/components/schemas/AdminOutcomeMetricDto"
+          }
+        },
+        "required": [
+          "totalBookings",
+          "success",
+          "failed",
+          "canceled"
+        ]
+      },
+      "AdminDashboardTransactionHealthDto": {
+        "type": "object",
+        "properties": {
+          "totalTransactions": {
+            "type": "number"
+          },
+          "paid": {
+            "type": "number"
+          },
+          "pending": {
+            "type": "number"
+          },
+          "refunded": {
+            "type": "number"
+          },
+          "failed": {
+            "type": "number"
+          },
+          "canceled": {
+            "type": "number"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "failedAmount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "totalTransactions",
+          "paid",
+          "pending",
+          "refunded",
+          "failed",
+          "canceled",
+          "grossRevenue",
+          "refundAmount",
+          "failedAmount"
+        ]
+      },
+      "AdminPartnerRankingVerificationStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "changesRequired",
+          "approved",
+          "rejected"
+        ]
+      },
+      "AdminPartnerRankingItemDto": {
+        "type": "object",
+        "properties": {
+          "partnerId": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "number"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "bookingCount": {
+            "type": "number"
+          },
+          "successfulBookingRate": {
+            "type": "number"
+          },
+          "verificationStatus": {
+            "$ref": "#/components/schemas/AdminPartnerRankingVerificationStatus"
+          }
+        },
+        "required": [
+          "partnerId",
+          "partnerName",
+          "rank",
+          "grossRevenue",
+          "bookingCount",
+          "successfulBookingRate",
+          "verificationStatus"
+        ]
+      },
+      "AdminServiceRankingItemDto": {
+        "type": "object",
+        "properties": {
+          "serviceId": {
+            "type": "string"
+          },
+          "serviceName": {
+            "type": "string"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "number"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "bookingCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "serviceId",
+          "serviceName",
+          "categoryName",
+          "partnerName",
+          "rank",
+          "grossRevenue",
+          "bookingCount"
+        ]
+      },
+      "AdminDashboardNotificationType": {
+        "type": "string",
+        "enum": [
+          "broadcast",
+          "payment",
+          "review",
+          "category",
+          "operations"
+        ]
+      },
+      "AdminDashboardNotificationPriority": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high",
+          "critical"
+        ]
+      },
+      "AdminDashboardNotificationItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AdminDashboardNotificationType"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/AdminDashboardNotificationPriority"
+          },
+          "isRead": {
+            "type": "boolean"
+          },
+          "isBroadcast": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "body",
+          "createdAt",
+          "type",
+          "priority",
+          "isRead",
+          "isBroadcast"
+        ]
+      },
+      "AdminCategorySnapshotDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "serviceCount": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "serviceCount",
+          "isActive"
+        ]
+      },
+      "AdminCategoryHealthDto": {
+        "type": "object",
+        "properties": {
+          "totalCategories": {
+            "type": "number"
+          },
+          "activeCategories": {
+            "type": "number"
+          },
+          "inactiveCategories": {
+            "type": "number"
+          },
+          "emptyCategories": {
+            "type": "number"
+          },
+          "totalMappedServices": {
+            "type": "number"
+          },
+          "topCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminCategorySnapshotDto"
+            }
+          }
+        },
+        "required": [
+          "totalCategories",
+          "activeCategories",
+          "inactiveCategories",
+          "emptyCategories",
+          "totalMappedServices",
+          "topCategories"
         ]
       },
       "AdminFinancePeriod": {

@@ -1,7 +1,9 @@
+import 'package:admin_panel/core/providers/s3.provider.dart';
 import 'package:admin_panel/features/partner/employee/domain/verification_document_entry.entity.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Read-only card displaying verification documents
@@ -164,13 +166,13 @@ class _DocumentGroup extends StatelessWidget {
 }
 
 /// A single document row with name and view action.
-class _DocumentTile extends StatelessWidget {
+class _DocumentTile extends ConsumerWidget {
   final DocumentEntry document;
 
   const _DocumentTile({required this.document});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -224,7 +226,7 @@ class _DocumentTile extends StatelessWidget {
             ),
             AppDimens.horizontalSmall,
             TextButton.icon(
-              onPressed: () => _openDocument(context, document.url),
+              onPressed: () => _openDocument(context, ref, document.url),
               icon: Icon(
                 Icons.open_in_new,
                 size: 16,
@@ -245,17 +247,39 @@ class _DocumentTile extends StatelessWidget {
   }
 
   /// Opens the document URL in the browser.
-  Future<void> _openDocument(BuildContext context, String url) async {
+  Future<void> _openDocument(
+    BuildContext context,
+    WidgetRef ref,
+    String rawUrl,
+  ) async {
+    final url = await _resolveDocumentUrl(ref, rawUrl);
+    if (!context.mounted) return;
+
+    if (url == null || url.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not resolve document: $rawUrl')),
+      );
+      return;
+    }
+
     final uri = Uri.tryParse(url);
     if (uri != null && await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not open document: $url')),
+          SnackBar(content: Text('Could not open document: $rawUrl')),
         );
       }
     }
+  }
+
+  Future<String?> _resolveDocumentUrl(WidgetRef ref, String rawUrl) async {
+    final uri = Uri.tryParse(rawUrl);
+    if (uri != null && (uri.scheme == 'http' || uri.scheme == 'https')) {
+      return rawUrl;
+    }
+    return ref.read(s3ServiceProvider).getFileUrl(rawUrl);
   }
 
   /// Returns an icon based on the file extension.

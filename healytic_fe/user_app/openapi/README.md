@@ -73,6 +73,14 @@ Class | Method | HTTP request | Description
 *AdminCategoriesApi* | [**adminCategoriesControllerFindOne**](doc//AdminCategoriesApi.md#admincategoriescontrollerfindone) | **GET** /admin/categories/{id} | Get a category by id (admin view)
 *AdminCategoriesApi* | [**adminCategoriesControllerRemove**](doc//AdminCategoriesApi.md#admincategoriescontrollerremove) | **DELETE** /admin/categories/{id} | Delete a category
 *AdminCategoriesApi* | [**adminCategoriesControllerUpdate**](doc//AdminCategoriesApi.md#admincategoriescontrollerupdate) | **PATCH** /admin/categories/{id} | Update a category
+*AdminDashboardApi* | [**adminDashboardControllerGetBookingOutcomeSummary**](doc//AdminDashboardApi.md#admindashboardcontrollergetbookingoutcomesummary) | **GET** /admin/dashboard/booking-outcomes | Get booking outcome summary
+*AdminDashboardApi* | [**adminDashboardControllerGetCategoryHealth**](doc//AdminDashboardApi.md#admindashboardcontrollergetcategoryhealth) | **GET** /admin/dashboard/category-health | Get service category health overview
+*AdminDashboardApi* | [**adminDashboardControllerGetNotifications**](doc//AdminDashboardApi.md#admindashboardcontrollergetnotifications) | **GET** /admin/dashboard/notifications | Get admin dashboard notifications
+*AdminDashboardApi* | [**adminDashboardControllerGetOverview**](doc//AdminDashboardApi.md#admindashboardcontrollergetoverview) | **GET** /admin/dashboard/overview | Get admin dashboard overview metrics
+*AdminDashboardApi* | [**adminDashboardControllerGetRevenueTrend**](doc//AdminDashboardApi.md#admindashboardcontrollergetrevenuetrend) | **GET** /admin/dashboard/revenue-trend | Get admin revenue trend data points
+*AdminDashboardApi* | [**adminDashboardControllerGetTopPartners**](doc//AdminDashboardApi.md#admindashboardcontrollergettoppartners) | **GET** /admin/dashboard/top-partners | Get top performing partners by revenue
+*AdminDashboardApi* | [**adminDashboardControllerGetTopServices**](doc//AdminDashboardApi.md#admindashboardcontrollergettopservices) | **GET** /admin/dashboard/top-services | Get top performing services by revenue
+*AdminDashboardApi* | [**adminDashboardControllerGetTransactionHealth**](doc//AdminDashboardApi.md#admindashboardcontrollergettransactionhealth) | **GET** /admin/dashboard/transaction-health | Get transaction health breakdown
 *AdminFinanceApi* | [**adminFinanceControllerAddNote**](doc//AdminFinanceApi.md#adminfinancecontrolleraddnote) | **POST** /admin/finance/notes | Add a note to a finance entity
 *AdminFinanceApi* | [**adminFinanceControllerApproveRefundCase**](doc//AdminFinanceApi.md#adminfinancecontrollerapproverefundcase) | **POST** /admin/finance/refund-cases/{id}/approve | Approve a refund or dispute case
 *AdminFinanceApi* | [**adminFinanceControllerCreateExport**](doc//AdminFinanceApi.md#adminfinancecontrollercreateexport) | **POST** /admin/finance/exports | Create a finance export job
@@ -158,12 +166,17 @@ Class | Method | HTTP request | Description
 *PartnerDashboardApi* | [**partnerDashboardControllerGetStats**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetstats) | **GET** /partner/dashboard/stats | Get aggregated KPI statistics
 *PartnerDashboardApi* | [**partnerDashboardControllerGetUpcomingAppointments**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetupcomingappointments) | **GET** /partner/dashboard/appointments/upcoming | Get upcoming appointments
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateDoctor**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatedoctor) | **POST** /partner/employees/doctors | Create a new doctor
+*PartnerEmployeesApi* | [**partnerEmployeesControllerCreateMassageSkill**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatemassageskill) | **POST** /partner/employees/massage-skills | Create a massage skill
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateMassageTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatemassagetherapist) | **POST** /partner/employees/massage-therapists | Create a new massage therapist
+*PartnerEmployeesApi* | [**partnerEmployeesControllerCreateSpaSkill**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatespaskill) | **POST** /partner/employees/spa-skills | Create a spa skill
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateSpaTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatespatherapist) | **POST** /partner/employees/spa-therapists | Create a new spa therapist
 *PartnerEmployeesApi* | [**partnerEmployeesControllerFindAll**](doc//PartnerEmployeesApi.md#partneremployeescontrollerfindall) | **GET** /partner/employees | Get all employees for this partner
+*PartnerEmployeesApi* | [**partnerEmployeesControllerFindAssignedServices**](doc//PartnerEmployeesApi.md#partneremployeescontrollerfindassignedservices) | **GET** /partner/employees/{id}/services | Get services assigned to an employee
 *PartnerEmployeesApi* | [**partnerEmployeesControllerFindOne**](doc//PartnerEmployeesApi.md#partneremployeescontrollerfindone) | **GET** /partner/employees/{id} | Get an employee by id
 *PartnerEmployeesApi* | [**partnerEmployeesControllerGetDetailAnalytics**](doc//PartnerEmployeesApi.md#partneremployeescontrollergetdetailanalytics) | **GET** /partner/employees/analytics/{employeeId} | Get per-employee detail analytics
+*PartnerEmployeesApi* | [**partnerEmployeesControllerGetMassageSkills**](doc//PartnerEmployeesApi.md#partneremployeescontrollergetmassageskills) | **GET** /partner/employees/massage-skills | Get massage skill catalog
 *PartnerEmployeesApi* | [**partnerEmployeesControllerGetOverviewAnalytics**](doc//PartnerEmployeesApi.md#partneremployeescontrollergetoverviewanalytics) | **GET** /partner/employees/analytics/overview | Get employee overview analytics
+*PartnerEmployeesApi* | [**partnerEmployeesControllerGetSpaSkills**](doc//PartnerEmployeesApi.md#partneremployeescontrollergetspaskills) | **GET** /partner/employees/spa-skills | Get spa skill catalog
 *PartnerEmployeesApi* | [**partnerEmployeesControllerRemove**](doc//PartnerEmployeesApi.md#partneremployeescontrollerremove) | **DELETE** /partner/employees/{id} | Delete an employee
 *PartnerEmployeesApi* | [**partnerEmployeesControllerUpdate**](doc//PartnerEmployeesApi.md#partneremployeescontrollerupdate) | **PATCH** /partner/employees/{id} | Update an employee
 *PartnerHealthServicesApi* | [**partnerHealthServiceControllerCreate**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollercreate) | **POST** /partner/health-services | Create a new health service
@@ -263,7 +276,16 @@ Class | Method | HTTP request | Description
  - [AddToCartDto](doc//AddToCartDto.md)
  - [AddressDto](doc//AddressDto.md)
  - [AddressInfoDto](doc//AddressInfoDto.md)
+ - [AdminCategoryHealthDto](doc//AdminCategoryHealthDto.md)
  - [AdminCategoryResponseDto](doc//AdminCategoryResponseDto.md)
+ - [AdminCategorySnapshotDto](doc//AdminCategorySnapshotDto.md)
+ - [AdminDashboardBookingOutcomeSummaryDto](doc//AdminDashboardBookingOutcomeSummaryDto.md)
+ - [AdminDashboardNotificationItemDto](doc//AdminDashboardNotificationItemDto.md)
+ - [AdminDashboardNotificationPriority](doc//AdminDashboardNotificationPriority.md)
+ - [AdminDashboardNotificationType](doc//AdminDashboardNotificationType.md)
+ - [AdminDashboardOverviewDto](doc//AdminDashboardOverviewDto.md)
+ - [AdminDashboardRevenueTrendPointDto](doc//AdminDashboardRevenueTrendPointDto.md)
+ - [AdminDashboardTransactionHealthDto](doc//AdminDashboardTransactionHealthDto.md)
  - [AdminFinanceAlertDto](doc//AdminFinanceAlertDto.md)
  - [AdminFinanceAuditEventDto](doc//AdminFinanceAuditEventDto.md)
  - [AdminFinanceCreateExportDto](doc//AdminFinanceCreateExportDto.md)
@@ -301,13 +323,17 @@ Class | Method | HTTP request | Description
  - [AdminFinanceTransactionRecordDto](doc//AdminFinanceTransactionRecordDto.md)
  - [AdminFinanceTrendPointDto](doc//AdminFinanceTrendPointDto.md)
  - [AdminLoginDto](doc//AdminLoginDto.md)
+ - [AdminOutcomeMetricDto](doc//AdminOutcomeMetricDto.md)
  - [AdminPartnerDetailResponseDto](doc//AdminPartnerDetailResponseDto.md)
  - [AdminPartnerItemDto](doc//AdminPartnerItemDto.md)
+ - [AdminPartnerRankingItemDto](doc//AdminPartnerRankingItemDto.md)
+ - [AdminPartnerRankingVerificationStatus](doc//AdminPartnerRankingVerificationStatus.md)
  - [AdminPartnerScope](doc//AdminPartnerScope.md)
  - [AdminPartnerSortBy](doc//AdminPartnerSortBy.md)
  - [AdminPartnerSortDirection](doc//AdminPartnerSortDirection.md)
  - [AdminPartnerStatsResponseDto](doc//AdminPartnerStatsResponseDto.md)
  - [AdminPartnersResponseDto](doc//AdminPartnersResponseDto.md)
+ - [AdminServiceRankingItemDto](doc//AdminServiceRankingItemDto.md)
  - [AiRecommendationItemDto](doc//AiRecommendationItemDto.md)
  - [AnalyticsAlertDto](doc//AnalyticsAlertDto.md)
  - [AnalyticsBookingMetricsDto](doc//AnalyticsBookingMetricsDto.md)
@@ -378,6 +404,7 @@ Class | Method | HTTP request | Description
  - [CreatePartnerHealthServiceFacilityImageDto](doc//CreatePartnerHealthServiceFacilityImageDto.md)
  - [CreatePartnerHealthServiceMediaDto](doc//CreatePartnerHealthServiceMediaDto.md)
  - [CreateServiceTagDto](doc//CreateServiceTagDto.md)
+ - [CreateSkillDto](doc//CreateSkillDto.md)
  - [CreateSpaTherapistDto](doc//CreateSpaTherapistDto.md)
  - [CreateSpecialistReviewDto](doc//CreateSpecialistReviewDto.md)
  - [CreateTherapistProfileDto](doc//CreateTherapistProfileDto.md)
@@ -395,6 +422,7 @@ Class | Method | HTTP request | Description
  - [DoctorProfileResponseDto](doc//DoctorProfileResponseDto.md)
  - [DocumentEntryDto](doc//DocumentEntryDto.md)
  - [EmployeeAppointmentResponseDto](doc//EmployeeAppointmentResponseDto.md)
+ - [EmployeeAssignedServiceDto](doc//EmployeeAssignedServiceDto.md)
  - [EmployeeBookingStatusFilter](doc//EmployeeBookingStatusFilter.md)
  - [EmployeeComplianceItemDto](doc//EmployeeComplianceItemDto.md)
  - [EmployeeDetailAnalyticsResponseDto](doc//EmployeeDetailAnalyticsResponseDto.md)
@@ -419,6 +447,7 @@ Class | Method | HTTP request | Description
  - [FeaturedSpecialistResponseDto](doc//FeaturedSpecialistResponseDto.md)
  - [FileUrlResponseDto](doc//FileUrlResponseDto.md)
  - [FlagReviewDto](doc//FlagReviewDto.md)
+ - [Gender](doc//Gender.md)
  - [GeocodeResponseDto](doc//GeocodeResponseDto.md)
  - [GeocodeResultDto](doc//GeocodeResultDto.md)
  - [HealthServiceDetailAnalyticsResponseDto](doc//HealthServiceDetailAnalyticsResponseDto.md)
@@ -549,6 +578,7 @@ Class | Method | HTTP request | Description
  - [ServiceRuleDto](doc//ServiceRuleDto.md)
  - [ServiceRuleInputDto](doc//ServiceRuleInputDto.md)
  - [ServiceTagResponseDto](doc//ServiceTagResponseDto.md)
+ - [SkillCatalogResponseDto](doc//SkillCatalogResponseDto.md)
  - [SpecialistInfoDto](doc//SpecialistInfoDto.md)
  - [SpecialistReviewResponseDto](doc//SpecialistReviewResponseDto.md)
  - [StaffScheduleEntryDto](doc//StaffScheduleEntryDto.md)
