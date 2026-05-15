@@ -41,7 +41,7 @@ class PartnerTablePageCache {
     if (!context.mounted) {
       return [];
     }
-    return PartnerTableSource.buildRows(context, setRowSelection, page.items);
+    return PartnerTableSource.buildRows(context, page.items);
   }
 
   Future<PartnerVerificationPageEntity> _fetchPage({
@@ -63,6 +63,7 @@ class PartnerTablePageCache {
       sortedBy: state.sortBy,
       sortedAsc: state.sortAsc,
       statusFilter: state.statusFilter,
+      quickFilter: state.quickFilter,
     );
 
     _cachedPage = page;
@@ -86,6 +87,7 @@ class PartnerTableSource {
       scope: state.scope,
       searchQuery: state.searchQuery.isNotEmpty ? state.searchQuery : null,
       statusFilter: state.statusFilter,
+      quickFilter: state.quickFilter,
     );
   }
 
@@ -108,28 +110,27 @@ class PartnerTableSource {
       sortedBy: state.sortBy,
       sortedAsc: state.sortAsc,
       statusFilter: state.statusFilter,
+      quickFilter: state.quickFilter,
     );
     if (!context.mounted) {
       return [];
     }
 
-    return buildRows(context, setRowSelection, partners);
+    return buildRows(context, partners);
   }
 
   /// Converts partner entities into table rows.
   static List<DataRow> buildRows(
     BuildContext context,
-    SetRowSelectionCallback setRowSelection,
     List<PartnerVerificationEntity> partners,
   ) {
     return partners.map((partner) {
-      return _buildRow(context, setRowSelection, partner);
+      return _buildRow(context, partner);
     }).toList();
   }
 
   static DataRow _buildRow(
     BuildContext context,
-    SetRowSelectionCallback setRowSelection,
     PartnerVerificationEntity partner,
   ) {
     final isHighPriority = partner.priority == PartnerPriority.high;
@@ -143,13 +144,6 @@ class PartnerTableSource {
         }
         return null;
       }),
-      onSelectChanged: !isReviewable
-          ? null
-          : (value) {
-              if (value != null) {
-                setRowSelection(ValueKey<String>(partner.id.value), value);
-              }
-            },
       cells: [
         DataCell(_buildProviderDetails(context, partner)),
         DataCell(_buildServiceTypes(context, partner.serviceTypes)),

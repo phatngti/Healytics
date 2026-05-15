@@ -18,19 +18,35 @@ class SignInProvider extends _$SignInProvider {
     return null;
   }
 
-  Future<void> signIn(String email, String password, String role) async {
+  Future<void> signIn(
+    String email,
+    String password,
+    String role,
+  ) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
+    final result = await AsyncValue.guard(() async {
       await _clearPreviousSession();
 
-      final request = SignInRequestEntity(email: email, password: password);
+      final request = SignInRequestEntity(
+        email: email,
+        password: password,
+      );
       final response = await ref
           .read(authenticateRepositoryProvider)
           .login(request, role);
 
       // Save tokens to store
-      await Store.put(StoreKey.accessToken, response.accessToken);
-      await Store.put(StoreKey.refreshToken, response.refreshToken);
+      await Store.put(
+        StoreKey.accessToken,
+        response.accessToken,
+      );
+      await Store.put(
+        StoreKey.refreshToken,
+        response.refreshToken,
+      );
+
+      if (!ref.mounted) return response;
+
       await ref
           .read(authenTokenProvider.notifier)
           .saveToken(
@@ -40,7 +56,8 @@ class SignInProvider extends _$SignInProvider {
             ),
           );
 
-      final isMockMode = Store.tryGet(StoreKey.mockFlag) ?? false;
+      final isMockMode =
+          Store.tryGet(StoreKey.mockFlag) ?? false;
 
       // Persist role for mock mode so
       // UserRoleHelper.getRole() works correctly.
@@ -53,17 +70,27 @@ class SignInProvider extends _$SignInProvider {
         if (isMockMode) {
           await _syncFlagsFromResponse(response);
         } else {
-          await UserRoleHelper.syncPartnerFlagsFromAccessToken(
-            response.accessToken,
-          );
+          await UserRoleHelper
+              .syncPartnerFlagsFromAccessToken(
+                response.accessToken,
+              );
         }
       }
+
+      if (!ref.mounted) return response;
 
       await ref
           .read(accountMeProvider.notifier)
           .refresh();
       return response;
     });
+
+    // Only update state if the provider is
+    // still alive — avoids disposed-ref crash
+    // after navigation.
+    if (ref.mounted) {
+      state = result;
+    }
   }
 
   /// Removes stale account, token, and partner-only

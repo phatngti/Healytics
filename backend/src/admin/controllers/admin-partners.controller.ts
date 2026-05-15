@@ -75,6 +75,7 @@ export class AdminPartnersController {
     description: 'Paginated list of partners.',
     type: AdminPartnersResponseDto,
   })
+    @LogResponse()
   async getPartners(
     @Query() query: AdminPartnersQueryDto,
   ): Promise<AdminPartnersResponseDto> {
