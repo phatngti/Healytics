@@ -1,6 +1,5 @@
 import 'package:admin_panel/features/admin/partner_manager/presentation/providers/partner_manager.provider.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/table/table_components/partner_function_buttons.dart';
-import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/table/table_components/partner_header_buttons.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/table/table_components/partner_table_columns.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/table/table_components/partner_table_source.dart';
 import 'package:common/widgets/table/table.dart';
@@ -30,6 +29,7 @@ class PartnerVerificationTable extends HookConsumerWidget {
       state.scope,
       state.searchQuery,
       state.statusFilter,
+      state.quickFilter,
       state.sortBy,
       state.sortAsc,
     );
@@ -43,6 +43,7 @@ class PartnerVerificationTable extends HookConsumerWidget {
         state.scope,
         state.searchQuery,
         state.statusFilter,
+        state.quickFilter,
         state.sortBy,
         state.sortAsc,
         state.reloadToken,
@@ -58,9 +59,12 @@ class PartnerVerificationTable extends HookConsumerWidget {
         getData: (setRowSelection, startingAt, count) =>
             pageCache.getData(context, setRowSelection, startingAt, count),
         defaultRowsPerPage: _defaultRowsPerPage,
-        buttons: PartnerHeaderButtons.buildTableButtons(context),
         onSearchChanged: onSearchChanged,
-        functionButtons: PartnerFunctionButtons.buildFunctionButtons(context),
+        functionButtons: PartnerFunctionButtons.buildFunctionButtons(
+          context,
+          ref,
+          state,
+        ),
       ),
     );
   }

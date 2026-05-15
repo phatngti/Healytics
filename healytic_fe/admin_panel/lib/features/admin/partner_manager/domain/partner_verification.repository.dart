@@ -15,6 +15,7 @@ abstract class PartnerVerificationRepository {
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   });
 
   /// Get one page plus its matching filtered total.
@@ -26,6 +27,7 @@ abstract class PartnerVerificationRepository {
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   });
 
   /// Get total count matching current filters.
@@ -33,6 +35,7 @@ abstract class PartnerVerificationRepository {
     required PartnerManagerScope scope,
     String? searchQuery,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   });
 
   /// Get detailed partner verification information

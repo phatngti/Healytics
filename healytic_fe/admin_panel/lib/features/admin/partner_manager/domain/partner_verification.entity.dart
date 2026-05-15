@@ -42,6 +42,15 @@ enum PartnerManagerScope {
   allProviders,
 }
 
+/// Dashboard-card filters that map to table data.
+enum PartnerManagerQuickFilter {
+  /// PENDING + REQUIRED_RESUBMIT review queue rows.
+  pendingReview,
+
+  /// Review queue rows with high or urgent backend priority.
+  highPriority,
+}
+
 /// Partner verification entity representing
 /// a partner's verification request in the list.
 @Freezed(toJson: true)
