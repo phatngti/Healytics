@@ -11,8 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Notifier managing the partner manager workspace
 /// state: tab scope, search, filters, sort, and
 /// reload token.
-class PartnerManagerWorkspaceNotifier
-    extends Notifier<PartnerManagerState> {
+class PartnerManagerWorkspaceNotifier extends Notifier<PartnerManagerState> {
   @override
   PartnerManagerState build() {
     return const PartnerManagerState();
@@ -30,6 +29,9 @@ class PartnerManagerWorkspaceNotifier
 
   /// Updates the search query and bumps reload.
   void setSearchQuery(String value) {
+    if (state.searchQuery == value) {
+      return;
+    }
     state = state.copyWith(
       searchQuery: value,
       reloadToken: state.reloadToken + 1,
@@ -37,9 +39,7 @@ class PartnerManagerWorkspaceNotifier
   }
 
   /// Sets an explicit status filter.
-  void setStatusFilter(
-    PartnerVerificationStatus? value,
-  ) {
+  void setStatusFilter(PartnerVerificationStatus? value) {
     state = state.copyWith(
       statusFilter: value,
       clearStatusFilter: value == null,
@@ -58,9 +58,7 @@ class PartnerManagerWorkspaceNotifier
 
   /// Forces a data refresh without changing filters.
   void bumpReload() {
-    state = state.copyWith(
-      reloadToken: state.reloadToken + 1,
-    );
+    state = state.copyWith(reloadToken: state.reloadToken + 1);
   }
 
   /// Resets all filters to defaults, keeping the
@@ -74,28 +72,23 @@ class PartnerManagerWorkspaceNotifier
 }
 
 final partnerManagerWorkspaceProvider =
-    NotifierProvider<
-      PartnerManagerWorkspaceNotifier,
-      PartnerManagerState
-    >(PartnerManagerWorkspaceNotifier.new);
+    NotifierProvider<PartnerManagerWorkspaceNotifier, PartnerManagerState>(
+      PartnerManagerWorkspaceNotifier.new,
+    );
 
 // ────────────────────────────────────────────────────
 // Async Data Providers
 // ────────────────────────────────────────────────────
 
-/// Dashboard statistics provider. Rebuilds whenever
-/// the workspace state changes.
+/// Dashboard statistics provider. Rebuilds only when
+/// the active tab scope changes; table search refreshes
+/// row data without recomputing page-level KPI cards.
 final partnerVerificationStatsProvider =
-    FutureProvider<PartnerVerificationStats>(
-  (ref) async {
-    final ws = ref.watch(partnerManagerWorkspaceProvider);
-    return ref
-        .read(partnerVerificationRepositoryProvider)
-        .getStats(
-          scope: ws.scope,
-          searchQuery: ws.searchQuery.isNotEmpty
-              ? ws.searchQuery
-              : null,
-        );
-  },
-);
+    FutureProvider<PartnerVerificationStats>((ref) async {
+      final scope = ref.watch(
+        partnerManagerWorkspaceProvider.select((state) => state.scope),
+      );
+      return ref
+          .read(partnerVerificationRepositoryProvider)
+          .getStats(scope: scope);
+    });

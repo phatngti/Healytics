@@ -60,6 +60,7 @@ class EmployeeEditDesktop extends StatelessWidget {
                     child: EmployeeDetailsProfileSection(
                       avatarUrl: employee.avatar,
                       fullName: employee.fullName,
+                      isEditing: isEditing,
                     ),
                   ),
                   AppDimens.horizontalLarge,

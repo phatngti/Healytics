@@ -35,6 +35,18 @@ abstract class PartnerVerificationRemoteDataSource {
     PartnerVerificationStatus? statusFilter,
   });
 
+  /// Get one paginated page plus the filtered total
+  /// returned by the same list endpoint.
+  Future<PartnerVerificationPageEntity> getPartnerVerificationPage({
+    required int startingAt,
+    required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    String? sortedBy,
+    bool? sortedAsc,
+    PartnerVerificationStatus? statusFilter,
+  });
+
   /// Get total count matching current filters.
   Future<int> getTotalRows({
     required PartnerManagerScope scope,
@@ -92,6 +104,28 @@ class PartnerVerificationRemoteDataSourceImpl
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
   }) async {
+    final page = await getPartnerVerificationPage(
+      startingAt: startingAt,
+      count: count,
+      scope: scope,
+      searchQuery: searchQuery,
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+      statusFilter: statusFilter,
+    );
+    return page.items;
+  }
+
+  @override
+  Future<PartnerVerificationPageEntity> getPartnerVerificationPage({
+    required int startingAt,
+    required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    String? sortedBy,
+    bool? sortedAsc,
+    PartnerVerificationStatus? statusFilter,
+  }) async {
     final page = (startingAt ~/ count) + 1;
 
     final response = await apiService.adminPartnersApi
@@ -105,9 +139,14 @@ class PartnerVerificationRemoteDataSourceImpl
           sortDirection: _mapSortDirection(sortedAsc),
         );
 
-    if (response == null) return [];
+    if (response == null) {
+      return const PartnerVerificationPageEntity(items: [], total: 0);
+    }
 
-    return response.data.map(_mapPartnerItemToEntity).toList();
+    return PartnerVerificationPageEntity(
+      items: response.data.map(_mapPartnerItemToEntity).toList(),
+      total: response.total.toInt(),
+    );
   }
 
   @override
@@ -236,10 +275,12 @@ class PartnerVerificationRemoteDataSourceImpl
   // ========================================================
 
   PartnerVerificationEntity _mapPartnerItemToEntity(AdminPartnerItemDto dto) {
+    final displayName = _getDisplayName(dto);
+
     return PartnerVerificationEntity(
       id: PartnerVerificationId(dto.id),
-      name: dto.brandName,
-      initials: _getInitials(dto.brandName),
+      name: displayName,
+      initials: _getInitials(displayName),
       serviceTypes: dto.businessType.map(_formatBusinessType).toList(),
       submittedAt: dto.createdAt,
       priority: _mapPriority(dto.priority),
@@ -247,6 +288,19 @@ class PartnerVerificationRemoteDataSourceImpl
       isAccountActive: dto.isAccountActive,
       providerId: dto.id,
     );
+  }
+
+  String _getDisplayName(AdminPartnerItemDto dto) {
+    final brandName = dto.brandName.trim();
+    if (brandName.isNotEmpty) return brandName;
+
+    final legalName = dto.legalName.trim();
+    if (legalName.isNotEmpty) return legalName;
+
+    final email = dto.email.trim();
+    if (email.isNotEmpty) return email;
+
+    return dto.id;
   }
 
   /// Formats backend BusinessType enum value into
@@ -581,10 +635,16 @@ class PartnerVerificationRemoteDataSourceImpl
   }
 
   String _getInitials(String name) {
-    final words = name.trim().split(RegExp(r'\s+'));
-    if (words.isEmpty) return '';
+    final words = name
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((word) => word.isNotEmpty)
+        .toList();
+    if (words.isEmpty) return '?';
     if (words.length == 1) {
-      return words.first.substring(0, 2).toUpperCase();
+      final word = words.first;
+      final end = word.length >= 2 ? 2 : word.length;
+      return word.substring(0, end).toUpperCase();
     }
     return '${words.first[0]}${words.last[0]}'.toUpperCase();
   }
@@ -610,40 +670,45 @@ class PartnerVerificationRemoteDataSourceMock
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
   }) async {
+    final page = await getPartnerVerificationPage(
+      startingAt: startingAt,
+      count: count,
+      scope: scope,
+      searchQuery: searchQuery,
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+      statusFilter: statusFilter,
+    );
+    return page.items;
+  }
+
+  @override
+  Future<PartnerVerificationPageEntity> getPartnerVerificationPage({
+    required int startingAt,
+    required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    String? sortedBy,
+    bool? sortedAsc,
+    PartnerVerificationStatus? statusFilter,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
-    var filtered = _applyMockFilters(
+    final filtered = _applyMockFilters(
       scope: scope,
       searchQuery: searchQuery,
       statusFilter: statusFilter,
     );
 
-    // Apply sorting
-    if (sortedBy != null) {
-      switch (sortedBy) {
-        case 'name':
-          filtered.sort(
-            (a, b) => sortedAsc == true
-                ? a.name.compareTo(b.name)
-                : b.name.compareTo(a.name),
-          );
-        case 'priority':
-          filtered.sort((a, b) {
-            final cmp = a.priority.index.compareTo(b.priority.index);
-            return sortedAsc == true ? cmp : -cmp;
-          });
-        case 'submittedAt':
-        default:
-          filtered.sort(
-            (a, b) => sortedAsc == true
-                ? a.submittedAt.compareTo(b.submittedAt)
-                : b.submittedAt.compareTo(a.submittedAt),
-          );
-      }
-    }
+    _applyMockSort(filtered, sortedBy, sortedAsc);
 
-    final endIndex = (startingAt + count).clamp(0, filtered.length);
-    return filtered.sublist(startingAt.clamp(0, filtered.length), endIndex);
+    final start = startingAt.clamp(0, filtered.length).toInt();
+    final end = (startingAt + count).clamp(0, filtered.length).toInt();
+
+    return PartnerVerificationPageEntity(
+      items: filtered.sublist(start, end),
+      total: filtered.length,
+    );
   }
 
   @override
@@ -780,6 +845,35 @@ class PartnerVerificationRemoteDataSourceMock
     }
 
     return filtered;
+  }
+
+  void _applyMockSort(
+    List<PartnerVerificationEntity> filtered,
+    String? sortedBy,
+    bool? sortedAsc,
+  ) {
+    if (sortedBy == null) return;
+
+    switch (sortedBy) {
+      case 'name':
+        filtered.sort(
+          (a, b) => sortedAsc == true
+              ? a.name.compareTo(b.name)
+              : b.name.compareTo(a.name),
+        );
+      case 'priority':
+        filtered.sort((a, b) {
+          final cmp = a.priority.index.compareTo(b.priority.index);
+          return sortedAsc == true ? cmp : -cmp;
+        });
+      case 'submittedAt':
+      default:
+        filtered.sort(
+          (a, b) => sortedAsc == true
+              ? a.submittedAt.compareTo(b.submittedAt)
+              : b.submittedAt.compareTo(a.submittedAt),
+        );
+    }
   }
 }
 

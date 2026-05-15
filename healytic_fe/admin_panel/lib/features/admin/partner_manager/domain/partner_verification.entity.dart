@@ -4,8 +4,7 @@ part 'partner_verification.entity.freezed.dart';
 part 'partner_verification.entity.g.dart';
 
 /// Strongly-typed Partner Verification ID
-extension type const PartnerVerificationId(String value)
-    implements String {
+extension type const PartnerVerificationId(String value) implements String {
   factory PartnerVerificationId.fromJson(dynamic json) =>
       PartnerVerificationId(json as String);
   String toJson() => value;
@@ -46,16 +45,14 @@ enum PartnerManagerScope {
 /// Partner verification entity representing
 /// a partner's verification request in the list.
 @Freezed(toJson: true)
-abstract class PartnerVerificationEntity
-    with _$PartnerVerificationEntity {
+abstract class PartnerVerificationEntity with _$PartnerVerificationEntity {
   const factory PartnerVerificationEntity({
     required PartnerVerificationId id,
     required String name,
     @Default('') String initials,
     @Default([]) List<String> serviceTypes,
     required DateTime submittedAt,
-    @Default(PartnerPriority.normal)
-    PartnerPriority priority,
+    @Default(PartnerPriority.normal) PartnerPriority priority,
     @Default(PartnerVerificationStatus.pending)
     PartnerVerificationStatus status,
     @Default(false) bool isAccountActive,
@@ -66,8 +63,17 @@ abstract class PartnerVerificationEntity
     int? avatarColorEnd,
   }) = _PartnerVerificationEntity;
 
-  factory PartnerVerificationEntity.fromJson(
-    Map<String, dynamic> json,
-  ) =>
+  factory PartnerVerificationEntity.fromJson(Map<String, dynamic> json) =>
       _$PartnerVerificationEntityFromJson(json);
+}
+
+/// Paginated partner verification list response.
+class PartnerVerificationPageEntity {
+  const PartnerVerificationPageEntity({
+    required this.items,
+    required this.total,
+  });
+
+  final List<PartnerVerificationEntity> items;
+  final int total;
 }
