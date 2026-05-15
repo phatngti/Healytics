@@ -43,22 +43,19 @@ class _TableHeaderWidgetState extends State<TableHeaderWidget> {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       mainAxisSize: MainAxisSize.max,
       children: [
         if (widget.onSearchChanged != null)
-          Flexible(
-            child: SizedBox(
-              width: responsive<double>(
-                context,
-                mobile: 200,
-                tablet: 250,
-                web: 300,
-              ),
-              child: AppSearchField(
-                fieldKey: widget.searchFieldKey,
-                onChanged: widget.onSearchChanged,
-              ),
+          SizedBox(
+            width: responsive<double>(
+              context,
+              mobile: 200,
+              tablet: 250,
+              web: 300,
+            ),
+            child: AppSearchField(
+              fieldKey: widget.searchFieldKey,
+              onChanged: widget.onSearchChanged,
             ),
           ),
         Row(
@@ -77,6 +74,7 @@ class _TableHeaderWidgetState extends State<TableHeaderWidget> {
             ],
           ],
         ),
+        const Spacer(),
       ],
     );
   }

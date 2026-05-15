@@ -22,6 +22,7 @@ class PartnerManagerWorkspaceNotifier extends Notifier<PartnerManagerState> {
     state = state.copyWith(
       scope: scope,
       clearStatusFilter: true,
+      clearQuickFilter: true,
       searchQuery: '',
       reloadToken: state.reloadToken + 1,
     );
@@ -43,6 +44,20 @@ class PartnerManagerWorkspaceNotifier extends Notifier<PartnerManagerState> {
     state = state.copyWith(
       statusFilter: value,
       clearStatusFilter: value == null,
+      clearQuickFilter: true,
+      reloadToken: state.reloadToken + 1,
+    );
+  }
+
+  /// Applies a dashboard-card quick filter to the table.
+  void setQuickFilter(PartnerManagerQuickFilter? value) {
+    state = state.copyWith(
+      scope: value == null
+          ? state.scope
+          : PartnerManagerScope.verificationQueue,
+      quickFilter: value,
+      clearQuickFilter: value == null,
+      clearStatusFilter: true,
       reloadToken: state.reloadToken + 1,
     );
   }

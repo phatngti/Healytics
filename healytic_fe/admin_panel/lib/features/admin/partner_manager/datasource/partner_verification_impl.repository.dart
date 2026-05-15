@@ -24,6 +24,7 @@ class PartnerVerificationRepositoryImpl
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) => dataSource.getPartnerVerifications(
     startingAt: startingAt,
     count: count,
@@ -32,6 +33,7 @@ class PartnerVerificationRepositoryImpl
     sortedBy: sortedBy,
     sortedAsc: sortedAsc,
     statusFilter: statusFilter,
+    quickFilter: quickFilter,
   );
 
   @override
@@ -43,6 +45,7 @@ class PartnerVerificationRepositoryImpl
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) => dataSource.getPartnerVerificationPage(
     startingAt: startingAt,
     count: count,
@@ -51,6 +54,7 @@ class PartnerVerificationRepositoryImpl
     sortedBy: sortedBy,
     sortedAsc: sortedAsc,
     statusFilter: statusFilter,
+    quickFilter: quickFilter,
   );
 
   @override
@@ -58,10 +62,12 @@ class PartnerVerificationRepositoryImpl
     required PartnerManagerScope scope,
     String? searchQuery,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) => dataSource.getTotalRows(
     scope: scope,
     searchQuery: searchQuery,
     statusFilter: statusFilter,
+    quickFilter: quickFilter,
   );
 
   @override

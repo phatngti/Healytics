@@ -33,6 +33,7 @@ abstract class PartnerVerificationRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   });
 
   /// Get one paginated page plus the filtered total
@@ -45,6 +46,7 @@ abstract class PartnerVerificationRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   });
 
   /// Get total count matching current filters.
@@ -52,6 +54,7 @@ abstract class PartnerVerificationRemoteDataSource {
     required PartnerManagerScope scope,
     String? searchQuery,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   });
 
   /// Get detailed partner verification information
@@ -103,6 +106,7 @@ class PartnerVerificationRemoteDataSourceImpl
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) async {
     final page = await getPartnerVerificationPage(
       startingAt: startingAt,
@@ -112,6 +116,7 @@ class PartnerVerificationRemoteDataSourceImpl
       sortedBy: sortedBy,
       sortedAsc: sortedAsc,
       statusFilter: statusFilter,
+      quickFilter: quickFilter,
     );
     return page.items;
   }
@@ -125,14 +130,31 @@ class PartnerVerificationRemoteDataSourceImpl
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) async {
+    if (quickFilter == PartnerManagerQuickFilter.highPriority) {
+      return _getHighPriorityPartnerVerificationPage(
+        startingAt: startingAt,
+        count: count,
+        scope: scope,
+        searchQuery: searchQuery,
+        sortedBy: sortedBy,
+        sortedAsc: sortedAsc,
+        statusFilter: statusFilter,
+      );
+    }
+
     final page = (startingAt ~/ count) + 1;
+    final effectiveScope =
+        quickFilter == PartnerManagerQuickFilter.pendingReview
+        ? PartnerManagerScope.verificationQueue
+        : scope;
 
     final response = await apiService.adminPartnersApi
         .adminPartnersControllerGetPartners(
           page: page,
           limit: count,
-          scope: _mapScope(scope),
+          scope: _mapScope(effectiveScope),
           search: searchQuery,
           verificationStatus: _mapStatusToQueryParam(statusFilter),
           sortBy: _mapSortBy(sortedBy),
@@ -154,7 +176,20 @@ class PartnerVerificationRemoteDataSourceImpl
     required PartnerManagerScope scope,
     String? searchQuery,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) async {
+    if (quickFilter != null) {
+      final page = await getPartnerVerificationPage(
+        startingAt: 0,
+        count: 1,
+        scope: scope,
+        searchQuery: searchQuery,
+        statusFilter: statusFilter,
+        quickFilter: quickFilter,
+      );
+      return page.total;
+    }
+
     final response = await apiService.adminPartnersApi
         .adminPartnersControllerGetTotalPartners(
           scope: _mapScope(scope),
@@ -163,6 +198,60 @@ class PartnerVerificationRemoteDataSourceImpl
         );
     if (response == null) return 0;
     return response.total.toInt();
+  }
+
+  Future<PartnerVerificationPageEntity>
+  _getHighPriorityPartnerVerificationPage({
+    required int startingAt,
+    required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    String? sortedBy,
+    bool? sortedAsc,
+    PartnerVerificationStatus? statusFilter,
+  }) async {
+    const pageSize = 100;
+    var page = 1;
+    var fetched = 0;
+    var total = 0;
+    final highPriority = <PartnerVerificationEntity>[];
+
+    do {
+      final response = await apiService.adminPartnersApi
+          .adminPartnersControllerGetPartners(
+            page: page,
+            limit: pageSize,
+            scope: _mapScope(PartnerManagerScope.verificationQueue),
+            search: searchQuery,
+            verificationStatus: _mapStatusToQueryParam(statusFilter),
+            sortBy: _mapSortBy(sortedBy),
+            sortDirection: _mapSortDirection(sortedAsc),
+          );
+
+      if (response == null) {
+        break;
+      }
+
+      total = response.total.toInt();
+      final items = response.data.map(_mapPartnerItemToEntity).toList();
+      fetched += items.length;
+      highPriority.addAll(
+        items.where((item) => item.priority == PartnerPriority.high),
+      );
+
+      if (items.isEmpty) {
+        break;
+      }
+      page += 1;
+    } while (fetched < total);
+
+    final start = startingAt.clamp(0, highPriority.length).toInt();
+    final end = (startingAt + count).clamp(0, highPriority.length).toInt();
+
+    return PartnerVerificationPageEntity(
+      items: highPriority.sublist(start, end),
+      total: highPriority.length,
+    );
   }
 
   @override
@@ -669,6 +758,7 @@ class PartnerVerificationRemoteDataSourceMock
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) async {
     final page = await getPartnerVerificationPage(
       startingAt: startingAt,
@@ -678,6 +768,7 @@ class PartnerVerificationRemoteDataSourceMock
       sortedBy: sortedBy,
       sortedAsc: sortedAsc,
       statusFilter: statusFilter,
+      quickFilter: quickFilter,
     );
     return page.items;
   }
@@ -691,6 +782,7 @@ class PartnerVerificationRemoteDataSourceMock
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
@@ -698,6 +790,7 @@ class PartnerVerificationRemoteDataSourceMock
       scope: scope,
       searchQuery: searchQuery,
       statusFilter: statusFilter,
+      quickFilter: quickFilter,
     );
 
     _applyMockSort(filtered, sortedBy, sortedAsc);
@@ -716,12 +809,14 @@ class PartnerVerificationRemoteDataSourceMock
     required PartnerManagerScope scope,
     String? searchQuery,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _applyMockFilters(
       scope: scope,
       searchQuery: searchQuery,
       statusFilter: statusFilter,
+      quickFilter: quickFilter,
     ).length;
   }
 
@@ -813,11 +908,16 @@ class PartnerVerificationRemoteDataSourceMock
     required PartnerManagerScope scope,
     String? searchQuery,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) {
     var filtered = _mockData.toList();
+    final effectiveScope =
+        quickFilter == PartnerManagerQuickFilter.pendingReview
+        ? PartnerManagerScope.verificationQueue
+        : scope;
 
     // Apply scope
-    if (scope == PartnerManagerScope.verificationQueue) {
+    if (effectiveScope == PartnerManagerScope.verificationQueue) {
       filtered = filtered
           .where(
             (p) =>
@@ -830,6 +930,12 @@ class PartnerVerificationRemoteDataSourceMock
     // Apply status filter
     if (statusFilter != null) {
       filtered = filtered.where((p) => p.status == statusFilter).toList();
+    }
+
+    if (quickFilter == PartnerManagerQuickFilter.highPriority) {
+      filtered = filtered
+          .where((p) => p.priority == PartnerPriority.high)
+          .toList();
     }
 
     // Apply search

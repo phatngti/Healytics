@@ -40,7 +40,11 @@ class AccountMe extends _$AccountMe {
   /// immediately shows the new user's info.
   Future<void> refresh() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => build());
+    final result =
+        await AsyncValue.guard(() => build());
+    if (ref.mounted) {
+      state = result;
+    }
   }
 
   /// Resets state to `null` without triggering a
