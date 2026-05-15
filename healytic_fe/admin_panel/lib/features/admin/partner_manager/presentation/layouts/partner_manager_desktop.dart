@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification.entity.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/providers/partner_manager.provider.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/partner_stats_cards.widget.dart';
@@ -5,6 +7,7 @@ import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/
 import 'package:common/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Desktop layout for partner verification management.
@@ -15,7 +18,14 @@ class PartnerManagerDesktop extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final ws = ref.watch(partnerManagerWorkspaceProvider);
+    final currentScope = ref.watch(
+      partnerManagerWorkspaceProvider.select((state) => state.scope),
+    );
+    final searchDebounce = useRef<Timer?>(null);
+
+    useEffect(() {
+      return () => searchDebounce.value?.cancel();
+    }, const []);
 
     return SingleChildScrollView(
       child: Padding(
@@ -54,7 +64,7 @@ class PartnerManagerDesktop extends HookConsumerWidget {
                 ),
                 AppDimens.horizontalMedium,
                 _TabButtons(
-                  currentScope: ws.scope,
+                  currentScope: currentScope,
                   onScopeChanged: (scope) {
                     ref
                         .read(partnerManagerWorkspaceProvider.notifier)
@@ -71,19 +81,17 @@ class PartnerManagerDesktop extends HookConsumerWidget {
 
             // Verification Table
             PartnerVerificationTable(
-              key: ValueKey(
-                'partner-table'
-                '-${ws.scope.name}'
-                '-${ws.reloadToken}'
-                '-${ws.searchQuery}'
-                '-${ws.statusFilter}',
-              ),
               height: DeviceUtils.getScreenHeight(context),
-              state: ws,
               onSearchChanged: (value) {
-                ref
-                    .read(partnerManagerWorkspaceProvider.notifier)
-                    .setSearchQuery(value);
+                searchDebounce.value?.cancel();
+                searchDebounce.value = Timer(
+                  const Duration(milliseconds: 350),
+                  () {
+                    ref
+                        .read(partnerManagerWorkspaceProvider.notifier)
+                        .setSearchQuery(value);
+                  },
+                );
               },
             ),
           ],

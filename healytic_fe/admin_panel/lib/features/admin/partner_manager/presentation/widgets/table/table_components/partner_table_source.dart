@@ -9,6 +9,69 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
+/// Small per-table page cache so AppTable's paired
+/// total/data callbacks can share the same list API response.
+class PartnerTablePageCache {
+  PartnerTablePageCache({
+    required this.ref,
+    required this.state,
+    required this.prefetchCount,
+  });
+
+  final WidgetRef ref;
+  final PartnerManagerState state;
+  final int prefetchCount;
+
+  PartnerVerificationPageEntity? _cachedPage;
+  int? _cachedStartingAt;
+  int? _cachedCount;
+
+  Future<int> getTotalRows() async {
+    final page = await _fetchPage(startingAt: 0, count: prefetchCount);
+    return page.total;
+  }
+
+  Future<List<DataRow>> getData(
+    BuildContext context,
+    SetRowSelectionCallback setRowSelection,
+    int startingAt,
+    int count,
+  ) async {
+    final page = await _fetchPage(startingAt: startingAt, count: count);
+    if (!context.mounted) {
+      return [];
+    }
+    return PartnerTableSource.buildRows(context, setRowSelection, page.items);
+  }
+
+  Future<PartnerVerificationPageEntity> _fetchPage({
+    required int startingAt,
+    required int count,
+  }) async {
+    if (_cachedPage != null &&
+        _cachedStartingAt == startingAt &&
+        _cachedCount == count) {
+      return _cachedPage!;
+    }
+
+    final repository = ref.read(partnerVerificationRepositoryProvider);
+    final page = await repository.getPartnerVerificationPage(
+      startingAt: startingAt,
+      count: count,
+      scope: state.scope,
+      searchQuery: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+      sortedBy: state.sortBy,
+      sortedAsc: state.sortAsc,
+      statusFilter: state.statusFilter,
+    );
+
+    _cachedPage = page;
+    _cachedStartingAt = startingAt;
+    _cachedCount = count;
+    return page;
+  }
+}
+
 /// Data source for the partner verification table.
 /// Routes all data access through the repository.
 class PartnerTableSource {
@@ -18,14 +81,10 @@ class PartnerTableSource {
     WidgetRef ref,
     PartnerManagerState state,
   ) async {
-    final repository = ref.read(
-      partnerVerificationRepositoryProvider,
-    );
+    final repository = ref.read(partnerVerificationRepositoryProvider);
     return repository.getTotalRows(
       scope: state.scope,
-      searchQuery: state.searchQuery.isNotEmpty
-          ? state.searchQuery
-          : null,
+      searchQuery: state.searchQuery.isNotEmpty ? state.searchQuery : null,
       statusFilter: state.statusFilter,
     );
   }
@@ -40,87 +99,71 @@ class PartnerTableSource {
     int count,
     PartnerManagerState state,
   ) async {
-    final repository = ref.read(
-      partnerVerificationRepositoryProvider,
-    );
-    final partners =
-        await repository.getPartnerVerifications(
+    final repository = ref.read(partnerVerificationRepositoryProvider);
+    final partners = await repository.getPartnerVerifications(
       startingAt: startingAt,
       count: count,
       scope: state.scope,
-      searchQuery: state.searchQuery.isNotEmpty
-          ? state.searchQuery
-          : null,
+      searchQuery: state.searchQuery.isNotEmpty ? state.searchQuery : null,
       sortedBy: state.sortBy,
       sortedAsc: state.sortAsc,
       statusFilter: state.statusFilter,
     );
+    if (!context.mounted) {
+      return [];
+    }
 
+    return buildRows(context, setRowSelection, partners);
+  }
+
+  /// Converts partner entities into table rows.
+  static List<DataRow> buildRows(
+    BuildContext context,
+    SetRowSelectionCallback setRowSelection,
+    List<PartnerVerificationEntity> partners,
+  ) {
     return partners.map((partner) {
-      final isHighPriority =
-          partner.priority == PartnerPriority.high;
-      final isReviewable = _isReviewable(
-        partner.status,
-      );
-
-      return DataRow(
-        key: ValueKey<String>(partner.id.value),
-        color: WidgetStateProperty.resolveWith<Color?>(
-          (states) {
-            if (isHighPriority && isReviewable) {
-              return _getDangerColor(context)
-                  .withValues(alpha: 0.05);
-            }
-            return null;
-          },
-        ),
-        onSelectChanged: !isReviewable
-            ? null
-            : (value) {
-                if (value != null) {
-                  setRowSelection(
-                    ValueKey<String>(
-                      partner.id.value,
-                    ),
-                    value,
-                  );
-                }
-              },
-        cells: [
-          DataCell(
-            _buildProviderDetails(context, partner),
-          ),
-          DataCell(
-            _buildServiceTypes(
-              context,
-              partner.serviceTypes,
-            ),
-          ),
-          DataCell(
-            _buildSubmittedDate(context, partner),
-          ),
-          DataCell(
-            _buildStatusBadge(
-              context,
-              partner.status,
-            ),
-          ),
-          DataCell(
-            _buildActionButton(context, partner),
-          ),
-        ],
-      );
+      return _buildRow(context, setRowSelection, partner);
     }).toList();
   }
 
-  /// Whether the partner status allows review.
-  static bool _isReviewable(
-    PartnerVerificationStatus status,
+  static DataRow _buildRow(
+    BuildContext context,
+    SetRowSelectionCallback setRowSelection,
+    PartnerVerificationEntity partner,
   ) {
-    return status ==
-            PartnerVerificationStatus.pending ||
-        status ==
-            PartnerVerificationStatus.requiredResubmit;
+    final isHighPriority = partner.priority == PartnerPriority.high;
+    final isReviewable = _isReviewable(partner.status);
+
+    return DataRow(
+      key: ValueKey<String>(partner.id.value),
+      color: WidgetStateProperty.resolveWith<Color?>((states) {
+        if (isHighPriority && isReviewable) {
+          return _getDangerColor(context).withValues(alpha: 0.05);
+        }
+        return null;
+      }),
+      onSelectChanged: !isReviewable
+          ? null
+          : (value) {
+              if (value != null) {
+                setRowSelection(ValueKey<String>(partner.id.value), value);
+              }
+            },
+      cells: [
+        DataCell(_buildProviderDetails(context, partner)),
+        DataCell(_buildServiceTypes(context, partner.serviceTypes)),
+        DataCell(_buildSubmittedDate(context, partner)),
+        DataCell(_buildStatusBadge(context, partner.status)),
+        DataCell(_buildActionButton(context, partner)),
+      ],
+    );
+  }
+
+  /// Whether the partner status allows review.
+  static bool _isReviewable(PartnerVerificationStatus status) {
+    return status == PartnerVerificationStatus.pending ||
+        status == PartnerVerificationStatus.requiredResubmit;
   }
 
   static Widget _buildProviderDetails(
@@ -143,12 +186,9 @@ class PartnerTableSource {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
+                      Color(partner.avatarColorStart!),
                       Color(
-                        partner.avatarColorStart!,
-                      ),
-                      Color(
-                        partner.avatarColorEnd ??
-                            partner.avatarColorStart!,
+                        partner.avatarColorEnd ?? partner.avatarColorStart!,
                       ),
                     ],
                   )
@@ -161,11 +201,9 @@ class PartnerTableSource {
             child: Text(
               partner.initials,
               style: textTheme.labelSmall?.copyWith(
-                color:
-                    partner.avatarColorStart != null
-                        ? Colors.white
-                        : colorScheme
-                            .onSurfaceVariant,
+                color: partner.avatarColorStart != null
+                    ? Colors.white
+                    : colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -174,10 +212,8 @@ class PartnerTableSource {
         AppDimens.horizontalMediumSmall,
         Flexible(
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-            mainAxisAlignment:
-                MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 partner.name,
@@ -193,15 +229,12 @@ class PartnerTableSource {
                   Flexible(
                     child: Text(
                       'ID: ${partner.providerId ?? partner.id.value}',
-                      style: textTheme.labelSmall
-                          ?.copyWith(
-                        color: colorScheme
-                            .onSurfaceVariant,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                         fontFamily: 'monospace',
                         fontSize: 11,
                       ),
-                      overflow:
-                          TextOverflow.ellipsis,
+                      overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
                   ),
@@ -210,9 +243,7 @@ class PartnerTableSource {
                     Icon(
                       Icons.verified,
                       size: 14,
-                      color: _getSuccessColor(
-                        context,
-                      ),
+                      color: _getSuccessColor(context),
                     ),
                   ],
                 ],
@@ -245,15 +276,10 @@ class PartnerTableSource {
       runSpacing: 4,
       children: serviceTypes.map((type) {
         return Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 2,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
-            color:
-                colorScheme.surfaceContainerHighest,
-            borderRadius:
-                AppDimens.radiusExtraSmall,
+            color: colorScheme.surfaceContainerHighest,
+            borderRadius: AppDimens.radiusExtraSmall,
           ),
           child: Text(
             type,
@@ -273,8 +299,7 @@ class PartnerTableSource {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final isHighPriority =
-        partner.priority == PartnerPriority.high;
+    final isHighPriority = partner.priority == PartnerPriority.high;
 
     final formattedDate = DateFormat(
       'MMM dd, yyyy',
@@ -298,9 +323,7 @@ class PartnerTableSource {
             color: isHighPriority
                 ? _getDangerColor(context)
                 : colorScheme.onSurfaceVariant,
-            fontWeight: isHighPriority
-                ? FontWeight.w500
-                : FontWeight.normal,
+            fontWeight: isHighPriority ? FontWeight.w500 : FontWeight.normal,
           ),
         ),
       ],
@@ -311,8 +334,7 @@ class PartnerTableSource {
     BuildContext context,
     PartnerVerificationStatus status,
   ) {
-    final semantics =
-        Theme.of(context).extension<SemanticColors>();
+    final semantics = Theme.of(context).extension<SemanticColors>();
 
     Color badgeColor;
     String label;
@@ -320,36 +342,27 @@ class PartnerTableSource {
 
     switch (status) {
       case PartnerVerificationStatus.pending:
-        badgeColor =
-            semantics?.warning ?? Colors.orange;
+        badgeColor = semantics?.warning ?? Colors.orange;
         label = 'Pending';
       case PartnerVerificationStatus.requiredResubmit:
-        badgeColor =
-            semantics?.warning ?? Colors.orange;
+        badgeColor = semantics?.warning ?? Colors.orange;
         label = 'Changes Required';
         icon = Icons.edit_note;
       case PartnerVerificationStatus.approved:
-        badgeColor =
-            semantics?.success ?? Colors.green;
+        badgeColor = semantics?.success ?? Colors.green;
         label = 'Active';
       case PartnerVerificationStatus.rejected:
-        badgeColor =
-            semantics?.error ?? Colors.red;
+        badgeColor = semantics?.error ?? Colors.red;
         label = 'Rejected';
         icon = Icons.block;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 4,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: badgeColor.withValues(alpha: 0.1),
         borderRadius: AppDimens.radiusMedium,
-        border: Border.all(
-          color: badgeColor.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: badgeColor.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -368,10 +381,7 @@ class PartnerTableSource {
           AppDimens.horizontalExtraSmall,
           Text(
             label,
-            style: Theme.of(context)
-                .textTheme
-                .labelSmall
-                ?.copyWith(
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: badgeColor,
               fontWeight: FontWeight.bold,
             ),
@@ -386,57 +396,39 @@ class PartnerTableSource {
     PartnerVerificationEntity partner,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isReviewable = _isReviewable(
-      partner.status,
-    );
+    final isReviewable = _isReviewable(partner.status);
 
     return IconButton(
       onPressed: () {
         if (isReviewable) {
-          ReviewApplicationRoute(
-            partnerId: partner.id.value,
-          ).go(context);
+          ReviewApplicationRoute(partnerId: partner.id.value).go(context);
         } else {
-          ViewPartnerDetailRoute(
-            partnerId: partner.id.value,
-          ).go(context);
+          ViewPartnerDetailRoute(partnerId: partner.id.value).go(context);
         }
       },
       icon: Icon(
-        isReviewable
-            ? Icons.edit_document
-            : Icons.visibility,
+        isReviewable ? Icons.edit_document : Icons.visibility,
         size: 20,
       ),
-      style: IconButton.styleFrom(
-        foregroundColor:
-            colorScheme.onSurfaceVariant,
-        backgroundColor: Colors.transparent,
-      ).copyWith(
-        foregroundColor:
-            WidgetStateProperty.resolveWith(
-          (states) {
-            if (states
-                .contains(WidgetState.hovered)) {
-              return Colors.white;
-            }
-            return colorScheme.onSurfaceVariant;
-          },
-        ),
-        backgroundColor:
-            WidgetStateProperty.resolveWith(
-          (states) {
-            if (states
-                .contains(WidgetState.hovered)) {
-              return colorScheme.primary;
-            }
-            return Colors.transparent;
-          },
-        ),
-      ),
-      tooltip: isReviewable
-          ? 'Review Application'
-          : 'View Details',
+      style:
+          IconButton.styleFrom(
+            foregroundColor: colorScheme.onSurfaceVariant,
+            backgroundColor: Colors.transparent,
+          ).copyWith(
+            foregroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.hovered)) {
+                return Colors.white;
+              }
+              return colorScheme.onSurfaceVariant;
+            }),
+            backgroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.hovered)) {
+                return colorScheme.primary;
+              }
+              return Colors.transparent;
+            }),
+          ),
+      tooltip: isReviewable ? 'Review Application' : 'View Details',
     );
   }
 
@@ -455,21 +447,12 @@ class PartnerTableSource {
     }
   }
 
-  static Color _getDangerColor(
-    BuildContext context,
-  ) {
-    return Theme.of(context)
-            .extension<SemanticColors>()
-            ?.error ??
-        Colors.red;
+  static Color _getDangerColor(BuildContext context) {
+    return Theme.of(context).extension<SemanticColors>()?.error ?? Colors.red;
   }
 
-  static Color _getSuccessColor(
-    BuildContext context,
-  ) {
-    return Theme.of(context)
-            .extension<SemanticColors>()
-            ?.success ??
+  static Color _getSuccessColor(BuildContext context) {
+    return Theme.of(context).extension<SemanticColors>()?.success ??
         Colors.green;
   }
 }

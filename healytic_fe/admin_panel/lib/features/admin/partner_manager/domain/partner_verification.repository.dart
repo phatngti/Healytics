@@ -7,8 +7,18 @@ import 'package:admin_panel/features/admin/partner_manager/domain/partner_verifi
 /// Flutter or API imports.
 abstract class PartnerVerificationRepository {
   /// Get paginated list of partner verification requests.
-  Future<List<PartnerVerificationEntity>>
-      getPartnerVerifications({
+  Future<List<PartnerVerificationEntity>> getPartnerVerifications({
+    required int startingAt,
+    required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    String? sortedBy,
+    bool? sortedAsc,
+    PartnerVerificationStatus? statusFilter,
+  });
+
+  /// Get one page plus its matching filtered total.
+  Future<PartnerVerificationPageEntity> getPartnerVerificationPage({
     required int startingAt,
     required int count,
     required PartnerManagerScope scope,
@@ -27,17 +37,15 @@ abstract class PartnerVerificationRepository {
 
   /// Get detailed partner verification information
   /// for review page.
-  Future<PartnerVerificationDetailEntity>
-      getPartnerDetailById(PartnerVerificationId id);
+  Future<PartnerVerificationDetailEntity> getPartnerDetailById(
+    PartnerVerificationId id,
+  );
 
   /// Approve a partner verification request.
   Future<void> approvePartner(PartnerVerificationId id);
 
   /// Reject a partner verification request.
-  Future<void> rejectPartner(
-    PartnerVerificationId id, {
-    String? reason,
-  });
+  Future<void> rejectPartner(PartnerVerificationId id, {String? reason});
 
   /// Submit a review decision for a partner with
   /// optional field-level feedback.
