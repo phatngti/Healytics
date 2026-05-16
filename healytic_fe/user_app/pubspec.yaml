@@ -77,6 +77,7 @@ dependencies:
   timezone: ^0.10.1
   fluttertoast: ^9.0.0
   jwt_decoder: ^2.0.1
+  app_links: ^6.4.1
   url_launcher: ^6.3.2
   flutter_pdfview: ^1.4.0
   socket_io_client: ^3.1.4
@@ -119,6 +120,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/store.dev.json
+    - assets/store.test.json
     - assets/store.uat.json
     - assets/store.prod.json
     - assets/icons/
@@ -126,6 +128,7 @@ flutter:
     - assets/translations/
     - assets/animations/
     - patrol_test/fixtures/
+    - patrol_test/fixtures/scenarios/
     
   #   - images/a_dot_ham.jpeg
 

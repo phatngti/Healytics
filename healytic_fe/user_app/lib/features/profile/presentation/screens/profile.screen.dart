@@ -3,12 +3,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/core/widgets/main_screen_layout.widget.dart';
+import 'package:user_app/router/routes.dart';
 
 import '../providers/profile.provider.dart';
 import '../widgets/profile_header.widget.dart';
 import '../widgets/profile_quick_stats.widget.dart';
-import '../widgets/profile_settings_list.widget.dart';
 import '../widgets/profile_logout_button.widget.dart';
 
 /// Personal profile screen rendered inside the
@@ -20,14 +21,14 @@ import '../widgets/profile_logout_button.widget.dart';
 /// Layout mirrors the HTML reference with sections:
 /// 1. Profile Identity (avatar, name, email, edit)
 /// 2. Quick Stats bento grid (orders, wishlist, pts)
-/// 3. Settings list (payment, shipping, security…)
-/// 4. Log Out action
+/// 3. Log Out action
 class ProfilePage extends HookConsumerWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final accountMeState = ref.watch(accountMeProvider);
+    final profileSummaryState = ref.watch(profileSummaryProvider);
     final userNameFallback = ref.watch(currentUserDisplayNameProvider);
     final hPadding = AppDimens.horizontalPadding(context);
     final bottomPadding = AppDimens.bottomScrollPadding(context);
@@ -64,16 +65,18 @@ class ProfilePage extends HookConsumerWidget {
             ),
             SizedBox(height: sectionGap * 1.5),
 
-            // § 2 — Quick Stats
-            const ProfileQuickStats(
-              ordersCount: 12,
-              wishlistCount: 48,
-              points: '2.4k',
+            profileSummaryState.when(
+              data: (summary) => ProfileQuickStats(
+                ordersCount: summary.ordersCount,
+                wishlistCount: summary.wishlistCount,
+                points: summary.pointsLabel,
+                onOrdersTap: () => const OrderApprovedRoute().go(context),
+              ),
+              loading: () => const ProfileQuickStats(),
+              error: (_, _) => ProfileQuickStats(
+                onOrdersTap: () => const OrderApprovedRoute().go(context),
+              ),
             ),
-            SizedBox(height: sectionGap * 1.5),
-
-            // § 3 — Settings List
-            const ProfileSettingsList(),
             SizedBox(height: sectionGap * 1.5),
 
             // § 4 — Log Out
@@ -107,6 +110,7 @@ class ProfilePage extends HookConsumerWidget {
         ),
         actions: [
           TextButton(
+            key: keys.logoutDialog.cancelButton,
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(ctx).colorScheme.onSurfaceVariant,
             ),
@@ -114,6 +118,7 @@ class ProfilePage extends HookConsumerWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
+            key: keys.logoutDialog.confirmButton,
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(ctx).colorScheme.error,
               foregroundColor: Theme.of(ctx).colorScheme.onError,

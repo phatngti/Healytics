@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { HealthServiceService } from './health-service.service';
 import { Product } from '@/common/entities/product.entity';
+import { UserWishlistItem } from '@/common/entities/user-wishlist-item.entity';
 import { Booking } from '@/common/entities/booking.entity';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
@@ -28,6 +29,7 @@ describe('HealthServiceService', () => {
   let bookingRepository: MockRepository<Booking>;
   let treatmentReviewRepository: MockRepository<TreatmentReview>;
   let eligibilityRepository: MockRepository<ProductEmployeeEligibility>;
+  let wishlistRepository: MockRepository<UserWishlistItem>;
   let createHandler: MockHandler;
   let updateHandler: MockHandler;
   let removeHandler: MockHandler;
@@ -41,6 +43,7 @@ describe('HealthServiceService', () => {
     bookingRepository = createMockRepository<Booking>();
     treatmentReviewRepository = createMockRepository<TreatmentReview>();
     eligibilityRepository = createMockRepository<ProductEmployeeEligibility>();
+    wishlistRepository = createMockRepository<UserWishlistItem>();
     createHandler = createMockHandler();
     updateHandler = createMockHandler();
     removeHandler = createMockHandler();
@@ -65,6 +68,10 @@ describe('HealthServiceService', () => {
         {
           provide: getRepositoryToken(ProductEmployeeEligibility),
           useValue: eligibilityRepository,
+        },
+        {
+          provide: getRepositoryToken(UserWishlistItem),
+          useValue: wishlistRepository,
         },
         {
           provide: CreateHealthServiceHandler,

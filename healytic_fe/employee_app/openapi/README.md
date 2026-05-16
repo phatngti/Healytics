@@ -220,6 +220,18 @@ Class | Method | HTTP request | Description
 *S3Api* | [**s3ControllerGetFileUrl**](doc//S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file URL
 *S3Api* | [**s3ControllerPreSign**](doc//S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload URL
 *StripeApi* | [**stripeWebhookControllerHandleStripeWebhook**](doc//StripeApi.md#stripewebhookcontrollerhandlestripewebhook) | **POST** /stripe/webhook | Stripe webhook callback (server-to-server)
+*TestBackdoorApi* | [**testBackdoorControllerPrepare**](doc//TestBackdoorApi.md#testbackdoorcontrollerprepare) | **POST** /test-backdoor/prepare | Reset DB then seed a scenario
+*TestBackdoorApi* | [**testBackdoorControllerResetDb**](doc//TestBackdoorApi.md#testbackdoorcontrollerresetdb) | **POST** /test-backdoor/reset-db | Truncate all non-master tables
+*TestBackdoorApi* | [**testBackdoorControllerSeed**](doc//TestBackdoorApi.md#testbackdoorcontrollerseed) | **POST** /test-backdoor/seed | Seed multiple entity types at once
+*TestBackdoorApi* | [**testBackdoorControllerSeedBooking**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedbooking) | **POST** /test-backdoor/seed-booking | Seed a single booking
+*TestBackdoorApi* | [**testBackdoorControllerSeedCart**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedcart) | **POST** /test-backdoor/seed-cart | Seed a single cart item
+*TestBackdoorApi* | [**testBackdoorControllerSeedCategory**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedcategory) | **POST** /test-backdoor/seed-category | Seed a single category
+*TestBackdoorApi* | [**testBackdoorControllerSeedCoupon**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedcoupon) | **POST** /test-backdoor/seed-coupon | Seed a single coupon
+*TestBackdoorApi* | [**testBackdoorControllerSeedEmployee**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedemployee) | **POST** /test-backdoor/seed-employee | Seed a single employee
+*TestBackdoorApi* | [**testBackdoorControllerSeedPartner**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedpartner) | **POST** /test-backdoor/seed-partner | Seed a single partner
+*TestBackdoorApi* | [**testBackdoorControllerSeedService**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedservice) | **POST** /test-backdoor/seed-service | Seed a single health service
+*TestBackdoorApi* | [**testBackdoorControllerSeedUser**](doc//TestBackdoorApi.md#testbackdoorcontrollerseeduser) | **POST** /test-backdoor/seed-user | Seed a single user
+*TestBackdoorApi* | [**testBackdoorControllerStatus**](doc//TestBackdoorApi.md#testbackdoorcontrollerstatus) | **GET** /test-backdoor/status | Check if backdoor is available
 *UserAppointmentsApi* | [**userAppointmentControllerGetAppointment**](doc//UserAppointmentsApi.md#userappointmentcontrollergetappointment) | **GET** /user/appointments/{id} | Get appointment details by ID
 *UserAppointmentsApi* | [**userAppointmentControllerGetServiceManual**](doc//UserAppointmentsApi.md#userappointmentcontrollergetservicemanual) | **GET** /user/appointments/{appointmentId}/manual | Get service manual for an appointment
 *UserAppointmentsApi* | [**userAppointmentControllerListAppointments**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistappointments) | **GET** /user/appointments | List all user appointments with optional distance calculation
@@ -236,9 +248,11 @@ Class | Method | HTTP request | Description
 *UserChatApi* | [**userChatControllerGetConversations**](doc//UserChatApi.md#userchatcontrollergetconversations) | **GET** /user/chat/conversations | List all conversations for the current user
 *UserChatApi* | [**userChatControllerGetMessages**](doc//UserChatApi.md#userchatcontrollergetmessages) | **GET** /user/chat/conversations/{id}/messages | Get message history for a conversation (cursor-paginated)
 *UserChatApi* | [**userChatControllerMarkRead**](doc//UserChatApi.md#userchatcontrollermarkread) | **POST** /user/chat/conversations/{id}/read | Mark all messages in a conversation as read
+*UserClinicsApi* | [**userClinicControllerFollowClinic**](doc//UserClinicsApi.md#usercliniccontrollerfollowclinic) | **POST** /user/clinics/{id}/follow | Follow a clinic
 *UserClinicsApi* | [**userClinicControllerGetClinicInfo**](doc//UserClinicsApi.md#usercliniccontrollergetclinicinfo) | **GET** /user/clinics/{id}/info | Get public clinic profile
 *UserClinicsApi* | [**userClinicControllerGetClinicProducts**](doc//UserClinicsApi.md#usercliniccontrollergetclinicproducts) | **GET** /user/clinics/{id}/products | Get clinic products/services catalog
 *UserClinicsApi* | [**userClinicControllerGetClinicReviews**](doc//UserClinicsApi.md#usercliniccontrollergetclinicreviews) | **GET** /user/clinics/{id}/reviews | Get paginated clinic reviews
+*UserClinicsApi* | [**userClinicControllerUnfollowClinic**](doc//UserClinicsApi.md#usercliniccontrollerunfollowclinic) | **DELETE** /user/clinics/{id}/follow | Unfollow a clinic
 *UserDevicesApi* | [**userDeviceControllerRegisterDevice**](doc//UserDevicesApi.md#userdevicecontrollerregisterdevice) | **POST** /user/devices | Register a device token for push notifications
 *UserDevicesApi* | [**userDeviceControllerUnregisterDevice**](doc//UserDevicesApi.md#userdevicecontrollerunregisterdevice) | **DELETE** /user/devices/{token} | Unregister a device token (e.g. on logout)
 *UserEmployeesApi* | [**userEmployeesControllerFindAll**](doc//UserEmployeesApi.md#useremployeescontrollerfindall) | **GET** /user/employees | Get all employees
@@ -263,10 +277,14 @@ Class | Method | HTTP request | Description
 *UserPaymentsApi* | [**userPaymentControllerCreateStripePayment**](doc//UserPaymentsApi.md#userpaymentcontrollercreatestripepayment) | **POST** /user/payments/stripe/{bookingId} | Create Stripe payment for booking (card)
 *UserPaymentsApi* | [**userPaymentControllerRefundMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollerrefundmomopayment) | **POST** /user/payments/momo/{bookingId}/refund | Request MoMo refund for booking
 *UserPaymentsApi* | [**userPaymentControllerRefundStripePayment**](doc//UserPaymentsApi.md#userpaymentcontrollerrefundstripepayment) | **POST** /user/payments/stripe/{bookingId}/refund | Request Stripe refund for booking
+*UserProfileApi* | [**userProfileControllerGetSummary**](doc//UserProfileApi.md#userprofilecontrollergetsummary) | **GET** /user/profile/summary | Get current user profile summary counters
 *UserReviewsApi* | [**userReviewControllerSubmitSpecialistReview**](doc//UserReviewsApi.md#userreviewcontrollersubmitspecialistreview) | **POST** /user/reviews/specialist | Submit a specialist review for a completed appointment
 *UserReviewsApi* | [**userReviewControllerSubmitTreatmentReview**](doc//UserReviewsApi.md#userreviewcontrollersubmittreatmentreview) | **POST** /user/reviews/treatment | Submit a treatment review for a completed appointment
 *UserSlotsApi* | [**slotsControllerCheckDuplicateSlot**](doc//UserSlotsApi.md#slotscontrollercheckduplicateslot) | **POST** /user/slots/check-duplicate | Check if the user already has a booking at the same datetime
 *UserSlotsApi* | [**slotsControllerMicroLock**](doc//UserSlotsApi.md#slotscontrollermicrolock) | **POST** /user/slots/micro-lock | Acquire a micro-lock on a time slot (120s TTL)
+*UserWishlistApi* | [**userWishlistControllerAddItem**](doc//UserWishlistApi.md#userwishlistcontrolleradditem) | **POST** /user/wishlist/{productId} | Add a product to the current user wishlist
+*UserWishlistApi* | [**userWishlistControllerListWishlist**](doc//UserWishlistApi.md#userwishlistcontrollerlistwishlist) | **GET** /user/wishlist | List current user wishlist items
+*UserWishlistApi* | [**userWishlistControllerRemoveItem**](doc//UserWishlistApi.md#userwishlistcontrollerremoveitem) | **DELETE** /user/wishlist/{productId} | Remove a product from the current user wishlist
 
 
 ## Documentation For Models
@@ -349,6 +367,8 @@ Class | Method | HTTP request | Description
  - [AsyncCheckoutResponseDto](doc//AsyncCheckoutResponseDto.md)
  - [AttachTagResponseDto](doc//AttachTagResponseDto.md)
  - [AuthTokensDto](doc//AuthTokensDto.md)
+ - [BackdoorPrepareDto](doc//BackdoorPrepareDto.md)
+ - [BackdoorStatusResponseDto](doc//BackdoorStatusResponseDto.md)
  - [BookingResponseDto](doc//BookingResponseDto.md)
  - [BookingScheduleDto](doc//BookingScheduleDto.md)
  - [BookingServiceResponseDto](doc//BookingServiceResponseDto.md)
@@ -565,12 +585,24 @@ Class | Method | HTTP request | Description
  - [RegisterPartnerDto](doc//RegisterPartnerDto.md)
  - [RegisterPartnerResponseDto](doc//RegisterPartnerResponseDto.md)
  - [RegisterProfileDto](doc//RegisterProfileDto.md)
+ - [ResetDbResponseDto](doc//ResetDbResponseDto.md)
  - [RetryPayoutDto](doc//RetryPayoutDto.md)
  - [RevenueDataPointDto](doc//RevenueDataPointDto.md)
  - [ReviewItemDto](doc//ReviewItemDto.md)
  - [ReviewPartnerProfileDto](doc//ReviewPartnerProfileDto.md)
  - [ReviewPartnerResponseDto](doc//ReviewPartnerResponseDto.md)
  - [ReviewSummaryDto](doc//ReviewSummaryDto.md)
+ - [SeedBookingDto](doc//SeedBookingDto.md)
+ - [SeedCartItemDto](doc//SeedCartItemDto.md)
+ - [SeedCategoryDto](doc//SeedCategoryDto.md)
+ - [SeedCouponDto](doc//SeedCouponDto.md)
+ - [SeedEmployeeDto](doc//SeedEmployeeDto.md)
+ - [SeedIdsMapDto](doc//SeedIdsMapDto.md)
+ - [SeedPartnerDto](doc//SeedPartnerDto.md)
+ - [SeedPayloadDto](doc//SeedPayloadDto.md)
+ - [SeedResponseDto](doc//SeedResponseDto.md)
+ - [SeedServiceDto](doc//SeedServiceDto.md)
+ - [SeedUserDto](doc//SeedUserDto.md)
  - [ServiceInfoDto](doc//ServiceInfoDto.md)
  - [ServiceManualInputDto](doc//ServiceManualInputDto.md)
  - [ServiceManualResponseDto](doc//ServiceManualResponseDto.md)
@@ -602,8 +634,10 @@ Class | Method | HTTP request | Description
  - [UpdateServiceTagDto](doc//UpdateServiceTagDto.md)
  - [UserEligibilityDetailResponseDto](doc//UserEligibilityDetailResponseDto.md)
  - [UserProfileDto](doc//UserProfileDto.md)
+ - [UserProfileSummaryResponseDto](doc//UserProfileSummaryResponseDto.md)
  - [VerificationDocumentEntryDto](doc//VerificationDocumentEntryDto.md)
  - [VerifiedField](doc//VerifiedField.md)
+ - [WishlistItemResponseDto](doc//WishlistItemResponseDto.md)
  - [WorkHistoryEntryDto](doc//WorkHistoryEntryDto.md)
  - [WorkScheduleEntryDto](doc//WorkScheduleEntryDto.md)
 

@@ -11,9 +11,14 @@ const _exposureTableHeight = 520.0;
 
 /// Ranks partners by financial risk exposure.
 class AdminFinancePartnerExposurePanel extends StatelessWidget {
-  const AdminFinancePartnerExposurePanel({super.key, required this.exposures});
+  const AdminFinancePartnerExposurePanel({
+    super.key,
+    required this.exposures,
+    this.onSearchChanged,
+  });
 
   final List<AdminFinancePartnerExposure> exposures;
+  final ValueChanged<String>? onSearchChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +49,13 @@ class AdminFinancePartnerExposurePanel extends StatelessWidget {
           'Partner Exposure',
           style: tt.titleMedium?.copyWith(fontWeight: AppDimens.fontWeightBold),
         ),
+        if (onSearchChanged != null) ...[
+          AppDimens.verticalSmall,
+          Text(
+            'Search filters this partner exposure table by partner.',
+            style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+          ),
+        ],
         AppDimens.verticalSmall,
         SizedBox(
           height: _exposureTableHeight,
@@ -64,6 +76,7 @@ class AdminFinancePartnerExposurePanel extends StatelessWidget {
                 TableColumnData(label: 'Risk', size: ColumnSize.S),
               ],
             ).dataColumns(context),
+            onSearchChanged: onSearchChanged,
             getTotalRows: () async => exposures.length,
             getData: (_, startingAt, count) async {
               if (startingAt >= exposures.length) {

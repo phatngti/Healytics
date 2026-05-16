@@ -340,6 +340,10 @@ class ApiClient {
           return AttachTagResponseDto.fromJson(value);
         case 'AuthTokensDto':
           return AuthTokensDto.fromJson(value);
+        case 'BackdoorPrepareDto':
+          return BackdoorPrepareDto.fromJson(value);
+        case 'BackdoorStatusResponseDto':
+          return BackdoorStatusResponseDto.fromJson(value);
         case 'BookingResponseDto':
           return BookingResponseDto.fromJson(value);
         case 'BookingScheduleDto':
@@ -772,6 +776,8 @@ class ApiClient {
           return RegisterPartnerResponseDto.fromJson(value);
         case 'RegisterProfileDto':
           return RegisterProfileDto.fromJson(value);
+        case 'ResetDbResponseDto':
+          return ResetDbResponseDto.fromJson(value);
         case 'RetryPayoutDto':
           return RetryPayoutDto.fromJson(value);
         case 'RevenueDataPointDto':
@@ -784,6 +790,28 @@ class ApiClient {
           return ReviewPartnerResponseDto.fromJson(value);
         case 'ReviewSummaryDto':
           return ReviewSummaryDto.fromJson(value);
+        case 'SeedBookingDto':
+          return SeedBookingDto.fromJson(value);
+        case 'SeedCartItemDto':
+          return SeedCartItemDto.fromJson(value);
+        case 'SeedCategoryDto':
+          return SeedCategoryDto.fromJson(value);
+        case 'SeedCouponDto':
+          return SeedCouponDto.fromJson(value);
+        case 'SeedEmployeeDto':
+          return SeedEmployeeDto.fromJson(value);
+        case 'SeedIdsMapDto':
+          return SeedIdsMapDto.fromJson(value);
+        case 'SeedPartnerDto':
+          return SeedPartnerDto.fromJson(value);
+        case 'SeedPayloadDto':
+          return SeedPayloadDto.fromJson(value);
+        case 'SeedResponseDto':
+          return SeedResponseDto.fromJson(value);
+        case 'SeedServiceDto':
+          return SeedServiceDto.fromJson(value);
+        case 'SeedUserDto':
+          return SeedUserDto.fromJson(value);
         case 'ServiceInfoDto':
           return ServiceInfoDto.fromJson(value);
         case 'ServiceManualInputDto':
@@ -846,10 +874,14 @@ class ApiClient {
           return UserEligibilityDetailResponseDto.fromJson(value);
         case 'UserProfileDto':
           return UserProfileDto.fromJson(value);
+        case 'UserProfileSummaryResponseDto':
+          return UserProfileSummaryResponseDto.fromJson(value);
         case 'VerificationDocumentEntryDto':
           return VerificationDocumentEntryDto.fromJson(value);
         case 'VerifiedField':
           return VerifiedField.fromJson(value);
+        case 'WishlistItemResponseDto':
+          return WishlistItemResponseDto.fromJson(value);
         case 'WorkHistoryEntryDto':
           return WorkHistoryEntryDto.fromJson(value);
         case 'WorkScheduleEntryDto':

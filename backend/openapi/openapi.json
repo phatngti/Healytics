@@ -8399,6 +8399,82 @@
         ]
       }
     },
+    "/user/clinics/{id}/follow": {
+      "post": {
+        "operationId": "userClinicControllerFollowClinic",
+        "summary": "Follow a clinic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicInfoResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Clinic not found."
+          }
+        },
+        "tags": [
+          "User Clinics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "userClinicControllerUnfollowClinic",
+        "summary": "Unfollow a clinic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicInfoResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Clinic not found."
+          }
+        },
+        "tags": [
+          "User Clinics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/user/clinics/{id}/products": {
       "get": {
         "operationId": "userClinicControllerGetClinicProducts",
@@ -8567,6 +8643,126 @@
         },
         "tags": [
           "User Clinics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/wishlist": {
+      "get": {
+        "operationId": "UserWishlistController_listWishlist",
+        "summary": "List current user wishlist items",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WishlistItemResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Wishlist"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/wishlist/{productId}": {
+      "post": {
+        "operationId": "userWishlistControllerAddItem",
+        "summary": "Add a product to the current user wishlist",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WishlistItemResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Wishlist"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "userWishlistControllerRemoveItem",
+        "summary": "Remove a product from the current user wishlist",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User Wishlist"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/profile/summary": {
+      "get": {
+        "operationId": "userProfileControllerGetSummary",
+        "summary": "Get current user profile summary counters",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileSummaryResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Profile"
         ],
         "security": [
           {
@@ -10579,7 +10775,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-15T08:04:18.996Z"
+              "submittedAt": "2026-05-16T14:30:18.986Z"
             }
           }
         },
@@ -16404,6 +16600,10 @@
             "type": "boolean",
             "example": true
           },
+          "isWishlisted": {
+            "type": "boolean",
+            "example": false
+          },
           "description": {
             "type": "string",
             "nullable": true
@@ -16439,6 +16639,7 @@
           "reviewCount",
           "price",
           "isVerified",
+          "isWishlisted",
           "featureTags",
           "clinic",
           "facilityImages",
@@ -20255,6 +20456,18 @@
             "type": "string",
             "example": "15k"
           },
+          "followerCount": {
+            "type": "number",
+            "example": 15000
+          },
+          "isFollowing": {
+            "type": "boolean",
+            "example": false
+          },
+          "chatPartnerId": {
+            "type": "string",
+            "nullable": true
+          },
           "reviewsLabel": {
             "type": "string",
             "example": "2.5k"
@@ -20298,6 +20511,8 @@
           "name",
           "gallery",
           "followersLabel",
+          "followerCount",
+          "isFollowing",
           "reviewsLabel",
           "trustMetrics",
           "certifications",
@@ -20591,6 +20806,66 @@
           "reviews",
           "totalCount",
           "hasMore"
+        ]
+      },
+      "WishlistItemResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "string",
+            "example": "799.000đ"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "productId",
+          "title",
+          "price",
+          "createdAt"
+        ]
+      },
+      "UserProfileSummaryResponseDto": {
+        "type": "object",
+        "properties": {
+          "ordersCount": {
+            "type": "number",
+            "example": 12
+          },
+          "wishlistCount": {
+            "type": "number",
+            "example": 48
+          },
+          "points": {
+            "type": "number",
+            "example": 0
+          },
+          "pointsLabel": {
+            "type": "string",
+            "example": "0"
+          }
+        },
+        "required": [
+          "ordersCount",
+          "wishlistCount",
+          "points",
+          "pointsLabel"
         ]
       },
       "DashboardStatsResponseDto": {

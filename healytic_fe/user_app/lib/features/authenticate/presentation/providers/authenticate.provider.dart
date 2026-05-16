@@ -39,35 +39,34 @@ class AuthenticateNotifier extends _$AuthenticateNotifier {
           .read(authenticateRepositoryProvider)
           .login(email: email, password: password);
 
-      // Persist tokens so the router guard recognises
-      // the session as authenticated.
-      await Store.put(StoreKey.accessToken, authenticate.accessToken);
       await Store.put(StoreKey.refreshToken, authenticate.refreshToken);
 
-      state = AsyncData(
-        AuthenticateStateData(
-          authenticate: authenticate,
-        ),
-      );
+      state = AsyncData(AuthenticateStateData(authenticate: authenticate));
+
+      // Store the watched access token after the success
+      // state so the sign-in screen can show its toast
+      // before the router redirects away from /signin.
+      await Store.put(StoreKey.accessToken, authenticate.accessToken);
 
       unawaited(_initializePushNotifications());
     } on ApiException catch (e) {
+      _log.warning('Login failed', e);
       state = AsyncError<AuthenticateStateData>(
         AppException.fromError(e),
         e.stackTrace ?? StackTrace.current,
       );
-      rethrow;
     } catch (e, stack) {
-      state = AsyncError<AuthenticateStateData>(e, stack);
-      rethrow;
+      _log.warning('Login failed unexpectedly', e);
+      state = AsyncError<AuthenticateStateData>(
+        AppException.fromError(e),
+        stack,
+      );
     }
   }
 
   Future<void> _initializePushNotifications() async {
     try {
-      final service = await ref.read(
-        pushNotificationServiceProvider.future,
-      );
+      final service = await ref.read(pushNotificationServiceProvider.future);
       await service.initialize();
     } catch (e, stack) {
       _log.warning(

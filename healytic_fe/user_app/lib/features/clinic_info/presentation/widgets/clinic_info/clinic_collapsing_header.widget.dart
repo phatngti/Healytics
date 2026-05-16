@@ -17,6 +17,8 @@ class ClinicCollapsingHeader extends StatelessWidget {
     required this.clinic,
     required this.collapseProgress,
     required this.expandedHeight,
+    this.onFollow,
+    this.onChat,
   });
 
   /// Full clinic entity for display data.
@@ -27,6 +29,8 @@ class ClinicCollapsingHeader extends StatelessWidget {
 
   /// The total expanded height of the SliverAppBar.
   final double expandedHeight;
+  final VoidCallback? onFollow;
+  final VoidCallback? onChat;
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +104,9 @@ class ClinicCollapsingHeader extends StatelessWidget {
                         followersLabel: clinic.followersLabel,
                         colorScheme: colorScheme,
                         textTheme: textTheme,
+                        isFollowing: clinic.isFollowing,
+                        onFollow: onFollow,
+                        onChat: onChat,
                       ),
                     ],
                   ),
@@ -243,12 +250,18 @@ class _StatsRow extends StatelessWidget {
     required this.followersLabel,
     required this.colorScheme,
     required this.textTheme,
+    required this.isFollowing,
+    this.onFollow,
+    this.onChat,
   });
 
   final String reviewsLabel;
   final String followersLabel;
   final ColorScheme colorScheme;
   final TextTheme textTheme;
+  final bool isFollowing;
+  final VoidCallback? onFollow;
+  final VoidCallback? onChat;
 
   @override
   Widget build(BuildContext context) {
@@ -288,9 +301,18 @@ class _StatsRow extends StatelessWidget {
               ),
             ),
           ),
-          _CompactFollowButton(colorScheme: colorScheme, textTheme: textTheme),
+          _CompactFollowButton(
+            colorScheme: colorScheme,
+            textTheme: textTheme,
+            isFollowing: isFollowing,
+            onPressed: onFollow,
+          ),
           AppDimens.horizontalSmall,
-          _CompactChatButton(colorScheme: colorScheme, textTheme: textTheme),
+          _CompactChatButton(
+            colorScheme: colorScheme,
+            textTheme: textTheme,
+            onPressed: onChat,
+          ),
         ],
       ),
     );
@@ -302,15 +324,19 @@ class _CompactFollowButton extends StatelessWidget {
   const _CompactFollowButton({
     required this.colorScheme,
     required this.textTheme,
+    required this.isFollowing,
+    this.onPressed,
   });
 
   final ColorScheme colorScheme;
   final TextTheme textTheme;
+  final bool isFollowing;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
     return FilledButton(
-      onPressed: () {},
+      onPressed: onPressed,
       style: FilledButton.styleFrom(
         padding: const EdgeInsets.symmetric(
           horizontal: AppDimens.spaceLg,
@@ -321,7 +347,7 @@ class _CompactFollowButton extends StatelessWidget {
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         textStyle: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
-      child: const Text('Follow'),
+      child: Text(isFollowing ? 'Following' : 'Follow'),
     );
   }
 }
@@ -331,15 +357,17 @@ class _CompactChatButton extends StatelessWidget {
   const _CompactChatButton({
     required this.colorScheme,
     required this.textTheme,
+    this.onPressed,
   });
 
   final ColorScheme colorScheme;
   final TextTheme textTheme;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
-      onPressed: () {},
+      onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(
           horizontal: AppDimens.spaceLg,

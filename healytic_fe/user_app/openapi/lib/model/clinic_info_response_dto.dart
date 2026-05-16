@@ -19,6 +19,9 @@ class ClinicInfoResponseDto {
     this.logoImageUrl,
     this.gallery = const [],
     required this.followersLabel,
+    required this.followerCount,
+    required this.isFollowing,
+    this.chatPartnerId,
     required this.reviewsLabel,
     this.description,
     required this.trustMetrics,
@@ -41,6 +44,12 @@ class ClinicInfoResponseDto {
   List<String> gallery;
 
   String followersLabel;
+
+  num followerCount;
+
+  bool isFollowing;
+
+  String? chatPartnerId;
 
   String reviewsLabel;
 
@@ -66,6 +75,9 @@ class ClinicInfoResponseDto {
     other.logoImageUrl == logoImageUrl &&
     _deepEquality.equals(other.gallery, gallery) &&
     other.followersLabel == followersLabel &&
+    other.followerCount == followerCount &&
+    other.isFollowing == isFollowing &&
+    other.chatPartnerId == chatPartnerId &&
     other.reviewsLabel == reviewsLabel &&
     other.description == description &&
     other.trustMetrics == trustMetrics &&
@@ -84,6 +96,9 @@ class ClinicInfoResponseDto {
     (logoImageUrl == null ? 0 : logoImageUrl!.hashCode) +
     (gallery.hashCode) +
     (followersLabel.hashCode) +
+    (followerCount.hashCode) +
+    (isFollowing.hashCode) +
+    (chatPartnerId == null ? 0 : chatPartnerId!.hashCode) +
     (reviewsLabel.hashCode) +
     (description == null ? 0 : description!.hashCode) +
     (trustMetrics.hashCode) +
@@ -94,7 +109,7 @@ class ClinicInfoResponseDto {
     (phoneNumber == null ? 0 : phoneNumber!.hashCode);
 
   @override
-  String toString() => 'ClinicInfoResponseDto[id=$id, name=$name, coverImageUrl=$coverImageUrl, logoImageUrl=$logoImageUrl, gallery=$gallery, followersLabel=$followersLabel, reviewsLabel=$reviewsLabel, description=$description, trustMetrics=$trustMetrics, certifications=$certifications, specialists=$specialists, businessTypes=$businessTypes, address=$address, phoneNumber=$phoneNumber]';
+  String toString() => 'ClinicInfoResponseDto[id=$id, name=$name, coverImageUrl=$coverImageUrl, logoImageUrl=$logoImageUrl, gallery=$gallery, followersLabel=$followersLabel, followerCount=$followerCount, isFollowing=$isFollowing, chatPartnerId=$chatPartnerId, reviewsLabel=$reviewsLabel, description=$description, trustMetrics=$trustMetrics, certifications=$certifications, specialists=$specialists, businessTypes=$businessTypes, address=$address, phoneNumber=$phoneNumber]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -112,6 +127,13 @@ class ClinicInfoResponseDto {
     }
       json[r'gallery'] = this.gallery;
       json[r'followersLabel'] = this.followersLabel;
+      json[r'followerCount'] = this.followerCount;
+      json[r'isFollowing'] = this.isFollowing;
+    if (this.chatPartnerId != null) {
+      json[r'chatPartnerId'] = this.chatPartnerId;
+    } else {
+      json[r'chatPartnerId'] = null;
+    }
       json[r'reviewsLabel'] = this.reviewsLabel;
     if (this.description != null) {
       json[r'description'] = this.description;
@@ -162,6 +184,9 @@ class ClinicInfoResponseDto {
             ? (json[r'gallery'] as Iterable).cast<String>().toList(growable: false)
             : const [],
         followersLabel: mapValueOfType<String>(json, r'followersLabel')!,
+        followerCount: num.parse('${json[r'followerCount']}'),
+        isFollowing: mapValueOfType<bool>(json, r'isFollowing')!,
+        chatPartnerId: mapValueOfType<String>(json, r'chatPartnerId'),
         reviewsLabel: mapValueOfType<String>(json, r'reviewsLabel')!,
         description: mapValueOfType<String>(json, r'description'),
         trustMetrics: ClinicTrustMetricsDto.fromJson(json[r'trustMetrics'])!,
@@ -223,6 +248,8 @@ class ClinicInfoResponseDto {
     'name',
     'gallery',
     'followersLabel',
+    'followerCount',
+    'isFollowing',
     'reviewsLabel',
     'trustMetrics',
     'certifications',

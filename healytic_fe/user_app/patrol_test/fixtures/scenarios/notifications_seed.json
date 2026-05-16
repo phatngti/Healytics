@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "key": "main_user",
+      "email": "notifications.user@test.healytics.vn",
+      "password": "Password123!",
+      "firstName": "Notifications",
+      "lastName": "Patrol",
+      "phone": "0900000005"
+    }
+  ],
+  "notifications": [
+    {
+      "key": "booking_confirmed",
+      "userKey": "main_user",
+      "type": "booking_confirmed",
+      "title": "Booking confirmed",
+      "body": "Your Patrol appointment is confirmed.",
+      "data": {
+        "action": "view_booking"
+      }
+    },
+    {
+      "key": "system_notice",
+      "userKey": "main_user",
+      "type": "system_broadcast",
+      "title": "System notice",
+      "body": "Welcome to the Healytics test environment.",
+      "isRead": true
+    }
+  ]
+}

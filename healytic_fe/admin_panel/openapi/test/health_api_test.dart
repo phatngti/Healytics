@@ -17,8 +17,10 @@ void main() {
   // final instance = HealthApi();
 
   group('tests for HealthApi', () {
-    //Future healthControllerCheck() async
-    test('test healthControllerCheck', () async {
+    // Health
+    //
+    //Future<Object> healthHealthGet() async
+    test('test healthHealthGet', () async {
       // TODO
     });
 

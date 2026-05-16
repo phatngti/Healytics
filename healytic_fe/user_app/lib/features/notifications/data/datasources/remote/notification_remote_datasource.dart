@@ -298,11 +298,23 @@ class NotificationRemoteDatasourceMock implements NotificationRemoteDatasource {
   }) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
-    final start = _resolveStartIndex(cursor);
-    final end = (start + limit).clamp(0, _items.length);
-    final pageItems = _items.sublist(start, end);
-    final hasMore = end < _items.length;
-    final nextCursor = hasMore ? pageItems.last.id : null;
+    // Mirror backend: exclude broadcasts sent before
+    // the simulated account creation date.
+    final visible = _items.where((item) {
+      if (item.isBroadcast) {
+        return !item.createdAt.isBefore(
+          kMockAccountCreatedAt,
+        );
+      }
+      return true;
+    }).toList();
+
+    final start = _resolveStartIndex(cursor, visible);
+    final end = (start + limit).clamp(0, visible.length);
+    final pageItems = visible.sublist(start, end);
+    final hasMore = end < visible.length;
+    final nextCursor =
+        hasMore ? pageItems.last.id : null;
 
     return NotificationPage(
       notifications: pageItems,
@@ -314,7 +326,13 @@ class NotificationRemoteDatasourceMock implements NotificationRemoteDatasource {
   @override
   Future<int> getUnreadCount() async {
     await Future.delayed(const Duration(milliseconds: 160));
-    return _items.where((item) => !item.isRead).length;
+    return _items.where((item) {
+      if (item.isRead) return false;
+      if (item.isBroadcast) {
+        return !item.createdAt.isBefore(kMockAccountCreatedAt);
+      }
+      return true;
+    }).length;
   }
 
   @override
@@ -332,6 +350,11 @@ class NotificationRemoteDatasourceMock implements NotificationRemoteDatasource {
     var changed = 0;
     for (var i = 0; i < _items.length; i++) {
       if (_items[i].isRead) continue;
+      // Skip broadcasts that predate account creation
+      if (_items[i].isBroadcast &&
+          _items[i].createdAt.isBefore(kMockAccountCreatedAt)) {
+        continue;
+      }
       _items[i] = _items[i].copyWith(isRead: true);
       changed++;
     }
@@ -351,9 +374,13 @@ class NotificationRemoteDatasourceMock implements NotificationRemoteDatasource {
     await Future.delayed(const Duration(milliseconds: 120));
   }
 
-  int _resolveStartIndex(String? cursor) {
+  int _resolveStartIndex(
+    String? cursor,
+    List<NotificationEntity> list,
+  ) {
     if (cursor == null || cursor.isEmpty) return 0;
-    final cursorIndex = _items.indexWhere((item) => item.id == cursor);
+    final cursorIndex =
+        list.indexWhere((item) => item.id == cursor);
     if (cursorIndex == -1) return 0;
     return cursorIndex + 1;
   }

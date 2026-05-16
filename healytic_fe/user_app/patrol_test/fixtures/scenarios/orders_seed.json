@@ -1,0 +1,80 @@
+{
+  "users": [
+    {
+      "key": "main_user",
+      "email": "orders.user@test.healytics.vn",
+      "password": "Password123!",
+      "firstName": "Orders",
+      "lastName": "Patrol",
+      "phone": "0900000004"
+    }
+  ],
+  "categories": [
+    {
+      "key": "spa",
+      "name": "Spa",
+      "slug": "spa",
+      "sortOrder": 1
+    }
+  ],
+  "partners": [
+    {
+      "key": "spa_partner",
+      "brandName": "Spa An Nhien",
+      "taxCode": "PATROLORDER001",
+      "status": "APPROVED"
+    }
+  ],
+  "employees": [
+    {
+      "key": "doctor_a",
+      "partnerKey": "spa_partner",
+      "employeeCode": "PATROL-ORDER-DR",
+      "displayName": "Dr. Nguyen Van A",
+      "role": "DOCTOR"
+    }
+  ],
+  "services": [
+    {
+      "key": "swedish_relax",
+      "partnerKey": "spa_partner",
+      "employeeKeys": ["doctor_a"],
+      "categoryName": "Spa",
+      "name": "Swedish Relax",
+      "slug": "swedish-relax",
+      "price": 500000,
+      "durationMinutes": 60,
+      "vendorName": "Spa An Nhien"
+    },
+    {
+      "key": "hot_stone",
+      "partnerKey": "spa_partner",
+      "employeeKeys": ["doctor_a"],
+      "categoryName": "Spa",
+      "name": "Hot Stone Therapy",
+      "slug": "hot-stone-therapy",
+      "price": 1200000,
+      "durationMinutes": 90,
+      "vendorName": "Spa An Nhien"
+    }
+  ],
+  "bookings": [
+    {
+      "key": "booking_pending",
+      "userKey": "main_user",
+      "serviceKey": "hot_stone",
+      "employeeKey": "doctor_a",
+      "startsAt": "2026-05-22T11:00:00+07:00",
+      "status": "PENDING_PAYMENT",
+      "paymentUrl": "https://pay.test.healytics.vn/patrol"
+    },
+    {
+      "key": "booking_confirmed",
+      "userKey": "main_user",
+      "serviceKey": "swedish_relax",
+      "employeeKey": "doctor_a",
+      "startsAt": "2026-05-23T14:00:00+07:00",
+      "status": "CONFIRMED"
+    }
+  ]
+}

@@ -9,83 +9,58 @@ import 'helpers/auth_helper.dart';
 import 'helpers/navigation_helper.dart';
 
 void main() {
-  patrolTest(
-    'home screen renders after sign in',
-    ($) async {
-      await pumpApp($);
-      await signIn($);
-      await navigateToTab($, TabKeys.home);
+  patrolTest('home screen renders after sign in', ($) async {
+    await pumpApp($, scenario: 'home');
+    await signIn($);
+    await navigateToTab($, TabKeys.home);
 
-      expect($(HomeUpdatePage), findsOneWidget);
-    },
-  );
+    expect($(HomeUpdatePage), findsOneWidget);
+  });
 
-  patrolTest(
-    'tapping a service card navigates to '
-    'service details',
-    ($) async {
-      await pumpApp($);
-      await signIn($);
-      await navigateToTab($, TabKeys.home);
+  patrolTest('tapping a service card navigates to '
+      'service details', ($) async {
+    await pumpApp($, scenario: 'home');
+    await signIn($);
+    await navigateToTab($, TabKeys.home);
 
-      // "Deep Tissue Massage" = first product in
-      // home_mock_data.dart (prod-1)
-      await $('Deep Tissue Massage')
-          .scrollTo()
-          .tap();
-      await $.pump(const Duration(seconds: 2));
+    // "Deep Tissue Massage" = first product in
+    // home_mock_data.dart (prod-1)
+    await $('Deep Tissue Massage').scrollTo().tap();
+    await $.pump(const Duration(seconds: 2));
 
-      expect(
-        $(ServiceDetailsScreen),
-        findsOneWidget,
-      );
-    },
-  );
+    expect($(ServiceDetailsScreen), findsOneWidget);
+  });
 
-  patrolTest(
-    'navigating to reviews from '
-    'service details',
-    ($) async {
-      await pumpApp($);
-      await signIn($);
-      await navigateToTab($, TabKeys.home);
+  patrolTest('navigating to reviews from '
+      'service details', ($) async {
+    await pumpApp($, scenario: 'home');
+    await signIn($);
+    await navigateToTab($, TabKeys.home);
 
-      await $('Deep Tissue Massage')
-          .scrollTo()
-          .tap();
-      await $.pump(const Duration(seconds: 2));
+    await $('Deep Tissue Massage').scrollTo().tap();
+    await $.pump(const Duration(seconds: 2));
 
-      // The "View More (N)" TextButton.icon in
-      // _ViewMoreButton navigates to ReviewsScreen.
-      final viewMore = $(find.textContaining('View More'));
-      await viewMore.scrollTo().tap();
-      await $.pump(const Duration(seconds: 2));
+    // The "View More (N)" TextButton.icon in
+    // _ViewMoreButton navigates to ReviewsScreen.
+    final viewMore = $(find.textContaining('View More'));
+    await viewMore.scrollTo().tap();
+    await $.pump(const Duration(seconds: 2));
 
-      expect(
-        $(ReviewsScreen),
-        findsOneWidget,
-      );
-    },
-  );
+    expect($(ReviewsScreen), findsOneWidget);
+  });
 
-  patrolTest(
-    'tapping category chips filters results',
-    ($) async {
-      await pumpApp($);
-      await signIn($);
-      await navigateToTab($, TabKeys.home);
+  patrolTest('tapping category chips filters results', ($) async {
+    await pumpApp($, scenario: 'home');
+    await signIn($);
+    await navigateToTab($, TabKeys.home);
 
-      // "Spa" = first category chip in
-      // home_mock_data.dart (cat-1)
-      await $('Spa').scrollTo().tap();
-      await $.pump(const Duration(seconds: 2));
+    // "Spa" = first category chip in
+    // home_mock_data.dart (cat-1)
+    await $('Spa').scrollTo().tap();
+    await $.pump(const Duration(seconds: 2));
 
-      // Spa category contains Deep Tissue Massage
-      // and Hot Stone Therapy
-      expect(
-        $('Deep Tissue Massage'),
-        findsWidgets,
-      );
-    },
-  );
+    // Spa category contains Deep Tissue Massage
+    // and Hot Stone Therapy
+    expect($('Deep Tissue Massage'), findsWidgets);
+  });
 }
