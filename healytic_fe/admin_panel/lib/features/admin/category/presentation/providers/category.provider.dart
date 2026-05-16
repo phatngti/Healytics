@@ -28,7 +28,7 @@ abstract class CategoryState with _$CategoryState {
 }
 
 /// Notifier for category state management
-@riverpod
+@Riverpod(keepAlive: true)
 class CategoryNotifier extends _$CategoryNotifier {
   int? _visibleCategoriesCacheKey;
   Future<List<CategoryEntity>>? _visibleCategoriesCache;

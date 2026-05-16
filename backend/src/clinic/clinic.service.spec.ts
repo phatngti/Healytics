@@ -6,6 +6,8 @@ import { Product } from '@/common/entities/product.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { Booking } from '@/common/entities/booking.entity';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
+import { Partner } from '@/common/entities/partner.entity';
+import { UserClinicFollow } from '@/common/entities/user-clinic-follow.entity';
 import { PartnersService } from '@/partners/partners.service';
 import { EmployeeStatus } from '@/employees/enum/employee-status.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
@@ -42,6 +44,14 @@ describe('ClinicService', () => {
   let employeeRepo: { find: jest.Mock };
   let bookingRepo: { createQueryBuilder: jest.Mock };
   let reviewRepo: { createQueryBuilder: jest.Mock };
+  let partnerRepo: { increment: jest.Mock; decrement: jest.Mock };
+  let clinicFollowRepo: {
+    exists: jest.Mock;
+    findOne: jest.Mock;
+    create: jest.Mock;
+    save: jest.Mock;
+    delete: jest.Mock;
+  };
   let certificationRepo: { find: jest.Mock };
   let clinicReviewResponseRepo: { find: jest.Mock };
   let partnersService: { findOneById: jest.Mock };
@@ -68,6 +78,17 @@ describe('ClinicService', () => {
     employeeRepo = { find: jest.fn() };
     bookingRepo = { createQueryBuilder: jest.fn() };
     reviewRepo = { createQueryBuilder: jest.fn() };
+    partnerRepo = {
+      increment: jest.fn(),
+      decrement: jest.fn(),
+    };
+    clinicFollowRepo = {
+      exists: jest.fn().mockResolvedValue(false),
+      findOne: jest.fn(),
+      create: jest.fn((value) => value),
+      save: jest.fn(async (value) => ({ id: 'follow-1', ...value })),
+      delete: jest.fn(),
+    };
     certificationRepo = { find: jest.fn() };
     clinicReviewResponseRepo = { find: jest.fn() };
     partnersService = { findOneById: jest.fn() };
@@ -79,6 +100,11 @@ describe('ClinicService', () => {
         { provide: getRepositoryToken(Employee), useValue: employeeRepo },
         { provide: getRepositoryToken(Booking), useValue: bookingRepo },
         { provide: getRepositoryToken(TreatmentReview), useValue: reviewRepo },
+        { provide: getRepositoryToken(Partner), useValue: partnerRepo },
+        {
+          provide: getRepositoryToken(UserClinicFollow),
+          useValue: clinicFollowRepo,
+        },
         {
           provide: getRepositoryToken(PartnerCertification),
           useValue: certificationRepo,
@@ -159,6 +185,9 @@ describe('ClinicService', () => {
         id: partner.id,
         name: partner.brandName,
         followersLabel: '2.5k',
+        followerCount: 2500,
+        isFollowing: false,
+        chatPartnerId: null,
         reviewsLabel: '5',
         address: '123 Health Street, Ward 1, District 1, Ho Chi Minh City',
         phoneNumber: '0123456789',
@@ -199,6 +228,57 @@ describe('ClinicService', () => {
     expect(publicProductsQb.andWhere).toHaveBeenNthCalledWith(
       2,
       'p.is_visible_online = true',
+    );
+  });
+
+  it('creates follow rows idempotently and increments once', async () => {
+    const publicProductsQb = createQueryBuilderMock();
+    publicProductsQb.getMany.mockResolvedValue([]);
+    productRepo.createQueryBuilder.mockReturnValue(publicProductsQb);
+    partnersService.findOneById.mockResolvedValue(partner);
+    employeeRepo.find.mockResolvedValue([]);
+    certificationRepo.find.mockResolvedValue([]);
+    jest.spyOn(service as any, 'buildRatingsMap').mockResolvedValue(new Map());
+    jest
+      .spyOn(service as any, 'countUniqueBookingUsers')
+      .mockResolvedValue(0);
+
+    clinicFollowRepo.findOne.mockResolvedValueOnce(null);
+
+    await service.followClinic(partner.id, 'user-1');
+
+    expect(clinicFollowRepo.save).toHaveBeenCalledWith({
+      userId: 'user-1',
+      partnerId: partner.id,
+    });
+    expect(partnerRepo.increment).toHaveBeenCalledWith(
+      { id: partner.id },
+      'followerCount',
+      1,
+    );
+  });
+
+  it('unfollows idempotently and decrements only when a row exists', async () => {
+    const publicProductsQb = createQueryBuilderMock();
+    publicProductsQb.getMany.mockResolvedValue([]);
+    productRepo.createQueryBuilder.mockReturnValue(publicProductsQb);
+    partnersService.findOneById.mockResolvedValue(partner);
+    employeeRepo.find.mockResolvedValue([]);
+    certificationRepo.find.mockResolvedValue([]);
+    jest.spyOn(service as any, 'buildRatingsMap').mockResolvedValue(new Map());
+    jest
+      .spyOn(service as any, 'countUniqueBookingUsers')
+      .mockResolvedValue(0);
+
+    clinicFollowRepo.findOne.mockResolvedValueOnce({ id: 'follow-1' });
+
+    await service.unfollowClinic(partner.id, 'user-1');
+
+    expect(clinicFollowRepo.delete).toHaveBeenCalledWith({ id: 'follow-1' });
+    expect(partnerRepo.decrement).toHaveBeenCalledWith(
+      { id: partner.id },
+      'followerCount',
+      1,
     );
   });
 

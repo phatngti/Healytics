@@ -7,7 +7,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import 'package:user_app/features/service_details/domain/entities/service_details.entity.dart';
+import 'package:user_app/features/service_details/data/provider/service_details.provider.dart';
 import 'package:user_app/features/service_details/presentation/providers/service_details.provider.dart';
+import 'package:user_app/features/profile/presentation/providers/profile.provider.dart';
 import 'package:user_app/router/routes.dart';
 
 import '../widgets/service_details/about_treatment.widget.dart';
@@ -50,19 +52,22 @@ class ServiceDetailsScreen extends ConsumerWidget {
 /// The main scrollable body rendered once data is
 /// available. Uses [CustomScrollView] with slivers so
 /// that off-screen sections are built lazily.
-class _ServiceDetailsBody extends StatefulWidget {
+class _ServiceDetailsBody extends ConsumerStatefulWidget {
   const _ServiceDetailsBody({required this.details, required this.serviceId});
 
   final ServiceDetailsEntity details;
   final String serviceId;
 
   @override
-  State<_ServiceDetailsBody> createState() => _ServiceDetailsBodyState();
+  ConsumerState<_ServiceDetailsBody> createState() =>
+      _ServiceDetailsBodyState();
 }
 
-class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
+class _ServiceDetailsBodyState extends ConsumerState<_ServiceDetailsBody> {
   final _scrollController = ScrollController();
   final _showBlur = ValueNotifier<bool>(false);
+  late bool _isWishlisted;
+  bool _wishlistBusy = false;
 
   /// Cached scroll threshold – recomputed only when
   /// MediaQuery values change (orientation / resize).
@@ -71,6 +76,7 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
   @override
   void initState() {
     super.initState();
+    _isWishlisted = widget.details.isWishlisted;
     _scrollController.addListener(_onScroll);
   }
 
@@ -78,6 +84,14 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _cacheScrollThreshold();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ServiceDetailsBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.details.isWishlisted != widget.details.isWishlisted) {
+      _isWishlisted = widget.details.isWishlisted;
+    }
   }
 
   @override
@@ -112,6 +126,30 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
       context.pop();
     } else {
       const HomeRoute().go(context);
+    }
+  }
+
+  Future<void> _toggleWishlist() async {
+    if (_wishlistBusy) return;
+    final previous = _isWishlisted;
+    setState(() {
+      _wishlistBusy = true;
+      _isWishlisted = !previous;
+    });
+    try {
+      await ref
+          .read(serviceDetailsRepositoryProvider)
+          .setWishlisted(widget.serviceId, !previous);
+      ref.invalidate(serviceDetailsProvider(serviceId: widget.serviceId));
+      ref.invalidate(profileSummaryProvider);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _isWishlisted = previous);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _wishlistBusy = false);
+      }
     }
   }
 
@@ -192,7 +230,14 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
                             clinicName: details.clinic.name,
                             address: details.clinic.address,
                             avatar: details.clinic.imageUrl,
+                            isFavorite: _isWishlisted,
+                            onFavorite: _wishlistBusy ? null : _toggleWishlist,
                             onTap: details.clinic.id.isNotEmpty
+                                ? () => ClinicInfoRoute(
+                                    clinicId: details.clinic.id,
+                                  ).push(context)
+                                : null,
+                            onVisit: details.clinic.id.isNotEmpty
                                 ? () => ClinicInfoRoute(
                                     clinicId: details.clinic.id,
                                   ).push(context)
@@ -242,6 +287,8 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
             child: RepaintBoundary(
               child: _FloatingHeaderBar(
                 onBack: _handleBack,
+                isFavorite: _isWishlisted,
+                onFavorite: _wishlistBusy ? null : _toggleWishlist,
                 showBlur: _showBlur,
               ),
             ),
@@ -277,9 +324,16 @@ class _ServiceDetailsBodyState extends State<_ServiceDetailsBody> {
 /// past the hero image area (controlled by [showBlur]).
 /// Uses a cached zero-blur filter to avoid allocations.
 class _FloatingHeaderBar extends StatelessWidget {
-  const _FloatingHeaderBar({required this.onBack, required this.showBlur});
+  const _FloatingHeaderBar({
+    required this.onBack,
+    required this.showBlur,
+    required this.isFavorite,
+    this.onFavorite,
+  });
 
   final VoidCallback onBack;
+  final bool isFavorite;
+  final VoidCallback? onFavorite;
 
   /// Whether the blurred backdrop should be visible.
   final ValueNotifier<bool> showBlur;
@@ -321,7 +375,10 @@ class _FloatingHeaderBar extends StatelessWidget {
           _GlassCircleButton(icon: Icons.arrow_back, onTap: onBack),
           Row(
             children: [
-              _GlassCircleButton(icon: Icons.favorite_border, onTap: () {}),
+              _GlassCircleButton(
+                icon: isFavorite ? Icons.favorite : Icons.favorite_border,
+                onTap: onFavorite,
+              ),
               AppDimens.horizontalMediumSmall,
               _GlassCircleButton(icon: Icons.ios_share, onTap: () {}),
             ],

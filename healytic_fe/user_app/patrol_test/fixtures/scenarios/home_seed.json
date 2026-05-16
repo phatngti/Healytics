@@ -1,0 +1,50 @@
+{
+  "users": [
+    {
+      "key": "main_user",
+      "email": "home.user@test.healytics.vn",
+      "password": "Password123!",
+      "firstName": "Home",
+      "lastName": "Patrol",
+      "phone": "0900000002"
+    }
+  ],
+  "categories": [
+    {
+      "key": "spa",
+      "name": "Spa",
+      "slug": "spa",
+      "sortOrder": 1
+    }
+  ],
+  "partners": [
+    {
+      "key": "spa_partner",
+      "brandName": "Spa An Nhien",
+      "taxCode": "PATROLHOME001",
+      "status": "APPROVED"
+    }
+  ],
+  "employees": [
+    {
+      "key": "doctor_a",
+      "partnerKey": "spa_partner",
+      "employeeCode": "PATROL-HOME-DR",
+      "displayName": "Dr. Nguyen Van A",
+      "role": "DOCTOR"
+    }
+  ],
+  "services": [
+    {
+      "key": "deep_tissue",
+      "partnerKey": "spa_partner",
+      "employeeKeys": ["doctor_a"],
+      "categoryName": "Spa",
+      "name": "Deep Tissue Massage",
+      "slug": "deep-tissue-massage",
+      "price": 850000,
+      "durationMinutes": 60,
+      "vendorName": "Spa An Nhien"
+    }
+  ]
+}

@@ -50,6 +50,8 @@ export { ProductResourceRequirement } from './product-resource-requirement.entit
 // Product Tags
 export { ProductFeatureTag } from './product-feature-tag.entity';
 export { ProductTag } from './product-tag.entity';
+export { UserClinicFollow } from './user-clinic-follow.entity';
+export { UserWishlistItem } from './user-wishlist-item.entity';
 
 // Booking & Checkout
 export { Booking } from './booking.entity';

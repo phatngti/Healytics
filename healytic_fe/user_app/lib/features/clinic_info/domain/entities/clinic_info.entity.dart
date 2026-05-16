@@ -11,6 +11,9 @@ class ClinicInfoEntity {
     this.logoImageUrl,
     this.gallery = const [],
     required this.followersLabel,
+    this.followerCount = 0,
+    this.isFollowing = false,
+    this.chatPartnerId,
     required this.reviewsLabel,
     this.description,
     this.address,
@@ -28,6 +31,9 @@ class ClinicInfoEntity {
   final String? logoImageUrl;
   final List<String> gallery;
   final String followersLabel;
+  final int followerCount;
+  final bool isFollowing;
+  final String? chatPartnerId;
   final String reviewsLabel;
   final String? description;
   final String? address;
@@ -39,6 +45,33 @@ class ClinicInfoEntity {
 
   /// Facility tour images derived from [gallery].
   final List<ClinicFacilityImage> facilityImages;
+
+  ClinicInfoEntity copyWith({
+    String? followersLabel,
+    int? followerCount,
+    bool? isFollowing,
+  }) {
+    return ClinicInfoEntity(
+      id: id,
+      name: name,
+      coverImageUrl: coverImageUrl,
+      logoImageUrl: logoImageUrl,
+      gallery: gallery,
+      followersLabel: followersLabel ?? this.followersLabel,
+      followerCount: followerCount ?? this.followerCount,
+      isFollowing: isFollowing ?? this.isFollowing,
+      chatPartnerId: chatPartnerId,
+      reviewsLabel: reviewsLabel,
+      description: description,
+      address: address,
+      phoneNumber: phoneNumber,
+      trustMetrics: trustMetrics,
+      certifications: certifications,
+      specialists: specialists,
+      businessTypes: businessTypes,
+      facilityImages: facilityImages,
+    );
+  }
 }
 
 /// Trust metrics bar displayed below the header.
@@ -99,10 +132,7 @@ class ClinicSpecialistPreview {
 
 /// Facility tour image with caption.
 class ClinicFacilityImage {
-  const ClinicFacilityImage({
-    required this.imageUrl,
-    required this.label,
-  });
+  const ClinicFacilityImage({required this.imageUrl, required this.label});
 
   final String imageUrl;
   final String label;

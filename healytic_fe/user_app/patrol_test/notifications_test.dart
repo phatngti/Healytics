@@ -8,24 +8,15 @@ import 'helpers/navigation_helper.dart';
 import 'helpers/permission_helper.dart';
 
 void main() {
-  patrolTest(
-    'notifications tab renders page',
-    ($) async {
-      await pumpApp($);
-      await signIn($);
-      await handlePermissionIfVisible($);
+  patrolTest('notifications tab renders page', ($) async {
+    await pumpApp($, scenario: 'notifications');
+    await signIn($);
+    await handlePermissionIfVisible($);
 
-      await navigateToTab(
-        $,
-        TabKeys.notifications,
-      );
+    await navigateToTab($, TabKeys.notifications);
 
-      expect(
-        $(NotificationsPage),
-        findsOneWidget,
-      );
-    },
-  );
+    expect($(NotificationsPage), findsOneWidget);
+  });
 
   // TODO: re-enable once NotificationsPage has
   // a ListView with notification items
@@ -36,26 +27,17 @@ void main() {
   //   },
   // );
 
-  patrolTest(
-    'grants notification permission via '
-    'native dialog',
-    ($) async {
-      await pumpApp($);
-      await signIn($);
+  patrolTest('grants notification permission via '
+      'native dialog', ($) async {
+    await pumpApp($, scenario: 'notifications');
+    await signIn($);
 
-      await navigateToTab(
-        $,
-        TabKeys.notifications,
-      );
+    await navigateToTab($, TabKeys.notifications);
 
-      await grantAllPermissions($);
+    await grantAllPermissions($);
 
-      expect(
-        $(NotificationsPage),
-        findsOneWidget,
-      );
-    },
-  );
+    expect($(NotificationsPage), findsOneWidget);
+  });
 
   // TODO: re-enable once push notifications
   // are implemented

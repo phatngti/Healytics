@@ -1,5 +1,4 @@
 import 'package:common/common.dart';
-import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
 /// Clinic info card with icon, name, address, favorite, and visit
@@ -15,6 +14,7 @@ class ClinicCard extends StatelessWidget {
     this.onTap,
     this.onVisit,
     this.onFavorite,
+    this.isFavorite = false,
     this.avatar,
   });
 
@@ -24,6 +24,7 @@ class ClinicCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onVisit;
   final VoidCallback? onFavorite;
+  final bool isFavorite;
 
   @override
   Widget build(BuildContext context) {
@@ -66,14 +67,19 @@ class ClinicCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Clinic icon
-                    Container(
-                      width: AppDimens.touchTarget,
-                      height: AppDimens.touchTarget,
-                      decoration: BoxDecoration(
+                    ClipRRect(
+                      borderRadius: AppDimens.radiusSmall,
+                      child: Container(
+                        width: AppDimens.touchTarget,
+                        height: AppDimens.touchTarget,
                         color: colorScheme.surface,
-                        borderRadius: AppDimens.radiusSmall,
+                        child: avatar == null || avatar!.isEmpty
+                            ? Icon(
+                                Icons.storefront_outlined,
+                                color: colorScheme.primary,
+                              )
+                            : NetworkImageAuto(imageUrl: avatar!),
                       ),
-                      child: NetworkImageAuto(imageUrl: avatar!),
                     ),
                     AppDimens.horizontalSmall,
                     // Name + address
@@ -127,7 +133,11 @@ class ClinicCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Favorite
-                  _ActionIcon(icon: Icons.favorite_border, onTap: onFavorite),
+                  _ActionIcon(
+                    icon: isFavorite ? Icons.favorite : Icons.favorite_border,
+                    onTap: onFavorite,
+                    isActive: isFavorite,
+                  ),
                   AppDimens.horizontalSmall,
                   // Visit button
                   Material(
@@ -163,10 +173,11 @@ class ClinicCard extends StatelessWidget {
 
 /// Small outlined icon button for the clinic card actions.
 class _ActionIcon extends StatelessWidget {
-  const _ActionIcon({required this.icon, this.onTap});
+  const _ActionIcon({required this.icon, this.onTap, this.isActive = false});
 
   final IconData icon;
   final VoidCallback? onTap;
+  final bool isActive;
 
   @override
   Widget build(BuildContext context) {
@@ -179,12 +190,14 @@ class _ActionIcon extends StatelessWidget {
         height: 36,
         decoration: BoxDecoration(
           borderRadius: AppDimens.radiusSmall,
-          border: Border.all(color: colorScheme.outlineVariant),
+          border: Border.all(
+            color: isActive ? colorScheme.primary : colorScheme.outlineVariant,
+          ),
         ),
         child: Icon(
           icon,
           size: AppDimens.iconSmMd,
-          color: colorScheme.onSurfaceVariant,
+          color: isActive ? colorScheme.primary : colorScheme.onSurfaceVariant,
         ),
       ),
     );

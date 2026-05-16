@@ -1,0 +1,123 @@
+{
+  "users": [
+    {
+      "key": "main_user",
+      "email": "buyer@test.healytics.vn",
+      "password": "Password123!",
+      "firstName": "Buyer",
+      "lastName": "Patrol",
+      "phone": "0900000001"
+    }
+  ],
+  "categories": [
+    {
+      "key": "spa",
+      "name": "Spa",
+      "slug": "spa",
+      "iconName": "spa",
+      "colorValue": "#7C3AED",
+      "sortOrder": 1
+    }
+  ],
+  "partners": [
+    {
+      "key": "spa_partner",
+      "email": "spa.partner@test.healytics.vn",
+      "brandName": "Spa An Nhien",
+      "taxCode": "PATROLSPA001",
+      "businessTypes": ["SPA_BEAUTY"],
+      "streetAddress": "District 1, Ho Chi Minh City",
+      "phoneNumber": "0900000100",
+      "status": "APPROVED"
+    }
+  ],
+  "employees": [
+    {
+      "key": "doctor_a",
+      "partnerKey": "spa_partner",
+      "email": "doctor.a@test.healytics.vn",
+      "employeeCode": "PATROL-DR-A",
+      "displayName": "Dr. Nguyen Van A",
+      "role": "DOCTOR"
+    }
+  ],
+  "services": [
+    {
+      "key": "deep_tissue",
+      "partnerKey": "spa_partner",
+      "employeeKeys": ["doctor_a"],
+      "categoryName": "Spa",
+      "name": "Deep Tissue Massage",
+      "slug": "deep-tissue-massage",
+      "price": 850000,
+      "durationMinutes": 60,
+      "vendorName": "Spa An Nhien"
+    },
+    {
+      "key": "swedish_relax",
+      "partnerKey": "spa_partner",
+      "employeeKeys": ["doctor_a"],
+      "categoryName": "Spa",
+      "name": "Swedish Relax",
+      "slug": "swedish-relax",
+      "price": 500000,
+      "durationMinutes": 60,
+      "vendorName": "Spa An Nhien"
+    },
+    {
+      "key": "hot_stone",
+      "partnerKey": "spa_partner",
+      "employeeKeys": ["doctor_a"],
+      "categoryName": "Spa",
+      "name": "Hot Stone Therapy",
+      "slug": "hot-stone-therapy",
+      "price": 1200000,
+      "durationMinutes": 90,
+      "vendorName": "Spa An Nhien"
+    }
+  ],
+  "coupons": [
+    {
+      "key": "relax10",
+      "code": "RELAX10",
+      "discountPercent": 10,
+      "maxDiscountAmount": 100000,
+      "serviceKey": "swedish_relax"
+    }
+  ],
+  "cartItems": [
+    {
+      "key": "cart_001",
+      "userKey": "main_user",
+      "serviceKey": "swedish_relax",
+      "employeeKey": "doctor_a",
+      "startsAt": "2026-05-20T09:00:00+07:00"
+    },
+    {
+      "key": "cart_002",
+      "userKey": "main_user",
+      "serviceKey": "hot_stone",
+      "employeeKey": "doctor_a",
+      "startsAt": "2026-05-21T10:00:00+07:00"
+    }
+  ],
+  "bookings": [
+    {
+      "key": "booking_pending",
+      "userKey": "main_user",
+      "serviceKey": "hot_stone",
+      "employeeKey": "doctor_a",
+      "startsAt": "2026-05-22T11:00:00+07:00",
+      "status": "PENDING_PAYMENT",
+      "paymentUrl": "https://pay.test.healytics.vn/patrol"
+    },
+    {
+      "key": "booking_confirmed",
+      "userKey": "main_user",
+      "serviceKey": "swedish_relax",
+      "employeeKey": "doctor_a",
+      "startsAt": "2026-05-23T14:00:00+07:00",
+      "status": "CONFIRMED"
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import 'package:admin_panel/features/admin/finance_manager/domain/admin_finance.
 import 'package:admin_panel/features/admin/finance_manager/domain/admin_finance_filter.dart';
 import 'package:admin_panel/features/admin/finance_manager/datasource/admin_finance_impl.repository.dart';
 import 'package:admin_panel/features/admin/finance_manager/presentation/widgets/admin_finance_ui_helpers.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/table/helper.dart';
 import 'package:common/widgets/table/table.dart';
 import 'package:data_table_2/data_table_2.dart';
@@ -97,12 +98,14 @@ class AdminFinanceTransactionTable extends ConsumerWidget {
     required this.filter,
     required this.reloadToken,
     required this.height,
+    required this.onSearchChanged,
     required this.onRowTap,
   });
 
   final AdminFinanceFilter filter;
   final int reloadToken;
   final double height;
+  final ValueChanged<String> onSearchChanged;
   final ValueChanged<AdminFinanceTransactionId> onRowTap;
 
   @override
@@ -112,6 +115,11 @@ class AdminFinanceTransactionTable extends ConsumerWidget {
     return _ContentSizedFinanceTable(
       height: height,
       contentWidth: _transactionColumns.tableWidth,
+      searchQuery: filter.searchQuery,
+      searchHint: 'ID, reference, partner, customer...',
+      searchNote:
+          'Searches ledger rows by transaction ID, reference, partner, and customer.',
+      onSearchChanged: onSearchChanged,
       child: AppTable(
         key: ValueKey(
           'admin-finance-transactions-$reloadToken-${filter.hashCode}',
@@ -200,12 +208,14 @@ class AdminFinancePayoutTable extends ConsumerWidget {
     required this.filter,
     required this.reloadToken,
     required this.height,
+    required this.onSearchChanged,
     required this.onRowTap,
   });
 
   final AdminFinanceFilter filter;
   final int reloadToken;
   final double height;
+  final ValueChanged<String> onSearchChanged;
   final ValueChanged<AdminFinancePayoutId> onRowTap;
 
   @override
@@ -215,6 +225,10 @@ class AdminFinancePayoutTable extends ConsumerWidget {
     return _ContentSizedFinanceTable(
       height: height,
       contentWidth: _payoutColumns.tableWidth,
+      searchQuery: filter.searchQuery,
+      searchHint: 'Payout ID or partner...',
+      searchNote: 'Searches payout rows by payout ID and partner.',
+      onSearchChanged: onSearchChanged,
       child: AppTable(
         key: ValueKey('admin-finance-payouts-$reloadToken-${filter.hashCode}'),
         columns: _payoutColumns.dataColumns(context),
@@ -286,12 +300,14 @@ class AdminFinanceRefundCaseTable extends ConsumerWidget {
     required this.filter,
     required this.reloadToken,
     required this.height,
+    required this.onSearchChanged,
     required this.onRowTap,
   });
 
   final AdminFinanceFilter filter;
   final int reloadToken;
   final double height;
+  final ValueChanged<String> onSearchChanged;
   final ValueChanged<AdminFinanceRefundCaseId> onRowTap;
 
   @override
@@ -301,6 +317,11 @@ class AdminFinanceRefundCaseTable extends ConsumerWidget {
     return _ContentSizedFinanceTable(
       height: height,
       contentWidth: _refundColumns.tableWidth,
+      searchQuery: filter.searchQuery,
+      searchHint: 'Case, transaction, partner, customer...',
+      searchNote:
+          'Searches refund rows by case ID, transaction ID, partner, customer, and reason.',
+      onSearchChanged: onSearchChanged,
       child: AppTable(
         key: ValueKey('admin-finance-refunds-$reloadToken-${filter.hashCode}'),
         columns: _refundColumns.dataColumns(context),
@@ -366,12 +387,14 @@ class AdminFinanceReconciliationTable extends ConsumerWidget {
     required this.filter,
     required this.reloadToken,
     required this.height,
+    required this.onSearchChanged,
     required this.onRowTap,
   });
 
   final AdminFinanceFilter filter;
   final int reloadToken;
   final double height;
+  final ValueChanged<String> onSearchChanged;
   final ValueChanged<AdminFinanceReconciliationId> onRowTap;
 
   @override
@@ -381,6 +404,11 @@ class AdminFinanceReconciliationTable extends ConsumerWidget {
     return _ContentSizedFinanceTable(
       height: height,
       contentWidth: _reconciliationColumns.tableWidth,
+      searchQuery: filter.searchQuery,
+      searchHint: 'Exception, provider event, transaction...',
+      searchNote:
+          'Searches reconciliation rows by exception ID, provider event, related transaction, and owner.',
+      onSearchChanged: onSearchChanged,
       child: AppTable(
         key: ValueKey(
           'admin-finance-reconciliation-$reloadToken-${filter.hashCode}',
@@ -547,11 +575,19 @@ class _ContentSizedFinanceTable extends StatefulWidget {
     required this.height,
     required this.contentWidth,
     required this.child,
+    this.searchQuery,
+    this.searchHint,
+    this.searchNote,
+    this.onSearchChanged,
   });
 
   final double height;
   final double contentWidth;
   final Widget child;
+  final String? searchQuery;
+  final String? searchHint;
+  final String? searchNote;
+  final ValueChanged<String>? onSearchChanged;
 
   @override
   State<_ContentSizedFinanceTable> createState() =>
@@ -571,30 +607,124 @@ class _ContentSizedFinanceTableState extends State<_ContentSizedFinanceTable> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: widget.height,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final viewportWidth = constraints.hasBoundedWidth
-              ? constraints.maxWidth
-              : widget.contentWidth;
-          final tableWidth = math.max(viewportWidth, widget.contentWidth);
-          final hasOverflow = tableWidth > viewportWidth;
-
-          return Scrollbar(
-            controller: _horizontalController,
-            thumbVisibility: hasOverflow,
-            interactive: true,
-            scrollbarOrientation: ScrollbarOrientation.bottom,
-            child: SingleChildScrollView(
-              controller: _horizontalController,
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: tableWidth,
-                height: widget.height,
-                child: widget.child,
-              ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.onSearchChanged != null) ...[
+            _FinanceTableSearchHeader(
+              value: widget.searchQuery ?? '',
+              hintText: widget.searchHint ?? 'Search finance records...',
+              note: widget.searchNote ?? 'Searches the rows in this table.',
+              onChanged: widget.onSearchChanged!,
             ),
-          );
-        },
+            AppDimens.verticalSmall,
+          ],
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final viewportWidth = constraints.hasBoundedWidth
+                    ? constraints.maxWidth
+                    : widget.contentWidth;
+                final tableWidth = math.max(viewportWidth, widget.contentWidth);
+                final hasOverflow = tableWidth > viewportWidth;
+
+                return Scrollbar(
+                  controller: _horizontalController,
+                  thumbVisibility: hasOverflow,
+                  interactive: true,
+                  scrollbarOrientation: ScrollbarOrientation.bottom,
+                  child: SingleChildScrollView(
+                    controller: _horizontalController,
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: tableWidth,
+                      height: constraints.maxHeight,
+                      child: widget.child,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FinanceTableSearchHeader extends StatefulWidget {
+  const _FinanceTableSearchHeader({
+    required this.value,
+    required this.hintText,
+    required this.note,
+    required this.onChanged,
+  });
+
+  final String value;
+  final String hintText;
+  final String note;
+  final ValueChanged<String> onChanged;
+
+  @override
+  State<_FinanceTableSearchHeader> createState() =>
+      _FinanceTableSearchHeaderState();
+}
+
+class _FinanceTableSearchHeaderState extends State<_FinanceTableSearchHeader> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.value);
+  }
+
+  @override
+  void didUpdateWidget(covariant _FinanceTableSearchHeader oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.value == _controller.text) return;
+
+    _controller.value = TextEditingValue(
+      text: widget.value,
+      selection: TextSelection.collapsed(offset: widget.value.length),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleChanged(String value) {
+    if (value == widget.value) return;
+    widget.onChanged(value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 420),
+      child: TextField(
+        controller: _controller,
+        style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurface),
+        cursorColor: colorScheme.primary,
+        decoration: InputDecoration(
+          isDense: true,
+          labelText: 'Search this table',
+          helperText: widget.note,
+          hintText: widget.hintText,
+          prefixIcon: const Icon(Icons.search, size: 18),
+          border: OutlineInputBorder(borderRadius: AppDimens.radiusSm),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppDimens.spaceSmMd,
+            vertical: AppDimens.spaceSmMd,
+          ),
+        ),
+        onChanged: _handleChanged,
       ),
     );
   }

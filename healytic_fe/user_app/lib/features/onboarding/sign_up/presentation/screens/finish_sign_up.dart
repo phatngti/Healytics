@@ -144,28 +144,10 @@ class FinishSignUpScreen extends HookConsumerWidget {
     final formState = formKey.currentState;
     if (formState == null) return;
 
-    const requiredTextKeys = [
-      'first_name',
-      'last_name',
-      'password',
-      'confirm_password',
-      'country',
-      'street_address',
-      'ward',
-      'district',
-      'city_or_province',
-    ];
-
-    bool isTextValid(String key) {
-      final value =
-          formState.fields[key]?.value?.toString().trim();
-      return value != null && value.isNotEmpty;
-    }
-
-    final isDobValid =
-        formState.fields['date_of_birth']?.value != null;
-    final isValid =
-        isDobValid && requiredTextKeys.every(isTextValid);
+    // Use FormBuilder's built-in valid state which runs all field validators
+    // (including age, password match, etc.) without forcibly showing errors
+    // unless the user has interacted with the field.
+    final isValid = formState.isValid;
 
     if (isFilledAll.value != isValid) {
       isFilledAll.value = isValid;
@@ -186,6 +168,14 @@ class FinishSignUpScreen extends HookConsumerWidget {
       final formData =
           formKey.currentState?.value ?? {};
       if (formData.isNotEmpty) {
+        final dobValue = formData['date_of_birth'];
+        String dobString = '';
+        if (dobValue is DateTime) {
+          dobString = dobValue.toIso8601String();
+        } else if (dobValue is String) {
+          dobString = dobValue;
+        }
+
         final email = ref
                 .read(registerFlowProvider)
                 .value
@@ -198,16 +188,12 @@ class FinishSignUpScreen extends HookConsumerWidget {
               UserEntity(
                 email: email,
                 password:
-                    formData['password'] as String? ??
-                        '',
+                    formData['password'] as String? ?? '',
                 firstName:
                     formData['first_name'] as String,
                 lastName:
                     formData['last_name'] as String,
-                dateOfBirth:
-                    formData['date_of_birth']
-                        as String? ??
-                    '',
+                dateOfBirth: dobString,
                 address: AddressEntity(
                   street:
                       formData['street_address'],
