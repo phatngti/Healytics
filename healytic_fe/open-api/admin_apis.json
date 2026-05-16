@@ -1242,6 +1242,136 @@
         ]
       }
     },
+    "/partner/employees/massage-skills": {
+      "get": {
+        "operationId": "PartnerEmployeesController_getMassageSkills",
+        "summary": "Get massage skill catalog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return all massage skills for the partner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SkillCatalogResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "PartnerEmployeesController_createMassageSkill",
+        "summary": "Create a massage skill",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSkillDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The massage skill has been created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillCatalogResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/employees/spa-skills": {
+      "get": {
+        "operationId": "PartnerEmployeesController_getSpaSkills",
+        "summary": "Get spa skill catalog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Return all spa skills for the partner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SkillCatalogResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "PartnerEmployeesController_createSpaSkill",
+        "summary": "Create a spa skill",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSkillDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The spa skill has been created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillCatalogResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/partner/employees": {
       "get": {
         "operationId": "PartnerEmployeesController_findAll",
@@ -1275,6 +1405,48 @@
                 }
               }
             }
+          }
+        },
+        "tags": [
+          "Partner Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/employees/{id}/services": {
+      "get": {
+        "operationId": "PartnerEmployeesController_findAssignedServices",
+        "summary": "Get services assigned to an employee",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return services assigned to the employee.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmployeeAssignedServiceDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found."
           }
         },
         "tags": [
@@ -3264,7 +3436,7 @@
             "name": "page",
             "required": false,
             "in": "query",
-            "description": "Page number",
+            "description": "Page number (1-indexed)",
             "schema": {
               "default": 1,
               "example": 1,
@@ -3283,19 +3455,21 @@
             }
           },
           {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerScope"
+            }
+          },
+          {
             "name": "verificationStatus",
             "required": false,
             "in": "query",
-            "description": "Filter by verification status (PENDING, REQUIRED_RESUBMIT, APPROVED, REJECTED)",
+            "description": "Explicit status filter",
             "schema": {
-              "example": "PENDING",
-              "enum": [
-                "PENDING",
-                "APPROVED",
-                "REJECTED",
-                "REQUIRED_RESUBMIT"
-              ],
-              "type": "string"
+              "$ref": "#/components/schemas/PartnerVerificationStatus"
             }
           },
           {
@@ -3307,15 +3481,129 @@
               "example": "spa",
               "type": "string"
             }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Column to sort by",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortBy"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortDirection"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of partners.",
+            "description": "Paginated list of partners.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PartnersResponseDto"
+                  "$ref": "#/components/schemas/AdminPartnersResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/partners/stats": {
+      "get": {
+        "operationId": "AdminPartnersController_getPartnerStats",
+        "summary": "Get partner dashboard statistics",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerScope"
+            }
+          },
+          {
+            "name": "verificationStatus",
+            "required": false,
+            "in": "query",
+            "description": "Explicit status filter",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerVerificationStatus"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by tax code, brand name, legal name, or email",
+            "schema": {
+              "example": "spa",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Column to sort by",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortBy"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortDirection"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "KPI card values.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPartnerStatsResponseDto"
                 }
               }
             }
@@ -3335,10 +3623,79 @@
       "get": {
         "operationId": "AdminPartnersController_getTotalPartners",
         "summary": "Get total number of partners",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerScope"
+            }
+          },
+          {
+            "name": "verificationStatus",
+            "required": false,
+            "in": "query",
+            "description": "Explicit status filter",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerVerificationStatus"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by tax code, brand name, legal name, or email",
+            "schema": {
+              "example": "spa",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Column to sort by",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortBy"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "required": false,
+            "in": "query",
+            "description": "Sort direction",
+            "schema": {
+              "$ref": "#/components/schemas/AdminPartnerSortDirection"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Total partner count.",
+            "description": "Filtered total partner count.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3443,6 +3800,2760 @@
         },
         "tags": [
           "Admin Partners"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/overview": {
+      "get": {
+        "operationId": "AdminDashboardController_getOverview",
+        "summary": "Get admin dashboard overview metrics",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardOverviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/revenue-trend": {
+      "get": {
+        "operationId": "AdminDashboardController_getRevenueTrend",
+        "summary": "Get admin revenue trend data points",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminDashboardRevenueTrendPointDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/booking-outcomes": {
+      "get": {
+        "operationId": "AdminDashboardController_getBookingOutcomeSummary",
+        "summary": "Get booking outcome summary",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardBookingOutcomeSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/transaction-health": {
+      "get": {
+        "operationId": "AdminDashboardController_getTransactionHealth",
+        "summary": "Get transaction health breakdown",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDashboardTransactionHealthDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/top-partners": {
+      "get": {
+        "operationId": "AdminDashboardController_getTopPartners",
+        "summary": "Get top performing partners by revenue",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminPartnerRankingItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/top-services": {
+      "get": {
+        "operationId": "AdminDashboardController_getTopServices",
+        "summary": "Get top performing services by revenue",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "30d",
+              "enum": [
+                "7d",
+                "30d",
+                "90d"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminServiceRankingItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/notifications": {
+      "get": {
+        "operationId": "AdminDashboardController_getNotifications",
+        "summary": "Get admin dashboard notifications",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 20,
+              "default": 5,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminDashboardNotificationItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/dashboard/category-health": {
+      "get": {
+        "operationId": "AdminDashboardController_getCategoryHealth",
+        "summary": "Get service category health overview",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryHealthDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Dashboard"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/summary": {
+      "get": {
+        "operationId": "AdminFinanceController_getSummary",
+        "summary": "Get platform-wide admin finance summary metrics",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceOverviewDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/trend": {
+      "get": {
+        "operationId": "AdminFinanceController_getTrend",
+        "summary": "Get platform-wide finance trend data",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFinanceTrendPointDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/alerts": {
+      "get": {
+        "operationId": "AdminFinanceController_getAlerts",
+        "summary": "Get derived operational finance alerts",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFinanceAlertDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/transactions": {
+      "get": {
+        "operationId": "AdminFinanceController_getTransactions",
+        "summary": "List platform ledger transactions",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceTransactionPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/transactions/{id}": {
+      "get": {
+        "operationId": "AdminFinanceController_getTransactionDetail",
+        "summary": "Get platform ledger transaction detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceTransactionDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/transactions/{id}/settlement": {
+      "patch": {
+        "operationId": "AdminFinanceController_markSettlement",
+        "summary": "Mark transaction settlement status with an admin note",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceSettlementActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceTransactionRecordDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid settlement transition or missing note"
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/transactions/{id}/review-flag": {
+      "patch": {
+        "operationId": "AdminFinanceController_flagTransaction",
+        "summary": "Flag or unflag a transaction for finance review",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceReviewFlagActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceTransactionRecordDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/payouts": {
+      "get": {
+        "operationId": "AdminFinanceController_getPayouts",
+        "summary": "List platform payouts",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinancePayoutPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/payouts/{id}": {
+      "get": {
+        "operationId": "AdminFinanceController_getPayoutDetail",
+        "summary": "Get payout detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinancePayoutDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Payout not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/payouts/{id}/retry": {
+      "post": {
+        "operationId": "AdminFinanceController_retryPayout",
+        "summary": "Retry a failed or held payout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinancePayoutDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/payouts/{id}/hold": {
+      "post": {
+        "operationId": "AdminFinanceController_holdPayout",
+        "summary": "Place an admin hold on a payout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceRequiredNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinancePayoutDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/payouts/{id}/release-hold": {
+      "post": {
+        "operationId": "AdminFinanceController_releasePayoutHold",
+        "summary": "Release an admin hold from a payout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinancePayoutDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/refund-cases": {
+      "get": {
+        "operationId": "AdminFinanceController_getRefundCases",
+        "summary": "List platform refund and dispute cases",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceRefundCasePageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/refund-cases/{id}": {
+      "get": {
+        "operationId": "AdminFinanceController_getRefundCaseDetail",
+        "summary": "Get refund or dispute case detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceRefundCaseDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Refund case not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/refund-cases/{id}/approve": {
+      "post": {
+        "operationId": "AdminFinanceController_approveRefundCase",
+        "summary": "Approve a refund or dispute case",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceRefundCaseDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/refund-cases/{id}/reject": {
+      "post": {
+        "operationId": "AdminFinanceController_rejectRefundCase",
+        "summary": "Reject a refund or dispute case",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceRequiredNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceRefundCaseDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/reconciliation": {
+      "get": {
+        "operationId": "AdminFinanceController_getReconciliation",
+        "summary": "List reconciliation exceptions",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceReconciliationPageDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/reconciliation/{id}": {
+      "get": {
+        "operationId": "AdminFinanceController_getReconciliationDetail",
+        "summary": "Get reconciliation exception detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceReconciliationDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reconciliation exception not found"
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/reconciliation/{id}/resolve": {
+      "post": {
+        "operationId": "AdminFinanceController_resolveReconciliation",
+        "summary": "Resolve a reconciliation exception",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceRequiredNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceReconciliationDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/reconciliation/{id}/reopen": {
+      "post": {
+        "operationId": "AdminFinanceController_reopenReconciliation",
+        "summary": "Reopen a reconciliation exception",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceNoteActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceReconciliationDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/partner-exposure": {
+      "get": {
+        "operationId": "AdminFinanceController_getPartnerExposure",
+        "summary": "Rank partner financial exposure",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinancePeriod"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerCommerceSourceType"
+            }
+          },
+          {
+            "name": "transactionType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionType"
+            }
+          },
+          {
+            "name": "transactionStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerTransactionStatus"
+            }
+          },
+          {
+            "name": "settlementStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerSettlementStatus"
+            }
+          },
+          {
+            "name": "payoutStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerPayoutStatus"
+            }
+          },
+          {
+            "name": "refundCaseStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+            }
+          },
+          {
+            "name": "refundCaseType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PartnerRefundCaseType"
+            }
+          },
+          {
+            "name": "reconciliationStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AdminFinanceProvider"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VND",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxAmount",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "onlyFlagged",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "onlySlaBreached",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFinancePartnerExposureDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/exports": {
+      "get": {
+        "operationId": "AdminFinanceController_getExports",
+        "summary": "List finance export jobs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminFinanceExportJobDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "AdminFinanceController_createExport",
+        "summary": "Create a finance export job",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceCreateExportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceExportJobDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/admin/finance/notes": {
+      "post": {
+        "operationId": "AdminFinanceController_addNote",
+        "summary": "Add a note to a finance entity",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminFinanceCreateNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminFinanceNoteDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin Finance"
         ],
         "security": [
           {
@@ -3766,7 +6877,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Return paginated list of employee appointments."
+            "description": "Return paginated list of employee appointments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedEmployeeAppointmentsResponseDto"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -5281,6 +8399,82 @@
         ]
       }
     },
+    "/user/clinics/{id}/follow": {
+      "post": {
+        "operationId": "userClinicControllerFollowClinic",
+        "summary": "Follow a clinic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicInfoResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Clinic not found."
+          }
+        },
+        "tags": [
+          "User Clinics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "userClinicControllerUnfollowClinic",
+        "summary": "Unfollow a clinic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicInfoResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Clinic not found."
+          }
+        },
+        "tags": [
+          "User Clinics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/user/clinics/{id}/products": {
       "get": {
         "operationId": "userClinicControllerGetClinicProducts",
@@ -5449,6 +8643,126 @@
         },
         "tags": [
           "User Clinics"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/wishlist": {
+      "get": {
+        "operationId": "UserWishlistController_listWishlist",
+        "summary": "List current user wishlist items",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WishlistItemResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Wishlist"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/wishlist/{productId}": {
+      "post": {
+        "operationId": "userWishlistControllerAddItem",
+        "summary": "Add a product to the current user wishlist",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WishlistItemResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Wishlist"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "userWishlistControllerRemoveItem",
+        "summary": "Remove a product from the current user wishlist",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User Wishlist"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/profile/summary": {
+      "get": {
+        "operationId": "userProfileControllerGetSummary",
+        "summary": "Get current user profile summary counters",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileSummaryResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Profile"
         ],
         "security": [
           {
@@ -6774,6 +10088,370 @@
         }
       }
     },
+    "/test-backdoor/status": {
+      "get": {
+        "operationId": "TestBackdoorController_status",
+        "summary": "Check if backdoor is available",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackdoorStatusResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/reset-db": {
+      "post": {
+        "operationId": "TestBackdoorController_resetDb",
+        "summary": "Truncate all non-master tables",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetDbResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/prepare": {
+      "post": {
+        "operationId": "TestBackdoorController_prepare",
+        "summary": "Reset DB then seed a scenario",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackdoorPrepareDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed": {
+      "post": {
+        "operationId": "TestBackdoorController_seed",
+        "summary": "Seed multiple entity types at once",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedPayloadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-user": {
+      "post": {
+        "operationId": "TestBackdoorController_seedUser",
+        "summary": "Seed a single user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-category": {
+      "post": {
+        "operationId": "TestBackdoorController_seedCategory",
+        "summary": "Seed a single category",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-partner": {
+      "post": {
+        "operationId": "TestBackdoorController_seedPartner",
+        "summary": "Seed a single partner",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedPartnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-employee": {
+      "post": {
+        "operationId": "TestBackdoorController_seedEmployee",
+        "summary": "Seed a single employee",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedEmployeeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-service": {
+      "post": {
+        "operationId": "TestBackdoorController_seedService",
+        "summary": "Seed a single health service",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedServiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-cart": {
+      "post": {
+        "operationId": "TestBackdoorController_seedCart",
+        "summary": "Seed a single cart item",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedCartItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-coupon": {
+      "post": {
+        "operationId": "TestBackdoorController_seedCoupon",
+        "summary": "Seed a single coupon",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedCouponDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-booking": {
+      "post": {
+        "operationId": "TestBackdoorController_seedBooking",
+        "summary": "Seed a single booking",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedBookingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
     "/generative_ai/stream": {
       "post": {
         "tags": [
@@ -7690,7 +11368,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-07T13:13:24.747Z"
+              "submittedAt": "2026-05-16T13:58:34.945Z"
             }
           }
         },
@@ -9532,10 +13210,12 @@
         "properties": {
           "title": {
             "type": "string",
+            "nullable": true,
             "description": "Title"
           },
           "license": {
             "type": "string",
+            "nullable": true,
             "description": "License"
           }
         }
@@ -9756,15 +13436,45 @@
           "description"
         ]
       },
+      "Gender": {
+        "type": "string",
+        "description": "Gender",
+        "enum": [
+          "MALE",
+          "FEMALE",
+          "OTHER"
+        ]
+      },
+      "EmployeeRole": {
+        "type": "string",
+        "description": "Employee role",
+        "enum": [
+          "DOCTOR",
+          "THERAPIST",
+          "RECEPTIONIST",
+          "MANAGER"
+        ]
+      },
+      "EmployeeStatus": {
+        "type": "string",
+        "description": "Employee status",
+        "enum": [
+          "ACTIVE",
+          "INACTIVE",
+          "ON_LEAVE"
+        ]
+      },
       "DoctorProfileResponseDto": {
         "type": "object",
         "properties": {
           "employeeId": {
             "type": "string",
+            "nullable": true,
             "description": "Employee ID (primary key)"
           },
           "title": {
             "type": "string",
+            "nullable": true,
             "description": "Doctor title"
           },
           "medicalCredentials": {
@@ -9776,10 +13486,12 @@
           },
           "experienceYears": {
             "type": "number",
+            "nullable": true,
             "description": "Years of experience"
           },
           "consultationFee": {
             "type": "number",
+            "nullable": true,
             "description": "Consultation fee"
           },
           "specializations": {
@@ -9795,6 +13507,13 @@
             "items": {
               "type": "string"
             }
+          },
+          "certifications": {
+            "description": "Certifications",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -9803,27 +13522,33 @@
         "properties": {
           "employeeId": {
             "type": "string",
+            "nullable": true,
             "description": "Employee ID (primary key)"
           },
           "level": {
             "type": "string",
+            "nullable": true,
             "description": "Therapist level (junior, senior, etc.)"
           },
           "type": {
             "type": "string",
+            "nullable": true,
             "description": "Therapist type"
           },
           "strengthLevel": {
             "type": "string",
+            "nullable": true,
             "description": "Strength level"
           },
           "commissionRate": {
             "type": "number",
+            "nullable": true,
             "description": "Commission rate (percentage)"
           },
           "healthCheckDate": {
             "format": "date-time",
             "type": "string",
+            "nullable": true,
             "description": "Health check date"
           },
           "skills": {
@@ -9854,11 +13579,13 @@
             "description": "Employee code"
           },
           "firstName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "First name"
           },
           "lastName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Last name"
           },
           "fullName": {
@@ -9870,35 +13597,44 @@
             "description": "Email address"
           },
           "phone": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Phone number"
           },
           "avatarUrl": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Avatar URL"
           },
           "jobTitle": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Job title"
           },
           "startDate": {
-            "type": "object",
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
             "description": "Start date"
           },
           "employmentType": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Employment type"
           },
           "description": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Description/bio"
           },
           "emergencyContactName": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Emergency contact name"
           },
           "emergencyContactPhone": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Emergency contact phone"
           },
           "verificationDocuments": {
@@ -9923,36 +13659,20 @@
             }
           },
           "dob": {
-            "type": "object",
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
             "description": "Date of birth"
           },
           "gender": {
-            "type": "string",
-            "enum": [
-              "MALE",
-              "FEMALE",
-              "OTHER"
-            ],
-            "description": "Gender"
+            "nullable": true,
+            "$ref": "#/components/schemas/Gender"
           },
           "role": {
-            "type": "string",
-            "enum": [
-              "DOCTOR",
-              "THERAPIST",
-              "RECEPTIONIST",
-              "MANAGER"
-            ],
-            "description": "Employee role"
+            "$ref": "#/components/schemas/EmployeeRole"
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE",
-              "ON_LEAVE"
-            ],
-            "description": "Employee status"
+            "$ref": "#/components/schemas/EmployeeStatus"
           },
           "rating": {
             "type": "number",
@@ -9963,7 +13683,8 @@
             "description": "Number of reviews"
           },
           "partnerId": {
-            "type": "object",
+            "type": "string",
+            "nullable": true,
             "description": "Partner ID the employee belongs to"
           },
           "createdAt": {
@@ -9977,6 +13698,7 @@
             "description": "Last update timestamp"
           },
           "doctorProfile": {
+            "nullable": true,
             "description": "Doctor profile",
             "allOf": [
               {
@@ -9985,6 +13707,7 @@
             ]
           },
           "therapistProfile": {
+            "nullable": true,
             "description": "Therapist profile",
             "allOf": [
               {
@@ -10427,21 +14150,102 @@
           "description"
         ]
       },
-      "EmployeeRole": {
-        "type": "string",
-        "enum": [
-          "DOCTOR",
-          "THERAPIST",
-          "RECEPTIONIST",
-          "MANAGER"
+      "SkillCatalogResponseDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique slug identifier",
+            "example": "deep_tissue"
+          },
+          "label": {
+            "type": "string",
+            "description": "Display label",
+            "example": "Deep Tissue"
+          }
+        },
+        "required": [
+          "key",
+          "label"
         ]
       },
-      "EmployeeStatus": {
+      "CreateSkillDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Display name of the skill",
+            "example": "Deep Tissue",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "HealthServiceStatus": {
         "type": "string",
+        "description": "Status",
         "enum": [
-          "ACTIVE",
-          "INACTIVE",
-          "ON_LEAVE"
+          "draft",
+          "active",
+          "archived"
+        ]
+      },
+      "EmployeeAssignedServiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Assigned service/product ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Service name"
+          },
+          "status": {
+            "$ref": "#/components/schemas/HealthServiceStatus"
+          },
+          "basePrice": {
+            "type": "number",
+            "description": "Base price in service currency"
+          },
+          "salePrice": {
+            "type": "number",
+            "nullable": true,
+            "description": "Sale price in service currency, when configured"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "nullable": true,
+            "description": "Service duration in minutes"
+          },
+          "categoryName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Service category name"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "Preferred service image URL"
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this employee is primary for this service"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "status",
+          "basePrice",
+          "currency",
+          "isPrimary"
         ]
       },
       "CreateDoctorProfileDto": {
@@ -11752,15 +15556,6 @@
         "description": "Type",
         "enum": [
           "service"
-        ]
-      },
-      "HealthServiceStatus": {
-        "type": "string",
-        "description": "Status",
-        "enum": [
-          "draft",
-          "active",
-          "archived"
         ]
       },
       "PartnerCategorySummaryDto": {
@@ -13398,6 +17193,10 @@
             "type": "boolean",
             "example": true
           },
+          "isWishlisted": {
+            "type": "boolean",
+            "example": false
+          },
           "description": {
             "type": "string",
             "nullable": true
@@ -13433,6 +17232,7 @@
           "reviewCount",
           "price",
           "isVerified",
+          "isWishlisted",
           "featureTags",
           "clinic",
           "facilityImages",
@@ -13994,24 +17794,57 @@
           "createdAt"
         ]
       },
-      "PartnerItemDto": {
+      "AdminPartnerScope": {
+        "type": "string",
+        "enum": [
+          "VERIFICATION_QUEUE",
+          "ALL_PROVIDERS"
+        ]
+      },
+      "AdminPartnerSortBy": {
+        "type": "string",
+        "enum": [
+          "createdAt",
+          "brandName",
+          "legalName",
+          "verificationStatus",
+          "priority"
+        ]
+      },
+      "AdminPartnerSortDirection": {
+        "type": "string",
+        "enum": [
+          "ASC",
+          "DESC"
+        ]
+      },
+      "PartnerPriority": {
+        "type": "string",
+        "enum": [
+          "low",
+          "normal",
+          "high",
+          "urgent"
+        ]
+      },
+      "AdminPartnerItemDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
-            "example": "uuid"
+            "example": "uuid-123"
           },
           "taxCode": {
             "type": "string",
             "example": "0123456789"
           },
-          "brandName": {
-            "type": "string",
-            "example": "Hanoi Spa"
-          },
           "legalName": {
             "type": "string",
             "example": "Hanoi Spa Co., Ltd"
+          },
+          "brandName": {
+            "type": "string",
+            "example": "Hanoi Spa"
           },
           "email": {
             "type": "string",
@@ -14030,30 +17863,46 @@
             "example": "PENDING",
             "$ref": "#/components/schemas/PartnerVerificationStatus"
           },
+          "priority": {
+            "example": "normal",
+            "$ref": "#/components/schemas/PartnerPriority"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string",
             "example": "2024-01-15T10:30:00Z"
+          },
+          "verificationCompletedAt": {
+            "type": "object",
+            "example": "2024-01-20T12:00:00Z",
+            "nullable": true
+          },
+          "isAccountActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the linked account is active"
           }
         },
         "required": [
           "id",
           "taxCode",
-          "brandName",
           "legalName",
+          "brandName",
           "email",
           "businessType",
           "verificationStatus",
-          "createdAt"
+          "priority",
+          "createdAt",
+          "isAccountActive"
         ]
       },
-      "PartnersResponseDto": {
+      "AdminPartnersResponseDto": {
         "type": "object",
         "properties": {
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PartnerItemDto"
+              "$ref": "#/components/schemas/AdminPartnerItemDto"
             }
           },
           "total": {
@@ -14076,6 +17925,67 @@
           "limit"
         ]
       },
+      "AdminPartnerStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "pendingReview": {
+            "type": "number",
+            "example": 12,
+            "description": "Partners awaiting admin review"
+          },
+          "highPriority": {
+            "type": "number",
+            "example": 3,
+            "description": "Review-queue partners with HIGH or URGENT priority"
+          },
+          "activeToday": {
+            "type": "number",
+            "example": 42,
+            "description": "Approved providers (active today v1)"
+          },
+          "avgWaitSeconds": {
+            "type": "number",
+            "example": 15120,
+            "description": "Average wait time in seconds"
+          },
+          "avgWaitTime": {
+            "type": "string",
+            "example": "4h 12m",
+            "description": "Formatted average wait time"
+          },
+          "totalProviders": {
+            "type": "number",
+            "example": 150,
+            "description": "Total providers across all statuses"
+          },
+          "requiredResubmit": {
+            "type": "number",
+            "example": 5,
+            "description": "Partners in REQUIRED_RESUBMIT status"
+          },
+          "approved": {
+            "type": "number",
+            "example": 100,
+            "description": "Partners with APPROVED status"
+          },
+          "rejected": {
+            "type": "number",
+            "example": 3,
+            "description": "Partners with REJECTED status"
+          }
+        },
+        "required": [
+          "pendingReview",
+          "highPriority",
+          "activeToday",
+          "avgWaitSeconds",
+          "avgWaitTime",
+          "totalProviders",
+          "requiredResubmit",
+          "approved",
+          "rejected"
+        ]
+      },
       "TotalPartnersResponseDto": {
         "type": "object",
         "properties": {
@@ -14087,15 +17997,6 @@
         },
         "required": [
           "total"
-        ]
-      },
-      "PartnerPriority": {
-        "type": "string",
-        "enum": [
-          "low",
-          "normal",
-          "high",
-          "urgent"
         ]
       },
       "AdminPartnerDetailResponseDto": {
@@ -14196,6 +18097,1422 @@
         },
         "required": [
           "message"
+        ]
+      },
+      "AdminDashboardOverviewDto": {
+        "type": "object",
+        "properties": {
+          "grossRevenue": {
+            "type": "number"
+          },
+          "netRevenue": {
+            "type": "number"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "failedPaymentAmount": {
+            "type": "number"
+          },
+          "averageBookingValue": {
+            "type": "number"
+          },
+          "successfulTransactions": {
+            "type": "number"
+          },
+          "pendingTransactions": {
+            "type": "number"
+          },
+          "refundedTransactions": {
+            "type": "number"
+          },
+          "failedTransactions": {
+            "type": "number"
+          },
+          "canceledTransactions": {
+            "type": "number"
+          },
+          "totalPartners": {
+            "type": "number"
+          },
+          "pendingPartnerReviews": {
+            "type": "number"
+          },
+          "bookingSuccessRate": {
+            "type": "number"
+          },
+          "bookingFailedRate": {
+            "type": "number"
+          },
+          "bookingCanceledRate": {
+            "type": "number"
+          },
+          "notificationVolume": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "grossRevenue",
+          "netRevenue",
+          "refundAmount",
+          "failedPaymentAmount",
+          "averageBookingValue",
+          "successfulTransactions",
+          "pendingTransactions",
+          "refundedTransactions",
+          "failedTransactions",
+          "canceledTransactions",
+          "totalPartners",
+          "pendingPartnerReviews",
+          "bookingSuccessRate",
+          "bookingFailedRate",
+          "bookingCanceledRate",
+          "notificationVolume"
+        ]
+      },
+      "AdminDashboardRevenueTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-05-13"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "netRevenue": {
+            "type": "number"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "transactionCount": {
+            "type": "number"
+          },
+          "successfulBookingCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "grossRevenue",
+          "netRevenue",
+          "refundAmount",
+          "transactionCount",
+          "successfulBookingCount"
+        ]
+      },
+      "AdminOutcomeMetricDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number"
+          },
+          "rate": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "count",
+          "rate"
+        ]
+      },
+      "AdminDashboardBookingOutcomeSummaryDto": {
+        "type": "object",
+        "properties": {
+          "totalBookings": {
+            "type": "number"
+          },
+          "success": {
+            "$ref": "#/components/schemas/AdminOutcomeMetricDto"
+          },
+          "failed": {
+            "$ref": "#/components/schemas/AdminOutcomeMetricDto"
+          },
+          "canceled": {
+            "$ref": "#/components/schemas/AdminOutcomeMetricDto"
+          }
+        },
+        "required": [
+          "totalBookings",
+          "success",
+          "failed",
+          "canceled"
+        ]
+      },
+      "AdminDashboardTransactionHealthDto": {
+        "type": "object",
+        "properties": {
+          "totalTransactions": {
+            "type": "number"
+          },
+          "paid": {
+            "type": "number"
+          },
+          "pending": {
+            "type": "number"
+          },
+          "refunded": {
+            "type": "number"
+          },
+          "failed": {
+            "type": "number"
+          },
+          "canceled": {
+            "type": "number"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "failedAmount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "totalTransactions",
+          "paid",
+          "pending",
+          "refunded",
+          "failed",
+          "canceled",
+          "grossRevenue",
+          "refundAmount",
+          "failedAmount"
+        ]
+      },
+      "AdminPartnerRankingVerificationStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "changesRequired",
+          "approved",
+          "rejected"
+        ]
+      },
+      "AdminPartnerRankingItemDto": {
+        "type": "object",
+        "properties": {
+          "partnerId": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "number"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "bookingCount": {
+            "type": "number"
+          },
+          "successfulBookingRate": {
+            "type": "number"
+          },
+          "verificationStatus": {
+            "$ref": "#/components/schemas/AdminPartnerRankingVerificationStatus"
+          }
+        },
+        "required": [
+          "partnerId",
+          "partnerName",
+          "rank",
+          "grossRevenue",
+          "bookingCount",
+          "successfulBookingRate",
+          "verificationStatus"
+        ]
+      },
+      "AdminServiceRankingItemDto": {
+        "type": "object",
+        "properties": {
+          "serviceId": {
+            "type": "string"
+          },
+          "serviceName": {
+            "type": "string"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "number"
+          },
+          "grossRevenue": {
+            "type": "number"
+          },
+          "bookingCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "serviceId",
+          "serviceName",
+          "categoryName",
+          "partnerName",
+          "rank",
+          "grossRevenue",
+          "bookingCount"
+        ]
+      },
+      "AdminDashboardNotificationType": {
+        "type": "string",
+        "enum": [
+          "broadcast",
+          "payment",
+          "review",
+          "category",
+          "operations"
+        ]
+      },
+      "AdminDashboardNotificationPriority": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high",
+          "critical"
+        ]
+      },
+      "AdminDashboardNotificationItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AdminDashboardNotificationType"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/AdminDashboardNotificationPriority"
+          },
+          "isRead": {
+            "type": "boolean"
+          },
+          "isBroadcast": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "body",
+          "createdAt",
+          "type",
+          "priority",
+          "isRead",
+          "isBroadcast"
+        ]
+      },
+      "AdminCategorySnapshotDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "serviceCount": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "serviceCount",
+          "isActive"
+        ]
+      },
+      "AdminCategoryHealthDto": {
+        "type": "object",
+        "properties": {
+          "totalCategories": {
+            "type": "number"
+          },
+          "activeCategories": {
+            "type": "number"
+          },
+          "inactiveCategories": {
+            "type": "number"
+          },
+          "emptyCategories": {
+            "type": "number"
+          },
+          "totalMappedServices": {
+            "type": "number"
+          },
+          "topCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminCategorySnapshotDto"
+            }
+          }
+        },
+        "required": [
+          "totalCategories",
+          "activeCategories",
+          "inactiveCategories",
+          "emptyCategories",
+          "totalMappedServices",
+          "topCategories"
+        ]
+      },
+      "AdminFinancePeriod": {
+        "type": "string",
+        "enum": [
+          "sevenDays",
+          "thirtyDays",
+          "ninetyDays",
+          "thisMonth",
+          "lastMonth",
+          "custom"
+        ]
+      },
+      "PartnerCommerceSourceType": {
+        "type": "string",
+        "enum": [
+          "serviceBooking",
+          "productOrder"
+        ]
+      },
+      "PartnerTransactionType": {
+        "type": "string",
+        "enum": [
+          "charge",
+          "refund",
+          "adjustment",
+          "payout",
+          "fee"
+        ]
+      },
+      "PartnerTransactionStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "paid",
+          "refunded",
+          "failed",
+          "canceled"
+        ]
+      },
+      "PartnerSettlementStatus": {
+        "type": "string",
+        "enum": [
+          "unsettled",
+          "scheduled",
+          "settled",
+          "held"
+        ]
+      },
+      "PartnerPayoutStatus": {
+        "type": "string",
+        "enum": [
+          "notAssigned",
+          "inPayout",
+          "paidOut",
+          "failed",
+          "held"
+        ]
+      },
+      "PartnerRefundCaseStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "underReview",
+          "approved",
+          "rejected"
+        ]
+      },
+      "PartnerRefundCaseType": {
+        "type": "string",
+        "enum": [
+          "refund",
+          "dispute"
+        ]
+      },
+      "AdminFinanceReconciliationStatus": {
+        "type": "string",
+        "enum": [
+          "open",
+          "underReview",
+          "resolved",
+          "reopened"
+        ]
+      },
+      "AdminFinanceProvider": {
+        "type": "string",
+        "enum": [
+          "stripe",
+          "momo",
+          "vnpay",
+          "bankTransfer",
+          "manual"
+        ]
+      },
+      "AdminFinanceOverviewDto": {
+        "type": "object",
+        "properties": {
+          "grossVolume": {
+            "type": "number"
+          },
+          "netRevenue": {
+            "type": "number"
+          },
+          "platformFeeRevenue": {
+            "type": "number"
+          },
+          "refundExposure": {
+            "type": "number"
+          },
+          "failedPaymentAmount": {
+            "type": "number"
+          },
+          "pendingPayoutAmount": {
+            "type": "number"
+          },
+          "heldPayoutAmount": {
+            "type": "number"
+          },
+          "unreconciledAmount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string",
+            "example": "VND"
+          }
+        },
+        "required": [
+          "grossVolume",
+          "netRevenue",
+          "platformFeeRevenue",
+          "refundExposure",
+          "failedPaymentAmount",
+          "pendingPayoutAmount",
+          "heldPayoutAmount",
+          "unreconciledAmount",
+          "currency"
+        ]
+      },
+      "AdminFinanceTrendPointDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-05-12"
+          },
+          "grossAmount": {
+            "type": "number"
+          },
+          "netAmount": {
+            "type": "number"
+          },
+          "refundAmount": {
+            "type": "number"
+          },
+          "payoutAmount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "grossAmount",
+          "netAmount",
+          "refundAmount",
+          "payoutAmount"
+        ]
+      },
+      "AdminFinanceRiskTone": {
+        "type": "string",
+        "enum": [
+          "neutral",
+          "positive",
+          "warning",
+          "critical"
+        ]
+      },
+      "AdminFinanceAlertDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "tone": {
+            "$ref": "#/components/schemas/AdminFinanceRiskTone"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "tone",
+          "createdAt"
+        ]
+      },
+      "AdminFinanceTransactionRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "sourceType": {
+            "$ref": "#/components/schemas/PartnerCommerceSourceType"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PartnerTransactionType"
+          },
+          "grossAmount": {
+            "type": "number"
+          },
+          "feeAmount": {
+            "type": "number"
+          },
+          "netAmount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "transactionStatus": {
+            "$ref": "#/components/schemas/PartnerTransactionStatus"
+          },
+          "settlementStatus": {
+            "$ref": "#/components/schemas/PartnerSettlementStatus"
+          },
+          "payoutStatus": {
+            "$ref": "#/components/schemas/PartnerPayoutStatus"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/AdminFinanceProvider"
+          },
+          "isFlagged": {
+            "type": "boolean"
+          },
+          "notesCount": {
+            "type": "number"
+          },
+          "payoutId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "reference",
+          "partnerName",
+          "customerName",
+          "sourceType",
+          "type",
+          "grossAmount",
+          "feeAmount",
+          "netAmount",
+          "currency",
+          "transactionStatus",
+          "settlementStatus",
+          "payoutStatus",
+          "provider",
+          "isFlagged",
+          "notesCount"
+        ]
+      },
+      "AdminFinancePageMetaDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "limit",
+          "totalPages"
+        ]
+      },
+      "AdminFinanceTransactionPageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceTransactionRecordDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AdminFinancePageMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminFinanceProviderEventDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/AdminFinanceProvider"
+          },
+          "occurredAt": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "rawPayload": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "eventType",
+          "provider",
+          "occurredAt",
+          "detail",
+          "rawPayload"
+        ]
+      },
+      "AdminFinanceAuditEventDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "performedBy": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string"
+          },
+          "isError": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "detail",
+          "performedBy",
+          "occurredAt",
+          "isError"
+        ]
+      },
+      "AdminFinanceNoteDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "content",
+          "createdBy",
+          "createdAt"
+        ]
+      },
+      "AdminFinanceRefundCaseRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "requestedAt": {
+            "type": "string"
+          },
+          "transactionId": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "caseType": {
+            "$ref": "#/components/schemas/PartnerRefundCaseType"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PartnerRefundCaseStatus"
+          },
+          "slaHours": {
+            "type": "number"
+          },
+          "slaBreached": {
+            "type": "boolean"
+          },
+          "riskTone": {
+            "$ref": "#/components/schemas/AdminFinanceRiskTone"
+          }
+        },
+        "required": [
+          "id",
+          "requestedAt",
+          "transactionId",
+          "partnerName",
+          "customerName",
+          "caseType",
+          "amount",
+          "currency",
+          "reason",
+          "owner",
+          "status",
+          "slaHours",
+          "slaBreached",
+          "riskTone"
+        ]
+      },
+      "AdminFinanceTransactionDetailDto": {
+        "type": "object",
+        "properties": {
+          "record": {
+            "$ref": "#/components/schemas/AdminFinanceTransactionRecordDto"
+          },
+          "providerEvents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceProviderEventDto"
+            }
+          },
+          "auditTrail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceAuditEventDto"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceNoteDto"
+            }
+          },
+          "relatedRefundCases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceRefundCaseRecordDto"
+            }
+          }
+        },
+        "required": [
+          "record",
+          "providerEvents",
+          "auditTrail",
+          "notes",
+          "relatedRefundCases"
+        ]
+      },
+      "AdminFinanceSettlementActionDto": {
+        "type": "object",
+        "properties": {
+          "settlementStatus": {
+            "$ref": "#/components/schemas/PartnerSettlementStatus"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "settlementStatus",
+          "note"
+        ]
+      },
+      "AdminFinanceReviewFlagActionDto": {
+        "type": "object",
+        "properties": {
+          "flagged": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "flagged"
+        ]
+      },
+      "AdminFinancePayoutRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "scheduledDate": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "periodLabel": {
+            "type": "string"
+          },
+          "includedVolume": {
+            "type": "number"
+          },
+          "feesAndAdjustments": {
+            "type": "number"
+          },
+          "netPayout": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PartnerPayoutStatus"
+          },
+          "attemptCount": {
+            "type": "number"
+          },
+          "notesCount": {
+            "type": "number"
+          },
+          "failureReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "holdReason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "scheduledDate",
+          "partnerName",
+          "periodLabel",
+          "includedVolume",
+          "feesAndAdjustments",
+          "netPayout",
+          "currency",
+          "method",
+          "status",
+          "attemptCount",
+          "notesCount"
+        ]
+      },
+      "AdminFinancePayoutPageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinancePayoutRecordDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AdminFinancePageMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminFinancePayoutAttemptDto": {
+        "type": "object",
+        "properties": {
+          "attemptNumber": {
+            "type": "number"
+          },
+          "attemptedAt": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "failureReason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "attemptNumber",
+          "attemptedAt",
+          "status"
+        ]
+      },
+      "AdminFinancePayoutDetailDto": {
+        "type": "object",
+        "properties": {
+          "record": {
+            "$ref": "#/components/schemas/AdminFinancePayoutRecordDto"
+          },
+          "includedTransactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceTransactionRecordDto"
+            }
+          },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinancePayoutAttemptDto"
+            }
+          },
+          "maskedDestination": {
+            "type": "string"
+          },
+          "auditTrail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceAuditEventDto"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceNoteDto"
+            }
+          }
+        },
+        "required": [
+          "record",
+          "includedTransactions",
+          "attempts",
+          "maskedDestination",
+          "auditTrail",
+          "notes"
+        ]
+      },
+      "AdminFinanceNoteActionDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        }
+      },
+      "AdminFinanceRequiredNoteActionDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "note"
+        ]
+      },
+      "AdminFinanceRefundCasePageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceRefundCaseRecordDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AdminFinancePageMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminFinanceRefundCaseDetailDto": {
+        "type": "object",
+        "properties": {
+          "record": {
+            "$ref": "#/components/schemas/AdminFinanceRefundCaseRecordDto"
+          },
+          "customerRequest": {
+            "type": "string"
+          },
+          "partnerResponse": {
+            "type": "string"
+          },
+          "evidenceLinks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "decisionNote": {
+            "type": "string"
+          },
+          "auditTrail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceAuditEventDto"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceNoteDto"
+            }
+          }
+        },
+        "required": [
+          "record",
+          "customerRequest",
+          "partnerResponse",
+          "evidenceLinks",
+          "decisionNote",
+          "auditTrail",
+          "notes"
+        ]
+      },
+      "AdminFinanceReconciliationType": {
+        "type": "string",
+        "enum": [
+          "missingProviderEvent",
+          "missingLedgerRecord",
+          "amountMismatch",
+          "currencyMismatch",
+          "duplicateProviderEvent",
+          "payoutMismatch",
+          "refundMismatch",
+          "stalePendingPayment"
+        ]
+      },
+      "AdminFinanceReconciliationExceptionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "detectedAt": {
+            "type": "string"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/AdminFinanceProvider"
+          },
+          "providerEventId": {
+            "type": "string"
+          },
+          "relatedTransactionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "expectedAmount": {
+            "type": "number"
+          },
+          "providerAmount": {
+            "type": "number"
+          },
+          "difference": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AdminFinanceReconciliationType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AdminFinanceReconciliationStatus"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "detectedAt",
+          "provider",
+          "providerEventId",
+          "expectedAmount",
+          "providerAmount",
+          "difference",
+          "currency",
+          "type",
+          "status",
+          "owner",
+          "summary"
+        ]
+      },
+      "AdminFinanceReconciliationPageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceReconciliationExceptionDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AdminFinancePageMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminFinanceReconciliationDetailDto": {
+        "type": "object",
+        "properties": {
+          "exception": {
+            "$ref": "#/components/schemas/AdminFinanceReconciliationExceptionDto"
+          },
+          "providerEventContext": {
+            "type": "string"
+          },
+          "ledgerContext": {
+            "type": "string"
+          },
+          "resolutionNotes": {
+            "type": "string"
+          },
+          "auditTrail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceAuditEventDto"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminFinanceNoteDto"
+            }
+          }
+        },
+        "required": [
+          "exception",
+          "providerEventContext",
+          "ledgerContext",
+          "resolutionNotes",
+          "auditTrail",
+          "notes"
+        ]
+      },
+      "AdminFinancePartnerExposureDto": {
+        "type": "object",
+        "properties": {
+          "partnerId": {
+            "type": "string"
+          },
+          "partnerName": {
+            "type": "string"
+          },
+          "totalVolume": {
+            "type": "number"
+          },
+          "pendingPayouts": {
+            "type": "number"
+          },
+          "refundExposure": {
+            "type": "number"
+          },
+          "failedPayments": {
+            "type": "number"
+          },
+          "heldFunds": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "riskTone": {
+            "$ref": "#/components/schemas/AdminFinanceRiskTone"
+          }
+        },
+        "required": [
+          "partnerId",
+          "partnerName",
+          "totalVolume",
+          "pendingPayouts",
+          "refundExposure",
+          "failedPayments",
+          "heldFunds",
+          "currency",
+          "riskTone"
+        ]
+      },
+      "AdminFinanceExportType": {
+        "type": "string",
+        "enum": [
+          "transactions",
+          "payouts",
+          "refundCases",
+          "reconciliation",
+          "partnerExposure",
+          "monthlySummary"
+        ]
+      },
+      "AdminFinanceExportStatus": {
+        "type": "string",
+        "enum": [
+          "queued",
+          "processing",
+          "ready",
+          "failed",
+          "expired"
+        ]
+      },
+      "AdminFinanceExportJobDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AdminFinanceExportType"
+          },
+          "requestedBy": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AdminFinanceExportStatus"
+          },
+          "rowCount": {
+            "type": "number"
+          },
+          "downloadUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "type",
+          "requestedBy",
+          "status",
+          "rowCount"
+        ]
+      },
+      "AdminFinanceCreateExportDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/AdminFinanceExportType"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "AdminFinanceNoteEntityType": {
+        "type": "string",
+        "enum": [
+          "transaction",
+          "payout",
+          "refundCase",
+          "reconciliation"
+        ]
+      },
+      "AdminFinanceCreateNoteDto": {
+        "type": "object",
+        "properties": {
+          "entityType": {
+            "$ref": "#/components/schemas/AdminFinanceNoteEntityType"
+          },
+          "entityId": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "entityType",
+          "entityId",
+          "content"
         ]
       },
       "AuditLog": {
@@ -14564,6 +19881,61 @@
           "checkInTime",
           "checkOutTime",
           "duration"
+        ]
+      },
+      "PaginationMetaResponseDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "example": 1,
+            "description": "Current page number"
+          },
+          "limit": {
+            "type": "number",
+            "example": 20,
+            "description": "Items per page"
+          },
+          "total": {
+            "type": "number",
+            "example": 42,
+            "description": "Total number of items"
+          },
+          "totalPages": {
+            "type": "number",
+            "example": 3,
+            "description": "Total number of pages"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "PaginatedEmployeeAppointmentsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "List of appointments",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeAppointmentResponseDto"
+            }
+          },
+          "meta": {
+            "description": "Pagination metadata",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaginationMetaResponseDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
         ]
       },
       "CancelEmployeeAppointmentDto": {
@@ -15677,6 +21049,18 @@
             "type": "string",
             "example": "15k"
           },
+          "followerCount": {
+            "type": "number",
+            "example": 15000
+          },
+          "isFollowing": {
+            "type": "boolean",
+            "example": false
+          },
+          "chatPartnerId": {
+            "type": "string",
+            "nullable": true
+          },
           "reviewsLabel": {
             "type": "string",
             "example": "2.5k"
@@ -15720,6 +21104,8 @@
           "name",
           "gallery",
           "followersLabel",
+          "followerCount",
+          "isFollowing",
           "reviewsLabel",
           "trustMetrics",
           "certifications",
@@ -16013,6 +21399,66 @@
           "reviews",
           "totalCount",
           "hasMore"
+        ]
+      },
+      "WishlistItemResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "string",
+            "example": "799.000đ"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "productId",
+          "title",
+          "price",
+          "createdAt"
+        ]
+      },
+      "UserProfileSummaryResponseDto": {
+        "type": "object",
+        "properties": {
+          "ordersCount": {
+            "type": "number",
+            "example": 12
+          },
+          "wishlistCount": {
+            "type": "number",
+            "example": 48
+          },
+          "points": {
+            "type": "number",
+            "example": 0
+          },
+          "pointsLabel": {
+            "type": "string",
+            "example": "0"
+          }
+        },
+        "required": [
+          "ordersCount",
+          "wishlistCount",
+          "points",
+          "pointsLabel"
         ]
       },
       "DashboardStatsResponseDto": {
@@ -16383,51 +21829,6 @@
           "ninetyDays"
         ]
       },
-      "PartnerCommerceSourceType": {
-        "type": "string",
-        "enum": [
-          "serviceBooking",
-          "productOrder"
-        ]
-      },
-      "PartnerTransactionType": {
-        "type": "string",
-        "enum": [
-          "charge",
-          "refund",
-          "adjustment",
-          "payout",
-          "fee"
-        ]
-      },
-      "PartnerTransactionStatus": {
-        "type": "string",
-        "enum": [
-          "pending",
-          "paid",
-          "refunded",
-          "failed",
-          "canceled"
-        ]
-      },
-      "PartnerSettlementStatus": {
-        "type": "string",
-        "enum": [
-          "unsettled",
-          "scheduled",
-          "settled",
-          "held"
-        ]
-      },
-      "PartnerPayoutStatus": {
-        "type": "string",
-        "enum": [
-          "notAssigned",
-          "inPayout",
-          "paidOut",
-          "failed"
-        ]
-      },
       "PartnerFinanceSummaryDto": {
         "type": "object",
         "properties": {
@@ -16692,22 +22093,6 @@
           "includedTransactionIds"
         ]
       },
-      "PartnerRefundCaseType": {
-        "type": "string",
-        "enum": [
-          "refund",
-          "dispute"
-        ]
-      },
-      "PartnerRefundCaseStatus": {
-        "type": "string",
-        "enum": [
-          "pending",
-          "underReview",
-          "approved",
-          "rejected"
-        ]
-      },
       "PartnerRefundCaseRecordDto": {
         "type": "object",
         "properties": {
@@ -16852,6 +22237,584 @@
             "example": "Approved from partner transaction manager."
           }
         }
+      },
+      "BackdoorStatusResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "database": {
+            "type": "string",
+            "example": "healytics_test"
+          },
+          "nodeEnv": {
+            "type": "string",
+            "example": "test"
+          }
+        },
+        "required": [
+          "ok",
+          "database",
+          "nodeEnv"
+        ]
+      },
+      "ResetDbResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "truncatedTables": {
+            "type": "number",
+            "example": 12
+          }
+        },
+        "required": [
+          "ok",
+          "truncatedTables"
+        ]
+      },
+      "SeedUserDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key for this seeded user"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@test.healytics.vn"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123!"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Nguyen"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Van A"
+          },
+          "phone": {
+            "type": "string",
+            "example": "0901234567"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "SeedCategoryDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "name": {
+            "type": "string",
+            "example": "Spa & Beauty"
+          },
+          "slug": {
+            "type": "string",
+            "example": "spa-beauty"
+          },
+          "description": {
+            "type": "string"
+          },
+          "iconName": {
+            "type": "string",
+            "example": "spa"
+          },
+          "colorValue": {
+            "type": "string",
+            "example": "#FF6B6B"
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "SeedPartnerDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "email": {
+            "type": "string",
+            "example": "partner@test.healytics.vn"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123!"
+          },
+          "taxCode": {
+            "type": "string",
+            "example": "TAX-12345"
+          },
+          "legalName": {
+            "type": "string",
+            "example": "Healytics Spa LLC"
+          },
+          "brandName": {
+            "type": "string",
+            "example": "Healytics Spa"
+          },
+          "businessTypes": {
+            "description": "Business type categories",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "streetAddress": {
+            "type": "string",
+            "example": "District 1, Ho Chi Minh City"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "0901234567"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "REQUIRED_RESUBMIT"
+            ],
+            "description": "Verification status"
+          }
+        },
+        "required": [
+          "brandName"
+        ]
+      },
+      "SeedEmployeeDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "partnerKey": {
+            "type": "string",
+            "description": "Key of a previously seeded partner"
+          },
+          "partnerBrandName": {
+            "type": "string",
+            "description": "Brand name to look up the partner"
+          },
+          "email": {
+            "type": "string",
+            "example": "emp@test.healytics.vn"
+          },
+          "employeeCode": {
+            "type": "string",
+            "example": "EMP-001"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Nguyen"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Van B"
+          },
+          "displayName": {
+            "type": "string",
+            "example": "Dr. Nguyen Van B"
+          },
+          "phone": {
+            "type": "string",
+            "example": "0912345678"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "DOCTOR",
+              "THERAPIST",
+              "RECEPTIONIST",
+              "MANAGER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "ON_LEAVE"
+            ]
+          }
+        },
+        "required": [
+          "displayName"
+        ]
+      },
+      "SeedServiceDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "partnerKey": {
+            "type": "string",
+            "description": "Key of a previously seeded partner"
+          },
+          "partnerBrandName": {
+            "type": "string",
+            "description": "Brand name to look up the partner"
+          },
+          "employeeKeys": {
+            "description": "Keys of previously seeded employees",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "categoryKey": {
+            "type": "string",
+            "description": "Key of a previously seeded category"
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "Category name (auto-created if missing)"
+          },
+          "name": {
+            "type": "string",
+            "example": "Deep Tissue Massage"
+          },
+          "slug": {
+            "type": "string",
+            "example": "deep-tissue-massage"
+          },
+          "description": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "example": 500000
+          },
+          "durationMinutes": {
+            "type": "number",
+            "example": 60
+          },
+          "vendorName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "SeedCouponDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "code": {
+            "type": "string",
+            "example": "SUMMER20"
+          },
+          "discountPercent": {
+            "type": "number",
+            "example": 20
+          },
+          "maxDiscountAmount": {
+            "type": "number",
+            "example": 100000
+          },
+          "usageLimit": {
+            "type": "number",
+            "example": 50
+          },
+          "serviceKey": {
+            "type": "string",
+            "description": "Key of a previously seeded service"
+          },
+          "serviceSlug": {
+            "type": "string",
+            "description": "Slug to look up the service"
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "Category name (auto-created if missing)"
+          },
+          "expiresAt": {
+            "type": "string",
+            "example": "2026-12-31T23:59:59Z",
+            "description": "ISO 8601 expiry"
+          }
+        },
+        "required": [
+          "code",
+          "discountPercent"
+        ]
+      },
+      "SeedCartItemDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "userKey": {
+            "type": "string",
+            "description": "Key of a previously seeded user"
+          },
+          "userEmail": {
+            "type": "string",
+            "description": "Email to look up the user"
+          },
+          "serviceKey": {
+            "type": "string",
+            "description": "Key of a previously seeded service"
+          },
+          "serviceSlug": {
+            "type": "string",
+            "description": "Slug to look up the service"
+          },
+          "employeeKey": {
+            "type": "string",
+            "description": "Key of a previously seeded employee"
+          },
+          "employeeEmail": {
+            "type": "string",
+            "description": "Email to look up the employee"
+          },
+          "startsAt": {
+            "type": "string",
+            "example": "2026-06-01T10:00:00Z",
+            "description": "ISO 8601 start time"
+          }
+        },
+        "required": [
+          "startsAt"
+        ]
+      },
+      "SeedBookingDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "userKey": {
+            "type": "string",
+            "description": "Key of a previously seeded user"
+          },
+          "userEmail": {
+            "type": "string",
+            "description": "Email to look up the user"
+          },
+          "serviceKey": {
+            "type": "string",
+            "description": "Key of a previously seeded service"
+          },
+          "serviceSlug": {
+            "type": "string",
+            "description": "Slug to look up the service"
+          },
+          "employeeKey": {
+            "type": "string",
+            "description": "Key of a previously seeded employee"
+          },
+          "employeeEmail": {
+            "type": "string",
+            "description": "Email to look up the employee"
+          },
+          "startsAt": {
+            "type": "string",
+            "example": "2026-06-01T10:00:00Z",
+            "description": "ISO 8601 start time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING_PAYMENT",
+              "CONFIRMED",
+              "IN_PROGRESS",
+              "CANCELLED",
+              "COMPLETED",
+              "NO_SHOW"
+            ]
+          },
+          "endsAt": {
+            "type": "string",
+            "example": "2026-06-01T11:00:00Z",
+            "description": "ISO 8601 end time"
+          },
+          "paymentUrl": {
+            "type": "string",
+            "example": "https://pay.stripe.com/xxx"
+          },
+          "paymentExpiresAt": {
+            "type": "string",
+            "example": "2026-06-01T10:30:00Z"
+          }
+        },
+        "required": [
+          "startsAt"
+        ]
+      },
+      "SeedPayloadDto": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedUserDto"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedCategoryDto"
+            }
+          },
+          "partners": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedPartnerDto"
+            }
+          },
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedEmployeeDto"
+            }
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedServiceDto"
+            }
+          },
+          "coupons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedCouponDto"
+            }
+          },
+          "cartItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedCartItemDto"
+            }
+          },
+          "bookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedBookingDto"
+            }
+          }
+        }
+      },
+      "BackdoorPrepareDto": {
+        "type": "object",
+        "properties": {
+          "scenario": {
+            "type": "string",
+            "example": "login-flow",
+            "description": "Scenario name"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/SeedPayloadDto"
+          }
+        }
+      },
+      "SeedIdsMapDto": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "user@test.healytics.vn": "a1b2c3d4-..."
+            },
+            "description": "user key → account UUID"
+          },
+          "categories": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "partners": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "employees": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "services": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "cartItems": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "bookings": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "coupons": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SeedResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "scenario": {
+            "type": "string",
+            "example": "inline"
+          },
+          "ids": {
+            "$ref": "#/components/schemas/SeedIdsMapDto"
+          }
+        },
+        "required": [
+          "ok",
+          "scenario",
+          "ids"
+        ]
       },
       "AiRecommendationItemDto": {
         "properties": {

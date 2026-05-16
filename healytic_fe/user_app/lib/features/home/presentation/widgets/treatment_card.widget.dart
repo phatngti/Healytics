@@ -105,10 +105,11 @@ class _CardImageSection extends StatelessWidget {
           Positioned(
             top: AppDimens.spaceSm,
             left: AppDimens.spaceSm,
+            right: AppDimens.spaceSm,
             child: _CategoryChip(label: product.category),
           ),
           Positioned(
-            top: AppDimens.spaceSm,
+            bottom: AppDimens.spaceSm,
             right: AppDimens.spaceSm,
             child: _RatingBadge(rating: double.tryParse(product.rating) ?? 4.9),
           ),

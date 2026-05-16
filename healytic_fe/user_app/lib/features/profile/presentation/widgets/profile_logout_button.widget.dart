@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 
 /// Full-width destructive "Log Out" button styled
 /// with error-container colors and an icon.
@@ -24,6 +25,7 @@ class ProfileLogoutButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(cardRad),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
+        key: keys.profilePage.logoutButton,
         onTap: onPressed,
         child: Padding(
           padding: EdgeInsets.symmetric(

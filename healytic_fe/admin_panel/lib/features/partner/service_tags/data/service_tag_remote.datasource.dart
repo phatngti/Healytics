@@ -24,6 +24,11 @@ abstract class ServiceTagRemoteDataSource {
     bool? sortedAsc,
   });
 
+  Future<List<ServiceTagEntity>> getAllServiceTags({
+    String? sortedBy,
+    bool? sortedAsc,
+  });
+
   Future<int> getTotalRows();
 
   Future<ServiceTagEntity> getServiceTagById(ServiceTagId id);
@@ -61,11 +66,26 @@ class ServiceTagRemoteDataSourceImpl implements ServiceTagRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   }) async {
+    final entities = await getAllServiceTags(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
+
+    // Apply pagination
+    final end = (startingAt + count).clamp(0, entities.length);
+    return entities.sublist(startingAt.clamp(0, entities.length), end);
+  }
+
+  @override
+  Future<List<ServiceTagEntity>> getAllServiceTags({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
     final response = await _serviceTagsApi.serviceTagsControllerFindAll();
 
     if (response == null) return [];
 
-    var entities = response.map(_mapResponseToEntity).toList();
+    final entities = response.map(_mapResponseToEntity).toList();
 
     // Apply sorting if requested
     if (sortedBy != null) {
@@ -75,9 +95,7 @@ class ServiceTagRemoteDataSourceImpl implements ServiceTagRemoteDataSource {
       });
     }
 
-    // Apply pagination
-    final end = (startingAt + count).clamp(0, entities.length);
-    return entities.sublist(startingAt.clamp(0, entities.length), end);
+    return entities;
   }
 
   /// Compares two [ServiceTagEntity] by [field] name.
@@ -203,6 +221,8 @@ class ServiceTagRemoteDataSourceImpl implements ServiceTagRemoteDataSource {
 
 /// Mock implementation with rich static data for UI testing
 class ServiceTagRemoteDataSourceMock implements ServiceTagRemoteDataSource {
+  final List<ServiceTagEntity> _tags = [...mockServiceTags];
+
   @override
   Future<List<ServiceTagEntity>> getServiceTags({
     required int startingAt,
@@ -210,27 +230,52 @@ class ServiceTagRemoteDataSourceMock implements ServiceTagRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   }) async {
+    final tags = await getAllServiceTags(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
+
+    final endIndex = (startingAt + count).clamp(0, tags.length);
+    return tags.sublist(startingAt.clamp(0, tags.length), endIndex);
+  }
+
+  @override
+  Future<List<ServiceTagEntity>> getAllServiceTags({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
-    print('ServiceTagRemoteDataSourceMock.getServiceTags called');
+    debugPrint('ServiceTagRemoteDataSourceMock.getAllServiceTags called');
 
-    final endIndex = (startingAt + count).clamp(0, mockServiceTags.length);
-    return mockServiceTags.sublist(
-      startingAt.clamp(0, mockServiceTags.length),
-      endIndex,
-    );
+    final tags = [..._tags];
+    if (sortedBy != null) {
+      tags.sort((a, b) {
+        final cmp = switch (sortedBy) {
+          'name' => a.name.compareTo(b.name),
+          'sortOrder' => a.sortOrder.compareTo(b.sortOrder),
+          'usage' => a.usage.compareTo(b.usage),
+          'isActive' => (a.isActive ? 1 : 0).compareTo(b.isActive ? 1 : 0),
+          'createdAt' => (a.createdAt ?? '').compareTo(b.createdAt ?? ''),
+          _ => 0,
+        };
+        return (sortedAsc ?? true) ? cmp : -cmp;
+      });
+    }
+
+    return tags;
   }
 
   @override
   Future<int> getTotalRows() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    return mockServiceTags.length;
+    return _tags.length;
   }
 
   @override
   Future<ServiceTagEntity> getServiceTagById(ServiceTagId id) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return mockServiceTags.firstWhere(
+    return _tags.firstWhere(
       (t) => t.id == id,
       orElse: () => throw Exception('ServiceTag not found: $id'),
     );
@@ -253,6 +298,7 @@ class ServiceTagRemoteDataSourceMock implements ServiceTagRemoteDataSource {
       createdAt: DateTime.now().toIso8601String(),
     );
 
+    _tags.insert(0, newTag);
     return newTag;
   }
 
@@ -266,19 +312,32 @@ class ServiceTagRemoteDataSourceMock implements ServiceTagRemoteDataSource {
     int? sortOrder,
   }) async {
     await Future.delayed(const Duration(seconds: 1));
+    final index = _tags.indexWhere((tag) => tag.id == id);
+    if (index != -1) {
+      final current = _tags[index];
+      _tags[index] = current.copyWith(
+        name: name ?? current.name,
+        description: description ?? current.description,
+        colorValue: colorValue ?? current.colorValue,
+        isActive: isActive ?? current.isActive,
+        sortOrder: sortOrder ?? current.sortOrder,
+        updatedAt: DateTime.now().toIso8601String(),
+      );
+    }
     debugPrint('Mock: Updated service tag $id');
   }
 
   @override
   Future<void> deleteServiceTag(ServiceTagId id) async {
     await Future.delayed(const Duration(milliseconds: 500));
+    _tags.removeWhere((tag) => tag.id == id);
     debugPrint('Mock: Deleted service tag $id');
   }
 
   @override
   Future<List<ServiceTagEntity>> getActiveServiceTags() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    return mockServiceTags.where((t) => t.isActive).toList();
+    return _tags.where((t) => t.isActive).toList();
   }
 }
 
@@ -289,7 +348,7 @@ class ServiceTagRemoteDataSourceMock implements ServiceTagRemoteDataSource {
 @riverpod
 ServiceTagRemoteDataSource serviceTagRemoteDataSource(Ref ref) {
   final isMock = Store.get(StoreKey.mockFlag, false);
-  print('isMock: $isMock');
+  debugPrint('isMock: $isMock');
   if (isMock) {
     return ServiceTagRemoteDataSourceMock();
   }

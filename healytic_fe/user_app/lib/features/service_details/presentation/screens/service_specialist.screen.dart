@@ -35,26 +35,20 @@ import '../widgets/service_details/reviews_section_loader.widget.dart';
 /// the user pick a specialist, date, and time
 /// slot. No step indicator or booking-flow
 /// state is involved.
-class ServiceSpecialistScreen
-    extends ConsumerStatefulWidget {
-  const ServiceSpecialistScreen({
-    super.key,
-    required this.serviceId,
-  });
+class ServiceSpecialistScreen extends ConsumerStatefulWidget {
+  const ServiceSpecialistScreen({super.key, required this.serviceId});
 
   /// Service identifier used to fetch
   /// specialists.
   final String serviceId;
 
   @override
-  ConsumerState<ServiceSpecialistScreen>
-      createState() =>
-          _ServiceSpecialistScreenState();
+  ConsumerState<ServiceSpecialistScreen> createState() =>
+      _ServiceSpecialistScreenState();
 }
 
 class _ServiceSpecialistScreenState
-    extends ConsumerState<
-        ServiceSpecialistScreen> {
+    extends ConsumerState<ServiceSpecialistScreen> {
   int _selectedSpecialistIdx = -1;
   int _selectedDateIdx = -1;
   int _selectedTimeSlotIdx = -1;
@@ -74,17 +68,13 @@ class _ServiceSpecialistScreenState
   void _handleContinue() {
     if (!_canContinue) return;
 
-    final specialist =
-        _specialists[_selectedSpecialistIdx];
-    final flowNotifier =
-        ref.read(bookingFlowProvider.notifier);
+    final specialist = _specialists[_selectedSpecialistIdx];
+    final flowNotifier = ref.read(bookingFlowProvider.notifier);
 
     // Build a BookingService from the cached
     // ServiceDetailsEntity for this serviceId.
     final detailsAsync = ref.read(
-      serviceDetailsProvider(
-        serviceId: widget.serviceId,
-      ),
+      serviceDetailsProvider(serviceId: widget.serviceId),
     );
     detailsAsync.whenData((details) {
       final service = BookingService(
@@ -92,9 +82,7 @@ class _ServiceSpecialistScreenState
         title: details.title,
         duration: _extractDuration(details),
         price: details.price,
-        imageUrl: details.images.isNotEmpty
-            ? details.images.first
-            : null,
+        imageUrl: details.images.isNotEmpty ? details.images.first : null,
         clinicName: details.clinic.name,
         clinicAddress: details.clinic.address,
       );
@@ -103,28 +91,20 @@ class _ServiceSpecialistScreenState
 
     flowNotifier.selectSpecialist(specialist);
 
-    final selectedDate = DateTime.now().add(
-      Duration(days: _selectedDateIdx),
-    );
+    final selectedDate = DateTime.now().add(Duration(days: _selectedDateIdx));
     flowNotifier.selectDate(selectedDate);
 
-    flowNotifier.selectTimeSlot(
-      _selectedTimeSlotIdx,
-      _selectedTimeSlotLabel,
-    );
+    flowNotifier.selectTimeSlot(_selectedTimeSlotIdx, _selectedTimeSlotLabel);
 
     const BookingSummaryRoute().push(context);
   }
 
   /// Extracts a duration label from feature tags
   /// or falls back to a default.
-  String _extractDuration(
-    dynamic details,
-  ) {
+  String _extractDuration(dynamic details) {
     for (final tag in details.featureTags) {
       final label = tag.label.toLowerCase();
-      if (label.contains('min') ||
-          label.contains('hour')) {
+      if (label.contains('min') || label.contains('hour')) {
         return tag.label;
       }
     }
@@ -146,10 +126,7 @@ class _ServiceSpecialistScreenState
     });
   }
 
-  void _onTimeSlotSelected(
-    int index,
-    String label,
-  ) {
+  void _onTimeSlotSelected(int index, String label) {
     setState(() {
       _selectedTimeSlotIdx = index;
       _selectedTimeSlotLabel = label;
@@ -158,17 +135,11 @@ class _ServiceSpecialistScreenState
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final hPad =
-        AppDimens.horizontalPadding(context);
-    final sectionGap =
-        AppDimens.sectionSpacing(context);
+    final hPad = AppDimens.horizontalPadding(context);
+    final sectionGap = AppDimens.sectionSpacing(context);
 
     final specialistsAsync = ref.watch(
-      specialistsByServiceProvider(
-        widget.serviceId,
-      ),
+      specialistsByServiceProvider(widget.serviceId),
     );
 
     return Scaffold(
@@ -181,12 +152,8 @@ class _ServiceSpecialistScreenState
         title: const Text('Select Specialist'),
       ),
       body: specialistsAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (e, _) => Center(
-          child: Text('Error: $e'),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
         data: (specialists) {
           _specialists = specialists;
           return _ServiceSpecialistBody(
@@ -194,16 +161,12 @@ class _ServiceSpecialistScreenState
             hPad: hPad,
             sectionGap: sectionGap,
             specialists: specialists,
-            selectedSpecialistIdx:
-                _selectedSpecialistIdx,
+            selectedSpecialistIdx: _selectedSpecialistIdx,
             selectedDateIdx: _selectedDateIdx,
-            selectedTimeSlotIdx:
-                _selectedTimeSlotIdx,
-            onSpecialistSelected:
-                _onSpecialistSelected,
+            selectedTimeSlotIdx: _selectedTimeSlotIdx,
+            onSpecialistSelected: _onSpecialistSelected,
             onDateSelected: _onDateSelected,
-            onTimeSlotSelected:
-                _onTimeSlotSelected,
+            onTimeSlotSelected: _onTimeSlotSelected,
           );
         },
       ),
@@ -217,8 +180,7 @@ class _ServiceSpecialistScreenState
 
 /// Scrollable body for service specialist
 /// selection — no step indicator.
-class _ServiceSpecialistBody
-    extends StatelessWidget {
+class _ServiceSpecialistBody extends StatelessWidget {
   const _ServiceSpecialistBody({
     required this.serviceId,
     required this.hPad,
@@ -247,12 +209,9 @@ class _ServiceSpecialistBody
   Widget build(BuildContext context) {
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
-        textScaler: MediaQuery.of(context)
-            .textScaler
-            .clamp(
-              minScaleFactor: 0.8,
-              maxScaleFactor: 1.3,
-            ),
+        textScaler: MediaQuery.of(
+          context,
+        ).textScaler.clamp(minScaleFactor: 0.8, maxScaleFactor: 1.3),
       ),
       child: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -260,14 +219,12 @@ class _ServiceSpecialistBody
           vertical: AppDimens.spaceLg,
         ),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Select Specialist (no step bar)
             SpecialistCardList(
               specialists: specialists,
-              selectedIndex:
-                  selectedSpecialistIdx,
+              selectedIndex: selectedSpecialistIdx,
               onSelected: onSpecialistSelected,
             ),
 
@@ -275,9 +232,7 @@ class _ServiceSpecialistBody
             // is selected)
             if (selectedSpecialistIdx >= 0) ...[
               SizedBox(height: sectionGap),
-              _SectionTitle(
-                title: 'Select Date',
-              ),
+              _SectionTitle(title: 'Select Date'),
               SizedBox(height: AppDimens.spaceMd),
               DatePickerRow(
                 selectedIndex: selectedDateIdx,
@@ -287,20 +242,15 @@ class _ServiceSpecialistBody
 
             if (selectedDateIdx >= 0) ...[
               SizedBox(height: sectionGap),
-              _SectionTitle(
-                title: 'Available Time Slots',
-              ),
+              _SectionTitle(title: 'Available Time Slots'),
               SizedBox(height: AppDimens.spaceMd),
               TimeSlotSection(
-                employeeId: specialists[
-                        selectedSpecialistIdx]
-                    .id,
+                employeeId: specialists[selectedSpecialistIdx].id,
                 currentServiceId: serviceId,
                 selectedDate: DateTime.now().add(
                   Duration(days: selectedDateIdx),
                 ),
-                selectedIndex:
-                    selectedTimeSlotIdx,
+                selectedIndex: selectedTimeSlotIdx,
                 onSelected: onTimeSlotSelected,
               ),
             ],
@@ -309,12 +259,9 @@ class _ServiceSpecialistBody
 
             // ── Reviews (shown when specialist
             //    is selected) ──
-            if (selectedSpecialistIdx >= 0 &&
-                specialists.isNotEmpty)
+            if (selectedSpecialistIdx >= 0 && specialists.isNotEmpty)
               ReviewsSectionLoader(
-                employeeId: specialists[
-                        selectedSpecialistIdx]
-                    .id,
+                employeeId: specialists[selectedSpecialistIdx].id,
               ),
 
             SizedBox(height: sectionGap),
@@ -336,9 +283,7 @@ class _SectionTitle extends StatelessWidget {
     final theme = Theme.of(context);
     return Text(
       title,
-      style: theme.textTheme.titleSmall?.copyWith(
-        fontWeight: FontWeight.bold,
-      ),
+      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
     );
   }
 }

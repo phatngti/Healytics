@@ -94,12 +94,6 @@ class HomeHeader extends ConsumerWidget {
                   onTap: () => const CartRoute().push(context),
                 ),
               ),
-              SizedBox(width: AppDimens.spaceMd),
-              _HeaderIconButton(
-                icon: Symbols.settings,
-                tooltip: 'Settings',
-                onTap: () {},
-              ),
             ],
           ),
         ],

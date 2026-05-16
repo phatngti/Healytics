@@ -24,6 +24,8 @@ abstract class ProductRemoteDataSource {
     bool? sortedAsc,
   );
 
+  Future<List<Product>> getAllProducts({String? sortedBy, bool? sortedAsc});
+
   Future<int> getTotalRows();
 
   Future<Product> getProductById(ProductId id);
@@ -70,14 +72,10 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    final response = await _partnerHealthServicesApi
-        .partnerHealthServiceControllerFindAll();
-
-    if (response == null) {
-      return [];
-    }
-
-    final products = response.map(_mapToProduct).toList();
+    final products = await getAllProducts(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
 
     // Local pagination since API doesn't support it
     if (startingAt >= products.length) return [];
@@ -85,6 +83,21 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     if (end > products.length) end = products.length;
 
     return products.sublist(startingAt, end);
+  }
+
+  @override
+  Future<List<Product>> getAllProducts({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
+    final response = await _partnerHealthServicesApi
+        .partnerHealthServiceControllerFindAll();
+
+    if (response == null) {
+      return [];
+    }
+
+    return response.map(_mapToProduct).toList();
   }
 
   @override
@@ -122,7 +135,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
         durationMinutes: request.duration ?? 60,
         bufferMinutes: request.buffer,
         maxCapacity: request.capacity,
-        minLeadTimeHours: request.leadTime,
+
         staffAssignmentType: _mapStaffAssignment(request.staffAllocation),
       );
     }
@@ -176,37 +189,55 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   @override
-  Future<void> updateProduct(
-    UpdateProductRequest request,
-  ) async {
-    final dto = UpdatePartnerHealthServiceDto(
+  Future<void> updateProduct(UpdateProductRequest request) async {
+    final hasProductDefinitionChanges =
+        request.duration != null ||
+        request.buffer != null ||
+        request.capacity != null ||
+        request.staffAllocation != null;
+    final dto = _SparseUpdatePartnerHealthServiceDto(
       name: request.name,
+      type: request.productType != null
+          ? _mapProductType(request.productType!)
+          : null,
       basePrice: request.basePrice,
+      salePrice: request.salePrice,
+      includeSalePrice: request.salePrice != null || request.clearSalePrice,
       description: request.description,
+      status: request.status != null ? _mapUpdateStatus(request.status!) : null,
+      isVisibleOnline: request.onlineStore,
       categoryId: request.category,
       employeeIds: request.staffIds,
+      productDefinition: hasProductDefinitionChanges
+          ? CreatePartnerHealthServiceDefinitionDto(
+              durationMinutes: request.duration ?? 60,
+              bufferMinutes: request.buffer ?? 0,
+              maxCapacity: request.capacity ?? 1,
+
+              staffAssignmentType: request.staffAllocation != null
+                  ? _mapStaffAssignment(request.staffAllocation!)
+                  : CreatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum
+                        .any,
+            )
+          : null,
       media: request.images
           ?.asMap()
           .entries
           .map(
-            (entry) =>
-                CreatePartnerHealthServiceMediaDto(
+            (entry) => CreatePartnerHealthServiceMediaDto(
               url: entry.value,
-              mediaType:
-                  CreatePartnerHealthServiceMediaDtoMediaTypeEnum
-                      .image,
+              mediaType: CreatePartnerHealthServiceMediaDtoMediaTypeEnum.image,
               isThumbnail: entry.key == 0,
               sortOrder: entry.key,
             ),
           )
           .toList(),
-      serviceManual: _mapServiceManual(
-        request.serviceManual,
-      ),
+      serviceManual: _mapServiceManual(request.serviceManual),
+      includeServiceManual:
+          request.serviceManual != null || request.clearServiceManual,
     );
 
-    await _partnerHealthServicesApi
-        .partnerHealthServiceControllerUpdate(
+    await _partnerHealthServicesApi.partnerHealthServiceControllerUpdate(
       request.id.value.toString(),
       dto,
     );
@@ -247,6 +278,9 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       capacity: service?.maxCapacity?.toInt(),
       leadTime: service?.minLeadTimeHours?.toInt(),
       staffAllocation: service?.staffAssignmentType?.toLowerCase() ?? 'any',
+      staffIds: dto.productEmployeeEligibilities
+          .map((eligibility) => eligibility.employeeId)
+          .toList(),
 
       // Service Manual
       serviceManual: _mapServiceManualFromDto(dto.serviceManual),
@@ -270,6 +304,18 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       case 'draft':
       default:
         return CreatePartnerHealthServiceDtoStatusEnum.draft;
+    }
+  }
+
+  UpdatePartnerHealthServiceDtoStatusEnum _mapUpdateStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return UpdatePartnerHealthServiceDtoStatusEnum.active;
+      case 'archived':
+        return UpdatePartnerHealthServiceDtoStatusEnum.archived;
+      case 'draft':
+      default:
+        return UpdatePartnerHealthServiceDtoStatusEnum.draft;
     }
   }
 
@@ -350,7 +396,87 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 }
 
+class _SparseUpdatePartnerHealthServiceDto
+    extends UpdatePartnerHealthServiceDto {
+  _SparseUpdatePartnerHealthServiceDto({
+    super.categoryId,
+    super.description,
+    super.salePrice,
+    super.name,
+    super.type,
+    super.basePrice,
+    super.status,
+    super.isVisibleOnline,
+    super.employeeIds,
+    super.media,
+    super.productDefinition,
+    super.serviceManual,
+    this.includeSalePrice = false,
+    this.includeServiceManual = false,
+  });
+
+  final bool includeSalePrice;
+  final bool includeServiceManual;
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = <String, dynamic>{};
+
+    void addIfPresent(String key, Object? value) {
+      if (value != null) {
+        json[key] = value;
+      }
+    }
+
+    addIfPresent(r'categoryId', categoryId);
+    addIfPresent(r'description', description);
+    if (includeSalePrice) {
+      json[r'salePrice'] = salePrice;
+    }
+    addIfPresent(r'name', name);
+    addIfPresent(r'type', type);
+    addIfPresent(r'basePrice', basePrice);
+    addIfPresent(r'status', status);
+    addIfPresent(r'isVisibleOnline', isVisibleOnline);
+    addIfPresent(r'employeeIds', employeeIds);
+    addIfPresent(r'media', media);
+    addIfPresent(r'productDefinition', productDefinition);
+    if (includeServiceManual) {
+      json[r'serviceManual'] = serviceManual;
+    }
+
+    return json;
+  }
+}
+
 class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
+  final List<Product> _products = List.generate(100, _mockProductAt);
+
+  static Product _mockProductAt(int index) {
+    return Product(
+      id: ProductId('mock-id-$index'),
+      name: 'Mock Product $index',
+      description: 'Description for mock product $index',
+      basePrice: 100.0 + index,
+      salePrice: 90.0 + index,
+      productType: index % 2 == 0 ? 'service' : 'physical',
+      status: index % 5 == 0 ? 'draft' : 'active',
+      category: CategoryEntity(
+        id: 'cat-${index % 5}',
+        name: 'Category ${index % 5}',
+        slug: 'category-${index % 5}',
+      ),
+      onlineStore: true,
+      images: ['https://picsum.photos/200/300?random=$index'],
+      costPerItem: index % 2 != 0 ? 50.0 : null,
+      duration: index % 2 == 0 ? 60 : null,
+      buffer: index % 2 == 0 ? 15 : null,
+      capacity: index % 2 == 0 ? 1 : null,
+      leadTime: index % 2 == 0 ? 24 : null,
+      staffAllocation: 'any',
+    );
+  }
+
   @override
   Future<List<Product>> getProducts(
     int startingAt,
@@ -358,48 +484,36 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return List.generate(
-      count,
-      (index) => Product(
-        id: ProductId('mock-id-${startingAt + index}'),
-        name: 'Mock Product ${startingAt + index}',
-        description:
-            'Description for mock product '
-            '${startingAt + index}',
-        basePrice: 100.0 + index,
-        salePrice: 90.0 + index,
-        productType: index % 2 == 0 ? 'service' : 'physical',
-        status: 'active',
-        category: CategoryEntity(
-          id: 'cat-${index % 5}',
-          name: 'Category ${index % 5}',
-          slug: 'category-${index % 5}',
-        ),
-        onlineStore: true,
-        images: [
-          'https://picsum.photos/200/300'
-              '?random=${startingAt + index}',
-        ],
-        costPerItem: index % 2 != 0 ? 50.0 : null,
-        duration: index % 2 == 0 ? 60 : null,
-        buffer: index % 2 == 0 ? 15 : null,
-        capacity: index % 2 == 0 ? 1 : null,
-        leadTime: index % 2 == 0 ? 24 : null,
-        staffAllocation: 'any',
-      ),
+    final products = await getAllProducts(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
     );
+    final end = (startingAt + count).clamp(0, products.length);
+    return products.sublist(startingAt.clamp(0, products.length), end);
+  }
+
+  @override
+  Future<List<Product>> getAllProducts({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return [..._products];
   }
 
   @override
   Future<int> getTotalRows() async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return 100;
+    return _products.length;
   }
 
   @override
   Future<Product> getProductById(ProductId id) async {
     await Future.delayed(const Duration(seconds: 1));
+    final existing = _products.where((product) => product.id == id);
+    if (existing.isNotEmpty) {
+      return existing.first;
+    }
 
     final product = productMockData[id.value] ?? productMockDefault;
 
@@ -413,8 +527,8 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
   @override
   Future<Product> createProduct(CreateProductRequest request) async {
     await Future.delayed(const Duration(seconds: 1));
-    return Product(
-      id: ProductId('new-mock-id'),
+    final product = Product(
+      id: ProductId('new-mock-id-${DateTime.now().millisecondsSinceEpoch}'),
       name: request.name,
       description: request.description,
       basePrice: request.basePrice,
@@ -432,9 +546,11 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
       duration: request.duration,
       buffer: request.buffer,
       capacity: request.capacity,
-      leadTime: request.leadTime,
+
       staffAllocation: request.staffAllocation,
     );
+    _products.insert(0, product);
+    return product;
   }
 
   @override
@@ -446,6 +562,7 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
   @override
   Future<void> deleteProduct(ProductId id) async {
     await Future.delayed(const Duration(seconds: 1));
+    _products.removeWhere((product) => product.id == id);
     debugPrint('Mock delete product: $id');
   }
 

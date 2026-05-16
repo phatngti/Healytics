@@ -21,6 +21,7 @@ class PublicHealthServiceInfoResponseDto {
     required this.reviewCount,
     required this.price,
     required this.isVerified,
+    required this.isWishlisted,
     this.description,
     this.featureTags = const [],
     required this.clinic,
@@ -45,6 +46,8 @@ class PublicHealthServiceInfoResponseDto {
 
   bool isVerified;
 
+  bool isWishlisted;
+
   String? description;
 
   List<PublicFeatureTagDto> featureTags;
@@ -65,6 +68,7 @@ class PublicHealthServiceInfoResponseDto {
     other.reviewCount == reviewCount &&
     other.price == price &&
     other.isVerified == isVerified &&
+    other.isWishlisted == isWishlisted &&
     other.description == description &&
     _deepEquality.equals(other.featureTags, featureTags) &&
     other.clinic == clinic &&
@@ -82,6 +86,7 @@ class PublicHealthServiceInfoResponseDto {
     (reviewCount.hashCode) +
     (price.hashCode) +
     (isVerified.hashCode) +
+    (isWishlisted.hashCode) +
     (description == null ? 0 : description!.hashCode) +
     (featureTags.hashCode) +
     (clinic.hashCode) +
@@ -89,7 +94,7 @@ class PublicHealthServiceInfoResponseDto {
     (serviceTags.hashCode);
 
   @override
-  String toString() => 'PublicHealthServiceInfoResponseDto[id=$id, title=$title, category=$category, images=$images, rating=$rating, reviewCount=$reviewCount, price=$price, isVerified=$isVerified, description=$description, featureTags=$featureTags, clinic=$clinic, facilityImages=$facilityImages, serviceTags=$serviceTags]';
+  String toString() => 'PublicHealthServiceInfoResponseDto[id=$id, title=$title, category=$category, images=$images, rating=$rating, reviewCount=$reviewCount, price=$price, isVerified=$isVerified, isWishlisted=$isWishlisted, description=$description, featureTags=$featureTags, clinic=$clinic, facilityImages=$facilityImages, serviceTags=$serviceTags]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -101,6 +106,7 @@ class PublicHealthServiceInfoResponseDto {
       json[r'reviewCount'] = this.reviewCount;
       json[r'price'] = this.price;
       json[r'isVerified'] = this.isVerified;
+      json[r'isWishlisted'] = this.isWishlisted;
     if (this.description != null) {
       json[r'description'] = this.description;
     } else {
@@ -142,6 +148,7 @@ class PublicHealthServiceInfoResponseDto {
         reviewCount: num.parse('${json[r'reviewCount']}'),
         price: mapValueOfType<String>(json, r'price')!,
         isVerified: mapValueOfType<bool>(json, r'isVerified')!,
+        isWishlisted: mapValueOfType<bool>(json, r'isWishlisted')!,
         description: mapValueOfType<String>(json, r'description'),
         featureTags: PublicFeatureTagDto.listFromJson(json[r'featureTags']),
         clinic: PublicClinicDto.fromJson(json[r'clinic'])!,
@@ -202,6 +209,7 @@ class PublicHealthServiceInfoResponseDto {
     'reviewCount',
     'price',
     'isVerified',
+    'isWishlisted',
     'featureTags',
     'clinic',
     'facilityImages',

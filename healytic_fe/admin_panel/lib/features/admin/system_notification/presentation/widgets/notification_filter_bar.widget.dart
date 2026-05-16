@@ -250,6 +250,10 @@ class _SearchFilterFieldState extends State<_SearchFilterField> {
     return TextField(
       controller: _controller,
       onChanged: widget.onChanged,
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        color: Colors.transparent,
+      ),
+      cursorColor: Colors.transparent,
       decoration: const InputDecoration(
         hintText: 'Search campaigns',
         prefixIcon: Icon(Icons.search),

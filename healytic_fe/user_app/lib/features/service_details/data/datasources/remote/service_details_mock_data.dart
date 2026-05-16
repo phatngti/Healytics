@@ -59,6 +59,7 @@ final kMockServiceInfo = ServiceDetailsEntity(
   reviewCount: 124,
   price: r'$350.00',
   isVerified: true,
+  isWishlisted: false,
   description:
       'Experience state-of-the-art '
       'skin resurfacing designed to '
@@ -129,6 +130,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
     reviewCount: 87,
     price: '850,000 VND',
     isVerified: true,
+    isWishlisted: false,
     description:
         'Our Deep Tissue Massage targets chronic '
         'muscle tension using slow, firm strokes '
@@ -179,6 +181,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
     reviewCount: 62,
     price: '450,000 VND',
     isVerified: true,
+    isWishlisted: false,
     description:
         'Combine gentle yoga postures with guided '
         'meditation for total mind-body balance. '
@@ -221,6 +224,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
     reviewCount: 45,
     price: '600,000 VND',
     isVerified: true,
+    isWishlisted: false,
     description:
         'Get a customized workout plan designed '
         'by certified trainers. Build strength, '
@@ -263,6 +267,7 @@ final Map<String, ServiceDetailsEntity> kMockServiceInfoMap = {
     reviewCount: 31,
     price: '1,200,000 VND',
     isVerified: true,
+    isWishlisted: false,
     description:
         'Smooth, heated basalt stones are placed '
         'on key energy points to melt away '

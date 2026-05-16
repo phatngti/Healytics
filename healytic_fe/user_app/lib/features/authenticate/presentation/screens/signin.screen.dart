@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:common/widgets/button/button.dart';
+import 'package:common/widgets/toast.dart';
+import 'package:user_app/features/authenticate/presentation/providers/authenticate.provider.dart';
 import 'package:user_app/features/authenticate/presentation/widgets/login_form.widget.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/utils/device.dart';
+
+final _log = Logger('SignInScreen');
 
 class SingInScreen extends HookConsumerWidget {
   const SingInScreen({super.key});
@@ -19,11 +24,28 @@ class SingInScreen extends HookConsumerWidget {
         DeviceUtils.getStatusBarHeight(context) -
         DeviceUtils.getAppBarHeight();
 
+    // Auth state listener for login success toast.
+    ref.listen(authenticateProvider, (previous, next) {
+      _log.fine('Auth state: $next');
+
+      final hasCompletedSignIn =
+          previous?.isLoading == true &&
+          next.hasValue &&
+          !next.isLoading &&
+          next.value?.authenticate != null;
+
+      if (hasCompletedSignIn && context.mounted) {
+        AppToast.success(context, 'Signed in successfully.');
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
           color: Theme.of(context).colorScheme.onSurface,
-          onPressed: () => {context.pushReplacementNamed(OnboardingRoute.name)},
+          onPressed: () {
+            context.pushReplacementNamed(OnboardingRoute.name);
+          },
         ),
       ),
       body: SingleChildScrollView(
@@ -35,7 +57,6 @@ class SingInScreen extends HookConsumerWidget {
             children: [
               SizedBox(
                 width: double.infinity,
-
                 child: Column(
                   children: [
                     Image.asset('assets/images/signin_image.png'),
@@ -46,7 +67,8 @@ class SingInScreen extends HookConsumerWidget {
                     ),
                     AppDimens.verticalSmall,
                     Text(
-                      'We’re so excited to see you again!',
+                      'We\u2019re so excited '
+                      'to see you again!',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
@@ -66,7 +88,6 @@ class SingInScreen extends HookConsumerWidget {
                   Expanded(child: Divider()),
                 ],
               ),
-
               AppDimens.verticalLarge,
               // Login with social media
               SizedBox(
@@ -108,7 +129,7 @@ class SingInScreen extends HookConsumerWidget {
                       child: AppButton(
                         key: keys.signInPage.facebookButton,
                         onPressed: () {
-                          // Handle Google sign-in
+                          // Handle Facebook sign-in
                         },
                         buttonType: ButtonType.outline,
                         customStyle: OutlinedButton.styleFrom(

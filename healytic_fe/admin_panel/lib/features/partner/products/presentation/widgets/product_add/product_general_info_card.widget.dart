@@ -85,6 +85,7 @@ class _ProductGeneralInfoCardState extends State<ProductGeneralInfoCard> {
                   context,
                   label: 'Description',
                   initialValue: widget.initialDescription,
+                  isRequired: true,
                 ),
               ],
             ),

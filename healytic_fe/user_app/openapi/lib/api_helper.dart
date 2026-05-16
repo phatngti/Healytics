@@ -55,6 +55,48 @@ String parameterToString(dynamic value) {
   if (value is DateTime) {
     return value.toUtc().toIso8601String();
   }
+  if (value is AdminDashboardNotificationPriority) {
+    return AdminDashboardNotificationPriorityTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminDashboardNotificationType) {
+    return AdminDashboardNotificationTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceExportStatus) {
+    return AdminFinanceExportStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceExportType) {
+    return AdminFinanceExportTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceNoteEntityType) {
+    return AdminFinanceNoteEntityTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinancePeriod) {
+    return AdminFinancePeriodTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceProvider) {
+    return AdminFinanceProviderTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceReconciliationStatus) {
+    return AdminFinanceReconciliationStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceReconciliationType) {
+    return AdminFinanceReconciliationTypeTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminFinanceRiskTone) {
+    return AdminFinanceRiskToneTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminPartnerRankingVerificationStatus) {
+    return AdminPartnerRankingVerificationStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminPartnerScope) {
+    return AdminPartnerScopeTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminPartnerSortBy) {
+    return AdminPartnerSortByTypeTransformer().encode(value).toString();
+  }
+  if (value is AdminPartnerSortDirection) {
+    return AdminPartnerSortDirectionTypeTransformer().encode(value).toString();
+  }
   if (value is AppointmentStatus) {
     return AppointmentStatusTypeTransformer().encode(value).toString();
   }
@@ -84,6 +126,9 @@ String parameterToString(dynamic value) {
   }
   if (value is EmployeeStatus) {
     return EmployeeStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is Gender) {
+    return GenderTypeTransformer().encode(value).toString();
   }
   if (value is HealthServiceStatus) {
     return HealthServiceStatusTypeTransformer().encode(value).toString();

@@ -5,8 +5,10 @@ import { Employee } from '@/common/entities/employee.entity';
 import { Partner } from '@/common/entities/partner.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { Booking } from '@/common/entities/booking.entity';
+import { SkillCatalog } from '@/common/entities/skill-catalog.entity';
 import { NotFoundException } from '@nestjs/common';
 import { EmployeeRole } from './enum/employee-role.enum';
+import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
 import { PartnersService } from '@/partners/partners.service';
 import { CreateDoctorHandler } from './application/handlers/create-doctor.handler';
 import { CreateTherapistHandler } from './application/handlers/create-therapist.handler';
@@ -59,10 +61,18 @@ describe('EmployeesService', () => {
 
   const mockEligibilityRepository = {
     find: jest.fn(),
+    createQueryBuilder: jest.fn(),
   };
 
   const mockBookingRepository = {
     find: jest.fn(),
+  };
+
+  const mockSkillCatalogRepository = {
+    find: jest.fn(),
+    findOne: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
   };
 
   const mockPartnersService = {
@@ -88,6 +98,10 @@ describe('EmployeesService', () => {
         {
           provide: getRepositoryToken(Booking),
           useValue: mockBookingRepository,
+        },
+        {
+          provide: getRepositoryToken(SkillCatalog),
+          useValue: mockSkillCatalogRepository,
         },
         {
           provide: PartnersService,
@@ -414,6 +428,121 @@ describe('EmployeesService', () => {
       await expect(
         service.findOneForPartner('emp-uuid', 'other-partner'),
       ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('findAssignedServicesForPartner', () => {
+    const createQueryBuilder = (result: any[]) => ({
+      innerJoinAndSelect: jest.fn().mockReturnThis(),
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      addOrderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue(result),
+    });
+
+    it('should return assigned services for a partner-owned employee', async () => {
+      // Arrange
+      const queryBuilder = createQueryBuilder([
+        {
+          isPrimary: true,
+          product: {
+            id: 'service-uuid',
+            name: 'Skin Consultation',
+            status: HealthServiceStatus.ACTIVE,
+            basePrice: '500000.00',
+            salePrice: '450000.00',
+            currency: 'VND',
+            category: { name: 'Dermatology' },
+            productDefinition: { durationMinutes: 45 },
+            media: [
+              {
+                url: 'https://cdn.example.com/other.jpg',
+                isThumbnail: false,
+                sortOrder: 2,
+              },
+              {
+                url: 'https://cdn.example.com/thumb.jpg',
+                isThumbnail: true,
+                sortOrder: 1,
+              },
+            ],
+          },
+        },
+      ]);
+      mockEmployeeRepository.findOne.mockResolvedValue({
+        id: 'emp-uuid',
+        partnerId: 'partner-uuid',
+      });
+      mockEligibilityRepository.createQueryBuilder.mockReturnValue(
+        queryBuilder,
+      );
+
+      // Act
+      const result = await service.findAssignedServicesForPartner(
+        'emp-uuid',
+        'partner-uuid',
+      );
+
+      // Assert
+      expect(result).toEqual([
+        {
+          id: 'service-uuid',
+          name: 'Skin Consultation',
+          status: HealthServiceStatus.ACTIVE,
+          basePrice: 500000,
+          salePrice: 450000,
+          currency: 'VND',
+          durationMinutes: 45,
+          categoryName: 'Dermatology',
+          imageUrl: 'https://cdn.example.com/thumb.jpg',
+          isPrimary: true,
+        },
+      ]);
+      expect(queryBuilder.innerJoinAndSelect).toHaveBeenCalledWith(
+        'eligibility.product',
+        'product',
+        'product.partner_id = :partnerId AND product.deleted_at IS NULL',
+        { partnerId: 'partner-uuid' },
+      );
+      expect(queryBuilder.where).toHaveBeenCalledWith(
+        'eligibility.employee_id = :employeeId',
+        { employeeId: 'emp-uuid' },
+      );
+    });
+
+    it('should return an empty list when the employee has no assignments', async () => {
+      // Arrange
+      const queryBuilder = createQueryBuilder([]);
+      mockEmployeeRepository.findOne.mockResolvedValue({
+        id: 'emp-uuid',
+        partnerId: 'partner-uuid',
+      });
+      mockEligibilityRepository.createQueryBuilder.mockReturnValue(
+        queryBuilder,
+      );
+
+      // Act
+      const result = await service.findAssignedServicesForPartner(
+        'emp-uuid',
+        'partner-uuid',
+      );
+
+      // Assert
+      expect(result).toEqual([]);
+    });
+
+    it('should throw NotFoundException when employee is not owned by partner', async () => {
+      // Arrange
+      mockEmployeeRepository.findOne.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(
+        service.findAssignedServicesForPartner('emp-uuid', 'other-partner'),
+      ).rejects.toThrow(NotFoundException);
+      expect(
+        mockEligibilityRepository.createQueryBuilder,
+      ).not.toHaveBeenCalled();
     });
   });
 

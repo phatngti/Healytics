@@ -1,10 +1,8 @@
 import 'dart:convert';
 
-import 'package:admin_panel/core/entities/store.entity.dart';
-import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/providers/image_upload.provider.dart';
 import 'package:admin_panel/core/utils/user_role_helper.dart';
-import 'package:admin_panel/features/common/providers/authen_token.provider.dart';
+import 'package:admin_panel/features/authenticate/presentation/providers/logout.provider.dart';
 import 'package:admin_panel/features/partner/profile_completion/domain/profile_completion.entity.dart';
 import 'package:admin_panel/features/partner/profile_completion/presentation/providers/profile_completion.provider.dart';
 import 'package:admin_panel/features/partner/profile_completion/presentation/widgets/branding_section.widget.dart';
@@ -197,10 +195,9 @@ class _ProfileCompletionScreenState
   // ── Actions ──────────────────────────────────
 
   Future<void> _logout() async {
-    await ref.read(authenTokenProvider.notifier).removeToken();
-    await Store.delete(StoreKey.accessToken);
-    await Store.delete(StoreKey.refreshToken);
-    await UserRoleHelper.clearSession();
+    await ref
+        .read(logoutProviderProvider.notifier)
+        .logout();
     if (mounted) context.go('/');
   }
 

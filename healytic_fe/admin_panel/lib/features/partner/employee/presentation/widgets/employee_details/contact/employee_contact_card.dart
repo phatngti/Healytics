@@ -16,6 +16,9 @@ class EmployeeContactCard extends StatelessWidget {
 
   final bool isEditing;
 
+  /// Callback when the edit icon is pressed.
+  final VoidCallback? onEdit;
+
   const EmployeeContactCard({
     super.key,
     required this.email,
@@ -23,6 +26,7 @@ class EmployeeContactCard extends StatelessWidget {
     this.emergencyContactName,
     this.emergencyContactPhone,
     this.isEditing = false,
+    this.onEdit,
   });
 
   @override
@@ -42,7 +46,7 @@ class EmployeeContactCard extends StatelessWidget {
         border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withOpacity(0.04),
+            color: colorScheme.shadow.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -54,7 +58,7 @@ class EmployeeContactCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              color: colorScheme.surfaceContainerHighest.withAlpha(128),
               border: Border(
                 bottom: BorderSide(color: colorScheme.outlineVariant),
               ),
@@ -74,7 +78,7 @@ class EmployeeContactCard extends StatelessWidget {
                     size: 20,
                     color: semanticColors.success,
                   ),
-                  onPressed: () {},
+                  onPressed: onEdit,
                   visualDensity: VisualDensity.compact,
                 ),
               ],

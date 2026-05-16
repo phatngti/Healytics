@@ -74,6 +74,7 @@ export class PublicHealthServiceInfoResponseDto {
   @ApiProperty({ type: Number, example: 124 }) reviewCount: number;
   @ApiProperty({ type: String, example: '$350.00' }) price: string;
   @ApiProperty({ type: Boolean, example: true }) isVerified: boolean;
+  @ApiProperty({ type: Boolean, example: false }) isWishlisted: boolean;
   @ApiPropertyOptional({ type: String, nullable: true }) description: string | null;
   @ApiProperty({ type: [PublicFeatureTagDto] })
   featureTags: PublicFeatureTagDto[];
@@ -87,6 +88,7 @@ export class PublicHealthServiceInfoResponseDto {
     product: Product,
     partner?: Partner | null,
     ratingData?: { rating: number; count: number },
+    isWishlisted = false,
   ): PublicHealthServiceInfoResponseDto {
     const dto = new PublicHealthServiceInfoResponseDto();
 
@@ -120,6 +122,7 @@ export class PublicHealthServiceInfoResponseDto {
 
     // Derived
     dto.isVerified = product.status === 'active';
+    dto.isWishlisted = isWishlisted;
 
     // Feature tags
     dto.featureTags = (product.productTags ?? []).map((pt) => ({

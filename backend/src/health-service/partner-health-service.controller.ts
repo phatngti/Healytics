@@ -144,9 +144,10 @@ export class PartnerHealthServiceController {
     type: PartnerHealthServiceResponseDto,
   })
   create(
+    @CurrentUser('id') userId: string,
     @Body() createDto: CreatePartnerHealthServiceDto,
   ): Promise<PartnerHealthServiceResponseDto> {
-    return this.healthServiceService.create(createDto);
+    return this.healthServiceService.create(userId, createDto);
   }
 
   /**
@@ -161,10 +162,11 @@ export class PartnerHealthServiceController {
   })
   @ApiNotFoundResponse({ description: 'Health service not found.' })
   update(
+    @CurrentUser('id') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDto: UpdatePartnerHealthServiceDto,
   ): Promise<PartnerHealthServiceResponseDto> {
-    return this.healthServiceService.update(id, updateDto);
+    return this.healthServiceService.update(userId, id, updateDto);
   }
 
   /**

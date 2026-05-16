@@ -1,3 +1,4 @@
+import 'package:admin_panel/core/keys/integration_test_keys.dart';
 import 'package:admin_panel/features/partner/service_tags/domain/service_tag.entity.dart';
 import 'package:admin_panel/features/partner/service_tags/presentation/providers/service_tag.provider.dart';
 import 'package:common/widgets/table/helper.dart';
@@ -8,12 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ServiceTagTableSource {
-  /// Get total rows from provider state
-  static Future<int> getTotalRows(BuildContext context, WidgetRef ref) async {
-    final state = ref.watch(serviceTagProvider);
-    return state.value?.totalCount ?? 0;
-  }
-
   /// Get data rows from provider state
   static Future<List<DataRow>> getData(
     BuildContext context,
@@ -24,19 +19,22 @@ class ServiceTagTableSource {
   ) async {
     final tags = await ref
         .read(serviceTagProvider.notifier)
-        .getServiceTags(
-          startingAt: startingAt,
-          count: count,
-          sortedBy: null,
-          sortedAsc: true,
-        );
-    print("tags $tags");
+        .getVisiblePage(startingAt: startingAt, count: count);
+    if (!context.mounted) return [];
+
+    final selectedIds =
+        ref.read(serviceTagProvider).value?.selectedIds ?? const <String>{};
+
     final rows = tags.map((tag) {
       return DataRow(
         key: ValueKey<String>(tag.id.value),
+        selected: selectedIds.contains(tag.id.value),
         onSelectChanged: (value) {
           if (value != null) {
             setRowSelection(ValueKey<String>(tag.id.value), value);
+            ref
+                .read(serviceTagProvider.notifier)
+                .toggleSelection(tag.id.value, value);
           }
         },
         cells: [
@@ -106,9 +104,13 @@ class ServiceTagTableSource {
     }).toList();
 
     // Add action button cells to each row
-    final actionButtons = ServiceTagTableActions.buildRowActionButtons(context);
+    final actionButtons = ServiceTagTableActions.buildRowActionButtons(
+      context,
+      ref,
+    );
     if (actionButtons.isNotEmpty) {
       for (final row in rows) {
+        final rowId = (row.key as ValueKey<String>).value;
         row.cells.add(
           DataCell(
             Row(
@@ -116,6 +118,12 @@ class ServiceTagTableSource {
               children: actionButtons
                   .map(
                     (action) => IconButton(
+                      key: action.icon == Icons.delete
+                          ? keys.managementTables.rowDeleteButton(
+                              'service_tag',
+                              rowId,
+                            )
+                          : null,
                       onPressed: () => action.onPressed(row.key),
                       icon: Icon(action.icon, size: 20),
                       padding: AppDimens.paddingAllExtraSmall,

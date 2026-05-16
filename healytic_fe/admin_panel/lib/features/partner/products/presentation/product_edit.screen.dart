@@ -1,6 +1,8 @@
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/product_form_field.dart';
 import 'package:admin_panel/features/partner/products/domain/service_manual.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/service_manual_key.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
 import 'package:admin_panel/features/partner/products/presentation/layouts/product_edit_desktop.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_service_manual_card.widget.dart';
@@ -78,31 +80,49 @@ class _ProductEditContent extends HookConsumerWidget {
 
     Future<void> handleSave() async {
       final state = formKey.currentState;
-      if (state == null || !state.saveAndValidate()) {
-        return;
-      }
+      final isFormValid =
+          state?.saveAndValidate() ?? false;
+      final isManualValid =
+          serviceManualKey.currentState?.validate() ??
+          true;
+
+      if (!isFormValid || !isManualValid) return;
 
       isSubmitting.value = true;
       try {
-        final data = state.value;
-        final request = _buildDeltaRequest(product, data, serviceManualKey);
+        final data = state!.value;
+        final request = _buildDeltaRequest(
+          product,
+          data,
+          serviceManualKey,
+        );
 
-        await ref.read(productProvider.notifier).updateProduct(request);
+        await ref
+            .read(productProvider.notifier)
+            .updateProduct(request);
 
         // Invalidate cache so details refresh
-        ref.invalidate(productDetailsProvider(product.id.value));
+        ref.invalidate(
+          productDetailsProvider(product.id.value),
+        );
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Product updated successfully!')),
+            const SnackBar(
+              content: Text(
+                'Product updated successfully!',
+              ),
+            ),
           );
           context.goNamed(ProductHomeRoute.name);
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Failed to update: $e')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update: $e'),
+            ),
+          );
         }
       } finally {
         isSubmitting.value = false;
@@ -152,33 +172,68 @@ class _ProductEditContent extends HookConsumerWidget {
     Map<String, dynamic> data,
     GlobalKey<ProductServiceManualCardState> manualKey,
   ) {
-    final newName = data['product_name'] as String?;
-    final newDescription = data['product_description'] as String?;
-    final newCategory = data['category'] as String?;
-    final newBasePrice = double.tryParse(data['base_price']?.toString() ?? '');
-    final newImages = (data['product_images'] as List?)
+    final newName = data[ProductFormField.productName.key] as String?;
+    final newDescription =
+        data[ProductFormField.productDescription.key] as String?;
+    final newProductType = data[ProductFormField.productType.key] as String?;
+    final newCategory = data[ProductFormField.category.key] as String?;
+    final newBasePrice = _parseDouble(data[ProductFormField.basePrice.key]);
+    final newSalePrice = _parseDouble(data[ProductFormField.salePrice.key]);
+    final newStatus = data[ProductFormField.visibilityStatus.key] as String?;
+    final newOnlineStore = data[ProductFormField.onlineStore.key] as bool?;
+    final newDuration = _parseInt(data[ProductFormField.duration.key]);
+    final newBuffer = _parseInt(data[ProductFormField.buffer.key]);
+    final newCapacity = _parseInt(data[ProductFormField.capacity.key]);
+
+    final newStaffAllocation =
+        data[ProductFormField.staffAllocation.key] as String?;
+    final newImages = (data[ProductFormField.productImages.key] as List?)
         ?.map((e) => e.toString())
         .toList();
-    final newStaffIds = (data['selected_staff_ids'] as List?)
+    final newStaffIds = (data[ProductFormField.selectedStaffIds.key] as List?)
         ?.map((e) => e.toString())
         .toList();
     final newManual = _extractServiceManual(manualKey);
+    final definitionChanged =
+        newDuration != product.duration ||
+        newBuffer != product.buffer ||
+        newCapacity != product.capacity ||
+        newStaffAllocation != product.staffAllocation;
 
     const listEq = DeepCollectionEquality();
 
     return UpdateProductRequest(
       id: product.id,
       name: newName != product.name ? newName : null,
+      productType: newProductType != product.productType
+          ? newProductType
+          : null,
       basePrice: newBasePrice != product.basePrice ? newBasePrice : null,
+      salePrice: newSalePrice != product.salePrice ? newSalePrice : null,
+      clearSalePrice: newSalePrice == null && product.salePrice != null,
       description: newDescription != product.description
           ? newDescription
           : null,
+      status: newStatus != product.status ? newStatus : null,
+      onlineStore: newOnlineStore != product.onlineStore
+          ? newOnlineStore
+          : null,
       category: newCategory != product.category.id ? newCategory : null,
+      duration: definitionChanged
+          ? (newDuration ?? product.duration ?? 60)
+          : null,
+      buffer: definitionChanged ? (newBuffer ?? 0) : null,
+      capacity: definitionChanged ? (newCapacity ?? 1) : null,
+
+      staffAllocation: definitionChanged
+          ? (newStaffAllocation ?? product.staffAllocation)
+          : null,
       images: !listEq.equals(newImages, product.images) ? newImages : null,
       staffIds: !listEq.equals(newStaffIds, product.staffIds)
           ? newStaffIds
           : null,
       serviceManual: newManual != product.serviceManual ? newManual : null,
+      clearServiceManual: newManual == null && product.serviceManual != null,
     );
   }
 
@@ -189,27 +244,28 @@ class _ProductEditContent extends HookConsumerWidget {
     final data = key.currentState?.extractFormData();
     if (data == null) return null;
 
-    final guidelines = (data['guidelines'] as List<String>?) ?? [];
+    final guidelines =
+        (data[ServiceManualKey.guidelines] as List<String>?) ?? [];
     final rules =
-        (data['rules'] as List<Map<String, String>>?)
+        (data[ServiceManualKey.rules] as List<Map<String, String>>?)
             ?.map(
               (r) => ServiceRuleEntity(
-                iconSlug: r['iconSlug'] ?? '',
-                title: r['title'] ?? '',
-                description: r['description'] ?? '',
+                iconSlug: r[ServiceManualKey.iconSlug] ?? '',
+                title: r[ServiceManualKey.title] ?? '',
+                description: r[ServiceManualKey.description] ?? '',
               ),
             )
             .toList() ??
         [];
     final steps =
-        (data['steps'] as List<Map<String, String>>?)
+        (data[ServiceManualKey.steps] as List<Map<String, String>>?)
             ?.asMap()
             .entries
             .map(
               (e) => ProcedureStepEntity(
                 stepNumber: e.key + 1,
-                title: e.value['title'] ?? '',
-                description: e.value['description'] ?? '',
+                title: e.value[ServiceManualKey.title] ?? '',
+                description: e.value[ServiceManualKey.description] ?? '',
               ),
             )
             .toList() ??
@@ -226,21 +282,33 @@ class _ProductEditContent extends HookConsumerWidget {
   /// field keys used by the card widgets.
   static Map<String, dynamic> _buildInitialValues(Product product) {
     return {
-      'product_name': product.name,
-      'product_description': product.description,
-      'product_type': product.productType,
-      'base_price': product.basePrice.toString(),
-      'sale_price': product.salePrice?.toString(),
-      'visibility_status': product.status,
-      'online_store': product.onlineStore,
-      'category': product.category.id,
-      'duration': product.duration?.toString(),
-      'buffer': product.buffer?.toString(),
-      'capacity': product.capacity?.toString(),
-      'lead_time': product.leadTime?.toString(),
-      'staff_allocation': product.staffAllocation,
-      'selected_staff_ids': product.staffIds,
-      'product_images': product.images,
+      ProductFormField.productName.key: product.name,
+      ProductFormField.productDescription.key: product.description,
+      ProductFormField.productType.key: product.productType,
+      ProductFormField.basePrice.key: product.basePrice.toString(),
+      ProductFormField.salePrice.key: product.salePrice?.toString(),
+      ProductFormField.visibilityStatus.key: product.status,
+      ProductFormField.onlineStore.key: product.onlineStore,
+      ProductFormField.category.key: product.category.id,
+      ProductFormField.duration.key: product.duration?.toString(),
+      ProductFormField.buffer.key: product.buffer?.toString(),
+      ProductFormField.capacity.key: product.capacity?.toString(),
+
+      ProductFormField.staffAllocation.key: product.staffAllocation,
+      ProductFormField.selectedStaffIds.key: product.staffIds,
+      ProductFormField.productImages.key: product.images,
     };
+  }
+
+  static double? _parseDouble(dynamic value) {
+    final raw = value?.toString().trim();
+    if (raw == null || raw.isEmpty) return null;
+    return double.tryParse(raw);
+  }
+
+  static int? _parseInt(dynamic value) {
+    final raw = value?.toString().trim();
+    if (raw == null || raw.isEmpty) return null;
+    return int.tryParse(raw);
   }
 }

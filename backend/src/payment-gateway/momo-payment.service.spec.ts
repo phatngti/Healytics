@@ -50,7 +50,7 @@ describe('MoMo Security Utility', () => {
       orderId: 'ORD-12345678_abc12',
       orderInfo: 'Thanh toan don hang ORD-20260301-A1B2C',
       partnerCode: 'MOMO',
-      redirectUrl: 'http://localhost:3000/payment/success/uuid',
+      redirectUrl: 'healytics://payment/momo/success?bookingId=uuid',
       requestId: 'ORD-12345678_abc12_def34',
       requestType: 'captureWallet',
     };

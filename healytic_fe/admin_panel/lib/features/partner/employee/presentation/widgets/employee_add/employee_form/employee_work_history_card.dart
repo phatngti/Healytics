@@ -15,7 +15,14 @@ class EmployeeWorkHistoryCard extends StatefulWidget {
   /// Pre-populated work history entries (edit mode).
   final List<WorkHistoryEntry>? initialEntries;
 
-  const EmployeeWorkHistoryCard({super.key, this.initialEntries});
+  /// Whether entry actions are available.
+  final bool isEditing;
+
+  const EmployeeWorkHistoryCard({
+    super.key,
+    this.initialEntries,
+    this.isEditing = true,
+  });
 
   @override
   State<EmployeeWorkHistoryCard> createState() =>
@@ -104,10 +111,10 @@ class _EmployeeWorkHistoryCardState extends State<EmployeeWorkHistoryCard> {
 
   Widget _buildFormContent(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final formEnabled =
+        (FormBuilder.of(context)?.enabled ?? true) && widget.isEditing;
 
-    final initialValue =
-        widget.initialEntries?.map((e) => e.toJson()).toList() ??
-        <Map<String, dynamic>>[];
+    final initialValue = widget.initialEntries?.map((e) => e.toJson()).toList();
 
     return FormBuilderField<List<Map<String, dynamic>>>(
       name: EmployeeFormField.workHistory.key,
@@ -125,12 +132,18 @@ class _EmployeeWorkHistoryCardState extends State<EmployeeWorkHistoryCard> {
               ...entries.asMap().entries.map(
                 (e) => _WorkHistoryEntryTile(
                   entry: e.value,
-                  onEdit: () => _editEntry(context, field, e.key),
-                  onDelete: () => _deleteEntry(field, e.key),
+                  onEdit: formEnabled
+                      ? () => _editEntry(context, field, e.key)
+                      : null,
+                  onDelete: formEnabled
+                      ? () => _deleteEntry(field, e.key)
+                      : null,
                 ),
               ),
-              AppDimens.verticalSmall,
-              _AddEntryButton(onTap: () => _addEntry(context, field)),
+              if (formEnabled) ...[
+                AppDimens.verticalSmall,
+                _AddEntryButton(onTap: () => _addEntry(context, field)),
+              ],
             ],
           ),
         );
@@ -264,8 +277,8 @@ class _EmployeeWorkHistoryCardState extends State<EmployeeWorkHistoryCard> {
 /// edit / delete actions.
 class _WorkHistoryEntryTile extends StatelessWidget {
   final Map<String, dynamic> entry;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const _WorkHistoryEntryTile({
     required this.entry,
@@ -327,26 +340,28 @@ class _WorkHistoryEntryTile extends StatelessWidget {
               ],
             ),
           ),
-          IconButton(
-            icon: Icon(
-              Icons.edit_outlined,
-              size: 18,
-              color: colorScheme.onSurfaceVariant,
+          if (onEdit != null)
+            IconButton(
+              icon: Icon(
+                Icons.edit_outlined,
+                size: 18,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              onPressed: onEdit,
+              tooltip: 'Edit',
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             ),
-            onPressed: onEdit,
-            tooltip: 'Edit',
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.delete_outline,
-              size: 18,
-              color: colorScheme.error,
+          if (onDelete != null)
+            IconButton(
+              icon: Icon(
+                Icons.delete_outline,
+                size: 18,
+                color: colorScheme.error,
+              ),
+              onPressed: onDelete,
+              tooltip: 'Delete',
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             ),
-            onPressed: onDelete,
-            tooltip: 'Delete',
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-          ),
         ],
       ),
     );
