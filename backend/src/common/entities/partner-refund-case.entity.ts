@@ -64,6 +64,22 @@ export class PartnerRefundCase {
   @Column({ name: 'sla_due_at', type: 'timestamptz', nullable: true })
   slaDueAt: Date | null;
 
+  @Column({ name: 'customer_request', type: 'text', nullable: true })
+  customerRequest: string | null;
+
+  @Column({ name: 'partner_response', type: 'text', nullable: true })
+  partnerResponse: string | null;
+
+  @Column({
+    name: 'evidence_links',
+    type: 'jsonb',
+    default: () => "'[]'::jsonb",
+  })
+  evidenceLinks: string[];
+
+  @Column({ name: 'decision_note', type: 'text', nullable: true })
+  decisionNote: string | null;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 

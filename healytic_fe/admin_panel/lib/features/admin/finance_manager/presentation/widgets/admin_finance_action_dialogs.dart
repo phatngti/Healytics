@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/admin/finance_manager/domain/admin_finance_period.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
@@ -41,8 +42,7 @@ class _ActionDialog extends StatefulWidget {
   final bool isDestructive;
 
   @override
-  State<_ActionDialog> createState() =>
-      _ActionDialogState();
+  State<_ActionDialog> createState() => _ActionDialogState();
 }
 
 class _ActionDialogState extends State<_ActionDialog> {
@@ -50,8 +50,7 @@ class _ActionDialogState extends State<_ActionDialog> {
   bool _isSubmitting = false;
 
   bool get _canConfirm =>
-      !widget.requireNote ||
-      _noteController.text.trim().isNotEmpty;
+      !widget.requireNote || _noteController.text.trim().isNotEmpty;
 
   @override
   void dispose() {
@@ -79,9 +78,7 @@ class _ActionDialogState extends State<_ActionDialog> {
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: 'Add a note (required)...',
-                  border: OutlineInputBorder(
-                    borderRadius: AppDimens.radiusSm,
-                  ),
+                  border: OutlineInputBorder(borderRadius: AppDimens.radiusSm),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -91,9 +88,7 @@ class _ActionDialogState extends State<_ActionDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: _isSubmitting
-              ? null
-              : () => Navigator.of(context).pop(),
+          onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
         ),
         FilledButton(
@@ -101,9 +96,7 @@ class _ActionDialogState extends State<_ActionDialog> {
               ? null
               : () {
                   setState(() => _isSubmitting = true);
-                  Navigator.of(context).pop(
-                    _noteController.text.trim(),
-                  );
+                  Navigator.of(context).pop(_noteController.text.trim());
                 },
           style: widget.isDestructive
               ? FilledButton.styleFrom(
@@ -119,9 +112,7 @@ class _ActionDialogState extends State<_ActionDialog> {
 }
 
 /// Shows an "Add Note" dialog.
-Future<String?> showAdminFinanceAddNoteDialog(
-  BuildContext context,
-) {
+Future<String?> showAdminFinanceAddNoteDialog(BuildContext context) {
   return showAdminFinanceActionDialog(
     context,
     title: 'Add Note',
@@ -132,15 +123,60 @@ Future<String?> showAdminFinanceAddNoteDialog(
 }
 
 /// Shows a "Create Export" dialog with type selection.
-Future<String?> showAdminFinanceCreateExportDialog(
+Future<AdminFinanceExportType?> showAdminFinanceCreateExportDialog(
   BuildContext context,
 ) {
-  return showAdminFinanceActionDialog(
-    context,
-    title: 'Create Export',
-    description:
-        'A new finance export will be queued '
-        'for processing.',
-    confirmLabel: 'Create',
+  return showDialog<AdminFinanceExportType>(
+    context: context,
+    builder: (ctx) => const _ExportDialog(),
   );
+}
+
+class _ExportDialog extends StatefulWidget {
+  const _ExportDialog();
+
+  @override
+  State<_ExportDialog> createState() => _ExportDialogState();
+}
+
+class _ExportDialogState extends State<_ExportDialog> {
+  AdminFinanceExportType _selected = AdminFinanceExportType.monthlySummary;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Create Export'),
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: DropdownButtonFormField<AdminFinanceExportType>(
+          initialValue: _selected,
+          decoration: InputDecoration(
+            labelText: 'Export type',
+            border: OutlineInputBorder(borderRadius: AppDimens.radiusSm),
+          ),
+          items: AdminFinanceExportType.values
+              .map(
+                (type) =>
+                    DropdownMenuItem(value: type, child: Text(type.label)),
+              )
+              .toList(),
+          onChanged: (value) {
+            if (value != null) {
+              setState(() => _selected = value);
+            }
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(_selected),
+          child: const Text('Create'),
+        ),
+      ],
+    );
+  }
 }

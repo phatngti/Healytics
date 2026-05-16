@@ -6,6 +6,8 @@ import { Product } from '@/common/entities/product.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { Booking } from '@/common/entities/booking.entity';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
+import { Partner } from '@/common/entities/partner.entity';
+import { UserClinicFollow } from '@/common/entities/user-clinic-follow.entity';
 import { PartnerCertification } from './entities/partner-certification.entity';
 import { ClinicReviewResponse } from './entities/clinic-review-response.entity';
 import { PartnersModule } from '@/partners/partners.module';
@@ -17,6 +19,8 @@ import { PartnersModule } from '@/partners/partners.module';
       Employee,
       Booking,
       TreatmentReview,
+      Partner,
+      UserClinicFollow,
       PartnerCertification,
       ClinicReviewResponse,
     ]),

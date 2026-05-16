@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Notification } from '@/common/entities/notification.entity';
 import { NotificationRead } from '@/common/entities/notification-read.entity';
 import { DeviceToken } from '@/common/entities/device-token.entity';
+import { Account } from '@/common/entities/account.entity';
 import { NotificationType } from '@/notification/enums/notification-type.enum';
 import { DevicePlatform } from '@/notification/enums/device-platform.enum';
 import { NotificationResponseDto } from '@/notification/dto/notification-response.dto';
@@ -32,6 +33,8 @@ export class NotificationService {
     private readonly notifReadRepo: Repository<NotificationRead>,
     @InjectRepository(DeviceToken)
     private readonly deviceTokenRepo: Repository<DeviceToken>,
+    @InjectRepository(Account)
+    private readonly accountRepo: Repository<Account>,
     private readonly createNotificationHandler: CreateNotificationHandler,
     private readonly createBroadcastHandler: CreateBroadcastHandler,
     private readonly markReadHandler: MarkNotificationReadHandler,
@@ -133,7 +136,32 @@ export class NotificationService {
   // ── Queries ──────────────────────────────────────────────────
 
   /**
+   * Resolves the account creation timestamp for a user.
+   *
+   * Used as a lower-bound for broadcast queries so that users
+   * only see system broadcasts published after they joined.
+   * Falls back to Unix epoch when the account is not found.
+   */
+  private async resolveAccountCreatedAt(
+    userId: string,
+  ): Promise<Date> {
+    // Avoid `select` option in findOne — TypeORM builds a distinctAlias
+    // subquery that references `Account_id` which doesn't exist as a column.
+    // Using a raw QueryBuilder projection sidesteps the issue entirely.
+    const result = await this.accountRepo
+      .createQueryBuilder('a')
+      .select('a.created_at', 'createdAt')
+      .where('a.id = :userId', { userId })
+      .getRawOne<{ createdAt: Date }>();
+    return result?.createdAt ? new Date(result.createdAt) : new Date(0);
+  }
+
+  /**
    * Get paginated notifications for a user (targeted + broadcasts).
+   *
+   * Broadcasts are filtered to those created on or after the user's
+   * account creation date, ensuring new users do not see stale
+   * system-wide announcements that predate their registration.
    */
   async getNotifications(
     userId: string,
@@ -145,6 +173,9 @@ export class NotificationService {
   }> {
     const limit = query.limit ?? 20;
 
+    // Resolve the lower-bound date for broadcast visibility
+    const accountCreatedAt = await this.resolveAccountCreatedAt(userId);
+
     // 1. Fetch targeted notifications
     const targetedQb = this.notificationRepo
       .createQueryBuilder('n')
@@ -152,25 +183,26 @@ export class NotificationService {
       .andWhere('n.isBroadcast = false')
       .andWhere('n.deletedAt IS NULL');
 
-    // 2. Fetch broadcasts (with read status from notification_reads)
+    // 2. Fetch broadcasts relevant to this user's join date
     const broadcastQb = this.notificationRepo
       .createQueryBuilder('n')
       .where('n.isBroadcast = true')
-      .andWhere('n.deletedAt IS NULL');
+      .andWhere('n.deletedAt IS NULL')
+      .andWhere('n.createdAt >= :accountCreatedAt', { accountCreatedAt });
 
     // Apply cursor
     if (query.cursor) {
-      const cursorNotif = await this.notificationRepo.findOne({
-        where: { id: query.cursor },
-        select: ['createdAt'],
-      });
-      if (cursorNotif) {
-        targetedQb.andWhere('n.createdAt < :cursorDate', {
-          cursorDate: cursorNotif.createdAt,
-        });
-        broadcastQb.andWhere('n.createdAt < :cursorDate', {
-          cursorDate: cursorNotif.createdAt,
-        });
+      // Avoid `select` with findOne for the same distinctAlias reason;
+      // use a raw projection instead.
+      const cursorRaw = await this.notificationRepo
+        .createQueryBuilder('cn')
+        .select('cn.created_at', 'createdAt')
+        .where('cn.id = :cursorId', { cursorId: query.cursor })
+        .getRawOne<{ createdAt: Date }>();
+      if (cursorRaw?.createdAt) {
+        const cursorDate = new Date(cursorRaw.createdAt);
+        targetedQb.andWhere('n.createdAt < :cursorDate', { cursorDate });
+        broadcastQb.andWhere('n.createdAt < :cursorDate', { cursorDate });
       }
     }
 
@@ -246,14 +278,20 @@ export class NotificationService {
 
   /**
    * Get the total unread notification count for a user.
+   *
+   * Broadcasts are scoped to those published after the user's
+   * account creation date, matching the listing behaviour.
    */
   async getUnreadCount(userId: string): Promise<number> {
+    const accountCreatedAt = await this.resolveAccountCreatedAt(userId);
+
     // Count unread targeted notifications
     const targetedCount = await this.notificationRepo.count({
       where: { recipientId: userId, isRead: false },
     });
 
-    // Count unread broadcasts (those NOT in notification_reads for this user)
+    // Count unread broadcasts (those NOT in notification_reads for this
+    // user) that were created after the user joined
     const unreadBroadcastCount = await this.notificationRepo
       .createQueryBuilder('n')
       .leftJoin(
@@ -264,6 +302,7 @@ export class NotificationService {
       )
       .where('n.isBroadcast = true')
       .andWhere('n.deletedAt IS NULL')
+      .andWhere('n.createdAt >= :accountCreatedAt', { accountCreatedAt })
       .andWhere('nr.id IS NULL')
       .getCount();
 

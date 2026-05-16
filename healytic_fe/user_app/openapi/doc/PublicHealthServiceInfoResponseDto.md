@@ -16,6 +16,7 @@ Name | Type | Description | Notes
 **reviewCount** | **num** |  | 
 **price** | **String** |  | 
 **isVerified** | **bool** |  | 
+**isWishlisted** | **bool** |  | 
 **description** | **String** |  | [optional] 
 **featureTags** | [**List<PublicFeatureTagDto>**](PublicFeatureTagDto.md) |  | [default to const []]
 **clinic** | [**PublicClinicDto**](PublicClinicDto.md) |  | 

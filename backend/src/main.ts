@@ -10,10 +10,13 @@ import fs from 'fs';
 import path from 'path';
 import express, { Request, Response } from 'express';
 import { RedisIoAdapter } from '@/common/adapters/redis-io.adapter';
+import { TestBackdoorModule } from './test-backdoor/test-backdoor.module';
 import { config } from 'dotenv';
 
 // Load .env BEFORE anything else so process.env is populated
-config();
+config({
+  path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+});
 
 async function bootstrap() {
   const logLevels: LogLevel[] =
@@ -91,6 +94,24 @@ async function bootstrap() {
     fs.writeFileSync(
       openapiPath + 'openapi.json',
       JSON.stringify(document, null, 2),
+    );
+
+    // ── Test Backdoor spec (separate file for Patrol / integration tests) ──
+    const testBackdoorOptions = new DocumentBuilder()
+      .setTitle('Healytics Test Backdoor API')
+      .setDescription(
+        'Endpoints used exclusively by Patrol / integration tests to seed and reset the test database.',
+      )
+      .setVersion('1.0.0')
+      .build();
+    const testBackdoorDocument = SwaggerModule.createDocument(
+      app,
+      testBackdoorOptions,
+      { include: [TestBackdoorModule] },
+    );
+    fs.writeFileSync(
+      openapiPath + 'openapi-test.json',
+      JSON.stringify(testBackdoorDocument, null, 2),
     );
 
     SwaggerModule.setup('/api/docs', app, document, {

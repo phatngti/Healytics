@@ -19,7 +19,7 @@ Future<void> _openCart(PatrolIntegrationTester $) async {
 
 void main() {
   patrolTest('cart screen renders seeded items from home header', ($) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'cartCheckout');
     final config = TestConfig.instance;
 
     if (!config.useMock) {
@@ -35,7 +35,7 @@ void main() {
   });
 
   patrolTest('searching cart filters visible items', ($) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'cartCheckout');
     final config = TestConfig.instance;
 
     if (!config.useMock) {
@@ -55,7 +55,7 @@ void main() {
   patrolTest('selecting an item exposes voucher actions and applies coupon', (
     $,
   ) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'cartCheckout');
     final config = TestConfig.instance;
 
     if (!config.useMock) {

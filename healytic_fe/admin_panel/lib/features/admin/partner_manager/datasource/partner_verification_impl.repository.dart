@@ -7,7 +7,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'partner_verification_impl.repository.g.dart';
 
-/// Implementation of [PartnerVerificationRepository] delegating to data source
+/// Implementation of [PartnerVerificationRepository]
+/// delegating to the remote data source.
 class PartnerVerificationRepositoryImpl
     implements PartnerVerificationRepository {
   final PartnerVerificationRemoteDataSource dataSource;
@@ -18,20 +19,56 @@ class PartnerVerificationRepositoryImpl
   Future<List<PartnerVerificationEntity>> getPartnerVerifications({
     required int startingAt,
     required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) => dataSource.getPartnerVerifications(
     startingAt: startingAt,
     count: count,
+    scope: scope,
+    searchQuery: searchQuery,
     sortedBy: sortedBy,
     sortedAsc: sortedAsc,
     statusFilter: statusFilter,
+    quickFilter: quickFilter,
   );
 
   @override
-  Future<int> getTotalRows({PartnerVerificationStatus? statusFilter}) =>
-      dataSource.getTotalRows(statusFilter: statusFilter);
+  Future<PartnerVerificationPageEntity> getPartnerVerificationPage({
+    required int startingAt,
+    required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    String? sortedBy,
+    bool? sortedAsc,
+    PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
+  }) => dataSource.getPartnerVerificationPage(
+    startingAt: startingAt,
+    count: count,
+    scope: scope,
+    searchQuery: searchQuery,
+    sortedBy: sortedBy,
+    sortedAsc: sortedAsc,
+    statusFilter: statusFilter,
+    quickFilter: quickFilter,
+  );
+
+  @override
+  Future<int> getTotalRows({
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
+  }) => dataSource.getTotalRows(
+    scope: scope,
+    searchQuery: searchQuery,
+    statusFilter: statusFilter,
+    quickFilter: quickFilter,
+  );
 
   @override
   Future<PartnerVerificationDetailEntity> getPartnerDetailById(
@@ -60,7 +97,10 @@ class PartnerVerificationRepositoryImpl
   );
 
   @override
-  Future<PartnerVerificationStats> getStats() => dataSource.getStats();
+  Future<PartnerVerificationStats> getStats({
+    PartnerManagerScope scope = PartnerManagerScope.verificationQueue,
+    String? searchQuery,
+  }) => dataSource.getStats(scope: scope, searchQuery: searchQuery);
 }
 
 @riverpod

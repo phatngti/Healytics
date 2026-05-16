@@ -1,7 +1,9 @@
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 
-config();
+config({
+  path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+});
 
 export default new DataSource({
   type: 'postgres',
@@ -16,8 +18,6 @@ export default new DataSource({
     __dirname + '/master-data/*{.ts,.js}',
   ],
   synchronize: false,
-  ssl: process.env.POSTGRES_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  ssl:
+    process.env.POSTGRES_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
-
-
-

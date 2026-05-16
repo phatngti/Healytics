@@ -6,6 +6,7 @@ import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/partner/employee/data/employee_mock_data.dart';
 import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_assigned_service.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee_gender.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
@@ -45,6 +46,12 @@ abstract class EmployeeRemoteDataSource {
     bool? sortedAsc,
   );
 
+  /// Retrieves all employees for client-side filtering/sorting.
+  Future<List<EmployeeEntity>> getAllEmployees({
+    String? sortedBy,
+    bool? sortedAsc,
+  });
+
   /// Returns the total count of employees.
   Future<int> getTotalRows();
 
@@ -65,8 +72,16 @@ abstract class EmployeeRemoteDataSource {
   /// Updates an existing employee's information.
   Future<void> updateEmployee(UpdateEmployeeRequest request);
 
+  /// Updates only the employee status.
+  Future<void> updateEmployeeStatus(EmployeeId id, EmployeeStatusType status);
+
   /// Deletes an employee by their unique identifier.
   Future<void> deleteEmployee(EmployeeId id);
+
+  /// Retrieves services assigned to an employee.
+  Future<List<EmployeeAssignedServiceEntity>> getEmployeeAssignedServices(
+    EmployeeId id,
+  );
 
   /// Retrieves employees filtered by role.
   ///
@@ -82,6 +97,15 @@ abstract class EmployeeRemoteDataSource {
 
   /// Retrieves available device proficiency options.
   Future<Map<String, String>> getDeviceProficiency();
+
+  /// Retrieves available massage skills options.
+  Future<Map<String, String>> getMassageSkills();
+
+  /// Creates a new massage skill for the partner.
+  Future<Map<String, String>> createMassageSkill(String name);
+
+  /// Creates a new spa skill for the partner.
+  Future<Map<String, String>> createSpaSkill(String name);
 }
 
 // ============================================================================
@@ -105,6 +129,26 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
+    final employees = await getAllEmployees(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
+
+    final endIndex = (startingAt + count) > employees.length
+        ? employees.length
+        : startingAt + count;
+    if (startingAt >= employees.length) {
+      return [];
+    }
+
+    return employees.sublist(startingAt, endIndex);
+  }
+
+  @override
+  Future<List<EmployeeEntity>> getAllEmployees({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
     final response = await _employeesApi.partnerEmployeesControllerFindAll();
     if (response == null) {
       return [];
@@ -115,16 +159,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       name: 'EmployeeRemoteDataSource',
     );
 
-    final employees = response.map(_mapToEmployeeEntity).toList();
-
-    final endIndex = (startingAt + count) > employees.length
-        ? employees.length
-        : startingAt + count;
-    if (startingAt >= employees.length) {
-      return [];
-    }
-
-    return employees.sublist(startingAt, endIndex);
+    return response.map(_mapToEmployeeEntity).toList();
   }
 
   @override
@@ -154,15 +189,37 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   @override
   Future<void> updateEmployee(UpdateEmployeeRequest request) async {
     final dto = UpdateEmployeeDto(
+      employeeCode: request.employeeCode,
+      firstName: request.firstName,
+      lastName: request.lastName,
       fullName: request.fullName,
       email: request.email,
       phone: request.phone,
       avatarUrl: request.avatar,
+      dob: request.dateOfBirth,
+      gender: _toUpdateGender(request.gender),
       role: _toUpdateRole(EmployeeRoleType.fromApiValue(request.role)),
       status: _toUpdateStatus(EmployeeStatusType.fromApiValue(request.status)),
+      jobTitle: request.jobTitle,
+      startDate: request.startDate,
+      employmentType: request.employmentType,
+      emergencyContactName: request.emergencyContactName,
+      emergencyContactPhone: request.emergencyContactPhone,
+      description: request.description,
       verificationDocuments: _toVerificationDocumentDtos(
         request.verificationDocuments,
       ),
+      schedule: _toScheduleEntries(request.schedule),
+      workHistory: _toWorkHistoryEntries(request.workHistory),
+      doctorProfile:
+          EmployeeRoleType.fromApiValue(request.role) == EmployeeRoleType.doctor
+          ? _toDoctorProfileDto(request)
+          : null,
+      therapistProfile:
+          EmployeeRoleType.fromApiValue(request.role) ==
+              EmployeeRoleType.therapist
+          ? _toTherapistProfileDto(request)
+          : null,
     );
 
     await _employeesApi.partnerEmployeesControllerUpdate(
@@ -177,10 +234,36 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   }
 
   @override
+  Future<void> updateEmployeeStatus(
+    EmployeeId id,
+    EmployeeStatusType status,
+  ) async {
+    await _employeesApi.partnerEmployeesControllerUpdate(
+      id.value.toString(),
+      UpdateEmployeeDto(status: _toUpdateStatus(status)),
+    );
+
+    developer.log(
+      'Updated employee status: $id -> ${status.apiValue}',
+      name: 'EmployeeRemoteDataSource',
+    );
+  }
+
+  @override
   Future<void> deleteEmployee(EmployeeId id) async {
     await _employeesApi.partnerEmployeesControllerRemove(id.value.toString());
 
     developer.log('Deleted employee: $id', name: 'EmployeeRemoteDataSource');
+  }
+
+  @override
+  Future<List<EmployeeAssignedServiceEntity>> getEmployeeAssignedServices(
+    EmployeeId id,
+  ) async {
+    final response = await _employeesApi
+        .partnerEmployeesControllerFindAssignedServices(id.value.toString());
+    if (response == null) return [];
+    return response.map(_mapAssignedService).toList();
   }
 
   @override
@@ -210,8 +293,8 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         request.medicalTitles,
         request.medicalLicenses,
       ),
-      experienceYears: request.experienceYears,
-      consultationFee: request.consultationFee,
+      experienceYears: request.experienceYears ?? 0,
+      consultationFee: request.consultationFee ?? 0,
       specializations: request.specializations,
       education: request.education,
       certifications: request.certifications,
@@ -363,8 +446,36 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
   @override
   Future<Map<String, String>> getSpaSkills() async {
-    // TODO(api): Implement when endpoint is available
-    return {};
+    final response = await _employeesApi
+        .partnerEmployeesControllerGetSpaSkills();
+    if (response == null) return {};
+    return {for (final item in response) item.key: item.label};
+  }
+
+  @override
+  Future<Map<String, String>> getMassageSkills() async {
+    final response = await _employeesApi
+        .partnerEmployeesControllerGetMassageSkills();
+    if (response == null) return {};
+    return {for (final item in response) item.key: item.label};
+  }
+
+  @override
+  Future<Map<String, String>> createMassageSkill(String name) async {
+    final dto = CreateSkillDto(name: name);
+    final response = await _employeesApi
+        .partnerEmployeesControllerCreateMassageSkill(dto);
+    if (response == null) return {};
+    return {response.key: response.label};
+  }
+
+  @override
+  Future<Map<String, String>> createSpaSkill(String name) async {
+    final dto = CreateSkillDto(name: name);
+    final response = await _employeesApi
+        .partnerEmployeesControllerCreateSpaSkill(dto);
+    if (response == null) return {};
+    return {response.key: response.label};
   }
 
   // ==========================================================
@@ -424,9 +535,10 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         consultationFee: profile.consultationFee?.toDouble(),
         specializations: profile.specializations,
         education: profile.education,
-        certifications: [],
+        certifications: profile.certifications,
       );
-    } else if (role == EmployeeRoleType.therapist && dto.therapistProfile != null) {
+    } else if (role == EmployeeRoleType.therapist &&
+        dto.therapistProfile != null) {
       final profile = dto.therapistProfile!;
       final therapistType = TherapistType.fromApiValue(profile.type);
 
@@ -563,28 +675,85 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   }
 
   /// Maps [EmployeeRoleType] to OpenAPI [EmployeeRole].
-  EmployeeRole? _toUpdateRole(EmployeeRoleType? role) =>
-      switch (role) {
-        EmployeeRoleType.doctor => EmployeeRole.DOCTOR,
-        EmployeeRoleType.therapist => EmployeeRole.THERAPIST,
-        EmployeeRoleType.receptionist =>
-          EmployeeRole.RECEPTIONIST,
-        EmployeeRoleType.manager => EmployeeRole.MANAGER,
+  EmployeeRole? _toUpdateRole(EmployeeRoleType? role) => switch (role) {
+    EmployeeRoleType.doctor => EmployeeRole.DOCTOR,
+    EmployeeRoleType.therapist => EmployeeRole.THERAPIST,
+    EmployeeRoleType.receptionist => EmployeeRole.RECEPTIONIST,
+    EmployeeRoleType.manager => EmployeeRole.MANAGER,
+    null => null,
+  };
+
+  /// Maps [EmployeeStatusType] to OpenAPI [EmployeeStatus].
+  EmployeeStatus? _toUpdateStatus(EmployeeStatusType? status) =>
+      switch (status) {
+        EmployeeStatusType.active => EmployeeStatus.ACTIVE,
+        EmployeeStatusType.inactive => EmployeeStatus.INACTIVE,
+        EmployeeStatusType.onLeave => EmployeeStatus.ON_LEAVE,
         null => null,
       };
 
-  /// Maps [EmployeeStatusType] to OpenAPI [EmployeeStatus].
-  EmployeeStatus? _toUpdateStatus(
-    EmployeeStatusType? status,
-  ) =>
-      switch (status) {
-        EmployeeStatusType.active => EmployeeStatus.ACTIVE,
-        EmployeeStatusType.inactive =>
-          EmployeeStatus.INACTIVE,
-        EmployeeStatusType.onLeave =>
-          EmployeeStatus.ON_LEAVE,
-        null => null,
-      };
+  /// Maps gender API values to OpenAPI update gender enum.
+  UpdateEmployeeDtoGenderEnum? _toUpdateGender(String? gender) {
+    return switch (gender?.toUpperCase()) {
+      'MALE' => UpdateEmployeeDtoGenderEnum.MALE,
+      'FEMALE' => UpdateEmployeeDtoGenderEnum.FEMALE,
+      'OTHER' => UpdateEmployeeDtoGenderEnum.OTHER,
+      _ => null,
+    };
+  }
+
+  /// Builds the nested doctor profile payload for employee updates.
+  CreateDoctorProfileDto _toDoctorProfileDto(UpdateEmployeeRequest request) {
+    return CreateDoctorProfileDto(
+      title: request.jobTitle,
+      medicalCredentials: _toMedicalCredentials(
+        request.medicalTitles,
+        request.medicalLicenses,
+      ),
+      experienceYears: request.experienceYears,
+      consultationFee: request.consultationFee,
+      specializations: request.specializations,
+      education: request.education,
+      certifications: request.certifications,
+    );
+  }
+
+  /// Builds the nested therapist profile payload for employee updates.
+  CreateTherapistProfileDto _toTherapistProfileDto(
+    UpdateEmployeeRequest request,
+  ) {
+    return CreateTherapistProfileDto(
+      level:
+          _toProfileTherapistLevel(request.therapistLevel) ??
+          CreateTherapistProfileDtoLevelEnum.JUNIOR,
+      type: request.therapistType,
+      strengthLevel: _toProfileStrengthLevel(request.strengthLevel),
+      commissionRate: request.commissionRate ?? 0,
+      healthCheckDate: request.healthCheckDate,
+      skills: request.skills,
+      deviceProficiency: request.deviceProficiency,
+    );
+  }
+
+  CreateTherapistProfileDtoLevelEnum? _toProfileTherapistLevel(String? level) {
+    return switch (level?.toUpperCase()) {
+      'JUNIOR' => CreateTherapistProfileDtoLevelEnum.JUNIOR,
+      'SENIOR' => CreateTherapistProfileDtoLevelEnum.SENIOR,
+      'MASTER' => CreateTherapistProfileDtoLevelEnum.MASTER,
+      _ => null,
+    };
+  }
+
+  CreateTherapistProfileDtoStrengthLevelEnum? _toProfileStrengthLevel(
+    String? level,
+  ) {
+    return switch (level?.toUpperCase()) {
+      'SOFT' => CreateTherapistProfileDtoStrengthLevelEnum.SOFT,
+      'MEDIUM' => CreateTherapistProfileDtoStrengthLevelEnum.MEDIUM,
+      'STRONG' => CreateTherapistProfileDtoStrengthLevelEnum.STRONG,
+      _ => null,
+    };
+  }
 
   /// Converts schedule maps to [WorkScheduleEntryDto].
   List<WorkScheduleEntryDto> _toScheduleEntries(
@@ -751,6 +920,24 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       )
       .toList();
 
+  /// Maps an assigned service DTO to the detail-page display entity.
+  EmployeeAssignedServiceEntity _mapAssignedService(
+    EmployeeAssignedServiceDto dto,
+  ) {
+    return EmployeeAssignedServiceEntity(
+      id: dto.id,
+      name: dto.name,
+      status: dto.status.value,
+      basePrice: dto.basePrice.toDouble(),
+      salePrice: dto.salePrice?.toDouble(),
+      currency: dto.currency,
+      durationMinutes: dto.durationMinutes?.toInt(),
+      categoryName: dto.categoryName,
+      imageUrl: dto.imageUrl,
+      isPrimary: dto.isPrimary,
+    );
+  }
+
   /// Converts domain verification document maps
   /// to [VerificationDocumentEntryDto].
   ///
@@ -824,6 +1011,20 @@ class _CommonFields {
 ///
 /// Provides rich static data with simulated network delays.
 class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
+  final List<EmployeeEntity> _employees = List.generate(100, _mockEmployeeAt);
+
+  static EmployeeEntity _mockEmployeeAt(int index) {
+    final type = index % 3;
+    final id = EmployeeId('mock-id-$index');
+
+    if (type == 0) {
+      return createMockDoctor(id);
+    } else if (type == 1) {
+      return createMockSpaTherapist(id);
+    }
+    return createMockMassageTherapist(id);
+  }
+
   @override
   Future<List<EmployeeEntity>> getEmployees(
     int startingAt,
@@ -831,31 +1032,37 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    await Future<void>.delayed(const Duration(seconds: 1));
-    return List.generate(count, (index) {
-      final i = startingAt + index;
-      final type = i % 3;
-      final id = EmployeeId('mock-id-$i');
+    final employees = await getAllEmployees(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
+    final end = (startingAt + count).clamp(0, employees.length);
+    return employees.sublist(startingAt.clamp(0, employees.length), end);
+  }
 
-      if (type == 0) {
-        return createMockDoctor(id);
-      } else if (type == 1) {
-        return createMockSpaTherapist(id);
-      } else {
-        return createMockMassageTherapist(id);
-      }
-    });
+  @override
+  Future<List<EmployeeEntity>> getAllEmployees({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+    return [..._employees];
   }
 
   @override
   Future<int> getTotalRows() async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
-    return 100;
+    return _employees.length;
   }
 
   @override
   Future<EmployeeEntity> getEmployeeById(EmployeeId id) async {
     await Future<void>.delayed(const Duration(seconds: 1));
+    final existing = _employees.where((employee) => employee.id == id);
+    if (existing.isNotEmpty) {
+      return existing.first;
+    }
+
     final idVal = id.value.toLowerCase();
 
     if (idVal.contains('doctor')) {
@@ -898,7 +1105,7 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       name: 'EmployeeRemoteDataSourceMock',
     );
 
-    return DoctorEntity(
+    final employee = DoctorEntity(
       id: EmployeeId('new-doctor-id-${DateTime.now().millisecondsSinceEpoch}'),
       fullName: '${request.firstName} ${request.lastName}',
       displayName: '${request.firstName} ${request.lastName}',
@@ -928,6 +1135,8 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       employmentType: EmploymentType.fullTime.displayName,
       startDate: DateTime.now().toIso8601String(),
     );
+    _employees.insert(0, employee);
+    return employee;
   }
 
   @override
@@ -941,7 +1150,7 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       name: 'EmployeeRemoteDataSourceMock',
     );
 
-    return SpaTherapistEntity(
+    final employee = SpaTherapistEntity(
       id: EmployeeId(
         'new-spa-therapist-id-${DateTime.now().millisecondsSinceEpoch}',
       ),
@@ -971,6 +1180,8 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       employmentType: EmploymentType.partTime.displayName,
       startDate: DateTime.now().toIso8601String(),
     );
+    _employees.insert(0, employee);
+    return employee;
   }
 
   @override
@@ -984,7 +1195,7 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       name: 'EmployeeRemoteDataSourceMock',
     );
 
-    return MassageTherapistEntity(
+    final employee = MassageTherapistEntity(
       id: EmployeeId(
         'new-massage-therapist-id-${DateTime.now().millisecondsSinceEpoch}',
       ),
@@ -1014,6 +1225,8 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       employmentType: EmploymentType.contractor.displayName,
       startDate: DateTime.now().toIso8601String(),
     );
+    _employees.insert(0, employee);
+    return employee;
   }
 
   @override
@@ -1027,13 +1240,57 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
   }
 
   @override
+  Future<void> updateEmployeeStatus(
+    EmployeeId id,
+    EmployeeStatusType status,
+  ) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+
+    developer.log(
+      'Mock: Updated employee status $id -> ${status.apiValue}',
+      name: 'EmployeeRemoteDataSourceMock',
+    );
+  }
+
+  @override
   Future<void> deleteEmployee(EmployeeId id) async {
     await Future<void>.delayed(const Duration(seconds: 1));
+    _employees.removeWhere((employee) => employee.id == id);
 
     developer.log(
       'Mock: Deleted employee $id',
       name: 'EmployeeRemoteDataSourceMock',
     );
+  }
+
+  @override
+  Future<List<EmployeeAssignedServiceEntity>> getEmployeeAssignedServices(
+    EmployeeId id,
+  ) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    return [
+      const EmployeeAssignedServiceEntity(
+        id: 'mock-service-consultation',
+        name: 'General Consultation',
+        status: 'ACTIVE',
+        basePrice: 500000,
+        salePrice: 450000,
+        currency: 'VND',
+        durationMinutes: 45,
+        categoryName: 'Consultation',
+        isPrimary: true,
+      ),
+      const EmployeeAssignedServiceEntity(
+        id: 'mock-service-follow-up',
+        name: 'Follow-up Session',
+        status: 'DRAFT',
+        basePrice: 300000,
+        currency: 'VND',
+        durationMinutes: 30,
+        categoryName: 'Care Plan',
+        isPrimary: false,
+      ),
+    ];
   }
 
   @override
@@ -1071,6 +1328,34 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
   Future<Map<String, String>> getSpaSkills() async {
     await Future<void>.delayed(const Duration(seconds: 1));
     return employeeMockSpaSkills;
+  }
+
+  @override
+  Future<Map<String, String>> getMassageSkills() async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+    return employeeMockMassageSkills;
+  }
+
+  @override
+  Future<Map<String, String>> createMassageSkill(String name) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    final key = name.toLowerCase().replaceAll(' ', '_');
+    developer.log(
+      'Mock: Created massage skill: $name',
+      name: 'EmployeeRemoteDataSourceMock',
+    );
+    return {key: name};
+  }
+
+  @override
+  Future<Map<String, String>> createSpaSkill(String name) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    final key = name.toLowerCase().replaceAll(' ', '_');
+    developer.log(
+      'Mock: Created spa skill: $name',
+      name: 'EmployeeRemoteDataSourceMock',
+    );
+    return {key: name};
   }
 }
 

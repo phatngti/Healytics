@@ -1,0 +1,7 @@
+{
+    "serverEndpoint": "https://dev.healytics.me",
+    "customHeaders": {
+        "deviceModel": "Android Emulator",
+        "deviceType": "Android"
+    }
+}

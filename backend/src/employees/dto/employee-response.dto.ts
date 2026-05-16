@@ -14,21 +14,37 @@ import { VerificationDocumentEntryDto } from './verification-document-entry.dto'
 
 export class MedicalCredentialResponseDto {
   @Expose()
-  @ApiPropertyOptional({ description: 'Title' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Title',
+  })
   title?: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'License' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'License',
+  })
   license?: string;
 }
 
 export class DoctorProfileResponseDto {
   @Expose()
-  @ApiPropertyOptional({ description: 'Employee ID (primary key)' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Employee ID (primary key)',
+  })
   employeeId?: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Doctor title' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Doctor title',
+  })
   title?: string;
 
   @Expose()
@@ -40,11 +56,19 @@ export class DoctorProfileResponseDto {
   medicalCredentials?: Array<MedicalCredentialResponseDto>;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Years of experience' })
+  @ApiPropertyOptional({
+    type: Number,
+    nullable: true,
+    description: 'Years of experience',
+  })
   experienceYears?: number;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Consultation fee' })
+  @ApiPropertyOptional({
+    type: Number,
+    nullable: true,
+    description: 'Consultation fee',
+  })
   consultationFee?: number;
 
   @Expose()
@@ -57,6 +81,10 @@ export class DoctorProfileResponseDto {
   @Expose()
   @ApiPropertyOptional({ type: [String], description: 'Education history' })
   education?: string[];
+
+  @Expose()
+  @ApiPropertyOptional({ type: [String], description: 'Certifications' })
+  certifications?: string[];
 }
 
 /**
@@ -65,29 +93,51 @@ export class DoctorProfileResponseDto {
  */
 export class TherapistProfileResponseDto {
   @Expose()
-  @ApiPropertyOptional({ description: 'Employee ID (primary key)' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Employee ID (primary key)',
+  })
   employeeId?: string;
 
   @Expose()
   @ApiPropertyOptional({
+    type: String,
+    nullable: true,
     description: 'Therapist level (junior, senior, etc.)',
   })
   level?: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Therapist type' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Therapist type',
+  })
   type?: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Strength level' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Strength level',
+  })
   strengthLevel?: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Commission rate (percentage)' })
+  @ApiPropertyOptional({
+    type: Number,
+    nullable: true,
+    description: 'Commission rate (percentage)',
+  })
   commissionRate?: number;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Health check date' })
+  @ApiPropertyOptional({
+    type: Date,
+    nullable: true,
+    description: 'Health check date',
+  })
   healthCheckDate?: Date;
 
   @Expose()
@@ -108,59 +158,99 @@ export class TherapistProfileResponseDto {
  */
 export class EmployeeResponseDto {
   @Expose()
-  @ApiProperty({ description: 'Unique employee identifier' })
+  @ApiProperty({ type: String, description: 'Unique employee identifier' })
   id: string;
 
   @Expose()
-  @ApiProperty({ description: 'Employee code' })
+  @ApiProperty({ type: String, description: 'Employee code' })
   employeeCode: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'First name' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'First name',
+  })
   firstName: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Last name' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Last name',
+  })
   lastName: string | null;
 
   @Expose()
-  @ApiProperty({ description: 'Full name' })
+  @ApiProperty({ type: String, description: 'Full name' })
   fullName: string;
 
   @Expose()
-  @ApiProperty({ description: 'Email address' })
+  @ApiProperty({ type: String, description: 'Email address' })
   email: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Phone number' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Phone number',
+  })
   phone: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Avatar URL' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Avatar URL',
+  })
   avatarUrl: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Job title' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Job title',
+  })
   jobTitle: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Start date' })
+  @ApiPropertyOptional({
+    type: Date,
+    nullable: true,
+    description: 'Start date',
+  })
   startDate: Date | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Employment type' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Employment type',
+  })
   employmentType: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Description/bio' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Description/bio',
+  })
   description: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Emergency contact name' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Emergency contact name',
+  })
   emergencyContactName: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Emergency contact phone' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Emergency contact phone',
+  })
   emergencyContactPhone: string | null;
 
   @Expose()
@@ -169,7 +259,7 @@ export class EmployeeResponseDto {
     description: 'Verification documents',
   })
   @Type(() => VerificationDocumentEntryDto)
-  verificationDocuments: VerificationDocumentEntryDto[] | null;
+  verificationDocuments: VerificationDocumentEntryDto[];
 
   @Expose()
   @ApiPropertyOptional({
@@ -177,7 +267,7 @@ export class EmployeeResponseDto {
     description: 'Work schedule',
   })
   @Type(() => WorkScheduleEntryDto)
-  schedule: WorkScheduleEntryDto[] | null;
+  schedule: WorkScheduleEntryDto[];
 
   @Expose()
   @ApiPropertyOptional({
@@ -185,48 +275,73 @@ export class EmployeeResponseDto {
     description: 'Work history',
   })
   @Type(() => WorkHistoryEntryDto)
-  workHistory: WorkHistoryEntryDto[] | null;
+  workHistory: WorkHistoryEntryDto[];
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Date of birth' })
+  @ApiPropertyOptional({
+    type: Date,
+    nullable: true,
+    description: 'Date of birth',
+  })
   dob: Date | null;
 
   @Expose()
-  @ApiPropertyOptional({ enum: Gender, description: 'Gender' })
+  @ApiPropertyOptional({
+    type: String,
+    enum: Gender,
+    enumName: 'Gender',
+    nullable: true,
+    description: 'Gender',
+  })
   gender: Gender | null;
 
   @Expose()
-  @ApiProperty({ enum: EmployeeRole, description: 'Employee role' })
+  @ApiProperty({
+    type: String,
+    enum: EmployeeRole,
+    enumName: 'EmployeeRole',
+    description: 'Employee role',
+  })
   role: EmployeeRole;
 
   @Expose()
-  @ApiProperty({ enum: EmployeeStatus, description: 'Employee status' })
+  @ApiProperty({
+    type: String,
+    enum: EmployeeStatus,
+    enumName: 'EmployeeStatus',
+    description: 'Employee status',
+  })
   status: EmployeeStatus;
 
   @Expose()
-  @ApiProperty({ description: 'Rating (0-5)' })
+  @ApiProperty({ type: Number, description: 'Rating (0-5)' })
   rating: number;
 
   @Expose()
-  @ApiProperty({ description: 'Number of reviews' })
+  @ApiProperty({ type: Number, description: 'Number of reviews' })
   reviewCount: number;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Partner ID the employee belongs to' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Partner ID the employee belongs to',
+  })
   partnerId: string | null;
 
   @Expose()
-  @ApiProperty({ description: 'Creation timestamp' })
+  @ApiProperty({ type: Date, description: 'Creation timestamp' })
   createdAt: Date;
 
   @Expose()
-  @ApiProperty({ description: 'Last update timestamp' })
+  @ApiProperty({ type: Date, description: 'Last update timestamp' })
   updatedAt: Date;
 
   @Expose()
   @Type(() => DoctorProfileResponseDto)
   @ApiPropertyOptional({
-    type: DoctorProfileResponseDto,
+    type: () => DoctorProfileResponseDto,
+    nullable: true,
     description: 'Doctor profile',
   })
   doctorProfile: DoctorProfileResponseDto | null;
@@ -234,7 +349,8 @@ export class EmployeeResponseDto {
   @Expose()
   @Type(() => TherapistProfileResponseDto)
   @ApiPropertyOptional({
-    type: TherapistProfileResponseDto,
+    type: () => TherapistProfileResponseDto,
+    nullable: true,
     description: 'Therapist profile',
   })
   therapistProfile: TherapistProfileResponseDto | null;

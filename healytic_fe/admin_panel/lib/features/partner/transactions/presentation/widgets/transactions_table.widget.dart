@@ -29,7 +29,7 @@ class TransactionsTable extends ConsumerWidget {
     return SizedBox(
       height: height,
       child: AppTable(
-        key: ValueKey('transactions-$reloadToken-$filterHash'),
+        refreshToken: Object.hash(reloadToken, filterHash),
         columns: TableColumns(
           columns: [
             TableColumnData(label: 'ID', size: ColumnSize.S),

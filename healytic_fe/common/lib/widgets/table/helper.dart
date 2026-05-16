@@ -90,10 +90,10 @@ typedef ActionButtonCallback = void Function(LocalKey?);
 /// Call [refreshDatasource] to clear the cache and re-fetch.
 class AppDataTableSource extends AsyncDataTableSource {
   /// Async callback returning the total number of rows.
-  final Future<int> Function() getTotalRows;
+  Future<int> Function() getTotalRows;
 
   /// Async callback fetching rows for a given page.
-  final GetDataCallback getData;
+  GetDataCallback getData;
 
   /// Page-level cache keyed by the starting row index.
   final Map<int, List<DataRow>> _cachedRows = {};
@@ -102,6 +102,21 @@ class AppDataTableSource extends AsyncDataTableSource {
   AppDataTableSource({required this.getTotalRows, required this.getData});
 
   bool _mounted = true;
+
+  /// Updates callbacks without replacing the data source.
+  ///
+  /// Parent widgets often rebuild after a row is selected because feature
+  /// providers keep their own selected ID sets for bulk actions. Replacing the
+  /// source on every callback identity change resets [AsyncDataTableSource]'s
+  /// internal selected-row bookkeeping, so keep the source and only swap the
+  /// callbacks it uses for future fetches.
+  void updateCallbacks({
+    required Future<int> Function() getTotalRows,
+    required GetDataCallback getData,
+  }) {
+    this.getTotalRows = getTotalRows;
+    this.getData = getData;
+  }
 
   @override
   // ignore: must_call_super

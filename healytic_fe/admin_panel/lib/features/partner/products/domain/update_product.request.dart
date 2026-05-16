@@ -13,12 +13,23 @@ abstract class UpdateProductRequest with _$UpdateProductRequest {
   const factory UpdateProductRequest({
     required ProductId id,
     String? name,
+    String? productType,
     double? basePrice,
+    double? salePrice,
     String? description,
+    String? status,
+    bool? onlineStore,
+    int? duration,
+    int? buffer,
+    int? capacity,
+
+    String? staffAllocation,
     List<String>? images,
     String? category,
     List<String>? staffIds,
     ServiceManualEntity? serviceManual,
+    @Default(false) bool clearSalePrice,
+    @Default(false) bool clearServiceManual,
   }) = _UpdateProductRequest;
 
   factory UpdateProductRequest.fromJson(Map<String, dynamic> json) =>

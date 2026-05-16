@@ -26,6 +26,7 @@ describe('PartnerEmployeesController', () => {
       createMassageTherapist: jest.fn(),
       findAll: jest.fn(),
       findOneForPartner: jest.fn(),
+      findAssignedServicesForPartner: jest.fn(),
       updateForPartner: jest.fn(),
       removeForPartner: jest.fn(),
     };
@@ -206,6 +207,35 @@ describe('PartnerEmployeesController', () => {
         id,
         mockPartnerId,
       );
+    });
+  });
+
+  describe('findAssignedServices', () => {
+    it('should resolve partnerId and call service.findAssignedServicesForPartner', async () => {
+      // Arrange
+      const id = 'uuid-1';
+      const expectedServices = [
+        {
+          id: 'service-1',
+          name: 'General Consultation',
+          isPrimary: true,
+        },
+      ];
+      employeesService.findAssignedServicesForPartner!.mockResolvedValue(
+        expectedServices,
+      );
+
+      // Act
+      const result = await controller.findAssignedServices(mockAccountId, id);
+
+      // Assert
+      expect(result).toEqual(expectedServices);
+      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(
+        mockAccountId,
+      );
+      expect(
+        employeesService.findAssignedServicesForPartner,
+      ).toHaveBeenCalledWith(id, mockPartnerId);
     });
   });
 

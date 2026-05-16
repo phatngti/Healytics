@@ -10,12 +10,17 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**partnerEmployeesControllerCreateDoctor**](PartnerEmployeesApi.md#partneremployeescontrollercreatedoctor) | **POST** /partner/employees/doctors | Create a new doctor
+[**partnerEmployeesControllerCreateMassageSkill**](PartnerEmployeesApi.md#partneremployeescontrollercreatemassageskill) | **POST** /partner/employees/massage-skills | Create a massage skill
 [**partnerEmployeesControllerCreateMassageTherapist**](PartnerEmployeesApi.md#partneremployeescontrollercreatemassagetherapist) | **POST** /partner/employees/massage-therapists | Create a new massage therapist
+[**partnerEmployeesControllerCreateSpaSkill**](PartnerEmployeesApi.md#partneremployeescontrollercreatespaskill) | **POST** /partner/employees/spa-skills | Create a spa skill
 [**partnerEmployeesControllerCreateSpaTherapist**](PartnerEmployeesApi.md#partneremployeescontrollercreatespatherapist) | **POST** /partner/employees/spa-therapists | Create a new spa therapist
 [**partnerEmployeesControllerFindAll**](PartnerEmployeesApi.md#partneremployeescontrollerfindall) | **GET** /partner/employees | Get all employees for this partner
+[**partnerEmployeesControllerFindAssignedServices**](PartnerEmployeesApi.md#partneremployeescontrollerfindassignedservices) | **GET** /partner/employees/{id}/services | Get services assigned to an employee
 [**partnerEmployeesControllerFindOne**](PartnerEmployeesApi.md#partneremployeescontrollerfindone) | **GET** /partner/employees/{id} | Get an employee by id
 [**partnerEmployeesControllerGetDetailAnalytics**](PartnerEmployeesApi.md#partneremployeescontrollergetdetailanalytics) | **GET** /partner/employees/analytics/{employeeId} | Get per-employee detail analytics
+[**partnerEmployeesControllerGetMassageSkills**](PartnerEmployeesApi.md#partneremployeescontrollergetmassageskills) | **GET** /partner/employees/massage-skills | Get massage skill catalog
 [**partnerEmployeesControllerGetOverviewAnalytics**](PartnerEmployeesApi.md#partneremployeescontrollergetoverviewanalytics) | **GET** /partner/employees/analytics/overview | Get employee overview analytics
+[**partnerEmployeesControllerGetSpaSkills**](PartnerEmployeesApi.md#partneremployeescontrollergetspaskills) | **GET** /partner/employees/spa-skills | Get spa skill catalog
 [**partnerEmployeesControllerRemove**](PartnerEmployeesApi.md#partneremployeescontrollerremove) | **DELETE** /partner/employees/{id} | Delete an employee
 [**partnerEmployeesControllerUpdate**](PartnerEmployeesApi.md#partneremployeescontrollerupdate) | **PATCH** /partner/employees/{id} | Update an employee
 
@@ -67,6 +72,53 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **partnerEmployeesControllerCreateMassageSkill**
+> SkillCatalogResponseDto partnerEmployeesControllerCreateMassageSkill(createSkillDto)
+
+Create a massage skill
+
+### Example
+```dart
+import 'package:employee_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = PartnerEmployeesApi();
+final createSkillDto = CreateSkillDto(); // CreateSkillDto | 
+
+try {
+    final result = api_instance.partnerEmployeesControllerCreateMassageSkill(createSkillDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling PartnerEmployeesApi->partnerEmployeesControllerCreateMassageSkill: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **createSkillDto** | [**CreateSkillDto**](CreateSkillDto.md)|  | 
+
+### Return type
+
+[**SkillCatalogResponseDto**](SkillCatalogResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **partnerEmployeesControllerCreateMassageTherapist**
 > EmployeeResponseDto partnerEmployeesControllerCreateMassageTherapist(createMassageTherapistDto)
 
@@ -102,6 +154,53 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**EmployeeResponseDto**](EmployeeResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **partnerEmployeesControllerCreateSpaSkill**
+> SkillCatalogResponseDto partnerEmployeesControllerCreateSpaSkill(createSkillDto)
+
+Create a spa skill
+
+### Example
+```dart
+import 'package:employee_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = PartnerEmployeesApi();
+final createSkillDto = CreateSkillDto(); // CreateSkillDto | 
+
+try {
+    final result = api_instance.partnerEmployeesControllerCreateSpaSkill(createSkillDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling PartnerEmployeesApi->partnerEmployeesControllerCreateSpaSkill: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **createSkillDto** | [**CreateSkillDto**](CreateSkillDto.md)|  | 
+
+### Return type
+
+[**SkillCatalogResponseDto**](SkillCatalogResponseDto.md)
 
 ### Authorization
 
@@ -196,6 +295,53 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**List<EmployeeResponseDto>**](EmployeeResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **partnerEmployeesControllerFindAssignedServices**
+> List<EmployeeAssignedServiceDto> partnerEmployeesControllerFindAssignedServices(id)
+
+Get services assigned to an employee
+
+### Example
+```dart
+import 'package:employee_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = PartnerEmployeesApi();
+final id = id_example; // String | 
+
+try {
+    final result = api_instance.partnerEmployeesControllerFindAssignedServices(id);
+    print(result);
+} catch (e) {
+    print('Exception when calling PartnerEmployeesApi->partnerEmployeesControllerFindAssignedServices: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
+
+### Return type
+
+[**List<EmployeeAssignedServiceDto>**](EmployeeAssignedServiceDto.md)
 
 ### Authorization
 
@@ -304,6 +450,49 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **partnerEmployeesControllerGetMassageSkills**
+> List<SkillCatalogResponseDto> partnerEmployeesControllerGetMassageSkills()
+
+Get massage skill catalog
+
+### Example
+```dart
+import 'package:employee_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = PartnerEmployeesApi();
+
+try {
+    final result = api_instance.partnerEmployeesControllerGetMassageSkills();
+    print(result);
+} catch (e) {
+    print('Exception when calling PartnerEmployeesApi->partnerEmployeesControllerGetMassageSkills: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**List<SkillCatalogResponseDto>**](SkillCatalogResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **partnerEmployeesControllerGetOverviewAnalytics**
 > EmployeeOverviewAnalyticsResponseDto partnerEmployeesControllerGetOverviewAnalytics(period)
 
@@ -339,6 +528,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**EmployeeOverviewAnalyticsResponseDto**](EmployeeOverviewAnalyticsResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **partnerEmployeesControllerGetSpaSkills**
+> List<SkillCatalogResponseDto> partnerEmployeesControllerGetSpaSkills()
+
+Get spa skill catalog
+
+### Example
+```dart
+import 'package:employee_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = PartnerEmployeesApi();
+
+try {
+    final result = api_instance.partnerEmployeesControllerGetSpaSkills();
+    print(result);
+} catch (e) {
+    print('Exception when calling PartnerEmployeesApi->partnerEmployeesControllerGetSpaSkills: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**List<SkillCatalogResponseDto>**](SkillCatalogResponseDto.md)
 
 ### Authorization
 

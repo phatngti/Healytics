@@ -2,9 +2,12 @@ import {
   Injectable,
   Logger,
   ConflictException,
+  ForbiddenException,
+  HttpException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import { RedisService } from '@/redis/redis.service';
 import { CreatePartnerHealthServiceDto } from '../../dto/partner/create-partner-health-service.dto';
 import { Product } from '@/common/entities/product.entity';
@@ -14,6 +17,12 @@ import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { StaffAssignmentType } from '@/health-service/enums/staff-assignment-type.enum';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
+import { Category } from '@/common/entities/category.entity';
+import { Employee } from '@/common/entities/employee.entity';
+
+type CreateHealthServiceCommand = CreatePartnerHealthServiceDto & {
+  partnerId: string;
+};
 
 @Injectable()
 export class CreateHealthServiceHandler {
@@ -24,7 +33,7 @@ export class CreateHealthServiceHandler {
     private readonly redisService: RedisService,
   ) {}
 
-  async execute(command: CreatePartnerHealthServiceDto): Promise<Product> {
+  async execute(command: CreateHealthServiceCommand): Promise<Product> {
     this.logger.log(
       `Executing CreateHealthServiceHandler with name: ${command.name}`,
     );
@@ -39,8 +48,10 @@ export class CreateHealthServiceHandler {
         employeeIds,
         facilityImages,
         serviceManual,
+        partnerId,
         ...baseData
       } = command;
+      const uniqueEmployeeIds = [...new Set(employeeIds ?? [])];
 
       // 1. Invariant Check (Validate)
       if (baseData.type === HealthServiceType.SERVICE && !productDefinition) {
@@ -49,9 +60,52 @@ export class CreateHealthServiceHandler {
         );
       }
 
+      if (baseData.categoryId) {
+        const category = await queryRunner.manager.findOne(Category, {
+          where: { id: baseData.categoryId, isActive: true },
+          select: ['id'],
+        });
+
+        if (!category) {
+          throw new NotFoundException(
+            `Category with ID ${baseData.categoryId} not found`,
+          );
+        }
+      }
+
+      if (
+        baseData.type === HealthServiceType.SERVICE &&
+        uniqueEmployeeIds.length > 0
+      ) {
+        const employees = await queryRunner.manager.find(Employee, {
+          where: { id: In(uniqueEmployeeIds) },
+          select: ['id', 'partnerId'],
+        });
+
+        if (employees.length !== uniqueEmployeeIds.length) {
+          const foundIds = new Set(employees.map((employee) => employee.id));
+          const missingIds = uniqueEmployeeIds.filter(
+            (id) => !foundIds.has(id),
+          );
+          throw new NotFoundException(
+            `Employee(s) not found: ${missingIds.join(', ')}`,
+          );
+        }
+
+        const foreignEmployee = employees.find(
+          (employee) => employee.partnerId !== partnerId,
+        );
+        if (foreignEmployee) {
+          throw new ForbiddenException(
+            `Employee ${foreignEmployee.id} does not belong to this partner`,
+          );
+        }
+      }
+
       // 2. Domain Action (Prepare Entity)
       const product = queryRunner.manager.create(Product, {
         ...baseData,
+        partnerId,
         serviceManual: serviceManual ?? null,
         currency: 'VND', // Hardcoded as per business rule defaults
       });
@@ -87,10 +141,9 @@ export class CreateHealthServiceHandler {
       // Handle Staff Eligibility - Relation Management
       if (
         baseData.type === HealthServiceType.SERVICE &&
-        employeeIds &&
-        employeeIds.length > 0
+        uniqueEmployeeIds.length > 0
       ) {
-        const eligibilityEntities = employeeIds.map((eid) =>
+        const eligibilityEntities = uniqueEmployeeIds.map((eid) =>
           queryRunner.manager.create(ProductEmployeeEligibility, {
             productId: savedProduct.id,
             employeeId: eid,
@@ -148,7 +201,7 @@ export class CreateHealthServiceHandler {
         error.stack,
       );
 
-      if (error instanceof ConflictException) throw error;
+      if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException(
         'Transaction failed during product creation',
       );

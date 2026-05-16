@@ -40,7 +40,7 @@ void main() {
 
     // List my appointments
     //
-    //Future employeeAppointmentsControllerListMyAppointments({ EmployeeBookingStatusFilter status, num page, num limit }) async
+    //Future<PaginatedEmployeeAppointmentsResponseDto> employeeAppointmentsControllerListMyAppointments({ EmployeeBookingStatusFilter status, num page, num limit }) async
     test('test employeeAppointmentsControllerListMyAppointments', () async {
       // TODO
     });

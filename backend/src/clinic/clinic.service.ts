@@ -5,6 +5,8 @@ import { Product } from '@/common/entities/product.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { Booking } from '@/common/entities/booking.entity';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
+import { Partner } from '@/common/entities/partner.entity';
+import { UserClinicFollow } from '@/common/entities/user-clinic-follow.entity';
 import { Category } from '@/common/entities/category.entity';
 import { PartnerCertification } from './entities/partner-certification.entity';
 import { ClinicReviewResponse } from './entities/clinic-review-response.entity';
@@ -45,6 +47,10 @@ export class ClinicService {
     private readonly bookingRepo: Repository<Booking>,
     @InjectRepository(TreatmentReview)
     private readonly treatmentReviewRepo: Repository<TreatmentReview>,
+    @InjectRepository(Partner)
+    private readonly partnerRepo: Repository<Partner>,
+    @InjectRepository(UserClinicFollow)
+    private readonly clinicFollowRepo: Repository<UserClinicFollow>,
     @InjectRepository(PartnerCertification)
     private readonly certificationRepo: Repository<PartnerCertification>,
     @InjectRepository(ClinicReviewResponse)
@@ -56,7 +62,10 @@ export class ClinicService {
   //  Endpoint 1: GET /v1/user/clinics/:id/info
   // ═══════════════════════════════════════════════════════════════
 
-  async getClinicInfo(partnerId: string): Promise<ClinicInfoResponseDto> {
+  async getClinicInfo(
+    partnerId: string,
+    userId?: string,
+  ): Promise<ClinicInfoResponseDto> {
     const partner = await this.ensureClinicExists(partnerId);
 
     const [employees, products, certifications] = await Promise.all([
@@ -133,13 +142,23 @@ export class ClinicService {
       partner.province?.fullName,
     ].filter(Boolean);
 
+    const followerCount = partner.followerCount ?? 0;
+    const isFollowing = userId
+      ? await this.clinicFollowRepo.exists({
+          where: { userId, partnerId },
+        })
+      : false;
+
     return {
       id: partner.id,
       name: partner.brandName,
       coverImageUrl: partner.coverImageUrl ?? null,
       logoImageUrl: partner.logoImageUrl ?? null,
       gallery: partner.gallery ?? [],
-      followersLabel: formatCount(partner.followerCount ?? 0),
+      followersLabel: formatCount(followerCount),
+      followerCount,
+      isFollowing,
+      chatPartnerId: partner.accountId ?? null,
       reviewsLabel: formatCount(totalReviewCount),
       description: partner.description ?? null,
       trustMetrics,
@@ -149,6 +168,38 @@ export class ClinicService {
       address: addressParts.join(', ') || null,
       phoneNumber: partner.phoneNumber,
     };
+  }
+
+  async followClinic(
+    partnerId: string,
+    userId: string,
+  ): Promise<ClinicInfoResponseDto> {
+    await this.ensureClinicExists(partnerId);
+    const existing = await this.clinicFollowRepo.findOne({
+      where: { userId, partnerId },
+    });
+    if (!existing) {
+      await this.clinicFollowRepo.save(
+        this.clinicFollowRepo.create({ userId, partnerId }),
+      );
+      await this.partnerRepo.increment({ id: partnerId }, 'followerCount', 1);
+    }
+    return this.getClinicInfo(partnerId, userId);
+  }
+
+  async unfollowClinic(
+    partnerId: string,
+    userId: string,
+  ): Promise<ClinicInfoResponseDto> {
+    await this.ensureClinicExists(partnerId);
+    const existing = await this.clinicFollowRepo.findOne({
+      where: { userId, partnerId },
+    });
+    if (existing) {
+      await this.clinicFollowRepo.delete({ id: existing.id });
+      await this.partnerRepo.decrement({ id: partnerId }, 'followerCount', 1);
+    }
+    return this.getClinicInfo(partnerId, userId);
   }
 
   // ═══════════════════════════════════════════════════════════════

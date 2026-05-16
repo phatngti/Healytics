@@ -8,10 +8,7 @@ import 'package:intl/intl.dart';
 // ────────────────────────────────────────────────────
 
 /// Formats a monetary amount with the correct locale.
-String formatAdminCurrency(
-  double amount,
-  String currency,
-) {
+String formatAdminCurrency(double amount, String currency) {
   final formatter = NumberFormat.currency(
     locale: currency == 'VND' ? 'vi_VN' : 'en_US',
     symbol: currency == 'VND' ? 'VND ' : '\$',
@@ -21,10 +18,7 @@ String formatAdminCurrency(
 }
 
 /// Compact currency format for KPI cards.
-String formatAdminCurrencyCompact(
-  double amount,
-  String currency,
-) {
+String formatAdminCurrencyCompact(double amount, String currency) {
   final prefix = currency == 'VND' ? 'VND ' : '\$';
   if (amount >= 1e9) {
     return '$prefix${(amount / 1e9).toStringAsFixed(1)}B';
@@ -68,38 +62,26 @@ String formatAdminRelativeTime(DateTime value) {
 // ────────────────────────────────────────────────────
 
 /// Returns the background color for a status label.
-Color adminFinanceStatusBackground(
-  BuildContext context,
-  String label,
-) {
+Color adminFinanceStatusBackground(BuildContext context, String label) {
   final cs = Theme.of(context).colorScheme;
   final tone = _statusTone(label);
   return switch (tone) {
-    AdminFinanceRiskTone.positive =>
-      Colors.green.withValues(alpha: 0.16),
-    AdminFinanceRiskTone.warning =>
-      Colors.amber.withValues(alpha: 0.18),
+    AdminFinanceRiskTone.positive => Colors.green.withValues(alpha: 0.16),
+    AdminFinanceRiskTone.warning => Colors.amber.withValues(alpha: 0.18),
     AdminFinanceRiskTone.critical => cs.errorContainer,
     AdminFinanceRiskTone.neutral => cs.primaryContainer,
   };
 }
 
 /// Returns the foreground color for a status label.
-Color adminFinanceStatusForeground(
-  BuildContext context,
-  String label,
-) {
+Color adminFinanceStatusForeground(BuildContext context, String label) {
   final cs = Theme.of(context).colorScheme;
   final tone = _statusTone(label);
   return switch (tone) {
-    AdminFinanceRiskTone.positive =>
-      Colors.green.shade900,
-    AdminFinanceRiskTone.warning =>
-      Colors.orange.shade900,
-    AdminFinanceRiskTone.critical =>
-      cs.onErrorContainer,
-    AdminFinanceRiskTone.neutral =>
-      cs.onPrimaryContainer,
+    AdminFinanceRiskTone.positive => Colors.green.shade900,
+    AdminFinanceRiskTone.warning => Colors.orange.shade900,
+    AdminFinanceRiskTone.critical => cs.onErrorContainer,
+    AdminFinanceRiskTone.neutral => cs.onPrimaryContainer,
   };
 }
 
@@ -142,10 +124,7 @@ AdminFinanceRiskTone _statusTone(String label) {
 
 /// Themed status chip for finance statuses.
 class AdminFinanceStatusChip extends StatelessWidget {
-  const AdminFinanceStatusChip({
-    super.key,
-    required this.label,
-  });
+  const AdminFinanceStatusChip({super.key, required this.label});
 
   final String label;
 
@@ -157,24 +136,18 @@ class AdminFinanceStatusChip extends StatelessWidget {
         vertical: AppDimens.spaceXs,
       ),
       decoration: BoxDecoration(
-        color: adminFinanceStatusBackground(
-          context,
-          label,
-        ),
+        color: adminFinanceStatusBackground(context, label),
         borderRadius: AppDimens.radiusPill,
       ),
       child: Text(
         label,
-        style: Theme.of(context)
-            .textTheme
-            .labelMedium
-            ?.copyWith(
-              color: adminFinanceStatusForeground(
-                context,
-                label,
-              ),
-              fontWeight: FontWeight.w600,
-            ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+          color: adminFinanceStatusForeground(context, label),
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -182,11 +155,7 @@ class AdminFinanceStatusChip extends StatelessWidget {
 
 /// Risk-tone indicator dot.
 class AdminFinanceRiskDot extends StatelessWidget {
-  const AdminFinanceRiskDot({
-    super.key,
-    required this.tone,
-    this.size = 10,
-  });
+  const AdminFinanceRiskDot({super.key, required this.tone, this.size = 10});
 
   final AdminFinanceRiskTone tone;
   final double size;
@@ -194,53 +163,39 @@ class AdminFinanceRiskDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (tone) {
-      AdminFinanceRiskTone.positive =>
-        Colors.green.shade600,
-      AdminFinanceRiskTone.warning =>
-        Colors.orange.shade600,
-      AdminFinanceRiskTone.critical =>
-        Theme.of(context).colorScheme.error,
-      AdminFinanceRiskTone.neutral =>
-        Theme.of(context).colorScheme.outline,
+      AdminFinanceRiskTone.positive => Colors.green.shade600,
+      AdminFinanceRiskTone.warning => Colors.orange.shade600,
+      AdminFinanceRiskTone.critical => Theme.of(context).colorScheme.error,
+      AdminFinanceRiskTone.neutral => Theme.of(context).colorScheme.outline,
     };
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }
 
 /// Change percent badge (↑ 12.3% or ↓ 4.1%).
 class AdminFinanceChangeBadge extends StatelessWidget {
-  const AdminFinanceChangeBadge({
-    super.key,
-    required this.changePercent,
-  });
+  const AdminFinanceChangeBadge({super.key, required this.changePercent});
 
   final double changePercent;
 
   @override
   Widget build(BuildContext context) {
     final isPositive = changePercent >= 0;
-    final color =
-        isPositive ? Colors.green.shade700 : Colors.red;
+    final color = isPositive ? Colors.green.shade700 : Colors.red;
     final arrow = isPositive ? '↑' : '↓';
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           '$arrow ${changePercent.abs().toStringAsFixed(1)}%',
-          style: Theme.of(context)
-              .textTheme
-              .labelSmall
-              ?.copyWith(
-                color: color,
-                fontWeight: FontWeight.w600,
-              ),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: color,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );

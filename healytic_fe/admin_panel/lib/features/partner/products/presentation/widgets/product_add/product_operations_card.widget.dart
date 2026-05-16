@@ -10,15 +10,23 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProductOperationsCard extends ConsumerStatefulWidget {
-  const ProductOperationsCard({super.key});
+  const ProductOperationsCard({
+    super.key,
+    this.initialStaffAllocation,
+    this.initialStaffIds = const [],
+  });
+
+  final String? initialStaffAllocation;
+  final List<String> initialStaffIds;
 
   @override
   ConsumerState<ProductOperationsCard> createState() =>
-      _ProductOperationsCardState();
+      ProductOperationsCardState();
 }
 
-class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
-  String _staffAllocation = StaffAllocation.any.apiValue;
+class ProductOperationsCardState
+    extends ConsumerState<ProductOperationsCard> {
+  late String _staffAllocation;
   String _staffRole = EmployeeRoleType.doctor.apiValue;
   List<EmployeeEntity> _selectedStaff = [];
   List<EmployeeEntity> _allStaff = [];
@@ -27,17 +35,39 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
   @override
   void initState() {
     super.initState();
-    _loadStaff();
+    _staffAllocation =
+        widget.initialStaffAllocation ?? StaffAllocation.any.apiValue;
+    _loadStaff(includeInitialSelection: widget.initialStaffIds.isNotEmpty);
   }
 
-  Future<void> _loadStaff() async {
+  Future<void> _loadStaff({bool includeInitialSelection = false}) async {
     try {
-      final staff = await ref
-          .read(productProvider.notifier)
-          .getStaffForProduct(role: _staffRole);
+      final notifier = ref.read(productProvider.notifier);
+      final staff = await notifier.getStaffForProduct(role: _staffRole);
+      final allStaff = includeInitialSelection
+          ? await notifier.getStaffForProduct()
+          : staff;
+      final selectedIds = widget.initialStaffIds.toSet();
+      final selectedStaff = includeInitialSelection
+          ? allStaff
+                .where((employee) => selectedIds.contains(employee.id.value))
+                .toList()
+          : _selectedStaff;
+      final selectedRole = selectedStaff.isNotEmpty
+          ? EmployeeRoleType.fromApiValue(selectedStaff.first.role)?.apiValue
+          : null;
+      final staffRole = selectedRole ?? _staffRole;
+      final visibleStaff = includeInitialSelection && selectedRole != null
+          ? allStaff
+                .where((employee) => employee.role.toUpperCase() == staffRole)
+                .toList()
+          : staff;
+
       if (mounted) {
         setState(() {
-          _allStaff = staff;
+          _staffRole = staffRole;
+          _allStaff = visibleStaff.isNotEmpty ? visibleStaff : staff;
+          _selectedStaff = selectedStaff;
           _isLoadingStaff = false;
         });
       }
@@ -55,7 +85,9 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
     final formState = FormBuilder.of(context);
     if (formState != null) {
       // Store staff IDs as a list
-      final staffIds = _selectedStaff.map((s) => s.id).toList();
+      final staffIds = _staffAllocation == StaffAllocation.specific.apiValue
+          ? _selectedStaff.map((s) => s.id.value).toList()
+          : <String>[];
       formState.fields[ProductFormField.selectedStaffIds.key]?.didChange(
         staffIds,
       );
@@ -76,12 +108,28 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
         // Hidden FormBuilder fields to store staff data
         FormBuilderField<List<dynamic>>(
           name: ProductFormField.selectedStaffIds.key,
-          initialValue: _selectedStaff.map((s) => s.id).toList(),
+          initialValue: widget.initialStaffIds,
+          validator: (value) {
+            if (_staffAllocation !=
+                StaffAllocation.specific.apiValue) {
+              return null;
+            }
+            if (value == null || value.isEmpty) {
+              return 'Select at least one staff member';
+            }
+            return null;
+          },
           builder: (field) => const SizedBox.shrink(),
         ),
         FormBuilderField<String>(
           name: ProductFormField.staffAllocation.key,
           initialValue: _staffAllocation,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Staff allocation is required';
+            }
+            return null;
+          },
           builder: (field) => const SizedBox.shrink(),
         ),
         Container(
@@ -161,17 +209,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                     ),
                     AppDimens.verticalMediumSmall,
                     _buildSchedulingDetails(context),
-                    AppDimens.verticalMedium,
-                    Divider(color: colorScheme.outlineVariant),
-                    AppDimens.verticalMedium,
-                    // Booking Rules Section
-                    _buildSectionHeader(
-                      context,
-                      icon: Icons.event_available_outlined,
-                      title: 'Booking Rules',
-                    ),
-                    AppDimens.verticalMediumSmall,
-                    _buildBookingRules(context),
+
                   ],
                 ),
               ),
@@ -212,7 +250,10 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
           subtitle: 'Auto-assign based on availability',
           isSelected: _staffAllocation == StaffAllocation.any.apiValue,
           onTap: () {
-            setState(() => _staffAllocation = StaffAllocation.any.apiValue);
+            setState(() {
+              _staffAllocation = StaffAllocation.any.apiValue;
+              _selectedStaff = [];
+            });
             _updateFormBuilderStaff();
           },
         ),
@@ -354,6 +395,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                 label: 'Duration (min)',
                 hintText: '60',
                 fieldKey: ProductFormField.duration.key,
+                isRequired: true,
               ),
             ),
             AppDimens.horizontalMedium,
@@ -363,6 +405,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
                 label: 'Buffer (min)',
                 hintText: '15',
                 fieldKey: ProductFormField.buffer.key,
+                isRequired: true,
               ),
             ),
           ],
@@ -376,14 +419,19 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
               label: 'Capacity (Parallel Bookings)',
               hintText: '1',
               fieldKey: ProductFormField.capacity.key,
+              isRequired: true,
             ),
             AppDimens.verticalExtraSmall,
             Text(
-              'Maximum clients served simultaneously per slot.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontSize: 10,
-                color: colorScheme.onSurfaceVariant,
-              ),
+              'Maximum clients served '
+              'simultaneously per slot.',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(
+                    fontSize: 10,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
             ),
           ],
         ),
@@ -391,141 +439,7 @@ class _ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
     );
   }
 
-  Widget _buildBookingRules(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Min. Lead Time',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Expanded(
-                  child: FormBuilderTextField(
-                    key: const ValueKey('formfield_lead_time'),
-                    name: ProductFormField.leadTime.key,
-                    keyboardType: TextInputType.number,
-                    initialValue: '2',
-                    decoration: InputDecoration(
-                      hintText: '2',
-                      filled: true,
-                      fillColor: colorScheme.surface,
-                      border: OutlineInputBorder(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          bottomLeft: Radius.circular(8),
-                        ),
-                        borderSide: BorderSide(
-                          color: colorScheme.outlineVariant,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          bottomLeft: Radius.circular(8),
-                        ),
-                        borderSide: BorderSide(
-                          color: colorScheme.outlineVariant,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          bottomLeft: Radius.circular(8),
-                        ),
-                        borderSide: BorderSide(color: colorScheme.primary),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 12,
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerLow,
-                    border: Border.all(color: colorScheme.outlineVariant),
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(8),
-                      bottomRight: Radius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    'hours',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        AppDimens.verticalMedium,
-        // Availability Info Card
-        Container(
-          padding: AppDimens.paddingAllMediumSmall,
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withAlpha(13),
-            borderRadius: AppDimens.radiusSmall,
-            border: Border.all(color: colorScheme.primary.withAlpha(26)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Availability',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      'Edit',
-                      style: TextStyle(
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Text(
-                'Using Business Hours (Mon-Fri, 9am-6pm)',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 class _StaffAllocationOption extends StatelessWidget {
@@ -552,7 +466,9 @@ class _StaffAllocationOption extends StatelessWidget {
         children: [
           Radio<bool>(
             value: true,
+            // ignore: deprecated_member_use
             groupValue: isSelected,
+            // ignore: deprecated_member_use
             onChanged: (_) => onTap(),
             activeColor: colorScheme.primary,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -666,12 +582,14 @@ class _IconTextField extends StatelessWidget {
   final String label;
   final String hintText;
   final String fieldKey;
+  final bool isRequired;
 
   const _IconTextField({
     required this.icon,
     required this.label,
     required this.hintText,
     required this.fieldKey,
+    this.isRequired = false,
   });
 
   @override
@@ -681,17 +599,37 @@ class _IconTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: label,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+                if (isRequired)
+                  const TextSpan(
+                    text: ' *',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
-        const SizedBox(height: 6),
         FormBuilderTextField(
           key: ValueKey('formfield_$fieldKey'),
           name: fieldKey,
           keyboardType: TextInputType.number,
+          validator: _buildValidator,
           decoration: InputDecoration(
             hintText: hintText,
             prefixIcon: Icon(
@@ -699,20 +637,40 @@ class _IconTextField extends StatelessWidget {
               size: 16,
               color: colorScheme.onSurfaceVariant,
             ),
-            prefixIconConstraints: const BoxConstraints(minWidth: 36),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 36),
             filled: true,
             fillColor: colorScheme.surface,
             border: OutlineInputBorder(
               borderRadius: AppDimens.radiusSmall,
-              borderSide: BorderSide(color: colorScheme.outlineVariant),
+              borderSide: BorderSide(
+                color: colorScheme.outlineVariant,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: AppDimens.radiusSmall,
-              borderSide: BorderSide(color: colorScheme.outlineVariant),
+              borderSide: BorderSide(
+                color: colorScheme.outlineVariant,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: AppDimens.radiusSmall,
-              borderSide: BorderSide(color: colorScheme.primary),
+              borderSide: BorderSide(
+                color: colorScheme.primary,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: AppDimens.radiusSmall,
+              borderSide: BorderSide(
+                color: colorScheme.error,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: AppDimens.radiusSmall,
+              borderSide: BorderSide(
+                color: colorScheme.error,
+                width: 2,
+              ),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
@@ -722,6 +680,31 @@ class _IconTextField extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// Validates the numeric field value.
+  ///
+  /// Checks emptiness for required fields, then
+  /// validates integer format and positive value.
+  String? _buildValidator(String? value) {
+    final trimmed = value?.trim() ?? '';
+
+    if (isRequired && trimmed.isEmpty) {
+      return '$label is required';
+    }
+
+    if (trimmed.isEmpty) return null;
+
+    final parsed = int.tryParse(trimmed);
+    if (parsed == null) {
+      return 'Enter a valid number';
+    }
+
+    if (parsed <= 0) {
+      return 'Must be greater than 0';
+    }
+
+    return null;
   }
 }
 

@@ -136,8 +136,7 @@ class CheckoutState {
       booking: booking ?? this.booking,
       moMoDeeplink: moMoDeeplink ?? this.moMoDeeplink,
       moMoPayUrl: moMoPayUrl ?? this.moMoPayUrl,
-      stripeClientSecret:
-          stripeClientSecret ?? this.stripeClientSecret,
+      stripeClientSecret: stripeClientSecret ?? this.stripeClientSecret,
     );
   }
 }
@@ -294,10 +293,8 @@ class CheckoutNotifier extends _$CheckoutNotifier {
         final booking = await repo.getBookingById(ticket.bookingId!);
 
         // ── Step 4: Payment if applicable ────────
-        final isCard =
-            current.selectedPayment == PaymentMethodType.card;
-        final isMoMo =
-            current.selectedPayment == PaymentMethodType.eWallet;
+        final isCard = current.selectedPayment == PaymentMethodType.card;
+        final isMoMo = current.selectedPayment == PaymentMethodType.eWallet;
 
         if (booking.status == BookingStatus.pendingPayment) {
           if (isCard) {
@@ -354,31 +351,23 @@ class CheckoutNotifier extends _$CheckoutNotifier {
 
   /// Creates a Stripe PaymentIntent for the booking
   /// and transitions to [awaitingStripePayment].
-  Future<void> _initiateStripePayment(
-    BookingEntity booking,
-  ) async {
+  Future<void> _initiateStripePayment(BookingEntity booking) async {
     final repo = ref.read(checkoutRepositoryProvider);
     try {
-      final result =
-          await repo.createStripePayment(booking.id);
+      final result = await repo.createStripePayment(booking.id);
 
       final current = state.value;
       if (current == null) return;
 
       state = AsyncValue.data(
         current.copyWith(
-          submissionStatus:
-              CheckoutSubmissionStatus.awaitingStripePayment,
+          submissionStatus: CheckoutSubmissionStatus.awaitingStripePayment,
           booking: booking,
           stripeClientSecret: result.clientSecret,
         ),
       );
     } catch (e, st) {
-      _log.severe(
-        'Stripe payment initiation error',
-        e,
-        st,
-      );
+      _log.severe('Stripe payment initiation error', e, st);
       _setError('$e');
     }
   }
@@ -386,9 +375,7 @@ class CheckoutNotifier extends _$CheckoutNotifier {
   /// Called after [Stripe.confirmPayment()] succeeds
   /// on-device. Polls the booking to verify the
   /// webhook has updated the status.
-  Future<void> verifyStripePayment(
-    String bookingId,
-  ) async {
+  Future<void> verifyStripePayment(String bookingId) async {
     final current = state.value;
     if (current == null) return;
 
@@ -396,17 +383,13 @@ class CheckoutNotifier extends _$CheckoutNotifier {
 
     final repo = ref.read(checkoutRepositoryProvider);
     try {
-      final booking =
-          await repo.getBookingById(bookingId);
+      final booking = await repo.getBookingById(bookingId);
 
       if (booking.status == BookingStatus.confirmed) {
         _setSuccess(booking);
       } else {
         // Webhook may not have arrived yet — poll.
-        await _pollBookingConfirmation(
-          repo,
-          bookingId,
-        );
+        await _pollBookingConfirmation(repo, bookingId);
       }
     } catch (e, st) {
       _log.severe('Stripe verify error', e, st);
@@ -416,17 +399,13 @@ class CheckoutNotifier extends _$CheckoutNotifier {
 
   /// Polls the booking status until CONFIRMED or
   /// max attempts reached.
-  Future<void> _pollBookingConfirmation(
-    dynamic repo,
-    String bookingId,
-  ) async {
+  Future<void> _pollBookingConfirmation(dynamic repo, String bookingId) async {
     const maxAttempts = 10;
     const interval = Duration(seconds: 2);
 
     for (var i = 0; i < maxAttempts; i++) {
       await Future.delayed(interval);
-      final booking =
-          await repo.getBookingById(bookingId);
+      final booking = await repo.getBookingById(bookingId);
 
       if (booking.status == BookingStatus.confirmed) {
         _setSuccess(booking);
@@ -434,8 +413,8 @@ class CheckoutNotifier extends _$CheckoutNotifier {
       }
     }
 
-    // Timeout — optimistic success; webhook will
-    // update later.
+    // Timeout — the webhook/IPN may still update
+    // shortly after the client stops polling.
     _setError(
       'Payment is being processed. '
       'Please check your bookings shortly.',
@@ -460,11 +439,9 @@ class CheckoutNotifier extends _$CheckoutNotifier {
       if (booking.status == BookingStatus.confirmed) {
         _setSuccess(booking);
       } else {
-        // Payment not yet confirmed — inform the user.
-        _setError(
-          'Payment not confirmed. '
-          'Please try again or contact support.',
-        );
+        // IPN may not have arrived yet — poll before
+        // showing a timeout message.
+        await _pollBookingConfirmation(repo, bookingId);
       }
     } catch (e, st) {
       _log.severe('MoMo verify error', e, st);

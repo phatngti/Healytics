@@ -35,8 +35,11 @@ class AuthHttpClient extends http.BaseClient {
   /// to avoid infinite loops.
   static const _authPaths = [
     '/auth/login',
+    '/auth/user/login',
+    '/auth/user/register',
     '/auth/refresh',
     '/auth/register',
+    '/auth/employee/login',
     '/auth/partner/login',
     '/auth/partner/refresh',
   ];
