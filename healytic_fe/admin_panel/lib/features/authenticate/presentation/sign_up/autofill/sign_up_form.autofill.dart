@@ -1,11 +1,9 @@
-/// Dev-only autofill defaults for the Partner Registration
+/// UAT-only autofill defaults for the Partner Registration
 /// form ([SignUpFormScreen]).
 ///
 /// Activate via `?autofill=true`
 /// (e.g. `/sign-up?autofill=true`)
-/// or the `autoFill` flag in `store.*.json`.
-///
-/// Only active when [kDebugMode] is `true`.
+/// or the `autoFill` flag in `store.uat.json`.
 abstract final class SignUpFormAutofill {
   // ── Section 1: Account Information ──
 

@@ -68,6 +68,58 @@ class PartnerEmployeesApi {
     return null;
   }
 
+  /// Create a massage skill
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [CreateSkillDto] createSkillDto (required):
+  Future<Response> partnerEmployeesControllerCreateMassageSkillWithHttpInfo(CreateSkillDto createSkillDto,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/partner/employees/massage-skills';
+
+    // ignore: prefer_final_locals
+    Object? postBody = createSkillDto;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Create a massage skill
+  ///
+  /// Parameters:
+  ///
+  /// * [CreateSkillDto] createSkillDto (required):
+  Future<SkillCatalogResponseDto?> partnerEmployeesControllerCreateMassageSkill(CreateSkillDto createSkillDto,) async {
+    final response = await partnerEmployeesControllerCreateMassageSkillWithHttpInfo(createSkillDto,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SkillCatalogResponseDto',) as SkillCatalogResponseDto;
+    
+    }
+    return null;
+  }
+
   /// Create a new massage therapist
   ///
   /// Note: This method returns the HTTP [Response].
@@ -115,6 +167,58 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
+    
+    }
+    return null;
+  }
+
+  /// Create a spa skill
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [CreateSkillDto] createSkillDto (required):
+  Future<Response> partnerEmployeesControllerCreateSpaSkillWithHttpInfo(CreateSkillDto createSkillDto,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/partner/employees/spa-skills';
+
+    // ignore: prefer_final_locals
+    Object? postBody = createSkillDto;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Create a spa skill
+  ///
+  /// Parameters:
+  ///
+  /// * [CreateSkillDto] createSkillDto (required):
+  Future<SkillCatalogResponseDto?> partnerEmployeesControllerCreateSpaSkill(CreateSkillDto createSkillDto,) async {
+    final response = await partnerEmployeesControllerCreateSpaSkillWithHttpInfo(createSkillDto,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SkillCatalogResponseDto',) as SkillCatalogResponseDto;
     
     }
     return null;
@@ -225,6 +329,62 @@ class PartnerEmployeesApi {
       final responseBody = await _decodeBodyBytes(response);
       return (await apiClient.deserializeAsync(responseBody, 'List<EmployeeResponseDto>') as List)
         .cast<EmployeeResponseDto>()
+        .toList(growable: false);
+
+    }
+    return null;
+  }
+
+  /// Get services assigned to an employee
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] id (required):
+  Future<Response> partnerEmployeesControllerFindAssignedServicesWithHttpInfo(String id,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/partner/employees/{id}/services'
+      .replaceAll('{id}', id);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get services assigned to an employee
+  ///
+  /// Parameters:
+  ///
+  /// * [String] id (required):
+  Future<List<EmployeeAssignedServiceDto>?> partnerEmployeesControllerFindAssignedServices(String id,) async {
+    final response = await partnerEmployeesControllerFindAssignedServicesWithHttpInfo(id,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<EmployeeAssignedServiceDto>') as List)
+        .cast<EmployeeAssignedServiceDto>()
         .toList(growable: false);
 
     }
@@ -347,6 +507,53 @@ class PartnerEmployeesApi {
     return null;
   }
 
+  /// Get massage skill catalog
+  ///
+  /// Note: This method returns the HTTP [Response].
+  Future<Response> partnerEmployeesControllerGetMassageSkillsWithHttpInfo() async {
+    // ignore: prefer_const_declarations
+    final path = r'/partner/employees/massage-skills';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get massage skill catalog
+  Future<List<SkillCatalogResponseDto>?> partnerEmployeesControllerGetMassageSkills() async {
+    final response = await partnerEmployeesControllerGetMassageSkillsWithHttpInfo();
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<SkillCatalogResponseDto>') as List)
+        .cast<SkillCatalogResponseDto>()
+        .toList(growable: false);
+
+    }
+    return null;
+  }
+
   /// Get employee overview analytics
   ///
   /// Note: This method returns the HTTP [Response].
@@ -401,6 +608,53 @@ class PartnerEmployeesApi {
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeOverviewAnalyticsResponseDto',) as EmployeeOverviewAnalyticsResponseDto;
     
+    }
+    return null;
+  }
+
+  /// Get spa skill catalog
+  ///
+  /// Note: This method returns the HTTP [Response].
+  Future<Response> partnerEmployeesControllerGetSpaSkillsWithHttpInfo() async {
+    // ignore: prefer_const_declarations
+    final path = r'/partner/employees/spa-skills';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get spa skill catalog
+  Future<List<SkillCatalogResponseDto>?> partnerEmployeesControllerGetSpaSkills() async {
+    final response = await partnerEmployeesControllerGetSpaSkillsWithHttpInfo();
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      return (await apiClient.deserializeAsync(responseBody, 'List<SkillCatalogResponseDto>') as List)
+        .cast<SkillCatalogResponseDto>()
+        .toList(growable: false);
+
     }
     return null;
   }

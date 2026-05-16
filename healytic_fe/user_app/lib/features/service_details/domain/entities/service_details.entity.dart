@@ -20,6 +20,7 @@ class ServiceDetailsEntity {
     required this.reviewCount,
     required this.price,
     required this.isVerified,
+    required this.isWishlisted,
     required this.description,
     required this.featureTags,
     required this.clinic,
@@ -38,6 +39,7 @@ class ServiceDetailsEntity {
   final int reviewCount;
   final String price;
   final bool isVerified;
+  final bool isWishlisted;
   final String description;
   final List<FeatureTagEntity> featureTags;
   final ClinicEntity clinic;
@@ -51,6 +53,7 @@ class ServiceDetailsEntity {
         'images: $images, rating: $rating, '
         'reviewCount: $reviewCount, '
         'price: $price, isVerified: $isVerified, '
+        'isWishlisted: $isWishlisted, '
         'description: $description, '
         'featureTags: $featureTags, '
         'clinic: $clinic, '

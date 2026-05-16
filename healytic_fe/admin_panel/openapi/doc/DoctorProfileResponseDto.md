@@ -15,6 +15,7 @@ Name | Type | Description | Notes
 **consultationFee** | **num** | Consultation fee | [optional] 
 **specializations** | **List<String>** | List of specializations | [optional] [default to const []]
 **education** | **List<String>** | Education history | [optional] [default to const []]
+**certifications** | **List<String>** | Certifications | [optional] [default to const []]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

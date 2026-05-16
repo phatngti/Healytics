@@ -53,4 +53,9 @@ class ClinicInfoRepositoryImpl
         starCount: starCount,
         hasMedia: hasMedia,
       );
+
+  @override
+  Future<ClinicInfoEntity> setFollowing(String clinicId, bool isFollowing) {
+    return _datasource.setFollowing(clinicId, isFollowing);
+  }
 }

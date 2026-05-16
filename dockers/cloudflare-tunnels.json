@@ -49,6 +49,13 @@
           "originRequest": {
             "noTLSVerify": true
           }
+        },
+        {
+          "hostname": "es.healytics.me",
+          "origin": "http://healytics-kibana:5601",
+          "originRequest": {
+            "noTLSVerify": true
+          }
         }
       ]
     }

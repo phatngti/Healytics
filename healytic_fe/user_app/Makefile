@@ -4,7 +4,7 @@
 	build-apk build-apk-dev build-apk-uat build-apk-prod \
 	build-ipa build-ipa-dev build-ipa-uat build-ipa-prod \
 	architecture-check \
-	patrol-test-dev patrol-test-uat patrol-dev
+	patrol-test-dev patrol-test-uat patrol-test-e2e patrol-dev patrol-dev-e2e
 
 # ─── Dependencies ────────────────────────────────
 get:
@@ -86,7 +86,18 @@ patrol-test-uat:
 	patrol test --dart-define=ENV=uat \
 		--dart-define=patrol=true
 
+patrol-test-e2e:
+	patrol test --dart-define=ENV=test \
+		--dart-define=patrol=true \
+		--dart-define=BACKDOOR_BASE_URL=http://10.0.2.2:8000/backend
+
 patrol-dev:
 	patrol develop --dart-define=ENV=dev \
 		--dart-define=patrol=true \
 		-t patrol_test/onboarding_test.dart
+
+patrol-dev-e2e:
+	patrol develop --dart-define=ENV=test \
+		--dart-define=patrol=true \
+		--dart-define=BACKDOOR_BASE_URL=http://10.0.2.2:8000/backend \
+		-t patrol_test/home_test.dart

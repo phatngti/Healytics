@@ -1,18 +1,31 @@
+import 'dart:async';
+
+import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification.entity.dart';
+import 'package:admin_panel/features/admin/partner_manager/presentation/providers/partner_manager.provider.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/partner_stats_cards.widget.dart';
 import 'package:admin_panel/features/admin/partner_manager/presentation/widgets/table/partner_verification_table.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// Desktop layout for partner verification management
+/// Desktop layout for partner verification management.
 class PartnerManagerDesktop extends HookConsumerWidget {
   const PartnerManagerDesktop({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final currentScope = ref.watch(
+      partnerManagerWorkspaceProvider.select((state) => state.scope),
+    );
+    final searchDebounce = useRef<Timer?>(null);
+
+    useEffect(() {
+      return () => searchDebounce.value?.cancel();
+    }, const []);
 
     return SingleChildScrollView(
       child: Padding(
@@ -38,8 +51,10 @@ class PartnerManagerDesktop extends HookConsumerWidget {
                       ),
                       AppDimens.verticalSmall,
                       Text(
-                        'Review and manage partner verification requests.'
-                        ' Approve or reject applications.',
+                        'Review and manage partner '
+                        'verification requests. '
+                        'Approve or reject '
+                        'applications.',
                         style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -48,8 +63,14 @@ class PartnerManagerDesktop extends HookConsumerWidget {
                   ),
                 ),
                 AppDimens.horizontalMedium,
-                // Tab buttons (Verification Queue / All Providers)
-                _TabButtons(),
+                _TabButtons(
+                  currentScope: currentScope,
+                  onScopeChanged: (scope) {
+                    ref
+                        .read(partnerManagerWorkspaceProvider.notifier)
+                        .setScope(scope);
+                  },
+                ),
               ],
             ),
             AppDimens.verticalLarge,
@@ -61,6 +82,17 @@ class PartnerManagerDesktop extends HookConsumerWidget {
             // Verification Table
             PartnerVerificationTable(
               height: DeviceUtils.getScreenHeight(context),
+              onSearchChanged: (value) {
+                searchDebounce.value?.cancel();
+                searchDebounce.value = Timer(
+                  const Duration(milliseconds: 350),
+                  () {
+                    ref
+                        .read(partnerManagerWorkspaceProvider.notifier)
+                        .setSearchQuery(value);
+                  },
+                );
+              },
             ),
           ],
         ),
@@ -69,8 +101,14 @@ class PartnerManagerDesktop extends HookConsumerWidget {
   }
 }
 
-/// Tab buttons for switching between Verification Queue and All Providers
+/// State-driven tab buttons for switching between
+/// Verification Queue and All Providers.
 class _TabButtons extends StatelessWidget {
+  const _TabButtons({required this.currentScope, required this.onScopeChanged});
+
+  final PartnerManagerScope currentScope;
+  final ValueChanged<PartnerManagerScope> onScopeChanged;
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -86,39 +124,70 @@ class _TabButtons extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Active tab
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: AppDimens.radiusExtraSmall,
-              boxShadow: [
-                BoxShadow(
-                  color: colorScheme.shadow.withValues(alpha: 0.1),
-                  blurRadius: 2,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            child: Text(
-              'Verification Queue',
-              style: textTheme.labelMedium?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          _buildTab(
+            context: context,
+            label: 'Verification Queue',
+            scope: PartnerManagerScope.verificationQueue,
+            isActive: currentScope == PartnerManagerScope.verificationQueue,
+            colorScheme: colorScheme,
+            textTheme: textTheme,
           ),
-          // Inactive tab
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Text(
-              'All Providers',
-              style: textTheme.labelMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
+          _buildTab(
+            context: context,
+            label: 'All Providers',
+            scope: PartnerManagerScope.allProviders,
+            isActive: currentScope == PartnerManagerScope.allProviders,
+            colorScheme: colorScheme,
+            textTheme: textTheme,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTab({
+    required BuildContext context,
+    required String label,
+    required PartnerManagerScope scope,
+    required bool isActive,
+    required ColorScheme colorScheme,
+    required TextTheme textTheme,
+  }) {
+    if (isActive) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: AppDimens.radiusExtraSmall,
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.shadow.withValues(alpha: 0.1),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Text(
+          label,
+          style: textTheme.labelMedium?.copyWith(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+
+    return InkWell(
+      onTap: () => onScopeChanged(scope),
+      borderRadius: AppDimens.radiusExtraSmall,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Text(
+          label,
+          style: textTheme.labelMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
       ),
     );
   }

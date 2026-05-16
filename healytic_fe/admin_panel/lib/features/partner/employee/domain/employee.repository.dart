@@ -1,5 +1,7 @@
 import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_assigned_service.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_status.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
 
 /// Repository interface for employee data operations.
@@ -22,6 +24,12 @@ abstract class EmployeeRepository {
     String? sortedBy,
     bool? sortedAsc,
   );
+
+  /// Retrieves all employees for client-side filtering/sorting.
+  Future<List<EmployeeEntity>> getAllEmployees({
+    String? sortedBy,
+    bool? sortedAsc,
+  });
 
   /// Returns the total count of employees in the system.
   Future<int> getTotalRows();
@@ -53,6 +61,9 @@ abstract class EmployeeRepository {
   /// Throws an exception if the employee is not found.
   Future<void> updateEmployee(UpdateEmployeeRequest request);
 
+  /// Updates only the employee status.
+  Future<void> updateEmployeeStatus(EmployeeId id, EmployeeStatusType status);
+
   /// Deletes an employee by their unique identifier.
   ///
   /// Throws an exception if the employee is not found.
@@ -76,6 +87,11 @@ abstract class EmployeeRepository {
     int? limit,
   });
 
+  /// Retrieves services assigned to an employee.
+  Future<List<EmployeeAssignedServiceEntity>> getEmployeeAssignedServices(
+    EmployeeId id,
+  );
+
   /// Retrieves available spa skills as key-value pairs.
   ///
   /// Keys are skill identifiers, values are display names.
@@ -85,4 +101,19 @@ abstract class EmployeeRepository {
   ///
   /// Keys are device identifiers, values are display names.
   Future<Map<String, String>> getDeviceProficiency();
+
+  /// Retrieves available massage skills as key-value pairs.
+  ///
+  /// Keys are skill identifiers, values are display names.
+  Future<Map<String, String>> getMassageSkills();
+
+  /// Creates a new massage skill for the partner.
+  ///
+  /// Returns updated skill map including the new entry.
+  Future<Map<String, String>> createMassageSkill(String name);
+
+  /// Creates a new spa skill for the partner.
+  ///
+  /// Returns updated skill map including the new entry.
+  Future<Map<String, String>> createSpaSkill(String name);
 }

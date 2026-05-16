@@ -113,6 +113,10 @@ class PartnerChat extends _$PartnerChat {
   late final WsService _wsService;
   late final UserChatSocket _socket;
 
+  /// Cached notifier reference so cleanup can call
+  /// `.set(null)` without accessing the disposed ref.
+  late final ActiveChatConversationId _activeConvNotifier;
+
   final List<StreamSubscription> _subscriptions = [];
 
   /// Resolved current-user ID from JWT.
@@ -127,6 +131,10 @@ class PartnerChat extends _$PartnerChat {
     _wsService = ref.read(wsServiceProvider);
     _socket = _wsService.userChat;
     _currentUserId = ref.read(currentUserIdProvider);
+    // Cache the notifier while ref is still valid.
+    _activeConvNotifier = ref.read(
+      activeChatConversationIdProvider.notifier,
+    );
 
     ref.onDispose(_cleanup);
 
@@ -141,14 +149,16 @@ class PartnerChat extends _$PartnerChat {
   /// Mark this conversation as active to suppress
   /// inline toasts while the user is viewing it.
   void _setActiveConversation(String conversationId) {
-    ref.read(activeChatConversationIdProvider.notifier).set(conversationId);
+    _activeConvNotifier.set(conversationId);
   }
 
   /// Clear active conversation on dispose.
+  ///
+  /// Uses the cached [_activeConvNotifier] so this is
+  /// safe to call from [_cleanup] / [ref.onDispose]
+  /// where the ref is already invalidated.
   void _clearActiveConversation() {
-    if (ref.exists(activeChatConversationIdProvider)) {
-      ref.read(activeChatConversationIdProvider.notifier).set(null);
-    }
+    _activeConvNotifier.set(null);
   }
 
   /// The current user's account ID for bubble

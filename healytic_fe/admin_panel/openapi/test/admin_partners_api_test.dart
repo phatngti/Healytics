@@ -24,16 +24,23 @@ void main() {
       // TODO
     });
 
+    // Get partner dashboard statistics
+    //
+    //Future<AdminPartnerStatsResponseDto> adminPartnersControllerGetPartnerStats({ num page, num limit, AdminPartnerScope scope, PartnerVerificationStatus verificationStatus, String search, AdminPartnerSortBy sortBy, AdminPartnerSortDirection sortDirection }) async
+    test('test adminPartnersControllerGetPartnerStats', () async {
+      // TODO
+    });
+
     // List all partners
     //
-    //Future<PartnersResponseDto> adminPartnersControllerGetPartners({ num page, num limit, String verificationStatus, String search }) async
+    //Future<AdminPartnersResponseDto> adminPartnersControllerGetPartners({ num page, num limit, AdminPartnerScope scope, PartnerVerificationStatus verificationStatus, String search, AdminPartnerSortBy sortBy, AdminPartnerSortDirection sortDirection }) async
     test('test adminPartnersControllerGetPartners', () async {
       // TODO
     });
 
     // Get total number of partners
     //
-    //Future<TotalPartnersResponseDto> adminPartnersControllerGetTotalPartners() async
+    //Future<TotalPartnersResponseDto> adminPartnersControllerGetTotalPartners({ num page, num limit, AdminPartnerScope scope, PartnerVerificationStatus verificationStatus, String search, AdminPartnerSortBy sortBy, AdminPartnerSortDirection sortDirection }) async
     test('test adminPartnersControllerGetTotalPartners', () async {
       // TODO
     });

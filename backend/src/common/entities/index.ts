@@ -16,6 +16,7 @@ export { Category } from './category.entity';
 export { Employee } from './employee.entity';
 export { DoctorProfile } from './doctor-profile.entity';
 export { TherapistProfile } from './therapist-profile.entity';
+export { SkillCatalog } from './skill-catalog.entity';
 
 // Locations
 export { Location } from './location.entity';
@@ -49,6 +50,8 @@ export { ProductResourceRequirement } from './product-resource-requirement.entit
 // Product Tags
 export { ProductFeatureTag } from './product-feature-tag.entity';
 export { ProductTag } from './product-tag.entity';
+export { UserClinicFollow } from './user-clinic-follow.entity';
+export { UserWishlistItem } from './user-wishlist-item.entity';
 
 // Booking & Checkout
 export { Booking } from './booking.entity';
@@ -82,4 +85,8 @@ export { PartnerLedgerTransaction } from './partner-ledger-transaction.entity';
 export { PartnerTransactionTimeline } from './partner-transaction-timeline.entity';
 export { PartnerPayout } from './partner-payout.entity';
 export { PartnerPayoutTransaction } from './partner-payout-transaction.entity';
+export { PartnerPayoutAttempt } from './partner-payout-attempt.entity';
 export { PartnerRefundCase } from './partner-refund-case.entity';
+export { AdminFinanceNote } from './admin-finance-note.entity';
+export { AdminFinanceExportJob } from './admin-finance-export-job.entity';
+export { AdminFinanceReconciliationException } from './admin-finance-reconciliation-exception.entity';

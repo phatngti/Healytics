@@ -1,12 +1,33 @@
-import 'package:admin_panel/features/authenticate/datasource/auth_mock_data.dart';
+import 'package:admin_panel/core/entities/role.entity.dart';
 
-/// Dev-only autofill defaults for the Sign-In form.
+/// UAT-only autofill defaults for the Sign-In form.
 ///
 /// Activate via `?autofill=true` (e.g. `/?autofill=true`)
-/// or the `autoFill` flag in `store.json`.
+/// or the `autoFill` flag in `store.uat.json`.
 ///
-/// Only active when [kDebugMode] is `true`.
+/// Credentials match the seeded accounts in
+/// `backend/src/database/seeds/users/user.seeder.ts`.
 abstract final class SignInAutofill {
-  static const email = DevMockAccounts.adminEmail;
-  static const password = DevMockAccounts.adminPassword;
+  // ── Admin ──
+  static const adminEmail = 'admin@healytics.vn';
+  static const adminPassword = 'admin@123';
+
+  // ── Health Partner ──
+  static const partnerEmail = 'partner@healytics.vn';
+  static const partnerPassword = 'partner@123';
+
+  static String getEmail(String role) {
+    print('role: $role');
+    if (role == Role.admin.value) {
+      return adminEmail;
+    }
+    return partnerEmail;
+  }
+
+  static String getPassword(String role) {
+    if (role == Role.admin.value) {
+      return adminPassword;
+    }
+    return partnerPassword;
+  }
 }

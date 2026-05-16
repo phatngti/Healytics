@@ -158,6 +158,7 @@ class _BusinessLocationSectionState
                       hintText: '028 1234 5678',
                       keyboardType: TextInputType.phone,
                       isRequired: true,
+                      validator: _validatePhone,
                     ),
                   ),
                 ],
@@ -182,6 +183,7 @@ class _BusinessLocationSectionState
                   hintText: '028 1234 5678',
                   keyboardType: TextInputType.phone,
                   isRequired: true,
+                  validator: _validatePhone,
                 ),
               ],
             );
@@ -442,5 +444,27 @@ class _BusinessLocationSectionState
         ),
       ],
     );
+  }
+
+  /// Validates Vietnamese phone number format.
+  ///
+  /// Accepts formats starting with +84, 84, or 0
+  /// followed by valid network prefixes (3, 5, 7, 8, 9).
+  String? _validatePhone(dynamic value) {
+    if (value == null || value.toString().isEmpty) {
+      return 'Phone number is required';
+    }
+    final phoneRegex = RegExp(
+      r'^(\+84|84|0)(3|5|7|8|9)[0-9]{8}$',
+    );
+    final phone = value.toString().replaceAll(
+      RegExp(r'[\s\-()]'),
+      '',
+    );
+    if (!phoneRegex.hasMatch(phone)) {
+      return 'Please enter a valid Vietnamese'
+          ' phone number';
+    }
+    return null;
   }
 }

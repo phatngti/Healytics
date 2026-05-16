@@ -48,12 +48,15 @@ class AppointmentAction extends _$AppointmentAction {
     }
   }
 
-  Future<bool> cancelAppointment(String id) async {
+  Future<bool> cancelAppointment(
+    String id, {
+    String? reason,
+  }) async {
     state = const AsyncLoading();
     try {
       final success = await ref
           .read(employeeAppointmentRepositoryProvider)
-          .cancelAppointment(id);
+          .cancelAppointment(id, reason: reason);
       state = const AsyncData(null);
       if (success) _invalidateLists();
       _log.info('Canceled appointment $id');

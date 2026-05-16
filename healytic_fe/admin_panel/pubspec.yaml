@@ -114,6 +114,7 @@ dev_dependencies:
   go_router_builder: ^4.1.0
   json_serializable: ^6.11.1
   drift_dev: ^2.28.0
+  patrol: 4.2.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -135,6 +136,7 @@ flutter:
     - assets/images/
     - assets/translations/
     - assets/animations/
+    - patrol_test/fixtures/
     
   #   - images/a_dot_ham.jpeg
 
@@ -163,3 +165,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+patrol:
+  app_name: GoHealth Admin
+  test_directory: patrol_test

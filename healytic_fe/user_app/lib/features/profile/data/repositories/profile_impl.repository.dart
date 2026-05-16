@@ -1,4 +1,5 @@
 import 'package:user_app/features/profile/domain/entities/user_account.entity.dart';
+import 'package:user_app/features/profile/domain/entities/profile_summary.entity.dart';
 import '../../domain/repositories/profile.repository.dart';
 import '../datasources/remote/profile_remote_datasource.dart';
 
@@ -10,5 +11,10 @@ class ProfileImplRepository implements ProfileRepository {
   @override
   Future<UserAccountEntity> getAccountMe() {
     return remoteDatasource.getAccountMe();
+  }
+
+  @override
+  Future<ProfileSummaryEntity> getProfileSummary() {
+    return remoteDatasource.getProfileSummary();
   }
 }
