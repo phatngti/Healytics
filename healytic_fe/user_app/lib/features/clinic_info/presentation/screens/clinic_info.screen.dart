@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:user_app/features/clinic_info/domain/entities/clinic_info.entity.dart';
+import 'package:user_app/features/clinic_info/data/provider/clinic_info.provider.dart';
 import 'package:user_app/features/clinic_info/presentation/providers/clinic_info.provider.dart';
 import 'package:user_app/features/clinic_info/presentation/widgets/clinic_reviews/review_tab_content.widget.dart';
 import 'package:user_app/features/clinic_info/presentation/widgets/clinic_info/clinic_collapsing_header.widget.dart';
@@ -47,20 +48,22 @@ const _kTabLabels = ['Shop', 'Services', 'Reviews'];
 ///
 /// Manages a [ScrollController] + [ValueNotifier]
 /// pair to drive the floating header blur transition.
-class _ClinicInfoBody extends StatefulWidget {
+class _ClinicInfoBody extends ConsumerStatefulWidget {
   const _ClinicInfoBody({required this.clinic, required this.clinicId});
 
   final ClinicInfoEntity clinic;
   final String clinicId;
 
   @override
-  State<_ClinicInfoBody> createState() => _ClinicInfoBodyState();
+  ConsumerState<_ClinicInfoBody> createState() => _ClinicInfoBodyState();
 }
 
-class _ClinicInfoBodyState extends State<_ClinicInfoBody>
+class _ClinicInfoBodyState extends ConsumerState<_ClinicInfoBody>
     with TickerProviderStateMixin {
   late final TabController _tabController;
   final _showBlur = ValueNotifier<bool>(false);
+  late ClinicInfoEntity _clinic;
+  bool _followBusy = false;
 
   /// Cached expanded height — set in
   /// [didChangeDependencies] when layout info
@@ -73,6 +76,7 @@ class _ClinicInfoBodyState extends State<_ClinicInfoBody>
   @override
   void initState() {
     super.initState();
+    _clinic = widget.clinic;
     _tabController = TabController(length: _kTabCount, vsync: this);
   }
 
@@ -80,6 +84,14 @@ class _ClinicInfoBodyState extends State<_ClinicInfoBody>
   void didChangeDependencies() {
     super.didChangeDependencies();
     _computeLayout();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ClinicInfoBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.clinic != widget.clinic) {
+      _clinic = widget.clinic;
+    }
   }
 
   @override
@@ -118,10 +130,62 @@ class _ClinicInfoBodyState extends State<_ClinicInfoBody>
     }
   }
 
+  Future<void> _toggleFollow() async {
+    if (_followBusy) return;
+    final previous = _clinic;
+    final nextFollowing = !previous.isFollowing;
+    final optimisticCount = (previous.followerCount + (nextFollowing ? 1 : -1))
+        .clamp(0, 1 << 31)
+        .toInt();
+    setState(() {
+      _followBusy = true;
+      _clinic = previous.copyWith(
+        isFollowing: nextFollowing,
+        followerCount: optimisticCount,
+        followersLabel: _formatCount(optimisticCount),
+      );
+    });
+    try {
+      final updated = await ref
+          .read(clinicInfoRepositoryProvider)
+          .setFollowing(widget.clinicId, nextFollowing);
+      if (mounted) {
+        setState(() => _clinic = updated);
+      }
+      ref.invalidate(clinicInfoProvider(clinicId: widget.clinicId));
+    } catch (_) {
+      if (mounted) {
+        setState(() => _clinic = previous);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _followBusy = false);
+      }
+    }
+  }
+
+  void _openChat() {
+    final partnerAccountId = _clinic.chatPartnerId;
+    if (partnerAccountId == null || partnerAccountId.isEmpty) return;
+    PartnerChatRoute(
+      partnerAccountId: partnerAccountId,
+      partnerName: _clinic.name,
+      partnerAvatar: _clinic.logoImageUrl,
+    ).push(context);
+  }
+
+  String _formatCount(int value) {
+    if (value >= 1000000) {
+      return '${(value / 1000000).toStringAsFixed(1)}m';
+    }
+    if (value >= 1000) {
+      return '${(value / 1000).toStringAsFixed(1)}k';
+    }
+    return value.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       body: Stack(
         children: [
@@ -133,7 +197,7 @@ class _ClinicInfoBodyState extends State<_ClinicInfoBody>
               body: TabBarView(
                 controller: _tabController,
                 children: [
-                  ShopTabContent(clinic: widget.clinic),
+                  ShopTabContent(clinic: _clinic),
                   ProductTabContent(clinicId: widget.clinicId),
                   ReviewTabContent(clinicId: widget.clinicId),
                 ],
@@ -148,8 +212,8 @@ class _ClinicInfoBodyState extends State<_ClinicInfoBody>
             right: 0,
             child: RepaintBoundary(
               child: ClinicFloatingHeader(
-                clinicName: widget.clinic.name,
-                logoUrl: widget.clinic.logoImageUrl,
+                clinicName: _clinic.name,
+                logoUrl: _clinic.logoImageUrl,
                 showBlur: _showBlur,
                 onBack: _handleBack,
               ),
@@ -198,9 +262,15 @@ class _ClinicInfoBodyState extends State<_ClinicInfoBody>
           builder: (context, constraints) {
             final collapseProgress = _computeCollapseProgress(constraints);
             return ClinicCollapsingHeader(
-              clinic: widget.clinic,
+              clinic: _clinic,
               collapseProgress: collapseProgress,
               expandedHeight: _expandedHeight,
+              onFollow: _followBusy ? null : _toggleFollow,
+              onChat:
+                  _clinic.chatPartnerId == null ||
+                      _clinic.chatPartnerId!.isEmpty
+                  ? null
+                  : _openChat,
             );
           },
         ),

@@ -12,6 +12,9 @@ enum AppEnvironment {
   /// Local / development – mock flags enabled.
   dev('store.dev.json'),
 
+  /// Local real-backend E2E testing through Patrol.
+  test('store.test.json'),
+
   /// User-acceptance testing – real APIs, no mocks.
   uat('store.uat.json'),
 
@@ -60,10 +63,7 @@ enum AppEnvironment {
   /// Defaults to [dev] when the define is unset
   /// or contains an unrecognised value.
   static AppEnvironment fromDartDefine() {
-    const envStr = String.fromEnvironment(
-      'ENV',
-      defaultValue: 'dev',
-    );
+    const envStr = String.fromEnvironment('ENV', defaultValue: 'dev');
     return AppEnvironment.values.firstWhere(
       (e) => e.name == envStr,
       orElse: () => AppEnvironment.dev,

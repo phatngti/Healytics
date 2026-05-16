@@ -13,7 +13,7 @@ import 'helpers/navigation_helper.dart';
 
 void main() {
   patrolTest('orders tab renders appointment cards', ($) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'orders');
     await signIn($);
     await navigateToTab($, TabKeys.orders);
 
@@ -21,7 +21,7 @@ void main() {
   });
 
   patrolTest('filtering orders by status tabs', ($) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'orders');
     await signIn($);
     await navigateToTab($, TabKeys.orders);
 
@@ -39,7 +39,7 @@ void main() {
   });
 
   patrolTest('pending orders show payment recovery action', ($) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'orders');
     final config = TestConfig.instance;
 
     if (!config.useMock) {
@@ -59,7 +59,7 @@ void main() {
   });
 
   patrolTest('orders can switch to calendar layout', ($) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'orders');
     await signIn($);
     await navigateToTab($, TabKeys.orders);
 
@@ -73,7 +73,7 @@ void main() {
   });
 
   patrolTest('tapping an order navigates to details', ($) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'orders');
     await signIn($);
     await navigateToTab($, TabKeys.orders);
 
@@ -86,7 +86,7 @@ void main() {
   });
 
   patrolTest('opening service manual from details', ($) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'orders');
     await signIn($);
     await navigateToTab($, TabKeys.orders);
 
@@ -98,7 +98,7 @@ void main() {
   });
 
   patrolTest('opening partner chat from order details', ($) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'orders');
     await signIn($);
     await navigateToTab($, TabKeys.orders);
 
@@ -112,7 +112,7 @@ void main() {
   });
 
   patrolTest('completed order can open treatment review', ($) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'orders');
     final config = TestConfig.instance;
 
     if (!config.useMock) {
@@ -134,7 +134,7 @@ void main() {
   });
 
   patrolTest('service details shows booking bar', ($) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'orders');
     await signIn($);
     await navigateToTab($, TabKeys.home);
 

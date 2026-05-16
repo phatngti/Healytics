@@ -17,6 +17,13 @@ void main() {
   // final instance = UserClinicsApi();
 
   group('tests for UserClinicsApi', () {
+    // Follow a clinic
+    //
+    //Future<ClinicInfoResponseDto> userClinicControllerFollowClinic(String id) async
+    test('test userClinicControllerFollowClinic', () async {
+      // TODO
+    });
+
     // Get public clinic profile
     //
     //Future<ClinicInfoResponseDto> userClinicControllerGetClinicInfo(String id) async
@@ -35,6 +42,13 @@ void main() {
     //
     //Future<ClinicReviewsResponseDto> userClinicControllerGetClinicReviews(String id, { num page, num limit, num starCount, bool hasMedia }) async
     test('test userClinicControllerGetClinicReviews', () async {
+      // TODO
+    });
+
+    // Unfollow a clinic
+    //
+    //Future<ClinicInfoResponseDto> userClinicControllerUnfollowClinic(String id) async
+    test('test userClinicControllerUnfollowClinic', () async {
       // TODO
     });
 

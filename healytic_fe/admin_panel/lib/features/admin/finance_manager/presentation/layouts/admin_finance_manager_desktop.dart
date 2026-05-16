@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:admin_panel/features/admin/finance_manager/datasource/admin_finance_impl.repository.dart';
 import 'package:admin_panel/features/admin/finance_manager/domain/admin_finance_period.dart';
 import 'package:admin_panel/features/admin/finance_manager/presentation/providers/admin_finance_state.dart';
@@ -18,11 +20,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Desktop layout for the Finance Manager screen.
-class AdminFinanceManagerDesktop extends ConsumerWidget {
+class AdminFinanceManagerDesktop extends ConsumerStatefulWidget {
   const AdminFinanceManagerDesktop({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdminFinanceManagerDesktop> createState() =>
+      _AdminFinanceManagerDesktopState();
+}
+
+class _AdminFinanceManagerDesktopState
+    extends ConsumerState<AdminFinanceManagerDesktop> {
+  static const _searchDebounceDuration = Duration(milliseconds: 350);
+
+  Timer? _searchDebounce;
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    super.dispose();
+  }
+
+  void _onTableSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(_searchDebounceDuration, () {
+      if (!mounted) return;
+      ref.read(adminFinanceWorkspaceProvider.notifier).setSearchQuery(value);
+    });
+  }
+
+  void _resetFilters() {
+    _searchDebounce?.cancel();
+    ref.read(adminFinanceWorkspaceProvider.notifier).resetFilters();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final ws = ref.watch(adminFinanceWorkspaceProvider);
     final notifier = ref.read(adminFinanceWorkspaceProvider.notifier);
 
@@ -46,7 +78,6 @@ class AdminFinanceManagerDesktop extends ConsumerWidget {
             AppDimens.verticalMedium,
             AdminFinanceFilterBar(
               state: ws,
-              onSearchChanged: notifier.setSearchQuery,
               onSourceTypeChanged: notifier.setSourceType,
               onTransactionTypeChanged: notifier.setTransactionType,
               onTransactionStatusChanged: notifier.setTransactionStatus,
@@ -58,7 +89,7 @@ class AdminFinanceManagerDesktop extends ConsumerWidget {
               onCurrencyChanged: notifier.setCurrency,
               onFlaggedChanged: notifier.setOnlyFlagged,
               onSlaBreachedChanged: notifier.setOnlySlaBreached,
-              onReset: notifier.resetFilters,
+              onReset: _resetFilters,
             ),
             AppDimens.verticalLarge,
             _buildActiveTabContent(context, ref, ws),
@@ -131,6 +162,7 @@ class AdminFinanceManagerDesktop extends ConsumerWidget {
       filter: ws.filter,
       reloadToken: ws.reloadToken,
       height: _tableHeight(context),
+      onSearchChanged: _onTableSearchChanged,
       onRowTap: (id) {
         AdminFinanceTransactionDetailRoute(
           transactionId: id.value,
@@ -144,6 +176,7 @@ class AdminFinanceManagerDesktop extends ConsumerWidget {
       filter: ws.filter,
       reloadToken: ws.reloadToken,
       height: _tableHeight(context),
+      onSearchChanged: _onTableSearchChanged,
       onRowTap: (id) {
         AdminFinancePayoutDetailRoute(payoutId: id.value).push(context);
       },
@@ -155,6 +188,7 @@ class AdminFinanceManagerDesktop extends ConsumerWidget {
       filter: ws.filter,
       reloadToken: ws.reloadToken,
       height: _tableHeight(context),
+      onSearchChanged: _onTableSearchChanged,
       onRowTap: (id) {
         AdminFinanceRefundCaseDetailRoute(caseId: id.value).push(context);
       },
@@ -169,6 +203,7 @@ class AdminFinanceManagerDesktop extends ConsumerWidget {
       filter: ws.filter,
       reloadToken: ws.reloadToken,
       height: _tableHeight(context),
+      onSearchChanged: _onTableSearchChanged,
       onRowTap: (id) {
         AdminFinanceReconciliationDetailRoute(
           exceptionId: id.value,
@@ -180,7 +215,10 @@ class AdminFinanceManagerDesktop extends ConsumerWidget {
   Widget _buildPartnerExposure(BuildContext context, WidgetRef ref) {
     final exposureAsync = ref.watch(adminFinancePartnerExposureProvider);
     return exposureAsync.when(
-      data: (data) => AdminFinancePartnerExposurePanel(exposures: data),
+      data: (data) => AdminFinancePartnerExposurePanel(
+        exposures: data,
+        onSearchChanged: _onTableSearchChanged,
+      ),
       loading: () => const LinearProgressIndicator(),
       error: (e, _) => _errorWidget(context, ref, e),
     );

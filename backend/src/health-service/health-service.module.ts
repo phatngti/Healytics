@@ -9,6 +9,7 @@ import { GetDetailAnalyticsHandler } from './application/handlers/get-detail-ana
 import { PartnerHealthServiceController } from './partner-health-service.controller';
 import { UserHealthServiceController } from './user-health-service.controller';
 import { Product } from '@/common/entities/product.entity';
+import { UserWishlistItem } from '@/common/entities/user-wishlist-item.entity';
 import { ProductMedia } from '@/common/entities/product-media.entity';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
@@ -26,6 +27,7 @@ import { PartnersModule } from '@/partners/partners.module';
   imports: [
     TypeOrmModule.forFeature([
       Product,
+      UserWishlistItem,
       ProductMedia,
       TreatmentReview,
       ProductFacilityImage,

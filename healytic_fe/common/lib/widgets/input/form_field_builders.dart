@@ -194,6 +194,7 @@ class FormFieldBuilders {
     String? fieldKey,
     bool enabled = true,
     bool isRequired = false,
+    String? Function(dynamic)? validator,
     Key? widgetKey,
   }) {
     return _AppDatePickField(
@@ -210,6 +211,7 @@ class FormFieldBuilders {
         color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       isRequired: isRequired,
+      validator: validator,
     );
   }
 

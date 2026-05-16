@@ -9,10 +9,59 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**userClinicControllerFollowClinic**](UserClinicsApi.md#usercliniccontrollerfollowclinic) | **POST** /user/clinics/{id}/follow | Follow a clinic
 [**userClinicControllerGetClinicInfo**](UserClinicsApi.md#usercliniccontrollergetclinicinfo) | **GET** /user/clinics/{id}/info | Get public clinic profile
 [**userClinicControllerGetClinicProducts**](UserClinicsApi.md#usercliniccontrollergetclinicproducts) | **GET** /user/clinics/{id}/products | Get clinic products/services catalog
 [**userClinicControllerGetClinicReviews**](UserClinicsApi.md#usercliniccontrollergetclinicreviews) | **GET** /user/clinics/{id}/reviews | Get paginated clinic reviews
+[**userClinicControllerUnfollowClinic**](UserClinicsApi.md#usercliniccontrollerunfollowclinic) | **DELETE** /user/clinics/{id}/follow | Unfollow a clinic
 
+
+# **userClinicControllerFollowClinic**
+> ClinicInfoResponseDto userClinicControllerFollowClinic(id)
+
+Follow a clinic
+
+### Example
+```dart
+import 'package:employee_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = UserClinicsApi();
+final id = id_example; // String | 
+
+try {
+    final result = api_instance.userClinicControllerFollowClinic(id);
+    print(result);
+} catch (e) {
+    print('Exception when calling UserClinicsApi->userClinicControllerFollowClinic: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
+
+### Return type
+
+[**ClinicInfoResponseDto**](ClinicInfoResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **userClinicControllerGetClinicInfo**
 > ClinicInfoResponseDto userClinicControllerGetClinicInfo(id)
@@ -161,6 +210,53 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**ClinicReviewsResponseDto**](ClinicReviewsResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **userClinicControllerUnfollowClinic**
+> ClinicInfoResponseDto userClinicControllerUnfollowClinic(id)
+
+Unfollow a clinic
+
+### Example
+```dart
+import 'package:employee_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = UserClinicsApi();
+final id = id_example; // String | 
+
+try {
+    final result = api_instance.userClinicControllerUnfollowClinic(id);
+    print(result);
+} catch (e) {
+    print('Exception when calling UserClinicsApi->userClinicControllerUnfollowClinic: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
+
+### Return type
+
+[**ClinicInfoResponseDto**](ClinicInfoResponseDto.md)
 
 ### Authorization
 
