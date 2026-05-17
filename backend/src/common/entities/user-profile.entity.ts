@@ -32,6 +32,9 @@ export class UserProfile {
   @Column({ name: 'date_of_birth', nullable: true, type: 'date' })
   dateOfBirth?: Date | null;
 
+  @Column({ name: 'avatar_url', type: 'text', nullable: true })
+  avatarUrl?: string | null;
+
   @Column({ name: 'profile_completed', default: false })
   profileCompleted: boolean;
 

@@ -49,6 +49,10 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
   String? _ruleError;
   String? _stepError;
 
+  /// Whether the current manual content differs from the edit-mode baseline.
+  bool get hasChanges =>
+      !_sameManualData(_manualDataFromControllers(), _initialManualData());
+
   @override
   void initState() {
     super.initState();
@@ -371,6 +375,10 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
   ///
   /// Returns `null` if all sections are empty.
   Map<String, dynamic>? extractFormData() {
+    return _manualDataFromControllers();
+  }
+
+  Map<String, dynamic>? _manualDataFromControllers() {
     final guidelines = _guideControllers
         .map((c) => c.text.trim())
         .where((s) => s.isNotEmpty)
@@ -404,6 +412,91 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
       ServiceManualKey.rules: rules,
       ServiceManualKey.steps: steps,
     };
+  }
+
+  Map<String, dynamic>? _initialManualData() {
+    final guidelines = widget.initialGuidelines
+        .map((g) => g.trim())
+        .where((g) => g.isNotEmpty)
+        .toList();
+    final rules = widget.initialRules
+        .map(
+          (r) => {
+            ServiceManualKey.iconSlug: (r[ServiceManualKey.iconSlug] ?? '')
+                .trim(),
+            ServiceManualKey.title: (r[ServiceManualKey.title] ?? '').trim(),
+            ServiceManualKey.description:
+                (r[ServiceManualKey.description] ?? '').trim(),
+          },
+        )
+        .where((r) => r[ServiceManualKey.title]!.isNotEmpty)
+        .toList();
+    final steps = widget.initialSteps
+        .map(
+          (s) => {
+            ServiceManualKey.title: (s[ServiceManualKey.title] ?? '').trim(),
+            ServiceManualKey.description:
+                (s[ServiceManualKey.description] ?? '').trim(),
+          },
+        )
+        .where((s) => s[ServiceManualKey.title]!.isNotEmpty)
+        .toList();
+
+    if (guidelines.isEmpty && rules.isEmpty && steps.isEmpty) {
+      return null;
+    }
+
+    return {
+      ServiceManualKey.guidelines: guidelines,
+      ServiceManualKey.rules: rules,
+      ServiceManualKey.steps: steps,
+    };
+  }
+
+  bool _sameManualData(
+    Map<String, dynamic>? current,
+    Map<String, dynamic>? initial,
+  ) {
+    return _sameStringList(
+          current?[ServiceManualKey.guidelines] as List<String>? ?? const [],
+          initial?[ServiceManualKey.guidelines] as List<String>? ?? const [],
+        ) &&
+        _sameStringMapList(
+          current?[ServiceManualKey.rules] as List<Map<String, String>>? ??
+              const [],
+          initial?[ServiceManualKey.rules] as List<Map<String, String>>? ??
+              const [],
+        ) &&
+        _sameStringMapList(
+          current?[ServiceManualKey.steps] as List<Map<String, String>>? ??
+              const [],
+          initial?[ServiceManualKey.steps] as List<Map<String, String>>? ??
+              const [],
+        );
+  }
+
+  bool _sameStringList(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  bool _sameStringMapList(
+    List<Map<String, String>> a,
+    List<Map<String, String>> b,
+  ) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      final left = a[i];
+      final right = b[i];
+      if (left.length != right.length) return false;
+      for (final key in left.keys) {
+        if (left[key] != right[key]) return false;
+      }
+    }
+    return true;
   }
 }
 

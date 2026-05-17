@@ -5,6 +5,7 @@ import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/features/checkout/presentation/providers/checkout.provider.dart';
 import 'package:user_app/features/checkout/presentation/providers/momo_launcher.dart';
@@ -14,6 +15,7 @@ import 'package:user_app/features/checkout/presentation/widgets/order_items_sect
 import 'package:user_app/features/checkout/presentation/widgets/payment_details_section.widget.dart';
 import 'package:user_app/features/checkout/presentation/widgets/payment_method_section.widget.dart';
 import 'package:user_app/features/checkout/presentation/widgets/vouchers_section.widget.dart';
+import 'package:user_app/router/routes.dart';
 
 /// Main checkout screen composing all section widgets.
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -276,7 +278,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           FilledButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              Navigator.of(context).maybePop();
+              const OrderApprovedRoute().go(context);
             },
             child: const Text('Done'),
           ),

@@ -13,6 +13,8 @@ import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
+import { ProductTag } from '@/common/entities/product-tag.entity';
+import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
 
 @Injectable()
 export class UpdateHealthServiceHandler {
@@ -46,22 +48,17 @@ export class UpdateHealthServiceHandler {
         productDefinition,
         serviceManual,
         employeeIds,
+        tagIds,
         facilityImages,
         ...updateData
       } = command;
 
-      // Strip null/undefined values for non-nullable DB columns while
-      // preserving explicit nulls for nullable columns that support clearing.
-      const nullableProductFields = new Set([
-        'categoryId',
-        'description',
-        'salePrice',
-      ]);
+      // Null values are already stripped by StripNullPropertiesPipe;
+      // only filter out undefined (omitted) fields.
       const sanitizedUpdate = Object.fromEntries(
-        Object.entries(updateData).filter(([key, value]) => {
-          if (value === undefined) return false;
-          return value !== null || nullableProductFields.has(key);
-        }),
+        Object.entries(updateData).filter(
+          ([, value]) => value !== undefined,
+        ),
       );
 
       if (Object.keys(sanitizedUpdate).length > 0) {
@@ -191,7 +188,44 @@ export class UpdateHealthServiceHandler {
         }
       }
 
-      // 7. Commit
+      // 7. Update feature tags (full replacement policy)
+      if (tagIds !== undefined) {
+        const uniqueTagIds = [...new Set(tagIds ?? [])];
+
+        // Validate that all tag IDs exist as active ProductFeatureTag records
+        if (uniqueTagIds.length > 0) {
+          const existingTags = await queryRunner.manager.find(
+            ProductFeatureTag,
+            {
+              where: { id: In(uniqueTagIds), isActive: true },
+              select: ['id'],
+            },
+          );
+          if (existingTags.length !== uniqueTagIds.length) {
+            const foundIds = new Set(existingTags.map((t) => t.id));
+            const missingIds = uniqueTagIds.filter((tid) => !foundIds.has(tid));
+            throw new NotFoundException(
+              `Feature tag(s) not found or inactive: ${missingIds.join(', ')}`,
+            );
+          }
+        }
+
+        // Delete all existing product-tag junction rows
+        await queryRunner.manager.delete(ProductTag, { productId: id });
+
+        // Insert new junction rows
+        if (uniqueTagIds.length > 0) {
+          const tagEntities = uniqueTagIds.map((tagId) =>
+            queryRunner.manager.create(ProductTag, {
+              productId: id,
+              tagId,
+            }),
+          );
+          await queryRunner.manager.save(ProductTag, tagEntities);
+        }
+      }
+
+      // 8. Commit
       await queryRunner.commitTransaction();
       this.logger.log(`Product updated successfully: ${id}`);
 
@@ -203,6 +237,9 @@ export class UpdateHealthServiceHandler {
           'productDefinition',
           'productEmployeeEligibilities',
           'productEmployeeEligibilities.employee',
+          'productTags',
+          'productTags.tag',
+          'facilityImages',
         ],
       });
       return updatedProduct!;

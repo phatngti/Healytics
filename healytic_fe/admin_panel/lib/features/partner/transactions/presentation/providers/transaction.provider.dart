@@ -96,6 +96,8 @@ class TransactionsManagerNotifier extends Notifier<TransactionsManagerState> {
   }
 
   void setSearchQuery(String value) {
+    if (value == state.filter.searchQuery) return;
+
     state = state.copyWith(
       filter: state.filter.copyWith(searchQuery: value),
       reloadToken: state.reloadToken + 1,
@@ -330,6 +332,35 @@ final financeFilterProvider = Provider<FinanceFilter>((ref) {
   return ref.watch(transactionsManagerProvider.select((state) => state.filter));
 });
 
+final financeAnalyticsFilterProvider = Provider<FinanceFilter>((ref) {
+  final filter = ref.watch(
+    transactionsManagerProvider.select((state) {
+      final filter = state.filter;
+      return (
+        startDate: filter.startDate,
+        endDate: filter.endDate,
+        sourceType: filter.sourceType,
+        transactionType: filter.transactionType,
+        transactionStatus: filter.transactionStatus,
+        settlementStatus: filter.settlementStatus,
+        payoutStatus: filter.payoutStatus,
+        currency: filter.currency,
+      );
+    }),
+  );
+
+  return FinanceFilter(
+    startDate: filter.startDate,
+    endDate: filter.endDate,
+    sourceType: filter.sourceType,
+    transactionType: filter.transactionType,
+    transactionStatus: filter.transactionStatus,
+    settlementStatus: filter.settlementStatus,
+    payoutStatus: filter.payoutStatus,
+    currency: filter.currency,
+  );
+});
+
 final financeActiveTabProvider = Provider<FinanceWorkspaceTab>((ref) {
   return ref.watch(
     transactionsManagerProvider.select((state) => state.activeTab),
@@ -355,7 +386,7 @@ final financeReloadTokenProvider = Provider<int>((ref) {
 });
 
 final financeSummaryProvider = FutureProvider<FinanceSummary>((ref) async {
-  final filter = ref.watch(financeFilterProvider);
+  final filter = ref.watch(financeAnalyticsFilterProvider);
   final period = ref.watch(financeSelectedPeriodProvider);
   return ref
       .read(transactionsRepositoryProvider)
@@ -365,7 +396,7 @@ final financeSummaryProvider = FutureProvider<FinanceSummary>((ref) async {
 final financeTrendProvider = FutureProvider<List<FinanceTrendPoint>>((
   ref,
 ) async {
-  final filter = ref.watch(financeFilterProvider);
+  final filter = ref.watch(financeAnalyticsFilterProvider);
   final period = ref.watch(financeSelectedPeriodProvider);
   return ref
       .read(transactionsRepositoryProvider)

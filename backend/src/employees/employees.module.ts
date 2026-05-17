@@ -14,6 +14,7 @@ import { ProductEmployeeEligibility } from '@/common/entities/product-employee-e
 import { Product } from '@/common/entities/product.entity';
 import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { Booking } from '@/common/entities/booking.entity';
+import { SpecialistReview } from '@/common/entities/specialist-review.entity';
 import { PartnersModule } from '@/partners/partners.module';
 import { CreateDoctorHandler } from './application/handlers/create-doctor.handler';
 import { CreateTherapistHandler } from './application/handlers/create-therapist.handler';
@@ -39,6 +40,7 @@ import { GetEmployeeRevenueBreakdownHandler } from './application/handlers/get-e
       Product,
       ProductDefinition,
       Booking,
+      SpecialistReview,
     ]),
     PartnersModule,
   ],

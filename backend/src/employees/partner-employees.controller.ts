@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { StripNullPropertiesPipe } from '@/common/pipes/strip-null-properties.pipe';
 import { Throttle } from '@nestjs/throttler';
 import {
   ApiOperation,
@@ -289,7 +290,7 @@ export class PartnerEmployeesController {
   async update(
     @CurrentUser('id') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateEmployeeDto: UpdateEmployeeDto,
+    @Body(new StripNullPropertiesPipe()) updateEmployeeDto: UpdateEmployeeDto,
   ): Promise<EmployeeResponseDto> {
     const partnerId =
       await this.employeesService.getPartnerIdByAccountId(userId);

@@ -19,6 +19,7 @@ enum ProductFormField {
 
   // ── Organization ───────────────────────────────
   category('category'),
+  tags('tags'),
 
   // ── Operations & scheduling ────────────────────
   duration('duration'),
