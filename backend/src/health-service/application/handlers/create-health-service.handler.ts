@@ -2,9 +2,12 @@ import {
   Injectable,
   Logger,
   ConflictException,
+  ForbiddenException,
+  HttpException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import { RedisService } from '@/redis/redis.service';
 import { CreatePartnerHealthServiceDto } from '../../dto/partner/create-partner-health-service.dto';
 import { Product } from '@/common/entities/product.entity';
@@ -14,6 +17,15 @@ import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { StaffAssignmentType } from '@/health-service/enums/staff-assignment-type.enum';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
+import { ProductTag } from '@/common/entities/product-tag.entity';
+import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
+import { Category } from '@/common/entities/category.entity';
+import { Employee } from '@/common/entities/employee.entity';
+import { Partner } from '@/common/entities/partner.entity';
+
+type CreateHealthServiceCommand = CreatePartnerHealthServiceDto & {
+  partnerId: string;
+};
 
 @Injectable()
 export class CreateHealthServiceHandler {
@@ -24,7 +36,25 @@ export class CreateHealthServiceHandler {
     private readonly redisService: RedisService,
   ) {}
 
-  async execute(command: CreatePartnerHealthServiceDto): Promise<Product> {
+  /**
+   * Generates a URL-friendly slug in the format:
+   *   {partner_brand_slug}_{product_name_slug}_{6-char-random}
+   *
+   * Example: "healytics-spa_thai-massage_a1b2c3"
+   */
+  private buildSlug(brandName: string, productName: string): string {
+    const toSlugPart = (str: string): string =>
+      str
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // strip non-alphanumeric
+        .trim()
+        .replace(/\s+/g, '-'); // spaces → hyphens
+
+    const random = Math.random().toString(36).slice(2, 8); // 6-char alphanumeric
+    return `${toSlugPart(brandName)}_${toSlugPart(productName)}_${random}`;
+  }
+
+  async execute(command: CreateHealthServiceCommand): Promise<Product> {
     this.logger.log(
       `Executing CreateHealthServiceHandler with name: ${command.name}`,
     );
@@ -39,8 +69,23 @@ export class CreateHealthServiceHandler {
         employeeIds,
         facilityImages,
         serviceManual,
+        tagIds,
+        partnerId,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        slug: _ignoredSlug, // slug is auto-generated; client value is ignored
         ...baseData
       } = command;
+      const uniqueEmployeeIds = [...new Set(employeeIds ?? [])];
+      const uniqueTagIds = [...new Set(tagIds ?? [])];
+
+      // 0. Fetch partner to derive brand name for slug generation
+      const partner = await queryRunner.manager.findOne(Partner, {
+        where: { id: partnerId },
+        select: ['id', 'brandName'],
+      });
+      if (!partner) {
+        throw new NotFoundException(`Partner with ID ${partnerId} not found`);
+      }
 
       // 1. Invariant Check (Validate)
       if (baseData.type === HealthServiceType.SERVICE && !productDefinition) {
@@ -49,9 +94,53 @@ export class CreateHealthServiceHandler {
         );
       }
 
+      if (baseData.categoryId) {
+        const category = await queryRunner.manager.findOne(Category, {
+          where: { id: baseData.categoryId, isActive: true },
+          select: ['id'],
+        });
+
+        if (!category) {
+          throw new NotFoundException(
+            `Category with ID ${baseData.categoryId} not found`,
+          );
+        }
+      }
+
+      if (
+        baseData.type === HealthServiceType.SERVICE &&
+        uniqueEmployeeIds.length > 0
+      ) {
+        const employees = await queryRunner.manager.find(Employee, {
+          where: { id: In(uniqueEmployeeIds) },
+          select: ['id', 'partnerId'],
+        });
+
+        if (employees.length !== uniqueEmployeeIds.length) {
+          const foundIds = new Set(employees.map((employee) => employee.id));
+          const missingIds = uniqueEmployeeIds.filter(
+            (id) => !foundIds.has(id),
+          );
+          throw new NotFoundException(
+            `Employee(s) not found: ${missingIds.join(', ')}`,
+          );
+        }
+
+        const foreignEmployee = employees.find(
+          (employee) => employee.partnerId !== partnerId,
+        );
+        if (foreignEmployee) {
+          throw new ForbiddenException(
+            `Employee ${foreignEmployee.id} does not belong to this partner`,
+          );
+        }
+      }
+
       // 2. Domain Action (Prepare Entity)
       const product = queryRunner.manager.create(Product, {
         ...baseData,
+        partnerId,
+        slug: this.buildSlug(partner.brandName, command.name),
         serviceManual: serviceManual ?? null,
         currency: 'VND', // Hardcoded as per business rule defaults
       });
@@ -87,10 +176,9 @@ export class CreateHealthServiceHandler {
       // Handle Staff Eligibility - Relation Management
       if (
         baseData.type === HealthServiceType.SERVICE &&
-        employeeIds &&
-        employeeIds.length > 0
+        uniqueEmployeeIds.length > 0
       ) {
-        const eligibilityEntities = employeeIds.map((eid) =>
+        const eligibilityEntities = uniqueEmployeeIds.map((eid) =>
           queryRunner.manager.create(ProductEmployeeEligibility, {
             productId: savedProduct.id,
             employeeId: eid,
@@ -112,6 +200,30 @@ export class CreateHealthServiceHandler {
           }),
         );
         await queryRunner.manager.save(ProductFacilityImage, facilityEntities);
+      }
+
+      // Handle Feature Tags — Junction Table Management
+      if (uniqueTagIds.length > 0) {
+        // Validate that all tag IDs exist as active ProductFeatureTag records
+        const existingTags = await queryRunner.manager.find(ProductFeatureTag, {
+          where: { id: In(uniqueTagIds), isActive: true },
+          select: ['id'],
+        });
+        if (existingTags.length !== uniqueTagIds.length) {
+          const foundIds = new Set(existingTags.map((t) => t.id));
+          const missingIds = uniqueTagIds.filter((id) => !foundIds.has(id));
+          throw new NotFoundException(
+            `Feature tag(s) not found or inactive: ${missingIds.join(', ')}`,
+          );
+        }
+
+        const tagEntities = uniqueTagIds.map((tagId) =>
+          queryRunner.manager.create(ProductTag, {
+            productId: savedProduct.id,
+            tagId,
+          }),
+        );
+        await queryRunner.manager.save(ProductTag, tagEntities);
       }
 
       await queryRunner.commitTransaction();
@@ -148,7 +260,7 @@ export class CreateHealthServiceHandler {
         error.stack,
       );
 
-      if (error instanceof ConflictException) throw error;
+      if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException(
         'Transaction failed during product creation',
       );

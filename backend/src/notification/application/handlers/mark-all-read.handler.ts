@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from '@/common/entities/notification.entity';
 import { NotificationRead } from '@/common/entities/notification-read.entity';
+import { Account } from '@/common/entities/account.entity';
 
 /**
  * Handler for marking all unread notifications as read for a user.
@@ -17,10 +18,19 @@ export class MarkAllReadHandler {
     private readonly notificationRepo: Repository<Notification>,
     @InjectRepository(NotificationRead)
     private readonly notifReadRepo: Repository<NotificationRead>,
+    @InjectRepository(Account)
+    private readonly accountRepo: Repository<Account>,
   ) {}
 
   async execute(userId: string): Promise<{ markedCount: number }> {
     this.logger.log(`Marking all notifications as read for userId=${userId}`);
+
+    // Resolve join date so we only touch broadcasts this user can see
+    const account = await this.accountRepo.findOne({
+      where: { id: userId },
+      select: ['createdAt'],
+    });
+    const accountCreatedAt = account?.createdAt ?? new Date(0);
 
     // 1. Mark all targeted unread notifications as read
     const targetedResult = await this.notificationRepo.update(
@@ -28,7 +38,7 @@ export class MarkAllReadHandler {
       { isRead: true, readAt: new Date() },
     );
 
-    // 2. Find all unread broadcasts (not in notification_reads for this user)
+    // 2. Find unread broadcasts published after the user's join date
     const unreadBroadcasts = await this.notificationRepo
       .createQueryBuilder('n')
       .leftJoin(
@@ -39,6 +49,7 @@ export class MarkAllReadHandler {
       )
       .where('n.isBroadcast = true')
       .andWhere('n.deletedAt IS NULL')
+      .andWhere('n.createdAt >= :accountCreatedAt', { accountCreatedAt })
       .andWhere('nr.id IS NULL')
       .getMany();
 

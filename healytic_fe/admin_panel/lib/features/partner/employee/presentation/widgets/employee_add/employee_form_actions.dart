@@ -32,29 +32,27 @@ class EmployeeFormActions extends StatelessWidget {
         AnimatedSize(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeInOut,
-          child: isFormValid
-              ? Row(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AppDimens.horizontalSmall,
+              AppButton(
+                buttonType: ButtonType.elevated,
+                onPressed: isLoading || !isFormValid ? null : onSubmit,
+                isLoading: isLoading,
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    AppDimens.horizontalSmall,
-                    AppButton(
-                      buttonType: ButtonType.elevated,
-                      onPressed: isLoading ? null : onSubmit,
-                      isLoading: isLoading,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (submitIcon != null) ...[
-                            submitIcon!,
-                            AppDimens.horizontalSmall,
-                          ],
-                          Text(submitLabel),
-                        ],
-                      ),
-                    ),
+                    if (submitIcon != null) ...[
+                      submitIcon!,
+                      AppDimens.horizontalSmall,
+                    ],
+                    Text(submitLabel),
                   ],
-                )
-              : const SizedBox.shrink(),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

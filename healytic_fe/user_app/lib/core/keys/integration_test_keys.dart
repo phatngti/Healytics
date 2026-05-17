@@ -84,6 +84,14 @@ class ProfilePageKeys {
   final editButton = const Key('profileEditButton');
   final saveButton = const Key('profileSaveButton');
   final displayNameField = const Key('profileDisplayNameField');
+  final logoutButton = const Key('profileLogoutButton');
+}
+
+// --- Logout Confirmation Dialog ---
+
+class LogoutDialogKeys {
+  final confirmButton = const Key('logoutDialogConfirmButton');
+  final cancelButton = const Key('logoutDialogCancelButton');
 }
 
 // --- Notifications ---
@@ -114,6 +122,7 @@ class Keys {
   final checkoutPage = CheckoutPageKeys();
   final cartPage = CartPageKeys();
   final profilePage = ProfilePageKeys();
+  final logoutDialog = LogoutDialogKeys();
   final notificationsPage = NotificationsPageKeys();
   final bottomNav = BottomNavKeys();
 }

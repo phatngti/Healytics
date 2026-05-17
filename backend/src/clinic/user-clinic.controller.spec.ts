@@ -15,6 +15,8 @@ describe('UserClinicController', () => {
     getClinicInfo: jest.Mock;
     getClinicProducts: jest.Mock;
     getClinicReviews: jest.Mock;
+    followClinic: jest.Mock;
+    unfollowClinic: jest.Mock;
   };
 
   const validationPipe = new ValidationPipe({
@@ -32,6 +34,7 @@ describe('UserClinicController', () => {
   });
 
   const clinicId = '11111111-1111-4111-8111-111111111111';
+  const userId = '33333333-3333-4333-8333-333333333333';
   const categoryId = '22222222-2222-4222-8222-222222222222';
 
   beforeEach(async () => {
@@ -39,6 +42,8 @@ describe('UserClinicController', () => {
       getClinicInfo: jest.fn(),
       getClinicProducts: jest.fn(),
       getClinicReviews: jest.fn(),
+      followClinic: jest.fn(),
+      unfollowClinic: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -91,8 +96,22 @@ describe('UserClinicController', () => {
       new NotFoundException(`Clinic with ID ${clinicId} not found`),
     );
 
-    await expect(controller.getClinicInfo(clinicId)).rejects.toThrow(
+    await expect(controller.getClinicInfo(clinicId, userId)).rejects.toThrow(
       NotFoundException,
+    );
+  });
+
+  it('delegates follow and unfollow to the service', async () => {
+    clinicService.followClinic.mockResolvedValue({ id: clinicId });
+    clinicService.unfollowClinic.mockResolvedValue({ id: clinicId });
+
+    await controller.followClinic(clinicId, userId);
+    await controller.unfollowClinic(clinicId, userId);
+
+    expect(clinicService.followClinic).toHaveBeenCalledWith(clinicId, userId);
+    expect(clinicService.unfollowClinic).toHaveBeenCalledWith(
+      clinicId,
+      userId,
     );
   });
 

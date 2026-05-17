@@ -1,14 +1,17 @@
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_add/employee_form/therapist_fields_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   Widget createWidgetUnderTest() {
-    return MaterialApp(
-      home: Scaffold(
-        body: FormBuilder(
-          child: SingleChildScrollView(child: TherapistFieldsCard()),
+    return ProviderScope(
+      child: MaterialApp(
+        home: Scaffold(
+          body: FormBuilder(
+            child: SingleChildScrollView(child: TherapistFieldsCard()),
+          ),
         ),
       ),
     );
@@ -21,13 +24,19 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify Massage Therapist is selected by default (implied by Strength field visibility)
-    expect(find.text('Massage Strength'), findsOneWidget);
+    expect(
+      find.textContaining('MASSAGE STRENGTH', findRichText: true),
+      findsOneWidget,
+    );
     expect(find.text('Soft'), findsOneWidget);
     expect(find.text('Medium'), findsOneWidget);
     expect(find.text('Strong'), findsOneWidget);
 
     // Verify Massage Skills
-    expect(find.text('Skill Set'), findsOneWidget);
+    expect(
+      find.textContaining('SKILL SET', findRichText: true),
+      findsOneWidget,
+    );
 
     // Verify Health Check is present
     expect(find.byType(FormBuilderDateTimePicker), findsOneWidget);
@@ -46,7 +55,10 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify Massage Strength is hidden
-    expect(find.text('Massage Strength'), findsNothing);
+    expect(
+      find.textContaining('MASSAGE STRENGTH', findRichText: true),
+      findsNothing,
+    );
     expect(find.text('Soft'), findsNothing);
 
     // Verify Health Check is still visible

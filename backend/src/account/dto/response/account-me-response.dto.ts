@@ -31,6 +31,10 @@ class UserProfileDto {
   @Expose()
   dateOfBirth?: Date | null;
 
+  @ApiPropertyOptional({ description: 'Avatar image URL' })
+  @Expose()
+  avatarUrl?: string | null;
+
   @ApiProperty({ description: 'Whether the profile is completed' })
   @Expose()
   profileCompleted: boolean;

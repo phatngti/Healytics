@@ -24,6 +24,11 @@ abstract class CategoryRemoteDataSource {
     bool? sortedAsc,
   });
 
+  Future<List<CategoryEntity>> getAllCategories({
+    String? sortedBy,
+    bool? sortedAsc,
+  });
+
   Future<int> getTotalRows();
 
   Future<CategoryEntity> getCategoryById(CategoryId id);
@@ -64,13 +69,24 @@ class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   }) async {
-    final dtos = await _api.adminCategoriesControllerFindAll();
-    if (dtos == null) return [];
-
-    final all = dtos.map(_mapDtoToEntity).toList();
+    final all = await getAllCategories(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
 
     final end = (startingAt + count).clamp(0, all.length);
     return all.sublist(startingAt.clamp(0, all.length), end);
+  }
+
+  @override
+  Future<List<CategoryEntity>> getAllCategories({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
+    final dtos = await _api.adminCategoriesControllerFindAll();
+    if (dtos == null) return [];
+
+    return dtos.map(_mapDtoToEntity).toList();
   }
 
   @override
@@ -189,7 +205,7 @@ String _slugify(String name) {
 /// Mock implementation with rich static data for UI testing
 class CategoryRemoteDataSourceMock implements CategoryRemoteDataSource {
   // Mock data matching the existing UI
-  final List<CategoryEntity> _mockCategories = categoryMockData;
+  final List<CategoryEntity> _mockCategories = [...categoryMockData];
 
   @override
   Future<List<CategoryEntity>> getCategories({
@@ -198,14 +214,24 @@ class CategoryRemoteDataSourceMock implements CategoryRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   }) async {
+    final categories = await getAllCategories(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
+
+    final endIndex = (startingAt + count).clamp(0, categories.length);
+    return categories.sublist(startingAt.clamp(0, categories.length), endIndex);
+  }
+
+  @override
+  Future<List<CategoryEntity>> getAllCategories({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
 
-    final endIndex = (startingAt + count).clamp(0, _mockCategories.length);
-    return _mockCategories.sublist(
-      startingAt.clamp(0, _mockCategories.length),
-      endIndex,
-    );
+    return _mockCategories.sublist(0, _mockCategories.length);
   }
 
   @override
@@ -239,8 +265,7 @@ class CategoryRemoteDataSourceMock implements CategoryRemoteDataSource {
       createdAt: DateTime.now().toIso8601String(),
     );
 
-    // In a real app, this would persist to the server
-    // For mock, we could add to local list if needed
+    _mockCategories.insert(0, newCategory);
     return newCategory;
   }
 
@@ -255,14 +280,26 @@ class CategoryRemoteDataSourceMock implements CategoryRemoteDataSource {
     int? sortOrder,
   }) async {
     await Future.delayed(const Duration(seconds: 1));
-    // Mock update - in real implementation, this would update the server
+    final index = _mockCategories.indexWhere((category) => category.id == id);
+    if (index != -1) {
+      final current = _mockCategories[index];
+      _mockCategories[index] = current.copyWith(
+        name: name ?? current.name,
+        description: description ?? current.description,
+        iconName: iconName ?? current.iconName,
+        colorValue: colorValue ?? current.colorValue,
+        isVisible: isVisible ?? current.isVisible,
+        sortOrder: sortOrder ?? current.sortOrder,
+        updatedAt: DateTime.now().toIso8601String(),
+      );
+    }
     debugPrint('Mock: Updated category $id');
   }
 
   @override
   Future<void> deleteCategory(CategoryId id) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    // Mock delete - in real implementation, this would delete from server
+    _mockCategories.removeWhere((category) => category.id == id);
     debugPrint('Mock: Deleted category $id');
   }
 

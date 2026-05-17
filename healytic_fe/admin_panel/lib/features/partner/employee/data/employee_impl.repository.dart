@@ -1,7 +1,9 @@
 import 'package:admin_panel/features/partner/employee/data/employee_remote.datasource.dart';
 import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_assigned_service.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.repository.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_status.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -30,6 +32,17 @@ class EmployeeRepositoryImpl implements EmployeeRepository {
       count,
       sortedBy,
       sortedAsc,
+    );
+  }
+
+  @override
+  Future<List<EmployeeEntity>> getAllEmployees({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) {
+    return remoteDataSource.getAllEmployees(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
     );
   }
 
@@ -66,6 +79,11 @@ class EmployeeRepositoryImpl implements EmployeeRepository {
   }
 
   @override
+  Future<void> updateEmployeeStatus(EmployeeId id, EmployeeStatusType status) {
+    return remoteDataSource.updateEmployeeStatus(id, status);
+  }
+
+  @override
   Future<void> deleteEmployee(EmployeeId id) {
     return remoteDataSource.deleteEmployee(id);
   }
@@ -87,6 +105,13 @@ class EmployeeRepositoryImpl implements EmployeeRepository {
   }
 
   @override
+  Future<List<EmployeeAssignedServiceEntity>> getEmployeeAssignedServices(
+    EmployeeId id,
+  ) {
+    return remoteDataSource.getEmployeeAssignedServices(id);
+  }
+
+  @override
   Future<Map<String, String>> getSpaSkills() {
     return remoteDataSource.getSpaSkills();
   }
@@ -94,6 +119,21 @@ class EmployeeRepositoryImpl implements EmployeeRepository {
   @override
   Future<Map<String, String>> getDeviceProficiency() {
     return remoteDataSource.getDeviceProficiency();
+  }
+
+  @override
+  Future<Map<String, String>> getMassageSkills() {
+    return remoteDataSource.getMassageSkills();
+  }
+
+  @override
+  Future<Map<String, String>> createMassageSkill(String name) {
+    return remoteDataSource.createMassageSkill(name);
+  }
+
+  @override
+  Future<Map<String, String>> createSpaSkill(String name) {
+    return remoteDataSource.createSpaSkill(name);
   }
 }
 

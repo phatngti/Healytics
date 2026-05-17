@@ -1,0 +1,9 @@
+{
+  "backdoor": {
+    "enabled": false
+  },
+  "auth": {
+    "email": "user@healytics.vn",
+    "password": "user@123"
+  }
+}

@@ -84,7 +84,7 @@ final class ChatProvider extends $NotifierProvider<Chat, ChatState> {
   }
 }
 
-String _$chatHash() => r'91a86a1fe0b4f875f5b8e96b4f5b385d4229c7ac';
+String _$chatHash() => r'19615d5fa543418a5c551aa395d22d85556f4649';
 
 /// Manages the message list for the active conversation
 /// with SSE streaming support.

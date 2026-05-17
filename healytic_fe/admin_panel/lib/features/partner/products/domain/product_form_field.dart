@@ -19,12 +19,13 @@ enum ProductFormField {
 
   // ── Organization ───────────────────────────────
   category('category'),
+  tags('tags'),
 
   // ── Operations & scheduling ────────────────────
   duration('duration'),
   buffer('buffer'),
   capacity('capacity'),
-  leadTime('lead_time'),
+
   staffAllocation('staff_allocation'),
   selectedStaffIds('selected_staff_ids'),
 

@@ -1,8 +1,7 @@
 import 'dart:convert';
 
 import 'package:admin_openapi/api.dart';
-import 'package:admin_panel/core/entities/store.entity.dart';
-import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/config/autofill_config.dart';
 import 'package:admin_panel/features/authenticate/domain/authenticate.entity.dart';
 import 'package:admin_panel/features/authenticate/presentation/providers/sign_up.provider.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_up/autofill/sign_up_form.autofill.dart';
@@ -18,7 +17,6 @@ import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/s
 import 'package:common/widgets/toast.dart';
 import 'package:admin_panel/router/admin_routes.dart';
 import 'package:common/utils/demensions.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart' hide Store;
@@ -37,13 +35,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class SignUpFormScreen extends HookConsumerWidget {
   const SignUpFormScreen({super.key, this.autofill = false});
 
-  /// When `true` (debug builds only), pre-fills all
+  /// When `true` in UAT, pre-fills all
   /// registration fields. Activate via
   /// `?autofill=true` or the `autoFill` store flag.
   final bool autofill;
 
   /// Extracts business types from form value and
-  /// converts to List<String>.
+  /// converts to `List<String>`.
   List<String> _extractBusinessTypes(dynamic value) {
     if (value == null) return [];
     if (value is String) return [value];
@@ -87,18 +85,44 @@ class SignUpFormScreen extends HookConsumerWidget {
     return error.toString();
   }
 
+  /// Required field keys that must all be non-empty
+  /// before the submit button is enabled.
+  static const _requiredFieldKeys = [
+    'email',
+    'password',
+    'confirm_password',
+    'brand_name',
+    'legal_name',
+    'tax_code',
+    'business_types',
+    'province',
+    'street_address',
+    'clinic_phone',
+    'representative_name',
+    'representative_position',
+    'representative_phone',
+    'id_type',
+    'id_number',
+    'id_issue_date',
+    'documents.identity_front',
+    'documents.identity_back',
+    'documents.business_license',
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final scrollController = useScrollController();
+    final isFormComplete = useState(false);
 
     final colorScheme = Theme.of(context).colorScheme;
     final state = ref.watch(signUpProviderProvider);
 
-    // Resolve autofill: URL param OR store config flag,
-    // gated behind kDebugMode.
-    final shouldAutofill =
-        kDebugMode && (autofill || (Store.tryGet(StoreKey.autoFill) ?? false));
+    // Resolve autofill for UAT only: URL param
+    // OR UAT store config flag.
+    final shouldAutofill = AutofillConfig.isUatAutofillEnabled(
+      routeAutofill: autofill,
+    );
 
     final initialValue = useMemoized(
       () => shouldAutofill ? _buildAutofillValues() : const <String, dynamic>{},
@@ -224,6 +248,8 @@ class SignUpFormScreen extends HookConsumerWidget {
                   child: FormBuilder(
                     key: formKey,
                     initialValue: initialValue,
+                    onChanged: () =>
+                        _checkFormCompleteness(formKey, isFormComplete),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -292,6 +318,7 @@ class SignUpFormScreen extends HookConsumerWidget {
                         RegistrationSubmitSection(
                           onSubmit: submit,
                           isLoading: state.isLoading,
+                          isEnabled: isFormComplete.value,
                         ),
                         AppDimens.verticalExtraLarge,
                       ],
@@ -304,6 +331,56 @@ class SignUpFormScreen extends HookConsumerWidget {
         ],
       ),
     );
+  }
+
+  /// Checks whether all [_requiredFieldKeys] have
+  /// non-empty values and updates [isFormComplete].
+  ///
+  /// Also reads underlying [TextEditingController]
+  /// text to catch programmatic/autofill values
+  /// that may not yet be synced to FormBuilder.
+  void _checkFormCompleteness(
+    GlobalKey<FormBuilderState> formKey,
+    ValueNotifier<bool> isFormComplete,
+  ) {
+    // Schedule after the current frame so
+    // FormBuilder has committed field values.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final fields = formKey.currentState?.fields;
+      if (fields == null) {
+        isFormComplete.value = false;
+        return;
+      }
+
+      for (final key in _requiredFieldKeys) {
+        if (!_isFieldFilled(fields, key)) {
+          isFormComplete.value = false;
+          return;
+        }
+      }
+      isFormComplete.value = true;
+    });
+  }
+
+  /// Returns `true` when the field identified by
+  /// [key] has a non-empty value.
+  ///
+  /// Checks both the FormBuilder field value and
+  /// the controller text (if available) to handle
+  /// edge cases where controllers are updated
+  /// programmatically.
+  bool _isFieldFilled(Map<String, dynamic> fields, String key) {
+    final field = fields[key];
+    if (field == null) return false;
+
+    final value = field.value;
+
+    // Check FormBuilder field value
+    if (value == null) return false;
+    if (value is String && value.isEmpty) return false;
+    if (value is List && value.isEmpty) return false;
+
+    return true;
   }
 
   /// Autofill map for all simple `FormBuilder` fields.

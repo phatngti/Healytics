@@ -50,6 +50,26 @@ test:
 	flutter test
 
 # =============================================================================
+# Patrol E2E Tests (web / Chrome)
+# =============================================================================
+
+# Run all patrol tests in DEV (mock data)
+patrol-test-dev:
+	patrol test --device chrome --dart-define=ENV=dev
+
+# Run all patrol tests in UAT (real backend)
+patrol-test-uat:
+	patrol test --device chrome --dart-define=ENV=uat
+
+# Run all patrol tests headless (CI)
+patrol-test-ci:
+	patrol test --device chrome --dart-define=ENV=dev --web-headless true
+
+# Interactive patrol develop mode (hot-restart)
+patrol-dev:
+	patrol develop --device chrome -t patrol_test/login_test.dart --dart-define=ENV=dev
+
+# =============================================================================
 # Docker targets
 # =============================================================================
 

@@ -119,6 +119,9 @@ crash_log.txt
 *.temp
 *~
 
+# Patrol generated test bundle
+patrol_test/test_bundle.dart
+
 # Node modules (if using any Node.js tooling)
 node_modules/
 package-lock.json

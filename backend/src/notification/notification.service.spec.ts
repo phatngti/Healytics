@@ -1,5 +1,6 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import type { Repository } from 'typeorm';
+import type { Account } from '@/common/entities/account.entity';
 import type { DeviceToken } from '@/common/entities/device-token.entity';
 import { Notification } from '@/common/entities/notification.entity';
 import type { NotificationRead } from '@/common/entities/notification-read.entity';
@@ -50,6 +51,7 @@ describe('NotificationService', () => {
       notificationRepo as unknown as Repository<Notification>,
       {} as unknown as Repository<NotificationRead>,
       {} as unknown as Repository<DeviceToken>,
+      {} as unknown as Repository<Account>,
       {} as unknown as CreateNotificationHandler,
       createBroadcastHandler as unknown as CreateBroadcastHandler,
       {} as unknown as MarkNotificationReadHandler,

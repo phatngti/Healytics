@@ -2,6 +2,7 @@ import 'package:common/widgets/button/back_button.dart';
 import 'package:common/widgets/button/button.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_general_info_card.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_facility_images_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_media_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_operations_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_organization_card.widget.dart';
@@ -72,18 +73,16 @@ class ProductEditDesktop extends StatelessWidget {
                             initialDescription: product.description,
                           ),
                           AppDimens.verticalMedium,
-                          const ProductOperationsCard(),
+                          ProductOperationsCard(
+                            initialStaffAllocation: product.staffAllocation,
+                            initialStaffIds: product.staffIds,
+                          ),
                           AppDimens.verticalMedium,
                           const ProductPricingCard(),
                           AppDimens.verticalMedium,
                           const ProductMediaCard(),
                           AppDimens.verticalMedium,
-                          ProductServiceManualCard(
-                            key: serviceManualKey,
-                            initialGuidelines: initialGuidelines,
-                            initialRules: initialRules,
-                            initialSteps: initialSteps,
-                          ),
+                          const ProductFacilityImagesCard(),
                         ],
                       ),
                     ),
@@ -99,13 +98,25 @@ class ProductEditDesktop extends StatelessWidget {
                           ),
                           AppDimens.verticalMedium,
                           ProductOrganizationCard(
+                            key: ValueKey(
+                              'product-organization-'
+                              '${product.id.value}-'
+                              '${product.tags.join('|')}',
+                            ),
                             initialCategory: product.category.id,
-                            initialTags: product.tags,
+                            initialTagIds: product.tags,
                           ),
                         ],
                       ),
                     ),
                   ],
+                ),
+                AppDimens.verticalMedium,
+                ProductServiceManualCard(
+                  key: serviceManualKey,
+                  initialGuidelines: initialGuidelines,
+                  initialRules: initialRules,
+                  initialSteps: initialSteps,
                 ),
               ],
             ),

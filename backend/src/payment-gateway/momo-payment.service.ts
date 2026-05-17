@@ -33,6 +33,7 @@ export class MoMoPaymentService {
   private readonly secretKey: string;
   private readonly endpoint: string;
   private readonly ipnUrl: string;
+  private readonly momoRedirectUrl: string;
 
   constructor(
     private readonly configService: ConfigService,
@@ -47,12 +48,13 @@ export class MoMoPaymentService {
     this.secretKey = this.configService.getOrThrow('MOMO_SECRET_KEY');
     this.endpoint = this.configService.getOrThrow('MOMO_ENDPOINT');
     this.ipnUrl = this.configService.getOrThrow('MOMO_IPN_URL');
+    this.momoRedirectUrl = this.configService.getOrThrow('MOMO_REDIRECT_URL');
   }
 
-  private get redirectUrl(): string {
-    // Derive redirect URL from IPN URL's origin
-    const origin = new URL(this.ipnUrl).origin;
-    return `${origin}/payment/success`;
+  private buildRedirectUrl(bookingId: string): string {
+    const redirectUrl = new URL(this.momoRedirectUrl);
+    redirectUrl.searchParams.set('bookingId', bookingId);
+    return redirectUrl.toString();
   }
 
   /**
@@ -108,7 +110,7 @@ export class MoMoPaymentService {
       amount,
       orderId: momoOrderId,
       orderInfo: `Thanh toan booking ${booking.id}`,
-      redirectUrl: `${this.redirectUrl}/${bookingId}`,
+      redirectUrl: this.buildRedirectUrl(bookingId),
       ipnUrl: this.ipnUrl,
       extraData: bookingId,
       requestType,

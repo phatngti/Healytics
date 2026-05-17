@@ -25,4 +25,6 @@ abstract class ServiceDetailsRepository {
   Future<List<RecommendedServiceEntity>> getRecommendedServices(
     String serviceId,
   );
+
+  Future<void> setWishlisted(String serviceId, bool isWishlisted);
 }

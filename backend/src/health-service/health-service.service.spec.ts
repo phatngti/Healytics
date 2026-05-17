@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { HealthServiceService } from './health-service.service';
 import { Product } from '@/common/entities/product.entity';
+import { UserWishlistItem } from '@/common/entities/user-wishlist-item.entity';
 import { Booking } from '@/common/entities/booking.entity';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
@@ -17,6 +18,7 @@ import { PartnersService } from '@/partners/partners.service';
 import {
   MockRepository,
   MockHandler,
+  MockType,
   createMockRepository,
   createMockHandler,
 } from '../../test/mocks/mock-types';
@@ -27,11 +29,13 @@ describe('HealthServiceService', () => {
   let bookingRepository: MockRepository<Booking>;
   let treatmentReviewRepository: MockRepository<TreatmentReview>;
   let eligibilityRepository: MockRepository<ProductEmployeeEligibility>;
+  let wishlistRepository: MockRepository<UserWishlistItem>;
   let createHandler: MockHandler;
   let updateHandler: MockHandler;
   let removeHandler: MockHandler;
   let overviewAnalyticsHandler: MockHandler;
   let detailAnalyticsHandler: MockHandler;
+  let partnersService: MockType<PartnersService>;
 
   beforeEach(async () => {
     // Arrange - Create fresh mocks for each test
@@ -39,6 +43,7 @@ describe('HealthServiceService', () => {
     bookingRepository = createMockRepository<Booking>();
     treatmentReviewRepository = createMockRepository<TreatmentReview>();
     eligibilityRepository = createMockRepository<ProductEmployeeEligibility>();
+    wishlistRepository = createMockRepository<UserWishlistItem>();
     createHandler = createMockHandler();
     updateHandler = createMockHandler();
     removeHandler = createMockHandler();
@@ -65,6 +70,10 @@ describe('HealthServiceService', () => {
           useValue: eligibilityRepository,
         },
         {
+          provide: getRepositoryToken(UserWishlistItem),
+          useValue: wishlistRepository,
+        },
+        {
           provide: CreateHealthServiceHandler,
           useValue: createHandler,
         },
@@ -87,6 +96,9 @@ describe('HealthServiceService', () => {
         {
           provide: PartnersService,
           useValue: {
+            getPartnerProfile: jest
+              .fn()
+              .mockResolvedValue({ id: 'partner-uuid' }),
             getFirstHealthPartner: jest.fn().mockResolvedValue(null),
           },
         },
@@ -94,6 +106,7 @@ describe('HealthServiceService', () => {
     }).compile();
 
     service = module.get<HealthServiceService>(HealthServiceService);
+    partnersService = module.get(PartnersService);
   });
 
   afterEach(() => {
@@ -103,18 +116,28 @@ describe('HealthServiceService', () => {
   describe('create', () => {
     it('should delegate to CreateHealthServiceHandler and return created product', async () => {
       // Arrange
+      const accountId = 'account-uuid';
+      const partnerId = 'partner-uuid';
       const dto: CreatePartnerHealthServiceDto = {
         name: 'Test Product',
       } as CreatePartnerHealthServiceDto;
-      const expectedProduct = { id: 'uuid-1', name: 'Test Product' };
+      const expectedProduct = {
+        id: 'uuid-1',
+        name: 'Test Product',
+        partnerId,
+      };
       createHandler.execute.mockResolvedValue(expectedProduct);
 
       // Act
-      const result = await service.create(dto);
+      const result = await service.create(accountId, dto);
 
       // Assert
       expect(result).toEqual(expectedProduct);
-      expect(createHandler.execute).toHaveBeenCalledWith(dto);
+      expect(partnersService.getPartnerProfile).toHaveBeenCalledWith(accountId);
+      expect(createHandler.execute).toHaveBeenCalledWith({
+        ...dto,
+        partnerId,
+      });
       expect(createHandler.execute).toHaveBeenCalledTimes(1);
     });
   });
@@ -122,6 +145,8 @@ describe('HealthServiceService', () => {
   describe('update', () => {
     it('should delegate to UpdateHealthServiceHandler and return updated product', async () => {
       // Arrange
+      const accountId = 'account-uuid';
+      const partnerId = 'partner-uuid';
       const id = 'uuid-1';
       const dto: UpdatePartnerHealthServiceDto = {
         name: 'Updated Product',
@@ -130,11 +155,12 @@ describe('HealthServiceService', () => {
       updateHandler.execute.mockResolvedValue(expectedProduct);
 
       // Act
-      const result = await service.update(id, dto);
+      const result = await service.update(accountId, id, dto);
 
       // Assert
       expect(result).toEqual(expectedProduct);
-      expect(updateHandler.execute).toHaveBeenCalledWith(id, dto);
+      expect(partnersService.getPartnerProfile).toHaveBeenCalledWith(accountId);
+      expect(updateHandler.execute).toHaveBeenCalledWith(id, dto, partnerId);
       expect(updateHandler.execute).toHaveBeenCalledTimes(1);
     });
   });

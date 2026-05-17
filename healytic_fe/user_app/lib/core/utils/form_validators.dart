@@ -96,6 +96,34 @@ final class FormValidators {
     return null;
   }
 
+  static String? dateOfBirth(Object? value, {int minAge = 16}) {
+    final requiredMessage = requiredField(value, fieldName: 'date of birth');
+    if (requiredMessage != null) return requiredMessage;
+
+    DateTime? dob;
+    if (value is DateTime) {
+      dob = value;
+    } else if (value is String) {
+      dob = DateTime.tryParse(value);
+    }
+
+    if (dob == null) {
+      return 'Please enter a valid date';
+    }
+
+    final now = DateTime.now();
+    int age = now.year - dob.year;
+    if (now.month < dob.month ||
+        (now.month == dob.month && now.day < dob.day)) {
+      age--;
+    }
+
+    if (age < minAge) {
+      return 'You must be at least $minAge years old';
+    }
+    return null;
+  }
+
   static String? _normalize(Object? value) {
     return value?.toString().trim();
   }

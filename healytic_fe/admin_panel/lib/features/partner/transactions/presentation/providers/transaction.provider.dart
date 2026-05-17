@@ -35,65 +35,52 @@ class TransactionsManagerState {
 }
 
 class TransactionsManagerNotifier extends Notifier<TransactionsManagerState> {
+  int? _transactionsCacheKey;
+  Future<List<TransactionRecord>>? _transactionsCache;
+  int? _payoutsCacheKey;
+  Future<List<PayoutRecord>>? _payoutsCache;
+  int? _refundCasesCacheKey;
+  Future<List<RefundCaseRecord>>? _refundCasesCache;
+
   @override
   TransactionsManagerState build() {
     return const TransactionsManagerState();
   }
 
   Future<int> getTransactionsTotalRows() async {
-    final items = await ref
-        .read(transactionsRepositoryProvider)
-        .getTransactions(startingAt: 0, count: 100, filter: state.filter);
-    return items.length;
+    return (await _getAllTransactions()).length;
   }
 
   Future<int> getPayoutsTotalRows() async {
-    final items = await ref
-        .read(transactionsRepositoryProvider)
-        .getPayouts(startingAt: 0, count: 100, filter: state.filter);
-    return items.length;
+    return (await _getAllPayouts()).length;
   }
 
   Future<int> getRefundCasesTotalRows() async {
-    final items = await ref
-        .read(transactionsRepositoryProvider)
-        .getRefundCases(startingAt: 0, count: 100, filter: state.filter);
-    return items.length;
+    return (await _getAllRefundCases()).length;
   }
 
   Future<List<TransactionRecord>> getTransactions({
     required int startingAt,
     required int count,
-  }) {
-    return ref
-        .read(transactionsRepositoryProvider)
-        .getTransactions(
-          startingAt: startingAt,
-          count: count,
-          filter: state.filter,
-        );
+  }) async {
+    final records = await _getAllTransactions();
+    return _page(records, startingAt, count);
   }
 
   Future<List<PayoutRecord>> getPayouts({
     required int startingAt,
     required int count,
-  }) {
-    return ref
-        .read(transactionsRepositoryProvider)
-        .getPayouts(startingAt: startingAt, count: count, filter: state.filter);
+  }) async {
+    final records = await _getAllPayouts();
+    return _page(records, startingAt, count);
   }
 
   Future<List<RefundCaseRecord>> getRefundCases({
     required int startingAt,
     required int count,
-  }) {
-    return ref
-        .read(transactionsRepositoryProvider)
-        .getRefundCases(
-          startingAt: startingAt,
-          count: count,
-          filter: state.filter,
-        );
+  }) async {
+    final records = await _getAllRefundCases();
+    return _page(records, startingAt, count);
   }
 
   void setActiveTab(FinanceWorkspaceTab value) {
@@ -109,6 +96,8 @@ class TransactionsManagerNotifier extends Notifier<TransactionsManagerState> {
   }
 
   void setSearchQuery(String value) {
+    if (value == state.filter.searchQuery) return;
+
     state = state.copyWith(
       filter: state.filter.copyWith(searchQuery: value),
       reloadToken: state.reloadToken + 1,
@@ -229,6 +218,109 @@ class TransactionsManagerNotifier extends Notifier<TransactionsManagerState> {
   void _bumpReload() {
     state = state.copyWith(reloadToken: state.reloadToken + 1);
   }
+
+  Future<List<TransactionRecord>> _getAllTransactions() async {
+    final cacheKey = _financeRowsKey(state);
+    final cached = _transactionsCache;
+    if (_transactionsCacheKey == cacheKey && cached != null) {
+      return cached;
+    }
+
+    final future = _loadTransactions(cacheKey);
+    _transactionsCacheKey = cacheKey;
+    _transactionsCache = future;
+    return future;
+  }
+
+  Future<List<TransactionRecord>> _loadTransactions(int cacheKey) async {
+    try {
+      return await ref
+          .read(transactionsRepositoryProvider)
+          .getTransactions(startingAt: 0, count: 100, filter: state.filter);
+    } catch (_) {
+      if (_transactionsCacheKey == cacheKey) {
+        _transactionsCacheKey = null;
+        _transactionsCache = null;
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<PayoutRecord>> _getAllPayouts() async {
+    final cacheKey = _financeRowsKey(state);
+    final cached = _payoutsCache;
+    if (_payoutsCacheKey == cacheKey && cached != null) {
+      return cached;
+    }
+
+    final future = _loadPayouts(cacheKey);
+    _payoutsCacheKey = cacheKey;
+    _payoutsCache = future;
+    return future;
+  }
+
+  Future<List<PayoutRecord>> _loadPayouts(int cacheKey) async {
+    try {
+      return await ref
+          .read(transactionsRepositoryProvider)
+          .getPayouts(startingAt: 0, count: 100, filter: state.filter);
+    } catch (_) {
+      if (_payoutsCacheKey == cacheKey) {
+        _payoutsCacheKey = null;
+        _payoutsCache = null;
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<RefundCaseRecord>> _getAllRefundCases() async {
+    final cacheKey = _financeRowsKey(state);
+    final cached = _refundCasesCache;
+    if (_refundCasesCacheKey == cacheKey && cached != null) {
+      return cached;
+    }
+
+    final future = _loadRefundCases(cacheKey);
+    _refundCasesCacheKey = cacheKey;
+    _refundCasesCache = future;
+    return future;
+  }
+
+  Future<List<RefundCaseRecord>> _loadRefundCases(int cacheKey) async {
+    try {
+      return await ref
+          .read(transactionsRepositoryProvider)
+          .getRefundCases(startingAt: 0, count: 100, filter: state.filter);
+    } catch (_) {
+      if (_refundCasesCacheKey == cacheKey) {
+        _refundCasesCacheKey = null;
+        _refundCasesCache = null;
+      }
+      rethrow;
+    }
+  }
+
+  int _financeRowsKey(TransactionsManagerState state) {
+    final filter = state.filter;
+    return Object.hash(
+      filter.searchQuery,
+      filter.startDate,
+      filter.endDate,
+      filter.sourceType,
+      filter.transactionType,
+      filter.transactionStatus,
+      filter.settlementStatus,
+      filter.payoutStatus,
+      filter.currency,
+      state.reloadToken,
+    );
+  }
+
+  List<T> _page<T>(List<T> items, int startingAt, int count) {
+    if (startingAt >= items.length) return [];
+    final end = (startingAt + count).clamp(0, items.length);
+    return items.sublist(startingAt.clamp(0, items.length), end);
+  }
 }
 
 final transactionsManagerProvider =
@@ -238,6 +330,35 @@ final transactionsManagerProvider =
 
 final financeFilterProvider = Provider<FinanceFilter>((ref) {
   return ref.watch(transactionsManagerProvider.select((state) => state.filter));
+});
+
+final financeAnalyticsFilterProvider = Provider<FinanceFilter>((ref) {
+  final filter = ref.watch(
+    transactionsManagerProvider.select((state) {
+      final filter = state.filter;
+      return (
+        startDate: filter.startDate,
+        endDate: filter.endDate,
+        sourceType: filter.sourceType,
+        transactionType: filter.transactionType,
+        transactionStatus: filter.transactionStatus,
+        settlementStatus: filter.settlementStatus,
+        payoutStatus: filter.payoutStatus,
+        currency: filter.currency,
+      );
+    }),
+  );
+
+  return FinanceFilter(
+    startDate: filter.startDate,
+    endDate: filter.endDate,
+    sourceType: filter.sourceType,
+    transactionType: filter.transactionType,
+    transactionStatus: filter.transactionStatus,
+    settlementStatus: filter.settlementStatus,
+    payoutStatus: filter.payoutStatus,
+    currency: filter.currency,
+  );
 });
 
 final financeActiveTabProvider = Provider<FinanceWorkspaceTab>((ref) {
@@ -265,7 +386,7 @@ final financeReloadTokenProvider = Provider<int>((ref) {
 });
 
 final financeSummaryProvider = FutureProvider<FinanceSummary>((ref) async {
-  final filter = ref.watch(financeFilterProvider);
+  final filter = ref.watch(financeAnalyticsFilterProvider);
   final period = ref.watch(financeSelectedPeriodProvider);
   return ref
       .read(transactionsRepositoryProvider)
@@ -275,7 +396,7 @@ final financeSummaryProvider = FutureProvider<FinanceSummary>((ref) async {
 final financeTrendProvider = FutureProvider<List<FinanceTrendPoint>>((
   ref,
 ) async {
-  final filter = ref.watch(financeFilterProvider);
+  final filter = ref.watch(financeAnalyticsFilterProvider);
   final period = ref.watch(financeSelectedPeriodProvider);
   return ref
       .read(transactionsRepositoryProvider)
