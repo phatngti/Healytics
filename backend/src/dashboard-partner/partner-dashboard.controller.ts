@@ -63,7 +63,6 @@ export class PartnerDashboardController {
   }
 
   @Get('employees/distribution')
-    @LogResponse()
   @ApiOperation({ summary: 'Get employee role distribution' })
   @ApiOkResponse({ type: [EmployeeDistributionDto] })
   getEmployeeDistribution(

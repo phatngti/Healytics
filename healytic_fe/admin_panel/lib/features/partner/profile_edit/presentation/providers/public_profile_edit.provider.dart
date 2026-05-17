@@ -61,6 +61,13 @@ class PublicProfileEditNotifier extends _$PublicProfileEditNotifier {
     final repo = ref.read(publicProfileRepositoryProvider);
 
     final request = _buildPartialRequest();
+    if (!request.hasChanges) {
+      final current = state.asData?.value;
+      if (current != null) {
+        return current;
+      }
+    }
+
     final result = await repo.updatePublicProfile(request);
 
     if (!ref.mounted) return result;
@@ -85,24 +92,72 @@ class PublicProfileEditNotifier extends _$PublicProfileEditNotifier {
 
   /// Builds a request containing only the fields
   /// that differ from the server snapshot.
-  PublicProfileUpdateRequest _buildPartialRequest() {
+  PublicProfileUpdatePatch _buildPartialRequest() {
     final snap = _serverSnapshot;
     final d = _draft;
     if (snap == null || d == null) {
-      return const PublicProfileUpdateRequest();
+      return const PublicProfileUpdatePatch();
     }
 
-    return PublicProfileUpdateRequest(
-      coverImageUrl: d.coverImageUrl != snap.coverImageUrl
-          ? d.coverImageUrl
-          : null,
-      logoImageUrl: d.logoImageUrl != snap.logoImageUrl ? d.logoImageUrl : null,
-      description: d.description != snap.description ? d.description : null,
-      gallery: _listsDiffer(d.gallery, snap.gallery) ? d.gallery : null,
-      certifications: _certsDiffer(d.certifications, snap.certifications)
-          ? d.certifications
-          : null,
+    final cover = _blankToNull(d.coverImageUrl);
+    final snapCover = _blankToNull(snap.coverImageUrl);
+    final logo = _blankToNull(d.logoImageUrl);
+    final snapLogo = _blankToNull(snap.logoImageUrl);
+    final description = _blankToNull(d.description);
+    final snapDescription = _blankToNull(snap.description);
+    final gallery = _normalizeUrls(d.gallery);
+    final snapGallery = _normalizeUrls(snap.gallery);
+    final certifications = _normalizeCertifications(d.certifications);
+    final snapCertifications = _normalizeCertifications(snap.certifications);
+
+    final coverChanged = cover != snapCover;
+    final logoChanged = logo != snapLogo;
+    final descriptionChanged = description != snapDescription;
+    final galleryChanged = _listsDiffer(gallery, snapGallery);
+    final certsChanged = _certsDiffer(certifications, snapCertifications);
+
+    return PublicProfileUpdatePatch(
+      coverImageUrl: cover,
+      includeCoverImageUrl: coverChanged,
+      logoImageUrl: logo,
+      includeLogoImageUrl: logoChanged,
+      description: description,
+      includeDescription: descriptionChanged,
+      gallery: gallery,
+      includeGallery: galleryChanged,
+      certifications: certifications,
+      includeCertifications: certsChanged,
     );
+  }
+
+  String? _blankToNull(String? value) {
+    final trimmed = value?.trim();
+    return trimmed == null || trimmed.isEmpty ? null : trimmed;
+  }
+
+  List<String> _normalizeUrls(List<String> values) {
+    return values
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .toList(growable: false);
+  }
+
+  List<PublicProfileCertification> _normalizeCertifications(
+    List<PublicProfileCertification> values,
+  ) {
+    return values
+        .asMap()
+        .entries
+        .where((entry) => entry.value.title.trim().isNotEmpty)
+        .map(
+          (entry) => entry.value.copyWith(
+            title: entry.value.title.trim(),
+            subtitle: _blankToNull(entry.value.subtitle),
+            iconName: entry.value.iconName.trim(),
+            sortOrder: entry.key,
+          ),
+        )
+        .toList(growable: false);
   }
 
   bool _listsDiffer(List<String> a, List<String> b) {

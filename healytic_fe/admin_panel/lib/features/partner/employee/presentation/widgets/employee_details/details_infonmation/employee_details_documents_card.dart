@@ -27,6 +27,7 @@ class _EmployeeDetailsDocumentsCardState
         type: FileType.custom,
         allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
       );
+      if (!mounted) return;
 
       if (result != null && result.files.single.path != null) {
         final XFile pickedFile = XFile(result.files.single.path!);
@@ -217,6 +218,7 @@ class _EmployeeDetailsDocumentsCardState
               uploadIcon: Icons.badge,
               uploadedTypeLabel: 'License / Permit',
               formEnabled: formEnabled,
+              isRequired: true,
             ),
             AppDimens.verticalMedium,
             _buildManagedDocumentItem(
@@ -227,6 +229,7 @@ class _EmployeeDetailsDocumentsCardState
               uploadIcon: Icons.perm_identity,
               uploadedTypeLabel: 'Identity Card',
               formEnabled: formEnabled,
+              isRequired: true,
             ),
           ],
         ),
@@ -242,6 +245,7 @@ class _EmployeeDetailsDocumentsCardState
     required IconData uploadIcon,
     required String uploadedTypeLabel,
     required bool formEnabled,
+    bool isRequired = true,
   }) {
     return FormBuilderField(
       name: fieldName,
@@ -256,6 +260,7 @@ class _EmployeeDetailsDocumentsCardState
             subtitle: uploadSubtitle,
             onUpload: () => _pickDocument(fieldName),
             isEnabled: formEnabled,
+            isRequired: isRequired,
           );
         }
 
@@ -282,6 +287,7 @@ class _EmployeeDetailsDocumentsCardState
           onRemove: formEnabled ? () => _removeDocument(fieldName) : null,
           onReplace: formEnabled ? () => _pickDocument(fieldName) : null,
           isEnabled: formEnabled,
+          isRequired: isRequired,
         );
       },
     );
@@ -410,6 +416,7 @@ class _EmployeeDetailsDocumentsCardState
     required String subtitle,
     required VoidCallback onUpload,
     required bool isEnabled,
+    bool isRequired = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -442,11 +449,25 @@ class _EmployeeDetailsDocumentsCardState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    if (isRequired)
+                      Text(
+                        ' *',
+                        style: TextStyle(
+                          color: colorScheme.error,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                  ],
                 ),
                 Text(
                   subtitle,
@@ -481,6 +502,7 @@ class _EmployeeDetailsDocumentsCardState
     VoidCallback? onReplace,
     bool showReplace = true,
     required bool isEnabled,
+    bool isRequired = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -517,12 +539,26 @@ class _EmployeeDetailsDocumentsCardState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  fileName,
-                  style: textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        fileName,
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (isRequired)
+                      Text(
+                        ' *',
+                        style: TextStyle(
+                          color: colorScheme.error,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                  ],
                 ),
                 Row(
                   children: [

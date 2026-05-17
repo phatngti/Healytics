@@ -28,7 +28,11 @@ class EmployeeAppointmentRepositoryImpl
   Future<bool> completeService(String id) => _ds.completeService(id);
 
   @override
-  Future<bool> cancelAppointment(String id) => _ds.cancelAppointment(id);
+  Future<bool> cancelAppointment(
+    String id, {
+    String? reason,
+  }) =>
+      _ds.cancelAppointment(id, reason: reason);
 }
 
 @Riverpod(keepAlive: true)

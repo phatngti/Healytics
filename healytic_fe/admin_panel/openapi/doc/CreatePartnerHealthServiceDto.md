@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **categoryId** | **String** |  | [optional] 
 **name** | **String** |  | 
-**slug** | **String** |  | 
+**slug** | **String** | Ignored — slug is auto-generated as {partner_brand}_{product_name}_{random}. | [optional] 
 **description** | **String** |  | [optional] 
 **type** | [**HealthServiceType**](HealthServiceType.md) |  | 
 **basePrice** | **num** |  | [optional] 
@@ -19,6 +19,7 @@ Name | Type | Description | Notes
 **status** | **String** |  | [optional] 
 **isVisibleOnline** | **bool** |  | [optional] 
 **employeeIds** | **List<String>** |  | [optional] [default to const []]
+**tagIds** | **List<String>** | Feature tag IDs to associate with this service | [optional] [default to const []]
 **media** | [**List<CreatePartnerHealthServiceMediaDto>**](CreatePartnerHealthServiceMediaDto.md) | Product media (images/videos) | [optional] [default to const []]
 **productDefinition** | [**CreatePartnerHealthServiceDefinitionDto**](CreatePartnerHealthServiceDefinitionDto.md) | Product definition (required if type is service) | [optional] 
 **facilityImages** | [**List<CreatePartnerHealthServiceFacilityImageDto>**](CreatePartnerHealthServiceFacilityImageDto.md) | Facility/clinic images | [optional] [default to const []]

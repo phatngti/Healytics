@@ -195,6 +195,19 @@ class AppDimens {
   // --- Dimensions ---
   static const double sidebarWidth = 250.0;
 
+  // --- Desktop Layout ---
+  /// Reserved top offset for the floating header bar (100 dp).
+  static const double floatingHeaderHeight = 100.0;
+
+  /// Fixed width of the profile / sidebar column (340 dp).
+  static const double profileColumnWidth = 340.0;
+
+  /// Fixed width for the settings sidebar column (320 dp).
+  static const double settingsSidebarWidth = 320.0;
+
+  /// Standard shadow blur radius for elevated headers (4 dp).
+  static const double shadowBlurSm = 4.0;
+
   // --- Text ---
   static const double fontSizeSmall = 12.0;
   static const double fontSizeMedium = 14.0;

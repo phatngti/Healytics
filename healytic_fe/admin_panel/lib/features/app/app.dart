@@ -20,7 +20,7 @@ class App extends HookConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: theme.lightTheme(),
       darkTheme: theme.darkTheme(),
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

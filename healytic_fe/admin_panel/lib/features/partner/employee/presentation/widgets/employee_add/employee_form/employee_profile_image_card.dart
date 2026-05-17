@@ -125,11 +125,16 @@ class _EmployeeProfileImageCardState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Profile Image',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              Row(
+                children: [
+                  Text(
+                    'Profile Image',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(' *', style: TextStyle(color: Colors.red)),
+                ],
               ),
               AppDimens.verticalMedium,
               Center(

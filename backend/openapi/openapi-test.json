@@ -1,0 +1,15 @@
+{
+  "openapi": "3.0.0",
+  "paths": {},
+  "info": {
+    "title": "Healytics Test Backdoor API",
+    "description": "Endpoints used exclusively by Patrol / integration tests to seed and reset the test database.",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {}
+  }
+}

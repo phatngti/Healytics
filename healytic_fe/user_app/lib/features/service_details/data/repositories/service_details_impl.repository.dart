@@ -42,4 +42,9 @@ class ServiceDetailsImplRepository implements ServiceDetailsRepository {
   ) async {
     return remoteDatasource.getRecommendedServices(serviceId);
   }
+
+  @override
+  Future<void> setWishlisted(String serviceId, bool isWishlisted) {
+    return remoteDatasource.setWishlisted(serviceId, isWishlisted);
+  }
 }

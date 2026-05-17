@@ -133,6 +133,10 @@ class _ConversationListPanel extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: TextField(
+            style: textTheme.bodyMedium?.copyWith(
+              color: Colors.transparent,
+            ),
+            cursorColor: Colors.transparent,
             decoration: InputDecoration(
               hintText: 'Search conversations...',
               hintStyle: textTheme.bodyMedium?.copyWith(

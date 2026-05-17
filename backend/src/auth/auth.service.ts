@@ -38,9 +38,11 @@ interface AuthJwtPayload {
   sub: string;
   email?: string;
   role?: Role;
+  name?: string;
   firstName?: string;
   lastName?: string;
   profileCompleted?: boolean;
+  createdAt?: string;
   verificationStatus?: PartnerVerificationStatus;
   verificationCompletedAt?: string | null;
   partnerProfileCompleted?: boolean;
@@ -71,6 +73,7 @@ export interface ValidatedUser {
   role: Role;
   userProfile?: UserProfile;
   roleNotAllowed?: boolean;
+  createdAt?: Date;
 }
 
 /**
@@ -123,6 +126,8 @@ export class AuthService {
    * @param role - The user's role
    * @param profile - Optional user profile
    * @param partnerVerification - Optional partner verification info
+   * @param options - Token creation options
+   * @param accountCreatedAt - The account creation timestamp to embed in the token
    * @returns The generated tokens
    */
   async createTokensForUser(
@@ -132,6 +137,7 @@ export class AuthService {
     profile?: UserProfile,
     partnerVerification?: PartnerVerificationInfo,
     options: CreateTokenOptions = {},
+    accountCreatedAt?: Date,
   ): Promise<AuthTokensDto> {
     const payload = this.buildJwtPayload(
       userId,
@@ -139,6 +145,7 @@ export class AuthService {
       role,
       profile,
       partnerVerification,
+      accountCreatedAt,
     );
 
     const [access_token, refresh_token] = await Promise.all([
@@ -263,6 +270,9 @@ export class AuthService {
       userEmail,
       userRole,
       user.userProfile,
+      undefined,
+      {},
+      user.createdAt,
     );
   }
 
@@ -294,6 +304,9 @@ export class AuthService {
       userEmail,
       userRole,
       user.userProfile,
+      undefined,
+      {},
+      user.createdAt,
     );
   }
 
@@ -320,6 +333,9 @@ export class AuthService {
       userEmail,
       userRole,
       user.userProfile,
+      undefined,
+      {},
+      user.createdAt,
     );
   }
 
@@ -358,6 +374,8 @@ export class AuthService {
       userRole,
       user.userProfile,
       partnerVerification,
+      {},
+      user.createdAt,
     );
   }
 
@@ -463,6 +481,7 @@ export class AuthService {
       profile,
       partnerVerification,
       { persistRefreshSession: false },
+      user.createdAt,
     );
     await this.rotateRefreshSession(
       validation,
@@ -473,6 +492,7 @@ export class AuthService {
         user.role,
         profile,
         partnerVerification,
+        user.createdAt,
       ),
     );
     return tokens;
@@ -498,11 +518,12 @@ export class AuthService {
       profile,
       undefined,
       { persistRefreshSession: false },
+      user.createdAt,
     );
     await this.rotateRefreshSession(
       validation,
       tokens.refresh_token,
-      this.buildJwtPayload(user.id, user.email, user.role, profile),
+      this.buildJwtPayload(user.id, user.email, user.role, profile, undefined, user.createdAt),
     );
     return tokens;
   }
@@ -513,12 +534,24 @@ export class AuthService {
     role?: Role,
     profile?: UserProfile,
     partnerVerification?: PartnerVerificationInfo,
+    accountCreatedAt?: Date,
   ): AuthJwtPayload {
     const payload: AuthJwtPayload = { sub: userId, email, role };
     if (profile) {
+      const fullName = [
+        profile.firstName ?? '',
+        profile.lastName ?? '',
+      ]
+        .join(' ')
+        .trim();
+      payload.name = fullName || undefined;
       payload.firstName = profile.firstName;
       payload.lastName = profile.lastName;
       payload.profileCompleted = profile.profileCompleted;
+    }
+
+    if (accountCreatedAt) {
+      payload.createdAt = accountCreatedAt.toISOString();
     }
 
     if (partnerVerification) {

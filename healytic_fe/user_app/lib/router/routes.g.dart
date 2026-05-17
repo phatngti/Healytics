@@ -27,6 +27,7 @@ List<RouteBase> get $appRoutes => [
   $serviceManualRoute,
   $employeeDetailRoute,
   $certificatesListRoute,
+  $employeeReviewsRoute,
   $certificateViewerRoute,
   $lottieSplashRoute,
   $onboardingRoute,
@@ -776,6 +777,44 @@ mixin $CertificatesListRoute on GoRouteData {
     queryParams: {
       'employee-name': _self.employeeName,
       'employee-id': _self.employeeId,
+    },
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $employeeReviewsRoute => GoRouteData.$route(
+  path: '/employee_reviews',
+  name: 'employee_reviews',
+  factory: $EmployeeReviewsRoute._fromState,
+);
+
+mixin $EmployeeReviewsRoute on GoRouteData {
+  static EmployeeReviewsRoute _fromState(GoRouterState state) =>
+      EmployeeReviewsRoute(
+        employeeId: state.uri.queryParameters['employee-id']!,
+        employeeName: state.uri.queryParameters['employee-name']!,
+      );
+
+  EmployeeReviewsRoute get _self => this as EmployeeReviewsRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/employee_reviews',
+    queryParams: {
+      'employee-id': _self.employeeId,
+      'employee-name': _self.employeeName,
     },
   );
 

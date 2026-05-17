@@ -16,7 +16,15 @@ class AdminFinanceWorkspaceNotifier
   }
 
   void setActiveTab(AdminFinanceWorkspaceTab tab) {
-    state = state.copyWith(activeTab: tab);
+    if (state.activeTab == tab) return;
+
+    state = state.copyWith(
+      activeTab: tab,
+      filter: state.filter.copyWith(searchQuery: ''),
+      reloadToken: state.filter.searchQuery.isEmpty
+          ? state.reloadToken
+          : state.reloadToken + 1,
+    );
   }
 
   void setPeriod(AdminFinancePeriod period) {
@@ -24,6 +32,8 @@ class AdminFinanceWorkspaceNotifier
   }
 
   void setSearchQuery(String value) {
+    if (state.filter.searchQuery == value) return;
+
     state = state.copyWith(
       filter: state.filter.copyWith(searchQuery: value),
       reloadToken: state.reloadToken + 1,

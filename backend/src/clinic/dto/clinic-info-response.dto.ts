@@ -65,6 +65,9 @@ export class ClinicSpecialistPreviewDto {
  * | logoImageUrl   | Partner.logoImageUrl (post-signup)      | —                              |
  * | gallery        | Partner.gallery (post-signup)           | —                              |
  * | followersLabel | formatCount(Partner.followerCount)      | — (derived)                   |
+ * | followerCount  | Partner.followerCount                   | — (derived)                   |
+ * | isFollowing    | user_clinic_follows current-user row     | — (derived)                   |
+ * | chatPartnerId  | Partner.accountId                        | — (derived)                   |
  * | reviewsLabel   | formatCount(totalReviewCount)           | — (derived)                   |
  * | description    | Partner.description (post-signup)       | —                              |
  * | trustMetrics   | see ClinicTrustMetricsDto              | — (derived)                   |
@@ -92,6 +95,15 @@ export class ClinicInfoResponseDto {
 
   @ApiProperty({ type: String, example: '15k' })
   followersLabel: string;
+
+  @ApiProperty({ type: Number, example: 15000 })
+  followerCount: number;
+
+  @ApiProperty({ type: Boolean, example: false })
+  isFollowing: boolean;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  chatPartnerId: string | null;
 
   @ApiProperty({ type: String, example: '2.5k' })
   reviewsLabel: string;

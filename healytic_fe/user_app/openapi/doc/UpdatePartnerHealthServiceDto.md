@@ -19,6 +19,7 @@ Name | Type | Description | Notes
 **status** | **String** |  | [optional] 
 **isVisibleOnline** | **bool** |  | [optional] 
 **employeeIds** | **List<String>** |  | [optional] [default to const []]
+**tagIds** | **List<String>** | Feature tag IDs to associate with this service (full replacement) | [optional] [default to const []]
 **media** | [**List<CreatePartnerHealthServiceMediaDto>**](CreatePartnerHealthServiceMediaDto.md) |  | [optional] [default to const []]
 **productDefinition** | [**CreatePartnerHealthServiceDefinitionDto**](CreatePartnerHealthServiceDefinitionDto.md) |  | [optional] 
 **facilityImages** | [**List<CreatePartnerHealthServiceFacilityImageDto>**](CreatePartnerHealthServiceFacilityImageDto.md) |  | [optional] [default to const []]

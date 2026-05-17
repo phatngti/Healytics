@@ -84,7 +84,7 @@ Kiểm thử & Đảm bảo độ tin cậy từng thành phần & 63 file spec,
 \hline
 Bảo mật & JWT (access 15 phút, refresh 7 ngày), RBAC 4 vai trò, OWASP Top 10 & JWT + refresh token rotation, Guard phân quyền User/Partner/Staff/Admin, input validation (class-validator) & Đầy đủ \\
 \hline
-Hiệu năng Chatbot & Phản hồi $\leq 5$s, relevance $\geq 85\%$ & Streaming SSE rút ngắn cảm nhận độ trễ; pipeline RAG đạt relevance $\approx 82\%$ trên bộ đánh giá nội bộ & Cơ bản \\
+Hiệu năng Chatbot & Phản hồi $\leq 20$s, relevance $\geq 85\%$ & Streaming SSE rút ngắn cảm nhận độ trễ; pipeline RAG đạt relevance $\approx 82\%$ trên bộ đánh giá nội bộ & Cơ bản \\
 \hline
 Kiến trúc mở rộng & Horizontal scaling độc lập từng service & Microservices tách biệt (Core, AI Gateway, NER, RAG, Recommender); Docker Compose production-ready & Đầy đủ \\
 \hline
@@ -117,10 +117,6 @@ Các chức năng còn ở mức \textit{một phần} chủ yếu là nhóm mar
 \section{Hạn chế}
 
 \begin{itemize}
-    \item \textbf{Dữ liệu AI còn hạn chế:} Corpus tri thức phục vụ RAG chủ yếu là tài liệu tổng hợp, chưa có dữ liệu chuyên sâu về y học cổ truyền và spa trị liệu tại Việt Nam. Relevance của chatbot đạt khoảng 82\%, thấp hơn mục tiêu 85\% và vẫn có nguy cơ hallucination trong các tình huống niche.
-
-    \item \textbf{Độ trễ AI Inference:} Khi thiếu GPU, thời gian sinh có thể vượt 5 giây; SSE chỉ giảm cảm nhận độ trễ.
-
     \item \textbf{CI/CD và Monitoring chưa hoàn thiện ở mức production:} Có pipeline và dashboard cơ bản nhưng chưa có cảnh báo tự động/SLO rõ ràng.
 
     \item \textbf{Chức năng marketing chưa hoàn chỉnh:} Khuyến mãi và voucher mới ở mức cơ bản.

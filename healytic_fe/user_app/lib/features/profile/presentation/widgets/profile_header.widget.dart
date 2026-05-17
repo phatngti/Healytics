@@ -36,7 +36,10 @@ class ProfileHeader extends StatelessWidget {
 
     return Column(
       children: [
-        _AvatarWithBadge(displayName: displayName, avatarUrl: avatarUrl),
+        _AvatarWithBadge(
+          displayName: displayName,
+          avatarUrl: avatarUrl,
+        ),
         SizedBox(height: AppDimens.spaceXl),
         Text(
           displayName,
@@ -71,7 +74,10 @@ class ProfileHeader extends StatelessWidget {
 // ─── Avatar with Verified Badge ─────────────────
 
 class _AvatarWithBadge extends StatelessWidget {
-  const _AvatarWithBadge({required this.displayName, this.avatarUrl});
+  const _AvatarWithBadge({
+    required this.displayName,
+    this.avatarUrl,
+  });
 
   final String displayName;
   final String? avatarUrl;

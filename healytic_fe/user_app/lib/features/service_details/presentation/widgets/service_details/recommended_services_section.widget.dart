@@ -3,17 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/features/service_details/domain/entities/service_details.entity.dart';
 import 'package:user_app/features/service_details/presentation/providers/service_details.provider.dart';
+import 'package:user_app/router/routes.dart';
 
 /// Horizontally-scrollable "Recommended Services" carousel.
 ///
 /// Watches [recommendedServicesProvider] for the given
 /// [serviceId] and renders nothing when the list is empty.
+/// Tapping a card navigates to the service detail screen.
 class RecommendedServicesSection extends ConsumerWidget {
   const RecommendedServicesSection({
     super.key,
     required this.serviceId,
     this.onViewAll,
-    this.onServiceTap,
   });
 
   /// Identifier used to fetch recommended services.
@@ -21,9 +22,6 @@ class RecommendedServicesSection extends ConsumerWidget {
 
   /// Called when the user taps the "View all" link.
   final VoidCallback? onViewAll;
-
-  /// Called when the user taps on an individual card.
-  final ValueChanged<RecommendedServiceEntity>? onServiceTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,13 +48,17 @@ class RecommendedServicesSection extends ConsumerWidget {
                 scrollDirection: Axis.horizontal,
                 clipBehavior: Clip.none,
                 itemCount: services.length,
-                separatorBuilder: (_, __) => AppDimens.horizontalMedium,
-                itemBuilder: (_, index) => _ServiceCard(
-                  service: services[index],
-                  onTap: onServiceTap != null
-                      ? () => onServiceTap!(services[index])
-                      : null,
-                ),
+                separatorBuilder: (_, __) =>
+                    AppDimens.horizontalMedium,
+                itemBuilder: (_, index) {
+                  final service = services[index];
+                  return _ServiceCard(
+                    service: service,
+                    onTap: () => ServiceDetailsRoute(
+                      serviceId: service.id,
+                    ).push(context),
+                  );
+                },
               ),
             ),
           ],

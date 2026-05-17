@@ -5,6 +5,7 @@ import {
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { UserApi } from '@/common/decorators/api/user-api.decorator';
+import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import { HealthServiceService } from './health-service.service';
 import { PublicHealthServiceResponseDto } from './dto/public/public-health-service-response.dto';
 import { PublicHealthServiceInfoResponseDto } from './dto/public/public-health-service-info-response.dto';
@@ -116,8 +117,9 @@ export class UserHealthServiceController {
   @ApiNotFoundResponse({ description: 'Service not found.' })
   getProductInfo(
     @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
   ): Promise<PublicHealthServiceInfoResponseDto> {
-    return this.healthServiceService.getProductInfo(id);
+    return this.healthServiceService.getProductInfo(id, userId);
   }
 
   /**

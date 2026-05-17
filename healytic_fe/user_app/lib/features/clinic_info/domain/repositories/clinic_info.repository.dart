@@ -34,4 +34,6 @@ abstract class ClinicInfoRepository {
     int? starCount,
     bool? hasMedia,
   });
+
+  Future<ClinicInfoEntity> setFollowing(String clinicId, bool isFollowing);
 }

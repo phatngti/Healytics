@@ -4,6 +4,7 @@ import { Not, Repository, In } from 'typeorm';
 import { CreatePartnerHealthServiceDto } from './dto/partner/create-partner-health-service.dto';
 import { UpdatePartnerHealthServiceDto } from './dto/partner/update-partner-health-service.dto';
 import { Product } from '@/common/entities/product.entity';
+import { UserWishlistItem } from '@/common/entities/user-wishlist-item.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { Booking } from '@/common/entities/booking.entity';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
@@ -51,6 +52,8 @@ export class HealthServiceService {
     private readonly treatmentReviewRepository: Repository<TreatmentReview>,
     @InjectRepository(ProductEmployeeEligibility)
     private readonly eligibilityRepository: Repository<ProductEmployeeEligibility>,
+    @InjectRepository(UserWishlistItem)
+    private readonly wishlistRepository: Repository<UserWishlistItem>,
     private readonly createHealthServiceHandler: CreateHealthServiceHandler,
     private readonly updateHealthServiceHandler: UpdateHealthServiceHandler,
     private readonly removeHealthServiceHandler: RemoveHealthServiceHandler,
@@ -109,8 +112,15 @@ export class HealthServiceService {
   /**
    * Facade: Delegates to CreateHealthServiceHandler
    */
-  async create(createDto: CreatePartnerHealthServiceDto): Promise<Product> {
-    return this.createHealthServiceHandler.execute(createDto);
+  async create(
+    accountId: string,
+    createDto: CreatePartnerHealthServiceDto,
+  ): Promise<Product> {
+    const partnerId = await this.resolvePartnerId(accountId);
+    return this.createHealthServiceHandler.execute({
+      ...createDto,
+      partnerId,
+    });
   }
 
   async findAll(): Promise<Product[]> {
@@ -124,6 +134,8 @@ export class HealthServiceService {
         'productDefinition',
         'productEmployeeEligibilities',
         'productEmployeeEligibilities.employee',
+        'productTags',
+        'productTags.tag',
       ],
       order: { createdAt: 'DESC' },
     });
@@ -138,6 +150,8 @@ export class HealthServiceService {
         'productDefinition',
         'productEmployeeEligibilities',
         'productEmployeeEligibilities.employee',
+        'productTags',
+        'productTags.tag',
       ],
     });
 
@@ -158,6 +172,8 @@ export class HealthServiceService {
         'productDefinition',
         'productEmployeeEligibilities',
         'productEmployeeEligibilities.employee',
+        'productTags',
+        'productTags.tag',
       ],
     });
 
@@ -187,7 +203,6 @@ export class HealthServiceService {
         'productEmployeeEligibilities.employee.doctorProfile',
         'productTags',
         'productTags.tag',
-        'reviews',
         'facilityImages',
       ],
     });
@@ -274,6 +289,7 @@ export class HealthServiceService {
    */
   async getProductInfo(
     id: string,
+    userId?: string,
   ): Promise<PublicHealthServiceInfoResponseDto> {
     const product = await this.productRepository.findOne({
       where: { id },
@@ -295,12 +311,20 @@ export class HealthServiceService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    const ratingData = await this.getProductRatingData(id);
+    const [ratingData, isWishlisted] = await Promise.all([
+      this.getProductRatingData(id),
+      userId
+        ? this.wishlistRepository.exists({
+            where: { userId, productId: id },
+          })
+        : false,
+    ]);
 
     return PublicHealthServiceInfoResponseDto.fromEntity(
       product,
       product.partner,
       ratingData,
+      isWishlisted,
     );
   }
 
@@ -589,10 +613,12 @@ export class HealthServiceService {
    * Facade: Delegates to UpdateHealthServiceHandler
    */
   async update(
+    accountId: string,
     id: string,
     updateDto: UpdatePartnerHealthServiceDto,
   ): Promise<Product> {
-    return this.updateHealthServiceHandler.execute(id, updateDto);
+    const partnerId = await this.resolvePartnerId(accountId);
+    return this.updateHealthServiceHandler.execute(id, updateDto, partnerId);
   }
 
   /**

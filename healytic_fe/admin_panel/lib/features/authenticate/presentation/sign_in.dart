@@ -1,3 +1,4 @@
+import 'package:admin_panel/core/config/autofill_config.dart';
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/features/authenticate/presentation/autofill/sign_in.autofill.dart';
@@ -13,7 +14,7 @@ import 'package:admin_panel/router/admin_routes.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:admin_panel/utils/device.dart';
 import 'package:admin_panel/core/entities/role.entity.dart';
-import 'package:flutter/foundation.dart';
+import 'package:admin_panel/core/keys/integration_test_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart' hide Store;
@@ -23,7 +24,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class SignInScreen extends HookConsumerWidget {
   const SignInScreen({super.key, this.autofill = false});
 
-  /// When `true` (debug builds only), pre-fills email & password.
+  /// When `true` in UAT, pre-fills email & password.
   /// Activate via `/?autofill=true`.
   final bool autofill;
 
@@ -43,22 +44,22 @@ class SignInScreen extends HookConsumerWidget {
     final scrollController = useScrollController();
     final signInState = ref.watch(signInProviderProvider);
     final selectedRole = useState(Role.admin.value);
-    final isMockMode = useMemoized(
-      () => Store.get(StoreKey.mockFlag, false),
-    );
+    final isMockMode = useMemoized(() => Store.get(StoreKey.mockFlag, false));
 
-    // Pre-fill credentials in debug builds when ?autofill=true
-    // or store config autoFill flag is true.
+    // Pre-fill credentials in UAT when ?autofill=true
+    // or the UAT store config autoFill flag is true.
     useEffect(() {
-      final shouldAutofill =
-          kDebugMode &&
-          (autofill || (Store.tryGet(StoreKey.autoFill) ?? false));
+      final shouldAutofill = AutofillConfig.isUatAutofillEnabled(
+        routeAutofill: autofill,
+      );
       if (shouldAutofill) {
-        emailController.text = SignInAutofill.email;
-        passwordController.text = SignInAutofill.password;
+        emailController.text = SignInAutofill.getEmail(selectedRole.value);
+        passwordController.text = SignInAutofill.getPassword(
+          selectedRole.value,
+        );
       }
       return null;
-    }, []);
+    }, [selectedRole.value]);
 
     ref.listen(signInProviderProvider, (previous, next) {
       next.whenOrNull(
@@ -140,22 +141,17 @@ class SignInScreen extends HookConsumerWidget {
                         SelectorSwitch(
                           controller: roleController,
                           onChanged: (index) {
-                            selectedRole.value =
-                                roles[index].value;
+                            selectedRole.value = roles[index].value;
                           },
                           options: roles,
                         ),
                         if (isMockMode) ...[
                           AppDimens.verticalSmall,
                           DevAccountPicker(
-                            currentRole:
-                                selectedRole.value,
-                            onAccountSelected:
-                                (email, password) {
-                              emailController.text =
-                                  email;
-                              passwordController.text =
-                                  password;
+                            currentRole: selectedRole.value,
+                            onAccountSelected: (email, password) {
+                              emailController.text = email;
+                              passwordController.text = password;
                             },
                           ),
                         ],
@@ -165,6 +161,7 @@ class SignInScreen extends HookConsumerWidget {
                           fieldKey: "email",
                           label: "Email",
                           controller: emailController,
+                          widgetKey: keys.signInPage.emailTextField,
                           suffixIcon: const Icon(Icons.email),
                           labelStyle: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
@@ -180,6 +177,7 @@ class SignInScreen extends HookConsumerWidget {
                           fieldKey: "password",
                           label: "Password",
                           controller: passwordController,
+                          widgetKey: keys.signInPage.passwordTextField,
                           suffixIcon: IconButton(
                             icon: Icon(
                               isPasswordVisible.value
@@ -205,6 +203,7 @@ class SignInScreen extends HookConsumerWidget {
                           alignment: Alignment.bottomRight,
                           child: AppButton(
                             buttonType: ButtonType.text,
+                            key: keys.signInPage.forgotPasswordButton,
                             onPressed: () {
                               context.pushReplacementNamed(
                                 ForgotPasswordRoute.name,
@@ -232,6 +231,7 @@ class SignInScreen extends HookConsumerWidget {
                             buttonType: ButtonType.elevated,
                             onPressed: submit,
                             isLoading: signInState.isLoading,
+                            key: keys.signInPage.loginButton,
                             child: Text(
                               'Login',
                               style: Theme.of(context).textTheme.bodyMedium
@@ -249,6 +249,7 @@ class SignInScreen extends HookConsumerWidget {
                           width: double.infinity,
                           child: AppButton(
                             buttonType: ButtonType.text,
+                            key: keys.signInPage.joinProviderButton,
                             onPressed: () {
                               context.go(SignUpRoute().location);
                             },

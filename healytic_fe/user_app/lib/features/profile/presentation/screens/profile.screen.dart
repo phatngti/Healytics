@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/core/widgets/main_screen_layout.widget.dart';
+import 'package:user_app/router/routes.dart';
 
 import '../providers/profile.provider.dart';
 import '../widgets/profile_header.widget.dart';
 import '../widgets/profile_quick_stats.widget.dart';
-import '../widgets/profile_settings_list.widget.dart';
 import '../widgets/profile_logout_button.widget.dart';
 
 /// Personal profile screen rendered inside the
@@ -20,69 +22,132 @@ import '../widgets/profile_logout_button.widget.dart';
 /// Layout mirrors the HTML reference with sections:
 /// 1. Profile Identity (avatar, name, email, edit)
 /// 2. Quick Stats bento grid (orders, wishlist, pts)
-/// 3. Settings list (payment, shipping, security…)
-/// 4. Log Out action
+/// 3. Log Out action
+///
+/// Auto-refreshes both [accountMeProvider] and
+/// [profileSummaryProvider] on first access.
+/// Supports pull-to-refresh for manual reload.
 class ProfilePage extends HookConsumerWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Auto-refresh every time the tab becomes
+    // visible. Ensures profile data (name, avatar,
+    // stats) stays fresh after edits or actions
+    // on other screens (e.g. new orders).
+    useEffect(() {
+      Future.microtask(() {
+        if (context.mounted) {
+          ref.invalidate(accountMeProvider);
+          ref.invalidate(profileSummaryProvider);
+        }
+      });
+      return null;
+    }, const []);
+
     final accountMeState = ref.watch(accountMeProvider);
-    final userNameFallback = ref.watch(currentUserDisplayNameProvider);
-    final hPadding = AppDimens.horizontalPadding(context);
-    final bottomPadding = AppDimens.bottomScrollPadding(context);
-    final sectionGap = AppDimens.sectionSpacing(context);
+    final profileSummaryState = ref.watch(
+      profileSummaryProvider,
+    );
+    final userNameFallback = ref.watch(
+      currentUserDisplayNameProvider,
+    );
+    final hPadding = AppDimens.horizontalPadding(
+      context,
+    );
+    final bottomPadding = AppDimens.bottomScrollPadding(
+      context,
+    );
+    final sectionGap = AppDimens.sectionSpacing(
+      context,
+    );
 
     return MainScreenLayout(
       title: 'Profile',
-      body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(
-          hPadding,
-          AppDimens.spaceXl,
-          hPadding,
-          bottomPadding,
-        ),
-        child: Column(
-          children: [
-            // § 1 — Profile Identity
-            accountMeState.when(
-              data: (user) => ProfileHeader(
-                displayName: user.displayName,
-                email: user.email,
-                onEditProfile: () => context.pushNamed('edit_profile'),
+      body: RefreshIndicator(
+        onRefresh: () => _refreshAll(ref),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(
+            hPadding,
+            AppDimens.spaceXl,
+            hPadding,
+            bottomPadding,
+          ),
+          child: Column(
+            children: [
+              // § 1 — Profile Identity
+              accountMeState.when(
+                data: (user) => ProfileHeader(
+                  displayName: user.displayName,
+                  email: user.email,
+                  avatarUrl: user.avatarUrl,
+                  onEditProfile: () => context
+                      .pushNamed('edit_profile'),
+                ),
+                loading: () => ProfileHeader(
+                  displayName:
+                      userNameFallback ?? 'Loading...',
+                  email: '',
+                  onEditProfile: () => context
+                      .pushNamed('edit_profile'),
+                ),
+                error: (err, stack) => ProfileHeader(
+                  displayName:
+                      userNameFallback ?? 'Guest',
+                  email: 'Error loading profile',
+                  onEditProfile: () => context
+                      .pushNamed('edit_profile'),
+                ),
               ),
-              loading: () => ProfileHeader(
-                displayName: userNameFallback ?? 'Loading...',
-                email: '',
-                onEditProfile: () => context.pushNamed('edit_profile'),
+              SizedBox(height: sectionGap * 1.5),
+
+              profileSummaryState.when(
+                data: (summary) => ProfileQuickStats(
+                  ordersCount: summary.ordersCount,
+                  wishlistCount: summary.wishlistCount,
+                  points: summary.pointsLabel,
+                  onOrdersTap: () =>
+                      const OrderApprovedRoute()
+                          .go(context),
+                ),
+                loading: () =>
+                    const ProfileQuickStats(),
+                error: (_, _) => ProfileQuickStats(
+                  onOrdersTap: () =>
+                      const OrderApprovedRoute()
+                          .go(context),
+                ),
               ),
-              error: (err, stack) => ProfileHeader(
-                displayName: userNameFallback ?? 'Guest',
-                email: 'Error loading profile',
-                onEditProfile: () => context.pushNamed('edit_profile'),
+              SizedBox(height: sectionGap * 1.5),
+
+              // § 4 — Log Out
+              ProfileLogoutButton(
+                onPressed: () => _handleLogout(
+                  context,
+                  ref,
+                ),
               ),
-            ),
-            SizedBox(height: sectionGap * 1.5),
-
-            // § 2 — Quick Stats
-            const ProfileQuickStats(
-              ordersCount: 12,
-              wishlistCount: 48,
-              points: '2.4k',
-            ),
-            SizedBox(height: sectionGap * 1.5),
-
-            // § 3 — Settings List
-            const ProfileSettingsList(),
-            SizedBox(height: sectionGap * 1.5),
-
-            // § 4 — Log Out
-            ProfileLogoutButton(onPressed: () => _handleLogout(context, ref)),
-            SizedBox(height: sectionGap),
-          ],
+              SizedBox(height: sectionGap),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  /// Invalidates both profile providers, causing
+  /// a fresh API fetch. Used for pull-to-refresh.
+  Future<void> _refreshAll(WidgetRef ref) async {
+    ref.invalidate(accountMeProvider);
+    ref.invalidate(profileSummaryProvider);
+    // Wait for both providers to settle before
+    // the refresh indicator dismisses.
+    await Future.wait([
+      ref.read(accountMeProvider.future),
+      ref.read(profileSummaryProvider.future),
+    ]);
   }
 
   /// Shows a confirmation dialog, then clears
@@ -107,6 +172,7 @@ class ProfilePage extends HookConsumerWidget {
         ),
         actions: [
           TextButton(
+            key: keys.logoutDialog.cancelButton,
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(ctx).colorScheme.onSurfaceVariant,
             ),
@@ -114,6 +180,7 @@ class ProfilePage extends HookConsumerWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
+            key: keys.logoutDialog.confirmButton,
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(ctx).colorScheme.error,
               foregroundColor: Theme.of(ctx).colorScheme.onError,

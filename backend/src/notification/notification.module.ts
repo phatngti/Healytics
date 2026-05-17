@@ -5,6 +5,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule } from '@nestjs/config';
 import { jwtConstants } from '@/auth/constants';
 import { AccountModule } from '@/account/account.module';
+import { Account } from '@/common/entities/account.entity';
 import { Notification } from '@/common/entities/notification.entity';
 import { NotificationRead } from '@/common/entities/notification-read.entity';
 import { DeviceToken } from '@/common/entities/device-token.entity';
@@ -37,6 +38,7 @@ import { UserDeviceController } from './user-device.controller';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      Account,
       Notification,
       NotificationRead,
       DeviceToken,

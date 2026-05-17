@@ -1,8 +1,6 @@
 import 'package:admin_openapi/api.dart';
-import 'package:admin_panel/core/entities/store.entity.dart';
-import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/features/authenticate/presentation/providers/logout.provider.dart';
 import 'package:admin_panel/features/common/providers/account_me.provider.dart';
-import 'package:admin_panel/features/common/providers/authen_token.provider.dart';
 import 'package:admin_panel/core/utils/user_role_helper.dart';
 import 'package:common/widgets/images/avatar.dart';
 import 'package:common/utils/demensions.dart';
@@ -18,10 +16,7 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
 
   /// Clears auth tokens and navigates to the login page.
   Future<void> _logout(BuildContext context, WidgetRef ref) async {
-    await ref.read(authenTokenProvider.notifier).removeToken();
-    await Store.delete(StoreKey.accessToken);
-    await Store.delete(StoreKey.refreshToken);
-    await UserRoleHelper.clearSession();
+    await ref.read(logoutProviderProvider.notifier).logout();
     if (context.mounted) {
       context.go('/');
     }
@@ -49,16 +44,6 @@ class Header extends HookConsumerWidget implements PreferredSizeWidget {
             : null,
         title: null,
         actions: [
-          // Notification
-          IconButton(
-            onPressed: () {
-              if (UserRoleHelper.isAdmin()) {
-                const AdminNotificationCampaignIndexRoute().go(context);
-              }
-            },
-            icon: const Icon(Icons.notifications, size: 16),
-          ),
-          AppDimens.horizontalSmall,
           // Profile with logout popup
           PopupMenuButton<String>(
             offset: const Offset(0, 48),

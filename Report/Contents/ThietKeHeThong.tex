@@ -252,9 +252,9 @@ Các giao diện thiết kế chi tiết được trình bày đầy đủ tại
 Dữ liệu phục vụ các pipeline AI trong mã nguồn hiện tại được phân theo từng dịch vụ như sau.
 
 \begin{itemize}
-    \item \textbf{RAG Chatbot:} Kho tri thức gồm các tài liệu PDF; khi khởi động dịch vụ, toàn bộ PDF trong thư mục tri thức được đọc song song, loại bỏ ký tự ngoài ASCII (UTF-8), sau đó chia nhỏ bằng \textit{Recursive Character Text Splitter} với độ dài đoạn 300 ký tự và không chồng lấp giữa các đoạn.
+    \item \textbf{RAG Chatbot:} Kho tri thức gồm các tài liệu PDF; khi khởi động dịch vụ, toàn bộ PDF trong thư mục tri thức được đọc song song, loại bỏ ký tự ngoài ASCII (UTF-8), sau đó chia nhỏ với độ dài đoạn 300 ký tự và không chồng lấp giữa các đoạn.
     \item \textbf{Recommender (vector search):} Mỗi bản ghi được ghép thành một văn bản gồm tên và mô tả, gắn metadata \texttt{service\_id} và \texttt{category}, rồi được embedding và lưu vào Chroma persistent để truy vấn tương đồng.
-    \item \textbf{Recommender Home (hồ sơ người dùng):} Dịch vụ gợi ý trang chủ đọc PostgreSQL: khảo sát người dùng lưu trong trường JSON trên bảng tài khoản (chuẩn hóa thành ba nhóm \textit{goals}, \textit{interests}, \textit{health\_conditions}), đồng thời có thể đọc hồ sơ cá nhân (tên, ngày sinh suy ra tuổi, v.v.). Danh sách mã dịch vụ đã dùng được dự kiến lấy từ lịch sử đơn hàng nhưng trong triển khai hiện tại luôn trả về rỗng cho đến khi tích hợp bảng đơn hàng.
+    \item \textbf{Recommender Home (hồ sơ người dùng):} Dịch vụ gợi ý trang chủ đọc PostgreSQL: khảo sát người dùng lưu trong trường JSON trên bảng tài khoản (chuẩn hóa thành ba nhóm \textit{goals}, \textit{interests}, \textit{health\_conditions}), đồng thời có thể đọc hồ sơ cá nhân (tên, ngày sinh suy ra tuổi, v.v.).
     \item \textbf{NER / PreFilter:} Dịch vụ tải cache địa điểm và dữ liệu phục vụ lọc từ cơ sở dữ liệu quan hệ khi khởi động; hỗ trợ truy vấn không gian (PostGIS) khi có ngữ cảnh khoảng cách hợp lệ.
 \end{itemize}
 

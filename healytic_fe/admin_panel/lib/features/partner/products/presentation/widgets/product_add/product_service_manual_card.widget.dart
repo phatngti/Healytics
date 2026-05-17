@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/partner/products/domain/service_manual_key.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/service_rule_icon_data.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,10 @@ import 'package:flutter/material.dart';
 /// 1. Pre-Service Guidelines (simple text list)
 /// 2. Service Rules (iconSlug, title, description)
 /// 3. Procedure Steps (auto-numbered, title, desc)
+///
+/// Each row's required fields are validated on submit
+/// via [validate]. Section titles show a red asterisk
+/// to indicate required fields within.
 class ProductServiceManualCard extends StatefulWidget {
   const ProductServiceManualCard({
     super.key,
@@ -38,6 +43,15 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
   late List<TextEditingController> _guideControllers;
   late List<_RuleControllers> _ruleControllers;
   late List<_StepControllers> _stepControllers;
+
+  /// Per-section error messages shown after validation.
+  String? _guidelineError;
+  String? _ruleError;
+  String? _stepError;
+
+  /// Whether the current manual content differs from the edit-mode baseline.
+  bool get hasChanges =>
+      !_sameManualData(_manualDataFromControllers(), _initialManualData());
 
   @override
   void initState() {
@@ -162,7 +176,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel(context, 'Pre-Service Guidelines'),
+        _sectionLabel(context, 'Pre-Service Guidelines', isRequired: true),
         AppDimens.verticalSmall,
         ..._guideControllers.asMap().entries.map(
           (entry) => _GuidelineRow(
@@ -171,6 +185,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
             onRemove: () => _removeGuideline(entry.key),
           ),
         ),
+        if (_guidelineError != null) _ErrorText(message: _guidelineError!),
         AppDimens.verticalSmall,
         _AddButton(label: 'Add Guideline', onPressed: _addGuideline),
       ],
@@ -180,6 +195,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
   void _addGuideline() {
     setState(() {
       _guideControllers.add(TextEditingController());
+      _guidelineError = null;
     });
   }
 
@@ -187,6 +203,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
     setState(() {
       _guideControllers[index].dispose();
       _guideControllers.removeAt(index);
+      _guidelineError = null;
     });
   }
 
@@ -196,7 +213,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel(context, 'Service Rules'),
+        _sectionLabel(context, 'Service Rules', isRequired: true),
         AppDimens.verticalSmall,
         ..._ruleControllers.asMap().entries.map(
           (entry) => _RuleRow(
@@ -205,6 +222,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
             onRemove: () => _removeRule(entry.key),
           ),
         ),
+        if (_ruleError != null) _ErrorText(message: _ruleError!),
         AppDimens.verticalSmall,
         _AddButton(label: 'Add Rule', onPressed: _addRule),
       ],
@@ -220,6 +238,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
           desc: TextEditingController(),
         ),
       );
+      _ruleError = null;
     });
   }
 
@@ -227,6 +246,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
     setState(() {
       _ruleControllers[index].dispose();
       _ruleControllers.removeAt(index);
+      _ruleError = null;
     });
   }
 
@@ -236,7 +256,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionLabel(context, 'Procedure Steps'),
+        _sectionLabel(context, 'Procedure Steps', isRequired: true),
         AppDimens.verticalSmall,
         ..._stepControllers.asMap().entries.map(
           (entry) => _StepRow(
@@ -245,6 +265,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
             onRemove: () => _removeStep(entry.key),
           ),
         ),
+        if (_stepError != null) _ErrorText(message: _stepError!),
         AppDimens.verticalSmall,
         _AddButton(label: 'Add Step', onPressed: _addStep),
       ],
@@ -259,6 +280,7 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
           desc: TextEditingController(),
         ),
       );
+      _stepError = null;
     });
   }
 
@@ -266,18 +288,86 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
     setState(() {
       _stepControllers[index].dispose();
       _stepControllers.removeAt(index);
+      _stepError = null;
     });
   }
 
   // ── Helpers ─────────────────────────────────────
 
-  Widget _sectionLabel(BuildContext context, String text) {
-    return Text(
-      text,
-      style: Theme.of(
-        context,
-      ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+  /// Renders a section label with an optional
+  /// red asterisk for required sections.
+  Widget _sectionLabel(
+    BuildContext context,
+    String text, {
+    bool isRequired = false,
+  }) {
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: text,
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          if (isRequired)
+            const TextSpan(
+              text: ' *',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+        ],
+      ),
     );
+  }
+
+  /// Validates all rows for required field
+  /// completeness. Returns `true` when valid.
+  ///
+  /// Call before [extractFormData] on form submit.
+  bool validate() {
+    var isValid = true;
+
+    // Guidelines: each added row must have text.
+    final emptyGuides = _guideControllers
+        .where((c) => c.text.trim().isEmpty)
+        .length;
+    if (emptyGuides > 0) {
+      _guidelineError =
+          '$emptyGuides guideline(s) are empty. '
+          'Please fill in or remove them.';
+      isValid = false;
+    } else {
+      _guidelineError = null;
+    }
+
+    // Rules: each added row must have a title.
+    final emptyRuleTitles = _ruleControllers
+        .where((r) => r.title.text.trim().isEmpty)
+        .length;
+    if (emptyRuleTitles > 0) {
+      _ruleError =
+          '$emptyRuleTitles rule(s) are missing a title. '
+          'Please fill in or remove them.';
+      isValid = false;
+    } else {
+      _ruleError = null;
+    }
+
+    // Steps: each added row must have a title.
+    final emptyStepTitles = _stepControllers
+        .where((s) => s.title.text.trim().isEmpty)
+        .length;
+    if (emptyStepTitles > 0) {
+      _stepError =
+          '$emptyStepTitles step(s) are missing a title. '
+          'Please fill in or remove them.';
+      isValid = false;
+    } else {
+      _stepError = null;
+    }
+
+    setState(() {});
+    return isValid;
   }
 
   /// Extracts the current form values as a map
@@ -285,6 +375,10 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
   ///
   /// Returns `null` if all sections are empty.
   Map<String, dynamic>? extractFormData() {
+    return _manualDataFromControllers();
+  }
+
+  Map<String, dynamic>? _manualDataFromControllers() {
     final guidelines = _guideControllers
         .map((c) => c.text.trim())
         .where((s) => s.isNotEmpty)
@@ -319,6 +413,91 @@ class ProductServiceManualCardState extends State<ProductServiceManualCard> {
       ServiceManualKey.steps: steps,
     };
   }
+
+  Map<String, dynamic>? _initialManualData() {
+    final guidelines = widget.initialGuidelines
+        .map((g) => g.trim())
+        .where((g) => g.isNotEmpty)
+        .toList();
+    final rules = widget.initialRules
+        .map(
+          (r) => {
+            ServiceManualKey.iconSlug: (r[ServiceManualKey.iconSlug] ?? '')
+                .trim(),
+            ServiceManualKey.title: (r[ServiceManualKey.title] ?? '').trim(),
+            ServiceManualKey.description:
+                (r[ServiceManualKey.description] ?? '').trim(),
+          },
+        )
+        .where((r) => r[ServiceManualKey.title]!.isNotEmpty)
+        .toList();
+    final steps = widget.initialSteps
+        .map(
+          (s) => {
+            ServiceManualKey.title: (s[ServiceManualKey.title] ?? '').trim(),
+            ServiceManualKey.description:
+                (s[ServiceManualKey.description] ?? '').trim(),
+          },
+        )
+        .where((s) => s[ServiceManualKey.title]!.isNotEmpty)
+        .toList();
+
+    if (guidelines.isEmpty && rules.isEmpty && steps.isEmpty) {
+      return null;
+    }
+
+    return {
+      ServiceManualKey.guidelines: guidelines,
+      ServiceManualKey.rules: rules,
+      ServiceManualKey.steps: steps,
+    };
+  }
+
+  bool _sameManualData(
+    Map<String, dynamic>? current,
+    Map<String, dynamic>? initial,
+  ) {
+    return _sameStringList(
+          current?[ServiceManualKey.guidelines] as List<String>? ?? const [],
+          initial?[ServiceManualKey.guidelines] as List<String>? ?? const [],
+        ) &&
+        _sameStringMapList(
+          current?[ServiceManualKey.rules] as List<Map<String, String>>? ??
+              const [],
+          initial?[ServiceManualKey.rules] as List<Map<String, String>>? ??
+              const [],
+        ) &&
+        _sameStringMapList(
+          current?[ServiceManualKey.steps] as List<Map<String, String>>? ??
+              const [],
+          initial?[ServiceManualKey.steps] as List<Map<String, String>>? ??
+              const [],
+        );
+  }
+
+  bool _sameStringList(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  bool _sameStringMapList(
+    List<Map<String, String>> a,
+    List<Map<String, String>> b,
+  ) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      final left = a[i];
+      final right = b[i];
+      if (left.length != right.length) return false;
+      for (final key in left.keys) {
+        if (left[key] != right[key]) return false;
+      }
+    }
+    return true;
+  }
 }
 
 // ── Private Row Widgets ───────────────────────────
@@ -343,10 +522,13 @@ class _GuidelineRow extends StatelessWidget {
           Expanded(
             child: FormFieldBuilders.buildTextField(
               context,
-              fieldKey: '${ServiceManualKey.guidelinePrefix}$index',
+              fieldKey:
+                  '${ServiceManualKey.guidelinePrefix}'
+                  '$index',
               label: 'Guideline ${index + 1}',
               hintText: 'e.g. Arrive 15 min early',
               controller: controller,
+              isRequired: true,
             ),
           ),
           _RemoveButton(onPressed: onRemove),
@@ -376,23 +558,20 @@ class _RuleRow extends StatelessWidget {
           Row(
             children: [
               SizedBox(
-                width: 120,
-                child: FormFieldBuilders.buildTextField(
-                  context,
-                  fieldKey: '${ServiceManualKey.ruleIconPrefix}$index',
-                  label: 'Icon Slug',
-                  hintText: 'e.g. clock',
-                  controller: controllers.icon,
-                ),
+                width: 112,
+                child: _IconSlugField(controller: controllers.icon),
               ),
               AppDimens.horizontalSmall,
               Expanded(
                 child: FormFieldBuilders.buildTextField(
                   context,
-                  fieldKey: '${ServiceManualKey.ruleTitlePrefix}$index',
+                  fieldKey:
+                      '${ServiceManualKey.ruleTitlePrefix}'
+                      '$index',
                   label: 'Title',
                   hintText: 'e.g. Punctuality',
                   controller: controllers.title,
+                  isRequired: true,
                 ),
               ),
               _RemoveButton(onPressed: onRemove),
@@ -401,13 +580,304 @@ class _RuleRow extends StatelessWidget {
           AppDimens.verticalExtraSmall,
           FormFieldBuilders.buildTextField(
             context,
-            fieldKey: '${ServiceManualKey.ruleDescPrefix}$index',
+            fieldKey:
+                '${ServiceManualKey.ruleDescPrefix}'
+                '$index',
             label: 'Description',
             hintText: 'Rule details…',
             controller: controllers.desc,
             maxLines: 2,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _IconSlugField extends StatelessWidget {
+  const _IconSlugField({required this.controller});
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: controller,
+      builder: (context, value, _) {
+        final icon = serviceRuleIconData(value.text);
+        final colorScheme = Theme.of(context).colorScheme;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                'ICON SLUG',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
+            Semantics(
+              button: true,
+              label: 'Select service rule icon',
+              value: normalizeServiceRuleIconSlug(value.text),
+              child: InkWell(
+                onTap: () => _showPicker(context),
+                borderRadius: AppDimens.radiusSmall,
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    isDense: true,
+                    filled: true,
+                    fillColor: colorScheme.surface,
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: AppDimens.paddingVerticalSmall.top * 1.5,
+                      horizontal: AppDimens.paddingHorizontalSmall.left,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: AppDimens.radiusSmall,
+                      borderSide: BorderSide(color: colorScheme.outline),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: AppDimens.radiusSmall,
+                      borderSide: BorderSide(color: colorScheme.outline),
+                    ),
+                  ),
+                  child: SizedBox(
+                    height: 24,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: Icon(
+                              icon ?? Icons.apps_outlined,
+                              size: 24,
+                              color: icon == null
+                                  ? colorScheme.onSurfaceVariant.withValues(
+                                      alpha: 0.55,
+                                    )
+                                  : colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.expand_more,
+                          size: 20,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showPicker(BuildContext context) async {
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (context) =>
+          _MaterialIconPickerDialog(initialSlug: controller.text),
+    );
+    if (selected == null) {
+      return;
+    }
+
+    controller.text = selected;
+  }
+}
+
+class _MaterialIconPickerDialog extends StatefulWidget {
+  const _MaterialIconPickerDialog({required this.initialSlug});
+
+  final String initialSlug;
+
+  @override
+  State<_MaterialIconPickerDialog> createState() =>
+      _MaterialIconPickerDialogState();
+}
+
+class _MaterialIconPickerDialogState extends State<_MaterialIconPickerDialog> {
+  late final TextEditingController _searchController;
+  String _query = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final normalizedQuery = normalizeServiceRuleIconSlug(_query);
+    final options = normalizedQuery.isEmpty
+        ? serviceRuleIconOptions
+        : serviceRuleIconOptions
+              .where((option) => option.slug.contains(normalizedQuery))
+              .toList();
+
+    return Dialog(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 720, maxHeight: 640),
+        child: Padding(
+          padding: AppDimens.paddingAllLarge,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Select Material Icon',
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    tooltip: 'Close',
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              AppDimens.verticalSmall,
+              TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  isDense: true,
+                  prefixIcon: const Icon(Icons.search),
+                  hintText: 'Search icons',
+                  border: OutlineInputBorder(
+                    borderRadius: AppDimens.radiusSmall,
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() => _query = value);
+                },
+              ),
+              AppDimens.verticalMedium,
+              Expanded(
+                child: options.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No icons found',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      )
+                    : GridView.builder(
+                        itemCount: options.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithMaxCrossAxisExtent(
+                              maxCrossAxisExtent: 132,
+                              mainAxisSpacing: 8,
+                              crossAxisSpacing: 8,
+                              childAspectRatio: 1.25,
+                            ),
+                        itemBuilder: (context, index) {
+                          final option = options[index];
+                          final initialIcon = serviceRuleIconData(
+                            widget.initialSlug,
+                          );
+                          final isSelected =
+                              option.slug ==
+                                  normalizeServiceRuleIconSlug(
+                                    widget.initialSlug,
+                                  ) ||
+                              option.icon == initialIcon;
+
+                          return _MaterialIconOptionTile(
+                            option: option,
+                            isSelected: isSelected,
+                            onTap: () {
+                              Navigator.of(context).pop(option.slug);
+                            },
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MaterialIconOptionTile extends StatelessWidget {
+  const _MaterialIconOptionTile({
+    required this.option,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final ServiceRuleIconOption option;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: AppDimens.radiusSmall,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: isSelected
+              ? colorScheme.primaryContainer
+              : colorScheme.surface,
+          borderRadius: AppDimens.radiusSmall,
+          border: Border.all(
+            color: isSelected
+                ? colorScheme.primary
+                : colorScheme.outlineVariant,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                option.icon,
+                size: 24,
+                color: isSelected
+                    ? colorScheme.onPrimaryContainer
+                    : colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                option.slug,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: isSelected
+                      ? colorScheme.onPrimaryContainer
+                      : colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -454,10 +924,13 @@ class _StepRow extends StatelessWidget {
               Expanded(
                 child: FormFieldBuilders.buildTextField(
                   context,
-                  fieldKey: '${ServiceManualKey.stepTitlePrefix}$index',
+                  fieldKey:
+                      '${ServiceManualKey.stepTitlePrefix}'
+                      '$index',
                   label: 'Step Title',
                   hintText: 'e.g. Consultation',
                   controller: controllers.title,
+                  isRequired: true,
                 ),
               ),
               _RemoveButton(onPressed: onRemove),
@@ -468,7 +941,9 @@ class _StepRow extends StatelessWidget {
             padding: const EdgeInsets.only(left: 44),
             child: FormFieldBuilders.buildTextField(
               context,
-              fieldKey: '${ServiceManualKey.stepDescPrefix}$index',
+              fieldKey:
+                  '${ServiceManualKey.stepDescPrefix}'
+                  '$index',
               label: 'Description',
               hintText: 'Step details…',
               controller: controllers.desc,
@@ -516,6 +991,27 @@ class _RemoveButton extends StatelessWidget {
       tooltip: 'Remove',
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+    );
+  }
+}
+
+/// Inline error text shown below a section
+/// when validation fails.
+class _ErrorText extends StatelessWidget {
+  const _ErrorText({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Text(
+        message,
+        style: Theme.of(
+          context,
+        ).textTheme.bodySmall?.copyWith(color: Colors.red),
+      ),
     );
   }
 }

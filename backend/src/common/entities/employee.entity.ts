@@ -103,9 +103,11 @@ export class Employee {
   })
   status: EmployeeStatus;
 
+  // Denormalized cache maintained from specialist_reviews by the review module.
   @Column({ type: 'decimal', precision: 3, scale: 2, default: 0 })
   rating: number;
 
+  // Denormalized cache maintained from specialist_reviews by the review module.
   @Column({ name: 'review_count', type: 'int', default: 0 })
   reviewCount: number;
 

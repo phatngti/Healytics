@@ -28,6 +28,17 @@ class CategoryImplementRepository implements CategoryRepository {
   }
 
   @override
+  Future<List<CategoryEntity>> getAllCategories({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) {
+    return remoteDataSource.getAllCategories(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
+  }
+
+  @override
   Future<int> getTotalRows() {
     return remoteDataSource.getTotalRows();
   }

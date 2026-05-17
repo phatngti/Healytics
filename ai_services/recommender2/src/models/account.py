@@ -24,7 +24,6 @@ class Account(Base):
         UUID(as_uuid=True), primary_key=True
     )
     email: Mapped[str] = mapped_column(String, nullable=False)
-    username: Mapped[str | None] = mapped_column(String, nullable=True)
 
     # Uses PostgreSQL JSONB in production; falls back to standard JSON
     # for SQLite in tests. JSONB is not supported by SQLite.

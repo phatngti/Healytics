@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/utils/form_validators.dart';
 
 /// Form section for selecting the user's date of birth
 /// during sign-up.
@@ -46,6 +47,7 @@ class DateOfBirthSection extends StatelessWidget {
           context,
           fieldKey: 'date_of_birth',
           label: 'Select your birthday',
+          validator: FormValidators.dateOfBirth,
         ),
         AppDimens.verticalSmall,
         Text(

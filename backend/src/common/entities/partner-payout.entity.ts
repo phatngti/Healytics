@@ -6,11 +6,13 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   Index,
 } from 'typeorm';
 import { Partner } from './partner.entity';
 import { PartnerPayoutStatus } from '@/partner-finance/enums/partner-payout-status.enum';
+import { PartnerPayoutAttempt } from './partner-payout-attempt.entity';
 
 /**
  * Payout batch record for a partner.
@@ -73,8 +75,30 @@ export class PartnerPayout {
   @Column({ name: 'currency', type: 'varchar', length: 10, default: 'VND' })
   currency: string;
 
-  @Column({ name: 'provider_payout_id', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'provider_payout_id',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   providerPayoutId: string | null;
+
+  @Column({ name: 'attempt_count', type: 'integer', default: 0 })
+  attemptCount: number;
+
+  @Column({ name: 'failure_reason', type: 'text', nullable: true })
+  failureReason: string | null;
+
+  @Column({ name: 'hold_reason', type: 'text', nullable: true })
+  holdReason: string | null;
+
+  @Column({
+    name: 'masked_destination',
+    type: 'varchar',
+    length: 120,
+    nullable: true,
+  })
+  maskedDestination: string | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
@@ -90,4 +114,9 @@ export class PartnerPayout {
   @ManyToOne(() => Partner, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'partner_id' })
   partner: Partner;
+
+  @OneToMany(() => PartnerPayoutAttempt, (attempt) => attempt.payout, {
+    cascade: true,
+  })
+  attempts: PartnerPayoutAttempt[];
 }

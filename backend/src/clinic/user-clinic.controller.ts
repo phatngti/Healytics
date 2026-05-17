@@ -1,10 +1,11 @@
-import { Get, Param, Query, ParseUUIDPipe } from '@nestjs/common';
+import { Get, Param, Query, ParseUUIDPipe, Post, Delete } from '@nestjs/common';
 import {
   ApiOperation,
   ApiOkResponse,
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { UserApi } from '@/common/decorators/api/user-api.decorator';
+import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import { ClinicService } from './clinic.service';
 import { ClinicInfoResponseDto } from './dto/clinic-info-response.dto';
 import { ClinicProductsResponseDto } from './dto/clinic-products-response.dto';
@@ -27,8 +28,37 @@ export class UserClinicController {
   @ApiNotFoundResponse({ description: 'Clinic not found.' })
   getClinicInfo(
     @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
   ): Promise<ClinicInfoResponseDto> {
-    return this.clinicService.getClinicInfo(id);
+    return this.clinicService.getClinicInfo(id, userId);
+  }
+
+  @Post(':id/follow')
+  @ApiOperation({
+    operationId: 'userClinicControllerFollowClinic',
+    summary: 'Follow a clinic',
+  })
+  @ApiOkResponse({ type: ClinicInfoResponseDto })
+  @ApiNotFoundResponse({ description: 'Clinic not found.' })
+  followClinic(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ): Promise<ClinicInfoResponseDto> {
+    return this.clinicService.followClinic(id, userId);
+  }
+
+  @Delete(':id/follow')
+  @ApiOperation({
+    operationId: 'userClinicControllerUnfollowClinic',
+    summary: 'Unfollow a clinic',
+  })
+  @ApiOkResponse({ type: ClinicInfoResponseDto })
+  @ApiNotFoundResponse({ description: 'Clinic not found.' })
+  unfollowClinic(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ): Promise<ClinicInfoResponseDto> {
+    return this.clinicService.unfollowClinic(id, userId);
   }
 
   @Get(':id/products')

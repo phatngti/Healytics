@@ -51,13 +51,59 @@ class TableFunctionButtonWidget extends StatefulWidget {
 
 class _TableFunctionButtonWidgetState extends State<TableFunctionButtonWidget> {
   final LayerLink _layerLink = LayerLink();
+  final GlobalKey _buttonKey = GlobalKey();
   OverlayEntry? _overlayEntry;
+
+  /// Safety margin from the edges of the screen (dp).
+  static const double _safeAreaMargin = 16.0;
+
+  /// Holds the computed popup offset and size constraints so the popup
+  /// never overflows the viewport in any direction.
+  ({Offset offset, double maxHeight}) _computePopupConstraints() {
+    final renderBox =
+        _buttonKey.currentContext?.findRenderObject() as RenderBox?;
+    final baseOffset = widget.offset ?? const Offset(0, 40);
+
+    if (renderBox == null) {
+      return (offset: baseOffset, maxHeight: 400);
+    }
+
+    final buttonPosition = renderBox.localToGlobal(Offset.zero);
+    final buttonHeight = renderBox.size.height;
+    final screenSize = MediaQuery.sizeOf(context);
+
+    // ── Vertical constraint ──
+    final popupTop = buttonPosition.dy + baseOffset.dy;
+    final maxHeight = (screenSize.height - popupTop - _safeAreaMargin)
+        .clamp(100.0, screenSize.height - buttonHeight);
+
+    // ── Horizontal constraint ──
+    // Where the popup's left edge would land in global coords.
+    final popupLeft = buttonPosition.dx + baseOffset.dx;
+    final popupRight =
+        popupLeft + TableFunctionButtonWidget.maxWidth;
+
+    double dx = baseOffset.dx;
+    if (popupRight > screenSize.width - _safeAreaMargin) {
+      // Shift left so the popup's right edge sits at the screen margin.
+      dx -= popupRight - (screenSize.width - _safeAreaMargin);
+    }
+    // Also guard against the popup going off the left edge.
+    final adjustedLeft = buttonPosition.dx + dx;
+    if (adjustedLeft < _safeAreaMargin) {
+      dx += _safeAreaMargin - adjustedLeft;
+    }
+
+    return (offset: Offset(dx, baseOffset.dy), maxHeight: maxHeight);
+  }
 
   void _showPopup(Widget popupContent) {
     if (_overlayEntry != null) {
       _removeOverlay();
       return;
     }
+
+    final constraints = _computePopupConstraints();
 
     _overlayEntry = OverlayEntry(
       builder: (context) => Stack(
@@ -72,14 +118,15 @@ class _TableFunctionButtonWidgetState extends State<TableFunctionButtonWidget> {
           CompositedTransformFollower(
             link: _layerLink,
             showWhenUnlinked: false,
-            offset: widget.offset ?? Offset(0, 40),
+            offset: constraints.offset,
             child: Material(
               elevation: 4,
               borderRadius: AppDimens.radiusSmall,
               color: Theme.of(context).cardColor,
               child: ConstrainedBox(
-                constraints: const BoxConstraints(
+                constraints: BoxConstraints(
                   maxWidth: TableFunctionButtonWidget.maxWidth,
+                  maxHeight: constraints.maxHeight,
                 ),
                 child: Container(
                   padding: AppDimens.paddingAllSmall,
@@ -90,7 +137,7 @@ class _TableFunctionButtonWidgetState extends State<TableFunctionButtonWidget> {
                       width: 0.5,
                     ),
                   ),
-                  child: popupContent,
+                  child: SingleChildScrollView(child: popupContent),
                 ),
               ),
             ),
@@ -124,6 +171,7 @@ class _TableFunctionButtonWidgetState extends State<TableFunctionButtonWidget> {
         child: CompositedTransformTarget(
           link: _layerLink,
           child: Container(
+            key: _buttonKey,
             padding: EdgeInsets.symmetric(
               horizontal: AppDimens.paddingHorizontalMedium.right,
               vertical: AppDimens.paddingVerticalSmall.top,
@@ -136,12 +184,17 @@ class _TableFunctionButtonWidgetState extends State<TableFunctionButtonWidget> {
               ),
             ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(widget.prefixIcon, size: AppDimens.sizeMedium.height),
                 AppDimens.horizontalSmall,
-                Text(
-                  widget.label,
-                  style: Theme.of(context).textTheme.bodySmall,
+                Flexible(
+                  child: Text(
+                    widget.label,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ),
               ],
             ),

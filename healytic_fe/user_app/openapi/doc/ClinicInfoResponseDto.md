@@ -14,6 +14,9 @@ Name | Type | Description | Notes
 **logoImageUrl** | **String** |  | [optional] 
 **gallery** | **List<String>** |  | [default to const []]
 **followersLabel** | **String** |  | 
+**followerCount** | **num** |  | 
+**isFollowing** | **bool** |  | 
+**chatPartnerId** | **String** |  | [optional] 
 **reviewsLabel** | **String** |  | 
 **description** | **String** |  | [optional] 
 **trustMetrics** | [**ClinicTrustMetricsDto**](ClinicTrustMetricsDto.md) |  | 

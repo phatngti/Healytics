@@ -28,7 +28,7 @@ void main() {
   patrolTest('checkout renders booking details from selected cart item', (
     $,
   ) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'cartCheckout');
     final config = TestConfig.instance;
 
     if (!config.useMock) {
@@ -48,7 +48,7 @@ void main() {
   patrolTest('confirming checkout with pay later shows success dialog', (
     $,
   ) async {
-    await pumpApp($);
+    await pumpApp($, scenario: 'cartCheckout');
     final config = TestConfig.instance;
 
     if (!config.useMock) {
