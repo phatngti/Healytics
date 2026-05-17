@@ -7,4 +7,23 @@ abstract class ProfileRepository {
   Future<UserAccountEntity> getAccountMe();
 
   Future<ProfileSummaryEntity> getProfileSummary();
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
+
+  Future<void> deleteAccount({required String password});
+
+  /// Uploads avatar image via S3 presigned URL.
+  /// Returns the storage key for the uploaded file.
+  Future<String> uploadAvatar({
+    required String fileName,
+    required String contentType,
+    required List<int> bytes,
+  });
+
+  /// Persists the S3 key as the user's avatar
+  /// on the backend profile.
+  Future<void> updateAvatarUrl(String avatarUrl);
 }

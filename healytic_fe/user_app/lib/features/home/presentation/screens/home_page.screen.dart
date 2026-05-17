@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
+import 'package:user_app/features/profile/presentation/providers/profile.provider.dart';
 import 'package:common/utils/demensions.dart';
 
 import '../widgets/specialists_section.widget.dart';
@@ -17,6 +18,9 @@ class HomeUpdatePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userName = ref.watch(currentUserDisplayNameProvider);
+    final accountMe = ref.watch(accountMeProvider);
+    final displayName = accountMe.value?.displayName ?? userName ?? '';
+    final avatarUrl = accountMe.value?.avatarUrl;
 
     // Adaptive values from AppDimens — scales per MobileSize tier.
     final hPadding = AppDimens.horizontalPadding(context);
@@ -38,7 +42,7 @@ class HomeUpdatePage extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                HomeHeader(userName: userName ?? ''),
+                HomeHeader(userName: displayName, avatarUrl: avatarUrl),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: hPadding),
                   child: Column(

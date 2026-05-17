@@ -84,6 +84,7 @@ class _ProductGeneralInfoCardState extends State<ProductGeneralInfoCard> {
                 FormFieldBuilders.buildQuillEditor(
                   context,
                   label: 'Description',
+                  fieldKey: ProductFormField.productDescription.key,
                   initialValue: widget.initialDescription,
                   isRequired: true,
                 ),

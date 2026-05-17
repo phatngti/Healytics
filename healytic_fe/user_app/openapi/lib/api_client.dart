@@ -340,10 +340,6 @@ class ApiClient {
           return AttachTagResponseDto.fromJson(value);
         case 'AuthTokensDto':
           return AuthTokensDto.fromJson(value);
-        case 'BackdoorPrepareDto':
-          return BackdoorPrepareDto.fromJson(value);
-        case 'BackdoorStatusResponseDto':
-          return BackdoorStatusResponseDto.fromJson(value);
         case 'BookingResponseDto':
           return BookingResponseDto.fromJson(value);
         case 'BookingScheduleDto':
@@ -648,6 +644,10 @@ class ApiClient {
           return PartnerPriorityTypeTransformer().decode(value);
         case 'PartnerProcedureStepDto':
           return PartnerProcedureStepDto.fromJson(value);
+        case 'PartnerProductTagDetailDto':
+          return PartnerProductTagDetailDto.fromJson(value);
+        case 'PartnerProductTagDto':
+          return PartnerProductTagDto.fromJson(value);
         case 'PartnerProfileCompletionCertificationDto':
           return PartnerProfileCompletionCertificationDto.fromJson(value);
         case 'PartnerProfileCompletionIdentityDto':
@@ -716,6 +716,8 @@ class ApiClient {
           return PublicClinicSpecialistPreviewDto.fromJson(value);
         case 'PublicClinicTrustMetricsDto':
           return PublicClinicTrustMetricsDto.fromJson(value);
+        case 'PublicEmployeeReviewResponseDto':
+          return PublicEmployeeReviewResponseDto.fromJson(value);
         case 'PublicEmployeeTimeSlotDto':
           return PublicEmployeeTimeSlotDto.fromJson(value);
         case 'PublicFacilityImageDto':
@@ -776,8 +778,6 @@ class ApiClient {
           return RegisterPartnerResponseDto.fromJson(value);
         case 'RegisterProfileDto':
           return RegisterProfileDto.fromJson(value);
-        case 'ResetDbResponseDto':
-          return ResetDbResponseDto.fromJson(value);
         case 'RetryPayoutDto':
           return RetryPayoutDto.fromJson(value);
         case 'RevenueDataPointDto':
@@ -790,28 +790,6 @@ class ApiClient {
           return ReviewPartnerResponseDto.fromJson(value);
         case 'ReviewSummaryDto':
           return ReviewSummaryDto.fromJson(value);
-        case 'SeedBookingDto':
-          return SeedBookingDto.fromJson(value);
-        case 'SeedCartItemDto':
-          return SeedCartItemDto.fromJson(value);
-        case 'SeedCategoryDto':
-          return SeedCategoryDto.fromJson(value);
-        case 'SeedCouponDto':
-          return SeedCouponDto.fromJson(value);
-        case 'SeedEmployeeDto':
-          return SeedEmployeeDto.fromJson(value);
-        case 'SeedIdsMapDto':
-          return SeedIdsMapDto.fromJson(value);
-        case 'SeedPartnerDto':
-          return SeedPartnerDto.fromJson(value);
-        case 'SeedPayloadDto':
-          return SeedPayloadDto.fromJson(value);
-        case 'SeedResponseDto':
-          return SeedResponseDto.fromJson(value);
-        case 'SeedServiceDto':
-          return SeedServiceDto.fromJson(value);
-        case 'SeedUserDto':
-          return SeedUserDto.fromJson(value);
         case 'ServiceInfoDto':
           return ServiceInfoDto.fromJson(value);
         case 'ServiceManualInputDto':

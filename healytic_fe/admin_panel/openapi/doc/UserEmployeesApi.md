@@ -11,6 +11,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**userEmployeesControllerFindAll**](UserEmployeesApi.md#useremployeescontrollerfindall) | **GET** /user/employees | Get all employees
 [**userEmployeesControllerFindOne**](UserEmployeesApi.md#useremployeescontrollerfindone) | **GET** /user/employees/{id} | Get an employee by id
+[**userEmployeesControllerFindReviews**](UserEmployeesApi.md#useremployeescontrollerfindreviews) | **GET** /user/employees/{id}/reviews | Get reviews for an employee
 [**userEmployeesControllerFindServices**](UserEmployeesApi.md#useremployeescontrollerfindservices) | **GET** /user/employees/{id}/services | Get services for a specialist
 [**userEmployeesControllerGetFeaturedSpecialists**](UserEmployeesApi.md#useremployeescontrollergetfeaturedspecialists) | **GET** /user/employees/featured-specialists | Get featured specialists for home page
 [**userEmployeesControllerGetTimeSlots**](UserEmployeesApi.md#useremployeescontrollergettimeslots) | **GET** /user/employees/{id}/time-slots | Get time slots with availability for an employee
@@ -98,6 +99,53 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**EmployeeResponseDto**](EmployeeResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **userEmployeesControllerFindReviews**
+> List<PublicEmployeeReviewResponseDto> userEmployeesControllerFindReviews(id)
+
+Get reviews for an employee
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = UserEmployeesApi();
+final id = id_example; // String | 
+
+try {
+    final result = api_instance.userEmployeesControllerFindReviews(id);
+    print(result);
+} catch (e) {
+    print('Exception when calling UserEmployeesApi->userEmployeesControllerFindReviews: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  | 
+
+### Return type
+
+[**List<PublicEmployeeReviewResponseDto>**](PublicEmployeeReviewResponseDto.md)
 
 ### Authorization
 

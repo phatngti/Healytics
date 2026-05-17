@@ -134,6 +134,8 @@ export class HealthServiceService {
         'productDefinition',
         'productEmployeeEligibilities',
         'productEmployeeEligibilities.employee',
+        'productTags',
+        'productTags.tag',
       ],
       order: { createdAt: 'DESC' },
     });
@@ -148,6 +150,8 @@ export class HealthServiceService {
         'productDefinition',
         'productEmployeeEligibilities',
         'productEmployeeEligibilities.employee',
+        'productTags',
+        'productTags.tag',
       ],
     });
 
@@ -168,6 +172,8 @@ export class HealthServiceService {
         'productDefinition',
         'productEmployeeEligibilities',
         'productEmployeeEligibilities.employee',
+        'productTags',
+        'productTags.tag',
       ],
     });
 
@@ -197,7 +203,6 @@ export class HealthServiceService {
         'productEmployeeEligibilities.employee.doctorProfile',
         'productTags',
         'productTags.tag',
-        'reviews',
         'facilityImages',
       ],
     });

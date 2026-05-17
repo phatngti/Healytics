@@ -18,6 +18,7 @@ import { Employee } from '@/common/entities/employee.entity';
 import { Partner } from '@/common/entities/partner.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { Booking } from '@/common/entities/booking.entity';
+import { SpecialistReview } from '@/common/entities/specialist-review.entity';
 import { SkillCatalog } from '@/common/entities/skill-catalog.entity';
 import { BookingServiceResponseDto } from './dto/booking-service-response.dto';
 import {
@@ -44,6 +45,7 @@ import { DashboardTimePeriod } from '@/dashboard-partner/dto/query/dashboard-per
 import { EmployeeOverviewAnalyticsResponseDto } from './dto/analytics/employee-overview-analytics.dto';
 import { EmployeeDetailAnalyticsResponseDto } from './dto/analytics/employee-detail-analytics.dto';
 import { EmployeeAssignedServiceDto } from './dto/employee-assigned-service.dto';
+import { PublicEmployeeReviewResponseDto } from './dto/public-employee-review-response.dto';
 
 /**
  * Service facade for managing employees (doctors, therapists, staff).
@@ -78,6 +80,8 @@ export class EmployeesService {
     private readonly eligibilityRepository: Repository<ProductEmployeeEligibility>,
     @InjectRepository(Booking)
     private readonly bookingRepository: Repository<Booking>,
+    @InjectRepository(SpecialistReview)
+    private readonly specialistReviewRepository: Repository<SpecialistReview>,
     @InjectRepository(SkillCatalog)
     private readonly skillCatalogRepository: Repository<SkillCatalog>,
     private readonly partnersService: PartnersService,
@@ -190,7 +194,34 @@ export class EmployeesService {
       this.logger.warn(`Employee not found: ${id}`);
       throw new NotFoundException(`Employee with ID ${id} not found`);
     }
+
     return this.normalizeEmployeeResponse(employee);
+  }
+
+  /**
+   * Returns public reviews for an employee/specialist.
+   */
+  async findReviewsByEmployee(
+    id: string,
+  ): Promise<PublicEmployeeReviewResponseDto[]> {
+    const employee = await this.employeeRepository.findOne({
+      where: { id },
+      select: ['id'],
+    });
+    if (!employee) {
+      this.logger.warn(`Employee not found for reviews: ${id}`);
+      throw new NotFoundException(`Employee with ID ${id} not found`);
+    }
+
+    const reviews = await this.specialistReviewRepository
+      .createQueryBuilder('review')
+      .innerJoinAndSelect('review.user', 'account')
+      .leftJoinAndSelect('account.userProfile', 'profile')
+      .where('review.specialist_id = :id', { id })
+      .orderBy('review.createdAt', 'DESC')
+      .getMany();
+
+    return PublicEmployeeReviewResponseDto.fromEntities(reviews);
   }
 
   /**

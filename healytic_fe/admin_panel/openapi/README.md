@@ -220,18 +220,6 @@ Class | Method | HTTP request | Description
 *S3Api* | [**s3ControllerGetFileUrl**](doc//S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file URL
 *S3Api* | [**s3ControllerPreSign**](doc//S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload URL
 *StripeApi* | [**stripeWebhookControllerHandleStripeWebhook**](doc//StripeApi.md#stripewebhookcontrollerhandlestripewebhook) | **POST** /stripe/webhook | Stripe webhook callback (server-to-server)
-*TestBackdoorApi* | [**testBackdoorControllerPrepare**](doc//TestBackdoorApi.md#testbackdoorcontrollerprepare) | **POST** /test-backdoor/prepare | Reset DB then seed a scenario
-*TestBackdoorApi* | [**testBackdoorControllerResetDb**](doc//TestBackdoorApi.md#testbackdoorcontrollerresetdb) | **POST** /test-backdoor/reset-db | Truncate all non-master tables
-*TestBackdoorApi* | [**testBackdoorControllerSeed**](doc//TestBackdoorApi.md#testbackdoorcontrollerseed) | **POST** /test-backdoor/seed | Seed multiple entity types at once
-*TestBackdoorApi* | [**testBackdoorControllerSeedBooking**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedbooking) | **POST** /test-backdoor/seed-booking | Seed a single booking
-*TestBackdoorApi* | [**testBackdoorControllerSeedCart**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedcart) | **POST** /test-backdoor/seed-cart | Seed a single cart item
-*TestBackdoorApi* | [**testBackdoorControllerSeedCategory**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedcategory) | **POST** /test-backdoor/seed-category | Seed a single category
-*TestBackdoorApi* | [**testBackdoorControllerSeedCoupon**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedcoupon) | **POST** /test-backdoor/seed-coupon | Seed a single coupon
-*TestBackdoorApi* | [**testBackdoorControllerSeedEmployee**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedemployee) | **POST** /test-backdoor/seed-employee | Seed a single employee
-*TestBackdoorApi* | [**testBackdoorControllerSeedPartner**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedpartner) | **POST** /test-backdoor/seed-partner | Seed a single partner
-*TestBackdoorApi* | [**testBackdoorControllerSeedService**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedservice) | **POST** /test-backdoor/seed-service | Seed a single health service
-*TestBackdoorApi* | [**testBackdoorControllerSeedUser**](doc//TestBackdoorApi.md#testbackdoorcontrollerseeduser) | **POST** /test-backdoor/seed-user | Seed a single user
-*TestBackdoorApi* | [**testBackdoorControllerStatus**](doc//TestBackdoorApi.md#testbackdoorcontrollerstatus) | **GET** /test-backdoor/status | Check if backdoor is available
 *UserAppointmentsApi* | [**userAppointmentControllerGetAppointment**](doc//UserAppointmentsApi.md#userappointmentcontrollergetappointment) | **GET** /user/appointments/{id} | Get appointment details by ID
 *UserAppointmentsApi* | [**userAppointmentControllerGetServiceManual**](doc//UserAppointmentsApi.md#userappointmentcontrollergetservicemanual) | **GET** /user/appointments/{appointmentId}/manual | Get service manual for an appointment
 *UserAppointmentsApi* | [**userAppointmentControllerListAppointments**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistappointments) | **GET** /user/appointments | List all user appointments with optional distance calculation
@@ -257,6 +245,7 @@ Class | Method | HTTP request | Description
 *UserDevicesApi* | [**userDeviceControllerUnregisterDevice**](doc//UserDevicesApi.md#userdevicecontrollerunregisterdevice) | **DELETE** /user/devices/{token} | Unregister a device token (e.g. on logout)
 *UserEmployeesApi* | [**userEmployeesControllerFindAll**](doc//UserEmployeesApi.md#useremployeescontrollerfindall) | **GET** /user/employees | Get all employees
 *UserEmployeesApi* | [**userEmployeesControllerFindOne**](doc//UserEmployeesApi.md#useremployeescontrollerfindone) | **GET** /user/employees/{id} | Get an employee by id
+*UserEmployeesApi* | [**userEmployeesControllerFindReviews**](doc//UserEmployeesApi.md#useremployeescontrollerfindreviews) | **GET** /user/employees/{id}/reviews | Get reviews for an employee
 *UserEmployeesApi* | [**userEmployeesControllerFindServices**](doc//UserEmployeesApi.md#useremployeescontrollerfindservices) | **GET** /user/employees/{id}/services | Get services for a specialist
 *UserEmployeesApi* | [**userEmployeesControllerGetFeaturedSpecialists**](doc//UserEmployeesApi.md#useremployeescontrollergetfeaturedspecialists) | **GET** /user/employees/featured-specialists | Get featured specialists for home page
 *UserEmployeesApi* | [**userEmployeesControllerGetTimeSlots**](doc//UserEmployeesApi.md#useremployeescontrollergettimeslots) | **GET** /user/employees/{id}/time-slots | Get time slots with availability for an employee
@@ -367,8 +356,6 @@ Class | Method | HTTP request | Description
  - [AsyncCheckoutResponseDto](doc//AsyncCheckoutResponseDto.md)
  - [AttachTagResponseDto](doc//AttachTagResponseDto.md)
  - [AuthTokensDto](doc//AuthTokensDto.md)
- - [BackdoorPrepareDto](doc//BackdoorPrepareDto.md)
- - [BackdoorStatusResponseDto](doc//BackdoorStatusResponseDto.md)
  - [BookingResponseDto](doc//BookingResponseDto.md)
  - [BookingScheduleDto](doc//BookingScheduleDto.md)
  - [BookingServiceResponseDto](doc//BookingServiceResponseDto.md)
@@ -521,6 +508,8 @@ Class | Method | HTTP request | Description
  - [PartnerPayoutStatus](doc//PartnerPayoutStatus.md)
  - [PartnerPriority](doc//PartnerPriority.md)
  - [PartnerProcedureStepDto](doc//PartnerProcedureStepDto.md)
+ - [PartnerProductTagDetailDto](doc//PartnerProductTagDetailDto.md)
+ - [PartnerProductTagDto](doc//PartnerProductTagDto.md)
  - [PartnerProfileCompletionCertificationDto](doc//PartnerProfileCompletionCertificationDto.md)
  - [PartnerProfileCompletionIdentityDto](doc//PartnerProfileCompletionIdentityDto.md)
  - [PartnerPublicProfileResponseDto](doc//PartnerPublicProfileResponseDto.md)
@@ -555,6 +544,7 @@ Class | Method | HTTP request | Description
  - [PublicClinicInfoResponseDto](doc//PublicClinicInfoResponseDto.md)
  - [PublicClinicSpecialistPreviewDto](doc//PublicClinicSpecialistPreviewDto.md)
  - [PublicClinicTrustMetricsDto](doc//PublicClinicTrustMetricsDto.md)
+ - [PublicEmployeeReviewResponseDto](doc//PublicEmployeeReviewResponseDto.md)
  - [PublicEmployeeTimeSlotDto](doc//PublicEmployeeTimeSlotDto.md)
  - [PublicFacilityImageDto](doc//PublicFacilityImageDto.md)
  - [PublicFeatureTagDto](doc//PublicFeatureTagDto.md)
@@ -585,24 +575,12 @@ Class | Method | HTTP request | Description
  - [RegisterPartnerDto](doc//RegisterPartnerDto.md)
  - [RegisterPartnerResponseDto](doc//RegisterPartnerResponseDto.md)
  - [RegisterProfileDto](doc//RegisterProfileDto.md)
- - [ResetDbResponseDto](doc//ResetDbResponseDto.md)
  - [RetryPayoutDto](doc//RetryPayoutDto.md)
  - [RevenueDataPointDto](doc//RevenueDataPointDto.md)
  - [ReviewItemDto](doc//ReviewItemDto.md)
  - [ReviewPartnerProfileDto](doc//ReviewPartnerProfileDto.md)
  - [ReviewPartnerResponseDto](doc//ReviewPartnerResponseDto.md)
  - [ReviewSummaryDto](doc//ReviewSummaryDto.md)
- - [SeedBookingDto](doc//SeedBookingDto.md)
- - [SeedCartItemDto](doc//SeedCartItemDto.md)
- - [SeedCategoryDto](doc//SeedCategoryDto.md)
- - [SeedCouponDto](doc//SeedCouponDto.md)
- - [SeedEmployeeDto](doc//SeedEmployeeDto.md)
- - [SeedIdsMapDto](doc//SeedIdsMapDto.md)
- - [SeedPartnerDto](doc//SeedPartnerDto.md)
- - [SeedPayloadDto](doc//SeedPayloadDto.md)
- - [SeedResponseDto](doc//SeedResponseDto.md)
- - [SeedServiceDto](doc//SeedServiceDto.md)
- - [SeedUserDto](doc//SeedUserDto.md)
  - [ServiceInfoDto](doc//ServiceInfoDto.md)
  - [ServiceManualInputDto](doc//ServiceManualInputDto.md)
  - [ServiceManualResponseDto](doc//ServiceManualResponseDto.md)

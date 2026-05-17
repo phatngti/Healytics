@@ -38,6 +38,7 @@ import 'package:user_app/features/employee/domain/entities/certificate.entity.da
 import 'package:user_app/features/employee/presentation/screens/certificate_viewer.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/certificates_list.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/employee_detail.screen.dart';
+import 'package:user_app/features/employee/presentation/screens/employee_reviews.screen.dart';
 import 'package:user_app/features/booking/presentation/screens/book_appointment.screen.dart';
 import 'package:user_app/features/booking/presentation/screens/select_specialist.screen.dart';
 import 'package:user_app/features/service_details/presentation/screens/service_specialist.screen.dart';
@@ -589,6 +590,33 @@ class CertificatesListRoute extends GoRouteData with $CertificatesListRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: CertificatesListScreen(
+        employeeId: employeeId,
+        employeeName: employeeName,
+      ),
+    );
+  }
+}
+
+@TypedGoRoute<EmployeeReviewsRoute>(
+  path: '/employee_reviews',
+  name: EmployeeReviewsRoute.name,
+)
+class EmployeeReviewsRoute extends GoRouteData with $EmployeeReviewsRoute {
+  final String employeeId;
+  final String employeeName;
+
+  const EmployeeReviewsRoute({
+    required this.employeeId,
+    required this.employeeName,
+  });
+
+  static const name = 'employee_reviews';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: EmployeeReviewsScreen(
         employeeId: employeeId,
         employeeName: employeeName,
       ),

@@ -73,6 +73,7 @@ export class AccountService {
           phone: true,
           bio: true,
           dateOfBirth: true,
+          avatarUrl: true,
           profileCompleted: true,
         },
       } as any,
@@ -87,6 +88,34 @@ export class AccountService {
     const response = this.toAccountMeResponse(account);
     await this.setCache(cacheKey, response, this.accountMeCacheTtlSeconds);
     return response;
+  }
+
+  /**
+   * Persists the avatar URL (S3 key) on the user
+   * profile and returns refreshed account data.
+   * @param accountId - The account ID from the JWT
+   * @param avatarUrl - The S3 key of the uploaded avatar
+   * @returns Refreshed AccountMeResponseDto
+   */
+  async updateAvatar(
+    accountId: string,
+    avatarUrl: string,
+  ): Promise<AccountMeResponseDto> {
+    const account = await this.accountRepo.findOne({
+      where: { id: accountId },
+      relations: { userProfile: true } as any,
+      loadEagerRelations: false,
+    });
+
+    if (!account || !account.userProfile) {
+      throw new NotFoundException('Account or profile not found');
+    }
+
+    account.userProfile.avatarUrl = avatarUrl;
+    await this.accountRepo.save(account);
+    await this.invalidateAccountMeCache(accountId);
+
+    return this.getMe(accountId);
   }
 
   /**
@@ -332,6 +361,7 @@ export class AccountService {
         phone: account.userProfile.phone,
         bio: account.userProfile.bio,
         dateOfBirth: account.userProfile.dateOfBirth,
+        avatarUrl: account.userProfile.avatarUrl ?? null,
         profileCompleted: account.userProfile.profileCompleted,
       };
     } else {

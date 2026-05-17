@@ -9,8 +9,13 @@ import 'package:user_app/router/routes.dart';
 
 class HomeHeader extends ConsumerWidget {
   final String userName;
+  final String? avatarUrl;
 
-  const HomeHeader({super.key, required this.userName});
+  const HomeHeader({
+    super.key,
+    required this.userName,
+    this.avatarUrl,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -44,6 +49,7 @@ class HomeHeader extends ConsumerWidget {
                   ),
                   child: AvatarImage(
                     name: userName,
+                    imageUrl: avatarUrl,
                     radius: AppDimens.avatarMd / 2,
                   ),
                 ),

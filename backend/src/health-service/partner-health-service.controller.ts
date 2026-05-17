@@ -10,6 +10,7 @@ import {
   Get,
   Query,
 } from '@nestjs/common';
+import { StripNullPropertiesPipe } from '@/common/pipes/strip-null-properties.pipe';
 import { Throttle } from '@nestjs/throttler';
 import {
   ApiOperation,
@@ -164,7 +165,7 @@ export class PartnerHealthServiceController {
   update(
     @CurrentUser('id') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateDto: UpdatePartnerHealthServiceDto,
+    @Body(new StripNullPropertiesPipe()) updateDto: UpdatePartnerHealthServiceDto,
   ): Promise<PartnerHealthServiceResponseDto> {
     return this.healthServiceService.update(userId, id, updateDto);
   }

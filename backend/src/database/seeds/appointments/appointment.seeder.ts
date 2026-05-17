@@ -930,6 +930,7 @@ export class AppointmentSeeder implements ISeeder {
       }
     }
 
+    await this.refreshEmployeeReviewAggregates();
     this.logger.log('Appointments seeding completed');
   }
 
@@ -1006,5 +1007,69 @@ export class AppointmentSeeder implements ISeeder {
       id: In(bookingIds),
     });
     this.logger.log(`🗑️ Hard-deleted ${bookingCount ?? 0} seed booking(s)`);
+
+    await this.refreshEmployeeReviewAggregates(staffIds);
+  }
+
+  private async refreshEmployeeReviewAggregates(
+    staffIds?: string[],
+  ): Promise<void> {
+    const params = staffIds?.length ? [staffIds] : [];
+    const scope = staffIds?.length
+      ? 'WHERE e.id = ANY($1::uuid[])'
+      : '';
+    const reviewScope = staffIds?.length
+      ? 'WHERE sr.specialist_id = ANY($1::uuid[])'
+      : '';
+
+    await this.employeeRepo.query(
+      `
+      WITH review_aggregates AS (
+        SELECT
+          sr.specialist_id,
+          ROUND(AVG(sr.rating)::numeric, 2) AS rating,
+          COUNT(sr.id)::int AS review_count
+        FROM specialist_reviews sr
+        ${reviewScope}
+        GROUP BY sr.specialist_id
+      ),
+      scoped_employees AS (
+        SELECT e.id
+        FROM employees e
+        ${scope}
+      ),
+      updated_reviewed_employees AS (
+        UPDATE employees e
+        SET
+          rating = ra.rating,
+          review_count = ra.review_count,
+          updated_at = NOW()
+        FROM review_aggregates ra
+        WHERE e.id = ra.specialist_id
+          AND (
+            e.rating IS DISTINCT FROM ra.rating
+            OR e.review_count IS DISTINCT FROM ra.review_count
+          )
+        RETURNING e.id
+      )
+      UPDATE employees e
+      SET
+        rating = 0,
+        review_count = 0,
+        updated_at = NOW()
+      FROM scoped_employees se
+      WHERE e.id = se.id
+        AND NOT EXISTS (
+          SELECT 1
+          FROM specialist_reviews sr
+          WHERE sr.specialist_id = e.id
+        )
+        AND (
+          e.rating IS DISTINCT FROM 0
+          OR e.review_count IS DISTINCT FROM 0
+        )
+      `,
+      params,
+    );
   }
 }
