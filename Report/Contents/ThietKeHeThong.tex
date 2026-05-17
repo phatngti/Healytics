@@ -1,50 +1,7 @@
 \chapter{Thiết kế hệ thống}
 \section{Kiến trúc tổng thể hệ thống}
 \subsection{Kiến trúc N-tier}
-\textbf{N-tier Architecture} chia hệ thống thành các tầng độc lập theo trách nhiệm, giao tiếp theo luồng rõ ràng để tăng khả năng bảo trì, bảo mật và mở rộng.
-\subsection{Kết cấu chi tiết 5 Tầng (Structure)}
-\subsubsection{Tầng 1: Presentation Layer (Client Layer)}
-Đây là tầng giao diện, tương tác trực tiếp với người dùng cuối.
-\begin{itemize}
-    \item \textbf{Chức năng:} Hiển thị dữ liệu và tiếp nhận thao tác người dùng.
-    \item \textbf{Thành phần:} Ứng dụng mobile, web hoặc desktop.
-\end{itemize}
-\subsubsection{Tầng 2: Connection \& API Layer (Gateway)}
-Đây là "người gác cổng" của hệ thống. Mọi yêu cầu từ Client đều đi qua tầng này trước khi vào nội bộ.
-\begin{itemize}
-    \item \textbf{Chức năng:} \textbf{API Gateway:} Định tuyến (Routing) yêu cầu đến đúng service xử lý. \textbf{Security:} Xác thực (Authentication), Phân quyền (Authorization), chặn DDoS, Rate Limiting (giới hạn số lượt truy cập). \textbf{Load Balancing:} Cân bằng tải để phân phối request đều đặn.
-    \item \textbf{Công nghệ:} NGINX, Kong, AWS API Gateway, Spring Cloud Gateway.
-\end{itemize}
-\subsubsection{Tầng 3: Business Logic Layer (Server Layer - Microservices)}
-Đây là "bộ não" của hệ thống, xử lý nghiệp vụ chính và thường được chia nhỏ thành \textbf{Microservices}.
-\begin{itemize}
-    \item \textbf{Chức năng:} Xử lý tính toán, logic nghiệp vụ (ví dụ: tính toán giỏ hàng, kiểm tra tồn kho, xử lý workflow).
-    \item \textbf{Đặc điểm:} Mỗi Microservice chạy độc lập, có thể viết bằng các ngôn ngữ khác nhau (Java, Go, Python, Node.js) và giao tiếp với nhau qua HTTP/REST hoặc gRPC.
-    \item \textbf{Giao tiếp:} Nhận lệnh từ Tầng 2, gọi xuống Tầng 4 để lấy dữ liệu, hoặc gọi sang Tầng 5 để dùng dịch vụ bên ngoài.
-\end{itemize}
-\subsubsection{Tầng 4: Data Access Layer (Data \& Infrastructure Layer)}
-Tầng này quản lý và lưu trữ dữ liệu bền vững. Business Layer truy cập dữ liệu thông qua tầng này thay vì truy cập trực tiếp vào database vật lý.
-\begin{itemize}
-    \item \textbf{Chức năng:}
-        \begin{itemize}
-            \item Thực hiện các thao tác CRUD (Create, Read, Update, Delete).
-            \item Trừu tượng hóa việc truy cập dữ liệu (giúp Tầng 3 không cần biết chi tiết kỹ thuật của Database).
-            \item Quản lý kết nối đến Database.
-           
-        \end{itemize}
-   \item \textbf{Thành phần:} ORM (Entity Framework, Hibernate), SQL Database (PostgreSQL, MySQL), NoSQL (MongoDB), Caching (Redis).
-    
-\end{itemize}
-\subsubsection{Tầng 5: Integration Layer (Third-Party Integrations)}
-Đây là tầng kết nối dịch vụ bên ngoài để mở rộng chức năng mà không cần tự xây dựng lại từ đầu.
-\begin{itemize}
-    \item \textbf{Chức năng:}
-    \begin{itemize}
-        \item Đóng vai trò là "Adapter" để kết nối hệ thống nội bộ với các dịch vụ thuê ngoài.
-        \item Xử lý việc chuyển đổi định dạng dữ liệu để phù hợp với API của đối tác.
-    \end{itemize}
-    \item \textbf{Thành phần:}  Payment Gateway (Stripe, Momo), SMS/Email Services (Twilio, SendGrid), Maps API, AI Services.
-\end{itemize}
+\textbf{N-tier Architecture} chia hệ thống thành các tầng độc lập theo trách nhiệm, giao tiếp theo luồng một chiều rõ ràng nhằm tăng khả năng bảo trì, bảo mật và mở rộng. Mỗi tầng chỉ giao tiếp với tầng liền kề, qua đó giảm thiểu sự phụ thuộc chéo (Loose Coupling) và cho phép thay đổi công nghệ ở một tầng mà không ảnh hưởng đến các tầng còn lại. Hệ thống Healytics áp dụng mô hình 5 tầng; kết cấu chi tiết cùng công nghệ cụ thể cho từng tầng sẽ được trình bày sau sơ đồ kiến trúc tổng thể (Hình~\ref{fig:sys_arch}).
 
 \subsection{Ưu điểm và Nhược điểm}
 \begin{table}[htbp]
@@ -150,7 +107,7 @@ Tầng này quản lý và lưu trữ dữ liệu bền vững. Business Layer t
     \end{tabularx}
 \end{table}
 
-\subsection{Diagram và Kết luận}
+\subsection{Sơ đồ kiến trúc và kết cấu 5 tầng}
 \begin{figure}[H]
     % Căn giữa hình ảnh
     \centering
@@ -255,7 +212,7 @@ Kiến trúc dữ liệu toàn diện hỗ trợ quản lý người dùng đa v
 \subsection{Lược đồ}
 \begin{figure}[H]
     \centering
-    \includegraphics[angle=-90, width=0.6\textwidth]{Images/ERD.png}
+    \includegraphics[angle=-90, width=0.9\textwidth]{Images/ERD.png}
     \vspace{10pt}
     
     % Thêm chú thích cho hình ảnh
@@ -318,8 +275,9 @@ Các endpoint chính gồm:
 Hệ thống áp dụng kiến trúc lai (Hybrid NER), kết hợp nhiều kỹ thuật để cân bằng giữa độ chính xác và tính ổn định vận hành:
 \begin{itemize}
     \item \textbf{LLM-based extraction (Gemini):} xử lý tốt các thực thể ngữ nghĩa như loại hình dịch vụ và cụm ý định phức tạp.
-    \item \textbf{Rule-based extraction:} parser cục bộ cho dữ liệu định lượng giúp kiểm soát tốt operator và đơn vị đo.
+    \item \textbf{Rule-based extraction:} parser cục bộ cho dữ liệu định lượng (giá, khoảng cách) với hỗ trợ range semantics (\texttt{between}, \texttt{gte}, \texttt{lte}) và đơn vị tiếng Việt (``cây số'', ``dặm'').
     \item \textbf{NLP + Dictionary fallback:} underthesea, keyword scan và bộ dò địa danh (Aho-Corasick hoặc n-gram fallback) để duy trì khả năng hoạt động khi LLM lỗi hoặc timeout.
+    \item \textbf{Semantic matching (SentenceTransformer):} so khớp ngữ nghĩa dựa trên multi-prototype embeddings cho loại hình dịch vụ và feature tags, sử dụng mô hình \texttt{paraphrase-multilingual-mpnet-base-v2}.
 \end{itemize}
 
 \subsubsection{Thiết kế luồng xử lý thực thể}
@@ -333,7 +291,8 @@ Một truy vấn đầu vào được xử lý theo chuỗi bước:
         \item \texttt{PRICE}: \textbf{Gemini-first}, chỉ fallback regex local khi Gemini không trả PRICE.
         \item \texttt{DISTANCE}: \textbf{Gemini-first}, fallback local deterministic extractor khi Gemini không trả DISTANCE.
     \end{itemize}
-    \item \textbf{Normalization}: ánh xạ về các trường chuẩn như \texttt{business\_type}, \texttt{location\_code}, \texttt{operator}, \texttt{amount}.
+    \item \textbf{Normalization}: ánh xạ về các trường chuẩn như \texttt{business\_type}, \texttt{location\_code}, \texttt{operator}, \texttt{amount}. Bước này bao gồm Entity Linking qua cache địa điểm, RapidFuzz fuzzy matching và Gemini location disambiguation (loại bỏ địa điểm được nhắc tới ngẫu nhiên, chỉ giữ địa điểm người dùng thực sự tìm kiếm).
+    \item \textbf{Spatial context resolution}: xác định tọa độ trung tâm và bán kính tìm kiếm theo thứ tự ưu tiên: (1)~tọa độ GPS của người dùng, (2)~địa chỉ đăng ký, (3)~trung tâm tỉnh/quận từ mã địa điểm đã trích xuất.
     \item \textbf{Query building}: tổng hợp tham số lọc cho truy vấn PostgreSQL/PostGIS.
 \end{enumerate}
 
@@ -344,7 +303,7 @@ Một truy vấn đầu vào được xử lý theo chuỗi bước:
     \item \textbf{LRU query cache}: lưu truy vấn gần nhất để giảm chi phí xử lý lặp.
     \item \textbf{Startup preload}: nạp cache vị trí từ database ngay khi khởi động.
     \item \textbf{Stale-while-revalidate}: khi refresh cache thất bại, vẫn dùng dữ liệu cũ để tránh gián đoạn.
-    \item \textbf{Confidence gating}: lọc confidence thấp cho các thực thể ngữ nghĩa trọng yếu nhằm giảm false positive trước pha truy vấn.
+    \item \textbf{Confidence gating}: loại bỏ thực thể có độ tin cậy thấp nhằm giảm false positive trước pha truy vấn. Ngưỡng này được chọn dựa trên phân tích đánh giá: loại bỏ toàn bộ 27 false positive, chỉ mất 11/108 true positive, đạt precision 100\% và recall 89{,}9\%.
 \end{itemize}
 
 \subsubsection{Thiết kế schema trao đổi dữ liệu}

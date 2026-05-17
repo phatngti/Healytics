@@ -24,3 +24,5 @@ ai_services/recommender2/.env
 /Report/DATN
 /Report/poster
 /Report/DATN - Copy
+/Report/extracted_images
+/Report/rendered_slides
