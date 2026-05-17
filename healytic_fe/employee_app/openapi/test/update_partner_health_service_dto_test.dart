@@ -71,6 +71,12 @@ void main() {
       // TODO
     });
 
+    // Feature tag IDs to associate with this service (full replacement)
+    // List<String> tagIds (default value: const [])
+    test('to test the property `tagIds`', () async {
+      // TODO
+    });
+
     // List<CreatePartnerHealthServiceMediaDto> media (default value: const [])
     test('to test the property `media`', () async {
       // TODO

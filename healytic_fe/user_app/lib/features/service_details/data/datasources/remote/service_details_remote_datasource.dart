@@ -26,8 +26,7 @@ abstract class ServiceDetailsRemoteDatasource {
   /// `GET /products/:id/reviews` — user reviews.
   Future<List<ReviewEntity>> getServiceReviews(String serviceId);
 
-  /// `GET /employees/:id/reviews` — reviews for a
-  /// specific employee.
+  /// `GET /user/employees/:id/reviews` — reviews for a specific employee.
   Future<List<ReviewEntity>> getEmployeeReviews(String employeeId);
 
   /// `GET /products/:id/recommended` — related
@@ -219,9 +218,20 @@ class ServiceDetailsRemoteDatasourceImpl
 
   @override
   Future<List<ReviewEntity>> getEmployeeReviews(String employeeId) async {
-    // TODO: call actual backend endpoint once
-    //       available.
-    return [];
+    final dtos = await _apiService.userEmployeesApi
+        .userEmployeesControllerFindReviews(employeeId);
+    if (dtos == null) return [];
+    return dtos.map(_mapEmployeeReviewToEntity).toList();
+  }
+
+  ReviewEntity _mapEmployeeReviewToEntity(PublicEmployeeReviewResponseDto dto) {
+    return ReviewEntity(
+      reviewerName: dto.reviewerName,
+      avatarUrl: dto.avatarUrl?.toString() ?? '',
+      rating: dto.rating.toInt(),
+      date: DateTime.tryParse(dto.createdAt) ?? DateTime.now(),
+      text: dto.comment?.toString() ?? '',
+    );
   }
 
   // ── Recommended ───────────────────────────────────

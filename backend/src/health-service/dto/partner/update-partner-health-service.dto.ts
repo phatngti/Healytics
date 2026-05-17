@@ -8,7 +8,6 @@ import {
   IsNumber,
   IsArray,
   ValidateNested,
-  ValidateIf,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -26,32 +25,31 @@ import {
 /**
  * Update DTO for health services.
  *
- * All properties are optional. For DB-nullable fields (categoryId, description,
- * salePrice, serviceManual, productDefinition, etc.) the client may send `null`
- * to explicitly clear the value. For non-nullable DB columns (name, slug, type,
- * basePrice, currency, status, isVisibleOnline) the client may omit the field
- * or send a valid value, but `null` will be stripped by the handler.
+ * All properties are optional. The controller applies `StripNullPropertiesPipe`
+ * to remove any field whose value is `null` before validation runs, so only
+ * fields with real values are validated and passed to the handler.
+ *
+ * To clear a nullable DB column, the frontend should simply omit the field
+ * (or send `null`, which the pipe strips).
  */
 export class UpdatePartnerHealthServiceDto {
-  // ── Nullable DB columns — accept null to clear ──────────────────────
+  // ── DB columns ──────────────────────────────────────────────────────
 
   @ApiPropertyOptional({ type: String, format: 'uuid', nullable: true })
-  @ValidateIf((o) => o.categoryId !== null)
+  @IsOptional()
   @IsUUID()
-  categoryId?: string | null;
+  categoryId?: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.description !== null)
+  @IsOptional()
   @IsString()
-  description?: string | null;
+  description?: string;
 
   @ApiPropertyOptional({ type: Number, nullable: true })
-  @ValidateIf((o) => o.salePrice !== null)
+  @IsOptional()
   @IsNumber()
   @Min(0)
-  salePrice?: number | null;
-
-  // ── Non-nullable DB columns — optional but never null ───────────────
+  salePrice?: number;
 
   @ApiPropertyOptional({ type: String })
   @IsOptional()
@@ -94,46 +92,56 @@ export class UpdatePartnerHealthServiceDto {
   @IsBoolean()
   isVisibleOnline?: boolean;
 
-  // ── Relation arrays — accept null or [] to clear ────────────────────
+  // ── Relations ───────────────────────────────────────────────────────
 
   @ApiPropertyOptional({ type: [String], nullable: true })
-  @ValidateIf((o) => o.employeeIds !== null)
+  @IsOptional()
   @IsArray()
   @IsUUID(undefined, { each: true })
-  employeeIds?: string[] | null;
+  employeeIds?: string[];
+
+  @ApiPropertyOptional({
+    type: [String],
+    nullable: true,
+    description: 'Feature tag IDs to associate with this service (full replacement)',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsUUID(undefined, { each: true })
+  tagIds?: string[];
 
   @ApiPropertyOptional({
     type: [CreatePartnerHealthServiceMediaDto],
     nullable: true,
   })
-  @ValidateIf((o) => o.media !== null)
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreatePartnerHealthServiceMediaDto)
-  media?: CreatePartnerHealthServiceMediaDto[] | null;
+  media?: CreatePartnerHealthServiceMediaDto[];
 
   @ApiPropertyOptional({
     type: CreatePartnerHealthServiceDefinitionDto,
     nullable: true,
   })
-  @ValidateIf((o) => o.productDefinition !== null)
+  @IsOptional()
   @ValidateNested()
   @Type(() => CreatePartnerHealthServiceDefinitionDto)
-  productDefinition?: CreatePartnerHealthServiceDefinitionDto | null;
+  productDefinition?: CreatePartnerHealthServiceDefinitionDto;
 
   @ApiPropertyOptional({
     type: [CreatePartnerHealthServiceFacilityImageDto],
     nullable: true,
   })
-  @ValidateIf((o) => o.facilityImages !== null)
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreatePartnerHealthServiceFacilityImageDto)
-  facilityImages?: CreatePartnerHealthServiceFacilityImageDto[] | null;
+  facilityImages?: CreatePartnerHealthServiceFacilityImageDto[];
 
   @ApiPropertyOptional({ type: ServiceManualInputDto, nullable: true })
-  @ValidateIf((o) => o.serviceManual !== null)
+  @IsOptional()
   @ValidateNested()
   @Type(() => ServiceManualInputDto)
-  serviceManual?: ServiceManualInputDto | null;
+  serviceManual?: ServiceManualInputDto;
 }

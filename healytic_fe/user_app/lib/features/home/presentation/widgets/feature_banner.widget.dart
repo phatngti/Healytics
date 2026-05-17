@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/router/routes.dart';
 
 class FeatureBanner extends StatelessWidget {
   const FeatureBanner({super.key});
@@ -148,7 +149,8 @@ class FeatureBanner extends StatelessWidget {
                             ),
                           ),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () =>
+                                const ChatRoute().push(context),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: colorScheme.onPrimary,
                               foregroundColor: colorScheme.primary,

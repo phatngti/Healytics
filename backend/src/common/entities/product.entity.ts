@@ -9,7 +9,7 @@ import {
   OneToMany,
   OneToOne,
   JoinColumn,
-  Index,
+  Unique,
 } from 'typeorm';
 import { HealthServiceType } from '@/health-service/enums/health-service-type.enum';
 import { Category } from './category.entity';
@@ -22,7 +22,7 @@ import { Partner } from './partner.entity';
 import { ProductFacilityImage } from './product-facility-image.entity';
 
 @Entity('products')
-@Index('IDX_PRODUCT_MERCHANT_SLUG', ['slug'])
+@Unique('UQ_PRODUCT_PARTNER_SLUG', ['partnerId', 'slug'])
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -129,4 +129,9 @@ export class Product {
 
   @OneToMany(() => ProductFacilityImage, (fi) => fi.product, { cascade: true })
   facilityImages: ProductFacilityImage[];
+
+  /** Computed convenience getter — returns tag IDs when productTags is loaded. */
+  get tagIds(): string[] {
+    return this.productTags?.map((pt) => pt.tagId) ?? [];
+  }
 }
