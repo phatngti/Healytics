@@ -19,6 +19,7 @@ import { EmployeeResponseDto } from './dto/employee-response.dto';
 import { BookingServiceResponseDto } from './dto/booking-service-response.dto';
 import { FeaturedSpecialistResponseDto } from './dto/featured-specialist-response.dto';
 import { EmployeeTimeSlotsResponseDto } from './dto/employee-time-slots-response.dto';
+import { PublicEmployeeReviewResponseDto } from './dto/public-employee-review-response.dto';
 import { UserApi } from '@/common/decorators/api/user-api.decorator';
 import { LogResponse } from '@/common/interceptors/response.interceptor';
 
@@ -66,6 +67,22 @@ export class UserEmployeesController {
     @Query() query: GetEmployeesQueryDto,
   ): Promise<EmployeeResponseDto[]> {
     return this.employeesService.findAll(query);
+  }
+
+  /**
+   * Retrieves public reviews for an employee.
+   */
+  @Get(':id/reviews')
+  @ApiOperation({ summary: 'Get reviews for an employee' })
+  @ApiOkResponse({
+    description: 'Return list of public employee reviews.',
+    type: [PublicEmployeeReviewResponseDto],
+  })
+  @ApiNotFoundResponse({ description: 'Employee not found.' })
+  findReviews(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<PublicEmployeeReviewResponseDto[]> {
+    return this.employeesService.findReviewsByEmployee(id);
   }
 
   /**

@@ -1,4 +1,3 @@
-import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
 import 'package:admin_panel/features/partner/products/domain/product_form_field.dart';
@@ -24,8 +23,7 @@ class ProductOperationsCard extends ConsumerStatefulWidget {
       ProductOperationsCardState();
 }
 
-class ProductOperationsCardState
-    extends ConsumerState<ProductOperationsCard> {
+class ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
   late String _staffAllocation;
   String _staffRole = EmployeeRoleType.doctor.apiValue;
   List<EmployeeEntity> _selectedStaff = [];
@@ -35,18 +33,16 @@ class ProductOperationsCardState
   @override
   void initState() {
     super.initState();
-    _staffAllocation =
-        widget.initialStaffAllocation ?? StaffAllocation.any.apiValue;
+    _staffAllocation = widget.initialStaffIds.isNotEmpty
+        ? StaffAllocation.specific.apiValue
+        : widget.initialStaffAllocation ?? StaffAllocation.any.apiValue;
     _loadStaff(includeInitialSelection: widget.initialStaffIds.isNotEmpty);
   }
 
   Future<void> _loadStaff({bool includeInitialSelection = false}) async {
     try {
       final notifier = ref.read(productProvider.notifier);
-      final staff = await notifier.getStaffForProduct(role: _staffRole);
-      final allStaff = includeInitialSelection
-          ? await notifier.getStaffForProduct()
-          : staff;
+      final allStaff = await notifier.getStaffForProduct();
       final selectedIds = widget.initialStaffIds.toSet();
       final selectedStaff = includeInitialSelection
           ? allStaff
@@ -57,16 +53,11 @@ class ProductOperationsCardState
           ? EmployeeRoleType.fromApiValue(selectedStaff.first.role)?.apiValue
           : null;
       final staffRole = selectedRole ?? _staffRole;
-      final visibleStaff = includeInitialSelection && selectedRole != null
-          ? allStaff
-                .where((employee) => employee.role.toUpperCase() == staffRole)
-                .toList()
-          : staff;
 
       if (mounted) {
         setState(() {
           _staffRole = staffRole;
-          _allStaff = visibleStaff.isNotEmpty ? visibleStaff : staff;
+          _allStaff = allStaff;
           _selectedStaff = selectedStaff;
           _isLoadingStaff = false;
         });
@@ -110,8 +101,7 @@ class ProductOperationsCardState
           name: ProductFormField.selectedStaffIds.key,
           initialValue: widget.initialStaffIds,
           validator: (value) {
-            if (_staffAllocation !=
-                StaffAllocation.specific.apiValue) {
+            if (_staffAllocation != StaffAllocation.specific.apiValue) {
               return null;
             }
             if (value == null || value.isEmpty) {
@@ -209,7 +199,6 @@ class ProductOperationsCardState
                     ),
                     AppDimens.verticalMediumSmall,
                     _buildSchedulingDetails(context),
-
                   ],
                 ),
               ),
@@ -345,24 +334,18 @@ class ProductOperationsCardState
       );
     }
 
-    return FormFieldBuilders.buildChipSelectorField(
-      context,
-      label: 'Select Staff',
-      chips: _selectedStaff
-          .map(
-            (staff) => _EmployeeStaffChip(
-              employee: staff,
-              onRemove: () {
-                setState(() {
-                  _selectedStaff.remove(staff);
-                });
-                _updateFormBuilderStaff();
-              },
-            ),
-          )
-          .toList(),
-      emptyPlaceholder: 'Select staff members...',
-      onTap: () => _showStaffSelectionDialog(context),
+    void removeStaff(EmployeeEntity staff) {
+      setState(() {
+        _selectedStaff.removeWhere((employee) => employee.id == staff.id);
+      });
+      _updateFormBuilderStaff();
+    }
+
+    return _AssignedStaffPanel(
+      staff: _selectedStaff,
+      onSelect: () => _showStaffSelectionDialog(context),
+      onReplace: () => _showStaffSelectionDialog(context),
+      onRemove: removeStaff,
     );
   }
 
@@ -425,21 +408,16 @@ class ProductOperationsCardState
             Text(
               'Maximum clients served '
               'simultaneously per slot.',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(
-                    fontSize: 10,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontSize: 10,
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
       ],
     );
   }
-
-
 }
 
 class _StaffAllocationOption extends StatelessWidget {
@@ -500,78 +478,467 @@ class _StaffAllocationOption extends StatelessWidget {
   }
 }
 
-/// Staff chip widget that displays an EmployeeEntity
-class _EmployeeStaffChip extends StatelessWidget {
-  final EmployeeEntity employee;
-  final VoidCallback onRemove;
-
-  const _EmployeeStaffChip({required this.employee, required this.onRemove});
-
-  String _getInitials(String name) {
-    final parts = name.split(' ');
-    if (parts.length >= 2) {
-      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    }
-    return name.isNotEmpty ? name[0].toUpperCase() : '';
+String _employeeInitials(EmployeeEntity employee) {
+  final name = employee.displayName.trim().isNotEmpty
+      ? employee.displayName.trim()
+      : employee.fullName.trim();
+  if (name.isEmpty) return '?';
+  final parts = name.split(RegExp(r'\s+'));
+  if (parts.length >= 2) {
+    return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
+  return name[0].toUpperCase();
+}
+
+String _roleLabel(EmployeeEntity employee) {
+  return EmployeeRoleType.fromApiValue(employee.role)?.displayName ??
+      employee.role;
+}
+
+String _primaryInfo(EmployeeEntity employee) {
+  if (employee is DoctorEntity) {
+    final title = employee.jobTitle.trim();
+    if (title.isNotEmpty) return title;
+    return EmployeeRoleType.doctor.displayName;
+  }
+
+  if (employee is SpaTherapistEntity) {
+    final level = employee.therapistLevel?.trim();
+    return [
+      _spaTherapistLabel,
+      if (level != null && level.isNotEmpty) level,
+    ].join(' - ');
+  }
+
+  if (employee is MassageTherapistEntity) {
+    final level = employee.therapistLevel?.trim();
+    return [
+      _massageTherapistLabel,
+      if (level != null && level.isNotEmpty) level,
+    ].join(' - ');
+  }
+
+  final position = employee.position.trim();
+  return position.isEmpty ? _roleLabel(employee) : position;
+}
+
+String _secondaryInfo(EmployeeEntity employee) {
+  if (employee is DoctorEntity) {
+    final parts = <String>[
+      if (employee.specializations.isNotEmpty)
+        employee.specializations.take(2).join(', '),
+      if ((employee.experienceYears ?? 0) > 0)
+        '${employee.experienceYears} yrs exp',
+    ];
+    return parts.join(' - ');
+  }
+
+  if (employee is SpaTherapistEntity) {
+    return employee.skills.take(3).join(', ');
+  }
+
+  if (employee is MassageTherapistEntity) {
+    return employee.skills.take(3).join(', ');
+  }
+
+  return employee.employeeCode;
+}
+
+List<String> _employeeBadges(EmployeeEntity employee) {
+  if (employee is DoctorEntity) {
+    return [
+      ...employee.specializations.take(2),
+      if (employee.medicalLicenses.isNotEmpty) 'Licensed',
+    ];
+  }
+
+  if (employee is SpaTherapistEntity) {
+    return [
+      ...employee.skills.take(2),
+      if (employee.deviceProficiency.isNotEmpty) 'Devices',
+    ];
+  }
+
+  if (employee is MassageTherapistEntity) {
+    return [
+      ...employee.skills.take(2),
+      if ((employee.strengthLevel ?? '').isNotEmpty) employee.strengthLevel!,
+    ];
+  }
+
+  return [];
+}
+
+String _statusLabel(EmployeeEntity employee) {
+  final normalized = employee.status
+      .split('_')
+      .where((part) => part.isNotEmpty)
+      .map(
+        (part) => '${part[0].toUpperCase()}${part.substring(1).toLowerCase()}',
+      )
+      .join(' ');
+  return normalized.isEmpty ? employee.status : normalized;
+}
+
+const _spaTherapistLabel = 'Spa therapist';
+const _massageTherapistLabel = 'Massage therapist';
+
+class _EmployeeAvatar extends StatelessWidget {
+  final EmployeeEntity employee;
+  final double size;
+
+  const _EmployeeAvatar({required this.employee, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    final avatar = employee.avatar.trim();
+
+    if (avatar.isNotEmpty) {
+      return ClipOval(
+        child: Image.network(
+          avatar,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _fallback(context),
+        ),
+      );
+    }
+
+    return _fallback(context);
+  }
+
+  Widget _fallback(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: colorScheme.primaryContainer,
+      ),
+      child: Center(
+        child: Text(
+          _employeeInitials(employee),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AssignedStaffPanel extends StatelessWidget {
+  final List<EmployeeEntity> staff;
+  final VoidCallback onSelect;
+  final VoidCallback onReplace;
+  final ValueChanged<EmployeeEntity> onRemove;
+
+  const _AssignedStaffPanel({
+    required this.staff,
+    required this.onSelect,
+    required this.onReplace,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final titleStyle = Theme.of(
+      context,
+    ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700);
+
+    if (staff.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Assigned Staff', style: titleStyle),
+          AppDimens.verticalSmall,
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerLowest,
+              borderRadius: AppDimens.radiusSmall,
+              border: Border.all(color: colorScheme.outlineVariant),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colorScheme.surfaceContainerHighest,
+                  ),
+                  child: Icon(
+                    Icons.person_add_alt_1_outlined,
+                    size: 22,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                AppDimens.horizontalMediumSmall,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'No employees assigned',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Assign specific doctors or therapists for this service.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                AppDimens.horizontalMediumSmall,
+                OutlinedButton.icon(
+                  onPressed: onSelect,
+                  icon: const Icon(Icons.group_add_outlined, size: 18),
+                  label: const Text('Assign'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Text('Assigned Staff', style: titleStyle),
+                  AppDimens.horizontalSmall,
+                  _StaffCountPill(count: staff.length),
+                ],
+              ),
+            ),
+            TextButton.icon(
+              onPressed: onReplace,
+              icon: const Icon(Icons.swap_horiz, size: 18),
+              label: const Text('Replace'),
+            ),
+          ],
+        ),
+        AppDimens.verticalSmall,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth >= 720;
+            final spacing = isWide ? 12.0 : 8.0;
+            final cardWidth = isWide
+                ? (constraints.maxWidth - spacing) / 2
+                : constraints.maxWidth;
+
+            return Wrap(
+              spacing: spacing,
+              runSpacing: 8,
+              children: staff
+                  .map(
+                    (employee) => SizedBox(
+                      width: cardWidth,
+                      child: _AssignedStaffCard(
+                        employee: employee,
+                        onRemove: () => onRemove(employee),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _StaffCountPill extends StatelessWidget {
+  final int count;
+
+  const _StaffCountPill({required this.count});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.only(left: 4, right: 8, top: 4, bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.withAlpha(90),
+        borderRadius: AppDimens.radiusPill,
+      ),
+      child: Text(
+        '$count assigned',
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: colorScheme.onPrimaryContainer,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+class _AssignedStaffCard extends StatelessWidget {
+  final EmployeeEntity employee;
+  final VoidCallback onRemove;
+
+  const _AssignedStaffCard({required this.employee, required this.onRemove});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 116),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
-        borderRadius: AppDimens.radiusPill,
+        borderRadius: AppDimens.radiusSmall,
         border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (employee.avatar.isNotEmpty)
-            CircleAvatar(
-              radius: 10,
-              backgroundImage: NetworkImage(employee.avatar, headers: const {}),
-              onBackgroundImageError: (_, __) {},
-            )
-          else
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.surfaceContainerHighest,
-              ),
-              child: Center(
-                child: Text(
-                  _getInitials(employee.displayName),
-                  style: TextStyle(
-                    fontSize: 8,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ),
-          const SizedBox(width: 6),
-          Text(
-            employee.displayName,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
-          ),
+          _EmployeeAvatar(employee: employee, size: 52),
+          AppDimens.horizontalMediumSmall,
+          Expanded(child: _EmployeeBasicInfo(employee: employee)),
           AppDimens.horizontalExtraSmall,
-          InkWell(
-            onTap: onRemove,
-            borderRadius: AppDimens.radiusPill,
-            child: Icon(
-              Icons.close,
-              size: 14,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _StatusPill(label: _statusLabel(employee)),
+              const SizedBox(height: 8),
+              IconButton(
+                tooltip: 'Remove staff member',
+                onPressed: onRemove,
+                icon: const Icon(Icons.close, size: 18),
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmployeeBasicInfo extends StatelessWidget {
+  final EmployeeEntity employee;
+
+  const _EmployeeBasicInfo({required this.employee});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final secondary = _secondaryInfo(employee);
+    final badges = _employeeBadges(employee);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          employee.displayName,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          _primaryInfo(employee),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
+        ),
+        if (secondary.isNotEmpty) ...[
+          const SizedBox(height: 2),
+          Text(
+            secondary,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],
+        if (badges.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: badges.map((badge) => _StaffBadge(label: badge)).toList(),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _StaffBadge extends StatelessWidget {
+  final String label;
+
+  const _StaffBadge({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.withAlpha(80),
+        borderRadius: AppDimens.radiusPill,
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: colorScheme.onSurface,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusPill extends StatelessWidget {
+  final String label;
+
+  const _StatusPill({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: AppDimens.radiusPill,
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -606,12 +973,9 @@ class _IconTextField extends StatelessWidget {
               children: [
                 TextSpan(
                   text: label,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
                 ),
                 if (isRequired)
                   const TextSpan(
@@ -637,40 +1001,28 @@ class _IconTextField extends StatelessWidget {
               size: 16,
               color: colorScheme.onSurfaceVariant,
             ),
-            prefixIconConstraints:
-                const BoxConstraints(minWidth: 36),
+            prefixIconConstraints: const BoxConstraints(minWidth: 36),
             filled: true,
             fillColor: colorScheme.surface,
             border: OutlineInputBorder(
               borderRadius: AppDimens.radiusSmall,
-              borderSide: BorderSide(
-                color: colorScheme.outlineVariant,
-              ),
+              borderSide: BorderSide(color: colorScheme.outlineVariant),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: AppDimens.radiusSmall,
-              borderSide: BorderSide(
-                color: colorScheme.outlineVariant,
-              ),
+              borderSide: BorderSide(color: colorScheme.outlineVariant),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: AppDimens.radiusSmall,
-              borderSide: BorderSide(
-                color: colorScheme.primary,
-              ),
+              borderSide: BorderSide(color: colorScheme.primary),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: AppDimens.radiusSmall,
-              borderSide: BorderSide(
-                color: colorScheme.error,
-              ),
+              borderSide: BorderSide(color: colorScheme.error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: AppDimens.radiusSmall,
-              borderSide: BorderSide(
-                color: colorScheme.error,
-                width: 2,
-              ),
+              borderSide: BorderSide(color: colorScheme.error, width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
@@ -750,73 +1102,56 @@ class _EmployeeSelectionDialogState extends State<_EmployeeSelectionDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final selectedCount = _tempSelected.length;
 
     return AlertDialog(
-      title: Text(
-        'Select Staff Members',
-        style: Theme.of(
-          context,
-        ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+              'Replace Assigned Staff',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ),
+          if (selectedCount > 0) _StaffCountPill(count: selectedCount),
+        ],
       ),
       content: SizedBox(
-        width: 300,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: widget.allStaff.map((staff) {
-              final isSelected = _isSelected(staff);
-              return CheckboxListTile(
-                value: isSelected,
-                onChanged: (_) => _toggleSelection(staff),
-                title: Row(
-                  children: [
-                    if (staff.avatar.isNotEmpty)
-                      CircleAvatar(
-                        radius: 14,
-                        backgroundImage: NetworkImage(staff.avatar),
-                        onBackgroundImageError: (_, __) {},
-                      )
-                    else
-                      Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: colorScheme.surfaceContainerHighest,
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.person,
-                            size: 16,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
+        width: 760,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 600),
+          child: widget.allStaff.isEmpty
+              ? const Center(child: Text('No staff members available'))
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isWide = constraints.maxWidth >= 680;
+                    final spacing = isWide ? 12.0 : 8.0;
+                    final cardWidth = isWide
+                        ? (constraints.maxWidth - spacing) / 2
+                        : constraints.maxWidth;
+
+                    return SingleChildScrollView(
+                      child: Wrap(
+                        spacing: spacing,
+                        runSpacing: 8,
+                        children: widget.allStaff
+                            .map(
+                              (staff) => SizedBox(
+                                width: cardWidth,
+                                child: _EmployeeSelectionCard(
+                                  employee: staff,
+                                  isSelected: _isSelected(staff),
+                                  onTap: () => _toggleSelection(staff),
+                                ),
+                              ),
+                            )
+                            .toList(),
                       ),
-                    AppDimens.horizontalMediumSmall,
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            staff.displayName,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            staff.position,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: colorScheme.onSurfaceVariant),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
-                controlAffinity: ListTileControlAffinity.trailing,
-                contentPadding: EdgeInsets.zero,
-              );
-            }).toList(),
-          ),
         ),
       ),
       actions: [
@@ -825,13 +1160,70 @@ class _EmployeeSelectionDialogState extends State<_EmployeeSelectionDialog> {
           child: const Text('Cancel'),
         ),
         FilledButton(
-          onPressed: () {
-            widget.onConfirm(_tempSelected);
-            Navigator.of(context).pop();
-          },
-          child: const Text('Confirm'),
+          onPressed: _tempSelected.isEmpty
+              ? null
+              : () {
+                  widget.onConfirm(_tempSelected);
+                  Navigator.of(context).pop();
+                },
+          child: const Text('Apply Assignment'),
         ),
       ],
+    );
+  }
+}
+
+class _EmployeeSelectionCard extends StatelessWidget {
+  final EmployeeEntity employee;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _EmployeeSelectionCard({
+    required this.employee,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Material(
+      color: isSelected
+          ? colorScheme.primaryContainer.withAlpha(70)
+          : colorScheme.surfaceContainerLow,
+      borderRadius: AppDimens.radiusSmall,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppDimens.radiusSmall,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 126),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: AppDimens.radiusSmall,
+            border: Border.all(
+              color: isSelected
+                  ? colorScheme.primary
+                  : colorScheme.outlineVariant,
+              width: isSelected ? 1.5 : 1,
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _EmployeeAvatar(employee: employee, size: 52),
+              AppDimens.horizontalMediumSmall,
+              Expanded(child: _EmployeeBasicInfo(employee: employee)),
+              AppDimens.horizontalSmall,
+              Checkbox(
+                value: isSelected,
+                onChanged: (_) => onTap(),
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

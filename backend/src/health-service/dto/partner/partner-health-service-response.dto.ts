@@ -143,6 +143,38 @@ class PartnerHealthServiceEmployeeEligibilityDto {
   isPrimary: boolean;
 }
 
+class PartnerProductTagDetailDto {
+  @Expose()
+  @ApiProperty({ type: String })
+  id: string;
+
+  @Expose()
+  @ApiProperty({ type: String })
+  name: string;
+
+  @Expose()
+  @ApiPropertyOptional({ type: String, nullable: true })
+  description: string | null;
+
+  @Expose()
+  @ApiProperty({ type: String })
+  colorValue: string;
+}
+
+/**
+ * Compact representation of a product–tag junction with tag details.
+ */
+class PartnerProductTagDto {
+  @Expose()
+  @ApiProperty({ type: String, description: 'Tag ID' })
+  tagId: string;
+
+  @Expose()
+  @Type(() => PartnerProductTagDetailDto)
+  @ApiPropertyOptional({ type: PartnerProductTagDetailDto, description: 'Tag detail' })
+  tag: PartnerProductTagDetailDto | null;
+}
+
 /**
  * Health service response DTO for API responses.
  * Never expose raw entity data directly.
@@ -239,4 +271,19 @@ export class PartnerHealthServiceResponseDto {
     description: 'Service manual (guidelines, rules, procedure steps)',
   })
   serviceManual: PartnerServiceManualDto | null;
+
+  @Expose()
+  @Type(() => PartnerProductTagDto)
+  @ApiPropertyOptional({
+    type: [PartnerProductTagDto],
+    description: 'Feature tags associated with this service',
+  })
+  productTags: PartnerProductTagDto[];
+
+  @Expose()
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Tag IDs associated with this service',
+  })
+  tagIds: string[];
 }

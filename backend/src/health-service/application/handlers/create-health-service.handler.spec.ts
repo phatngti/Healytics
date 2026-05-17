@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { RedisService } from '@/redis/redis.service';
 import { Category } from '@/common/entities/category.entity';
 import { Employee } from '@/common/entities/employee.entity';
+import { Partner } from '@/common/entities/partner.entity';
 import { Product } from '@/common/entities/product.entity';
 import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
@@ -51,9 +52,12 @@ describe('CreateHealthServiceHandler', () => {
 
   it('assigns the authenticated partner and de-duplicates employee eligibility', async () => {
     const queryRunner = createQueryRunner();
-    queryRunner.manager.findOne.mockImplementation(async (entity) =>
-      entity === Category ? { id: 'category-uuid' } : null,
-    );
+    queryRunner.manager.findOne.mockImplementation(async (entity) => {
+      if (entity === Partner)
+        return { id: 'partner-uuid', brandName: 'Test Partner' };
+      if (entity === Category) return { id: 'category-uuid' };
+      return null;
+    });
     queryRunner.manager.find.mockResolvedValue([
       { id: 'employee-1', partnerId: 'partner-uuid' },
       { id: 'employee-2', partnerId: 'partner-uuid' },
@@ -94,6 +98,11 @@ describe('CreateHealthServiceHandler', () => {
 
   it('rejects employees that do not belong to the authenticated partner', async () => {
     const queryRunner = createQueryRunner();
+    queryRunner.manager.findOne.mockImplementation(async (entity) => {
+      if (entity === Partner)
+        return { id: 'partner-uuid', brandName: 'Test Partner' };
+      return null;
+    });
     queryRunner.manager.find.mockResolvedValue([
       { id: 'employee-1', partnerId: 'other-partner' },
     ] satisfies Pick<Employee, 'id' | 'partnerId'>[]);

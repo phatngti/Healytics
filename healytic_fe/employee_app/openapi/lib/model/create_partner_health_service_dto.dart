@@ -15,7 +15,7 @@ class CreatePartnerHealthServiceDto {
   CreatePartnerHealthServiceDto({
     this.categoryId,
     required this.name,
-    required this.slug,
+    this.slug,
     this.description,
     required this.type,
     this.basePrice,
@@ -24,6 +24,7 @@ class CreatePartnerHealthServiceDto {
     this.status,
     this.isVisibleOnline,
     this.employeeIds = const [],
+    this.tagIds = const [],
     this.media = const [],
     this.productDefinition,
     this.facilityImages = const [],
@@ -41,7 +42,14 @@ class CreatePartnerHealthServiceDto {
 
   String name;
 
-  String slug;
+  /// Ignored — slug is auto-generated as {partner_brand}_{product_name}_{random}.
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? slug;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -89,6 +97,9 @@ class CreatePartnerHealthServiceDto {
 
   List<String> employeeIds;
 
+  /// Feature tag IDs to associate with this service
+  List<String> tagIds;
+
   /// Product media (images/videos)
   List<CreatePartnerHealthServiceMediaDto> media;
 
@@ -126,6 +137,7 @@ class CreatePartnerHealthServiceDto {
     other.status == status &&
     other.isVisibleOnline == isVisibleOnline &&
     _deepEquality.equals(other.employeeIds, employeeIds) &&
+    _deepEquality.equals(other.tagIds, tagIds) &&
     _deepEquality.equals(other.media, media) &&
     other.productDefinition == productDefinition &&
     _deepEquality.equals(other.facilityImages, facilityImages) &&
@@ -136,7 +148,7 @@ class CreatePartnerHealthServiceDto {
     // ignore: unnecessary_parenthesis
     (categoryId == null ? 0 : categoryId!.hashCode) +
     (name.hashCode) +
-    (slug.hashCode) +
+    (slug == null ? 0 : slug!.hashCode) +
     (description == null ? 0 : description!.hashCode) +
     (type.hashCode) +
     (basePrice == null ? 0 : basePrice!.hashCode) +
@@ -145,13 +157,14 @@ class CreatePartnerHealthServiceDto {
     (status == null ? 0 : status!.hashCode) +
     (isVisibleOnline == null ? 0 : isVisibleOnline!.hashCode) +
     (employeeIds.hashCode) +
+    (tagIds.hashCode) +
     (media.hashCode) +
     (productDefinition == null ? 0 : productDefinition!.hashCode) +
     (facilityImages.hashCode) +
     (serviceManual == null ? 0 : serviceManual!.hashCode);
 
   @override
-  String toString() => 'CreatePartnerHealthServiceDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, serviceManual=$serviceManual]';
+  String toString() => 'CreatePartnerHealthServiceDto[categoryId=$categoryId, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, tagIds=$tagIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, serviceManual=$serviceManual]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -161,7 +174,11 @@ class CreatePartnerHealthServiceDto {
       json[r'categoryId'] = null;
     }
       json[r'name'] = this.name;
+    if (this.slug != null) {
       json[r'slug'] = this.slug;
+    } else {
+      json[r'slug'] = null;
+    }
     if (this.description != null) {
       json[r'description'] = this.description;
     } else {
@@ -194,6 +211,7 @@ class CreatePartnerHealthServiceDto {
       json[r'isVisibleOnline'] = null;
     }
       json[r'employeeIds'] = this.employeeIds;
+      json[r'tagIds'] = this.tagIds;
       json[r'media'] = this.media;
     if (this.productDefinition != null) {
       json[r'productDefinition'] = this.productDefinition;
@@ -230,7 +248,7 @@ class CreatePartnerHealthServiceDto {
       return CreatePartnerHealthServiceDto(
         categoryId: mapValueOfType<String>(json, r'categoryId'),
         name: mapValueOfType<String>(json, r'name')!,
-        slug: mapValueOfType<String>(json, r'slug')!,
+        slug: mapValueOfType<String>(json, r'slug'),
         description: mapValueOfType<String>(json, r'description'),
         type: HealthServiceType.fromJson(json[r'type'])!,
         basePrice: num.parse('${json[r'basePrice']}'),
@@ -240,6 +258,9 @@ class CreatePartnerHealthServiceDto {
         isVisibleOnline: mapValueOfType<bool>(json, r'isVisibleOnline'),
         employeeIds: json[r'employeeIds'] is Iterable
             ? (json[r'employeeIds'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        tagIds: json[r'tagIds'] is Iterable
+            ? (json[r'tagIds'] as Iterable).cast<String>().toList(growable: false)
             : const [],
         media: CreatePartnerHealthServiceMediaDto.listFromJson(json[r'media']),
         productDefinition: CreatePartnerHealthServiceDefinitionDto.fromJson(json[r'productDefinition']),
@@ -293,7 +314,6 @@ class CreatePartnerHealthServiceDto {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'name',
-    'slug',
     'type',
   };
 }

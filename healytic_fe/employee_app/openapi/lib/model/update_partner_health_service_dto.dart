@@ -24,6 +24,7 @@ class UpdatePartnerHealthServiceDto {
     this.status,
     this.isVisibleOnline,
     this.employeeIds = const [],
+    this.tagIds = const [],
     this.media = const [],
     this.productDefinition,
     this.facilityImages = const [],
@@ -89,6 +90,9 @@ class UpdatePartnerHealthServiceDto {
 
   List<String>? employeeIds;
 
+  /// Feature tag IDs to associate with this service (full replacement)
+  List<String>? tagIds;
+
   List<CreatePartnerHealthServiceMediaDto>? media;
 
   CreatePartnerHealthServiceDefinitionDto? productDefinition;
@@ -110,6 +114,7 @@ class UpdatePartnerHealthServiceDto {
     other.status == status &&
     other.isVisibleOnline == isVisibleOnline &&
     _deepEquality.equals(other.employeeIds, employeeIds) &&
+    _deepEquality.equals(other.tagIds, tagIds) &&
     _deepEquality.equals(other.media, media) &&
     other.productDefinition == productDefinition &&
     _deepEquality.equals(other.facilityImages, facilityImages) &&
@@ -129,13 +134,14 @@ class UpdatePartnerHealthServiceDto {
     (status == null ? 0 : status!.hashCode) +
     (isVisibleOnline == null ? 0 : isVisibleOnline!.hashCode) +
     (employeeIds == null ? 0 : employeeIds!.hashCode) +
+    (tagIds == null ? 0 : tagIds!.hashCode) +
     (media == null ? 0 : media!.hashCode) +
     (productDefinition == null ? 0 : productDefinition!.hashCode) +
     (facilityImages == null ? 0 : facilityImages!.hashCode) +
     (serviceManual == null ? 0 : serviceManual!.hashCode);
 
   @override
-  String toString() => 'UpdatePartnerHealthServiceDto[categoryId=$categoryId, description=$description, salePrice=$salePrice, name=$name, slug=$slug, type=$type, basePrice=$basePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, serviceManual=$serviceManual]';
+  String toString() => 'UpdatePartnerHealthServiceDto[categoryId=$categoryId, description=$description, salePrice=$salePrice, name=$name, slug=$slug, type=$type, basePrice=$basePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, tagIds=$tagIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, serviceManual=$serviceManual]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -194,6 +200,11 @@ class UpdatePartnerHealthServiceDto {
     } else {
       json[r'employeeIds'] = null;
     }
+    if (this.tagIds != null) {
+      json[r'tagIds'] = this.tagIds;
+    } else {
+      json[r'tagIds'] = null;
+    }
     if (this.media != null) {
       json[r'media'] = this.media;
     } else {
@@ -250,6 +261,9 @@ class UpdatePartnerHealthServiceDto {
         isVisibleOnline: mapValueOfType<bool>(json, r'isVisibleOnline'),
         employeeIds: json[r'employeeIds'] is Iterable
             ? (json[r'employeeIds'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        tagIds: json[r'tagIds'] is Iterable
+            ? (json[r'tagIds'] as Iterable).cast<String>().toList(growable: false)
             : const [],
         media: CreatePartnerHealthServiceMediaDto.listFromJson(json[r'media']),
         productDefinition: CreatePartnerHealthServiceDefinitionDto.fromJson(json[r'productDefinition']),

@@ -1660,6 +1660,48 @@
         ]
       }
     },
+    "/user/employees/{id}/reviews": {
+      "get": {
+        "operationId": "UserEmployeesController_findReviews",
+        "summary": "Get reviews for an employee",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of public employee reviews.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicEmployeeReviewResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found."
+          }
+        },
+        "tags": [
+          "User Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/user/employees/{id}": {
       "get": {
         "operationId": "UserEmployeesController_findOne",
@@ -10088,370 +10130,6 @@
         }
       }
     },
-    "/test-backdoor/status": {
-      "get": {
-        "operationId": "TestBackdoorController_status",
-        "summary": "Check if backdoor is available",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BackdoorStatusResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
-    "/test-backdoor/reset-db": {
-      "post": {
-        "operationId": "TestBackdoorController_resetDb",
-        "summary": "Truncate all non-master tables",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResetDbResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
-    "/test-backdoor/prepare": {
-      "post": {
-        "operationId": "TestBackdoorController_prepare",
-        "summary": "Reset DB then seed a scenario",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BackdoorPrepareDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeedResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
-    "/test-backdoor/seed": {
-      "post": {
-        "operationId": "TestBackdoorController_seed",
-        "summary": "Seed multiple entity types at once",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SeedPayloadDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeedResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
-    "/test-backdoor/seed-user": {
-      "post": {
-        "operationId": "TestBackdoorController_seedUser",
-        "summary": "Seed a single user",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SeedUserDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeedResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
-    "/test-backdoor/seed-category": {
-      "post": {
-        "operationId": "TestBackdoorController_seedCategory",
-        "summary": "Seed a single category",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SeedCategoryDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeedResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
-    "/test-backdoor/seed-partner": {
-      "post": {
-        "operationId": "TestBackdoorController_seedPartner",
-        "summary": "Seed a single partner",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SeedPartnerDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeedResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
-    "/test-backdoor/seed-employee": {
-      "post": {
-        "operationId": "TestBackdoorController_seedEmployee",
-        "summary": "Seed a single employee",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SeedEmployeeDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeedResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
-    "/test-backdoor/seed-service": {
-      "post": {
-        "operationId": "TestBackdoorController_seedService",
-        "summary": "Seed a single health service",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SeedServiceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeedResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
-    "/test-backdoor/seed-cart": {
-      "post": {
-        "operationId": "TestBackdoorController_seedCart",
-        "summary": "Seed a single cart item",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SeedCartItemDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeedResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
-    "/test-backdoor/seed-coupon": {
-      "post": {
-        "operationId": "TestBackdoorController_seedCoupon",
-        "summary": "Seed a single coupon",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SeedCouponDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeedResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
-    "/test-backdoor/seed-booking": {
-      "post": {
-        "operationId": "TestBackdoorController_seedBooking",
-        "summary": "Seed a single booking",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SeedBookingDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeedResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Test Backdoor"
-        ]
-      }
-    },
     "/generative_ai/stream": {
       "post": {
         "tags": [
@@ -11368,7 +11046,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-16T13:58:34.945Z"
+              "submittedAt": "2026-05-17T06:33:57.799Z"
             }
           }
         },
@@ -14529,6 +14207,59 @@
           "clinicName"
         ]
       },
+      "PublicEmployeeReviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "reviewerName": {
+            "type": "string",
+            "example": "Nguyen Van A"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true,
+            "example": "https://example.com/avatar.jpg"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true,
+            "example": "Very attentive and professional throughout."
+          },
+          "tags": {
+            "example": [
+              "Professional",
+              "Attentive"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "wouldRecommend": {
+            "type": "boolean",
+            "example": true
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-03-29T13:01:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "reviewerName",
+          "rating",
+          "tags",
+          "wouldRecommend",
+          "createdAt"
+        ]
+      },
       "TimeSlotDto": {
         "type": "object",
         "properties": {
@@ -15733,6 +15464,49 @@
           }
         }
       },
+      "PartnerProductTagDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "colorValue": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "colorValue"
+        ]
+      },
+      "PartnerProductTagDto": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "string",
+            "description": "Tag ID"
+          },
+          "tag": {
+            "description": "Tag detail",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerProductTagDetailDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "tagId"
+        ]
+      },
       "PartnerHealthServiceResponseDto": {
         "type": "object",
         "properties": {
@@ -15828,6 +15602,20 @@
                 "$ref": "#/components/schemas/PartnerServiceManualDto"
               }
             ]
+          },
+          "productTags": {
+            "description": "Feature tags associated with this service",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerProductTagDto"
+            }
+          },
+          "tagIds": {
+            "description": "Tag IDs associated with this service",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -16398,7 +16186,8 @@
           },
           "slug": {
             "type": "string",
-            "example": "thai-massage"
+            "example": "thai-massage",
+            "description": "Ignored — slug is auto-generated as {partner_brand}_{product_name}_{random}."
           },
           "description": {
             "type": "string",
@@ -16443,6 +16232,17 @@
               "type": "string"
             }
           },
+          "tagIds": {
+            "example": [
+              "uuid-tag-1",
+              "uuid-tag-2"
+            ],
+            "description": "Feature tag IDs to associate with this service",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "media": {
             "description": "Product media (images/videos)",
             "type": "array",
@@ -16476,7 +16276,6 @@
         },
         "required": [
           "name",
-          "slug",
           "type"
         ]
       },
@@ -16524,6 +16323,14 @@
           },
           "employeeIds": {
             "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tagIds": {
+            "nullable": true,
+            "description": "Feature tag IDs to associate with this service (full replacement)",
             "type": "array",
             "items": {
               "type": "string"
@@ -22237,584 +22044,6 @@
             "example": "Approved from partner transaction manager."
           }
         }
-      },
-      "BackdoorStatusResponseDto": {
-        "type": "object",
-        "properties": {
-          "ok": {
-            "type": "boolean",
-            "example": true
-          },
-          "database": {
-            "type": "string",
-            "example": "healytics_test"
-          },
-          "nodeEnv": {
-            "type": "string",
-            "example": "test"
-          }
-        },
-        "required": [
-          "ok",
-          "database",
-          "nodeEnv"
-        ]
-      },
-      "ResetDbResponseDto": {
-        "type": "object",
-        "properties": {
-          "ok": {
-            "type": "boolean",
-            "example": true
-          },
-          "truncatedTables": {
-            "type": "number",
-            "example": 12
-          }
-        },
-        "required": [
-          "ok",
-          "truncatedTables"
-        ]
-      },
-      "SeedUserDto": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "Unique lookup key for this seeded user"
-          },
-          "email": {
-            "type": "string",
-            "example": "user@test.healytics.vn"
-          },
-          "password": {
-            "type": "string",
-            "example": "Password123!"
-          },
-          "firstName": {
-            "type": "string",
-            "example": "Nguyen"
-          },
-          "lastName": {
-            "type": "string",
-            "example": "Van A"
-          },
-          "phone": {
-            "type": "string",
-            "example": "0901234567"
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ]
-      },
-      "SeedCategoryDto": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "Unique lookup key"
-          },
-          "name": {
-            "type": "string",
-            "example": "Spa & Beauty"
-          },
-          "slug": {
-            "type": "string",
-            "example": "spa-beauty"
-          },
-          "description": {
-            "type": "string"
-          },
-          "iconName": {
-            "type": "string",
-            "example": "spa"
-          },
-          "colorValue": {
-            "type": "string",
-            "example": "#FF6B6B"
-          },
-          "sortOrder": {
-            "type": "number",
-            "example": 0
-          }
-        },
-        "required": [
-          "name"
-        ]
-      },
-      "SeedPartnerDto": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "Unique lookup key"
-          },
-          "email": {
-            "type": "string",
-            "example": "partner@test.healytics.vn"
-          },
-          "password": {
-            "type": "string",
-            "example": "Password123!"
-          },
-          "taxCode": {
-            "type": "string",
-            "example": "TAX-12345"
-          },
-          "legalName": {
-            "type": "string",
-            "example": "Healytics Spa LLC"
-          },
-          "brandName": {
-            "type": "string",
-            "example": "Healytics Spa"
-          },
-          "businessTypes": {
-            "description": "Business type categories",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "streetAddress": {
-            "type": "string",
-            "example": "District 1, Ho Chi Minh City"
-          },
-          "phoneNumber": {
-            "type": "string",
-            "example": "0901234567"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "APPROVED",
-              "REJECTED",
-              "REQUIRED_RESUBMIT"
-            ],
-            "description": "Verification status"
-          }
-        },
-        "required": [
-          "brandName"
-        ]
-      },
-      "SeedEmployeeDto": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "Unique lookup key"
-          },
-          "partnerKey": {
-            "type": "string",
-            "description": "Key of a previously seeded partner"
-          },
-          "partnerBrandName": {
-            "type": "string",
-            "description": "Brand name to look up the partner"
-          },
-          "email": {
-            "type": "string",
-            "example": "emp@test.healytics.vn"
-          },
-          "employeeCode": {
-            "type": "string",
-            "example": "EMP-001"
-          },
-          "firstName": {
-            "type": "string",
-            "example": "Nguyen"
-          },
-          "lastName": {
-            "type": "string",
-            "example": "Van B"
-          },
-          "displayName": {
-            "type": "string",
-            "example": "Dr. Nguyen Van B"
-          },
-          "phone": {
-            "type": "string",
-            "example": "0912345678"
-          },
-          "role": {
-            "type": "string",
-            "enum": [
-              "DOCTOR",
-              "THERAPIST",
-              "RECEPTIONIST",
-              "MANAGER"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE",
-              "ON_LEAVE"
-            ]
-          }
-        },
-        "required": [
-          "displayName"
-        ]
-      },
-      "SeedServiceDto": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "Unique lookup key"
-          },
-          "partnerKey": {
-            "type": "string",
-            "description": "Key of a previously seeded partner"
-          },
-          "partnerBrandName": {
-            "type": "string",
-            "description": "Brand name to look up the partner"
-          },
-          "employeeKeys": {
-            "description": "Keys of previously seeded employees",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "categoryKey": {
-            "type": "string",
-            "description": "Key of a previously seeded category"
-          },
-          "categoryName": {
-            "type": "string",
-            "description": "Category name (auto-created if missing)"
-          },
-          "name": {
-            "type": "string",
-            "example": "Deep Tissue Massage"
-          },
-          "slug": {
-            "type": "string",
-            "example": "deep-tissue-massage"
-          },
-          "description": {
-            "type": "string"
-          },
-          "price": {
-            "type": "number",
-            "example": 500000
-          },
-          "durationMinutes": {
-            "type": "number",
-            "example": 60
-          },
-          "vendorName": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "name"
-        ]
-      },
-      "SeedCouponDto": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "Unique lookup key"
-          },
-          "code": {
-            "type": "string",
-            "example": "SUMMER20"
-          },
-          "discountPercent": {
-            "type": "number",
-            "example": 20
-          },
-          "maxDiscountAmount": {
-            "type": "number",
-            "example": 100000
-          },
-          "usageLimit": {
-            "type": "number",
-            "example": 50
-          },
-          "serviceKey": {
-            "type": "string",
-            "description": "Key of a previously seeded service"
-          },
-          "serviceSlug": {
-            "type": "string",
-            "description": "Slug to look up the service"
-          },
-          "categoryName": {
-            "type": "string",
-            "description": "Category name (auto-created if missing)"
-          },
-          "expiresAt": {
-            "type": "string",
-            "example": "2026-12-31T23:59:59Z",
-            "description": "ISO 8601 expiry"
-          }
-        },
-        "required": [
-          "code",
-          "discountPercent"
-        ]
-      },
-      "SeedCartItemDto": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "Unique lookup key"
-          },
-          "userKey": {
-            "type": "string",
-            "description": "Key of a previously seeded user"
-          },
-          "userEmail": {
-            "type": "string",
-            "description": "Email to look up the user"
-          },
-          "serviceKey": {
-            "type": "string",
-            "description": "Key of a previously seeded service"
-          },
-          "serviceSlug": {
-            "type": "string",
-            "description": "Slug to look up the service"
-          },
-          "employeeKey": {
-            "type": "string",
-            "description": "Key of a previously seeded employee"
-          },
-          "employeeEmail": {
-            "type": "string",
-            "description": "Email to look up the employee"
-          },
-          "startsAt": {
-            "type": "string",
-            "example": "2026-06-01T10:00:00Z",
-            "description": "ISO 8601 start time"
-          }
-        },
-        "required": [
-          "startsAt"
-        ]
-      },
-      "SeedBookingDto": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "Unique lookup key"
-          },
-          "userKey": {
-            "type": "string",
-            "description": "Key of a previously seeded user"
-          },
-          "userEmail": {
-            "type": "string",
-            "description": "Email to look up the user"
-          },
-          "serviceKey": {
-            "type": "string",
-            "description": "Key of a previously seeded service"
-          },
-          "serviceSlug": {
-            "type": "string",
-            "description": "Slug to look up the service"
-          },
-          "employeeKey": {
-            "type": "string",
-            "description": "Key of a previously seeded employee"
-          },
-          "employeeEmail": {
-            "type": "string",
-            "description": "Email to look up the employee"
-          },
-          "startsAt": {
-            "type": "string",
-            "example": "2026-06-01T10:00:00Z",
-            "description": "ISO 8601 start time"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING_PAYMENT",
-              "CONFIRMED",
-              "IN_PROGRESS",
-              "CANCELLED",
-              "COMPLETED",
-              "NO_SHOW"
-            ]
-          },
-          "endsAt": {
-            "type": "string",
-            "example": "2026-06-01T11:00:00Z",
-            "description": "ISO 8601 end time"
-          },
-          "paymentUrl": {
-            "type": "string",
-            "example": "https://pay.stripe.com/xxx"
-          },
-          "paymentExpiresAt": {
-            "type": "string",
-            "example": "2026-06-01T10:30:00Z"
-          }
-        },
-        "required": [
-          "startsAt"
-        ]
-      },
-      "SeedPayloadDto": {
-        "type": "object",
-        "properties": {
-          "users": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SeedUserDto"
-            }
-          },
-          "categories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SeedCategoryDto"
-            }
-          },
-          "partners": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SeedPartnerDto"
-            }
-          },
-          "employees": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SeedEmployeeDto"
-            }
-          },
-          "services": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SeedServiceDto"
-            }
-          },
-          "coupons": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SeedCouponDto"
-            }
-          },
-          "cartItems": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SeedCartItemDto"
-            }
-          },
-          "bookings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SeedBookingDto"
-            }
-          }
-        }
-      },
-      "BackdoorPrepareDto": {
-        "type": "object",
-        "properties": {
-          "scenario": {
-            "type": "string",
-            "example": "login-flow",
-            "description": "Scenario name"
-          },
-          "payload": {
-            "$ref": "#/components/schemas/SeedPayloadDto"
-          }
-        }
-      },
-      "SeedIdsMapDto": {
-        "type": "object",
-        "properties": {
-          "users": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "example": {
-              "user@test.healytics.vn": "a1b2c3d4-..."
-            },
-            "description": "user key → account UUID"
-          },
-          "categories": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "partners": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "employees": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "services": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "cartItems": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "bookings": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "coupons": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "SeedResponseDto": {
-        "type": "object",
-        "properties": {
-          "ok": {
-            "type": "boolean",
-            "example": true
-          },
-          "scenario": {
-            "type": "string",
-            "example": "inline"
-          },
-          "ids": {
-            "$ref": "#/components/schemas/SeedIdsMapDto"
-          }
-        },
-        "required": [
-          "ok",
-          "scenario",
-          "ids"
-        ]
       },
       "AiRecommendationItemDto": {
         "properties": {

@@ -7,7 +7,6 @@ import {
   IsNotEmpty,
   IsUUID,
   ValidateNested,
-  ValidateIf,
   IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -26,10 +25,12 @@ import {
 /**
  * Update DTO for employees.
  *
- * All properties are optional. For DB-nullable fields the client may send
- * `null` to explicitly clear the value. For non-nullable DB columns
- * (employeeCode, fullName, email, role, status) the client may omit the
- * field or send a valid value — `null` will be stripped by the handler.
+ * All properties are optional. The controller applies `StripNullPropertiesPipe`
+ * to remove any field whose value is `null` before validation runs, so only
+ * fields with real values are validated and passed to the handler.
+ *
+ * To clear a nullable DB column, the frontend should simply omit the field
+ * (or send `null`, which the pipe strips).
  */
 export class UpdateEmployeeDto {
   // ── Non-nullable DB columns — optional but never null ───────────────
@@ -62,107 +63,107 @@ export class UpdateEmployeeDto {
   @IsEnum(EmployeeStatus)
   status?: EmployeeStatus;
 
-  // ── Nullable DB columns — accept null to clear ──────────────────────
+  // ── Nullable DB columns ─────────────────────────────────────────────
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.firstName !== null)
+  @IsOptional()
   @IsString()
-  firstName?: string | null;
+  firstName?: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.lastName !== null)
+  @IsOptional()
   @IsString()
-  lastName?: string | null;
+  lastName?: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.phone !== null)
+  @IsOptional()
   @IsString()
-  phone?: string | null;
+  phone?: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.avatarUrl !== null)
+  @IsOptional()
   @IsString()
-  avatarUrl?: string | null;
+  avatarUrl?: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.dob !== null)
+  @IsOptional()
   @IsDateString()
-  dob?: string | null;
+  dob?: string;
 
   @ApiPropertyOptional({ enum: Gender, nullable: true })
-  @ValidateIf((o) => o.gender !== null)
+  @IsOptional()
   @IsEnum(Gender)
-  gender?: Gender | null;
+  gender?: Gender;
 
   @ApiPropertyOptional({ type: String, format: 'uuid', nullable: true })
-  @ValidateIf((o) => o.partnerId !== null)
+  @IsOptional()
   @IsUUID()
-  partnerId?: string | null;
+  partnerId?: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.jobTitle !== null)
+  @IsOptional()
   @IsString()
-  jobTitle?: string | null;
+  jobTitle?: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.startDate !== null)
+  @IsOptional()
   @IsDateString()
-  startDate?: string | null;
+  startDate?: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.employmentType !== null)
+  @IsOptional()
   @IsString()
-  employmentType?: string | null;
+  employmentType?: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.emergencyContactName !== null)
+  @IsOptional()
   @IsString()
-  emergencyContactName?: string | null;
+  emergencyContactName?: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.emergencyContactPhone !== null)
+  @IsOptional()
   @IsString()
-  emergencyContactPhone?: string | null;
+  emergencyContactPhone?: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
-  @ValidateIf((o) => o.description !== null)
+  @IsOptional()
   @IsString()
-  description?: string | null;
+  description?: string;
 
-  // ── Nullable relation arrays — accept null or [] to clear ───────────
+  // ── Nullable relation arrays ────────────────────────────────────────
 
   @ApiPropertyOptional({ type: [VerificationDocumentEntryDto], nullable: true })
-  @ValidateIf((o) => o.verificationDocuments !== null)
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => VerificationDocumentEntryDto)
-  verificationDocuments?: VerificationDocumentEntryDto[] | null;
+  verificationDocuments?: VerificationDocumentEntryDto[];
 
   @ApiPropertyOptional({ type: [WorkScheduleEntryDto], nullable: true })
-  @ValidateIf((o) => o.schedule !== null)
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => WorkScheduleEntryDto)
-  schedule?: WorkScheduleEntryDto[] | null;
+  schedule?: WorkScheduleEntryDto[];
 
   @ApiPropertyOptional({ type: [WorkHistoryEntryDto], nullable: true })
-  @ValidateIf((o) => o.workHistory !== null)
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => WorkHistoryEntryDto)
-  workHistory?: WorkHistoryEntryDto[] | null;
+  workHistory?: WorkHistoryEntryDto[];
 
-  // ── Nested profiles — accept null to clear ──────────────────────────
+  // ── Nested profiles ─────────────────────────────────────────────────
 
   @ApiPropertyOptional({ type: CreateDoctorProfileDto, nullable: true })
-  @ValidateIf((o) => o.doctorProfile !== null)
+  @IsOptional()
   @ValidateNested()
   @Type(() => CreateDoctorProfileDto)
-  doctorProfile?: CreateDoctorProfileDto | null;
+  doctorProfile?: CreateDoctorProfileDto;
 
   @ApiPropertyOptional({ type: CreateTherapistProfileDto, nullable: true })
-  @ValidateIf((o) => o.therapistProfile !== null)
+  @IsOptional()
   @ValidateNested()
   @Type(() => CreateTherapistProfileDto)
-  therapistProfile?: CreateTherapistProfileDto | null;
+  therapistProfile?: CreateTherapistProfileDto;
 }

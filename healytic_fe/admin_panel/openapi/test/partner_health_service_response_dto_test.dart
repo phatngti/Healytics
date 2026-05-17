@@ -122,6 +122,18 @@ void main() {
       // TODO
     });
 
+    // Feature tags associated with this service
+    // List<PartnerProductTagDto> productTags (default value: const [])
+    test('to test the property `productTags`', () async {
+      // TODO
+    });
+
+    // Tag IDs associated with this service
+    // List<String> tagIds (default value: const [])
+    test('to test the property `tagIds`', () async {
+      // TODO
+    });
+
 
   });
 

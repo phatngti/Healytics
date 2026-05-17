@@ -36,7 +36,8 @@ class ProductTableSource {
         },
         cells: [
           DataCell(
-            Center(
+            Align(
+              alignment: Alignment.centerLeft,
               child: Text(
                 product.id.value,
                 maxLines: 1,
@@ -45,7 +46,8 @@ class ProductTableSource {
             ),
           ),
           DataCell(
-            Center(
+            Align(
+              alignment: Alignment.centerLeft,
               child: product.images.isNotEmpty && product.images[0].isNotEmpty
                   ? SizedBox(
                       width: 50,
@@ -64,9 +66,18 @@ class ProductTableSource {
                     ),
             ),
           ),
-          DataCell(Center(child: Text(product.category.name))),
-          DataCell(Center(child: Text(product.name))),
-          DataCell(Center(child: Text(product.basePrice.toString()))),
+          DataCell(Align(
+            alignment: Alignment.centerLeft,
+            child: Text(product.category.name),
+          )),
+          DataCell(Align(
+            alignment: Alignment.centerLeft,
+            child: Text(product.name),
+          )),
+          DataCell(Align(
+            alignment: Alignment.centerLeft,
+            child: Text(product.basePrice.toString()),
+          )),
         ],
       );
     }).toList();

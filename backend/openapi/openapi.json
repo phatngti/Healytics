@@ -417,6 +417,43 @@
         ]
       }
     },
+    "/account/me/avatar": {
+      "patch": {
+        "operationId": "AccountController_updateAvatar",
+        "summary": "Update current user avatar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAvatarDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Avatar updated, returns refreshed account data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountMeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/account/survey": {
       "get": {
         "operationId": "AccountController_getSurvey",
@@ -1648,6 +1685,48 @@
                 }
               }
             }
+          }
+        },
+        "tags": [
+          "User Employees"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/employees/{id}/reviews": {
+      "get": {
+        "operationId": "UserEmployeesController_findReviews",
+        "summary": "Get reviews for an employee",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return list of public employee reviews.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicEmployeeReviewResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found."
           }
         },
         "tags": [
@@ -10632,6 +10711,10 @@
             "description": "Date of birth",
             "example": "1990-01-15"
           },
+          "avatarUrl": {
+            "type": "object",
+            "description": "Avatar image URL"
+          },
           "profileCompleted": {
             "type": "boolean",
             "description": "Whether the profile is completed"
@@ -10694,6 +10777,19 @@
           "isActive",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "UpdateAvatarDto": {
+        "type": "object",
+        "properties": {
+          "avatarUrl": {
+            "type": "string",
+            "description": "S3 storage key of the uploaded avatar",
+            "example": "avatars/abc123.png"
+          }
+        },
+        "required": [
+          "avatarUrl"
         ]
       },
       "SurveyResponseDto": {
@@ -10775,7 +10871,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-16T14:30:18.986Z"
+              "submittedAt": "2026-05-17T09:44:33.921Z"
             }
           }
         },
@@ -13936,6 +14032,59 @@
           "clinicName"
         ]
       },
+      "PublicEmployeeReviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "reviewerName": {
+            "type": "string",
+            "example": "Nguyen Van A"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true,
+            "example": "https://example.com/avatar.jpg"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true,
+            "example": "Very attentive and professional throughout."
+          },
+          "tags": {
+            "example": [
+              "Professional",
+              "Attentive"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "wouldRecommend": {
+            "type": "boolean",
+            "example": true
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-03-29T13:01:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "reviewerName",
+          "rating",
+          "tags",
+          "wouldRecommend",
+          "createdAt"
+        ]
+      },
       "TimeSlotDto": {
         "type": "object",
         "properties": {
@@ -15140,6 +15289,49 @@
           }
         }
       },
+      "PartnerProductTagDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "colorValue": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "colorValue"
+        ]
+      },
+      "PartnerProductTagDto": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "string",
+            "description": "Tag ID"
+          },
+          "tag": {
+            "description": "Tag detail",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerProductTagDetailDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "tagId"
+        ]
+      },
       "PartnerHealthServiceResponseDto": {
         "type": "object",
         "properties": {
@@ -15235,6 +15427,20 @@
                 "$ref": "#/components/schemas/PartnerServiceManualDto"
               }
             ]
+          },
+          "productTags": {
+            "description": "Feature tags associated with this service",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartnerProductTagDto"
+            }
+          },
+          "tagIds": {
+            "description": "Tag IDs associated with this service",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -15805,7 +16011,8 @@
           },
           "slug": {
             "type": "string",
-            "example": "thai-massage"
+            "example": "thai-massage",
+            "description": "Ignored — slug is auto-generated as {partner_brand}_{product_name}_{random}."
           },
           "description": {
             "type": "string",
@@ -15850,6 +16057,17 @@
               "type": "string"
             }
           },
+          "tagIds": {
+            "example": [
+              "uuid-tag-1",
+              "uuid-tag-2"
+            ],
+            "description": "Feature tag IDs to associate with this service",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "media": {
             "description": "Product media (images/videos)",
             "type": "array",
@@ -15883,7 +16101,6 @@
         },
         "required": [
           "name",
-          "slug",
           "type"
         ]
       },
@@ -15931,6 +16148,14 @@
           },
           "employeeIds": {
             "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tagIds": {
+            "nullable": true,
+            "description": "Feature tag IDs to associate with this service (full replacement)",
             "type": "array",
             "items": {
               "type": "string"

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:admin_panel/core/config/autofill_config.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
@@ -26,6 +28,7 @@ class ProductAddScreen extends HookConsumerWidget {
 
   static final List<String> _requiredFields = [
     ProductFormField.productName.key,
+    ProductFormField.productDescription.key,
     ProductFormField.basePrice.key,
     ProductFormField.productImages.key,
     ProductFormField.facilityImages.key,
@@ -217,6 +220,13 @@ class ProductAddScreen extends HookConsumerWidget {
             .toList() ??
         [];
 
+    // Organization — Tags
+    final selectedTagIds =
+        (formData[ProductFormField.tags.key] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
+
     // Media
     final productImages =
         (formData[ProductFormField.productImages.key] as List<dynamic>?)
@@ -238,10 +248,10 @@ class ProductAddScreen extends HookConsumerWidget {
       status: status,
       onlineStore: onlineStore,
       category: category,
+      tags: selectedTagIds,
       duration: duration,
       buffer: buffer,
       capacity: capacity,
-
       staffAllocation: staffAllocation,
       staffIds: selectedStaffIds,
       images: productImages,
@@ -272,8 +282,30 @@ class ProductAddScreen extends HookConsumerWidget {
 
   static bool _hasValue(dynamic value) {
     if (value == null) return false;
-    if (value is String) return value.trim().isNotEmpty;
+    if (value is String) return _hasMeaningfulText(value);
     if (value is Iterable) return value.isNotEmpty;
+    return true;
+  }
+
+  static bool _hasMeaningfulText(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return false;
+
+    try {
+      final decoded = jsonDecode(trimmed);
+      if (decoded is List) {
+        final plainText = decoded
+            .whereType<Map>()
+            .map((operation) => operation['insert'])
+            .whereType<String>()
+            .join()
+            .trim();
+        return plainText.isNotEmpty;
+      }
+    } catch (_) {
+      // Plain text is valid for existing non-Delta descriptions.
+    }
+
     return true;
   }
 

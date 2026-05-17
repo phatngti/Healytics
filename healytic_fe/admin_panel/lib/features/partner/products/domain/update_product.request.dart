@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/partner/products/domain/facility_image.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/service_manual.entity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -25,8 +26,10 @@ abstract class UpdateProductRequest with _$UpdateProductRequest {
 
     String? staffAllocation,
     List<String>? images,
+    List<FacilityImageEntity>? facilityImages,
     String? category,
     List<String>? staffIds,
+    List<String>? tagIds,
     ServiceManualEntity? serviceManual,
     @Default(false) bool clearSalePrice,
     @Default(false) bool clearServiceManual,

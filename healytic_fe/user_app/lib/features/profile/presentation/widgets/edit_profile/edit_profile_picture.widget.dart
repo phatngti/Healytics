@@ -6,15 +6,19 @@ class EditProfilePicture extends StatelessWidget {
     super.key,
     required this.name,
     this.imageUrl,
+    this.onEditAvatar,
+    this.isBusy = false,
   });
 
   final String name;
   final String? imageUrl;
+  final VoidCallback? onEditAvatar;
+  final bool isBusy;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Column(
       children: [
         Stack(
@@ -27,10 +31,9 @@ class EditProfilePicture extends StatelessWidget {
                   width: 4,
                 ),
               ),
-              child: AvatarImage(
+              child: _EditableAvatarImage(
                 name: name,
                 imageUrl: imageUrl,
-                radius: 64,
               ),
             ),
             Positioned(
@@ -42,18 +45,25 @@ class EditProfilePicture extends StatelessWidget {
                 elevation: 4,
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
-                  onTap: () {
-                    // TODO: Implement image picker
-                  },
+                  onTap: isBusy ? null : onEditAvatar,
                   child: Container(
                     width: 40,
                     height: 40,
                     alignment: Alignment.center,
-                    child: Icon(
-                      Icons.camera_alt,
-                      color: colorScheme.onPrimary,
-                      size: 20,
-                    ),
+                    child: isBusy
+                        ? SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: colorScheme.onPrimary,
+                            ),
+                          )
+                        : Icon(
+                            Icons.camera_alt,
+                            color: colorScheme.onPrimary,
+                            size: 20,
+                          ),
                   ),
                 ),
               ),
@@ -64,12 +74,31 @@ class EditProfilePicture extends StatelessWidget {
         Text(
           'PERSONAL IDENTITY',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.2,
-              ),
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.2,
+          ),
         ),
       ],
+    );
+  }
+}
+
+class _EditableAvatarImage extends StatelessWidget {
+  const _EditableAvatarImage({
+    required this.name,
+    this.imageUrl,
+  });
+
+  final String name;
+  final String? imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return AvatarImage(
+      name: name,
+      imageUrl: imageUrl,
+      radius: 64,
     );
   }
 }
