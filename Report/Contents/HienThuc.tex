@@ -163,7 +163,6 @@ Hệ thống AI được triển khai như một cụm microservices độc lậ
 
     \item \textbf{Tối ưu suy luận:}
     \begin{itemize}
-        \item \textbf{vLLM}: Engine suy luận hiệu năng cao, PagedAttention tăng throughput 2--4x.
         \item \textbf{BitsAndBytes (4-bit)}: NF4 quantization, giảm 75\% bộ nhớ, chỉ giảm <3\% chất lượng.
     \end{itemize}
 \end{itemize}
@@ -2580,31 +2579,6 @@ Intent Classification đóng vai trò như một \textbf{routing gate}, giúp:
     \item tối ưu latency tổng thể của hệ thống
 \end{itemize}
 
-\subsubsection{Đánh giá hiệu năng}
-
-\paragraph{Latency}
-
-\begin{itemize}
-    \item Encoding (MiniLM): $\sim 5$–8ms
-    \item Classification: $<1$ms
-    \item Tổng: $<10$ms
-\end{itemize}
-
-\paragraph{Memory}
-
-\begin{itemize}
-    \item SentenceTransformer: $\sim 80$–120MB
-    \item Logistic model: $<1$MB
-\end{itemize}
-
-\paragraph{Độ chính xác}
-
-Mô hình đạt độ chính xác tốt trên tập validation nội bộ:
-
-\begin{itemize}
-    \item Accuracy: $\sim 85\%$
-    \item Precision (positive class): cao hơn recall để giảm false trigger
-\end{itemize}
 
 \subsubsection{Khả năng mở rộng}
 
