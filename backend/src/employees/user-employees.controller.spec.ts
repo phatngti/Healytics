@@ -16,6 +16,7 @@ describe('UserEmployeesController', () => {
       createMassageTherapist: jest.fn(),
       findAll: jest.fn(),
       findOne: jest.fn(),
+      findReviewsByEmployee: jest.fn(),
       update: jest.fn(),
       remove: jest.fn(),
       getFeaturedSpecialists: jest.fn(),
@@ -97,6 +98,30 @@ describe('UserEmployeesController', () => {
       // Assert
       expect(result).toEqual(expectedEmployee);
       expect(employeesService.findOne).toHaveBeenCalledWith(id);
+    });
+  });
+
+  describe('findReviews', () => {
+    it('should call service.findReviewsByEmployee with ID and return reviews', async () => {
+      // Arrange
+      const id = 'uuid-1';
+      const expectedReviews = [
+        {
+          id: 'review-1',
+          reviewerName: 'Jane Doe',
+          rating: 5,
+        },
+      ];
+      employeesService.findReviewsByEmployee!.mockResolvedValue(
+        expectedReviews,
+      );
+
+      // Act
+      const result = await controller.findReviews(id);
+
+      // Assert
+      expect(result).toEqual(expectedReviews);
+      expect(employeesService.findReviewsByEmployee).toHaveBeenCalledWith(id);
     });
   });
 });

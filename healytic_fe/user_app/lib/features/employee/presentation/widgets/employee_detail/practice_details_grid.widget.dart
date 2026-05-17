@@ -5,7 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:user_app/features/employee/domain/entities/employee_detail.entity.dart';
 
 /// 2×2 grid showing practice details:
-/// Certificates, Reviews, Consultation/Strength,
+/// Documents, Reviews, Consultation/Strength,
 /// and Employment Status.
 class EmployeePracticeDetailsGrid extends StatelessWidget {
   const EmployeePracticeDetailsGrid({super.key, required this.employee});
@@ -47,6 +47,7 @@ class EmployeePracticeDetailsGrid extends StatelessWidget {
                   'Reviews: '
                   '${employee.rating.toStringAsFixed(1)}'
                   ' (${employee.reviewCount})',
+              onTap: () => _openReviews(context),
             ),
           ),
           AppDimens.verticalLarge,
@@ -63,6 +64,13 @@ class EmployeePracticeDetailsGrid extends StatelessWidget {
 
   void _openCertificates(BuildContext context) {
     CertificatesListRoute(
+      employeeName: employee.displayName,
+      employeeId: employee.id,
+    ).push<void>(context);
+  }
+
+  void _openReviews(BuildContext context) {
+    EmployeeReviewsRoute(
       employeeName: employee.displayName,
       employeeId: employee.id,
     ).push<void>(context);
@@ -120,57 +128,65 @@ class _DetailCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final radius = AppDimens.cardRadius(context);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(AppDimens.contentPadding(context)),
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
+    return Semantics(
+      button: onTap != null,
+      label: label,
+      child: Material(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(radius),
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(radius),
-          border: Border.all(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.04),
-              blurRadius: AppDimens.spaceSm,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              height: AppDimens.avatarSm + 4,
-              width: AppDimens.avatarSm + 4,
-              decoration: BoxDecoration(
-                color: iconBgColor,
-                shape: BoxShape.circle,
+          child: Container(
+            padding: EdgeInsets.all(AppDimens.contentPadding(context)),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(radius),
+              border: Border.all(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.3),
               ),
-              child: Icon(icon, color: iconColor, size: AppDimens.iconSmMd),
-            ),
-            AppDimens.verticalExtraSmall,
-            Text(
-              label,
-              style: textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (subtitle != null)
-              Text(
-                subtitle!,
-                style: textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  fontSize: AppDimens.fontSizeSmall - 2,
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.shadow.withValues(alpha: 0.04),
+                  blurRadius: AppDimens.spaceSm,
+                  offset: const Offset(0, 2),
                 ),
-                textAlign: TextAlign.center,
-              ),
-          ],
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: AppDimens.avatarSm + 4,
+                  width: AppDimens.avatarSm + 4,
+                  decoration: BoxDecoration(
+                    color: iconBgColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: iconColor, size: AppDimens.iconSmMd),
+                ),
+                AppDimens.verticalExtraSmall,
+                Text(
+                  label,
+                  style: textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (subtitle != null)
+                  Text(
+                    subtitle!,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: AppDimens.fontSizeSmall - 2,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
