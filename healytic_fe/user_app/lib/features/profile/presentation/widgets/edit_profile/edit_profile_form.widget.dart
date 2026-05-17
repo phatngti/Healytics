@@ -33,6 +33,7 @@ class EditProfileForm extends StatelessWidget {
           controller: emailController,
           hintText: 'your@email.com',
           keyboardType: TextInputType.emailAddress,
+          readOnly: true,
         ),
         const SizedBox(height: 24),
         _buildField(
@@ -62,6 +63,7 @@ class EditProfileForm extends StatelessWidget {
     required TextEditingController controller,
     required String hintText,
     TextInputType? keyboardType,
+    bool readOnly = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -88,6 +90,7 @@ class EditProfileForm extends StatelessWidget {
           child: TextFormField(
             controller: controller,
             keyboardType: keyboardType,
+            readOnly: readOnly,
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurface,
               fontWeight: FontWeight.w500,

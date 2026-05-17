@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   UseGuards,
   UseInterceptors,
@@ -9,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { SurveyDto } from './dto/request/survey.dto';
+import { UpdateAvatarDto } from './dto/request/update-avatar.dto';
 import { SurveyResponseDto } from './dto/response/survey-response.dto';
 import { AccountMeResponseDto } from './dto/response/account-me-response.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
@@ -55,6 +57,23 @@ export class AccountController {
     @CurrentUser('id') userId: string,
   ): Promise<AccountMeResponseDto> {
     return this.accountService.getMe(userId);
+  }
+
+  /**
+   * Updates the current user's avatar URL (S3 key).
+   */
+  @Patch('me/avatar')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @ApiOperation({ summary: 'Update current user avatar' })
+  @ApiOkResponse({
+    description: 'Avatar updated, returns refreshed account data.',
+    type: AccountMeResponseDto,
+  })
+  async updateAvatar(
+    @CurrentUser('id') userId: string,
+    @Body() dto: UpdateAvatarDto,
+  ): Promise<AccountMeResponseDto> {
+    return this.accountService.updateAvatar(userId, dto.avatarUrl);
   }
 
   /**

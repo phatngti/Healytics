@@ -194,6 +194,7 @@ export class EmployeesService {
       this.logger.warn(`Employee not found: ${id}`);
       throw new NotFoundException(`Employee with ID ${id} not found`);
     }
+
     return this.normalizeEmployeeResponse(employee);
   }
 

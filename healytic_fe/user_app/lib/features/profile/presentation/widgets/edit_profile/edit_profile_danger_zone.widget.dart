@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class EditProfileDangerZone extends StatelessWidget {
-  const EditProfileDangerZone({super.key});
+  const EditProfileDangerZone({
+    super.key,
+    this.onDeleteAccount,
+    this.isBusy = false,
+  });
+
+  final VoidCallback? onDeleteAccount;
+  final bool isBusy;
 
   @override
   Widget build(BuildContext context) {
@@ -11,26 +18,30 @@ class EditProfileDangerZone extends StatelessWidget {
     return Column(
       children: [
         TextButton(
-          onPressed: () {
-            // TODO: Delete account flow
-          },
+          onPressed: isBusy ? null : onDeleteAccount,
           style: TextButton.styleFrom(
             foregroundColor: colorScheme.error,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 12,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
             ),
           ),
-          child: Text(
-            'Delete Account',
-            style: textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.error,
-            ),
-          ),
+          child: isBusy
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: colorScheme.error,
+                  ),
+                )
+              : Text(
+                  'Delete Account',
+                  style: textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.error,
+                  ),
+                ),
         ),
         const SizedBox(height: 16),
         Text(

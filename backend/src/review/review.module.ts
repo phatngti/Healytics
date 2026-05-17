@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
 import { SpecialistReview } from '@/common/entities/specialist-review.entity';
@@ -9,6 +10,7 @@ import { UserReviewController } from './user-review.controller';
 import { ReviewService } from './review.service';
 import { SubmitTreatmentReviewHandler } from './application/handlers/submit-treatment-review.handler';
 import { SubmitSpecialistReviewHandler } from './application/handlers/submit-specialist-review.handler';
+import { SpecialistReviewAggregateService } from './application/services/specialist-review-aggregate.service';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { SubmitSpecialistReviewHandler } from './application/handlers/submit-spe
       Booking,
       Employee,
     ]),
+    ScheduleModule.forRoot(),
     S3Module,
   ],
   controllers: [UserReviewController],
@@ -25,6 +28,7 @@ import { SubmitSpecialistReviewHandler } from './application/handlers/submit-spe
     ReviewService,
     SubmitTreatmentReviewHandler,
     SubmitSpecialistReviewHandler,
+    SpecialistReviewAggregateService,
   ],
   exports: [ReviewService],
 })
