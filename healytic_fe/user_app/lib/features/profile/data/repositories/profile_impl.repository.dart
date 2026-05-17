@@ -17,4 +17,40 @@ class ProfileImplRepository implements ProfileRepository {
   Future<ProfileSummaryEntity> getProfileSummary() {
     return remoteDatasource.getProfileSummary();
   }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) {
+    return remoteDatasource.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+  }
+
+  @override
+  Future<void> deleteAccount({required String password}) {
+    return remoteDatasource.deleteAccount(password: password);
+  }
+
+  @override
+  Future<String> uploadAvatar({
+    required String fileName,
+    required String contentType,
+    required List<int> bytes,
+  }) {
+    return remoteDatasource.uploadAvatar(
+      fileName: fileName,
+      contentType: contentType,
+      bytes: bytes,
+    );
+  }
+
+  @override
+  Future<void> updateAvatarUrl(String avatarUrl) {
+    return remoteDatasource.updateAvatarUrl(
+      avatarUrl,
+    );
+  }
 }

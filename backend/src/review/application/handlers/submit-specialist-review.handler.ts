@@ -9,17 +9,20 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { Booking } from '@/common/entities/booking.entity';
-import { Employee } from '@/common/entities/employee.entity';
 import { SpecialistReview } from '@/common/entities/specialist-review.entity';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { CreateSpecialistReviewDto } from '../../dto/create-specialist-review.dto';
 import { SpecialistReviewResponseDto } from '../../dto/specialist-review-response.dto';
+import { SpecialistReviewAggregateService } from '../services/specialist-review-aggregate.service';
 
 @Injectable()
 export class SubmitSpecialistReviewHandler {
   private readonly logger = new Logger(SubmitSpecialistReviewHandler.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly specialistReviewAggregateService: SpecialistReviewAggregateService,
+  ) {}
 
   async execute(
     userId: string,
@@ -32,6 +35,7 @@ export class SubmitSpecialistReviewHandler {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+    let transactionCommitted = false;
 
     try {
       // ── 1. Invariant Check: Booking exists ──────────────────────
@@ -85,30 +89,28 @@ export class SubmitSpecialistReviewHandler {
 
       const saved = await queryRunner.manager.save(SpecialistReview, review);
 
-      // ── 7. Side Effect: Update specialist rating aggregate ──────
-      const employee = await queryRunner.manager.findOne(Employee, {
-        where: { id: dto.specialistId },
-      });
-
-      if (employee) {
-        const newReviewCount = (employee.reviewCount || 0) + 1;
-        const currentTotal =
-          (Number(employee.rating) || 0) * (employee.reviewCount || 0);
-        const newRating = (currentTotal + dto.rating) / newReviewCount;
-
-        await queryRunner.manager.update(Employee, dto.specialistId, {
-          rating: Math.round(newRating * 100) / 100,
-          reviewCount: newReviewCount,
-        });
-      }
-
-      // ── 8. Commit ───────────────────────────────────────────────
+      // ── 7. Commit ───────────────────────────────────────────────
       await queryRunner.commitTransaction();
+      transactionCommitted = true;
       this.logger.log(`Specialist review created: ${saved.id}`);
+
+      // Recompute the denormalized employee aggregate outside the write
+      // transaction. The 5-minute reconciliation job is the safety net.
+      try {
+        this.specialistReviewAggregateService.enqueueSpecialistRefresh(
+          saved.specialistId,
+        );
+      } catch (aggregateError) {
+        this.logger.warn(
+          `Specialist review aggregate enqueue failed for ${saved.specialistId}: ${(aggregateError as Error).message}`,
+        );
+      }
 
       return SpecialistReviewResponseDto.fromEntity(saved);
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      if (!transactionCommitted) {
+        await queryRunner.rollbackTransaction();
+      }
 
       // Re-throw domain exceptions
       if (

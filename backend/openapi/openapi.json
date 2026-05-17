@@ -417,6 +417,43 @@
         ]
       }
     },
+    "/account/me/avatar": {
+      "patch": {
+        "operationId": "AccountController_updateAvatar",
+        "summary": "Update current user avatar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAvatarDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Avatar updated, returns refreshed account data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountMeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/account/survey": {
       "get": {
         "operationId": "AccountController_getSurvey",
@@ -10674,6 +10711,10 @@
             "description": "Date of birth",
             "example": "1990-01-15"
           },
+          "avatarUrl": {
+            "type": "object",
+            "description": "Avatar image URL"
+          },
           "profileCompleted": {
             "type": "boolean",
             "description": "Whether the profile is completed"
@@ -10736,6 +10777,19 @@
           "isActive",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "UpdateAvatarDto": {
+        "type": "object",
+        "properties": {
+          "avatarUrl": {
+            "type": "string",
+            "description": "S3 storage key of the uploaded avatar",
+            "example": "avatars/abc123.png"
+          }
+        },
+        "required": [
+          "avatarUrl"
         ]
       },
       "SurveyResponseDto": {
@@ -10817,7 +10871,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-17T06:33:57.799Z"
+              "submittedAt": "2026-05-17T09:44:33.921Z"
             }
           }
         },

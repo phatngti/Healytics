@@ -12,6 +12,7 @@ abstract class UserAccountEntity with _$UserAccountEntity {
     String? lastName,
     String? phone,
     String? dateOfBirth,
+    String? avatarUrl,
     required bool profileCompleted,
   }) = _UserAccountEntity;
 
