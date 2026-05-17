@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 
 /// Submit section for the Partner Registration form.
 ///
-/// Contains the submit button and login link for the registration page.
+/// Contains the submit button and login link for
+/// the registration page. The button is disabled
+/// until all required form fields are filled.
 class RegistrationSubmitSection extends StatelessWidget {
   /// Callback invoked when the submit button is pressed.
   final VoidCallback onSubmit;
@@ -14,10 +16,15 @@ class RegistrationSubmitSection extends StatelessWidget {
   /// Whether the form is currently loading/submitting.
   final bool isLoading;
 
+  /// Whether the form is complete enough to submit.
+  /// When `false`, the submit button is disabled.
+  final bool isEnabled;
+
   const RegistrationSubmitSection({
     super.key,
     required this.onSubmit,
     required this.isLoading,
+    this.isEnabled = true,
   });
 
   @override
@@ -32,14 +39,16 @@ class RegistrationSubmitSection extends StatelessWidget {
           width: double.infinity,
           height: 56,
           child: AppButton(
-            onPressed: onSubmit,
+            onPressed: isEnabled ? onSubmit : null,
             buttonType: ButtonType.elevated,
             isLoading: isLoading,
             child: Text(
               'Complete Registration',
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: colorScheme.onPrimary,
+                color: isEnabled
+                    ? colorScheme.onPrimary
+                    : colorScheme.onSurface.withValues(alpha: 0.38),
               ),
             ),
           ),

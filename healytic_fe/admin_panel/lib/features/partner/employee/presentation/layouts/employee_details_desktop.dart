@@ -17,11 +17,15 @@ import 'package:go_router/go_router.dart';
 class EmployeeDetailsDesktop extends StatelessWidget {
   final EmployeeEntity employee;
   final VoidCallback onEdit;
+  final VoidCallback? onDeactivate;
+  final bool isDeactivating;
 
   const EmployeeDetailsDesktop({
     super.key,
     required this.employee,
     required this.onEdit,
+    this.onDeactivate,
+    this.isDeactivating = false,
   });
 
   @override
@@ -41,7 +45,12 @@ class EmployeeDetailsDesktop extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              EmployeeHeaderCard(employee: employee, onEdit: onEdit),
+              EmployeeHeaderCard(
+                employee: employee,
+                onEdit: onEdit,
+                onDeactivate: onDeactivate,
+                isDeactivating: isDeactivating,
+              ),
               AppDimens.verticalLarge,
               EmployeeDetailAnalyticsSection(employee: employee),
               AppDimens.verticalLarge,
@@ -58,6 +67,7 @@ class EmployeeDetailsDesktop extends StatelessWidget {
                           phone: employee.phone,
                           emergencyContactName: employee.emergencyContactName,
                           emergencyContactPhone: employee.emergencyContactPhone,
+                          onEdit: onEdit,
                         ),
                         AppDimens.verticalMedium,
                         EmployeeNotesCard(description: employee.description),

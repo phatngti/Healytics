@@ -136,6 +136,9 @@ class ReviewHeader extends StatelessWidget {
       case PartnerVerificationStatus.pending:
         badgeColor = semantics?.warning ?? Colors.orange;
         label = 'PENDING REVIEW';
+      case PartnerVerificationStatus.requiredResubmit:
+        badgeColor = semantics?.warning ?? Colors.orange;
+        label = 'CHANGES REQUIRED';
       case PartnerVerificationStatus.approved:
         badgeColor = semantics?.success ?? Colors.green;
         label = 'APPROVED';
@@ -154,7 +157,8 @@ class ReviewHeader extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (status == PartnerVerificationStatus.pending) ...[
+          if (status == PartnerVerificationStatus.pending ||
+              status == PartnerVerificationStatus.requiredResubmit) ...[
             _AnimatedDot(color: badgeColor),
             AppDimens.horizontalSmall,
           ],

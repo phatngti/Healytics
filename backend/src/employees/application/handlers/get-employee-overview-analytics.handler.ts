@@ -370,9 +370,59 @@ export class GetEmployeeOverviewAnalyticsHandler {
     start: Date,
     end: Date,
   ): Promise<EmployeePerformanceSummaryDto[]> {
-    // Load all employees with their workload stats
+    // Load all employees with pre-aggregated workload and review stats.
     const rows = await this.dataSource.query(
-      `SELECT
+      `WITH booking_stats AS (
+        SELECT
+          e.id AS employee_id,
+          COUNT(*) FILTER (
+            WHERE b.status = '${BookingStatus.COMPLETED}'
+          ) AS completed_sessions,
+          COALESCE(SUM(
+            CASE WHEN pay.payment_status IN ('${PaymentStatus.PAID}', '${PaymentStatus.DEPOSITED}')
+                 THEN pay.amount ELSE 0 END
+          ), 0) AS contribution_value,
+          COALESCE(SUM(
+            EXTRACT(EPOCH FROM (
+              COALESCE(b.end_time, b.start_time + INTERVAL '30 minutes') - b.start_time
+            )) / 3600
+          ) FILTER (
+            WHERE b.status IN (
+              '${BookingStatus.COMPLETED}',
+              '${BookingStatus.CONFIRMED}',
+              '${BookingStatus.PENDING_PAYMENT}'
+            )
+          ), 0) AS booked_hours
+        FROM employees e
+        LEFT JOIN bookings b
+          ON b.staff_id = e.id
+          AND b.start_time BETWEEN $2 AND $3
+          AND b.deleted_at IS NULL
+          AND b.status IN (
+            '${BookingStatus.COMPLETED}',
+            '${BookingStatus.CONFIRMED}',
+            '${BookingStatus.PENDING_PAYMENT}'
+          )
+        LEFT JOIN payments pay
+          ON pay.booking_id = b.id
+          AND pay.deleted_at IS NULL
+        WHERE e.partner_id = $1
+          AND e.deleted_at IS NULL
+        GROUP BY e.id
+      ),
+      review_stats AS (
+        SELECT
+          sr.specialist_id AS employee_id,
+          COALESCE(AVG(sr.rating), 0) AS avg_rating
+        FROM specialist_reviews sr
+        INNER JOIN employees e
+          ON e.id = sr.specialist_id
+          AND e.partner_id = $1
+          AND e.deleted_at IS NULL
+        WHERE sr.created_at BETWEEN $2 AND $3
+        GROUP BY sr.specialist_id
+      )
+      SELECT
         e.id,
         e.full_name,
         e.role,
@@ -380,46 +430,16 @@ export class GetEmployeeOverviewAnalyticsHandler {
         e.rating AS cached_rating,
         e.review_count AS cached_review_count,
         tp.type AS therapist_type,
-        COUNT(*) FILTER (
-          WHERE b.status = '${BookingStatus.COMPLETED}'
-        ) AS completed_sessions,
-        COALESCE(SUM(
-          CASE WHEN pay.payment_status IN ('${PaymentStatus.PAID}', '${PaymentStatus.DEPOSITED}')
-               THEN pay.amount ELSE 0 END
-        ), 0) AS contribution_value,
-        COALESCE(SUM(
-          EXTRACT(EPOCH FROM (
-            COALESCE(b.end_time, b.start_time + INTERVAL '30 minutes') - b.start_time
-          )) / 3600
-        ) FILTER (
-          WHERE b.status IN (
-            '${BookingStatus.COMPLETED}',
-            '${BookingStatus.CONFIRMED}',
-            '${BookingStatus.PENDING_PAYMENT}'
-          )
-        ), 0) AS booked_hours,
-        COALESCE(AVG(sr.rating), 0) AS avg_rating
+        COALESCE(bs.completed_sessions, 0) AS completed_sessions,
+        COALESCE(bs.contribution_value, 0) AS contribution_value,
+        COALESCE(bs.booked_hours, 0) AS booked_hours,
+        COALESCE(rs.avg_rating, 0) AS avg_rating
       FROM employees e
       LEFT JOIN therapist_profiles tp ON tp.employee_id = e.id
-      LEFT JOIN bookings b
-        ON b.staff_id = e.id
-        AND b.start_time BETWEEN $2 AND $3
-        AND b.deleted_at IS NULL
-        AND b.status IN (
-          '${BookingStatus.COMPLETED}',
-          '${BookingStatus.CONFIRMED}',
-          '${BookingStatus.PENDING_PAYMENT}'
-        )
-      LEFT JOIN payments pay
-        ON pay.booking_id = b.id
-        AND pay.deleted_at IS NULL
-      LEFT JOIN specialist_reviews sr
-        ON sr.specialist_id = e.id
-        AND sr.created_at BETWEEN $2 AND $3
+      LEFT JOIN booking_stats bs ON bs.employee_id = e.id
+      LEFT JOIN review_stats rs ON rs.employee_id = e.id
       WHERE e.partner_id = $1
-        AND e.deleted_at IS NULL
-      GROUP BY e.id, e.full_name, e.role, e.schedule,
-               e.rating, e.review_count, tp.type`,
+        AND e.deleted_at IS NULL`,
       [partnerId, start, end],
     );
 

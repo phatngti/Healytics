@@ -58,6 +58,12 @@ void main() {
       // TODO
     });
 
+    // Certifications
+    // List<String> certifications (default value: const [])
+    test('to test the property `certifications`', () async {
+      // TODO
+    });
+
 
   });
 

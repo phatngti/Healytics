@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/partner/employee/data/employee_impl.repository.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_assigned_service.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,4 +21,14 @@ final employeeDetailsProvider =
     FutureProvider.family<EmployeeEntity, EmployeeId>((ref, employeeId) async {
       final repository = ref.read(employeeRepositoryProvider);
       return repository.getEmployeeById(employeeId);
+    });
+
+/// Provider that fetches services assigned to an employee.
+final employeeAssignedServicesProvider =
+    FutureProvider.family<List<EmployeeAssignedServiceEntity>, EmployeeId>((
+      ref,
+      employeeId,
+    ) async {
+      final repository = ref.read(employeeRepositoryProvider);
+      return repository.getEmployeeAssignedServices(employeeId);
     });

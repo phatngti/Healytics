@@ -31,6 +31,8 @@ class PartnerHealthServiceResponseDto {
     this.productDefinition,
     this.productEmployeeEligibilities = const [],
     this.serviceManual,
+    this.productTags = const [],
+    this.tagIds = const [],
   });
 
 
@@ -104,6 +106,12 @@ class PartnerHealthServiceResponseDto {
   ///
   PartnerServiceManualDto? serviceManual;
 
+  /// Feature tags associated with this service
+  List<PartnerProductTagDto> productTags;
+
+  /// Tag IDs associated with this service
+  List<String> tagIds;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is PartnerHealthServiceResponseDto &&
     other.id == id &&
@@ -123,7 +131,9 @@ class PartnerHealthServiceResponseDto {
     _deepEquality.equals(other.media, media) &&
     other.productDefinition == productDefinition &&
     _deepEquality.equals(other.productEmployeeEligibilities, productEmployeeEligibilities) &&
-    other.serviceManual == serviceManual;
+    other.serviceManual == serviceManual &&
+    _deepEquality.equals(other.productTags, productTags) &&
+    _deepEquality.equals(other.tagIds, tagIds);
 
   @override
   int get hashCode =>
@@ -145,10 +155,12 @@ class PartnerHealthServiceResponseDto {
     (media.hashCode) +
     (productDefinition == null ? 0 : productDefinition!.hashCode) +
     (productEmployeeEligibilities.hashCode) +
-    (serviceManual == null ? 0 : serviceManual!.hashCode);
+    (serviceManual == null ? 0 : serviceManual!.hashCode) +
+    (productTags.hashCode) +
+    (tagIds.hashCode);
 
   @override
-  String toString() => 'PartnerHealthServiceResponseDto[id=$id, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, vendorName=$vendorName, createdAt=$createdAt, updatedAt=$updatedAt, category=$category, media=$media, productDefinition=$productDefinition, productEmployeeEligibilities=$productEmployeeEligibilities, serviceManual=$serviceManual]';
+  String toString() => 'PartnerHealthServiceResponseDto[id=$id, name=$name, slug=$slug, description=$description, type=$type, basePrice=$basePrice, salePrice=$salePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, vendorName=$vendorName, createdAt=$createdAt, updatedAt=$updatedAt, category=$category, media=$media, productDefinition=$productDefinition, productEmployeeEligibilities=$productEmployeeEligibilities, serviceManual=$serviceManual, productTags=$productTags, tagIds=$tagIds]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -194,6 +206,8 @@ class PartnerHealthServiceResponseDto {
     } else {
       json[r'serviceManual'] = null;
     }
+      json[r'productTags'] = this.productTags;
+      json[r'tagIds'] = this.tagIds;
     return json;
   }
 
@@ -236,6 +250,10 @@ class PartnerHealthServiceResponseDto {
         productDefinition: PartnerHealthServiceDefinitionDto.fromJson(json[r'productDefinition']),
         productEmployeeEligibilities: PartnerHealthServiceEmployeeEligibilityDto.listFromJson(json[r'productEmployeeEligibilities']),
         serviceManual: PartnerServiceManualDto.fromJson(json[r'serviceManual']),
+        productTags: PartnerProductTagDto.listFromJson(json[r'productTags']),
+        tagIds: json[r'tagIds'] is Iterable
+            ? (json[r'tagIds'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
       );
     }
     return null;

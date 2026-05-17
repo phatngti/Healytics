@@ -31,6 +31,13 @@ void main() {
       // TODO
     });
 
+    // Get reviews for an employee
+    //
+    //Future<List<PublicEmployeeReviewResponseDto>> userEmployeesControllerFindReviews(String id) async
+    test('test userEmployeesControllerFindReviews', () async {
+      // TODO
+    });
+
     // Get services for a specialist
     //
     //Future<List<BookingServiceResponseDto>> userEmployeesControllerFindServices(String id) async

@@ -218,8 +218,6 @@ class _EmployeeBookingSummaryScreenState
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
     final hPad =
         AppDimens.horizontalPadding(context);
     final sectionGap =

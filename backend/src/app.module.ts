@@ -27,9 +27,12 @@ import { ChatModule } from './chat/chat.module';
 import { NotificationModule } from './notification/notification.module';
 import { CartModule } from './cart/cart.module';
 import { ClinicModule } from './clinic/clinic.module';
+import { WishlistModule } from './wishlist/wishlist.module';
+import { ProfileModule } from './profile/profile.module';
 import { DashboardPartnerModule } from './dashboard-partner/dashboard-partner.module';
 import { PartnerFinanceModule } from './partner-finance/partner-finance.module';
 import { HealthModule } from './health/health.module';
+import { TestBackdoorModule } from './test-backdoor/test-backdoor.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 import rabbitmqConfig from './config/rabbitmq.config';
@@ -41,12 +44,15 @@ import { PerformanceMetricsInterceptor } from './common/interceptors/performance
 import { PublicThrottlerGuard } from './common/guards';
 import { WsContractBootstrapService } from './common/services/ws-contract-bootstrap.service';
 
+const envFilePath =
+  process.env.NODE_ENV === 'test' ? ['.env.test', '.env'] : '.env';
+
 @Module({
   imports: [
     DiscoveryModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath,
       load: [databaseConfig, redisConfig, rabbitmqConfig, mapboxConfig],
     }),
     // Rate limiting: 1000 requests per 60 seconds per tracker for public routes
@@ -82,7 +88,7 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
           // Connection pool: sized for the auth-heavy perf profile.
           // Revisit per-process max before scaling API workers horizontally.
           extra: {
-            max: 50,                  // max pool connections (default: 10)
+            max: 50, // max pool connections (default: 10)
             idleTimeoutMillis: 30000, // close idle connections after 30s
             connectionTimeoutMillis: 5000, // fail fast if pool exhausted
           },
@@ -111,9 +117,12 @@ import { WsContractBootstrapService } from './common/services/ws-contract-bootst
     NotificationModule,
     CartModule,
     ClinicModule,
+    WishlistModule,
+    ProfileModule,
     DashboardPartnerModule,
     PartnerFinanceModule,
     HealthModule,
+    ...(process.env.NODE_ENV === 'test' ? [TestBackdoorModule] : []),
   ],
   providers: [
     {

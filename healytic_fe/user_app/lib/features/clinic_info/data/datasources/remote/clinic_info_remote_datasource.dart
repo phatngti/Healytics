@@ -1,10 +1,12 @@
 import 'dart:developer';
+import 'dart:convert';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_openapi/api.dart';
 
 import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/providers/api.provider.dart';
+import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/clinic_info/domain/entities/clinic_info.entity.dart';
 import 'package:user_app/features/clinic_info/domain/entities/clinic_product.entity.dart';
 import 'package:user_app/features/clinic_info/domain/entities/clinic_review.entity.dart';
@@ -17,9 +19,7 @@ import 'clinic_reviews_mock_data.dart';
 /// remote source.
 abstract class ClinicInfoRemoteDatasource {
   /// `GET /user/clinics/:id/info`
-  Future<ClinicInfoEntity> getClinicInfo(
-    String clinicId,
-  );
+  Future<ClinicInfoEntity> getClinicInfo(String clinicId);
 
   /// `GET /user/clinics/:id/products`
   Future<ClinicProductsData> getClinicProducts(
@@ -39,6 +39,8 @@ abstract class ClinicInfoRemoteDatasource {
     int? starCount,
     bool? hasMedia,
   });
+
+  Future<ClinicInfoEntity> setFollowing(String clinicId, bool isFollowing);
 }
 
 // ─────────────────────────────────────────────────────
@@ -47,25 +49,54 @@ abstract class ClinicInfoRemoteDatasource {
 
 /// Calls the backend clinic endpoints and maps the
 /// response DTOs to domain entities defensively.
-class ClinicInfoRemoteDatasourceImpl
-    implements ClinicInfoRemoteDatasource {
-  const ClinicInfoRemoteDatasourceImpl(this._api);
+class ClinicInfoRemoteDatasourceImpl implements ClinicInfoRemoteDatasource {
+  const ClinicInfoRemoteDatasourceImpl(this._apiService);
 
-  final UserClinicsApi _api;
+  final ApiService _apiService;
+  UserClinicsApi get _api => _apiService.userClinicsApi;
 
   @override
-  Future<ClinicInfoEntity> getClinicInfo(
+  Future<ClinicInfoEntity> getClinicInfo(String clinicId) async {
+    final response = await _apiService.apiClient.invokeAPI(
+      '/user/clinics/$clinicId/info',
+      'GET',
+      const [],
+      null,
+      {},
+      {},
+      null,
+    );
+    if (response.statusCode >= 400 || response.body.isEmpty) {
+      throw ApiException(404, 'Clinic info not found for $clinicId');
+    }
+    return _mapClinicInfoJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
+  }
+
+  @override
+  Future<ClinicInfoEntity> setFollowing(
     String clinicId,
+    bool isFollowing,
   ) async {
-    final dto = await _api
-        .userClinicControllerGetClinicInfo(clinicId);
-    if (dto == null) {
+    final response = await _apiService.apiClient.invokeAPI(
+      '/user/clinics/$clinicId/follow',
+      isFollowing ? 'POST' : 'DELETE',
+      const [],
+      null,
+      {},
+      {},
+      null,
+    );
+    if (response.statusCode >= 400 || response.body.isEmpty) {
       throw ApiException(
-        404,
-        'Clinic info not found for $clinicId',
+        response.statusCode,
+        'Failed to update clinic follow state',
       );
     }
-    return _mapClinicInfo(dto);
+    return _mapClinicInfoJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
+    );
   }
 
   @override
@@ -77,8 +108,7 @@ class ClinicInfoRemoteDatasourceImpl
     int page = 1,
     int limit = 20,
   }) async {
-    final dto = await _api
-        .userClinicControllerGetClinicProducts(
+    final dto = await _api.userClinicControllerGetClinicProducts(
       clinicId,
       categoryId: categoryId,
       sort: sort.toApiValue(),
@@ -87,10 +117,7 @@ class ClinicInfoRemoteDatasourceImpl
       limit: limit,
     );
     if (dto == null) {
-      throw ApiException(
-        404,
-        'Clinic products not found for $clinicId',
-      );
+      throw ApiException(404, 'Clinic products not found for $clinicId');
     }
     return _mapProducts(dto);
   }
@@ -103,8 +130,7 @@ class ClinicInfoRemoteDatasourceImpl
     int? starCount,
     bool? hasMedia,
   }) async {
-    final dto = await _api
-        .userClinicControllerGetClinicReviews(
+    final dto = await _api.userClinicControllerGetClinicReviews(
       clinicId,
       page: page,
       limit: limit,
@@ -112,123 +138,113 @@ class ClinicInfoRemoteDatasourceImpl
       hasMedia: hasMedia,
     );
     if (dto == null) {
-      throw ApiException(
-        404,
-        'Clinic reviews not found for $clinicId',
-      );
+      throw ApiException(404, 'Clinic reviews not found for $clinicId');
     }
     return _mapReviews(dto);
   }
 
   // ── Clinic Info Mapping ───────────────────────────
 
-  ClinicInfoEntity _mapClinicInfo(
-    ClinicInfoResponseDto dto,
-  ) {
+  ClinicInfoEntity _mapClinicInfoJson(Map<String, dynamic> dto) {
+    final trustMetrics = _asMap(dto['trustMetrics']);
     return ClinicInfoEntity(
-      id: dto.id,
-      name: dto.name,
-      coverImageUrl: dto.coverImageUrl?.toString(),
-      logoImageUrl: dto.logoImageUrl?.toString(),
-      gallery: dto.gallery,
-      followersLabel: dto.followersLabel,
-      reviewsLabel: dto.reviewsLabel,
-      description: dto.description?.toString(),
-      address: dto.address?.toString(),
-      phoneNumber: dto.phoneNumber?.toString(),
-      trustMetrics: _mapTrustMetrics(dto.trustMetrics),
-      certifications: dto.certifications
-          .map(_mapCertification)
-          .toList(),
-      specialists: dto.specialists
-          .map(_mapSpecialist)
-          .toList(),
-      businessTypes: dto.businessTypes,
-      facilityImages: dto.gallery
+      id: dto['id']?.toString() ?? '',
+      name: dto['name']?.toString() ?? '',
+      coverImageUrl: dto['coverImageUrl']?.toString(),
+      logoImageUrl: dto['logoImageUrl']?.toString(),
+      gallery: _stringList(dto['gallery']),
+      followersLabel: dto['followersLabel']?.toString() ?? '0',
+      followerCount: _toInt(dto['followerCount']),
+      isFollowing: dto['isFollowing'] == true,
+      chatPartnerId: dto['chatPartnerId']?.toString(),
+      reviewsLabel: dto['reviewsLabel']?.toString() ?? '0',
+      description: dto['description']?.toString(),
+      address: dto['address']?.toString(),
+      phoneNumber: dto['phoneNumber']?.toString(),
+      trustMetrics: ClinicTrustMetrics(
+        rating: _toDouble(trustMetrics['rating']),
+        reviewCount: _toInt(trustMetrics['reviewCount']),
+        experienceLabel: trustMetrics['experienceLabel']?.toString() ?? '',
+        clientsLabel: trustMetrics['clientsLabel']?.toString() ?? '',
+      ),
+      certifications: _listOfMaps(dto['certifications'])
           .map(
-            (url) => ClinicFacilityImage(
-              imageUrl: url,
-              label: '',
+            (c) => ClinicCertification(
+              title: c['title']?.toString() ?? '',
+              subtitle: c['subtitle']?.toString() ?? '',
+              iconName: c['iconName']?.toString() ?? '',
             ),
           )
           .toList(),
+      specialists: _listOfMaps(dto['specialists'])
+          .map(
+            (s) => ClinicSpecialistPreview(
+              id: s['id']?.toString() ?? '',
+              name: s['name']?.toString() ?? '',
+              role: s['role']?.toString() ?? '',
+              imageUrl: s['imageUrl']?.toString(),
+              experienceLabel: s['experienceLabel']?.toString(),
+            ),
+          )
+          .toList(),
+      businessTypes: _stringList(dto['businessTypes']),
+      facilityImages: _stringList(
+        dto['gallery'],
+      ).map((url) => ClinicFacilityImage(imageUrl: url, label: '')).toList(),
     );
   }
 
-  ClinicTrustMetrics _mapTrustMetrics(
-    ClinicTrustMetricsDto dto,
-  ) {
-    return ClinicTrustMetrics(
-      rating: dto.rating.toDouble(),
-      reviewCount: dto.reviewCount.toInt(),
-      experienceLabel: dto.experienceLabel,
-      clientsLabel: dto.clientsLabel,
-    );
+  Map<String, dynamic> _asMap(Object? raw) {
+    if (raw is Map<String, dynamic>) return raw;
+    if (raw is Map) return raw.cast<String, dynamic>();
+    return <String, dynamic>{};
   }
 
-  ClinicCertification _mapCertification(
-    ClinicCertificationDto dto,
-  ) {
-    return ClinicCertification(
-      title: dto.title,
-      subtitle: dto.subtitle?.toString() ?? '',
-      iconName: dto.iconName,
-    );
+  List<Map<String, dynamic>> _listOfMaps(Object? raw) {
+    if (raw is! List) return [];
+    return raw.map(_asMap).toList();
   }
 
-  ClinicSpecialistPreview _mapSpecialist(
-    ClinicSpecialistPreviewDto dto,
-  ) {
-    return ClinicSpecialistPreview(
-      id: dto.id,
-      name: dto.name,
-      role: dto.role,
-      imageUrl: dto.imageUrl?.toString(),
-      experienceLabel:
-          dto.experienceLabel?.toString(),
-    );
+  List<String> _stringList(Object? raw) {
+    if (raw is! List) return [];
+    return raw.map((e) => e.toString()).toList();
+  }
+
+  int _toInt(Object? raw) {
+    if (raw is num) return raw.toInt();
+    return int.tryParse(raw?.toString() ?? '') ?? 0;
+  }
+
+  double _toDouble(Object? raw) {
+    if (raw is num) return raw.toDouble();
+    return double.tryParse(raw?.toString() ?? '') ?? 0;
   }
 
   // ── Products Mapping ──────────────────────────────
 
-  ClinicProductsData _mapProducts(
-    ClinicProductsResponseDto dto,
-  ) {
+  ClinicProductsData _mapProducts(ClinicProductsResponseDto dto) {
     return ClinicProductsData(
       categories: dto.categories
-          .map(
-            (item) => ClinicProductCategory(
-              id: item.id,
-              label: item.label,
-            ),
-          )
+          .map((item) => ClinicProductCategory(id: item.id, label: item.label))
           .toList(),
-      products: dto.products
-          .map(_mapProduct)
-          .toList(),
+      products: dto.products.map(_mapProduct).toList(),
       totalCount: dto.totalCount.toInt(),
       hasMore: dto.hasMore,
     );
   }
 
-  ClinicProductEntity _mapProduct(
-    ClinicProductDto dto,
-  ) {
+  ClinicProductEntity _mapProduct(ClinicProductDto dto) {
     return ClinicProductEntity(
       id: dto.id,
       title: dto.title,
       imageUrl: dto.imageUrl?.toString(),
       price: dto.price,
       priceAmount: dto.priceAmount.toDouble(),
-      originalPrice:
-          dto.originalPrice?.toString(),
-      discountLabel:
-          dto.discountLabel?.toString(),
+      originalPrice: dto.originalPrice?.toString(),
+      discountLabel: dto.discountLabel?.toString(),
       badgeLabel: dto.badgeLabel?.toString(),
-      durationLabel:
-          dto.durationLabel?.toString(),
-      specialistLabel:
-          dto.specialistLabel?.toString(),
+      durationLabel: dto.durationLabel?.toString(),
+      specialistLabel: dto.specialistLabel?.toString(),
       categoryId: dto.categoryId,
       soldCount: dto.soldCount.toInt(),
       createdAtMs: dto.createdAtMs.toInt(),
@@ -237,117 +253,75 @@ class ClinicInfoRemoteDatasourceImpl
 
   // ── Reviews Mapping ───────────────────────────────
 
-  ClinicReviewsData _mapReviews(
-    ClinicReviewsResponseDto dto,
-  ) {
+  ClinicReviewsData _mapReviews(ClinicReviewsResponseDto dto) {
     return ClinicReviewsData(
       summary: _mapReviewSummary(dto.summary),
-      filters: dto.filters
-          .map(_mapReviewFilter)
-          .toList(),
-      reviews: dto.reviews
-          .map(_mapReview)
-          .toList(),
+      filters: dto.filters.map(_mapReviewFilter).toList(),
+      reviews: dto.reviews.map(_mapReview).toList(),
       totalCount: dto.totalCount.toInt(),
       hasMore: dto.hasMore,
     );
   }
 
-  ClinicReviewSummary _mapReviewSummary(
-    ClinicReviewSummaryDto dto,
-  ) {
+  ClinicReviewSummary _mapReviewSummary(ClinicReviewSummaryDto dto) {
     return ClinicReviewSummary(
       averageRating: dto.averageRating.toDouble(),
-      totalReviewCount:
-          dto.totalReviewCount.toInt(),
+      totalReviewCount: dto.totalReviewCount.toInt(),
       ratingLabel: dto.ratingLabel,
-      starDistribution:
-          _parseStarDistribution(
-        dto.starDistribution,
-      ),
+      starDistribution: _parseStarDistribution(dto.starDistribution),
     );
   }
 
   /// Defensively parses the star distribution from
   /// the API's `Object` type to `Map<int, double>`.
-  Map<int, double> _parseStarDistribution(
-    Object raw,
-  ) {
-    final result = <int, double>{
-      5: 0,
-      4: 0,
-      3: 0,
-      2: 0,
-      1: 0,
-    };
+  Map<int, double> _parseStarDistribution(Object raw) {
+    final result = <int, double>{5: 0, 4: 0, 3: 0, 2: 0, 1: 0};
     try {
       if (raw is Map) {
         for (final entry in raw.entries) {
-          final star = int.tryParse(
-            entry.key.toString(),
-          );
-          final value = double.tryParse(
-            entry.value.toString(),
-          );
+          final star = int.tryParse(entry.key.toString());
+          final value = double.tryParse(entry.value.toString());
           if (star != null && value != null) {
             result[star] = value;
           }
         }
       }
     } catch (e) {
-      log(
-        'Failed to parse starDistribution: $e',
-        name: 'ClinicInfoDatasource',
-      );
+      log('Failed to parse starDistribution: $e', name: 'ClinicInfoDatasource');
     }
     return result;
   }
 
-  ClinicReviewFilter _mapReviewFilter(
-    ClinicReviewFilterDto dto,
-  ) {
+  ClinicReviewFilter _mapReviewFilter(ClinicReviewFilterDto dto) {
     return ClinicReviewFilter(
       id: dto.id,
       label: dto.label,
-      starCount: int.tryParse(
-        dto.starCount?.toString() ?? '',
-      ),
+      starCount: int.tryParse(dto.starCount?.toString() ?? ''),
       requiresMedia: dto.requiresMedia,
     );
   }
 
-  ClinicReviewEntity _mapReview(
-    ClinicReviewDto dto,
-  ) {
+  ClinicReviewEntity _mapReview(ClinicReviewDto dto) {
     return ClinicReviewEntity(
       id: dto.id,
       reviewerName: dto.reviewerName,
       reviewerInitial: dto.reviewerInitial,
       starCount: dto.starCount.toInt(),
-      memberBadge:
-          dto.memberBadge?.toString(),
+      memberBadge: dto.memberBadge?.toString(),
       dateLabel: dto.dateLabel,
-      serviceName:
-          dto.serviceName?.toString(),
-      serviceIcon:
-          dto.serviceIcon?.toString(),
+      serviceName: dto.serviceName?.toString(),
+      serviceIcon: dto.serviceIcon?.toString(),
       reviewText: dto.reviewText,
       mediaUrls: dto.mediaUrls,
-      clinicResponse: _mapClinicResponse(
-        dto.clinicResponse,
-      ),
+      clinicResponse: _mapClinicResponse(dto.clinicResponse),
     );
   }
 
-  ClinicReviewResponse? _mapClinicResponse(
-    ClinicReviewResponseSubDto? dto,
-  ) {
+  ClinicReviewResponse? _mapClinicResponse(ClinicReviewResponseSubDto? dto) {
     if (dto == null) return null;
     final text = dto.responseText?.toString();
     if (text == null || text.isEmpty) return null;
-    return ClinicReviewResponse(
-      responseText: text,
-    );
+    return ClinicReviewResponse(responseText: text);
   }
 }
 
@@ -356,76 +330,47 @@ class ClinicInfoRemoteDatasourceImpl
 // ─────────────────────────────────────────────────────
 
 /// Returns fake data after a simulated network delay.
-class ClinicInfoRemoteDatasourceMock
-    implements ClinicInfoRemoteDatasource {
+class ClinicInfoRemoteDatasourceMock implements ClinicInfoRemoteDatasource {
   @override
-  Future<ClinicInfoEntity> getClinicInfo(
-    String clinicId,
-  ) async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
-    return kMockClinicInfoMap[clinicId] ??
-        kMockClinicInfo;
+  Future<ClinicInfoEntity> getClinicInfo(String clinicId) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return kMockClinicInfoMap[clinicId] ?? kMockClinicInfo;
   }
 
   @override
   Future<ClinicProductsData> getClinicProducts(
     String clinicId, {
     String? categoryId,
-    ClinicProductSort sort =
-        ClinicProductSort.popular,
+    ClinicProductSort sort = ClinicProductSort.popular,
     String? search,
     int page = 1,
     int limit = 20,
   }) async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+    await Future.delayed(const Duration(milliseconds: 500));
 
     var items = kMockClinicProducts.toList();
 
     // -- Category filter --
     if (categoryId != null && categoryId != 'all') {
-      items = items
-          .where((p) => p.categoryId == categoryId)
-          .toList();
+      items = items.where((p) => p.categoryId == categoryId).toList();
     }
 
     // -- Search filter --
     if (search != null && search.isNotEmpty) {
       final q = search.toLowerCase();
-      items = items
-          .where(
-            (p) => p.title
-                .toLowerCase()
-                .contains(q),
-          )
-          .toList();
+      items = items.where((p) => p.title.toLowerCase().contains(q)).toList();
     }
 
     // -- Sort --
     switch (sort) {
       case ClinicProductSort.latest:
-        items.sort(
-          (a, b) => b.createdAtMs
-              .compareTo(a.createdAtMs),
-        );
+        items.sort((a, b) => b.createdAtMs.compareTo(a.createdAtMs));
       case ClinicProductSort.topSales:
-        items.sort(
-          (a, b) => b.soldCount
-              .compareTo(a.soldCount),
-        );
+        items.sort((a, b) => b.soldCount.compareTo(a.soldCount));
       case ClinicProductSort.priceAsc:
-        items.sort(
-          (a, b) => a.priceAmount
-              .compareTo(b.priceAmount),
-        );
+        items.sort((a, b) => a.priceAmount.compareTo(b.priceAmount));
       case ClinicProductSort.priceDesc:
-        items.sort(
-          (a, b) => b.priceAmount
-              .compareTo(a.priceAmount),
-        );
+        items.sort((a, b) => b.priceAmount.compareTo(a.priceAmount));
       case ClinicProductSort.popular:
         break; // keep default order
     }
@@ -435,10 +380,7 @@ class ClinicInfoRemoteDatasourceMock
     final start = (page - 1) * limit;
     final end = start + limit;
     final paged = start < total
-        ? items.sublist(
-            start,
-            end > total ? total : end,
-          )
+        ? items.sublist(start, end > total ? total : end)
         : <ClinicProductEntity>[];
 
     return ClinicProductsData(
@@ -457,17 +399,13 @@ class ClinicInfoRemoteDatasourceMock
     int? starCount,
     bool? hasMedia,
   }) async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+    await Future.delayed(const Duration(milliseconds: 500));
 
     var all = kMockClinicReviews.toList();
 
     // -- Server-side-like filtering --
     if (starCount != null) {
-      all = all
-          .where((r) => r.starCount == starCount)
-          .toList();
+      all = all.where((r) => r.starCount == starCount).toList();
     }
     if (hasMedia == true) {
       all = all.where((r) => r.hasMedia).toList();
@@ -476,10 +414,7 @@ class ClinicInfoRemoteDatasourceMock
     final start = (page - 1) * limit;
     final end = start + limit;
     final paged = start < all.length
-        ? all.sublist(
-            start,
-            end > all.length ? all.length : end,
-          )
+        ? all.sublist(start, end > all.length ? all.length : end)
         : <ClinicReviewEntity>[];
 
     return ClinicReviewsData(
@@ -490,6 +425,23 @@ class ClinicInfoRemoteDatasourceMock
       hasMore: end < all.length,
     );
   }
+
+  @override
+  Future<ClinicInfoEntity> setFollowing(
+    String clinicId,
+    bool isFollowing,
+  ) async {
+    await Future.delayed(const Duration(milliseconds: 150));
+    final current = kMockClinicInfoMap[clinicId] ?? kMockClinicInfo;
+    final nextCount = (current.followerCount + (isFollowing ? 1 : -1))
+        .clamp(0, 1 << 31)
+        .toInt();
+    return current.copyWith(
+      isFollowing: isFollowing,
+      followerCount: nextCount,
+      followersLabel: nextCount.toString(),
+    );
+  }
 }
 
 // ─────────────────────────────────────────────────────
@@ -498,15 +450,12 @@ class ClinicInfoRemoteDatasourceMock
 
 /// Uses [AppEnvironment.useMock] to switch between
 /// real and mock implementations at runtime.
-final clinicInfoRemoteDatasourceProvider =
-    Provider<ClinicInfoRemoteDatasource>(
+final clinicInfoRemoteDatasourceProvider = Provider<ClinicInfoRemoteDatasource>(
   (ref) {
     if (AppEnvironment.current.useMock) {
       return ClinicInfoRemoteDatasourceMock();
     }
     final apiService = ref.read(apiServiceProvider);
-    return ClinicInfoRemoteDatasourceImpl(
-      apiService.userClinicsApi,
-    );
+    return ClinicInfoRemoteDatasourceImpl(apiService);
   },
 );

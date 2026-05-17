@@ -71,6 +71,118 @@ class AdminPartnersApi {
     return null;
   }
 
+  /// Get partner dashboard statistics
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [num] page:
+  ///   Page number (1-indexed)
+  ///
+  /// * [num] limit:
+  ///   Items per page
+  ///
+  /// * [AdminPartnerScope] scope:
+  ///   Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS
+  ///
+  /// * [PartnerVerificationStatus] verificationStatus:
+  ///   Explicit status filter
+  ///
+  /// * [String] search:
+  ///   Search by tax code, brand name, legal name, or email
+  ///
+  /// * [AdminPartnerSortBy] sortBy:
+  ///   Column to sort by
+  ///
+  /// * [AdminPartnerSortDirection] sortDirection:
+  ///   Sort direction
+  Future<Response> adminPartnersControllerGetPartnerStatsWithHttpInfo({ num? page, num? limit, AdminPartnerScope? scope, PartnerVerificationStatus? verificationStatus, String? search, AdminPartnerSortBy? sortBy, AdminPartnerSortDirection? sortDirection, }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/admin/partners/stats';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    if (page != null) {
+      queryParams.addAll(_queryParams('', 'page', page));
+    }
+    if (limit != null) {
+      queryParams.addAll(_queryParams('', 'limit', limit));
+    }
+    if (scope != null) {
+      queryParams.addAll(_queryParams('', 'scope', scope));
+    }
+    if (verificationStatus != null) {
+      queryParams.addAll(_queryParams('', 'verificationStatus', verificationStatus));
+    }
+    if (search != null) {
+      queryParams.addAll(_queryParams('', 'search', search));
+    }
+    if (sortBy != null) {
+      queryParams.addAll(_queryParams('', 'sortBy', sortBy));
+    }
+    if (sortDirection != null) {
+      queryParams.addAll(_queryParams('', 'sortDirection', sortDirection));
+    }
+
+    const contentTypes = <String>[];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get partner dashboard statistics
+  ///
+  /// Parameters:
+  ///
+  /// * [num] page:
+  ///   Page number (1-indexed)
+  ///
+  /// * [num] limit:
+  ///   Items per page
+  ///
+  /// * [AdminPartnerScope] scope:
+  ///   Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS
+  ///
+  /// * [PartnerVerificationStatus] verificationStatus:
+  ///   Explicit status filter
+  ///
+  /// * [String] search:
+  ///   Search by tax code, brand name, legal name, or email
+  ///
+  /// * [AdminPartnerSortBy] sortBy:
+  ///   Column to sort by
+  ///
+  /// * [AdminPartnerSortDirection] sortDirection:
+  ///   Sort direction
+  Future<AdminPartnerStatsResponseDto?> adminPartnersControllerGetPartnerStats({ num? page, num? limit, AdminPartnerScope? scope, PartnerVerificationStatus? verificationStatus, String? search, AdminPartnerSortBy? sortBy, AdminPartnerSortDirection? sortDirection, }) async {
+    final response = await adminPartnersControllerGetPartnerStatsWithHttpInfo( page: page, limit: limit, scope: scope, verificationStatus: verificationStatus, search: search, sortBy: sortBy, sortDirection: sortDirection, );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminPartnerStatsResponseDto',) as AdminPartnerStatsResponseDto;
+    
+    }
+    return null;
+  }
+
   /// List all partners
   ///
   /// Note: This method returns the HTTP [Response].
@@ -78,17 +190,26 @@ class AdminPartnersApi {
   /// Parameters:
   ///
   /// * [num] page:
-  ///   Page number
+  ///   Page number (1-indexed)
   ///
   /// * [num] limit:
   ///   Items per page
   ///
-  /// * [String] verificationStatus:
-  ///   Filter by verification status (PENDING, REQUIRED_RESUBMIT, APPROVED, REJECTED)
+  /// * [AdminPartnerScope] scope:
+  ///   Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS
+  ///
+  /// * [PartnerVerificationStatus] verificationStatus:
+  ///   Explicit status filter
   ///
   /// * [String] search:
   ///   Search by tax code, brand name, legal name, or email
-  Future<Response> adminPartnersControllerGetPartnersWithHttpInfo({ num? page, num? limit, String? verificationStatus, String? search, }) async {
+  ///
+  /// * [AdminPartnerSortBy] sortBy:
+  ///   Column to sort by
+  ///
+  /// * [AdminPartnerSortDirection] sortDirection:
+  ///   Sort direction
+  Future<Response> adminPartnersControllerGetPartnersWithHttpInfo({ num? page, num? limit, AdminPartnerScope? scope, PartnerVerificationStatus? verificationStatus, String? search, AdminPartnerSortBy? sortBy, AdminPartnerSortDirection? sortDirection, }) async {
     // ignore: prefer_const_declarations
     final path = r'/admin/partners';
 
@@ -105,11 +226,20 @@ class AdminPartnersApi {
     if (limit != null) {
       queryParams.addAll(_queryParams('', 'limit', limit));
     }
+    if (scope != null) {
+      queryParams.addAll(_queryParams('', 'scope', scope));
+    }
     if (verificationStatus != null) {
       queryParams.addAll(_queryParams('', 'verificationStatus', verificationStatus));
     }
     if (search != null) {
       queryParams.addAll(_queryParams('', 'search', search));
+    }
+    if (sortBy != null) {
+      queryParams.addAll(_queryParams('', 'sortBy', sortBy));
+    }
+    if (sortDirection != null) {
+      queryParams.addAll(_queryParams('', 'sortDirection', sortDirection));
     }
 
     const contentTypes = <String>[];
@@ -131,18 +261,27 @@ class AdminPartnersApi {
   /// Parameters:
   ///
   /// * [num] page:
-  ///   Page number
+  ///   Page number (1-indexed)
   ///
   /// * [num] limit:
   ///   Items per page
   ///
-  /// * [String] verificationStatus:
-  ///   Filter by verification status (PENDING, REQUIRED_RESUBMIT, APPROVED, REJECTED)
+  /// * [AdminPartnerScope] scope:
+  ///   Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS
+  ///
+  /// * [PartnerVerificationStatus] verificationStatus:
+  ///   Explicit status filter
   ///
   /// * [String] search:
   ///   Search by tax code, brand name, legal name, or email
-  Future<PartnersResponseDto?> adminPartnersControllerGetPartners({ num? page, num? limit, String? verificationStatus, String? search, }) async {
-    final response = await adminPartnersControllerGetPartnersWithHttpInfo( page: page, limit: limit, verificationStatus: verificationStatus, search: search, );
+  ///
+  /// * [AdminPartnerSortBy] sortBy:
+  ///   Column to sort by
+  ///
+  /// * [AdminPartnerSortDirection] sortDirection:
+  ///   Sort direction
+  Future<AdminPartnersResponseDto?> adminPartnersControllerGetPartners({ num? page, num? limit, AdminPartnerScope? scope, PartnerVerificationStatus? verificationStatus, String? search, AdminPartnerSortBy? sortBy, AdminPartnerSortDirection? sortDirection, }) async {
+    final response = await adminPartnersControllerGetPartnersWithHttpInfo( page: page, limit: limit, scope: scope, verificationStatus: verificationStatus, search: search, sortBy: sortBy, sortDirection: sortDirection, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -150,7 +289,7 @@ class AdminPartnersApi {
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnersResponseDto',) as PartnersResponseDto;
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminPartnersResponseDto',) as AdminPartnersResponseDto;
     
     }
     return null;
@@ -159,7 +298,30 @@ class AdminPartnersApi {
   /// Get total number of partners
   ///
   /// Note: This method returns the HTTP [Response].
-  Future<Response> adminPartnersControllerGetTotalPartnersWithHttpInfo() async {
+  ///
+  /// Parameters:
+  ///
+  /// * [num] page:
+  ///   Page number (1-indexed)
+  ///
+  /// * [num] limit:
+  ///   Items per page
+  ///
+  /// * [AdminPartnerScope] scope:
+  ///   Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS
+  ///
+  /// * [PartnerVerificationStatus] verificationStatus:
+  ///   Explicit status filter
+  ///
+  /// * [String] search:
+  ///   Search by tax code, brand name, legal name, or email
+  ///
+  /// * [AdminPartnerSortBy] sortBy:
+  ///   Column to sort by
+  ///
+  /// * [AdminPartnerSortDirection] sortDirection:
+  ///   Sort direction
+  Future<Response> adminPartnersControllerGetTotalPartnersWithHttpInfo({ num? page, num? limit, AdminPartnerScope? scope, PartnerVerificationStatus? verificationStatus, String? search, AdminPartnerSortBy? sortBy, AdminPartnerSortDirection? sortDirection, }) async {
     // ignore: prefer_const_declarations
     final path = r'/admin/partners/total';
 
@@ -169,6 +331,28 @@ class AdminPartnersApi {
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
+
+    if (page != null) {
+      queryParams.addAll(_queryParams('', 'page', page));
+    }
+    if (limit != null) {
+      queryParams.addAll(_queryParams('', 'limit', limit));
+    }
+    if (scope != null) {
+      queryParams.addAll(_queryParams('', 'scope', scope));
+    }
+    if (verificationStatus != null) {
+      queryParams.addAll(_queryParams('', 'verificationStatus', verificationStatus));
+    }
+    if (search != null) {
+      queryParams.addAll(_queryParams('', 'search', search));
+    }
+    if (sortBy != null) {
+      queryParams.addAll(_queryParams('', 'sortBy', sortBy));
+    }
+    if (sortDirection != null) {
+      queryParams.addAll(_queryParams('', 'sortDirection', sortDirection));
+    }
 
     const contentTypes = <String>[];
 
@@ -185,8 +369,31 @@ class AdminPartnersApi {
   }
 
   /// Get total number of partners
-  Future<TotalPartnersResponseDto?> adminPartnersControllerGetTotalPartners() async {
-    final response = await adminPartnersControllerGetTotalPartnersWithHttpInfo();
+  ///
+  /// Parameters:
+  ///
+  /// * [num] page:
+  ///   Page number (1-indexed)
+  ///
+  /// * [num] limit:
+  ///   Items per page
+  ///
+  /// * [AdminPartnerScope] scope:
+  ///   Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS
+  ///
+  /// * [PartnerVerificationStatus] verificationStatus:
+  ///   Explicit status filter
+  ///
+  /// * [String] search:
+  ///   Search by tax code, brand name, legal name, or email
+  ///
+  /// * [AdminPartnerSortBy] sortBy:
+  ///   Column to sort by
+  ///
+  /// * [AdminPartnerSortDirection] sortDirection:
+  ///   Sort direction
+  Future<TotalPartnersResponseDto?> adminPartnersControllerGetTotalPartners({ num? page, num? limit, AdminPartnerScope? scope, PartnerVerificationStatus? verificationStatus, String? search, AdminPartnerSortBy? sortBy, AdminPartnerSortDirection? sortDirection, }) async {
+    final response = await adminPartnersControllerGetTotalPartnersWithHttpInfo( page: page, limit: limit, scope: scope, verificationStatus: verificationStatus, search: search, sortBy: sortBy, sortDirection: sortDirection, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

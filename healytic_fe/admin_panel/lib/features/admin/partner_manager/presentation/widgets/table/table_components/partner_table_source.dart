@@ -1,71 +1,163 @@
-import 'package:admin_panel/features/admin/partner_manager/datasource/partner_verification_remote.datasource.dart';
+import 'package:admin_panel/features/admin/partner_manager/datasource/partner_verification_impl.repository.dart';
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification.entity.dart';
-import 'package:common/widgets/table/helper.dart';
+import 'package:admin_panel/features/admin/partner_manager/presentation/providers/partner_manager_state.dart';
 import 'package:admin_panel/router/admin_routes.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:common/widgets/table/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
-/// Data source for the partner verification table
-class PartnerTableSource {
-  static Future<int> getTotalRows(WidgetRef ref) async {
-    final dataSource = ref.read(partnerVerificationRemoteDataSourceProvider);
-    return dataSource.getTotalRows();
+/// Small per-table page cache so AppTable's paired
+/// total/data callbacks can share the same list API response.
+class PartnerTablePageCache {
+  PartnerTablePageCache({
+    required this.ref,
+    required this.state,
+    required this.prefetchCount,
+  });
+
+  final WidgetRef ref;
+  final PartnerManagerState state;
+  final int prefetchCount;
+
+  PartnerVerificationPageEntity? _cachedPage;
+  int? _cachedStartingAt;
+  int? _cachedCount;
+
+  Future<int> getTotalRows() async {
+    final page = await _fetchPage(startingAt: 0, count: prefetchCount);
+    return page.total;
   }
 
+  Future<List<DataRow>> getData(
+    BuildContext context,
+    SetRowSelectionCallback setRowSelection,
+    int startingAt,
+    int count,
+  ) async {
+    final page = await _fetchPage(startingAt: startingAt, count: count);
+    if (!context.mounted) {
+      return [];
+    }
+    return PartnerTableSource.buildRows(context, page.items);
+  }
+
+  Future<PartnerVerificationPageEntity> _fetchPage({
+    required int startingAt,
+    required int count,
+  }) async {
+    if (_cachedPage != null &&
+        _cachedStartingAt == startingAt &&
+        _cachedCount == count) {
+      return _cachedPage!;
+    }
+
+    final repository = ref.read(partnerVerificationRepositoryProvider);
+    final page = await repository.getPartnerVerificationPage(
+      startingAt: startingAt,
+      count: count,
+      scope: state.scope,
+      searchQuery: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+      sortedBy: state.sortBy,
+      sortedAsc: state.sortAsc,
+      statusFilter: state.statusFilter,
+      quickFilter: state.quickFilter,
+    );
+
+    _cachedPage = page;
+    _cachedStartingAt = startingAt;
+    _cachedCount = count;
+    return page;
+  }
+}
+
+/// Data source for the partner verification table.
+/// Routes all data access through the repository.
+class PartnerTableSource {
+  /// Fetches total rows matching the current
+  /// workspace state filters.
+  static Future<int> getTotalRows(
+    WidgetRef ref,
+    PartnerManagerState state,
+  ) async {
+    final repository = ref.read(partnerVerificationRepositoryProvider);
+    return repository.getTotalRows(
+      scope: state.scope,
+      searchQuery: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+      statusFilter: state.statusFilter,
+      quickFilter: state.quickFilter,
+    );
+  }
+
+  /// Fetches a page of data rows matching the
+  /// current workspace state filters.
   static Future<List<DataRow>> getData(
     BuildContext context,
     WidgetRef ref,
     SetRowSelectionCallback setRowSelection,
     int startingAt,
     int count,
+    PartnerManagerState state,
   ) async {
-    final dataSource = ref.read(partnerVerificationRemoteDataSourceProvider);
-    final partners = await dataSource.getPartnerVerifications(
+    final repository = ref.read(partnerVerificationRepositoryProvider);
+    final partners = await repository.getPartnerVerifications(
       startingAt: startingAt,
       count: count,
-      sortedBy: 'submittedAt',
-      sortedAsc: false,
+      scope: state.scope,
+      searchQuery: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+      sortedBy: state.sortBy,
+      sortedAsc: state.sortAsc,
+      statusFilter: state.statusFilter,
+      quickFilter: state.quickFilter,
     );
+    if (!context.mounted) {
+      return [];
+    }
 
-    final rows = partners.map((partner) {
-      final isHighPriority = partner.priority == PartnerPriority.high;
-      final isNotPending = partner.status != PartnerVerificationStatus.pending;
+    return buildRows(context, partners);
+  }
 
-      return DataRow(
-        key: ValueKey<String>(partner.id.value),
-        color: WidgetStateProperty.resolveWith<Color?>((states) {
-          if (isHighPriority &&
-              partner.status == PartnerVerificationStatus.pending) {
-            return _getDangerColor(context).withValues(alpha: 0.05);
-          }
-          return null;
-        }),
-        onSelectChanged: isNotPending
-            ? null
-            : (value) {
-                if (value != null) {
-                  setRowSelection(ValueKey<String>(partner.id.value), value);
-                }
-              },
-        cells: [
-          // Provider Details
-          DataCell(_buildProviderDetails(context, partner)),
-          // Business Type
-          DataCell(_buildServiceTypes(context, partner.serviceTypes)),
-          // Submitted Date
-          DataCell(_buildSubmittedDate(context, partner)),
-          // Status
-          DataCell(_buildStatusBadge(context, partner.status)),
-          // Actions
-          DataCell(_buildActionButton(context, partner)),
-        ],
-      );
+  /// Converts partner entities into table rows.
+  static List<DataRow> buildRows(
+    BuildContext context,
+    List<PartnerVerificationEntity> partners,
+  ) {
+    return partners.map((partner) {
+      return _buildRow(context, partner);
     }).toList();
+  }
 
-    return rows;
+  static DataRow _buildRow(
+    BuildContext context,
+    PartnerVerificationEntity partner,
+  ) {
+    final isHighPriority = partner.priority == PartnerPriority.high;
+    final isReviewable = _isReviewable(partner.status);
+
+    return DataRow(
+      key: ValueKey<String>(partner.id.value),
+      color: WidgetStateProperty.resolveWith<Color?>((states) {
+        if (isHighPriority && isReviewable) {
+          return _getDangerColor(context).withValues(alpha: 0.05);
+        }
+        return null;
+      }),
+      cells: [
+        DataCell(_buildProviderDetails(context, partner)),
+        DataCell(_buildServiceTypes(context, partner.serviceTypes)),
+        DataCell(_buildSubmittedDate(context, partner)),
+        DataCell(_buildStatusBadge(context, partner.status)),
+        DataCell(_buildActionButton(context, partner)),
+      ],
+    );
+  }
+
+  /// Whether the partner status allows review.
+  static bool _isReviewable(PartnerVerificationStatus status) {
+    return status == PartnerVerificationStatus.pending ||
+        status == PartnerVerificationStatus.requiredResubmit;
   }
 
   static Widget _buildProviderDetails(
@@ -140,7 +232,7 @@ class PartnerTableSource {
                       maxLines: 1,
                     ),
                   ),
-                  if (partner.isEmailVerified) ...[
+                  if (partner.isAccountActive) ...[
                     AppDimens.horizontalSmall,
                     Icon(
                       Icons.verified,
@@ -163,6 +255,15 @@ class PartnerTableSource {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    if (serviceTypes.isEmpty) {
+      return Text(
+        '—',
+        style: textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+      );
+    }
 
     return Wrap(
       spacing: 4,
@@ -237,6 +338,10 @@ class PartnerTableSource {
       case PartnerVerificationStatus.pending:
         badgeColor = semantics?.warning ?? Colors.orange;
         label = 'Pending';
+      case PartnerVerificationStatus.requiredResubmit:
+        badgeColor = semantics?.warning ?? Colors.orange;
+        label = 'Changes Required';
+        icon = Icons.edit_note;
       case PartnerVerificationStatus.approved:
         badgeColor = semantics?.success ?? Colors.green;
         label = 'Active';
@@ -285,17 +390,20 @@ class PartnerTableSource {
     PartnerVerificationEntity partner,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isPending = partner.status == PartnerVerificationStatus.pending;
+    final isReviewable = _isReviewable(partner.status);
 
     return IconButton(
       onPressed: () {
-        if (isPending) {
+        if (isReviewable) {
           ReviewApplicationRoute(partnerId: partner.id.value).go(context);
         } else {
           ViewPartnerDetailRoute(partnerId: partner.id.value).go(context);
         }
       },
-      icon: Icon(isPending ? Icons.edit_document : Icons.visibility, size: 20),
+      icon: Icon(
+        isReviewable ? Icons.edit_document : Icons.visibility,
+        size: 20,
+      ),
       style:
           IconButton.styleFrom(
             foregroundColor: colorScheme.onSurfaceVariant,
@@ -314,7 +422,7 @@ class PartnerTableSource {
               return Colors.transparent;
             }),
           ),
-      tooltip: isPending ? 'Review Application' : 'View Details',
+      tooltip: isReviewable ? 'Review Application' : 'View Details',
     );
   }
 

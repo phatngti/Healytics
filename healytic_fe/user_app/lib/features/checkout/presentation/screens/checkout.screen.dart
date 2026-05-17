@@ -1,7 +1,11 @@
+import 'dart:async';
+
+import 'package:app_links/app_links.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/features/checkout/presentation/providers/checkout.provider.dart';
 import 'package:user_app/features/checkout/presentation/providers/momo_launcher.dart';
@@ -11,25 +15,28 @@ import 'package:user_app/features/checkout/presentation/widgets/order_items_sect
 import 'package:user_app/features/checkout/presentation/widgets/payment_details_section.widget.dart';
 import 'package:user_app/features/checkout/presentation/widgets/payment_method_section.widget.dart';
 import 'package:user_app/features/checkout/presentation/widgets/vouchers_section.widget.dart';
+import 'package:user_app/router/routes.dart';
 
 /// Main checkout screen composing all section widgets.
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
 
   @override
-  ConsumerState<CheckoutScreen> createState() =>
-      _CheckoutScreenState();
+  ConsumerState<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
-class _CheckoutScreenState
-    extends ConsumerState<CheckoutScreen> {
+class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   /// Listens for the app returning to the foreground
   /// after the user visits MoMo.
   AppLifecycleListener? _lifecycleListener;
+  StreamSubscription<Uri>? _moMoReturnSubscription;
+  String? _activeMoMoBookingId;
+  bool _moMoReturnHandled = false;
 
   @override
   void dispose() {
     _lifecycleListener?.dispose();
+    _moMoReturnSubscription?.cancel();
     super.dispose();
   }
 
@@ -42,12 +49,8 @@ class _CheckoutScreenState
     // Listen for submission status changes.
     ref.listen<AsyncValue<CheckoutState>>(
       checkoutProvider,
-      (prev, next) => _handleSubmissionChange(
-        context,
-        ref,
-        prev?.value,
-        next.value,
-      ),
+      (prev, next) =>
+          _handleSubmissionChange(context, ref, prev?.value, next.value),
     );
 
     return Scaffold(
@@ -66,14 +69,11 @@ class _CheckoutScreenState
         ),
         centerTitle: true,
         surfaceTintColor: Colors.transparent,
-        backgroundColor:
-            colorScheme.surface.withValues(alpha: 0.9),
+        backgroundColor: colorScheme.surface.withValues(alpha: 0.9),
       ),
       body: checkoutAsync.when(
-        loading: () =>
-            const Center(child: CircularProgressIndicator()),
-        error: (error, _) =>
-            Center(child: Text('Error: $error')),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(child: Text('Error: $error')),
         data: (state) => _CheckoutBody(state: state),
       ),
     );
@@ -92,18 +92,16 @@ class _CheckoutScreenState
 
     switch (next.submissionStatus) {
       case CheckoutSubmissionStatus.failed:
+        _disposeMoMoReturnHandlers();
         ToastContext.showToast(
           context,
           ToastType.error,
-          next.errorMessage ??
-              'Checkout failed. Please try again.',
+          next.errorMessage ?? 'Checkout failed. Please try again.',
         );
-        ref
-            .read(checkoutProvider.notifier)
-            .resetSubmission();
+        ref.read(checkoutProvider.notifier).resetSubmission();
 
       case CheckoutSubmissionStatus.success:
-        _disposeLifecycleListener();
+        _disposeMoMoReturnHandlers();
         _showSuccessDialog(context, next);
 
       case CheckoutSubmissionStatus.awaitingMoMoPayment:
@@ -125,24 +123,23 @@ class _CheckoutScreenState
     WidgetRef ref,
     CheckoutState state,
   ) {
-    launchMoMoPayment(
-      deeplink: state.moMoDeeplink,
-      payUrl: state.moMoPayUrl,
-    );
-
-    // Dispose any previous listener before creating.
-    _disposeLifecycleListener();
-
     final bookingId = state.booking?.id;
     if (bookingId == null) return;
 
+    _startMoMoReturnListener(bookingId);
+
+    launchMoMoPayment(deeplink: state.moMoDeeplink, payUrl: state.moMoPayUrl);
+
+    // Dispose any previous lifecycle listener before creating.
+    _disposeLifecycleListener();
+
     _lifecycleListener = AppLifecycleListener(
       onResume: () {
+        if (_moMoReturnHandled) return;
+        _moMoReturnHandled = true;
         // Only verify once — dispose immediately.
-        _disposeLifecycleListener();
-        ref
-            .read(checkoutProvider.notifier)
-            .verifyMoMoPayment(bookingId);
+        _disposeMoMoReturnHandlers();
+        ref.read(checkoutProvider.notifier).verifyMoMoPayment(bookingId);
       },
     );
   }
@@ -173,15 +170,11 @@ class _CheckoutScreenState
       // On-device confirmation succeeded — verify
       // via webhook polling.
       if (!context.mounted) return;
-      ref
-          .read(checkoutProvider.notifier)
-          .verifyStripePayment(bookingId);
+      ref.read(checkoutProvider.notifier).verifyStripePayment(bookingId);
     } on StripeException catch (e) {
       if (e.error.code == FailureCode.Canceled) {
         // User dismissed the payment sheet.
-        ref
-            .read(checkoutProvider.notifier)
-            .resetSubmission();
+        ref.read(checkoutProvider.notifier).resetSubmission();
         return;
       }
 
@@ -191,9 +184,7 @@ class _CheckoutScreenState
         ToastType.error,
         e.error.localizedMessage ?? 'Payment failed',
       );
-      ref
-          .read(checkoutProvider.notifier)
-          .resetSubmission();
+      ref.read(checkoutProvider.notifier).resetSubmission();
     }
   }
 
@@ -202,10 +193,59 @@ class _CheckoutScreenState
     _lifecycleListener = null;
   }
 
-  void _showSuccessDialog(
-    BuildContext context,
-    CheckoutState state,
-  ) {
+  void _startMoMoReturnListener(String bookingId) {
+    _disposeMoMoReturnHandlers();
+    _activeMoMoBookingId = bookingId;
+    _moMoReturnHandled = false;
+
+    final appLinks = AppLinks();
+    _moMoReturnSubscription = appLinks.uriLinkStream.listen(
+      _handleMoMoReturnUri,
+    );
+  }
+
+  void _handleMoMoReturnUri(Uri uri) {
+    if (_moMoReturnHandled || !_isMoMoReturnUri(uri)) return;
+
+    final bookingId = uri.queryParameters['bookingId'];
+    if (bookingId == null ||
+        bookingId.isEmpty ||
+        bookingId != _activeMoMoBookingId) {
+      return;
+    }
+
+    _moMoReturnHandled = true;
+    _disposeMoMoReturnHandlers();
+
+    final resultCode = uri.queryParameters['resultCode'];
+    if (resultCode == null || resultCode == '0') {
+      ref.read(checkoutProvider.notifier).verifyMoMoPayment(bookingId);
+      return;
+    }
+
+    if (!mounted) return;
+    ToastContext.showToast(
+      context,
+      ToastType.error,
+      uri.queryParameters['message'] ?? 'MoMo payment was cancelled or failed.',
+    );
+    ref.read(checkoutProvider.notifier).resetSubmission();
+  }
+
+  bool _isMoMoReturnUri(Uri uri) {
+    return uri.scheme == 'healytics' &&
+        uri.host == 'payment' &&
+        uri.path == '/momo/success';
+  }
+
+  void _disposeMoMoReturnHandlers() {
+    _disposeLifecycleListener();
+    _moMoReturnSubscription?.cancel();
+    _moMoReturnSubscription = null;
+    _activeMoMoBookingId = null;
+  }
+
+  void _showSuccessDialog(BuildContext context, CheckoutState state) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final booking = state.booking;
@@ -214,9 +254,7 @@ class _CheckoutScreenState
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: AppDimens.radiusMedium,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: AppDimens.radiusMedium),
         icon: Icon(
           Icons.check_circle_rounded,
           color: colorScheme.primary,
@@ -224,8 +262,7 @@ class _CheckoutScreenState
         ),
         title: Text(
           'Booking Confirmed!',
-          style: textTheme.titleMedium
-              ?.copyWith(fontWeight: FontWeight.bold),
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         content: Text(
           booking?.paymentUrl != null
@@ -241,7 +278,7 @@ class _CheckoutScreenState
           FilledButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              Navigator.of(context).maybePop();
+              const OrderApprovedRoute().go(context);
             },
             child: const Text('Done'),
           ),
@@ -274,12 +311,7 @@ class _CheckoutBody extends ConsumerWidget {
     return Stack(
       children: [
         ListView(
-          padding: EdgeInsets.fromLTRB(
-            hPad,
-            section,
-            hPad,
-            bottomBar,
-          ),
+          padding: EdgeInsets.fromLTRB(hPad, section, hPad, bottomBar),
           children: [
             OrderItemsSection(items: data.items),
             SizedBox(height: section),
@@ -325,9 +357,7 @@ class _CheckoutBody extends ConsumerWidget {
                 CheckoutSubmissionStatus.awaitingMoMoPayment ||
             state.submissionStatus ==
                 CheckoutSubmissionStatus.awaitingStripePayment)
-          Positioned.fill(
-            child: CheckoutSubmissionOverlay(state: state),
-          ),
+          Positioned.fill(child: CheckoutSubmissionOverlay(state: state)),
       ],
     );
   }

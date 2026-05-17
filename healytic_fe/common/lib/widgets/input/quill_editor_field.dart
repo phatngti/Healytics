@@ -27,6 +27,9 @@ class _AppQuillEditorField extends StatelessWidget {
   /// Whether the field is enabled (reduces opacity when disabled).
   final bool enabled;
 
+  /// Whether the field is required (shows asterisk).
+  final bool isRequired;
+
   /// Creates an [_AppQuillEditorField].
   const _AppQuillEditorField({
     required this.name,
@@ -36,6 +39,7 @@ class _AppQuillEditorField extends StatelessWidget {
     this.height = 250,
     this.labelStyle,
     this.enabled = true,
+    this.isRequired = false,
   });
 
   @override
@@ -70,13 +74,29 @@ class _AppQuillEditorField extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (label.isNotEmpty) ...[
-                Text(
-                  label,
-                  style:
-                      labelStyle ??
-                      Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: label,
+                        style:
+                            labelStyle ??
+                            Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
                       ),
+                      if (isRequired)
+                        const TextSpan(
+                          text: ' *',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
                 AppDimens.verticalExtraSmall,
               ],

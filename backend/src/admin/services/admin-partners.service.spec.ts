@@ -22,6 +22,7 @@ describe('AdminPartnersService', () => {
     skip: jest.fn().mockReturnThis(),
     take: jest.fn().mockReturnThis(),
     getManyAndCount: jest.fn(),
+    getCount: jest.fn(),
   };
 
   const mockPartnerRepo = {
@@ -105,7 +106,7 @@ describe('AdminPartnersService', () => {
   describe('getTotalPartners', () => {
     it('should return total partner count', async () => {
       // Arrange
-      mockPartnerRepo.count.mockResolvedValue(42);
+      mockQueryBuilder.getCount.mockResolvedValue(42);
 
       // Act
       const result = await service.getTotalPartners();

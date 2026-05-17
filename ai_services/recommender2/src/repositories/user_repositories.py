@@ -120,7 +120,7 @@ async def build_user_profile(
         {
             "user_id":             str,
             "email":               str | None,
-            "username":            str | None,
+            "username":            None,
             "name":                str | None,
             "phone":               str | None,
             "bio":                 str | None,
@@ -162,7 +162,7 @@ async def build_user_profile(
         # ── Identity (from account) ──────────────────────────────────
         "user_id":             str(user_id),
         "email":               account.email,
-        "username":            account.username,
+        "username":            None,
 
         # ── Personal info (from user_profile) ───────────────────────
         "name":                name,                 # first + last

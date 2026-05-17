@@ -7,8 +7,10 @@ import {
 import { DataSource } from 'typeorm';
 import { Booking } from '@/common/entities/booking.entity';
 import { Employee } from '@/common/entities/employee.entity';
+import { Partner } from '@/common/entities/partner.entity';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
+import { EmployeeAppointmentResponseDto } from '../../dto/employee/employee-appointment-response.dto';
 
 /**
  * Handler for canceling an appointment by the employee.
@@ -30,7 +32,7 @@ export class CancelEmployeeAppointmentHandler {
     accountId: string,
     bookingId: string,
     reason?: string,
-  ): Promise<Booking> {
+  ): Promise<EmployeeAppointmentResponseDto> {
     this.logger.log(`Canceling appointment: ${bookingId}`);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -40,7 +42,7 @@ export class CancelEmployeeAppointmentHandler {
       // 1. Resolve employee
       const employee = await queryRunner.manager.findOne(Employee, {
         where: { accountId },
-        select: ['id'],
+        select: ['id', 'partnerId'],
       });
       if (!employee) {
         throw new NotFoundException(
@@ -103,7 +105,26 @@ export class CancelEmployeeAppointmentHandler {
           'user.userProfile',
         ],
       });
-      return reloaded!;
+
+      // Resolve clinic info from partner
+      let clinicName = 'Healytics Clinic';
+      let clinicAddress = '';
+      if (employee.partnerId) {
+        const partner = await this.dataSource.manager.findOne(Partner, {
+          where: { id: employee.partnerId },
+          select: ['id', 'brandName', 'streetAddress'],
+        });
+        if (partner) {
+          clinicName = partner.brandName ?? clinicName;
+          clinicAddress = partner.streetAddress ?? '';
+        }
+      }
+
+      return EmployeeAppointmentResponseDto.fromBooking(
+        reloaded!,
+        clinicName,
+        clinicAddress,
+      );
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(

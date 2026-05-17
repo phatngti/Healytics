@@ -6,8 +6,9 @@ part 'update_employee.request.g.dart';
 
 /// Request model for updating an existing employee.
 ///
-/// Contains all fields that can be updated for an employee.
-/// The [id] field is required to identify which employee to update.
+/// Contains only fields that changed in the edit form.
+/// The [id] field identifies the employee to update; [fields]
+/// is sent as the sparse PATCH payload.
 @Freezed(toJson: true)
 abstract class UpdateEmployeeRequest with _$UpdateEmployeeRequest {
   /// Creates a new [UpdateEmployeeRequest].
@@ -15,47 +16,10 @@ abstract class UpdateEmployeeRequest with _$UpdateEmployeeRequest {
     /// The unique identifier of the employee to update.
     required EmployeeId id,
 
-    /// Updated full name.
-    required String fullName,
-
-    /// Updated display name.
-    required String displayName,
-
-    /// Updated avatar URL.
-    required String avatar,
-
-    /// Updated role (e.g., 'DOCTOR', 'THERAPIST').
-    required String role,
-
-    /// Updated position/title.
-    required String position,
-
-    /// Updated status (e.g., 'ACTIVE', 'INACTIVE', 'ON_LEAVE').
-    required String status,
-
-    /// Updated branch assignment.
-    required String branch,
-
-    /// Updated email address.
-    required String email,
-
-    /// Updated phone number.
-    required String phone,
-
-    /// Updated street address.
-    required String address,
-
-    /// Updated city.
-    required String city,
-
-    /// Updated state/province.
-    required String state,
-
-    /// Updated country.
-    required String country,
-
-    /// Updated verification documents.
-    @Default([]) List<Map<String, dynamic>> verificationDocuments,
+    /// Sparse API field map. Keys are backend DTO
+    /// field names such as `firstName`,
+    /// `doctorProfile`, or `therapistProfile`.
+    @Default(<String, dynamic>{}) Map<String, dynamic> fields,
   }) = _UpdateEmployeeRequest;
 
   /// Creates an [UpdateEmployeeRequest] from JSON data.

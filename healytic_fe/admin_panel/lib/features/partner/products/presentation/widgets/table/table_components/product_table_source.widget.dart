@@ -1,3 +1,4 @@
+import 'package:admin_panel/core/keys/integration_test_keys.dart';
 import 'package:common/widgets/table/helper.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_table_actions.widget.dart';
@@ -15,24 +16,28 @@ class ProductTableSource {
   ) async {
     final products = await ref
         .read(productProvider.notifier)
-        .getProducts(
-          startingAt: startingAt,
-          count: count,
-          search: null,
-          sortAscending: false,
-        );
+        .getVisiblePage(startingAt: startingAt, count: count);
+    if (!context.mounted) return [];
+
+    final selectedIds =
+        ref.read(productProvider).value?.selectedIds ?? const <String>{};
 
     final rows = products.map((product) {
       return DataRow(
         key: ValueKey<String>(product.id.value),
+        selected: selectedIds.contains(product.id.value),
         onSelectChanged: (value) {
           if (value != null) {
             setRowSelection(ValueKey<String>(product.id.value), value);
+            ref
+                .read(productProvider.notifier)
+                .toggleSelection(product.id.value, value);
           }
         },
         cells: [
           DataCell(
-            Center(
+            Align(
+              alignment: Alignment.centerLeft,
               child: Text(
                 product.id.value,
                 maxLines: 1,
@@ -41,7 +46,8 @@ class ProductTableSource {
             ),
           ),
           DataCell(
-            Center(
+            Align(
+              alignment: Alignment.centerLeft,
               child: product.images.isNotEmpty && product.images[0].isNotEmpty
                   ? SizedBox(
                       width: 50,
@@ -60,17 +66,30 @@ class ProductTableSource {
                     ),
             ),
           ),
-          DataCell(Center(child: Text(product.category.name))),
-          DataCell(Center(child: Text(product.name))),
-          DataCell(Center(child: Text(product.basePrice.toString()))),
+          DataCell(Align(
+            alignment: Alignment.centerLeft,
+            child: Text(product.category.name),
+          )),
+          DataCell(Align(
+            alignment: Alignment.centerLeft,
+            child: Text(product.name),
+          )),
+          DataCell(Align(
+            alignment: Alignment.centerLeft,
+            child: Text(product.basePrice.toString()),
+          )),
         ],
       );
     }).toList();
 
     // Add action button cells to each row
-    final actionButtons = ProductTableActions.buildRowActionButtons(context);
+    final actionButtons = ProductTableActions.buildRowActionButtons(
+      context,
+      ref,
+    );
     if (actionButtons.isNotEmpty) {
       for (final row in rows) {
+        final rowId = (row.key as ValueKey<String>).value;
         row.cells.add(
           DataCell(
             Center(
@@ -79,6 +98,12 @@ class ProductTableSource {
                 children: actionButtons
                     .map(
                       (action) => IconButton(
+                        key: action.icon == Icons.delete
+                            ? keys.managementTables.rowDeleteButton(
+                                'product',
+                                rowId,
+                              )
+                            : null,
                         onPressed: () => action.onPressed(row.key),
                         icon: Icon(action.icon, size: 20),
                         padding: AppDimens.paddingAllExtraSmall,

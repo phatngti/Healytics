@@ -73,9 +73,42 @@ Class | Method | HTTP request | Description
 *AdminCategoriesApi* | [**adminCategoriesControllerFindOne**](doc//AdminCategoriesApi.md#admincategoriescontrollerfindone) | **GET** /admin/categories/{id} | Get a category by id (admin view)
 *AdminCategoriesApi* | [**adminCategoriesControllerRemove**](doc//AdminCategoriesApi.md#admincategoriescontrollerremove) | **DELETE** /admin/categories/{id} | Delete a category
 *AdminCategoriesApi* | [**adminCategoriesControllerUpdate**](doc//AdminCategoriesApi.md#admincategoriescontrollerupdate) | **PATCH** /admin/categories/{id} | Update a category
+*AdminDashboardApi* | [**adminDashboardControllerGetBookingOutcomeSummary**](doc//AdminDashboardApi.md#admindashboardcontrollergetbookingoutcomesummary) | **GET** /admin/dashboard/booking-outcomes | Get booking outcome summary
+*AdminDashboardApi* | [**adminDashboardControllerGetCategoryHealth**](doc//AdminDashboardApi.md#admindashboardcontrollergetcategoryhealth) | **GET** /admin/dashboard/category-health | Get service category health overview
+*AdminDashboardApi* | [**adminDashboardControllerGetNotifications**](doc//AdminDashboardApi.md#admindashboardcontrollergetnotifications) | **GET** /admin/dashboard/notifications | Get admin dashboard notifications
+*AdminDashboardApi* | [**adminDashboardControllerGetOverview**](doc//AdminDashboardApi.md#admindashboardcontrollergetoverview) | **GET** /admin/dashboard/overview | Get admin dashboard overview metrics
+*AdminDashboardApi* | [**adminDashboardControllerGetRevenueTrend**](doc//AdminDashboardApi.md#admindashboardcontrollergetrevenuetrend) | **GET** /admin/dashboard/revenue-trend | Get admin revenue trend data points
+*AdminDashboardApi* | [**adminDashboardControllerGetTopPartners**](doc//AdminDashboardApi.md#admindashboardcontrollergettoppartners) | **GET** /admin/dashboard/top-partners | Get top performing partners by revenue
+*AdminDashboardApi* | [**adminDashboardControllerGetTopServices**](doc//AdminDashboardApi.md#admindashboardcontrollergettopservices) | **GET** /admin/dashboard/top-services | Get top performing services by revenue
+*AdminDashboardApi* | [**adminDashboardControllerGetTransactionHealth**](doc//AdminDashboardApi.md#admindashboardcontrollergettransactionhealth) | **GET** /admin/dashboard/transaction-health | Get transaction health breakdown
+*AdminFinanceApi* | [**adminFinanceControllerAddNote**](doc//AdminFinanceApi.md#adminfinancecontrolleraddnote) | **POST** /admin/finance/notes | Add a note to a finance entity
+*AdminFinanceApi* | [**adminFinanceControllerApproveRefundCase**](doc//AdminFinanceApi.md#adminfinancecontrollerapproverefundcase) | **POST** /admin/finance/refund-cases/{id}/approve | Approve a refund or dispute case
+*AdminFinanceApi* | [**adminFinanceControllerCreateExport**](doc//AdminFinanceApi.md#adminfinancecontrollercreateexport) | **POST** /admin/finance/exports | Create a finance export job
+*AdminFinanceApi* | [**adminFinanceControllerFlagTransaction**](doc//AdminFinanceApi.md#adminfinancecontrollerflagtransaction) | **PATCH** /admin/finance/transactions/{id}/review-flag | Flag or unflag a transaction for finance review
+*AdminFinanceApi* | [**adminFinanceControllerGetAlerts**](doc//AdminFinanceApi.md#adminfinancecontrollergetalerts) | **GET** /admin/finance/alerts | Get derived operational finance alerts
+*AdminFinanceApi* | [**adminFinanceControllerGetExports**](doc//AdminFinanceApi.md#adminfinancecontrollergetexports) | **GET** /admin/finance/exports | List finance export jobs
+*AdminFinanceApi* | [**adminFinanceControllerGetPartnerExposure**](doc//AdminFinanceApi.md#adminfinancecontrollergetpartnerexposure) | **GET** /admin/finance/partner-exposure | Rank partner financial exposure
+*AdminFinanceApi* | [**adminFinanceControllerGetPayoutDetail**](doc//AdminFinanceApi.md#adminfinancecontrollergetpayoutdetail) | **GET** /admin/finance/payouts/{id} | Get payout detail
+*AdminFinanceApi* | [**adminFinanceControllerGetPayouts**](doc//AdminFinanceApi.md#adminfinancecontrollergetpayouts) | **GET** /admin/finance/payouts | List platform payouts
+*AdminFinanceApi* | [**adminFinanceControllerGetReconciliation**](doc//AdminFinanceApi.md#adminfinancecontrollergetreconciliation) | **GET** /admin/finance/reconciliation | List reconciliation exceptions
+*AdminFinanceApi* | [**adminFinanceControllerGetReconciliationDetail**](doc//AdminFinanceApi.md#adminfinancecontrollergetreconciliationdetail) | **GET** /admin/finance/reconciliation/{id} | Get reconciliation exception detail
+*AdminFinanceApi* | [**adminFinanceControllerGetRefundCaseDetail**](doc//AdminFinanceApi.md#adminfinancecontrollergetrefundcasedetail) | **GET** /admin/finance/refund-cases/{id} | Get refund or dispute case detail
+*AdminFinanceApi* | [**adminFinanceControllerGetRefundCases**](doc//AdminFinanceApi.md#adminfinancecontrollergetrefundcases) | **GET** /admin/finance/refund-cases | List platform refund and dispute cases
+*AdminFinanceApi* | [**adminFinanceControllerGetSummary**](doc//AdminFinanceApi.md#adminfinancecontrollergetsummary) | **GET** /admin/finance/summary | Get platform-wide admin finance summary metrics
+*AdminFinanceApi* | [**adminFinanceControllerGetTransactionDetail**](doc//AdminFinanceApi.md#adminfinancecontrollergettransactiondetail) | **GET** /admin/finance/transactions/{id} | Get platform ledger transaction detail
+*AdminFinanceApi* | [**adminFinanceControllerGetTransactions**](doc//AdminFinanceApi.md#adminfinancecontrollergettransactions) | **GET** /admin/finance/transactions | List platform ledger transactions
+*AdminFinanceApi* | [**adminFinanceControllerGetTrend**](doc//AdminFinanceApi.md#adminfinancecontrollergettrend) | **GET** /admin/finance/trend | Get platform-wide finance trend data
+*AdminFinanceApi* | [**adminFinanceControllerHoldPayout**](doc//AdminFinanceApi.md#adminfinancecontrollerholdpayout) | **POST** /admin/finance/payouts/{id}/hold | Place an admin hold on a payout
+*AdminFinanceApi* | [**adminFinanceControllerMarkSettlement**](doc//AdminFinanceApi.md#adminfinancecontrollermarksettlement) | **PATCH** /admin/finance/transactions/{id}/settlement | Mark transaction settlement status with an admin note
+*AdminFinanceApi* | [**adminFinanceControllerRejectRefundCase**](doc//AdminFinanceApi.md#adminfinancecontrollerrejectrefundcase) | **POST** /admin/finance/refund-cases/{id}/reject | Reject a refund or dispute case
+*AdminFinanceApi* | [**adminFinanceControllerReleasePayoutHold**](doc//AdminFinanceApi.md#adminfinancecontrollerreleasepayouthold) | **POST** /admin/finance/payouts/{id}/release-hold | Release an admin hold from a payout
+*AdminFinanceApi* | [**adminFinanceControllerReopenReconciliation**](doc//AdminFinanceApi.md#adminfinancecontrollerreopenreconciliation) | **POST** /admin/finance/reconciliation/{id}/reopen | Reopen a reconciliation exception
+*AdminFinanceApi* | [**adminFinanceControllerResolveReconciliation**](doc//AdminFinanceApi.md#adminfinancecontrollerresolvereconciliation) | **POST** /admin/finance/reconciliation/{id}/resolve | Resolve a reconciliation exception
+*AdminFinanceApi* | [**adminFinanceControllerRetryPayout**](doc//AdminFinanceApi.md#adminfinancecontrollerretrypayout) | **POST** /admin/finance/payouts/{id}/retry | Retry a failed or held payout
 *AdminNotificationsApi* | [**adminNotificationControllerCreateBroadcast**](doc//AdminNotificationsApi.md#adminnotificationcontrollercreatebroadcast) | **POST** /admin/notifications/broadcast | Create and send a system-wide broadcast notification
 *AdminNotificationsApi* | [**adminNotificationControllerGetBroadcasts**](doc//AdminNotificationsApi.md#adminnotificationcontrollergetbroadcasts) | **GET** /admin/notifications/broadcasts | List sent broadcast notifications (audit)
 *AdminPartnersApi* | [**adminPartnersControllerGetPartnerDetail**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartnerdetail) | **GET** /admin/partners/{id} | Get partner details including documents
+*AdminPartnersApi* | [**adminPartnersControllerGetPartnerStats**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartnerstats) | **GET** /admin/partners/stats | Get partner dashboard statistics
 *AdminPartnersApi* | [**adminPartnersControllerGetPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergetpartners) | **GET** /admin/partners | List all partners
 *AdminPartnersApi* | [**adminPartnersControllerGetTotalPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergettotalpartners) | **GET** /admin/partners/total | Get total number of partners
 *AdminPartnersApi* | [**adminPartnersControllerReviewPartner**](doc//AdminPartnersApi.md#adminpartnerscontrollerreviewpartner) | **PUT** /admin/partners/{id}/review | Review partner profile
@@ -133,12 +166,17 @@ Class | Method | HTTP request | Description
 *PartnerDashboardApi* | [**partnerDashboardControllerGetStats**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetstats) | **GET** /partner/dashboard/stats | Get aggregated KPI statistics
 *PartnerDashboardApi* | [**partnerDashboardControllerGetUpcomingAppointments**](doc//PartnerDashboardApi.md#partnerdashboardcontrollergetupcomingappointments) | **GET** /partner/dashboard/appointments/upcoming | Get upcoming appointments
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateDoctor**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatedoctor) | **POST** /partner/employees/doctors | Create a new doctor
+*PartnerEmployeesApi* | [**partnerEmployeesControllerCreateMassageSkill**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatemassageskill) | **POST** /partner/employees/massage-skills | Create a massage skill
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateMassageTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatemassagetherapist) | **POST** /partner/employees/massage-therapists | Create a new massage therapist
+*PartnerEmployeesApi* | [**partnerEmployeesControllerCreateSpaSkill**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatespaskill) | **POST** /partner/employees/spa-skills | Create a spa skill
 *PartnerEmployeesApi* | [**partnerEmployeesControllerCreateSpaTherapist**](doc//PartnerEmployeesApi.md#partneremployeescontrollercreatespatherapist) | **POST** /partner/employees/spa-therapists | Create a new spa therapist
 *PartnerEmployeesApi* | [**partnerEmployeesControllerFindAll**](doc//PartnerEmployeesApi.md#partneremployeescontrollerfindall) | **GET** /partner/employees | Get all employees for this partner
+*PartnerEmployeesApi* | [**partnerEmployeesControllerFindAssignedServices**](doc//PartnerEmployeesApi.md#partneremployeescontrollerfindassignedservices) | **GET** /partner/employees/{id}/services | Get services assigned to an employee
 *PartnerEmployeesApi* | [**partnerEmployeesControllerFindOne**](doc//PartnerEmployeesApi.md#partneremployeescontrollerfindone) | **GET** /partner/employees/{id} | Get an employee by id
 *PartnerEmployeesApi* | [**partnerEmployeesControllerGetDetailAnalytics**](doc//PartnerEmployeesApi.md#partneremployeescontrollergetdetailanalytics) | **GET** /partner/employees/analytics/{employeeId} | Get per-employee detail analytics
+*PartnerEmployeesApi* | [**partnerEmployeesControllerGetMassageSkills**](doc//PartnerEmployeesApi.md#partneremployeescontrollergetmassageskills) | **GET** /partner/employees/massage-skills | Get massage skill catalog
 *PartnerEmployeesApi* | [**partnerEmployeesControllerGetOverviewAnalytics**](doc//PartnerEmployeesApi.md#partneremployeescontrollergetoverviewanalytics) | **GET** /partner/employees/analytics/overview | Get employee overview analytics
+*PartnerEmployeesApi* | [**partnerEmployeesControllerGetSpaSkills**](doc//PartnerEmployeesApi.md#partneremployeescontrollergetspaskills) | **GET** /partner/employees/spa-skills | Get spa skill catalog
 *PartnerEmployeesApi* | [**partnerEmployeesControllerRemove**](doc//PartnerEmployeesApi.md#partneremployeescontrollerremove) | **DELETE** /partner/employees/{id} | Delete an employee
 *PartnerEmployeesApi* | [**partnerEmployeesControllerUpdate**](doc//PartnerEmployeesApi.md#partneremployeescontrollerupdate) | **PATCH** /partner/employees/{id} | Update an employee
 *PartnerHealthServicesApi* | [**partnerHealthServiceControllerCreate**](doc//PartnerHealthServicesApi.md#partnerhealthservicecontrollercreate) | **POST** /partner/health-services | Create a new health service
@@ -198,13 +236,16 @@ Class | Method | HTTP request | Description
 *UserChatApi* | [**userChatControllerGetConversations**](doc//UserChatApi.md#userchatcontrollergetconversations) | **GET** /user/chat/conversations | List all conversations for the current user
 *UserChatApi* | [**userChatControllerGetMessages**](doc//UserChatApi.md#userchatcontrollergetmessages) | **GET** /user/chat/conversations/{id}/messages | Get message history for a conversation (cursor-paginated)
 *UserChatApi* | [**userChatControllerMarkRead**](doc//UserChatApi.md#userchatcontrollermarkread) | **POST** /user/chat/conversations/{id}/read | Mark all messages in a conversation as read
+*UserClinicsApi* | [**userClinicControllerFollowClinic**](doc//UserClinicsApi.md#usercliniccontrollerfollowclinic) | **POST** /user/clinics/{id}/follow | Follow a clinic
 *UserClinicsApi* | [**userClinicControllerGetClinicInfo**](doc//UserClinicsApi.md#usercliniccontrollergetclinicinfo) | **GET** /user/clinics/{id}/info | Get public clinic profile
 *UserClinicsApi* | [**userClinicControllerGetClinicProducts**](doc//UserClinicsApi.md#usercliniccontrollergetclinicproducts) | **GET** /user/clinics/{id}/products | Get clinic products/services catalog
 *UserClinicsApi* | [**userClinicControllerGetClinicReviews**](doc//UserClinicsApi.md#usercliniccontrollergetclinicreviews) | **GET** /user/clinics/{id}/reviews | Get paginated clinic reviews
+*UserClinicsApi* | [**userClinicControllerUnfollowClinic**](doc//UserClinicsApi.md#usercliniccontrollerunfollowclinic) | **DELETE** /user/clinics/{id}/follow | Unfollow a clinic
 *UserDevicesApi* | [**userDeviceControllerRegisterDevice**](doc//UserDevicesApi.md#userdevicecontrollerregisterdevice) | **POST** /user/devices | Register a device token for push notifications
 *UserDevicesApi* | [**userDeviceControllerUnregisterDevice**](doc//UserDevicesApi.md#userdevicecontrollerunregisterdevice) | **DELETE** /user/devices/{token} | Unregister a device token (e.g. on logout)
 *UserEmployeesApi* | [**userEmployeesControllerFindAll**](doc//UserEmployeesApi.md#useremployeescontrollerfindall) | **GET** /user/employees | Get all employees
 *UserEmployeesApi* | [**userEmployeesControllerFindOne**](doc//UserEmployeesApi.md#useremployeescontrollerfindone) | **GET** /user/employees/{id} | Get an employee by id
+*UserEmployeesApi* | [**userEmployeesControllerFindReviews**](doc//UserEmployeesApi.md#useremployeescontrollerfindreviews) | **GET** /user/employees/{id}/reviews | Get reviews for an employee
 *UserEmployeesApi* | [**userEmployeesControllerFindServices**](doc//UserEmployeesApi.md#useremployeescontrollerfindservices) | **GET** /user/employees/{id}/services | Get services for a specialist
 *UserEmployeesApi* | [**userEmployeesControllerGetFeaturedSpecialists**](doc//UserEmployeesApi.md#useremployeescontrollergetfeaturedspecialists) | **GET** /user/employees/featured-specialists | Get featured specialists for home page
 *UserEmployeesApi* | [**userEmployeesControllerGetTimeSlots**](doc//UserEmployeesApi.md#useremployeescontrollergettimeslots) | **GET** /user/employees/{id}/time-slots | Get time slots with availability for an employee
@@ -225,10 +266,14 @@ Class | Method | HTTP request | Description
 *UserPaymentsApi* | [**userPaymentControllerCreateStripePayment**](doc//UserPaymentsApi.md#userpaymentcontrollercreatestripepayment) | **POST** /user/payments/stripe/{bookingId} | Create Stripe payment for booking (card)
 *UserPaymentsApi* | [**userPaymentControllerRefundMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollerrefundmomopayment) | **POST** /user/payments/momo/{bookingId}/refund | Request MoMo refund for booking
 *UserPaymentsApi* | [**userPaymentControllerRefundStripePayment**](doc//UserPaymentsApi.md#userpaymentcontrollerrefundstripepayment) | **POST** /user/payments/stripe/{bookingId}/refund | Request Stripe refund for booking
+*UserProfileApi* | [**userProfileControllerGetSummary**](doc//UserProfileApi.md#userprofilecontrollergetsummary) | **GET** /user/profile/summary | Get current user profile summary counters
 *UserReviewsApi* | [**userReviewControllerSubmitSpecialistReview**](doc//UserReviewsApi.md#userreviewcontrollersubmitspecialistreview) | **POST** /user/reviews/specialist | Submit a specialist review for a completed appointment
 *UserReviewsApi* | [**userReviewControllerSubmitTreatmentReview**](doc//UserReviewsApi.md#userreviewcontrollersubmittreatmentreview) | **POST** /user/reviews/treatment | Submit a treatment review for a completed appointment
 *UserSlotsApi* | [**slotsControllerCheckDuplicateSlot**](doc//UserSlotsApi.md#slotscontrollercheckduplicateslot) | **POST** /user/slots/check-duplicate | Check if the user already has a booking at the same datetime
 *UserSlotsApi* | [**slotsControllerMicroLock**](doc//UserSlotsApi.md#slotscontrollermicrolock) | **POST** /user/slots/micro-lock | Acquire a micro-lock on a time slot (120s TTL)
+*UserWishlistApi* | [**userWishlistControllerAddItem**](doc//UserWishlistApi.md#userwishlistcontrolleradditem) | **POST** /user/wishlist/{productId} | Add a product to the current user wishlist
+*UserWishlistApi* | [**userWishlistControllerListWishlist**](doc//UserWishlistApi.md#userwishlistcontrollerlistwishlist) | **GET** /user/wishlist | List current user wishlist items
+*UserWishlistApi* | [**userWishlistControllerRemoveItem**](doc//UserWishlistApi.md#userwishlistcontrollerremoveitem) | **DELETE** /user/wishlist/{productId} | Remove a product from the current user wishlist
 
 
 ## Documentation For Models
@@ -238,9 +283,64 @@ Class | Method | HTTP request | Description
  - [AddToCartDto](doc//AddToCartDto.md)
  - [AddressDto](doc//AddressDto.md)
  - [AddressInfoDto](doc//AddressInfoDto.md)
+ - [AdminCategoryHealthDto](doc//AdminCategoryHealthDto.md)
  - [AdminCategoryResponseDto](doc//AdminCategoryResponseDto.md)
+ - [AdminCategorySnapshotDto](doc//AdminCategorySnapshotDto.md)
+ - [AdminDashboardBookingOutcomeSummaryDto](doc//AdminDashboardBookingOutcomeSummaryDto.md)
+ - [AdminDashboardNotificationItemDto](doc//AdminDashboardNotificationItemDto.md)
+ - [AdminDashboardNotificationPriority](doc//AdminDashboardNotificationPriority.md)
+ - [AdminDashboardNotificationType](doc//AdminDashboardNotificationType.md)
+ - [AdminDashboardOverviewDto](doc//AdminDashboardOverviewDto.md)
+ - [AdminDashboardRevenueTrendPointDto](doc//AdminDashboardRevenueTrendPointDto.md)
+ - [AdminDashboardTransactionHealthDto](doc//AdminDashboardTransactionHealthDto.md)
+ - [AdminFinanceAlertDto](doc//AdminFinanceAlertDto.md)
+ - [AdminFinanceAuditEventDto](doc//AdminFinanceAuditEventDto.md)
+ - [AdminFinanceCreateExportDto](doc//AdminFinanceCreateExportDto.md)
+ - [AdminFinanceCreateNoteDto](doc//AdminFinanceCreateNoteDto.md)
+ - [AdminFinanceExportJobDto](doc//AdminFinanceExportJobDto.md)
+ - [AdminFinanceExportStatus](doc//AdminFinanceExportStatus.md)
+ - [AdminFinanceExportType](doc//AdminFinanceExportType.md)
+ - [AdminFinanceNoteActionDto](doc//AdminFinanceNoteActionDto.md)
+ - [AdminFinanceNoteDto](doc//AdminFinanceNoteDto.md)
+ - [AdminFinanceNoteEntityType](doc//AdminFinanceNoteEntityType.md)
+ - [AdminFinanceOverviewDto](doc//AdminFinanceOverviewDto.md)
+ - [AdminFinancePageMetaDto](doc//AdminFinancePageMetaDto.md)
+ - [AdminFinancePartnerExposureDto](doc//AdminFinancePartnerExposureDto.md)
+ - [AdminFinancePayoutAttemptDto](doc//AdminFinancePayoutAttemptDto.md)
+ - [AdminFinancePayoutDetailDto](doc//AdminFinancePayoutDetailDto.md)
+ - [AdminFinancePayoutPageDto](doc//AdminFinancePayoutPageDto.md)
+ - [AdminFinancePayoutRecordDto](doc//AdminFinancePayoutRecordDto.md)
+ - [AdminFinancePeriod](doc//AdminFinancePeriod.md)
+ - [AdminFinanceProvider](doc//AdminFinanceProvider.md)
+ - [AdminFinanceProviderEventDto](doc//AdminFinanceProviderEventDto.md)
+ - [AdminFinanceReconciliationDetailDto](doc//AdminFinanceReconciliationDetailDto.md)
+ - [AdminFinanceReconciliationExceptionDto](doc//AdminFinanceReconciliationExceptionDto.md)
+ - [AdminFinanceReconciliationPageDto](doc//AdminFinanceReconciliationPageDto.md)
+ - [AdminFinanceReconciliationStatus](doc//AdminFinanceReconciliationStatus.md)
+ - [AdminFinanceReconciliationType](doc//AdminFinanceReconciliationType.md)
+ - [AdminFinanceRefundCaseDetailDto](doc//AdminFinanceRefundCaseDetailDto.md)
+ - [AdminFinanceRefundCasePageDto](doc//AdminFinanceRefundCasePageDto.md)
+ - [AdminFinanceRefundCaseRecordDto](doc//AdminFinanceRefundCaseRecordDto.md)
+ - [AdminFinanceRequiredNoteActionDto](doc//AdminFinanceRequiredNoteActionDto.md)
+ - [AdminFinanceReviewFlagActionDto](doc//AdminFinanceReviewFlagActionDto.md)
+ - [AdminFinanceRiskTone](doc//AdminFinanceRiskTone.md)
+ - [AdminFinanceSettlementActionDto](doc//AdminFinanceSettlementActionDto.md)
+ - [AdminFinanceTransactionDetailDto](doc//AdminFinanceTransactionDetailDto.md)
+ - [AdminFinanceTransactionPageDto](doc//AdminFinanceTransactionPageDto.md)
+ - [AdminFinanceTransactionRecordDto](doc//AdminFinanceTransactionRecordDto.md)
+ - [AdminFinanceTrendPointDto](doc//AdminFinanceTrendPointDto.md)
  - [AdminLoginDto](doc//AdminLoginDto.md)
+ - [AdminOutcomeMetricDto](doc//AdminOutcomeMetricDto.md)
  - [AdminPartnerDetailResponseDto](doc//AdminPartnerDetailResponseDto.md)
+ - [AdminPartnerItemDto](doc//AdminPartnerItemDto.md)
+ - [AdminPartnerRankingItemDto](doc//AdminPartnerRankingItemDto.md)
+ - [AdminPartnerRankingVerificationStatus](doc//AdminPartnerRankingVerificationStatus.md)
+ - [AdminPartnerScope](doc//AdminPartnerScope.md)
+ - [AdminPartnerSortBy](doc//AdminPartnerSortBy.md)
+ - [AdminPartnerSortDirection](doc//AdminPartnerSortDirection.md)
+ - [AdminPartnerStatsResponseDto](doc//AdminPartnerStatsResponseDto.md)
+ - [AdminPartnersResponseDto](doc//AdminPartnersResponseDto.md)
+ - [AdminServiceRankingItemDto](doc//AdminServiceRankingItemDto.md)
  - [AiRecommendationItemDto](doc//AiRecommendationItemDto.md)
  - [AnalyticsAlertDto](doc//AnalyticsAlertDto.md)
  - [AnalyticsBookingMetricsDto](doc//AnalyticsBookingMetricsDto.md)
@@ -311,6 +411,7 @@ Class | Method | HTTP request | Description
  - [CreatePartnerHealthServiceFacilityImageDto](doc//CreatePartnerHealthServiceFacilityImageDto.md)
  - [CreatePartnerHealthServiceMediaDto](doc//CreatePartnerHealthServiceMediaDto.md)
  - [CreateServiceTagDto](doc//CreateServiceTagDto.md)
+ - [CreateSkillDto](doc//CreateSkillDto.md)
  - [CreateSpaTherapistDto](doc//CreateSpaTherapistDto.md)
  - [CreateSpecialistReviewDto](doc//CreateSpecialistReviewDto.md)
  - [CreateTherapistProfileDto](doc//CreateTherapistProfileDto.md)
@@ -328,6 +429,7 @@ Class | Method | HTTP request | Description
  - [DoctorProfileResponseDto](doc//DoctorProfileResponseDto.md)
  - [DocumentEntryDto](doc//DocumentEntryDto.md)
  - [EmployeeAppointmentResponseDto](doc//EmployeeAppointmentResponseDto.md)
+ - [EmployeeAssignedServiceDto](doc//EmployeeAssignedServiceDto.md)
  - [EmployeeBookingStatusFilter](doc//EmployeeBookingStatusFilter.md)
  - [EmployeeComplianceItemDto](doc//EmployeeComplianceItemDto.md)
  - [EmployeeDetailAnalyticsResponseDto](doc//EmployeeDetailAnalyticsResponseDto.md)
@@ -352,6 +454,7 @@ Class | Method | HTTP request | Description
  - [FeaturedSpecialistResponseDto](doc//FeaturedSpecialistResponseDto.md)
  - [FileUrlResponseDto](doc//FileUrlResponseDto.md)
  - [FlagReviewDto](doc//FlagReviewDto.md)
+ - [Gender](doc//Gender.md)
  - [GeocodeResponseDto](doc//GeocodeResponseDto.md)
  - [GeocodeResultDto](doc//GeocodeResultDto.md)
  - [HealthServiceDetailAnalyticsResponseDto](doc//HealthServiceDetailAnalyticsResponseDto.md)
@@ -378,7 +481,9 @@ Class | Method | HTTP request | Description
  - [MyProfileCompletionResponseDto](doc//MyProfileCompletionResponseDto.md)
  - [MyProfileResponseDto](doc//MyProfileResponseDto.md)
  - [NotificationResponseDto](doc//NotificationResponseDto.md)
+ - [PaginatedEmployeeAppointmentsResponseDto](doc//PaginatedEmployeeAppointmentsResponseDto.md)
  - [PaginationMeta](doc//PaginationMeta.md)
+ - [PaginationMetaResponseDto](doc//PaginationMetaResponseDto.md)
  - [ParticipantInfoDto](doc//ParticipantInfoDto.md)
  - [PartnerCategorySummaryDto](doc//PartnerCategorySummaryDto.md)
  - [PartnerClinicDto](doc//PartnerClinicDto.md)
@@ -398,12 +503,13 @@ Class | Method | HTTP request | Description
  - [PartnerHealthServiceEmployeeEligibilityDto](doc//PartnerHealthServiceEmployeeEligibilityDto.md)
  - [PartnerHealthServiceMediaDto](doc//PartnerHealthServiceMediaDto.md)
  - [PartnerHealthServiceResponseDto](doc//PartnerHealthServiceResponseDto.md)
- - [PartnerItemDto](doc//PartnerItemDto.md)
  - [PartnerLoginDto](doc//PartnerLoginDto.md)
  - [PartnerPayoutRecordDto](doc//PartnerPayoutRecordDto.md)
  - [PartnerPayoutStatus](doc//PartnerPayoutStatus.md)
  - [PartnerPriority](doc//PartnerPriority.md)
  - [PartnerProcedureStepDto](doc//PartnerProcedureStepDto.md)
+ - [PartnerProductTagDetailDto](doc//PartnerProductTagDetailDto.md)
+ - [PartnerProductTagDto](doc//PartnerProductTagDto.md)
  - [PartnerProfileCompletionCertificationDto](doc//PartnerProfileCompletionCertificationDto.md)
  - [PartnerProfileCompletionIdentityDto](doc//PartnerProfileCompletionIdentityDto.md)
  - [PartnerPublicProfileResponseDto](doc//PartnerPublicProfileResponseDto.md)
@@ -424,7 +530,6 @@ Class | Method | HTTP request | Description
  - [PartnerTransactionTimelineEventDto](doc//PartnerTransactionTimelineEventDto.md)
  - [PartnerTransactionType](doc//PartnerTransactionType.md)
  - [PartnerVerificationStatus](doc//PartnerVerificationStatus.md)
- - [PartnersResponseDto](doc//PartnersResponseDto.md)
  - [PresignRequestDto](doc//PresignRequestDto.md)
  - [PresignResponseDto](doc//PresignResponseDto.md)
  - [PriceBreakdownDto](doc//PriceBreakdownDto.md)
@@ -439,6 +544,7 @@ Class | Method | HTTP request | Description
  - [PublicClinicInfoResponseDto](doc//PublicClinicInfoResponseDto.md)
  - [PublicClinicSpecialistPreviewDto](doc//PublicClinicSpecialistPreviewDto.md)
  - [PublicClinicTrustMetricsDto](doc//PublicClinicTrustMetricsDto.md)
+ - [PublicEmployeeReviewResponseDto](doc//PublicEmployeeReviewResponseDto.md)
  - [PublicEmployeeTimeSlotDto](doc//PublicEmployeeTimeSlotDto.md)
  - [PublicFacilityImageDto](doc//PublicFacilityImageDto.md)
  - [PublicFeatureTagDto](doc//PublicFeatureTagDto.md)
@@ -482,6 +588,7 @@ Class | Method | HTTP request | Description
  - [ServiceRuleDto](doc//ServiceRuleDto.md)
  - [ServiceRuleInputDto](doc//ServiceRuleInputDto.md)
  - [ServiceTagResponseDto](doc//ServiceTagResponseDto.md)
+ - [SkillCatalogResponseDto](doc//SkillCatalogResponseDto.md)
  - [SpecialistInfoDto](doc//SpecialistInfoDto.md)
  - [SpecialistReviewResponseDto](doc//SpecialistReviewResponseDto.md)
  - [StaffScheduleEntryDto](doc//StaffScheduleEntryDto.md)
@@ -505,8 +612,10 @@ Class | Method | HTTP request | Description
  - [UpdateServiceTagDto](doc//UpdateServiceTagDto.md)
  - [UserEligibilityDetailResponseDto](doc//UserEligibilityDetailResponseDto.md)
  - [UserProfileDto](doc//UserProfileDto.md)
+ - [UserProfileSummaryResponseDto](doc//UserProfileSummaryResponseDto.md)
  - [VerificationDocumentEntryDto](doc//VerificationDocumentEntryDto.md)
  - [VerifiedField](doc//VerifiedField.md)
+ - [WishlistItemResponseDto](doc//WishlistItemResponseDto.md)
  - [WorkHistoryEntryDto](doc//WorkHistoryEntryDto.md)
  - [WorkScheduleEntryDto](doc//WorkScheduleEntryDto.md)
 

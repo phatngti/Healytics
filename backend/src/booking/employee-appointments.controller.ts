@@ -16,6 +16,7 @@ import { EmployeeApi } from '@/common/decorators/api/employee-api.decorator';
 import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import { GetEmployeeAppointmentsQueryDto } from './dto/employee/get-employee-appointments-query.dto';
 import { EmployeeAppointmentResponseDto } from './dto/employee/employee-appointment-response.dto';
+import { PaginatedEmployeeAppointmentsResponseDto } from './dto/employee/paginated-employee-appointments-response.dto';
 import { CancelEmployeeAppointmentDto } from './dto/employee/cancel-employee-appointment.dto';
 import { ListEmployeeAppointmentsHandler } from './application/handlers/list-employee-appointments.handler';
 import { GetEmployeeAppointmentHandler } from './application/handlers/get-employee-appointment.handler';
@@ -47,11 +48,12 @@ export class EmployeeAppointmentsController {
   @ApiOperation({ summary: 'List my appointments' })
   @ApiOkResponse({
     description: 'Return paginated list of employee appointments.',
+    type: PaginatedEmployeeAppointmentsResponseDto,
   })
   async listMyAppointments(
     @CurrentUser('id') accountId: string,
     @Query() query: GetEmployeeAppointmentsQueryDto,
-  ) {
+  ): Promise<PaginatedEmployeeAppointmentsResponseDto> {
     return this.listHandler.execute(accountId, query);
   }
 
@@ -87,12 +89,7 @@ export class EmployeeAppointmentsController {
     @CurrentUser('id') accountId: string,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<EmployeeAppointmentResponseDto> {
-    const booking = await this.startHandler.execute(accountId, id);
-    return EmployeeAppointmentResponseDto.fromBooking(
-      booking,
-      'Healytics Clinic',
-      '',
-    );
+    return this.startHandler.execute(accountId, id);
   }
 
   /**
@@ -110,12 +107,7 @@ export class EmployeeAppointmentsController {
     @CurrentUser('id') accountId: string,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<EmployeeAppointmentResponseDto> {
-    const booking = await this.completeHandler.execute(accountId, id);
-    return EmployeeAppointmentResponseDto.fromBooking(
-      booking,
-      'Healytics Clinic',
-      '',
-    );
+    return this.completeHandler.execute(accountId, id);
   }
 
   /**
@@ -134,15 +126,6 @@ export class EmployeeAppointmentsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: CancelEmployeeAppointmentDto,
   ): Promise<EmployeeAppointmentResponseDto> {
-    const booking = await this.cancelHandler.execute(
-      accountId,
-      id,
-      dto.reason,
-    );
-    return EmployeeAppointmentResponseDto.fromBooking(
-      booking,
-      'Healytics Clinic',
-      '',
-    );
+    return this.cancelHandler.execute(accountId, id, dto.reason);
   }
 }

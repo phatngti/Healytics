@@ -13,6 +13,6 @@ abstract class PublicProfileRepository {
   /// returns the refreshed profile aggregate
   /// with recalculated completion summary.
   Future<PartnerPublicProfileEntity> updatePublicProfile(
-    PublicProfileUpdateRequest request,
+    PublicProfileUpdatePatch request,
   );
 }

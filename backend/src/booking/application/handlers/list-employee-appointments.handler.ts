@@ -10,6 +10,7 @@ import {
   EmployeeBookingStatusFilter,
 } from '../../dto/employee/get-employee-appointments-query.dto';
 import { EmployeeAppointmentResponseDto } from '../../dto/employee/employee-appointment-response.dto';
+import { PaginatedEmployeeAppointmentsResponseDto } from '../../dto/employee/paginated-employee-appointments-response.dto';
 
 /**
  * Handler to list appointments assigned to the authenticated employee.
@@ -49,10 +50,7 @@ export class ListEmployeeAppointmentsHandler {
   async execute(
     accountId: string,
     query: GetEmployeeAppointmentsQueryDto,
-  ): Promise<{
-    data: EmployeeAppointmentResponseDto[];
-    meta: { page: number; limit: number; total: number; totalPages: number };
-  }> {
+  ): Promise<PaginatedEmployeeAppointmentsResponseDto> {
     // 1. Resolve employee from account
     const employee = await this.employeeRepository.findOne({
       where: { accountId },

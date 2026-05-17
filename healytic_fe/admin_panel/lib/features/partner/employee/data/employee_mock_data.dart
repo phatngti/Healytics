@@ -108,6 +108,18 @@ const Map<String, String> employeeMockSpaSkills = {
   'skin_care': 'Skin Care',
 };
 
+/// Mock massage skills options for massage therapists.
+const Map<String, String> employeeMockMassageSkills = {
+  'swedish_massage': 'Swedish Massage',
+  'deep_tissue': 'Deep Tissue',
+  'hot_stone': 'Hot Stone',
+  'thai_massage': 'Thai Massage',
+  'shiatsu': 'Shiatsu',
+  'reflexology': 'Reflexology',
+  'sports_massage': 'Sports Massage',
+  'trigger_point': 'Trigger Point',
+};
+
 // ============================================================================
 // Mock Entity Factory Functions
 // ============================================================================

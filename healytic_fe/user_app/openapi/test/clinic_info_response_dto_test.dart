@@ -46,6 +46,21 @@ void main() {
       // TODO
     });
 
+    // num followerCount
+    test('to test the property `followerCount`', () async {
+      // TODO
+    });
+
+    // bool isFollowing
+    test('to test the property `isFollowing`', () async {
+      // TODO
+    });
+
+    // String chatPartnerId
+    test('to test the property `chatPartnerId`', () async {
+      // TODO
+    });
+
     // String reviewsLabel
     test('to test the property `reviewsLabel`', () async {
       // TODO

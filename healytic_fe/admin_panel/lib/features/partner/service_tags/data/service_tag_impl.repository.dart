@@ -28,6 +28,17 @@ class ServiceTagImplRepository implements ServiceTagRepository {
   }
 
   @override
+  Future<List<ServiceTagEntity>> getAllServiceTags({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) {
+    return remoteDataSource.getAllServiceTags(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
+  }
+
+  @override
   Future<int> getTotalRows() {
     return remoteDataSource.getTotalRows();
   }

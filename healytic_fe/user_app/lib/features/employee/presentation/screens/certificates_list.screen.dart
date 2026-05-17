@@ -6,9 +6,9 @@ import 'package:user_app/features/employee/domain/entities/certificate.entity.da
 import 'package:user_app/features/employee/presentation/providers/employee_detail.provider.dart';
 import 'package:user_app/router/routes.dart';
 
-/// Full-screen list of employee certificates.
+/// Full-screen list of employee documents.
 ///
-/// Reads certificates from the already-cached
+/// Reads documents from the already-cached
 /// [employeeDetailProvider] to avoid passing complex
 /// objects through GoRouter extras.
 class CertificatesListScreen extends ConsumerWidget {
@@ -34,8 +34,8 @@ class CertificatesListScreen extends ConsumerWidget {
           _AppBar(employeeName: employeeName),
           employeeAsync.when(
             data: (employee) {
-              final certs = employee.certificates;
-              if (certs.isEmpty) {
+              final documents = employee.certificates;
+              if (documents.isEmpty) {
                 return SliverFillRemaining(
                   child: _EmptyState(
                     colorScheme: colorScheme,
@@ -43,7 +43,7 @@ class CertificatesListScreen extends ConsumerWidget {
                   ),
                 );
               }
-              return _CertificatesList(certificates: certs);
+              return _DocumentsList(documents: documents);
             },
             loading: () => const SliverFillRemaining(
               child: Center(child: CircularProgressIndicator()),
@@ -78,7 +78,7 @@ class _AppBar extends StatelessWidget {
       title: Column(
         children: [
           Text(
-            'Certificates',
+            'Documents',
             style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           Text(
@@ -122,7 +122,7 @@ class _EmptyState extends StatelessWidget {
           ),
           AppDimens.verticalMedium,
           Text(
-            'No certificates available',
+            'No documents available',
             style: textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -133,12 +133,12 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-// ─── Certificates list ─────────────────────────────
+// ─── Documents list ────────────────────────────────
 
-class _CertificatesList extends StatelessWidget {
-  const _CertificatesList({required this.certificates});
+class _DocumentsList extends StatelessWidget {
+  const _DocumentsList({required this.documents});
 
-  final List<CertificateEntity> certificates;
+  final List<CertificateEntity> documents;
 
   @override
   Widget build(BuildContext context) {
@@ -150,21 +150,21 @@ class _CertificatesList extends StatelessWidget {
         vertical: AppDimens.spaceLg,
       ),
       sliver: SliverList.separated(
-        itemCount: certificates.length,
+        itemCount: documents.length,
         separatorBuilder: (_, __) => AppDimens.verticalSmall,
         itemBuilder: (context, index) =>
-            _CertificateCard(certificate: certificates[index]),
+            _DocumentCard(document: documents[index]),
       ),
     );
   }
 }
 
-// ─── Individual certificate card ───────────────────
+// ─── Individual document card ──────────────────────
 
-class _CertificateCard extends StatelessWidget {
-  const _CertificateCard({required this.certificate});
+class _DocumentCard extends StatelessWidget {
+  const _DocumentCard({required this.document});
 
-  final CertificateEntity certificate;
+  final CertificateEntity document;
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +175,7 @@ class _CertificateCard extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: 'View ${certificate.name}',
+      label: 'View ${document.name}',
       child: Material(
         color: colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(radius),
@@ -192,14 +192,14 @@ class _CertificateCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                _TypeIcon(type: certificate.type),
+                _TypeIcon(type: document.type),
                 SizedBox(width: AppDimens.spaceMd),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        certificate.name,
+                        document.name,
                         style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -230,7 +230,7 @@ class _CertificateCard extends StatelessWidget {
   }
 
   String get _typeLabel {
-    return switch (certificate.type) {
+    return switch (document.type) {
       CertificateType.image => 'Image',
       CertificateType.pdf => 'PDF Document',
       CertificateType.unknown => 'Document',
@@ -239,9 +239,9 @@ class _CertificateCard extends StatelessWidget {
 
   void _onTap(BuildContext context) {
     CertificateViewerRoute(
-      certificateName: certificate.name,
-      url: certificate.url,
-      type: certificate.type.name,
+      certificateName: document.name,
+      url: document.url,
+      type: document.type.name,
     ).push<void>(context);
   }
 }

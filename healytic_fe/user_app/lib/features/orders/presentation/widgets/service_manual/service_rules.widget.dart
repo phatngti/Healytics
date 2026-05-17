@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:user_app/features/orders/domain/entities/service_manual.entity.dart';
 import 'package:user_app/features/orders/presentation/widgets/service_manual/manual_section_card.widget.dart';
+import 'package:user_app/features/orders/presentation/widgets/service_manual/service_rule_icon_data.dart';
 
 /// Displays the "Service Rules" section with
 /// purple icon badges and rule descriptions.
@@ -53,7 +54,8 @@ class _RuleRow extends StatelessWidget {
               borderRadius: AppDimens.radiusSmall,
             ),
             child: Icon(
-              Symbols.tune,
+              serviceRuleIconData(rule.iconSlug) ??
+                  Symbols.tune,
               size: AppDimens.iconMd,
               color: colors.onPrimary,
             ),

@@ -34,7 +34,7 @@ abstract class CreateProductRequest with _$CreateProductRequest {
     int? duration,
     int? buffer,
     int? capacity,
-    int? leadTime,
+
     @Default('any') String staffAllocation,
     @Default([]) List<String> staffIds,
 
