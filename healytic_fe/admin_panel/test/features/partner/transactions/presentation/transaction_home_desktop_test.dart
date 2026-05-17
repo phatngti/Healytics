@@ -1,3 +1,5 @@
+import 'package:admin_panel/features/partner/transactions/data/transactions_impl.repository.dart';
+import 'package:admin_panel/features/partner/transactions/data/transactions_remote.datasource.dart';
 import 'package:admin_panel/features/partner/transactions/presentation/layouts/transaction_home_desktop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,8 +7,15 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   Widget createWidgetUnderTest() {
-    return const ProviderScope(
-      child: MaterialApp(home: Scaffold(body: TransactionHomeDesktop())),
+    return ProviderScope(
+      overrides: [
+        transactionsRepositoryProvider.overrideWithValue(
+          TransactionsImplRepository(
+            remoteDataSource: TransactionsRemoteDataSourceMock(),
+          ),
+        ),
+      ],
+      child: const MaterialApp(home: Scaffold(body: TransactionHomeDesktop())),
     );
   }
 
@@ -45,7 +54,14 @@ void main() {
     await tester.enterText(searchField, 'BK-240408-001');
     await tester.pumpAndSettle();
 
-    expect(find.text('BK-240408-001'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is Text && widget.data == 'BK-240408-001',
+      ),
+      findsOneWidget,
+    );
     expect(find.text('OD-240408-013'), findsNothing);
+
+    await tester.pump(const Duration(milliseconds: 600));
   });
 }

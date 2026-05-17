@@ -6,6 +6,8 @@ import 'package:user_app/core/providers/api.provider.dart';
 import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/employee/domain/entities/employee_detail.entity.dart';
 import 'package:user_app/features/employee/domain/entities/medical_credential.entity.dart';
+import 'package:user_app/features/service_details/data/datasources/remote/service_details_mock_data.dart';
+import 'package:user_app/features/service_details/domain/entities/service_details.entity.dart';
 import 'package:user_openapi/api.dart' hide EmployeeRole, EmployeeStatus;
 
 import 'employee_mock_data.dart';
@@ -18,6 +20,9 @@ abstract class EmployeeRemoteDatasource {
 
   /// Fetches a single employee by [id].
   Future<EmployeeDetailEntity> getEmployeeById(String id);
+
+  /// Fetches public reviews for a single employee.
+  Future<List<ReviewEntity>> getEmployeeReviews(String id);
 }
 
 // ─── Real implementation ──────────────────────────
@@ -59,6 +64,21 @@ class EmployeeRemoteDatasourceImpl implements EmployeeRemoteDatasource {
       return _mapEmployeeDto(dto);
     } catch (e, s) {
       _log.severe('Error fetching employee $id', e, s);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<ReviewEntity>> getEmployeeReviews(String id) async {
+    try {
+      final dtos = await _apiService.userEmployeesApi
+          .userEmployeesControllerFindReviews(id);
+
+      _log.info('Fetched ${dtos?.length ?? 0} reviews for employee $id');
+
+      return (dtos ?? []).map(_mapReviewDto).toList();
+    } catch (e, s) {
+      _log.severe('Error fetching employee reviews $id', e, s);
       rethrow;
     }
   }
@@ -193,6 +213,16 @@ class EmployeeRemoteDatasourceImpl implements EmployeeRemoteDatasource {
     );
   }
 
+  ReviewEntity _mapReviewDto(PublicEmployeeReviewResponseDto dto) {
+    return ReviewEntity(
+      reviewerName: dto.reviewerName,
+      avatarUrl: dto.avatarUrl?.toString() ?? '',
+      rating: dto.rating.toInt(),
+      date: DateTime.tryParse(dto.createdAt) ?? DateTime.now(),
+      text: dto.comment?.toString() ?? '',
+    );
+  }
+
   /// Defensively converts [Object?] to [String?].
   String? _objToString(Object? value) {
     if (value == null) return null;
@@ -226,6 +256,12 @@ class EmployeeRemoteDatasourceMock implements EmployeeRemoteDatasource {
       (e) => e.id == id,
       orElse: () => kMockEmployees.first,
     );
+  }
+
+  @override
+  Future<List<ReviewEntity>> getEmployeeReviews(String id) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return kMockEmployeeReviewsMap[id] ?? [];
   }
 }
 

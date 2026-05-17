@@ -26,6 +26,7 @@ void main() {
       // TODO
     });
 
+    // Ignored — slug is auto-generated as {partner_brand}_{product_name}_{random}.
     // String slug
     test('to test the property `slug`', () async {
       // TODO
@@ -68,6 +69,12 @@ void main() {
 
     // List<String> employeeIds (default value: const [])
     test('to test the property `employeeIds`', () async {
+      // TODO
+    });
+
+    // Feature tag IDs to associate with this service
+    // List<String> tagIds (default value: const [])
+    test('to test the property `tagIds`', () async {
       // TODO
     });
 

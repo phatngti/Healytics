@@ -38,6 +38,7 @@ class ProductFunctionButtons {
           width: 220,
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _sortOption(
                 label: 'Name',

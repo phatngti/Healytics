@@ -6,6 +6,7 @@ import { Partner } from '@/common/entities/partner.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { Booking } from '@/common/entities/booking.entity';
 import { SkillCatalog } from '@/common/entities/skill-catalog.entity';
+import { SpecialistReview } from '@/common/entities/specialist-review.entity';
 import { NotFoundException } from '@nestjs/common';
 import { EmployeeRole } from './enum/employee-role.enum';
 import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
@@ -25,6 +26,7 @@ describe('EmployeesService', () => {
   let createTherapistHandler: Record<string, jest.Mock>;
   let updateEmployeeHandler: Record<string, jest.Mock>;
   let removeEmployeeHandler: Record<string, jest.Mock>;
+  let specialistReviewRepository: Record<string, jest.Mock>;
 
   const mockEmployeeRepository = {
     find: jest.fn(),
@@ -68,6 +70,10 @@ describe('EmployeesService', () => {
     find: jest.fn(),
   };
 
+  const mockSpecialistReviewRepository = {
+    createQueryBuilder: jest.fn(),
+  };
+
   const mockSkillCatalogRepository = {
     find: jest.fn(),
     findOne: jest.fn(),
@@ -98,6 +104,10 @@ describe('EmployeesService', () => {
         {
           provide: getRepositoryToken(Booking),
           useValue: mockBookingRepository,
+        },
+        {
+          provide: getRepositoryToken(SpecialistReview),
+          useValue: mockSpecialistReviewRepository,
         },
         {
           provide: getRepositoryToken(SkillCatalog),
@@ -141,6 +151,9 @@ describe('EmployeesService', () => {
     createTherapistHandler = module.get(CreateTherapistHandler);
     updateEmployeeHandler = module.get(UpdateEmployeeHandler);
     removeEmployeeHandler = module.get(RemoveEmployeeHandler);
+    specialistReviewRepository = module.get(
+      getRepositoryToken(SpecialistReview),
+    );
   });
 
   afterEach(() => {
@@ -397,6 +410,139 @@ describe('EmployeesService', () => {
       await expect(service.findOne('missing-id')).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('findReviewsByEmployee', () => {
+    const createReviewQueryBuilder = (result: any[]) => ({
+      innerJoinAndSelect: jest.fn().mockReturnThis(),
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue(result),
+    });
+
+    it('should throw NotFoundException when employee is missing', async () => {
+      // Arrange
+      mockEmployeeRepository.findOne.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(service.findReviewsByEmployee('missing-id')).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(
+        specialistReviewRepository.createQueryBuilder,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should return an empty list for an employee with no reviews', async () => {
+      // Arrange
+      const queryBuilder = createReviewQueryBuilder([]);
+      mockEmployeeRepository.findOne.mockResolvedValue({ id: 'emp-uuid' });
+      specialistReviewRepository.createQueryBuilder.mockReturnValue(
+        queryBuilder,
+      );
+
+      // Act
+      const result = await service.findReviewsByEmployee('emp-uuid');
+
+      // Assert
+      expect(result).toEqual([]);
+      expect(queryBuilder.where).toHaveBeenCalledWith(
+        'review.specialist_id = :id',
+        { id: 'emp-uuid' },
+      );
+      expect(queryBuilder.orderBy).toHaveBeenCalledWith(
+        'review.createdAt',
+        'DESC',
+      );
+    });
+
+    it('should return newest-first public employee reviews', async () => {
+      // Arrange
+      const newer = {
+        id: 'review-new',
+        rating: 5,
+        comment: 'Excellent',
+        tags: ['Professional'],
+        wouldRecommend: true,
+        createdAt: new Date('2026-03-30T10:00:00.000Z'),
+        user: {
+          userProfile: {
+            firstName: 'Jane',
+            lastName: 'Doe',
+          },
+        },
+      };
+      const older = {
+        id: 'review-old',
+        rating: 4,
+        comment: null,
+        tags: [],
+        wouldRecommend: true,
+        createdAt: new Date('2026-03-29T10:00:00.000Z'),
+        user: {
+          userProfile: {
+            firstName: 'John',
+            lastName: 'Smith',
+          },
+        },
+      };
+      const queryBuilder = createReviewQueryBuilder([newer, older]);
+      mockEmployeeRepository.findOne.mockResolvedValue({ id: 'emp-uuid' });
+      specialistReviewRepository.createQueryBuilder.mockReturnValue(
+        queryBuilder,
+      );
+
+      // Act
+      const result = await service.findReviewsByEmployee('emp-uuid');
+
+      // Assert
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 'review-new',
+          reviewerName: 'Jane Doe',
+          rating: 5,
+          createdAt: '2026-03-30T10:00:00.000Z',
+        }),
+        expect.objectContaining({
+          id: 'review-old',
+          reviewerName: 'John Smith',
+          rating: 4,
+          createdAt: '2026-03-29T10:00:00.000Z',
+        }),
+      ]);
+    });
+
+    it('should map missing reviewer profile to Anonymous', async () => {
+      // Arrange
+      const queryBuilder = createReviewQueryBuilder([
+        {
+          id: 'review-anon',
+          rating: 3,
+          comment: 'Okay',
+          tags: null,
+          wouldRecommend: false,
+          createdAt: new Date('2026-03-30T10:00:00.000Z'),
+          user: {},
+        },
+      ]);
+      mockEmployeeRepository.findOne.mockResolvedValue({ id: 'emp-uuid' });
+      specialistReviewRepository.createQueryBuilder.mockReturnValue(
+        queryBuilder,
+      );
+
+      // Act
+      const result = await service.findReviewsByEmployee('emp-uuid');
+
+      // Assert
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 'review-anon',
+          reviewerName: 'Anonymous',
+          tags: [],
+        }),
+      ]);
     });
   });
 

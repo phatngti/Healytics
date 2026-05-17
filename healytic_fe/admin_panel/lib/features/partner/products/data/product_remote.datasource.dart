@@ -3,6 +3,7 @@ import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/partner/products/data/data/product_mock_data.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/facility_image.entity.dart';
 
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/service_manual.entity.dart';
@@ -122,7 +123,54 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       throw Exception('Product not found');
     }
 
-    return _mapToProduct(match.first);
+    final dto = match.first;
+    final product = _mapToProduct(dto);
+    final details = await _partnerHealthServicesApi
+        .partnerHealthServiceControllerGetDetails(dto.slug);
+
+    if (details == null) {
+      return product;
+    }
+
+    final resolvedTagIds = await _getAssignedTagIds(
+      productId: dto.id,
+      detailTags: details.featureTags,
+    );
+
+    return product.copyWith(
+      facilityImages: _mapFacilityImagesFromDetailDto(details.facilityImages),
+      tags: resolvedTagIds,
+    );
+  }
+
+  Future<List<String>> _getAssignedTagIds({
+    required String productId,
+    required List<PartnerFeatureTagDto> detailTags,
+  }) async {
+    try {
+      final tags = await _serviceTagsApi.serviceTagsControllerGetTagsForProduct(
+        productId,
+      );
+      return tags?.map((tag) => tag.id).toList() ?? [];
+    } catch (error, stackTrace) {
+      debugPrint(
+        'Failed to load assigned service tag IDs for product $productId: '
+        '$error\n$stackTrace',
+      );
+    }
+
+    // Fallback for older backend builds: the detail endpoint only exposes
+    // labels, so resolve them against active tags when the product-specific
+    // endpoint is not available.
+    final allTags = await getServiceTags();
+    final labelToId = {
+      for (final tag in allTags) tag.name.trim().toLowerCase(): tag.id,
+    };
+
+    return detailTags
+        .map((tag) => labelToId[tag.label.trim().toLowerCase()])
+        .whereType<String>()
+        .toList();
   }
 
   @override
@@ -144,13 +192,13 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       name: request.name,
       description: request.description,
       categoryId: request.category,
-      slug: request.name.toLowerCase().replaceAll(RegExp(r'\s+'), '-'),
       type: typeEnum,
       basePrice: request.basePrice,
       salePrice: request.salePrice,
       status: _mapStatus(request.status),
       isVisibleOnline: request.onlineStore,
       employeeIds: request.staffIds,
+      tagIds: request.tags,
       productDefinition: productDefinition,
       media: request.images
           .asMap()
@@ -208,16 +256,19 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       isVisibleOnline: request.onlineStore,
       categoryId: request.category,
       employeeIds: request.staffIds,
+      tagIds: request.tagIds,
       productDefinition: hasProductDefinitionChanges
-          ? CreatePartnerHealthServiceDefinitionDto(
-              durationMinutes: request.duration ?? 60,
-              bufferMinutes: request.buffer ?? 0,
-              maxCapacity: request.capacity ?? 1,
-
-              staffAssignmentType: request.staffAllocation != null
-                  ? _mapStaffAssignment(request.staffAllocation!)
-                  : CreatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum
-                        .any,
+          ? _SparseCreatePartnerHealthServiceDefinitionDto(
+              durationMinutes: request.duration ?? 1,
+              includeDurationMinutes: request.duration != null,
+              bufferMinutes: request.buffer,
+              includeBufferMinutes: request.buffer != null,
+              maxCapacity: request.capacity,
+              includeMaxCapacity: request.capacity != null,
+              staffAssignmentType: request.staffAllocation == null
+                  ? null
+                  : _mapStaffAssignment(request.staffAllocation!),
+              includeStaffAssignmentType: request.staffAllocation != null,
             )
           : null,
       media: request.images
@@ -228,6 +279,17 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
               url: entry.value,
               mediaType: CreatePartnerHealthServiceMediaDtoMediaTypeEnum.image,
               isThumbnail: entry.key == 0,
+              sortOrder: entry.key,
+            ),
+          )
+          .toList(),
+      facilityImages: request.facilityImages
+          ?.asMap()
+          .entries
+          .map(
+            (entry) => CreatePartnerHealthServiceFacilityImageDto(
+              imageUrl: entry.value.imageUrl,
+              label: entry.value.label,
               sortOrder: entry.key,
             ),
           )
@@ -271,6 +333,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       ),
       onlineStore: dto.isVisibleOnline,
       images: dto.media.map((m) => m.url).where((s) => s.isNotEmpty).toList(),
+      facilityImages: const [],
 
       // Service details
       duration: service?.durationMinutes.toInt(),
@@ -389,10 +452,65 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     );
   }
 
+  List<FacilityImageEntity> _mapFacilityImagesFromDetailDto(
+    List<PartnerFacilityImageDto> dto,
+  ) {
+    return dto
+        .asMap()
+        .entries
+        .map(
+          (entry) => FacilityImageEntity(
+            imageUrl: entry.value.imageUrl,
+            label: entry.value.label,
+            sortOrder: entry.key,
+          ),
+        )
+        .toList();
+  }
+
   @override
   Future<List<ServiceTagResponseDto>> getServiceTags() async {
     final response = await _serviceTagsApi.serviceTagsControllerFindActive();
     return response ?? [];
+  }
+}
+
+class _SparseCreatePartnerHealthServiceDefinitionDto
+    extends CreatePartnerHealthServiceDefinitionDto {
+  _SparseCreatePartnerHealthServiceDefinitionDto({
+    required super.durationMinutes,
+    super.bufferMinutes,
+    super.maxCapacity,
+    super.staffAssignmentType,
+    this.includeDurationMinutes = false,
+    this.includeBufferMinutes = false,
+    this.includeMaxCapacity = false,
+    this.includeStaffAssignmentType = false,
+  });
+
+  final bool includeDurationMinutes;
+  final bool includeBufferMinutes;
+  final bool includeMaxCapacity;
+  final bool includeStaffAssignmentType;
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = <String, dynamic>{};
+
+    if (includeDurationMinutes) {
+      json[r'durationMinutes'] = durationMinutes;
+    }
+    if (includeBufferMinutes) {
+      json[r'bufferMinutes'] = bufferMinutes;
+    }
+    if (includeMaxCapacity) {
+      json[r'maxCapacity'] = maxCapacity;
+    }
+    if (includeStaffAssignmentType) {
+      json[r'staffAssignmentType'] = staffAssignmentType;
+    }
+
+    return json;
   }
 }
 
@@ -409,14 +527,19 @@ class _SparseUpdatePartnerHealthServiceDto
     super.isVisibleOnline,
     super.employeeIds,
     super.media,
+    super.facilityImages,
     super.productDefinition,
     super.serviceManual,
     this.includeSalePrice = false,
     this.includeServiceManual = false,
+    this.tagIds,
   });
 
   final bool includeSalePrice;
   final bool includeServiceManual;
+
+  /// Tag IDs to associate with this service.
+  final List<String>? tagIds;
 
   @override
   Map<String, dynamic> toJson() {
@@ -439,7 +562,9 @@ class _SparseUpdatePartnerHealthServiceDto
     addIfPresent(r'status', status);
     addIfPresent(r'isVisibleOnline', isVisibleOnline);
     addIfPresent(r'employeeIds', employeeIds);
+    addIfPresent(r'tagIds', tagIds);
     addIfPresent(r'media', media);
+    addIfPresent(r'facilityImages', facilityImages);
     addIfPresent(r'productDefinition', productDefinition);
     if (includeServiceManual) {
       json[r'serviceManual'] = serviceManual;
