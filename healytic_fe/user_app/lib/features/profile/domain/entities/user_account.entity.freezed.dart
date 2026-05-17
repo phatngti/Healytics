@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserAccountEntity {
 
- String get id; String get email; String? get firstName; String? get lastName; String? get phone; String? get dateOfBirth; bool get profileCompleted;
+ String get id; String get email; String? get firstName; String? get lastName; String? get phone; String? get dateOfBirth; String? get avatarUrl; bool get profileCompleted;
 /// Create a copy of UserAccountEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $UserAccountEntityCopyWith<UserAccountEntity> get copyWith => _$UserAccountEntit
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserAccountEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.profileCompleted, profileCompleted) || other.profileCompleted == profileCompleted));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserAccountEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.profileCompleted, profileCompleted) || other.profileCompleted == profileCompleted));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,phone,dateOfBirth,profileCompleted);
+int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,phone,dateOfBirth,avatarUrl,profileCompleted);
 
 @override
 String toString() {
-  return 'UserAccountEntity(id: $id, email: $email, firstName: $firstName, lastName: $lastName, phone: $phone, dateOfBirth: $dateOfBirth, profileCompleted: $profileCompleted)';
+  return 'UserAccountEntity(id: $id, email: $email, firstName: $firstName, lastName: $lastName, phone: $phone, dateOfBirth: $dateOfBirth, avatarUrl: $avatarUrl, profileCompleted: $profileCompleted)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $UserAccountEntityCopyWith<$Res>  {
   factory $UserAccountEntityCopyWith(UserAccountEntity value, $Res Function(UserAccountEntity) _then) = _$UserAccountEntityCopyWithImpl;
 @useResult
 $Res call({
- String id, String email, String? firstName, String? lastName, String? phone, String? dateOfBirth, bool profileCompleted
+ String id, String email, String? firstName, String? lastName, String? phone, String? dateOfBirth, String? avatarUrl, bool profileCompleted
 });
 
 
@@ -62,7 +62,7 @@ class _$UserAccountEntityCopyWithImpl<$Res>
 
 /// Create a copy of UserAccountEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? phone = freezed,Object? dateOfBirth = freezed,Object? profileCompleted = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? phone = freezed,Object? dateOfBirth = freezed,Object? avatarUrl = freezed,Object? profileCompleted = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
@@ -70,6 +70,7 @@ as String,firstName: freezed == firstName ? _self.firstName : firstName // ignor
 as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String?,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
+as String?,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String?,profileCompleted: null == profileCompleted ? _self.profileCompleted : profileCompleted // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
@@ -156,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  String? phone,  String? dateOfBirth,  bool profileCompleted)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  String? phone,  String? dateOfBirth,  String? avatarUrl,  bool profileCompleted)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserAccountEntity() when $default != null:
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.phone,_that.dateOfBirth,_that.profileCompleted);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.phone,_that.dateOfBirth,_that.avatarUrl,_that.profileCompleted);case _:
   return orElse();
 
 }
@@ -177,10 +178,10 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.phone,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  String? phone,  String? dateOfBirth,  bool profileCompleted)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  String? phone,  String? dateOfBirth,  String? avatarUrl,  bool profileCompleted)  $default,) {final _that = this;
 switch (_that) {
 case _UserAccountEntity():
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.phone,_that.dateOfBirth,_that.profileCompleted);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.phone,_that.dateOfBirth,_that.avatarUrl,_that.profileCompleted);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +198,10 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.phone,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String? firstName,  String? lastName,  String? phone,  String? dateOfBirth,  bool profileCompleted)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String? firstName,  String? lastName,  String? phone,  String? dateOfBirth,  String? avatarUrl,  bool profileCompleted)?  $default,) {final _that = this;
 switch (_that) {
 case _UserAccountEntity() when $default != null:
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.phone,_that.dateOfBirth,_that.profileCompleted);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.phone,_that.dateOfBirth,_that.avatarUrl,_that.profileCompleted);case _:
   return null;
 
 }
@@ -212,7 +213,7 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.phone,
 
 
 class _UserAccountEntity extends UserAccountEntity {
-  const _UserAccountEntity({required this.id, required this.email, this.firstName, this.lastName, this.phone, this.dateOfBirth, required this.profileCompleted}): super._();
+  const _UserAccountEntity({required this.id, required this.email, this.firstName, this.lastName, this.phone, this.dateOfBirth, this.avatarUrl, required this.profileCompleted}): super._();
   
 
 @override final  String id;
@@ -221,6 +222,7 @@ class _UserAccountEntity extends UserAccountEntity {
 @override final  String? lastName;
 @override final  String? phone;
 @override final  String? dateOfBirth;
+@override final  String? avatarUrl;
 @override final  bool profileCompleted;
 
 /// Create a copy of UserAccountEntity
@@ -233,16 +235,16 @@ _$UserAccountEntityCopyWith<_UserAccountEntity> get copyWith => __$UserAccountEn
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserAccountEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.profileCompleted, profileCompleted) || other.profileCompleted == profileCompleted));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserAccountEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.profileCompleted, profileCompleted) || other.profileCompleted == profileCompleted));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,phone,dateOfBirth,profileCompleted);
+int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,phone,dateOfBirth,avatarUrl,profileCompleted);
 
 @override
 String toString() {
-  return 'UserAccountEntity(id: $id, email: $email, firstName: $firstName, lastName: $lastName, phone: $phone, dateOfBirth: $dateOfBirth, profileCompleted: $profileCompleted)';
+  return 'UserAccountEntity(id: $id, email: $email, firstName: $firstName, lastName: $lastName, phone: $phone, dateOfBirth: $dateOfBirth, avatarUrl: $avatarUrl, profileCompleted: $profileCompleted)';
 }
 
 
@@ -253,7 +255,7 @@ abstract mixin class _$UserAccountEntityCopyWith<$Res> implements $UserAccountEn
   factory _$UserAccountEntityCopyWith(_UserAccountEntity value, $Res Function(_UserAccountEntity) _then) = __$UserAccountEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String email, String? firstName, String? lastName, String? phone, String? dateOfBirth, bool profileCompleted
+ String id, String email, String? firstName, String? lastName, String? phone, String? dateOfBirth, String? avatarUrl, bool profileCompleted
 });
 
 
@@ -270,7 +272,7 @@ class __$UserAccountEntityCopyWithImpl<$Res>
 
 /// Create a copy of UserAccountEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? phone = freezed,Object? dateOfBirth = freezed,Object? profileCompleted = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? phone = freezed,Object? dateOfBirth = freezed,Object? avatarUrl = freezed,Object? profileCompleted = null,}) {
   return _then(_UserAccountEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
@@ -278,6 +280,7 @@ as String,firstName: freezed == firstName ? _self.firstName : firstName // ignor
 as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String?,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
+as String?,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String?,profileCompleted: null == profileCompleted ? _self.profileCompleted : profileCompleted // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
