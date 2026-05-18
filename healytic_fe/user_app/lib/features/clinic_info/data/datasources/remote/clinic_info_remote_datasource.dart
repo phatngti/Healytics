@@ -7,6 +7,7 @@ import 'package:user_openapi/api.dart';
 import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/providers/api.provider.dart';
 import 'package:user_app/core/services/api.service.dart';
+import 'package:user_app/features/clinic_info/data/mappers/clinic_description_text.mapper.dart';
 import 'package:user_app/features/clinic_info/domain/entities/clinic_info.entity.dart';
 import 'package:user_app/features/clinic_info/domain/entities/clinic_product.entity.dart';
 import 'package:user_app/features/clinic_info/domain/entities/clinic_review.entity.dart';
@@ -158,7 +159,7 @@ class ClinicInfoRemoteDatasourceImpl implements ClinicInfoRemoteDatasource {
       isFollowing: dto['isFollowing'] == true,
       chatPartnerId: dto['chatPartnerId']?.toString(),
       reviewsLabel: dto['reviewsLabel']?.toString() ?? '0',
-      description: dto['description']?.toString(),
+      description: clinicDescriptionToPlainText(dto['description']),
       address: dto['address']?.toString(),
       phoneNumber: dto['phoneNumber']?.toString(),
       trustMetrics: ClinicTrustMetrics(

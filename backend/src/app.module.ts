@@ -33,10 +33,12 @@ import { DashboardPartnerModule } from './dashboard-partner/dashboard-partner.mo
 import { PartnerFinanceModule } from './partner-finance/partner-finance.module';
 import { HealthModule } from './health/health.module';
 import { TestBackdoorModule } from './test-backdoor/test-backdoor.module';
+import { SearchModule } from './search/search.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 import rabbitmqConfig from './config/rabbitmq.config';
 import mapboxConfig from './config/mapbox.config';
+import elasticsearchConfig from './config/elasticsearch.config';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
@@ -53,7 +55,13 @@ const envFilePath =
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath,
-      load: [databaseConfig, redisConfig, rabbitmqConfig, mapboxConfig],
+      load: [
+        databaseConfig,
+        redisConfig,
+        rabbitmqConfig,
+        mapboxConfig,
+        elasticsearchConfig,
+      ],
     }),
     // Rate limiting: 1000 requests per 60 seconds per tracker for public routes
     // Uses Redis storage for distributed state across instances
@@ -122,6 +130,7 @@ const envFilePath =
     DashboardPartnerModule,
     PartnerFinanceModule,
     HealthModule,
+    SearchModule,
     ...(process.env.NODE_ENV === 'test' ? [TestBackdoorModule] : []),
   ],
   providers: [

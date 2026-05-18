@@ -38,5 +38,12 @@ void main() {
       // TODO
     });
 
+    // Update current user avatar
+    //
+    //Future<AccountMeResponseDto> accountControllerUpdateAvatar(UpdateAvatarDto updateAvatarDto) async
+    test('test accountControllerUpdateAvatar', () async {
+      // TODO
+    });
+
   });
 }
