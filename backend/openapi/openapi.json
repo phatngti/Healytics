@@ -2103,6 +2103,55 @@
         ]
       }
     },
+    "/user/booking-search": {
+      "get": {
+        "operationId": "BookingSearchController_search",
+        "summary": "Search booking services and specialists",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "description": "Search text. Minimum 2 characters.",
+            "schema": {
+              "minLength": 2,
+              "example": "massage",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximum results per group. Default 5, max 20.",
+            "schema": {
+              "example": 5,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingSearchResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Booking-search"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/categories": {
       "get": {
         "operationId": "CategoriesController_findAll",
@@ -10871,7 +10920,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-17T09:44:33.921Z"
+              "submittedAt": "2026-05-18T09:14:04.395Z"
             }
           }
         },
@@ -14380,6 +14429,61 @@
           "totalAmount"
         ]
       },
+      "BookingSpecialistResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique specialist/employee ID"
+          },
+          "eligibilityId": {
+            "type": "string",
+            "description": "product_employee_eligibility surrogate PK"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full display name",
+            "example": "Dr. Anna Nguyen"
+          },
+          "specialty": {
+            "type": "string",
+            "description": "Short specialty label",
+            "example": "Spa Therapist"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "description": "URL to avatar image",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "eligibilityId",
+          "name",
+          "specialty"
+        ]
+      },
+      "BookingSearchResponseDto": {
+        "type": "object",
+        "properties": {
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookingServiceResponseDto"
+            }
+          },
+          "specialists": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookingSpecialistResponseDto"
+            }
+          }
+        },
+        "required": [
+          "services",
+          "specialists"
+        ]
+      },
       "CategorySummaryDto": {
         "type": "object",
         "properties": {
@@ -14466,40 +14570,6 @@
           "isActive",
           "createdAt",
           "updatedAt"
-        ]
-      },
-      "BookingSpecialistResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique specialist/employee ID"
-          },
-          "eligibilityId": {
-            "type": "string",
-            "description": "product_employee_eligibility surrogate PK"
-          },
-          "name": {
-            "type": "string",
-            "description": "Full display name",
-            "example": "Dr. Anna Nguyen"
-          },
-          "specialty": {
-            "type": "string",
-            "description": "Short specialty label",
-            "example": "Spa Therapist"
-          },
-          "avatarUrl": {
-            "type": "object",
-            "description": "URL to avatar image",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "eligibilityId",
-          "name",
-          "specialty"
         ]
       },
       "AdminCategoryResponseDto": {

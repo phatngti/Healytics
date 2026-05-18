@@ -2,6 +2,7 @@ import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/entities/app_exception.dart';
 import 'package:user_app/features/authenticate/presentation/providers/authenticate.provider.dart';
@@ -11,6 +12,7 @@ import 'package:common/widgets/toast.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/core/utils/form_validators.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
+import 'package:user_app/router/routes.dart';
 
 final _log = Logger('AuthForm');
 
@@ -46,9 +48,7 @@ class LoginForm extends HookConsumerWidget {
     // Listen for auth errors and update inline message.
     ref.listen(authenticateProvider, (previous, next) {
       final hasCompletedWithError =
-          previous?.isLoading == true &&
-          next.hasError &&
-          !next.isLoading;
+          previous?.isLoading == true && next.hasError && !next.isLoading;
       if (hasCompletedWithError) {
         final error = next.error;
         final appEx = AppException.fromError(
@@ -113,8 +113,7 @@ class LoginForm extends HookConsumerWidget {
               widgetKey: keys.signInPage.passwordTextField,
               suffixIcon: IconButton(
                 onPressed: () {
-                  isPasswordVisible.value =
-                      !isPasswordVisible.value;
+                  isPasswordVisible.value = !isPasswordVisible.value;
                 },
                 icon: isPasswordVisible.value
                     ? Icon(Icons.visibility_off)
@@ -125,15 +124,13 @@ class LoginForm extends HookConsumerWidget {
             ),
             // Inline sign-in error message.
             if (signInError.value != null)
-              _SignInErrorBanner(
-                message: signInError.value!,
-              ),
+              _SignInErrorBanner(message: signInError.value!),
             SizedBox(
               child: AppButton(
                 key: keys.signInPage.forgotPasswordButton,
                 buttonType: ButtonType.text,
                 onPressed: () {
-                  // Handle forgot password action
+                  context.pushNamed(ForgotPasswordRoute.name);
                 },
                 customStyle: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
@@ -189,19 +186,14 @@ class _SignInErrorBanner extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: 18,
-            color: colorScheme.error,
-          ),
+          Icon(Icons.error_outline, size: 18, color: colorScheme.error),
           const SizedBox(width: 6),
           Expanded(
             child: Text(
               message,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: colorScheme.error),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: colorScheme.error),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
@@ -217,10 +209,12 @@ class _SignInErrorBanner extends StatelessWidget {
 String _signInErrorMessage(AppException exception) {
   return switch (exception) {
     ServerException(:final statusCode) => switch (statusCode) {
-      401 => 'Invalid email or password. '
-          'Please try again.',
-      404 => 'Account not found. '
-          'Please check your email.',
+      401 =>
+        'Invalid email or password. '
+            'Please try again.',
+      404 =>
+        'Account not found. '
+            'Please check your email.',
       _ => exception.userMessage,
     },
     NetworkException() => exception.userMessage,

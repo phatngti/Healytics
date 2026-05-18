@@ -22,6 +22,7 @@ import { Booking } from '@/common/entities/booking.entity';
 import { Payment } from '@/common/entities/payment.entity';
 import { Category } from '@/common/entities/category.entity';
 import { PartnersModule } from '@/partners/partners.module';
+import { SearchModule } from '@/search/search.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { PartnersModule } from '@/partners/partners.module';
       Category,
     ]),
     PartnersModule,
+    SearchModule,
   ],
   controllers: [PartnerHealthServiceController, UserHealthServiceController],
   providers: [

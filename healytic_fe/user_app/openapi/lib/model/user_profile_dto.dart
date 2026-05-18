@@ -19,6 +19,7 @@ class UserProfileDto {
     this.phone,
     this.bio,
     this.dateOfBirth,
+    this.avatarUrl,
     required this.profileCompleted,
   });
 
@@ -71,6 +72,15 @@ class UserProfileDto {
   ///
   String? dateOfBirth;
 
+  /// Avatar image URL
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  Object? avatarUrl;
+
   /// Whether the profile is completed
   bool profileCompleted;
 
@@ -82,6 +92,7 @@ class UserProfileDto {
     other.phone == phone &&
     other.bio == bio &&
     other.dateOfBirth == dateOfBirth &&
+    other.avatarUrl == avatarUrl &&
     other.profileCompleted == profileCompleted;
 
   @override
@@ -93,10 +104,11 @@ class UserProfileDto {
     (phone == null ? 0 : phone!.hashCode) +
     (bio == null ? 0 : bio!.hashCode) +
     (dateOfBirth == null ? 0 : dateOfBirth!.hashCode) +
+    (avatarUrl == null ? 0 : avatarUrl!.hashCode) +
     (profileCompleted.hashCode);
 
   @override
-  String toString() => 'UserProfileDto[id=$id, firstName=$firstName, lastName=$lastName, phone=$phone, bio=$bio, dateOfBirth=$dateOfBirth, profileCompleted=$profileCompleted]';
+  String toString() => 'UserProfileDto[id=$id, firstName=$firstName, lastName=$lastName, phone=$phone, bio=$bio, dateOfBirth=$dateOfBirth, avatarUrl=$avatarUrl, profileCompleted=$profileCompleted]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -125,6 +137,11 @@ class UserProfileDto {
       json[r'dateOfBirth'] = this.dateOfBirth;
     } else {
       json[r'dateOfBirth'] = null;
+    }
+    if (this.avatarUrl != null) {
+      json[r'avatarUrl'] = this.avatarUrl;
+    } else {
+      json[r'avatarUrl'] = null;
     }
       json[r'profileCompleted'] = this.profileCompleted;
     return json;
@@ -155,6 +172,7 @@ class UserProfileDto {
         phone: mapValueOfType<String>(json, r'phone'),
         bio: mapValueOfType<Object>(json, r'bio'),
         dateOfBirth: mapValueOfType<String>(json, r'dateOfBirth'),
+        avatarUrl: mapValueOfType<Object>(json, r'avatarUrl'),
         profileCompleted: mapValueOfType<bool>(json, r'profileCompleted')!,
       );
     }

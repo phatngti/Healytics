@@ -3,9 +3,12 @@ import {
   Logger,
   NotFoundException,
   InternalServerErrorException,
+  Optional,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { Employee } from '@/common/entities/employee.entity';
+import { SearchIndexOperation } from '@/search/entities/search-index-outbox.entity';
+import { SearchIndexOutboxService } from '@/search/services/search-index-outbox.service';
 
 /**
  * Handler for removing employees using soft delete.
@@ -15,7 +18,11 @@ import { Employee } from '@/common/entities/employee.entity';
 export class RemoveEmployeeHandler {
   private readonly logger = new Logger(RemoveEmployeeHandler.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @Optional()
+    private readonly searchIndexOutboxService?: SearchIndexOutboxService,
+  ) {}
 
   /**
    * Executes the remove employee command using soft delete.
@@ -39,6 +46,11 @@ export class RemoveEmployeeHandler {
 
       // 2. Domain Action: Soft delete employee
       await queryRunner.manager.softRemove(Employee, employee);
+      await this.searchIndexOutboxService?.enqueueEmployee(
+        queryRunner.manager,
+        id,
+        SearchIndexOperation.DELETE,
+      );
 
       // 3. Commit transaction
       await queryRunner.commitTransaction();

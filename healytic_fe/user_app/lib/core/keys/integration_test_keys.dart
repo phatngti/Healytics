@@ -25,6 +25,11 @@ class SignInPageKeys {
   final facebookButton = const Key('facebookSignInButton');
 }
 
+class ForgotPasswordPageKeys {
+  final emailTextField = const Key('forgotPasswordEmailTextField');
+  final sendResetLinkButton = const Key('forgotPasswordSendResetLinkButton');
+}
+
 // --- Sign Up: Email Form ---
 
 class EmailFormPageKeys {
@@ -115,6 +120,7 @@ class BottomNavKeys {
 class Keys {
   final onboardPage = OnboardPageKeys();
   final signInPage = SignInPageKeys();
+  final forgotPasswordPage = ForgotPasswordPageKeys();
   final emailFormPage = EmailFormPageKeys();
   final codeConfirmationPage = CodeConfirmationPageKeys();
   final homePage = HomePageKeys();

@@ -32,6 +32,7 @@ List<RouteBase> get $appRoutes => [
   $lottieSplashRoute,
   $onboardingRoute,
   $signInRoute,
+  $forgotPasswordRoute,
   $emailFormRoute,
   $emailCodeConfirmationRoute,
   $finishSignUpRoute,
@@ -47,6 +48,7 @@ List<RouteBase> get $appRoutes => [
   $reviewSubmittedRoute,
   $partnerChatRoute,
   $clinicInfoRoute,
+  $clinicSpecialistsRoute,
   $cartRoute,
 ];
 
@@ -952,6 +954,33 @@ mixin $SignInRoute on GoRouteData {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $forgotPasswordRoute => GoRouteData.$route(
+  path: '/forgot-password',
+  name: 'forgot_password',
+  factory: $ForgotPasswordRoute._fromState,
+);
+
+mixin $ForgotPasswordRoute on GoRouteData {
+  static ForgotPasswordRoute _fromState(GoRouterState state) =>
+      const ForgotPasswordRoute();
+
+  @override
+  String get location => GoRouteData.$location('/forgot-password');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
 RouteBase get $emailFormRoute => GoRouteData.$route(
   path: '/email_form',
   name: 'email_form',
@@ -1434,6 +1463,38 @@ mixin $ClinicInfoRoute on GoRouteData {
   @override
   String get location => GoRouteData.$location(
     '/clinic_info',
+    queryParams: {'clinic-id': _self.clinicId},
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $clinicSpecialistsRoute => GoRouteData.$route(
+  path: '/clinic_specialists',
+  name: 'clinic_specialists',
+  factory: $ClinicSpecialistsRoute._fromState,
+);
+
+mixin $ClinicSpecialistsRoute on GoRouteData {
+  static ClinicSpecialistsRoute _fromState(GoRouterState state) =>
+      ClinicSpecialistsRoute(clinicId: state.uri.queryParameters['clinic-id']!);
+
+  ClinicSpecialistsRoute get _self => this as ClinicSpecialistsRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/clinic_specialists',
     queryParams: {'clinic-id': _self.clinicId},
   );
 

@@ -710,15 +710,24 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-elastic@123}
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-kibana@123}
     command:
       - /bin/sh
       - -c
       - |
-        curl -fsS -X POST -u elastic:${ELASTIC_PASSWORD:-elastic@123} \
+        echo "Setting kibana_system password..."
+        curl -fsS -X POST -u "elastic:$${ELASTIC_PASSWORD}" \
           -H 'Content-Type: application/json' \
-          http://elasticsearch:9200/_security/user/kibana_system/_password \
-          -d '{"password":"${KIBANA_SYSTEM_PASSWORD:-kibana@123}"}'
-        echo "\n✅ kibana_system password configured"
+          "http://elasticsearch:9200/_security/user/kibana_system/_password" \
+          -d "{\"password\":\"$${KIBANA_SYSTEM_PASSWORD}\"}"
+        echo ""
+        echo "Verifying kibana_system can authenticate..."
+        curl -fsS -u "kibana_system:$${KIBANA_SYSTEM_PASSWORD}" \
+          "http://elasticsearch:9200/" > /dev/null && \
+          echo "✅ kibana_system password configured and verified" || \
+          echo "❌ kibana_system authentication failed"
 
 volumes:
   pgdata:

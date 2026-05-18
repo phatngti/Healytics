@@ -4,6 +4,7 @@ import {
   ConflictException,
   UnauthorizedException,
   ForbiddenException,
+  BadRequestException,
   Optional,
 } from '@nestjs/common';
 import { AccountService } from '@/account/account.service';
@@ -11,7 +12,7 @@ import { RegisterDto } from './dto/request/register.dto';
 import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import { LogoutResponseDto } from './dto/response/logout-response.dto';
 import * as bcrypt from 'bcrypt';
-import { createHash } from 'crypto';
+import { createHash, randomBytes } from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@/account/enum/role.enum';
 import { UserProfile } from '@/common/entities/user-profile.entity';
@@ -19,6 +20,10 @@ import { Account } from '@/common/entities/account.entity';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 import { PartnersService } from '@/partners/partners.service';
 import { RedisService } from '@/redis/redis.service';
+import { PasswordResetMailerService } from './password-reset-mailer.service';
+import { ForgotPasswordDto } from './dto/request/forgot-password.dto';
+import { ResetPasswordDto } from './dto/request/reset-password.dto';
+import { PasswordResetResponseDto } from './dto/response/password-reset-response.dto';
 
 /** Roles allowed for admin/partner login */
 const ADMIN_ROLES: Role[] = [Role.ADMIN, Role.HEALTH_PARTNER, Role.EMPLOYEE];
@@ -66,6 +71,11 @@ interface CreateTokenOptions {
   persistRefreshSession?: boolean;
 }
 
+interface PasswordResetJwtPayload extends AuthJwtPayload {
+  purpose?: 'password_reset';
+  nonce?: string;
+}
+
 /** Validated user from authentication */
 export interface ValidatedUser {
   id: string;
@@ -96,11 +106,14 @@ export class AuthService {
   private readonly refreshDbFallback: boolean;
   private readonly refreshDualWrite: boolean;
   private readonly partnerVerificationCacheTtlSeconds: number;
+  private readonly passwordResetExpires: string;
+  private readonly passwordResetTtlSeconds: number;
 
   constructor(
     private readonly accountService: AccountService,
     private readonly jwtService: JwtService,
     private readonly partnerService: PartnersService,
+    private readonly passwordResetMailer: PasswordResetMailerService,
     @Optional()
     private readonly redisService?: RedisService,
   ) {
@@ -116,6 +129,12 @@ export class AuthService {
     this.refreshDualWrite = process.env.AUTH_REFRESH_DUAL_WRITE === 'true';
     this.partnerVerificationCacheTtlSeconds = Number(
       process.env.PARTNER_VERIFICATION_CACHE_TTL_SECONDS || 300,
+    );
+    this.passwordResetExpires =
+      process.env.AUTH_PASSWORD_RESET_EXPIRES_IN || '15m';
+    this.passwordResetTtlSeconds = this.parseDurationSeconds(
+      this.passwordResetExpires,
+      15 * 60,
     );
   }
 
@@ -242,6 +261,53 @@ export class AuthService {
     return user;
   }
 
+  async requestUserPasswordReset(
+    dto: ForgotPasswordDto,
+  ): Promise<PasswordResetResponseDto> {
+    const email = dto.email.trim().toLowerCase();
+    const response = this.passwordResetRequestedResponse();
+    const account = await this.accountService.findByEmail(email);
+
+    if (!account || !account.isActive) {
+      this.logger.warn(`Password reset requested for unknown email: ${email}`);
+      return response;
+    }
+
+    const token = await this.createPasswordResetToken(account);
+    await this.passwordResetMailer.sendPasswordResetEmail(account.email, token);
+    this.logger.log(`Password reset email queued for account: ${account.id}`);
+    return response;
+  }
+
+  async resetUserPassword(
+    dto: ResetPasswordDto,
+  ): Promise<PasswordResetResponseDto> {
+    const payload = this.verifyPasswordResetToken(dto.token);
+
+    if (
+      !payload.sub ||
+      payload.purpose !== 'password_reset' ||
+      !payload.nonce
+    ) {
+      throw new BadRequestException('Invalid password reset token');
+    }
+
+    await this.consumePasswordResetToken(payload.sub, payload.nonce, dto.token);
+
+    const account = await this.accountService.findOne(payload.sub);
+    if (!account || !account.isActive) {
+      throw new BadRequestException('Invalid password reset token');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+    await this.accountService.updatePasswordHash(account.id, passwordHash);
+    await this.deleteRedisRefreshSession(account.id);
+
+    const response = new PasswordResetResponseDto();
+    response.message = 'Password reset successfully.';
+    return response;
+  }
+
   /**
    * Logs in a regular user (USER role).
    * @param user - The validated user
@@ -359,8 +425,7 @@ export class AuthService {
       );
     }
 
-    const partnerVerification =
-      await this.getPartnerVerificationInfo(userId);
+    const partnerVerification = await this.getPartnerVerificationInfo(userId);
     if (!partnerVerification) {
       throw new ForbiddenException(
         'This account is not authorized for partner login.',
@@ -523,9 +588,74 @@ export class AuthService {
     await this.rotateRefreshSession(
       validation,
       tokens.refresh_token,
-      this.buildJwtPayload(user.id, user.email, user.role, profile, undefined, user.createdAt),
+      this.buildJwtPayload(
+        user.id,
+        user.email,
+        user.role,
+        profile,
+        undefined,
+        user.createdAt,
+      ),
     );
     return tokens;
+  }
+
+  private async createPasswordResetToken(account: Account): Promise<string> {
+    const nonce = randomBytes(16).toString('hex');
+    const payload: PasswordResetJwtPayload = {
+      sub: account.id,
+      email: account.email,
+      role: account.role,
+      purpose: 'password_reset',
+      nonce,
+    };
+    const token = await this.signJwt(payload, this.passwordResetExpires);
+
+    if (this.redisService && this.passwordResetTtlSeconds > 0) {
+      await this.redisService.set(
+        this.passwordResetKey(account.id, nonce),
+        this.sha256(token),
+        this.passwordResetTtlSeconds,
+      );
+    } else {
+      this.logger.warn(
+        'Redis is unavailable for password reset tokens; using JWT expiry only.',
+      );
+    }
+
+    return token;
+  }
+
+  private verifyPasswordResetToken(token: string): PasswordResetJwtPayload {
+    try {
+      return this.jwtService.verify(token) as PasswordResetJwtPayload;
+    } catch {
+      throw new BadRequestException('Invalid or expired password reset token');
+    }
+  }
+
+  private async consumePasswordResetToken(
+    accountId: string,
+    nonce: string,
+    token: string,
+  ): Promise<void> {
+    if (!this.redisService) {
+      return;
+    }
+
+    const key = this.passwordResetKey(accountId, nonce);
+    const storedHash = await this.redisService.get(key);
+    if (!storedHash || storedHash !== this.sha256(token)) {
+      throw new BadRequestException('Invalid or expired password reset token');
+    }
+    await this.redisService.del(key);
+  }
+
+  private passwordResetRequestedResponse(): PasswordResetResponseDto {
+    const response = new PasswordResetResponseDto();
+    response.message =
+      'If the email is registered, a password reset link has been sent.';
+    return response;
   }
 
   private buildJwtPayload(
@@ -538,10 +668,7 @@ export class AuthService {
   ): AuthJwtPayload {
     const payload: AuthJwtPayload = { sub: userId, email, role };
     if (profile) {
-      const fullName = [
-        profile.firstName ?? '',
-        profile.lastName ?? '',
-      ]
+      const fullName = [profile.firstName ?? '', profile.lastName ?? '']
         .join(' ')
         .trim();
       payload.name = fullName || undefined;
@@ -592,9 +719,8 @@ export class AuthService {
     const key = this.refreshSessionKey(userId);
 
     try {
-      const session = await this.redisService!.getJson<RefreshSessionRecord>(
-        key,
-      );
+      const session =
+        await this.redisService!.getJson<RefreshSessionRecord>(key);
       if (!session) {
         return null;
       }
@@ -642,9 +768,8 @@ export class AuthService {
       }
     }
 
-    const partnerProfile = await this.partnerService.getPartnerProfile(
-      accountId,
-    );
+    const partnerProfile =
+      await this.partnerService.getPartnerProfile(accountId);
     if (!partnerProfile) {
       return null;
     }
@@ -807,10 +932,7 @@ export class AuthService {
   }
 
   private userProfileFromClaims(
-    claims: Pick<
-      AuthJwtPayload,
-      'firstName' | 'lastName' | 'profileCompleted'
-    >,
+    claims: Pick<AuthJwtPayload, 'firstName' | 'lastName' | 'profileCompleted'>,
   ): UserProfile | undefined {
     const hasProfileClaims =
       claims.firstName !== undefined ||
@@ -855,6 +977,14 @@ export class AuthService {
 
   private hashRefreshToken(refreshToken: string): string {
     return createHash('sha256').update(refreshToken).digest('hex');
+  }
+
+  private passwordResetKey(accountId: string, nonce: string): string {
+    return `auth:password-reset:v1:${accountId}:${nonce}`;
+  }
+
+  private sha256(value: string): string {
+    return createHash('sha256').update(value).digest('hex');
   }
 
   private parseDurationSeconds(value: string, fallbackSeconds: number): number {

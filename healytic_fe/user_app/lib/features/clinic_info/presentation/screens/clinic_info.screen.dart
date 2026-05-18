@@ -103,23 +103,10 @@ class _ClinicInfoBodyState extends ConsumerState<_ClinicInfoBody>
 
   /// Pre-compute expanded height and blur threshold
   /// from screen dimensions.
-  ///
-  /// Note: SliverAppBar internally computes
-  /// maxExtent = topPad + expandedHeight, so we
-  /// must NOT include topPad here.
   void _computeLayout() {
-    final screenWidth = MediaQuery.sizeOf(context).width;
-
-    final coverHeight = screenWidth * 9 / 25;
-    // Logo extends 44px below cover (72 - 28 overlap).
-    final logoExtension = screenWidth * 2 / 25;
-    final statsHeight = screenWidth * 2 / 25;
-    final breathing = screenWidth * 1 / 25;
-
-    _expandedHeight = coverHeight + logoExtension + statsHeight + breathing;
-
-    // Blur activates when cover is mostly gone.
-    _blurThreshold = coverHeight * 0.5;
+    final headerLayout = ClinicCollapsingHeaderLayout.of(context);
+    _expandedHeight = headerLayout.expandedHeight;
+    _blurThreshold = headerLayout.blurThreshold;
   }
 
   void _handleBack() {
@@ -264,7 +251,6 @@ class _ClinicInfoBodyState extends ConsumerState<_ClinicInfoBody>
             return ClinicCollapsingHeader(
               clinic: _clinic,
               collapseProgress: collapseProgress,
-              expandedHeight: _expandedHeight,
               onFollow: _followBusy ? null : _toggleFollow,
               onChat:
                   _clinic.chatPartnerId == null ||
@@ -290,7 +276,7 @@ class _ClinicInfoBodyState extends ConsumerState<_ClinicInfoBody>
   ///
   /// SliverAppBar internally:
   ///   maxExtent = topPad + expandedHeight
-  ///   minExtent = topPad (toolbarHeight=0)
+  ///   minExtent = topPad + toolbarHeight
   ///   range = expandedHeight
   double _computeCollapseProgress(BoxConstraints constraints) {
     final topPad = MediaQuery.paddingOf(context).top;

@@ -2,12 +2,14 @@ import {
   Injectable,
   Logger,
   InternalServerErrorException,
+  Optional,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { CreateDoctorDto } from '../../dto/create-doctor.dto';
 import { Employee } from '@/common/entities/employee.entity';
 import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
 import { EmployeeRole } from '../../enum/employee-role.enum';
+import { SearchIndexOutboxService } from '@/search/services/search-index-outbox.service';
 
 /**
  * Handler for creating doctor employees with transactional boundaries.
@@ -17,7 +19,11 @@ import { EmployeeRole } from '../../enum/employee-role.enum';
 export class CreateDoctorHandler {
   private readonly logger = new Logger(CreateDoctorHandler.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @Optional()
+    private readonly searchIndexOutboxService?: SearchIndexOutboxService,
+  ) {}
 
   /**
    * Executes the create doctor command within a transaction.
@@ -67,6 +73,11 @@ export class CreateDoctorHandler {
         certifications: command.certifications,
       });
       await queryRunner.manager.save(DoctorProfile, doctorProfile);
+
+      await this.searchIndexOutboxService?.enqueueEmployee(
+        queryRunner.manager,
+        savedEmployee.id,
+      );
 
       // 3. Commit transaction
       await queryRunner.commitTransaction();
