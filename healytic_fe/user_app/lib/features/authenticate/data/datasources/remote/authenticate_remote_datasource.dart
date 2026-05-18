@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ abstract class AuthenticateRemoteDatasource {
     required String email,
     required String password,
   });
+
+  Future<void> requestPasswordReset({required String email});
 }
 
 class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
@@ -50,6 +53,48 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
       'refreshToken': response.refreshToken,
       'basicInfo': basicInfo.toJson(),
     });
+  }
+
+  @override
+  Future<void> requestPasswordReset({required String email}) async {
+    final response = await apiService.apiClient.invokeAPI(
+      '/auth/user/forgot-password',
+      'POST',
+      const [],
+      {'email': email.trim().toLowerCase()},
+      {'Content-Type': 'application/json'},
+      {},
+      'application/json',
+    );
+
+    if (response.statusCode >= 400) {
+      throw ApiException(
+        response.statusCode,
+        _messageFromResponse(
+          response.body,
+          'Unable to send password reset email',
+        ),
+      );
+    }
+  }
+
+  String _messageFromResponse(String body, String fallback) {
+    if (body.isEmpty) return fallback;
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map<String, dynamic>) {
+        final message = decoded['message'];
+        if (message is String && message.trim().isNotEmpty) {
+          return message;
+        }
+        if (message is List && message.isNotEmpty) {
+          return message.join('\n');
+        }
+      }
+    } catch (_) {
+      // Use fallback for non-JSON backend errors.
+    }
+    return fallback;
   }
 }
 

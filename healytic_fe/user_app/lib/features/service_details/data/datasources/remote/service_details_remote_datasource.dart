@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/providers/api.provider.dart';
 import 'package:user_app/core/services/api.service.dart';
+import 'package:user_app/features/service_details/data/mappers/service_description_text.mapper.dart';
 import 'package:user_app/features/service_details/domain/entities/service_details.entity.dart';
 import 'package:user_openapi/api.dart';
 
@@ -88,7 +89,7 @@ class ServiceDetailsRemoteDatasourceImpl
       price: dto['price']?.toString() ?? '',
       isVerified: dto['isVerified'] == true,
       isWishlisted: dto['isWishlisted'] == true,
-      description: dto['description']?.toString() ?? '',
+      description: serviceDescriptionToPlainText(dto['description']),
       featureTags: _listOfMaps(dto['featureTags'])
           .map(
             (t) => FeatureTagEntity(

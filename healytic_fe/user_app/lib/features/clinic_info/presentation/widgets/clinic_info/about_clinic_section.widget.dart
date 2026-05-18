@@ -45,9 +45,14 @@ class _AboutClinicSectionState extends State<AboutClinicSection> {
               fontSize: 11,
             ),
           ),
-          const SizedBox(height: 4),
-          GestureDetector(
-            onTap: () => setState(() => _expanded = !_expanded),
+          TextButton(
+            onPressed: () => setState(() => _expanded = !_expanded),
+            style: TextButton.styleFrom(
+              minimumSize: Size.zero,
+              padding: EdgeInsets.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              alignment: Alignment.centerLeft,
+            ),
             child: Text(
               _expanded ? 'Show Less' : 'Read More',
               style: textTheme.labelSmall?.copyWith(

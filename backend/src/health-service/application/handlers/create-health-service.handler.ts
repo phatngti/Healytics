@@ -6,6 +6,7 @@ import {
   HttpException,
   InternalServerErrorException,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { DataSource, In } from 'typeorm';
 import { RedisService } from '@/redis/redis.service';
@@ -22,6 +23,8 @@ import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity'
 import { Category } from '@/common/entities/category.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { Partner } from '@/common/entities/partner.entity';
+import { SearchIndexOperation } from '@/search/entities/search-index-outbox.entity';
+import { SearchIndexOutboxService } from '@/search/services/search-index-outbox.service';
 
 type CreateHealthServiceCommand = CreatePartnerHealthServiceDto & {
   partnerId: string;
@@ -34,6 +37,8 @@ export class CreateHealthServiceHandler {
   constructor(
     private readonly dataSource: DataSource,
     private readonly redisService: RedisService,
+    @Optional()
+    private readonly searchIndexOutboxService?: SearchIndexOutboxService,
   ) {}
 
   /**
@@ -225,6 +230,17 @@ export class CreateHealthServiceHandler {
         );
         await queryRunner.manager.save(ProductTag, tagEntities);
       }
+
+      await this.searchIndexOutboxService?.enqueueProduct(
+        queryRunner.manager,
+        savedProduct.id,
+        SearchIndexOperation.UPSERT,
+        { employeeIds: uniqueEmployeeIds },
+      );
+      await this.searchIndexOutboxService?.enqueueEmployees(
+        queryRunner.manager,
+        uniqueEmployeeIds,
+      );
 
       await queryRunner.commitTransaction();
       this.logger.log(`Product created successfully: ${savedProduct.id}`);

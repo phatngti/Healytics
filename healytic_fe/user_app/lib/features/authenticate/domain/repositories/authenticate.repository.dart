@@ -5,4 +5,6 @@ abstract class AuthenticateRepository {
     required String email,
     required String password,
   });
+
+  Future<void> requestPasswordReset({required String email});
 }
