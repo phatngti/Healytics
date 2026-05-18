@@ -3,6 +3,7 @@ import {
   Logger,
   NotFoundException,
   InternalServerErrorException,
+  Optional,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { UpdateEmployeeDto } from '../../dto/update-employee.dto';
@@ -10,6 +11,7 @@ import { Employee } from '@/common/entities/employee.entity';
 import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
 import { TherapistProfile } from '@/common/entities/therapist-profile.entity';
 import { EmployeeRole } from '../../enum/employee-role.enum';
+import { SearchIndexOutboxService } from '@/search/services/search-index-outbox.service';
 
 /**
  * Handler for updating employees with transactional boundaries.
@@ -19,7 +21,11 @@ import { EmployeeRole } from '../../enum/employee-role.enum';
 export class UpdateEmployeeHandler {
   private readonly logger = new Logger(UpdateEmployeeHandler.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @Optional()
+    private readonly searchIndexOutboxService?: SearchIndexOutboxService,
+  ) {}
 
   /**
    * Executes the update employee command within a transaction.
@@ -91,6 +97,11 @@ export class UpdateEmployeeHandler {
         }
         await queryRunner.manager.save(TherapistProfile, profile);
       }
+
+      await this.searchIndexOutboxService?.enqueueEmployee(
+        queryRunner.manager,
+        id,
+      );
 
       // 5. Commit transaction
       await queryRunner.commitTransaction();

@@ -9,10 +9,12 @@ class SpecialistsSection extends StatelessWidget {
   const SpecialistsSection({
     super.key,
     required this.specialists,
+    this.onViewAllTap,
     this.onSpecialistTap,
   });
 
   final List<ClinicSpecialistPreview> specialists;
+  final VoidCallback? onViewAllTap;
   final void Function(String id)? onSpecialistTap;
 
   @override
@@ -41,12 +43,20 @@ class SpecialistsSection extends StatelessWidget {
                   color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              Text(
-                'View All',
-                style: textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
-                  fontSize: 10,
+              TextButton(
+                onPressed: onViewAllTap,
+                style: TextButton.styleFrom(
+                  minimumSize: Size.zero,
+                  padding: EdgeInsets.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  'View All',
+                  style: textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.primary,
+                    fontSize: 10,
+                  ),
                 ),
               ),
             ],
@@ -62,74 +72,80 @@ class SpecialistsSection extends StatelessWidget {
             separatorBuilder: (_, __) => AppDimens.horizontalMediumSmall,
             itemBuilder: (context, index) {
               final spec = specialists[index];
-              return GestureDetector(
-                onTap: () => onSpecialistTap?.call(spec.id),
-                child: SizedBox(
-                  width: 120,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AspectRatio(
-                        aspectRatio: 1,
-                        child: ClipRRect(
-                          borderRadius: AppDimens.radiusMediumSmall,
-                          child: spec.imageUrl != null
-                              ? NetworkImageAuto(
-                                  imageUrl: spec.imageUrl!,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(
-                                  color: colorScheme.surfaceContainerHighest,
-                                  child: Icon(
-                                    Icons.person,
-                                    color: colorScheme.onSurfaceVariant,
+              return Semantics(
+                button: onSpecialistTap != null,
+                label: spec.name,
+                child: GestureDetector(
+                  onTap: () => onSpecialistTap?.call(spec.id),
+                  child: SizedBox(
+                    width: 120,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AspectRatio(
+                          aspectRatio: 1,
+                          child: ClipRRect(
+                            borderRadius: AppDimens.radiusMediumSmall,
+                            child: spec.imageUrl != null
+                                ? NetworkImageAuto(
+                                    imageUrl: spec.imageUrl!,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Container(
+                                    color: colorScheme.surfaceContainerHighest,
+                                    child: Icon(
+                                      Icons.person,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
                                   ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        spec.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
-                        ),
-                      ),
-                      Text(
-                        spec.role,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.labelSmall?.copyWith(
-                          fontSize: 9,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      if (spec.experienceLabel != null) ...[
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
                           ),
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary.withValues(alpha: 0.05),
-                            borderRadius: AppDimens.radiusExtraSmall,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          spec.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
                           ),
-                          child: Text(
-                            spec.experienceLabel!,
-                            style: textTheme.labelSmall?.copyWith(
-                              fontSize: 8,
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FontStyle.italic,
-                              color: colorScheme.primary,
+                        ),
+                        Text(
+                          spec.role,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.labelSmall?.copyWith(
+                            fontSize: 9,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        if (spec.experienceLabel != null) ...[
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary.withValues(
+                                alpha: 0.05,
+                              ),
+                              borderRadius: AppDimens.radiusExtraSmall,
+                            ),
+                            child: Text(
+                              spec.experienceLabel!,
+                              style: textTheme.labelSmall?.copyWith(
+                                fontSize: 8,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic,
+                                color: colorScheme.primary,
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               );

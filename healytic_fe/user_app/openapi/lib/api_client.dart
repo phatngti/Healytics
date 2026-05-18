@@ -344,6 +344,8 @@ class ApiClient {
           return BookingResponseDto.fromJson(value);
         case 'BookingScheduleDto':
           return BookingScheduleDto.fromJson(value);
+        case 'BookingSearchResponseDto':
+          return BookingSearchResponseDto.fromJson(value);
         case 'BookingServiceResponseDto':
           return BookingServiceResponseDto.fromJson(value);
         case 'BookingSpecialistResponseDto':
@@ -830,6 +832,8 @@ class ApiClient {
           return TreatmentReviewResponseDto.fromJson(value);
         case 'UpcomingAppointmentDto':
           return UpcomingAppointmentDto.fromJson(value);
+        case 'UpdateAvatarDto':
+          return UpdateAvatarDto.fromJson(value);
         case 'UpdateCategoryDto':
           return UpdateCategoryDto.fromJson(value);
         case 'UpdateEmployeeDto':

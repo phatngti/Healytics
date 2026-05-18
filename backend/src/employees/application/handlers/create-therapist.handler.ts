@@ -2,6 +2,7 @@ import {
   Injectable,
   Logger,
   InternalServerErrorException,
+  Optional,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import {
@@ -11,6 +12,7 @@ import {
 import { Employee } from '@/common/entities/employee.entity';
 import { TherapistProfile } from '@/common/entities/therapist-profile.entity';
 import { EmployeeRole } from '../../enum/employee-role.enum';
+import { SearchIndexOutboxService } from '@/search/services/search-index-outbox.service';
 
 type CreateTherapistCommand = CreateSpaTherapistDto | CreateMassageTherapistDto;
 
@@ -23,7 +25,11 @@ type CreateTherapistCommand = CreateSpaTherapistDto | CreateMassageTherapistDto;
 export class CreateTherapistHandler {
   private readonly logger = new Logger(CreateTherapistHandler.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @Optional()
+    private readonly searchIndexOutboxService?: SearchIndexOutboxService,
+  ) {}
 
   /**
    * Executes the create therapist command within a transaction.
@@ -95,6 +101,11 @@ export class CreateTherapistHandler {
         profileData,
       );
       await queryRunner.manager.save(TherapistProfile, therapistProfile);
+
+      await this.searchIndexOutboxService?.enqueueEmployee(
+        queryRunner.manager,
+        savedEmployee.id,
+      );
 
       // 3. Commit transaction
       await queryRunner.commitTransaction();

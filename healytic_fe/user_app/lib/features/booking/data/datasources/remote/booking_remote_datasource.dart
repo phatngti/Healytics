@@ -163,11 +163,33 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
 
   @override
   Future<BookingSearchResult> searchBooking(String query) async {
-    // TODO: Call Elasticsearch endpoint when
-    // backend is ready. Stubbed to return empty
-    // results for now.
-    log('searchBooking stub called: $query');
-    return const BookingSearchResult();
+    final normalized = query.trim();
+    if (normalized.length < 2) return const BookingSearchResult();
+
+    try {
+      final response = await _apiService.userBookingSearchApi
+          .bookingSearchControllerSearch(normalized, limit: '5');
+
+      if (response == null) return const BookingSearchResult();
+
+      return BookingSearchResult(
+        services: response.services.map(_mapServiceDto).toList(),
+        specialists: response.specialists
+            .map(
+              (dto) => BookingSpecialist(
+                id: dto.id,
+                eligibilityId: dto.eligibilityId,
+                name: dto.name,
+                specialty: dto.specialty,
+                avatarUrl: dto.avatarUrl?.toString(),
+              ),
+            )
+            .toList(),
+      );
+    } catch (e, st) {
+      log('Error searching booking data', error: e, stackTrace: st);
+      rethrow;
+    }
   }
 
   @override

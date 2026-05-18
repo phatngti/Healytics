@@ -3,6 +3,7 @@ import {
   Logger,
   NotFoundException,
   InternalServerErrorException,
+  Optional,
 } from '@nestjs/common';
 import { DataSource, In } from 'typeorm';
 import { UpdatePartnerHealthServiceDto } from '../../dto/partner/update-partner-health-service.dto';
@@ -15,12 +16,18 @@ import { Employee } from '@/common/entities/employee.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
 import { ProductTag } from '@/common/entities/product-tag.entity';
 import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
+import { SearchIndexOperation } from '@/search/entities/search-index-outbox.entity';
+import { SearchIndexOutboxService } from '@/search/services/search-index-outbox.service';
 
 @Injectable()
 export class UpdateHealthServiceHandler {
   private readonly logger = new Logger(UpdateHealthServiceHandler.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @Optional()
+    private readonly searchIndexOutboxService?: SearchIndexOutboxService,
+  ) {}
 
   async execute(
     id: string,
@@ -43,6 +50,17 @@ export class UpdateHealthServiceHandler {
         throw new NotFoundException(`Product with ID ${id} not found`);
       }
 
+      const previousEligibilities = await queryRunner.manager.find(
+        ProductEmployeeEligibility,
+        {
+          where: { productId: id },
+          select: ['employeeId'],
+        },
+      );
+      const previousEmployeeIds = previousEligibilities.map(
+        (eligibility) => eligibility.employeeId,
+      );
+
       const {
         media,
         productDefinition,
@@ -56,9 +74,7 @@ export class UpdateHealthServiceHandler {
       // Null values are already stripped by StripNullPropertiesPipe;
       // only filter out undefined (omitted) fields.
       const sanitizedUpdate = Object.fromEntries(
-        Object.entries(updateData).filter(
-          ([, value]) => value !== undefined,
-        ),
+        Object.entries(updateData).filter(([, value]) => value !== undefined),
       );
 
       if (Object.keys(sanitizedUpdate).length > 0) {
@@ -224,6 +240,28 @@ export class UpdateHealthServiceHandler {
           await queryRunner.manager.save(ProductTag, tagEntities);
         }
       }
+
+      const currentEligibilities = await queryRunner.manager.find(
+        ProductEmployeeEligibility,
+        {
+          where: { productId: id },
+          select: ['employeeId'],
+        },
+      );
+      const relatedEmployeeIds = [
+        ...previousEmployeeIds,
+        ...currentEligibilities.map((eligibility) => eligibility.employeeId),
+      ];
+      await this.searchIndexOutboxService?.enqueueProduct(
+        queryRunner.manager,
+        id,
+        SearchIndexOperation.UPSERT,
+        { employeeIds: relatedEmployeeIds },
+      );
+      await this.searchIndexOutboxService?.enqueueEmployees(
+        queryRunner.manager,
+        relatedEmployeeIds,
+      );
 
       // 8. Commit
       await queryRunner.commitTransaction();

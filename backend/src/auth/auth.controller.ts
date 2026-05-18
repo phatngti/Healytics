@@ -13,6 +13,8 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/request/register.dto';
 import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto';
 import { CheckEmailDto } from './dto/request/check-email.dto';
+import { ForgotPasswordDto } from './dto/request/forgot-password.dto';
+import { ResetPasswordDto } from './dto/request/reset-password.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import {
   ApiBody,
@@ -29,6 +31,7 @@ import { Throttle } from '@nestjs/throttler';
 import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import { CheckEmailResponseDto } from './dto/response/check-email-response.dto';
 import { LogoutResponseDto } from './dto/response/logout-response.dto';
+import { PasswordResetResponseDto } from './dto/response/password-reset-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from '../common/decorators/auth/public.decorator';
 import { LoginDto } from './dto/request/login.dto';
@@ -80,12 +83,8 @@ export class AuthController {
     type: CheckEmailResponseDto,
   })
   @ApiBadRequestResponse({ description: 'Invalid email format.' })
-  async checkEmail(
-    @Body() dto: CheckEmailDto,
-  ): Promise<CheckEmailResponseDto> {
-    const exists = await this.accountService.checkEmailExists(
-      dto.email,
-    );
+  async checkEmail(@Body() dto: CheckEmailDto): Promise<CheckEmailResponseDto> {
+    const exists = await this.accountService.checkEmailExists(dto.email);
     const response = new CheckEmailResponseDto();
     response.exists = exists;
     return response;
@@ -130,6 +129,50 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginUser(@Req() req): Promise<AuthTokensDto> {
     return this.authService.loginUser(req.user);
+  }
+
+  /**
+   * Sends a password reset link to a user account email.
+   */
+  @Post('user/forgot-password')
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Request a user password reset email',
+    description:
+      'Returns a generic success response to avoid exposing whether an email is registered.',
+  })
+  @ApiOkResponse({
+    description: 'Password reset request accepted.',
+    type: PasswordResetResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid email format.' })
+  async forgotUserPassword(
+    @Body() dto: ForgotPasswordDto,
+  ): Promise<PasswordResetResponseDto> {
+    return this.authService.requestUserPasswordReset(dto);
+  }
+
+  /**
+   * Resets a user password using the token received by email.
+   */
+  @Post('user/reset-password')
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset a user password with email token' })
+  @ApiOkResponse({
+    description: 'Password reset successfully.',
+    type: PasswordResetResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid or expired token, or invalid password.',
+  })
+  async resetUserPassword(
+    @Body() dto: ResetPasswordDto,
+  ): Promise<PasswordResetResponseDto> {
+    return this.authService.resetUserPassword(dto);
   }
 
   // ============================================================================

@@ -34,6 +34,7 @@ import 'package:user_app/features/profile/presentation/screens/profile.screen.da
 import 'package:user_app/features/profile/presentation/screens/edit_profile.screen.dart';
 import 'package:user_app/features/checkout/presentation/screens/checkout.screen.dart';
 import 'package:user_app/features/authenticate/presentation/screens/signin.screen.dart';
+import 'package:user_app/features/authenticate/presentation/screens/forgot_password.screen.dart';
 import 'package:user_app/features/employee/domain/entities/certificate.entity.dart';
 import 'package:user_app/features/employee/presentation/screens/certificate_viewer.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/certificates_list.screen.dart';
@@ -52,6 +53,7 @@ import 'package:user_app/features/review/presentation/screens/review_submitted.s
 import 'package:user_app/features/review/presentation/screens/review_facility.screen.dart';
 import 'package:user_app/features/partner_chat/presentation/screens/partner_chat.screen.dart';
 import 'package:user_app/features/clinic_info/presentation/screens/clinic_info.screen.dart';
+import 'package:user_app/features/clinic_info/presentation/screens/clinic_specialists.screen.dart';
 import 'package:user_app/features/cart/presentation/screens/cart.screen.dart';
 import 'package:user_app/features/notifications/'
     'presentation/providers/notification.provider.dart';
@@ -706,6 +708,26 @@ class SignInRoute extends GoRouteData with $SignInRoute {
   }
 }
 
+@TypedGoRoute<ForgotPasswordRoute>(
+  path: '/forgot-password',
+  name: ForgotPasswordRoute.name,
+)
+class ForgotPasswordRoute extends GoRouteData with $ForgotPasswordRoute {
+  static const String pathPattern = '/forgot-password';
+  static const bool isPublic = true;
+
+  const ForgotPasswordRoute();
+  static const name = 'forgot_password';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const ForgotPasswordScreen(),
+    );
+  }
+}
+
 @TypedGoRoute<EmailFormRoute>(path: '/email_form', name: EmailFormRoute.name)
 class EmailFormRoute extends GoRouteData with $EmailFormRoute {
   static const String pathPattern = '/email_form';
@@ -1088,6 +1110,26 @@ class ClinicInfoRoute extends GoRouteData with $ClinicInfoRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ClinicInfoScreen(clinicId: clinicId),
+    );
+  }
+}
+
+@TypedGoRoute<ClinicSpecialistsRoute>(
+  path: '/clinic_specialists',
+  name: ClinicSpecialistsRoute.name,
+)
+class ClinicSpecialistsRoute extends GoRouteData with $ClinicSpecialistsRoute {
+  final String clinicId;
+
+  const ClinicSpecialistsRoute({required this.clinicId});
+
+  static const name = 'clinic_specialists';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ClinicSpecialistsScreen(clinicId: clinicId),
     );
   }
 }

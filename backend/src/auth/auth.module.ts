@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PartnersModule } from '@/partners/partners.module';
+import { PasswordResetMailerService } from './password-reset-mailer.service';
 
 @Module({
   imports: [
@@ -21,7 +22,12 @@ import { PartnersModule } from '@/partners/partners.module';
     forwardRef(() => PartnersModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    PasswordResetMailerService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}
