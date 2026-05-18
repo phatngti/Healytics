@@ -5,22 +5,30 @@ import { JwtService } from '@nestjs/jwt';
 import { PartnersService } from '@/partners/partners.service';
 import { Role } from '@/account/enum/role.enum';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
+import { PasswordResetMailerService } from './password-reset-mailer.service';
 
 describe('AuthService', () => {
   let service: AuthService;
 
   const mockAccountService = {
     findByEmail: jest.fn(),
+    findOne: jest.fn(),
     create: jest.fn(),
     setRefreshTokenHash: jest.fn(),
+    updatePasswordHash: jest.fn(),
   };
 
   const mockJwtService = {
     sign: jest.fn(),
+    verify: jest.fn(),
   };
 
   const mockPartnersService = {
     getPartnerProfile: jest.fn(),
+  };
+
+  const mockPasswordResetMailer = {
+    sendPasswordResetEmail: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -31,6 +39,10 @@ describe('AuthService', () => {
         { provide: AccountService, useValue: mockAccountService },
         { provide: JwtService, useValue: mockJwtService },
         { provide: PartnersService, useValue: mockPartnersService },
+        {
+          provide: PasswordResetMailerService,
+          useValue: mockPasswordResetMailer,
+        },
       ],
     }).compile();
 
@@ -63,6 +75,63 @@ describe('AuthService', () => {
         partnerProfileCompleted: true,
       }),
       expect.any(Object),
+    );
+  });
+
+  it('should send reset email for active account', async () => {
+    mockJwtService.sign.mockReturnValue('reset-token');
+    mockAccountService.findByEmail.mockResolvedValue({
+      id: 'account-uuid',
+      email: 'user@test.com',
+      role: Role.USER,
+      isActive: true,
+    });
+
+    const result = await service.requestUserPasswordReset({
+      email: 'USER@Test.com',
+    });
+
+    expect(result.message).toContain('password reset link has been sent');
+    expect(mockPasswordResetMailer.sendPasswordResetEmail).toHaveBeenCalledWith(
+      'user@test.com',
+      'reset-token',
+    );
+  });
+
+  it('should not reveal unknown reset emails', async () => {
+    mockAccountService.findByEmail.mockResolvedValue(null);
+
+    const result = await service.requestUserPasswordReset({
+      email: 'missing@test.com',
+    });
+
+    expect(result.message).toContain('password reset link has been sent');
+    expect(
+      mockPasswordResetMailer.sendPasswordResetEmail,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should reset password with valid reset token', async () => {
+    mockJwtService.verify.mockReturnValue({
+      sub: 'account-uuid',
+      purpose: 'password_reset',
+      nonce: 'nonce',
+    });
+    mockAccountService.findOne.mockResolvedValue({
+      id: 'account-uuid',
+      isActive: true,
+    });
+    mockAccountService.updatePasswordHash.mockResolvedValue(undefined);
+
+    const result = await service.resetUserPassword({
+      token: 'reset-token',
+      password: 'Password123!',
+    });
+
+    expect(result.message).toBe('Password reset successfully.');
+    expect(mockAccountService.updatePasswordHash).toHaveBeenCalledWith(
+      'account-uuid',
+      expect.any(String),
     );
   });
 });

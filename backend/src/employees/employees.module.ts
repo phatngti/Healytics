@@ -27,6 +27,7 @@ import { UpdateEmployeeProfileHandler } from './application/handlers/update-empl
 import { GetEmployeeRevenueSummaryHandler } from './application/handlers/get-employee-revenue-summary.handler';
 import { GetEmployeeRevenueTrendHandler } from './application/handlers/get-employee-revenue-trend.handler';
 import { GetEmployeeRevenueBreakdownHandler } from './application/handlers/get-employee-revenue-breakdown.handler';
+import { SearchModule } from '@/search/search.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { GetEmployeeRevenueBreakdownHandler } from './application/handlers/get-e
       SpecialistReview,
     ]),
     PartnersModule,
+    SearchModule,
   ],
   controllers: [
     PartnerEmployeesController,

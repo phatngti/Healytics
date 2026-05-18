@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -41,6 +43,8 @@ class _BookingSearchBarState extends ConsumerState<BookingSearchBar> {
   OverlayEntry? _overlayEntry;
   BookingSearchResult _results = const BookingSearchResult();
   bool _isLoading = false;
+  Timer? _debounceTimer;
+  int _queryVersion = 0;
 
   @override
   void initState() {
@@ -50,6 +54,7 @@ class _BookingSearchBarState extends ConsumerState<BookingSearchBar> {
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _removeOverlay();
     _controller.dispose();
     _focusNode
@@ -64,7 +69,10 @@ class _BookingSearchBarState extends ConsumerState<BookingSearchBar> {
 
   Future<void> _onQueryChanged(String query) async {
     final normalised = query.trim();
-    if (normalised.isEmpty) {
+    _debounceTimer?.cancel();
+
+    if (normalised.length < 2) {
+      _queryVersion++;
       _removeOverlay();
       setState(() {
         _results = const BookingSearchResult();
@@ -73,12 +81,24 @@ class _BookingSearchBarState extends ConsumerState<BookingSearchBar> {
       return;
     }
 
+    final version = ++_queryVersion;
     setState(() => _isLoading = true);
     _showOverlay();
 
-    final result = await ref.read(searchBookingProvider(normalised).future);
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      _executeSearch(normalised, version);
+    });
+  }
 
-    if (!mounted) return;
+  Future<void> _executeSearch(String query, int version) async {
+    BookingSearchResult result;
+    try {
+      result = await ref.read(searchBookingProvider(query).future);
+    } catch (_) {
+      result = const BookingSearchResult();
+    }
+
+    if (!mounted || version != _queryVersion) return;
     setState(() {
       _results = result;
       _isLoading = false;

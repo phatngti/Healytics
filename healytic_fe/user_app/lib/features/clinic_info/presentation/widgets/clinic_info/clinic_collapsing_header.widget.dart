@@ -1,9 +1,72 @@
+import 'dart:math' as math;
+
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/images/avatar.dart';
 import 'package:common/widgets/images/network_image_auto.dart';
 import 'package:flutter/material.dart';
 
 import 'package:user_app/features/clinic_info/domain/entities/clinic_info.entity.dart';
+
+/// Shared measurements for the collapsing clinic header.
+///
+/// [SliverAppBar.expandedHeight] excludes the top safe-area inset, while its
+/// flexible space receives a max height that includes it. Keeping both values
+/// here prevents the header body from being clipped differently per device.
+class ClinicCollapsingHeaderLayout {
+  const ClinicCollapsingHeaderLayout({
+    required this.coverHeight,
+    required this.avatarSize,
+    required this.contentTop,
+    required this.expandedHeight,
+    required this.blurThreshold,
+  });
+
+  static const _coverAspectRatio = 9 / 21;
+  static const _floatingButtonSize = 36.0;
+  static const _profileTopGap = 10.0;
+  static const _statsRowHeight = 40.0;
+  static const _minExpandedHeight = kToolbarHeight + 120;
+
+  final double coverHeight;
+  final double avatarSize;
+  final double contentTop;
+  final double expandedHeight;
+  final double blurThreshold;
+
+  static ClinicCollapsingHeaderLayout of(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final topInset = mediaQuery.padding.top;
+    final avatarSize = AppDimens.adaptive(
+      context,
+      small: 64.0,
+      medium: 72.0,
+      large: 80.0,
+    );
+    final avatarTopOverlap = avatarSize / 2;
+    final coverHeight = math.max(
+      screenWidth * _coverAspectRatio,
+      topInset + _floatingButtonSize + AppDimens.spaceXxl,
+    );
+    final contentTop = coverHeight - avatarTopOverlap + _profileTopGap;
+    final paintedHeight =
+        contentTop +
+        avatarSize +
+        AppDimens.spaceSm +
+        _statsRowHeight +
+        AppDimens.spaceMd;
+
+    return ClinicCollapsingHeaderLayout(
+      coverHeight: coverHeight,
+      avatarSize: avatarSize,
+      contentTop: contentTop,
+      expandedHeight: (paintedHeight - topInset)
+          .clamp(_minExpandedHeight, double.infinity)
+          .toDouble(),
+      blurThreshold: coverHeight * 0.5,
+    );
+  }
+}
 
 /// Flexible space content for the clinic profile
 /// collapsing toolbar.
@@ -16,7 +79,6 @@ class ClinicCollapsingHeader extends StatelessWidget {
     super.key,
     required this.clinic,
     required this.collapseProgress,
-    required this.expandedHeight,
     this.onFollow,
     this.onChat,
   });
@@ -27,8 +89,6 @@ class ClinicCollapsingHeader extends StatelessWidget {
   /// 0.0 = fully expanded, 1.0 = fully collapsed.
   final double collapseProgress;
 
-  /// The total expanded height of the SliverAppBar.
-  final double expandedHeight;
   final VoidCallback? onFollow;
   final VoidCallback? onChat;
 
@@ -36,27 +96,15 @@ class ClinicCollapsingHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final screenWidth = MediaQuery.sizeOf(context).width;
     final hPad = AppDimens.horizontalPadding(context);
+    final headerLayout = ClinicCollapsingHeaderLayout.of(context);
 
     // Content fades out faster than the cover image
     // so text disappears before the image is gone.
     final contentOpacity = (1.0 - collapseProgress * 2.5).clamp(0.0, 1.0);
 
-    // Responsive avatar size and overlap
-    final avatarSize = AppDimens.adaptive(
-      context,
-      small: 64.0,
-      medium: 72.0,
-      large: 80.0,
-    );
-    final topOverlap = avatarSize / 2;
-
-    // Cover image height based on 21:9 aspect ratio.
-    final coverHeight = screenWidth * 9 / 21;
-
     // Parallax offset: image scrolls at 40% speed.
-    final parallaxOffset = collapseProgress * coverHeight * 0.4;
+    final parallaxOffset = collapseProgress * headerLayout.coverHeight * 0.4;
 
     return ClipRect(
       child: Stack(
@@ -70,7 +118,7 @@ class ClinicCollapsingHeader extends StatelessWidget {
             top: -parallaxOffset,
             left: 0,
             right: 0,
-            height: coverHeight,
+            height: headerLayout.coverHeight,
             child: _CoverImage(
               imageUrl: clinic.coverImageUrl,
               fallbackColor: colorScheme.surfaceContainerHighest,
@@ -80,7 +128,7 @@ class ClinicCollapsingHeader extends StatelessWidget {
           // ── Logo + name + address + stats ──
           if (contentOpacity > 0)
             Positioned(
-              top: coverHeight - topOverlap + 10,
+              top: headerLayout.contentTop,
               left: 0,
               right: 0,
               child: Opacity(
@@ -96,7 +144,7 @@ class ClinicCollapsingHeader extends StatelessWidget {
                         logoImageUrl: clinic.logoImageUrl,
                         colorScheme: colorScheme,
                         textTheme: textTheme,
-                        avatarSize: avatarSize,
+                        avatarSize: headerLayout.avatarSize,
                       ),
                       AppDimens.verticalSmall,
                       _StatsRow(
@@ -299,6 +347,8 @@ class _StatsRow extends StatelessWidget {
                   ),
                 ],
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           _CompactFollowButton(
