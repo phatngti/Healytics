@@ -26,3 +26,6 @@ ai_services/recommender2/.env
 /Report/DATN - Copy
 /Report/extracted_images
 /Report/rendered_slides
+# Ignore env files in ai_services
+ai_services/**/.env
+!ai_services/**/.env.example
