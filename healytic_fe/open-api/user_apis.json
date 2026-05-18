@@ -417,6 +417,43 @@
         ]
       }
     },
+    "/account/me/avatar": {
+      "patch": {
+        "operationId": "AccountController_updateAvatar",
+        "summary": "Update current user avatar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAvatarDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Avatar updated, returns refreshed account data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountMeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/account/survey": {
       "get": {
         "operationId": "AccountController_getSurvey",
@@ -2058,6 +2095,55 @@
         },
         "tags": [
           "Employee Revenue"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/booking-search": {
+      "get": {
+        "operationId": "BookingSearchController_search",
+        "summary": "Search booking services and specialists",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "description": "Search text. Minimum 2 characters.",
+            "schema": {
+              "minLength": 2,
+              "example": "massage",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximum results per group. Default 5, max 20.",
+            "schema": {
+              "example": 5,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingSearchResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Booking-search"
         ],
         "security": [
           {
@@ -10903,6 +10989,10 @@
             "description": "Date of birth",
             "example": "1990-01-15"
           },
+          "avatarUrl": {
+            "type": "object",
+            "description": "Avatar image URL"
+          },
           "profileCompleted": {
             "type": "boolean",
             "description": "Whether the profile is completed"
@@ -10965,6 +11055,19 @@
           "isActive",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "UpdateAvatarDto": {
+        "type": "object",
+        "properties": {
+          "avatarUrl": {
+            "type": "string",
+            "description": "S3 storage key of the uploaded avatar",
+            "example": "avatars/abc123.png"
+          }
+        },
+        "required": [
+          "avatarUrl"
         ]
       },
       "SurveyResponseDto": {
@@ -11046,7 +11149,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-17T06:33:57.799Z"
+              "submittedAt": "2026-05-18T08:44:34.943Z"
             }
           }
         },
@@ -14555,6 +14658,61 @@
           "totalAmount"
         ]
       },
+      "BookingSpecialistResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique specialist/employee ID"
+          },
+          "eligibilityId": {
+            "type": "string",
+            "description": "product_employee_eligibility surrogate PK"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full display name",
+            "example": "Dr. Anna Nguyen"
+          },
+          "specialty": {
+            "type": "string",
+            "description": "Short specialty label",
+            "example": "Spa Therapist"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "description": "URL to avatar image",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "eligibilityId",
+          "name",
+          "specialty"
+        ]
+      },
+      "BookingSearchResponseDto": {
+        "type": "object",
+        "properties": {
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookingServiceResponseDto"
+            }
+          },
+          "specialists": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookingSpecialistResponseDto"
+            }
+          }
+        },
+        "required": [
+          "services",
+          "specialists"
+        ]
+      },
       "CategorySummaryDto": {
         "type": "object",
         "properties": {
@@ -14641,40 +14799,6 @@
           "isActive",
           "createdAt",
           "updatedAt"
-        ]
-      },
-      "BookingSpecialistResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique specialist/employee ID"
-          },
-          "eligibilityId": {
-            "type": "string",
-            "description": "product_employee_eligibility surrogate PK"
-          },
-          "name": {
-            "type": "string",
-            "description": "Full display name",
-            "example": "Dr. Anna Nguyen"
-          },
-          "specialty": {
-            "type": "string",
-            "description": "Short specialty label",
-            "example": "Spa Therapist"
-          },
-          "avatarUrl": {
-            "type": "object",
-            "description": "URL to avatar image",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "eligibilityId",
-          "name",
-          "specialty"
         ]
       },
       "AdminCategoryResponseDto": {

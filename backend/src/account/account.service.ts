@@ -264,9 +264,7 @@ export class AccountService {
     await this.setCache(
       cacheKey,
       exists,
-      exists
-        ? this.emailExistsTrueTtlSeconds
-        : this.emailExistsFalseTtlSeconds,
+      exists ? this.emailExistsTrueTtlSeconds : this.emailExistsFalseTtlSeconds,
     );
     return exists;
   }
@@ -306,13 +304,7 @@ export class AccountService {
   async findOneWithRefreshHash(id: string): Promise<Account | null> {
     return this.accountRepo.findOne({
       where: { id },
-      select: [
-        'id',
-        'email',
-        'role',
-        'refreshTokenHash',
-        'isActive',
-      ],
+      select: ['id', 'email', 'role', 'refreshTokenHash', 'isActive'],
       loadEagerRelations: false,
     });
   }
@@ -338,6 +330,12 @@ export class AccountService {
     await this.accountRepo.update(id, { refreshTokenHash: null });
     await this.invalidateAccountMeCache(id);
     this.logger.log(`Refresh token removed for account: ${id}`);
+  }
+
+  async updatePasswordHash(id: string, passwordHash: string): Promise<void> {
+    await this.accountRepo.update(id, { passwordHash, refreshTokenHash: null });
+    await this.invalidateAccountMeCache(id);
+    this.logger.log(`Password hash updated for account: ${id}`);
   }
 
   async invalidateAccountMeCache(accountId: string): Promise<void> {

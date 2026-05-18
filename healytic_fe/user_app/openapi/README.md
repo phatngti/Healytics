@@ -67,6 +67,7 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**accountControllerGetMe**](doc//AccountApi.md#accountcontrollergetme) | **GET** /account/me | Get current user account details
 *AccountApi* | [**accountControllerGetSurvey**](doc//AccountApi.md#accountcontrollergetsurvey) | **GET** /account/survey | Get current user survey
 *AccountApi* | [**accountControllerPostSurvey**](doc//AccountApi.md#accountcontrollerpostsurvey) | **POST** /account/survey | Create one-shot survey for current user
+*AccountApi* | [**accountControllerUpdateAvatar**](doc//AccountApi.md#accountcontrollerupdateavatar) | **PATCH** /account/me/avatar | Update current user avatar
 *AdminAuditLogsApi* | [**auditControllerGetAuditLogs**](doc//AdminAuditLogsApi.md#auditcontrollergetauditlogs) | **GET** /admin/audit-logs | Get audit logs with optional filters
 *AdminCategoriesApi* | [**adminCategoriesControllerCreate**](doc//AdminCategoriesApi.md#admincategoriescontrollercreate) | **POST** /admin/categories | Create a new category
 *AdminCategoriesApi* | [**adminCategoriesControllerFindAll**](doc//AdminCategoriesApi.md#admincategoriescontrollerfindall) | **GET** /admin/categories | List all categories (admin view)
@@ -226,6 +227,7 @@ Class | Method | HTTP request | Description
 *UserAppointmentsApi* | [**userAppointmentControllerListCategories**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistcategories) | **GET** /user/appointments/categories | Get appointment categories for filter chips
 *UserAppointmentsApi* | [**userAppointmentControllerListRecentActivity**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistrecentactivity) | **GET** /user/appointments/recent-activity | Get recent appointment activity for home dashboard
 *UserAppointmentsApi* | [**userAppointmentControllerListRecommendedServices**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistrecommendedservices) | **GET** /user/appointments/recommendations | Get recommended services
+*UserBookingSearchApi* | [**bookingSearchControllerSearch**](doc//UserBookingSearchApi.md#bookingsearchcontrollersearch) | **GET** /user/booking-search | Search booking services and specialists
 *UserBookingsApi* | [**bookingControllerAsyncCheckout**](doc//UserBookingsApi.md#bookingcontrollerasynccheckout) | **POST** /user/bookings/async-checkout | Start async checkout (returns 202 with ticket ID)
 *UserBookingsApi* | [**bookingControllerGetBooking**](doc//UserBookingsApi.md#bookingcontrollergetbooking) | **GET** /user/bookings/{id} | Get booking by ID
 *UserBookingsApi* | [**bookingControllerGetTicketStatus**](doc//UserBookingsApi.md#bookingcontrollergetticketstatus) | **GET** /user/bookings/tickets/{id} | Get checkout ticket status
@@ -358,6 +360,7 @@ Class | Method | HTTP request | Description
  - [AuthTokensDto](doc//AuthTokensDto.md)
  - [BookingResponseDto](doc//BookingResponseDto.md)
  - [BookingScheduleDto](doc//BookingScheduleDto.md)
+ - [BookingSearchResponseDto](doc//BookingSearchResponseDto.md)
  - [BookingServiceResponseDto](doc//BookingServiceResponseDto.md)
  - [BookingSpecialistResponseDto](doc//BookingSpecialistResponseDto.md)
  - [BookingStatus](doc//BookingStatus.md)
@@ -601,6 +604,7 @@ Class | Method | HTTP request | Description
  - [TotalPartnersResponseDto](doc//TotalPartnersResponseDto.md)
  - [TreatmentReviewResponseDto](doc//TreatmentReviewResponseDto.md)
  - [UpcomingAppointmentDto](doc//UpcomingAppointmentDto.md)
+ - [UpdateAvatarDto](doc//UpdateAvatarDto.md)
  - [UpdateCategoryDto](doc//UpdateCategoryDto.md)
  - [UpdateEmployeeDto](doc//UpdateEmployeeDto.md)
  - [UpdateEmployeeProfileDto](doc//UpdateEmployeeProfileDto.md)

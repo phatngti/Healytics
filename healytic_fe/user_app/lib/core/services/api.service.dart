@@ -91,7 +91,7 @@ enum ServicePrefix {
 
 class ApiService implements Authentication {
   final _clients = <ServicePrefix, ApiClient>{};
-  AuthHttpClient? _authHttpClient;
+  final AuthHttpClient? _authHttpClient;
 
   /// The raw API gateway URL **without** any service
   /// prefix (e.g. `https://api.healytics.vn`).
@@ -114,6 +114,7 @@ class ApiService implements Authentication {
   late UserHealthServicesApi userHealthServicesApi;
 
   // ── Booking / Slots ───────────────────────────────
+  late UserBookingSearchApi userBookingSearchApi;
   late UserBookingsApi userBookingsApi;
   late UserSlotsApi userSlotsApi;
 
@@ -198,7 +199,7 @@ class ApiService implements Authentication {
         authentication: this,
       );
       if (_authHttpClient != null) {
-        client.client = _authHttpClient!;
+        client.client = _authHttpClient;
       }
       _clients[prefix] = client;
     }
@@ -220,6 +221,7 @@ class ApiService implements Authentication {
     accountApi = AccountApi(backend);
     categoriesApi = CategoriesApi(backend);
     partnerServiceTagsApi = PartnerServiceTagsApi(backend);
+    userBookingSearchApi = UserBookingSearchApi(backend);
     userBookingsApi = UserBookingsApi(backend);
     userSlotsApi = UserSlotsApi(backend);
     userAppointmentsApi = UserAppointmentsApi(backend);

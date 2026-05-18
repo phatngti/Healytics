@@ -90,3 +90,11 @@ export { PartnerRefundCase } from './partner-refund-case.entity';
 export { AdminFinanceNote } from './admin-finance-note.entity';
 export { AdminFinanceExportJob } from './admin-finance-export-job.entity';
 export { AdminFinanceReconciliationException } from './admin-finance-reconciliation-exception.entity';
+
+// Search
+export { SearchIndexOutbox } from '@/search/entities/search-index-outbox.entity';
+export {
+  SearchIndexEntityType,
+  SearchIndexOperation,
+  SearchIndexOutboxStatus,
+} from '@/search/entities/search-index-outbox.entity';

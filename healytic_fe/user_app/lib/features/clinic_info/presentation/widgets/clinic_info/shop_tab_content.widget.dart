@@ -7,15 +7,13 @@ import 'package:user_app/features/clinic_info/presentation/widgets/clinic_info/c
 import 'package:user_app/features/clinic_info/presentation/widgets/clinic_info/clinic_facility_grid.widget.dart';
 import 'package:user_app/features/clinic_info/presentation/widgets/clinic_info/specialists_section.widget.dart';
 import 'package:user_app/features/clinic_info/presentation/widgets/clinic_info/trust_metrics_bar.widget.dart';
+import 'package:user_app/router/routes.dart';
 
 /// Shop tab — existing clinic profile sections
 /// including trust metrics, certifications,
 /// specialists, facilities, and about.
 class ShopTabContent extends StatelessWidget {
-  const ShopTabContent({
-    super.key,
-    required this.clinic,
-  });
+  const ShopTabContent({super.key, required this.clinic});
 
   final ClinicInfoEntity clinic;
 
@@ -27,17 +25,12 @@ class ShopTabContent extends StatelessWidget {
         AppDimens.verticalLarge,
 
         // Trust metrics
-        TrustMetricsBar(
-          metrics: clinic.trustMetrics,
-        ),
+        TrustMetricsBar(metrics: clinic.trustMetrics),
         AppDimens.verticalLarge,
 
         // Certifications
         if (clinic.certifications.isNotEmpty) ...[
-          CertificationsSection(
-            certifications:
-                clinic.certifications,
-          ),
+          CertificationsSection(certifications: clinic.certifications),
           AppDimens.verticalLarge,
         ],
 
@@ -45,24 +38,25 @@ class ShopTabContent extends StatelessWidget {
         if (clinic.specialists.isNotEmpty) ...[
           SpecialistsSection(
             specialists: clinic.specialists,
+            onViewAllTap: () {
+              ClinicSpecialistsRoute(clinicId: clinic.id).push(context);
+            },
+            onSpecialistTap: (id) {
+              EmployeeDetailRoute(employeeId: id).push(context);
+            },
           ),
           AppDimens.verticalLarge,
         ],
 
         // Facility tour
         if (clinic.facilityImages.isNotEmpty) ...[
-          ClinicFacilityGrid(
-            images: clinic.facilityImages,
-          ),
+          ClinicFacilityGrid(images: clinic.facilityImages),
           AppDimens.verticalLarge,
         ],
 
         // About
-        if (clinic.description != null &&
-            clinic.description!.isNotEmpty) ...[
-          AboutClinicSection(
-            description: clinic.description!,
-          ),
+        if (clinic.description != null && clinic.description!.isNotEmpty) ...[
+          AboutClinicSection(description: clinic.description!),
           AppDimens.verticalLarge,
         ],
       ],
