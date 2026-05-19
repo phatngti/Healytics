@@ -21,7 +21,7 @@ Name | Type | Description | Notes
 **employeeIds** | **List<String>** |  | [optional] [default to const []]
 **tagIds** | **List<String>** | Feature tag IDs to associate with this service (full replacement) | [optional] [default to const []]
 **media** | [**List<CreatePartnerHealthServiceMediaDto>**](CreatePartnerHealthServiceMediaDto.md) |  | [optional] [default to const []]
-**productDefinition** | [**CreatePartnerHealthServiceDefinitionDto**](CreatePartnerHealthServiceDefinitionDto.md) |  | [optional] 
+**productDefinition** | [**UpdatePartnerHealthServiceDefinitionDto**](UpdatePartnerHealthServiceDefinitionDto.md) |  | [optional] 
 **facilityImages** | [**List<CreatePartnerHealthServiceFacilityImageDto>**](CreatePartnerHealthServiceFacilityImageDto.md) |  | [optional] [default to const []]
 **serviceManual** | [**ServiceManualInputDto**](ServiceManualInputDto.md) |  | [optional] 
 

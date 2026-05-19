@@ -1,4 +1,12 @@
-import { Post, Body, Param, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Body,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import {
   ApiOperation,
   ApiCreatedResponse,
@@ -13,9 +21,12 @@ import { StripePaymentService } from './stripe-payment.service';
 import {
   CreateMoMoPaymentDto,
   CreateMoMoRefundDto,
+  ConfirmStripeSetupIntentDto,
   CreateStripePaymentDto,
+  CreateStripeSetupIntentResponseDto,
   MoMoPaymentResponseDto,
   MoMoRefundResponseDto,
+  SavedPaymentCardDto,
   StripePaymentResponseDto,
   StripeRefundResponseDto,
 } from './dto';
@@ -77,17 +88,72 @@ export class UserPaymentController {
 
   // ── Stripe Endpoints ────────────────────────────────────────
 
+  @Get('cards')
+  @ApiOperation({ summary: 'List saved payment cards' })
+  @ApiOkResponse({ type: SavedPaymentCardDto, isArray: true })
+  async listCards(
+    @CurrentUser('id') userId: string,
+  ): Promise<SavedPaymentCardDto[]> {
+    return this.stripeService.listCards(userId);
+  }
+
+  @Post('stripe/setup-intents')
+  @ApiOperation({ summary: 'Create Stripe SetupIntent for adding a card' })
+  @ApiCreatedResponse({ type: CreateStripeSetupIntentResponseDto })
+  async createStripeSetupIntent(
+    @CurrentUser('id') userId: string,
+  ): Promise<CreateStripeSetupIntentResponseDto> {
+    return this.stripeService.createSetupIntent(userId);
+  }
+
+  @Post('stripe/setup-intents/:setupIntentId/confirm')
+  @ApiOperation({ summary: 'Confirm and persist a saved Stripe card' })
+  @ApiOkResponse({ type: SavedPaymentCardDto })
+  @ApiBadRequestResponse({ description: 'SetupIntent is not valid/succeeded' })
+  async confirmStripeSetupIntent(
+    @Param('setupIntentId') setupIntentId: string,
+    @CurrentUser('id') userId: string,
+    @Body() dto: ConfirmStripeSetupIntentDto,
+  ): Promise<SavedPaymentCardDto> {
+    return this.stripeService.confirmSetupIntent(
+      setupIntentId,
+      userId,
+      dto.setDefault === true,
+    );
+  }
+
+  @Patch('cards/:cardId/default')
+  @ApiOperation({ summary: 'Set a saved card as the default card' })
+  @ApiOkResponse({ type: SavedPaymentCardDto })
+  @ApiNotFoundResponse({ description: 'Saved card not found' })
+  async setDefaultCard(
+    @Param('cardId', ParseUUIDPipe) cardId: string,
+    @CurrentUser('id') userId: string,
+  ): Promise<SavedPaymentCardDto> {
+    return this.stripeService.setDefaultCard(userId, cardId);
+  }
+
+  @Delete('cards/:cardId')
+  @ApiOperation({ summary: 'Delete a saved payment card' })
+  @ApiOkResponse({ type: SavedPaymentCardDto, isArray: true })
+  @ApiNotFoundResponse({ description: 'Saved card not found' })
+  async deleteCard(
+    @Param('cardId', ParseUUIDPipe) cardId: string,
+    @CurrentUser('id') userId: string,
+  ): Promise<SavedPaymentCardDto[]> {
+    return this.stripeService.deleteCard(userId, cardId);
+  }
+
   /**
    * Create a Stripe PaymentIntent for a booking.
    *
    * Returns `clientSecret` — Flutter uses Stripe SDK to
-   * confirm payment on-device with debit/credit card.
+   * confirm payment on-device with the saved debit/credit card.
    *
    * ```dart
    * final resp = await api.post('/payments/stripe/$bookingId');
    * await Stripe.instance.confirmPayment(
    *   paymentIntentClientSecret: resp.clientSecret,
-   *   data: PaymentMethodParams.card(...),
    * );
    * ```
    */
@@ -101,9 +167,9 @@ export class UserPaymentController {
   async createStripePayment(
     @Param('bookingId', ParseUUIDPipe) bookingId: string,
     @CurrentUser('id') userId: string,
-    @Body() _dto: CreateStripePaymentDto,
+    @Body() dto: CreateStripePaymentDto,
   ): Promise<StripePaymentResponseDto> {
-    return this.stripeService.createPayment(bookingId, userId);
+    return this.stripeService.createPayment(bookingId, userId, dto.cardId);
   }
 
   /**
@@ -126,4 +192,3 @@ export class UserPaymentController {
     return this.stripeService.refundPayment(bookingId, userId);
   }
 }
-

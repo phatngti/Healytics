@@ -40,6 +40,11 @@ final List<Map<String, dynamic>> providerSlideMenuItems = [
     "route": partner.TransactionHomeRoute().location,
   },
   {
+    "icon": Icons.calendar_month_outlined,
+    "label": 'Bookings',
+    "route": partner.PartnerBookingsRoute().location,
+  },
+  {
     "icon": Icons.chat_bubble_outline_rounded,
     "label": 'Messages',
     "route": partner.PartnerChatInboxRoute().location,

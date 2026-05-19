@@ -10,7 +10,8 @@ enum StoreKey<T> {
   partnerVerified<bool>._(8),
   partnerProfileCompleted<bool>._(9),
   r2PublicBaseUrl<String>._(10),
-  mapboxAccessToken<String>._(11);
+  mapboxAccessToken<String>._(11),
+  mockBookingsSimulateFailure<bool>._(12);
 
   const StoreKey._(this.id);
   final int id;

@@ -110,6 +110,112 @@
         ]
       }
     },
+    "/auth/user/forgot-password": {
+      "post": {
+        "operationId": "AuthController_forgotUserPassword",
+        "summary": "Request a user password reset code",
+        "description": "Returns a generic success response to avoid exposing whether an email is registered.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset request accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordResetResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email format."
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/user/validate-reset-code": {
+      "post": {
+        "operationId": "AuthController_validateUserPasswordResetCode",
+        "summary": "Validate a user password reset code",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidatePasswordResetCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset code verified.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidatePasswordResetCodeResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired code."
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/auth/user/reset-password": {
+      "post": {
+        "operationId": "AuthController_resetUserPassword",
+        "summary": "Reset a user password with validated reset token",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordResetResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired token, or invalid password."
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/auth/partner/register": {
       "post": {
         "operationId": "AuthController_registerPartner",
@@ -1051,6 +1157,49 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DistanceMatrixResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
+        ]
+      }
+    },
+    "/mapbox/directions": {
+      "get": {
+        "operationId": "MapboxController_directions",
+        "summary": "Get driving directions route geometry",
+        "parameters": [
+          {
+            "name": "origin",
+            "required": true,
+            "in": "query",
+            "description": "Origin coordinate in lat,lng format",
+            "schema": {
+              "example": "10.762622,106.660172",
+              "type": "string"
+            }
+          },
+          {
+            "name": "destination",
+            "required": true,
+            "in": "query",
+            "description": "Destination coordinate in lat,lng format",
+            "schema": {
+              "example": "10.823099,106.629662",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectionsResponseDto"
                 }
               }
             }
@@ -7200,6 +7349,124 @@
         ]
       }
     },
+    "/partner/bookings": {
+      "get": {
+        "operationId": "PartnerBookingsController_listBookings",
+        "summary": "List bookings for the authenticated partner",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartnerBookingResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Partner Bookings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/partner/bookings/{id}": {
+      "get": {
+        "operationId": "PartnerBookingsController_getBooking",
+        "summary": "Get partner booking detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerBookingResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found"
+          }
+        },
+        "tags": [
+          "Partner Bookings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/bookings/{id}/status": {
+      "patch": {
+        "operationId": "BookingStatusController_updateStatus",
+        "summary": "Update booking status through the shared booking lifecycle",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBookingStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingStatusChangeEventDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden when role is not allowed to mutate or booking ownership fails."
+          }
+        },
+        "tags": [
+          "Bookings"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/user/notifications": {
       "get": {
         "operationId": "UserNotificationController_getNotifications",
@@ -7504,6 +7771,7 @@
               "enum": [
                 "pending_payment",
                 "upcoming",
+                "processing",
                 "completed",
                 "canceled"
               ],
@@ -7833,6 +8101,52 @@
         ]
       }
     },
+    "/user/reviews/facility": {
+      "post": {
+        "operationId": "UserReviewController_submitFacilityReview",
+        "summary": "Submit a facility review for a completed appointment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFacilityReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Facility review submitted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityReviewResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or appointment not completed"
+          },
+          "404": {
+            "description": "Appointment not found"
+          },
+          "409": {
+            "description": "Facility review already submitted"
+          }
+        },
+        "tags": [
+          "User Reviews"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/momo/ipn": {
       "post": {
         "operationId": "MoMoController_handleMoMoIPN",
@@ -7974,6 +8288,193 @@
           },
           "404": {
             "description": "Booking not found"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/cards": {
+      "get": {
+        "operationId": "UserPaymentController_listCards",
+        "summary": "List saved payment cards",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SavedPaymentCardDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/stripe/setup-intents": {
+      "post": {
+        "operationId": "UserPaymentController_createStripeSetupIntent",
+        "summary": "Create Stripe SetupIntent for adding a card",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateStripeSetupIntentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/stripe/setup-intents/{setupIntentId}/confirm": {
+      "post": {
+        "operationId": "UserPaymentController_confirmStripeSetupIntent",
+        "summary": "Confirm and persist a saved Stripe card",
+        "parameters": [
+          {
+            "name": "setupIntentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmStripeSetupIntentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedPaymentCardDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "SetupIntent is not valid/succeeded"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/cards/{cardId}/default": {
+      "patch": {
+        "operationId": "UserPaymentController_setDefaultCard",
+        "summary": "Set a saved card as the default card",
+        "parameters": [
+          {
+            "name": "cardId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedPaymentCardDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Saved card not found"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/cards/{cardId}": {
+      "delete": {
+        "operationId": "UserPaymentController_deleteCard",
+        "summary": "Delete a saved payment card",
+        "parameters": [
+          {
+            "name": "cardId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SavedPaymentCardDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Saved card not found"
           }
         },
         "tags": [
@@ -8650,6 +9151,55 @@
             "description": "Case-insensitive service name search",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "minPrice",
+            "required": false,
+            "in": "query",
+            "description": "Minimum current price",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "required": false,
+            "in": "query",
+            "description": "Maximum current price",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "minDuration",
+            "required": false,
+            "in": "query",
+            "description": "Minimum service duration in minutes",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxDuration",
+            "required": false,
+            "in": "query",
+            "description": "Maximum service duration in minutes",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "discountOnly",
+            "required": false,
+            "in": "query",
+            "description": "Only discounted products",
+            "schema": {
+              "type": "boolean"
             }
           },
           {
@@ -10595,6 +11145,89 @@
           "password"
         ]
       },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address for the account requesting password reset",
+            "format": "email",
+            "example": "user@healytics.vn"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "PasswordResetResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Human-readable status message",
+            "example": "If the email is registered, a password reset code has been sent."
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ValidatePasswordResetCodeDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address that requested the password reset code",
+            "format": "email",
+            "example": "user@healytics.vn"
+          },
+          "code": {
+            "type": "string",
+            "description": "One-time password reset code sent to email",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "email",
+          "code"
+        ]
+      },
+      "ValidatePasswordResetCodeResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Human-readable status message",
+            "example": "Password reset code verified."
+          },
+          "resetToken": {
+            "type": "string",
+            "description": "Short-lived token required by the final reset-password endpoint"
+          }
+        },
+        "required": [
+          "message",
+          "resetToken"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Password reset token returned after validating email code"
+          },
+          "password": {
+            "type": "string",
+            "description": "New password for the account",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
       "AccountRequestDto": {
         "type": "object",
         "properties": {
@@ -11149,7 +11782,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-18T08:44:34.943Z"
+              "submittedAt": "2026-05-19T06:15:34.604Z"
             }
           }
         },
@@ -12471,6 +13104,57 @@
           "originAddresses",
           "destinationAddresses",
           "rows"
+        ]
+      },
+      "DirectionsCoordinateDto": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "example": 10.762622
+          },
+          "longitude": {
+            "type": "number",
+            "example": 106.660172
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
+        ]
+      },
+      "DirectionsResponseDto": {
+        "type": "object",
+        "properties": {
+          "route": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DirectionsCoordinateDto"
+            }
+          },
+          "distanceText": {
+            "type": "string",
+            "example": "12.3 km"
+          },
+          "distanceValue": {
+            "type": "number",
+            "example": 12300
+          },
+          "durationText": {
+            "type": "string",
+            "example": "25 mins"
+          },
+          "durationValue": {
+            "type": "number",
+            "example": 1500
+          }
+        },
+        "required": [
+          "route",
+          "distanceText",
+          "distanceValue",
+          "durationText",
+          "durationValue"
         ]
       },
       "ClientKeyResponseDto": {
@@ -16403,6 +17087,36 @@
           "type"
         ]
       },
+      "UpdatePartnerHealthServiceDefinitionDto": {
+        "type": "object",
+        "properties": {
+          "durationMinutes": {
+            "type": "number",
+            "example": 60,
+            "description": "Duration in minutes"
+          },
+          "bufferMinutes": {
+            "type": "number",
+            "example": 15
+          },
+          "maxCapacity": {
+            "type": "number",
+            "example": 1
+          },
+          "minLeadTimeHours": {
+            "type": "number",
+            "example": 2
+          },
+          "staffAssignmentType": {
+            "type": "string",
+            "enum": [
+              "any",
+              "specific"
+            ],
+            "example": "any"
+          }
+        }
+      },
       "UpdatePartnerHealthServiceDto": {
         "type": "object",
         "properties": {
@@ -16471,7 +17185,7 @@
             "nullable": true,
             "allOf": [
               {
-                "$ref": "#/components/schemas/CreatePartnerHealthServiceDefinitionDto"
+                "$ref": "#/components/schemas/UpdatePartnerHealthServiceDefinitionDto"
               }
             ]
           },
@@ -16662,6 +17376,16 @@
           "mapUrl": {
             "type": "object",
             "example": "https://maps.example.com/..."
+          },
+          "latitude": {
+            "type": "number",
+            "example": 10.7758,
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "example": 106.7009,
+            "nullable": true
           }
         },
         "required": [
@@ -19479,6 +20203,12 @@
             "type": "string",
             "description": "Webhook URL to receive checkout result",
             "example": "https://ai-service.com/webhook/booking-result"
+          },
+          "payLater": {
+            "type": "boolean",
+            "description": "If true, booking is immediately CONFIRMED without requiring payment. The booking has no payment URL or expiry — suitable for in-person pay-later scenarios.",
+            "example": false,
+            "default": false
           }
         },
         "required": [
@@ -19878,6 +20608,239 @@
           }
         }
       },
+      "PartnerBookingCustomerDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "age": {
+            "type": "number"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "fullName",
+          "age"
+        ]
+      },
+      "PartnerBookingSpecialistDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "roleLabel": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "fullName",
+          "roleLabel"
+        ]
+      },
+      "PartnerBookingServiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "currencyCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "categoryName",
+          "price",
+          "currencyCode"
+        ]
+      },
+      "PartnerBookingSlotDto": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "end": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ]
+      },
+      "PartnerBookingStatus": {
+        "type": "string",
+        "enum": [
+          "Waiting",
+          "OnProcess",
+          "Canceled",
+          "Finished"
+        ]
+      },
+      "PartnerBookingResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/PartnerBookingCustomerDto"
+          },
+          "specialist": {
+            "$ref": "#/components/schemas/PartnerBookingSpecialistDto"
+          },
+          "service": {
+            "$ref": "#/components/schemas/PartnerBookingServiceDto"
+          },
+          "slot": {
+            "$ref": "#/components/schemas/PartnerBookingSlotDto"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PartnerBookingStatus"
+          }
+        },
+        "required": [
+          "id",
+          "customer",
+          "specialist",
+          "service",
+          "slot",
+          "status"
+        ]
+      },
+      "BookingStatusUpdate": {
+        "type": "string",
+        "enum": [
+          "PROCESSING",
+          "COMPLETED"
+        ]
+      },
+      "UpdateBookingStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "example": "PROCESSING",
+            "$ref": "#/components/schemas/BookingStatusUpdate"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "PublicBookingStatus": {
+        "type": "string",
+        "enum": [
+          "PROCESSING",
+          "COMPLETED"
+        ]
+      },
+      "BookingStatusChangedByDto": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "type": "string",
+            "example": "employee"
+          }
+        },
+        "required": [
+          "accountId",
+          "role"
+        ]
+      },
+      "BookingStatusChangeEventDto": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "example": "PROCESSING",
+            "$ref": "#/components/schemas/PublicBookingStatus"
+          },
+          "persistedStatus": {
+            "example": "IN_PROGRESS",
+            "$ref": "#/components/schemas/BookingStatus"
+          },
+          "previousStatus": {
+            "example": "CONFIRMED",
+            "$ref": "#/components/schemas/BookingStatus"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "partnerId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "specialistId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "changedBy": {
+            "$ref": "#/components/schemas/BookingStatusChangedByDto"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "eventId",
+          "bookingId",
+          "status",
+          "persistedStatus",
+          "previousStatus",
+          "userId",
+          "specialistId",
+          "changedBy",
+          "occurredAt"
+        ]
+      },
       "CreateBroadcastDto": {
         "type": "object",
         "properties": {
@@ -20002,6 +20965,7 @@
         "enum": [
           "pending_payment",
           "upcoming",
+          "processing",
           "completed",
           "canceled"
         ]
@@ -20535,6 +21499,117 @@
           "createdAt"
         ]
       },
+      "CreateFacilityReviewDto": {
+        "type": "object",
+        "properties": {
+          "appointmentId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "description": "ID of the completed appointment to review"
+          },
+          "facilityId": {
+            "type": "string",
+            "example": "660e8400-e29b-41d4-a716-556655440000",
+            "description": "ID of the clinic or facility being reviewed"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5,
+            "description": "Rating from 1 to 5"
+          },
+          "comment": {
+            "type": "string",
+            "example": "Clean facility and easy to find.",
+            "description": "Free-text comment (max 2000 chars)"
+          },
+          "tags": {
+            "example": [
+              "Clean",
+              "Comfortable",
+              "Easy to Find"
+            ],
+            "description": "Feedback tags (max 10)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "photoKeys": {
+            "example": [
+              "review-photos/1234-photo1.jpg"
+            ],
+            "description": "S3 keys of uploaded photos (max 5). Upload via POST /v1/s3/presign first.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "appointmentId",
+          "facilityId",
+          "rating"
+        ]
+      },
+      "FacilityReviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "appointmentId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "facilityId": {
+            "type": "string",
+            "example": "660e8400-e29b-41d4-a716-556655440000"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5
+          },
+          "comment": {
+            "type": "object",
+            "example": "Clean facility and easy to find."
+          },
+          "tags": {
+            "example": [
+              "Clean",
+              "Comfortable",
+              "Easy to Find"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "photoUrls": {
+            "example": [
+              "https://cdn.healytics.com/reviews/photo1.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-03-29T13:02:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "appointmentId",
+          "facilityId",
+          "rating",
+          "tags",
+          "photoUrls",
+          "createdAt"
+        ]
+      },
       "MoMoIPNDto": {
         "type": "object",
         "properties": {}
@@ -20570,9 +21645,88 @@
         "type": "object",
         "properties": {}
       },
+      "SavedPaymentCardDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "brand": {
+            "type": "string",
+            "example": "visa"
+          },
+          "last4": {
+            "type": "string",
+            "example": "4242"
+          },
+          "expMonth": {
+            "type": "number",
+            "example": 12
+          },
+          "expYear": {
+            "type": "number",
+            "example": 2030
+          },
+          "funding": {
+            "type": "string",
+            "nullable": true,
+            "example": "credit"
+          },
+          "country": {
+            "type": "string",
+            "nullable": true,
+            "example": "US"
+          },
+          "isDefault": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "brand",
+          "last4",
+          "expMonth",
+          "expYear",
+          "isDefault"
+        ]
+      },
+      "CreateStripeSetupIntentResponseDto": {
+        "type": "object",
+        "properties": {
+          "setupIntentId": {
+            "type": "string",
+            "description": "Stripe SetupIntent ID"
+          },
+          "clientSecret": {
+            "type": "string",
+            "description": "Client secret used by Stripe PaymentSheet to add a card"
+          }
+        },
+        "required": [
+          "setupIntentId",
+          "clientSecret"
+        ]
+      },
+      "ConfirmStripeSetupIntentDto": {
+        "type": "object",
+        "properties": {
+          "setDefault": {
+            "type": "boolean",
+            "description": "Make the added card the default card",
+            "default": false
+          }
+        }
+      },
       "CreateStripePaymentDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "cardId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Saved card ID to use for this on-session card payment"
+          }
+        }
       },
       "StripePaymentResponseDto": {
         "type": "object",

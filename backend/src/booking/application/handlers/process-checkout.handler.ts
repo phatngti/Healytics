@@ -5,13 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
 import { Booking } from '@/common/entities/booking.entity';
-import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
 import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { CheckoutTicketStatus } from '@/booking/enums/checkout-ticket-status.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 import { NotificationType } from '@/notification/enums/notification-type.enum';
 import { NotificationEventService } from '@/notification/services/notification-event.service';
 import { RedisService } from '@/redis/redis.service';
+import { BookingStatusLogWriterService } from '../../services/booking-status-log-writer.service';
 import { WebhookService, WebhookPayload } from '../../services/webhook.service';
 import { formatSlotKey } from '../../utils/slot-key.util';
 
@@ -26,6 +27,12 @@ interface CheckoutMessage {
   webhookUrl?: string;
   /** Pre-acquired lock token from CreateCheckoutTicketHandler (may be null for old messages) */
   lockToken?: string;
+  /**
+   * When true the booking is immediately set to CONFIRMED — no payment URL is
+   * generated and no expiry is set. This models an in-person "pay later" scenario.
+   * Defaults to false (standard PENDING_PAYMENT flow).
+   */
+  payLater?: boolean;
 }
 
 @Controller()
@@ -39,6 +46,7 @@ export class ProcessCheckoutHandler {
     private readonly redisService: RedisService,
     private readonly webhookService: WebhookService,
     private readonly notificationEventService: NotificationEventService,
+    private readonly logWriter: BookingStatusLogWriterService,
   ) {}
 
   @EventPattern('checkout.process')
@@ -178,28 +186,36 @@ export class ProcessCheckoutHandler {
       }
 
       // Create booking
-      const paymentExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+      const isPayLater = data.payLater === true;
+
       const booking = queryRunner.manager.create(Booking, {
         userId: data.userId,
         staffId: data.staffId,
         productId: data.productId || null,
         startTime: startDate,
         endTime,
-        status: BookingStatus.PENDING_PAYMENT,
-        paymentUrl: null, // Will be set by payment service later
-        paymentExpiresAt,
+        status: isPayLater
+          ? BookingStatus.CONFIRMED
+          : BookingStatus.PENDING_PAYMENT,
+        paymentUrl: null,
+        paymentExpiresAt: isPayLater
+          ? null
+          : new Date(Date.now() + 10 * 60 * 1000), // 10 min — only for payment flow
       });
       savedBooking = await queryRunner.manager.save(Booking, booking);
 
-      // Create status log
-      const log = queryRunner.manager.create(BookingStatusLog, {
+      await this.logWriter.write(queryRunner.manager, {
         bookingId: savedBooking.id,
         fromStatus: null,
-        toStatus: BookingStatus.PENDING_PAYMENT,
+        toStatus: isPayLater ? BookingStatus.CONFIRMED : BookingStatus.PENDING_PAYMENT,
         changedBy: 'system',
-        reason: 'Checkout completed successfully',
+        reasonCode: isPayLater
+          ? BookingStatusReasonCode.CHECKOUT_CREATED_CONFIRMED
+          : BookingStatusReasonCode.CHECKOUT_CREATED_PENDING_PAYMENT,
+        reason: isPayLater
+          ? 'Checkout completed — booking confirmed immediately (pay later)'
+          : 'Checkout completed successfully',
       });
-      await queryRunner.manager.save(BookingStatusLog, log);
 
       // Update ticket → SUCCESS
       await queryRunner.manager.update(CheckoutTicket, data.ticketId, {
@@ -213,16 +229,27 @@ export class ProcessCheckoutHandler {
       );
 
       // Notify webhook (fire-and-forget, outside transaction)
-      const webhookPayload: WebhookPayload = {
-        ticket_id: data.ticketId,
-        status: 'SUCCESS',
-        data: {
-          booking_id: savedBooking.id,
-          payment_url: savedBooking.paymentUrl ?? '',
-          expires_at: paymentExpiresAt.toISOString(),
-        },
-        error: null,
-      };
+      const webhookPayload: WebhookPayload = isPayLater
+        ? {
+            ticket_id: data.ticketId,
+            status: 'SUCCESS',
+            data: {
+              booking_id: savedBooking.id,
+              payment_url: '',
+              expires_at: '',
+            },
+            error: null,
+          }
+        : {
+            ticket_id: data.ticketId,
+            status: 'SUCCESS',
+            data: {
+              booking_id: savedBooking.id,
+              payment_url: savedBooking.paymentUrl ?? '',
+              expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+            },
+            error: null,
+          };
       await this.webhookService.notify(data.webhookUrl ?? null, webhookPayload);
 
       // Send booking confirmation notification (fire-and-forget, outside transaction)
@@ -231,9 +258,13 @@ export class ProcessCheckoutHandler {
           type: NotificationType.BOOKING_CONFIRMED,
           recipientId: data.userId,
           title: 'Booking Confirmed! 🎉',
-          body: serviceName
-            ? `Your booking for "${serviceName}" on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`
-            : `Your booking on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`,
+          body: isPayLater
+            ? (serviceName
+                ? `Your booking for "${serviceName}" on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Payment is due at the clinic.`
+                : `Your booking on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Payment is due at the clinic.`)
+            : (serviceName
+                ? `Your booking for "${serviceName}" on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`
+                : `Your booking on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`),
           data: {
             bookingId: savedBooking.id,
             action: 'view_booking',

@@ -1,5 +1,4 @@
 import 'package:user_app/features/partner_chat/data/datasources/remote/partner_chat_remote_datasource.dart';
-import 'package:user_app/features/partner_chat/domain/entities/partner_chat_message.entity.dart';
 import 'package:user_app/features/partner_chat/domain/entities/partner_conversation.entity.dart';
 
 /// Repository interface for P2P partner chat.

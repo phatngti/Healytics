@@ -252,6 +252,11 @@ _StatusStyle _statusStyle(String status, ColorScheme colorScheme) {
       color: colorScheme.primary,
       label: 'Done',
     ),
+    'processing' => _StatusStyle(
+      icon: Symbols.pending_actions,
+      color: colorScheme.secondary,
+      label: 'Processing',
+    ),
     'canceled' || 'cancelled' => _StatusStyle(
       icon: Symbols.cancel,
       color: colorScheme.error,

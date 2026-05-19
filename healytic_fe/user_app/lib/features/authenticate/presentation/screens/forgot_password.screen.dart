@@ -21,7 +21,6 @@ class ForgotPasswordScreen extends HookConsumerWidget {
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final emailController = useTextEditingController();
     final isSubmitting = useState(false);
-    final submittedEmail = useState<String?>(null);
 
     useListenable(emailController);
 
@@ -41,9 +40,9 @@ class ForgotPasswordScreen extends HookConsumerWidget {
         await ref
             .read(authenticateRepositoryProvider)
             .requestPasswordReset(email: email);
-        submittedEmail.value = email;
         if (context.mounted) {
-          AppToast.success(context, 'Password reset email sent.');
+          AppToast.success(context, 'Password reset code sent.');
+          PasswordResetCodeRoute(email: email).pushReplacement(context);
         }
       } catch (error) {
         final message = AppException.fromError(error).userMessage;
@@ -88,8 +87,8 @@ class ForgotPasswordScreen extends HookConsumerWidget {
                       ),
                       AppDimens.verticalSmall,
                       Text(
-                        'Enter your account email and we will send you a link '
-                        'to reset your password.',
+                        'Enter your account email and we will send you a '
+                        'verification code.',
                         style: Theme.of(context).textTheme.bodyMedium,
                         textAlign: TextAlign.center,
                       ),
@@ -108,9 +107,6 @@ class ForgotPasswordScreen extends HookConsumerWidget {
                   keyboardType: TextInputType.emailAddress,
                   widgetKey: keys.forgotPasswordPage.emailTextField,
                   validator: FormValidators.email,
-                  onChanged: (_) {
-                    submittedEmail.value = null;
-                  },
                 ),
                 AppDimens.verticalLarge,
                 FractionallySizedBox(
@@ -119,7 +115,7 @@ class ForgotPasswordScreen extends HookConsumerWidget {
                   child: SizedBox(
                     width: double.infinity,
                     child: AppButton(
-                      key: keys.forgotPasswordPage.sendResetLinkButton,
+                      key: keys.forgotPasswordPage.sendResetCodeButton,
                       onPressed: (isSubmitting.value || !hasValidEmail)
                           ? null
                           : submit,
@@ -137,45 +133,15 @@ class ForgotPasswordScreen extends HookConsumerWidget {
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       isLoading: isSubmitting.value,
-                      child: const Text('Send Reset Link'),
+                      child: const Text('Send Code'),
                     ),
                   ),
                 ),
-                if (submittedEmail.value != null) ...[
-                  AppDimens.verticalMedium,
-                  _ResetEmailSentMessage(email: submittedEmail.value!),
-                ],
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class _ResetEmailSentMessage extends StatelessWidget {
-  const _ResetEmailSentMessage({required this.email});
-
-  final String email;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(Icons.check_circle_outline, color: colorScheme.primary, size: 20),
-        AppDimens.horizontalSmall,
-        Expanded(
-          child: Text(
-            'If $email is registered, a password reset link has been sent.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

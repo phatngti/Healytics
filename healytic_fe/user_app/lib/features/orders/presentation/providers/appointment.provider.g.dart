@@ -47,7 +47,7 @@ final class FilteredAppointmentsNotifierProvider
 }
 
 String _$filteredAppointmentsNotifierHash() =>
-    r'd6579a03251cdb39d23a021a90dec3b88c98025d';
+    r'd2976080ad50e5806ed79902cf7e50e159f6d396';
 
 /// Fetches appointments filtered by the current
 /// tab (status) and category selection using
@@ -80,6 +80,62 @@ abstract class _$FilteredAppointmentsNotifier
     element.handleValue(ref, created);
   }
 }
+
+/// Keeps the booking-events socket subscribed while
+/// the orders screen is mounted. Incoming events are
+/// pushed into the filtered list notifier so cards can
+/// move between tabs immediately.
+
+@ProviderFor(bookingStatusRealtime)
+const bookingStatusRealtimeProvider = BookingStatusRealtimeProvider._();
+
+/// Keeps the booking-events socket subscribed while
+/// the orders screen is mounted. Incoming events are
+/// pushed into the filtered list notifier so cards can
+/// move between tabs immediately.
+
+final class BookingStatusRealtimeProvider
+    extends $FunctionalProvider<void, void, void>
+    with $Provider<void> {
+  /// Keeps the booking-events socket subscribed while
+  /// the orders screen is mounted. Incoming events are
+  /// pushed into the filtered list notifier so cards can
+  /// move between tabs immediately.
+  const BookingStatusRealtimeProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'bookingStatusRealtimeProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$bookingStatusRealtimeHash();
+
+  @$internal
+  @override
+  $ProviderElement<void> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  void create(Ref ref) {
+    return bookingStatusRealtime(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
+}
+
+String _$bookingStatusRealtimeHash() =>
+    r'af392149924fa51c0e4ebd167fc1da1903c6f287';
 
 /// Legacy-compatible alias. Widgets that still
 /// reference [appointmentsProvider] will get the

@@ -60,6 +60,40 @@ final List<AppointmentEntity> kMockAppointments = [
       const Duration(minutes: 7),
     ),
   ),
+
+  // ── Already-expired pending payment ──────────────
+  // paymentExpiresAt is in the past →
+  // _isExpiredPayment() should filter this out.
+  // This entry must NOT appear in the Pending tab.
+  AppointmentEntity(
+    id: 'apt-pending-expired',
+    serviceName: 'Vitamin Infusion Drip',
+    healthPartnerName: 'HealthTech Clinic',
+    healthPartnerId: 'vendor-healthtech-1',
+    imageUrl:
+        'https://images.unsplash.com/photo-1559757148-5c350d0d3c56'
+        '?w=800&h=400&fit=crop',
+    status: 'pending_payment',
+    category: 'wellness',
+    specialistName: 'Dr Nguyen Minh',
+    address:
+        '10 Pham Ngoc Thach, Ward 7\n'
+        'District 3, HCM City, VN',
+    date: DateTime.now().add(const Duration(days: 3)),
+    checkInTime: '11:00 AM',
+    checkOutTime: '12:00 PM',
+    duration: '60 min',
+    distanceKm: 3.7,
+    specialistId: 'emp-doctor-2',
+    serviceId: 'svc-vitamin-drip',
+    paymentUrl: 'https://checkout.stripe.com/c/pay/cs_mock_expired',
+    paymentDeeplink: null,
+    // 30 minutes ago — already expired
+    paymentExpiresAt: DateTime.now().subtract(
+      const Duration(minutes: 30),
+    ),
+  ),
+
   AppointmentEntity(
     id: 'apt-1',
     serviceName: 'Swedish Relax',

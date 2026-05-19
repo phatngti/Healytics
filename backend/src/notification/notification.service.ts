@@ -142,9 +142,7 @@ export class NotificationService {
    * only see system broadcasts published after they joined.
    * Falls back to Unix epoch when the account is not found.
    */
-  private async resolveAccountCreatedAt(
-    userId: string,
-  ): Promise<Date> {
+  private async resolveAccountCreatedAt(userId: string): Promise<Date> {
     // Avoid `select` option in findOne — TypeORM builds a distinctAlias
     // subquery that references `Account_id` which doesn't exist as a column.
     // Using a raw QueryBuilder projection sidesteps the issue entirely.
@@ -311,12 +309,17 @@ export class NotificationService {
 
   // ── Mutations ────────────────────────────────────────────────
 
-  markRead(notificationId: string, userId: string): Promise<void> {
-    return this.markReadHandler.execute(notificationId, userId);
+  async markRead(notificationId: string, userId: string): Promise<void> {
+    await this.markReadHandler.execute(notificationId, userId);
+    const count = await this.getUnreadCount(userId);
+    this.notificationGateway.pushUnreadCount(userId, count);
   }
 
-  markAllRead(userId: string): Promise<{ markedCount: number }> {
-    return this.markAllReadHandler.execute(userId);
+  async markAllRead(userId: string): Promise<{ markedCount: number }> {
+    const result = await this.markAllReadHandler.execute(userId);
+    const count = await this.getUnreadCount(userId);
+    this.notificationGateway.pushUnreadCount(userId, count);
+    return result;
   }
 
   // ── Broadcast listing (admin) ────────────────────────────────

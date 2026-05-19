@@ -51,9 +51,20 @@ const HEADER = `// =============================================================
 
 `;
 
-/** snake_case / kebab-case → camelCase */
+/** event/path-like names → camelCase Dart identifier */
 function snakeToCamel(s) {
-  return s.replace(/[-_]([a-z])/g, (_, c) => c.toUpperCase());
+  const parts = String(s).split(/[^a-zA-Z0-9]+/).filter(Boolean);
+  if (parts.length === 0) return 'event';
+
+  const normalizePart = (part) =>
+    part === part.toUpperCase() ? part.toLowerCase() : part;
+  const normalized = parts.map(normalizePart);
+  const first = normalized[0].charAt(0).toLowerCase() + normalized[0].slice(1);
+  const rest = normalized
+    .slice(1)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1));
+  const identifier = [first, ...rest].join('');
+  return /^[0-9]/.test(identifier) ? `event${identifier}` : identifier;
 }
 
 /** Derive the Dart event-constants class name for a namespace.

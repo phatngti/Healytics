@@ -28,6 +28,7 @@ abstract class ClinicInfoRemoteDatasource {
     String? categoryId,
     ClinicProductSort sort,
     String? search,
+    ClinicProductFilters filters,
     int page,
     int limit,
   });
@@ -106,6 +107,7 @@ class ClinicInfoRemoteDatasourceImpl implements ClinicInfoRemoteDatasource {
     String? categoryId,
     ClinicProductSort sort = ClinicProductSort.popular,
     String? search,
+    ClinicProductFilters filters = const ClinicProductFilters(),
     int page = 1,
     int limit = 20,
   }) async {
@@ -114,6 +116,11 @@ class ClinicInfoRemoteDatasourceImpl implements ClinicInfoRemoteDatasource {
       categoryId: categoryId,
       sort: sort.toApiValue(),
       search: search,
+      minPrice: filters.minPrice,
+      maxPrice: filters.maxPrice,
+      minDuration: filters.minDuration,
+      maxDuration: filters.maxDuration,
+      discountOnly: filters.discountOnly ? true : null,
       page: page,
       limit: limit,
     );
@@ -344,6 +351,7 @@ class ClinicInfoRemoteDatasourceMock implements ClinicInfoRemoteDatasource {
     String? categoryId,
     ClinicProductSort sort = ClinicProductSort.popular,
     String? search,
+    ClinicProductFilters filters = const ClinicProductFilters(),
     int page = 1,
     int limit = 20,
   }) async {
@@ -360,6 +368,26 @@ class ClinicInfoRemoteDatasourceMock implements ClinicInfoRemoteDatasource {
     if (search != null && search.isNotEmpty) {
       final q = search.toLowerCase();
       items = items.where((p) => p.title.toLowerCase().contains(q)).toList();
+    }
+
+    if (filters.minPrice != null) {
+      items = items.where((p) => p.priceAmount >= filters.minPrice!).toList();
+    }
+    if (filters.maxPrice != null) {
+      items = items.where((p) => p.priceAmount <= filters.maxPrice!).toList();
+    }
+    if (filters.minDuration != null) {
+      items = items
+          .where((p) => _durationMinutes(p) >= filters.minDuration!)
+          .toList();
+    }
+    if (filters.maxDuration != null) {
+      items = items
+          .where((p) => _durationMinutes(p) <= filters.maxDuration!)
+          .toList();
+    }
+    if (filters.discountOnly) {
+      items = items.where((p) => p.hasDiscount).toList();
     }
 
     // -- Sort --
@@ -442,6 +470,11 @@ class ClinicInfoRemoteDatasourceMock implements ClinicInfoRemoteDatasource {
       followerCount: nextCount,
       followersLabel: nextCount.toString(),
     );
+  }
+
+  int _durationMinutes(ClinicProductEntity product) {
+    final match = RegExp(r'\d+').firstMatch(product.durationLabel ?? '');
+    return int.tryParse(match?.group(0) ?? '') ?? 0;
   }
 }
 

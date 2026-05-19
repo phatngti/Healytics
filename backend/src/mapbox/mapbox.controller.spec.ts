@@ -10,6 +10,7 @@ describe('MapboxController', () => {
     geocode: jest.fn(),
     reverseGeocode: jest.fn(),
     distanceMatrix: jest.fn(),
+    directions: jest.fn(),
     getClientApiKey: jest.fn(),
   };
 
@@ -69,5 +70,23 @@ describe('MapboxController', () => {
     const result = controller.getClientKey();
     expect(service.getClientApiKey).toHaveBeenCalled();
     expect(result).toEqual({ apiKey: 'pk.test-key' });
+  });
+
+  it('directions should delegate to service', async () => {
+    const expected = {
+      route: [{ latitude: 10, longitude: 106 }],
+      distanceText: '1.0 km',
+      distanceValue: 1000,
+      durationText: '5 mins',
+      durationValue: 300,
+    };
+    mockService.directions.mockResolvedValue(expected);
+
+    const result = await controller.directions({
+      origin: '10,106',
+      destination: '11,107',
+    });
+    expect(service.directions).toHaveBeenCalledWith('10,106', '11,107');
+    expect(result).toBe(expected);
   });
 });

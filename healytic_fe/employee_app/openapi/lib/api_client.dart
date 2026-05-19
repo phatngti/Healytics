@@ -344,6 +344,8 @@ class ApiClient {
           return BookingResponseDto.fromJson(value);
         case 'BookingScheduleDto':
           return BookingScheduleDto.fromJson(value);
+        case 'BookingSearchResponseDto':
+          return BookingSearchResponseDto.fromJson(value);
         case 'BookingServiceResponseDto':
           return BookingServiceResponseDto.fromJson(value);
         case 'BookingSpecialistResponseDto':
@@ -352,6 +354,12 @@ class ApiClient {
           return BookingStatusTypeTransformer().decode(value);
         case 'BookingStatusBreakdownDto':
           return BookingStatusBreakdownDto.fromJson(value);
+        case 'BookingStatusChangeEventDto':
+          return BookingStatusChangeEventDto.fromJson(value);
+        case 'BookingStatusChangedByDto':
+          return BookingStatusChangedByDto.fromJson(value);
+        case 'BookingStatusUpdate':
+          return BookingStatusUpdateTypeTransformer().decode(value);
         case 'BusinessInfo':
           return BusinessInfo.fromJson(value);
         case 'BusinessInfoDto':
@@ -536,6 +544,8 @@ class ApiClient {
           return FileUrlResponseDto.fromJson(value);
         case 'FlagReviewDto':
           return FlagReviewDto.fromJson(value);
+        case 'ForgotPasswordDto':
+          return ForgotPasswordDto.fromJson(value);
         case 'Gender':
           return GenderTypeTransformer().decode(value);
         case 'GeocodeResponseDto':
@@ -598,6 +608,18 @@ class ApiClient {
           return PaginationMetaResponseDto.fromJson(value);
         case 'ParticipantInfoDto':
           return ParticipantInfoDto.fromJson(value);
+        case 'PartnerBookingCustomerDto':
+          return PartnerBookingCustomerDto.fromJson(value);
+        case 'PartnerBookingResponseDto':
+          return PartnerBookingResponseDto.fromJson(value);
+        case 'PartnerBookingServiceDto':
+          return PartnerBookingServiceDto.fromJson(value);
+        case 'PartnerBookingSlotDto':
+          return PartnerBookingSlotDto.fromJson(value);
+        case 'PartnerBookingSpecialistDto':
+          return PartnerBookingSpecialistDto.fromJson(value);
+        case 'PartnerBookingStatus':
+          return PartnerBookingStatusTypeTransformer().decode(value);
         case 'PartnerCategorySummaryDto':
           return PartnerCategorySummaryDto.fromJson(value);
         case 'PartnerClinicDto':
@@ -688,6 +710,8 @@ class ApiClient {
           return PartnerTransactionTypeTypeTransformer().decode(value);
         case 'PartnerVerificationStatus':
           return PartnerVerificationStatusTypeTransformer().decode(value);
+        case 'PasswordResetResponseDto':
+          return PasswordResetResponseDto.fromJson(value);
         case 'PresignRequestDto':
           return PresignRequestDto.fromJson(value);
         case 'PresignResponseDto':
@@ -698,6 +722,8 @@ class ApiClient {
           return ProcedureStepDto.fromJson(value);
         case 'ProcedureStepInputDto':
           return ProcedureStepInputDto.fromJson(value);
+        case 'PublicBookingStatus':
+          return PublicBookingStatusTypeTransformer().decode(value);
         case 'PublicCategoryDto':
           return PublicCategoryDto.fromJson(value);
         case 'PublicCategorySummaryDto':
@@ -778,6 +804,8 @@ class ApiClient {
           return RegisterPartnerResponseDto.fromJson(value);
         case 'RegisterProfileDto':
           return RegisterProfileDto.fromJson(value);
+        case 'ResetPasswordDto':
+          return ResetPasswordDto.fromJson(value);
         case 'RetryPayoutDto':
           return RetryPayoutDto.fromJson(value);
         case 'RevenueDataPointDto':
@@ -830,6 +858,10 @@ class ApiClient {
           return TreatmentReviewResponseDto.fromJson(value);
         case 'UpcomingAppointmentDto':
           return UpcomingAppointmentDto.fromJson(value);
+        case 'UpdateAvatarDto':
+          return UpdateAvatarDto.fromJson(value);
+        case 'UpdateBookingStatusDto':
+          return UpdateBookingStatusDto.fromJson(value);
         case 'UpdateCategoryDto':
           return UpdateCategoryDto.fromJson(value);
         case 'UpdateEmployeeDto':
@@ -854,6 +886,10 @@ class ApiClient {
           return UserProfileDto.fromJson(value);
         case 'UserProfileSummaryResponseDto':
           return UserProfileSummaryResponseDto.fromJson(value);
+        case 'ValidatePasswordResetCodeDto':
+          return ValidatePasswordResetCodeDto.fromJson(value);
+        case 'ValidatePasswordResetCodeResponseDto':
+          return ValidatePasswordResetCodeResponseDto.fromJson(value);
         case 'VerificationDocumentEntryDto':
           return VerificationDocumentEntryDto.fromJson(value);
         case 'VerifiedField':

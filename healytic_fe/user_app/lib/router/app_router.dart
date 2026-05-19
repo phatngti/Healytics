@@ -49,6 +49,10 @@ class RouterListenable extends _$RouterListenable implements Listenable {
         (SignInRoute.isPublic && path == SignInRoute.pathPattern) ||
         (ForgotPasswordRoute.isPublic &&
             path == ForgotPasswordRoute.pathPattern) ||
+        (PasswordResetCodeRoute.isPublic &&
+            path == PasswordResetCodeRoute.pathPattern) ||
+        (ResetPasswordRoute.isPublic &&
+            path == ResetPasswordRoute.pathPattern) ||
         (EmailFormRoute.isPublic && path == EmailFormRoute.pathPattern) ||
         (EmailCodeConfirmationRoute.isPublic &&
             path == EmailCodeConfirmationRoute.pathPattern) ||

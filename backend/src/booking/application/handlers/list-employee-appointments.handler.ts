@@ -37,7 +37,7 @@ export class ListEmployeeAppointmentsHandler {
   ): BookingStatus[] {
     switch (filter) {
       case EmployeeBookingStatusFilter.UPCOMING:
-        return [BookingStatus.PENDING_PAYMENT, BookingStatus.CONFIRMED];
+        return [BookingStatus.CONFIRMED];
       case EmployeeBookingStatusFilter.IN_PROGRESS:
         return [BookingStatus.IN_PROGRESS];
       case EmployeeBookingStatusFilter.COMPLETED:
@@ -57,7 +57,9 @@ export class ListEmployeeAppointmentsHandler {
       select: ['id', 'partnerId'],
     });
     if (!employee) {
-      throw new NotFoundException('Employee profile not found for this account');
+      throw new NotFoundException(
+        'Employee profile not found for this account',
+      );
     }
 
     // 2. Build query
@@ -82,9 +84,7 @@ export class ListEmployeeAppointmentsHandler {
     }
 
     // 4. Order and paginate
-    qb.orderBy('booking.startTime', 'DESC')
-      .skip(skip)
-      .take(limit);
+    qb.orderBy('booking.startTime', 'DESC').skip(skip).take(limit);
 
     const [bookings, total] = await qb.getManyAndCount();
 

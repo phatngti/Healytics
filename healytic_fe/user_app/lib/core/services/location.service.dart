@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:logging/logging.dart';
 import 'package:user_app/core/entities/location_coordinate.dart';
@@ -79,6 +80,57 @@ class LocationService {
       latitude: position.latitude,
       longitude: position.longitude,
     );
+  }
+
+  Future<String?> getCurrentlyLocationAddress() async {
+    return getLocationAddress(await getCurrentCoordinate());
+  }
+
+  /// Reverse-geocodes the given [coordinate] and returns
+  /// a formatted address string as "City - Country".
+  ///
+  /// Returns `null` when no meaningful address can be
+  /// resolved (e.g. middle of the ocean).
+  Future<String?> getLocationAddress(LocationCoordinate coordinate) async {
+    try {
+      final placemarks = await placemarkFromCoordinates(
+        coordinate.latitude,
+        coordinate.longitude,
+      );
+
+      if (placemarks.isEmpty) return null;
+
+      final placemark = placemarks.first;
+      final city = _resolveCity(placemark);
+      final country = placemark.country;
+
+      if (city == null && country == null) return null;
+      if (city == null) return country;
+      if (country == null) return city;
+
+      return '$city - $country';
+    } catch (error, stackTrace) {
+      _log.warning('Failed to reverse-geocode coordinate.', error, stackTrace);
+      return null;
+    }
+  }
+
+  /// Picks the best "city" field from a [Placemark],
+  /// falling back through sub-administrative and
+  /// administrative areas when locality is unavailable.
+  String? _resolveCity(Placemark placemark) {
+    final candidates = [
+      placemark.locality,
+      placemark.subAdministrativeArea,
+      placemark.administrativeArea,
+    ];
+
+    for (final candidate in candidates) {
+      if (candidate != null && candidate.isNotEmpty) {
+        return candidate;
+      }
+    }
+    return null;
   }
 
   Future<bool> isLocationServiceEnabled() {

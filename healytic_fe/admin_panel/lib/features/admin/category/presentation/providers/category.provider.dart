@@ -163,6 +163,10 @@ class CategoryNotifier extends _$CategoryNotifier {
       isVisible: isVisible,
       sortOrder: sortOrder,
     );
+
+    final current = _currentState;
+    _invalidateVisibleCategoriesCache();
+    _setTableState(current.copyWith(reloadToken: current.reloadToken + 1));
   }
 
   /// Delete a category by ID

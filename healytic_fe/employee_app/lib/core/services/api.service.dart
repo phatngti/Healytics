@@ -8,7 +8,7 @@ import '../entities/store.entity.dart';
 import '../models/store.model.dart';
 import '../utils/url_helper.dart';
 import '../utils/user_agent.dart';
-import 'package:user_openapi/api.dart';
+import 'package:employee_openapi/api.dart';
 
 import 'auth_http_client.dart';
 
@@ -42,6 +42,7 @@ class ApiService implements Authentication {
   late AccountApi accountApi;
 
   // ── Appointments ──────────────────────────────
+  late BookingsApi bookingsApi;
   late UserAppointmentsApi userAppointmentsApi;
   late EmployeeAppointmentsApi employeeAppointmentsApi;
 
@@ -98,9 +99,9 @@ class ApiService implements Authentication {
     // ── Backend APIs ────────────────────────────
     authenticateApi = AuthenticationApi(backend);
     accountApi = AccountApi(backend);
+    bookingsApi = BookingsApi(backend);
     userAppointmentsApi = UserAppointmentsApi(backend);
-    employeeAppointmentsApi =
-        EmployeeAppointmentsApi(backend);
+    employeeAppointmentsApi = EmployeeAppointmentsApi(backend);
   }
 
   Future<void> _setUserAgentHeaders() async {

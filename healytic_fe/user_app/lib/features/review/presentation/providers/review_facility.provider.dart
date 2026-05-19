@@ -14,8 +14,7 @@ part 'review_facility.provider.g.dart';
 
 /// UI state for the facility review form.
 @freezed
-abstract class ReviewFacilityState
-    with _$ReviewFacilityState {
+abstract class ReviewFacilityState with _$ReviewFacilityState {
   const factory ReviewFacilityState({
     /// Star rating (0 = unset, 1–5).
     @Default(0) int rating,
@@ -45,11 +44,9 @@ abstract class ReviewFacilityState
 /// Manages the facility review form state and
 /// handles submission through the repository.
 @riverpod
-class ReviewFacilityNotifier
-    extends _$ReviewFacilityNotifier {
+class ReviewFacilityNotifier extends _$ReviewFacilityNotifier {
   @override
-  ReviewFacilityState build() =>
-      const ReviewFacilityState();
+  ReviewFacilityState build() => const ReviewFacilityState();
 
   /// Sets the star rating (1–5).
   void setRating(int rating) {
@@ -74,15 +71,12 @@ class ReviewFacilityNotifier
 
   /// Appends new photo paths to the list.
   void addPhotos(List<String> paths) {
-    state = state.copyWith(
-      photoPaths: [...state.photoPaths, ...paths],
-    );
+    state = state.copyWith(photoPaths: [...state.photoPaths, ...paths]);
   }
 
   /// Removes a single photo by its path.
   void removePhoto(String path) {
-    final updated = List<String>.from(state.photoPaths)
-      ..remove(path);
+    final updated = List<String>.from(state.photoPaths)..remove(path);
     state = state.copyWith(photoPaths: updated);
   }
 
@@ -97,10 +91,14 @@ class ReviewFacilityNotifier
   }) async {
     if (state.isSubmitting) return;
 
-    state = state.copyWith(
-      isSubmitting: true,
-      errorMessage: null,
-    );
+    if (state.rating < 1) {
+      state = state.copyWith(
+        errorMessage: 'Please select a rating before submitting.',
+      );
+      return;
+    }
+
+    state = state.copyWith(isSubmitting: true, errorMessage: null);
 
     try {
       final entity = FacilityReviewEntity(
@@ -112,16 +110,11 @@ class ReviewFacilityNotifier
         photoPaths: state.photoPaths,
       );
 
-      final repo = ref.read(
-        facilityReviewRepositoryProvider,
-      );
+      final repo = ref.read(facilityReviewRepositoryProvider);
       await repo.submitReview(entity);
       if (!ref.mounted) return;
 
-      state = state.copyWith(
-        isSubmitting: false,
-        isSubmitted: true,
-      );
+      state = state.copyWith(isSubmitting: false, isSubmitted: true);
     } catch (e, s) {
       log(
         'Failed to submit facility review',
@@ -132,7 +125,8 @@ class ReviewFacilityNotifier
       if (!ref.mounted) return;
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage: 'Failed to submit review. '
+        errorMessage:
+            'Failed to submit review. '
             'Please try again.',
       );
     }

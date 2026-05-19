@@ -9,9 +9,57 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**userReviewControllerSubmitFacilityReview**](UserReviewsApi.md#userreviewcontrollersubmitfacilityreview) | **POST** /user/reviews/facility | Submit a facility review for a completed appointment
 [**userReviewControllerSubmitSpecialistReview**](UserReviewsApi.md#userreviewcontrollersubmitspecialistreview) | **POST** /user/reviews/specialist | Submit a specialist review for a completed appointment
 [**userReviewControllerSubmitTreatmentReview**](UserReviewsApi.md#userreviewcontrollersubmittreatmentreview) | **POST** /user/reviews/treatment | Submit a treatment review for a completed appointment
 
+
+# **userReviewControllerSubmitFacilityReview**
+> FacilityReviewResponseDto userReviewControllerSubmitFacilityReview(createFacilityReviewDto)
+
+Submit a facility review for a completed appointment
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = UserReviewsApi();
+final createFacilityReviewDto = CreateFacilityReviewDto(); // CreateFacilityReviewDto | 
+
+try {
+    final result = api_instance.userReviewControllerSubmitFacilityReview(createFacilityReviewDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling UserReviewsApi->userReviewControllerSubmitFacilityReview: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **createFacilityReviewDto** | [**CreateFacilityReviewDto**](CreateFacilityReviewDto.md)|  | 
+
+### Return type
+
+[**FacilityReviewResponseDto**](FacilityReviewResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **userReviewControllerSubmitSpecialistReview**
 > SpecialistReviewResponseDto userReviewControllerSubmitSpecialistReview(createSpecialistReviewDto)

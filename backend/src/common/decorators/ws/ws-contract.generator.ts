@@ -59,6 +59,13 @@ function toContractModelName(dtoClass: Type): string {
   return dtoClass.name.replace(/Dto$/, '');
 }
 
+function isDtoConstructor(value: unknown): value is Type {
+  return (
+    typeof value === 'function' &&
+    ![String, Number, Boolean, Date, Object, Array].includes(value as any)
+  );
+}
+
 /** Map JS constructor / swagger type to contract type string */
 function resolveType(meta: any): { type: string; isEnum?: boolean } {
   // Enum property — use enumName to look up the registry
@@ -85,9 +92,39 @@ function resolveType(meta: any): { type: string; isEnum?: boolean } {
   if (t === Number || t === 'Number' || t === 'number') return { type: 'num' };
   if (t === Boolean || t === 'Boolean' || t === 'boolean')
     return { type: 'bool' };
-  if (t === 'object' || t === Object || (typeof t === 'function' && t.name === 'Object'))
+  if (
+    t === 'object' ||
+    t === Object ||
+    (typeof t === 'function' && t.name === 'Object')
+  )
     return { type: 'object' };
+  if (isDtoConstructor(t)) return { type: toContractModelName(t) };
   return { type: 'String' };
+}
+
+function readDtoPropertyTypes(dtoClass: Type): Type[] {
+  const nested: Type[] = [];
+  const propArray: string[] =
+    Reflect.getMetadata(
+      DECORATORS.API_MODEL_PROPERTIES_ARRAY,
+      dtoClass.prototype,
+    ) || [];
+
+  for (const prefixed of propArray) {
+    const name = prefixed.startsWith(':') ? prefixed.slice(1) : prefixed;
+    const meta =
+      Reflect.getMetadata(
+        DECORATORS.API_MODEL_PROPERTIES,
+        dtoClass.prototype,
+        name,
+      ) || {};
+
+    if (isDtoConstructor(meta.type)) {
+      nested.push(meta.type);
+    }
+  }
+
+  return nested;
 }
 
 /** Read @ApiProperty metadata from a DTO class */
@@ -234,6 +271,14 @@ export function generateWsContract(gateways: Type[]): WsContract {
   const allDtos = new Map<Type, 'clientToServer' | 'serverToClient'>();
   for (const dto of clientToServerDtos) allDtos.set(dto, 'clientToServer');
   for (const dto of serverToClientDtos) allDtos.set(dto, 'serverToClient');
+
+  for (const [dtoClass, direction] of Array.from(allDtos)) {
+    for (const nestedDto of readDtoPropertyTypes(dtoClass)) {
+      if (!allDtos.has(nestedDto)) {
+        allDtos.set(nestedDto, direction);
+      }
+    }
+  }
 
   for (const [dtoClass, direction] of allDtos) {
     const contractName = toContractModelName(dtoClass);

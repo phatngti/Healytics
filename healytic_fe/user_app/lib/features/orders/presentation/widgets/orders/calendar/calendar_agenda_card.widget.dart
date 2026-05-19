@@ -311,6 +311,11 @@ class _StatusChip extends StatelessWidget {
 
     final (bg, fg, label) = switch (status) {
       'upcoming' => (colors.primaryContainer, colors.primary, 'Upcoming'),
+      'processing' => (
+        colors.secondaryContainer,
+        colors.secondary,
+        'Processing',
+      ),
       'completed' => (colors.tertiaryContainer, colors.tertiary, 'Completed'),
       'canceled' => (colors.errorContainer, colors.error, 'Canceled'),
       _ => (colors.surfaceContainerHighest, colors.onSurfaceVariant, status),

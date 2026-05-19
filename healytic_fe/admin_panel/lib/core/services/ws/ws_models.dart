@@ -91,6 +91,82 @@ String wsMessageTypeToJson(WsMessageType value) {
   }
 }
 
+/// Public booking status emitted to realtime clients
+enum PublicBookingStatus {
+  processing,
+  completed,
+}
+
+PublicBookingStatus publicBookingStatusFromJson(dynamic value) {
+  if (value == null) return PublicBookingStatus.processing;
+  final str = value.toString();
+  switch (str) {
+    case 'PROCESSING':
+      return PublicBookingStatus.processing;
+    case 'COMPLETED':
+      return PublicBookingStatus.completed;
+    default:
+      return PublicBookingStatus.processing;
+  }
+}
+
+String publicBookingStatusToJson(PublicBookingStatus value) {
+  switch (value) {
+    case PublicBookingStatus.processing:
+      return 'PROCESSING';
+    case PublicBookingStatus.completed:
+      return 'COMPLETED';
+  }
+}
+
+/// Persisted booking lifecycle status
+enum BookingStatus {
+  pendingPayment,
+  confirmed,
+  inProgress,
+  cancelled,
+  completed,
+  noShow,
+}
+
+BookingStatus bookingStatusFromJson(dynamic value) {
+  if (value == null) return BookingStatus.pendingPayment;
+  final str = value.toString();
+  switch (str) {
+    case 'PENDING_PAYMENT':
+      return BookingStatus.pendingPayment;
+    case 'CONFIRMED':
+      return BookingStatus.confirmed;
+    case 'IN_PROGRESS':
+      return BookingStatus.inProgress;
+    case 'CANCELLED':
+      return BookingStatus.cancelled;
+    case 'COMPLETED':
+      return BookingStatus.completed;
+    case 'NO_SHOW':
+      return BookingStatus.noShow;
+    default:
+      return BookingStatus.pendingPayment;
+  }
+}
+
+String bookingStatusToJson(BookingStatus value) {
+  switch (value) {
+    case BookingStatus.pendingPayment:
+      return 'PENDING_PAYMENT';
+    case BookingStatus.confirmed:
+      return 'CONFIRMED';
+    case BookingStatus.inProgress:
+      return 'IN_PROGRESS';
+    case BookingStatus.cancelled:
+      return 'CANCELLED';
+    case BookingStatus.completed:
+      return 'COMPLETED';
+    case BookingStatus.noShow:
+      return 'NO_SHOW';
+  }
+}
+
 /// Payload for sending a message via WebSocket
 class WsSendMessagePayload {
   /// Target conversation UUID
@@ -240,6 +316,89 @@ class WsJoinConversationPayload {
   @override
   String toString() {
     return 'WsJoinConversationPayload(conversationId: $conversationId)';
+  }
+}
+
+/// Server event emitted when a booking status changes through the lifecycle API
+class BookingStatusChangeEvent {
+  /// 
+  final String eventId;
+
+  /// 
+  final String bookingId;
+
+  /// 
+  final PublicBookingStatus status;
+
+  /// 
+  final BookingStatus persistedStatus;
+
+  /// 
+  final BookingStatus previousStatus;
+
+  /// 
+  final String userId;
+
+  /// 
+  final String? partnerId;
+
+  /// 
+  final String specialistId;
+
+  /// 
+  final BookingStatusChangedBy changedBy;
+
+  /// 
+  final String occurredAt;
+
+  const BookingStatusChangeEvent({
+    required this.eventId,
+    required this.bookingId,
+    required this.status,
+    required this.persistedStatus,
+    required this.previousStatus,
+    required this.userId,
+    this.partnerId,
+    required this.specialistId,
+    required this.changedBy,
+    required this.occurredAt,
+  });
+
+  /// Deserialize from a Socket.IO JSON map.
+  factory BookingStatusChangeEvent.fromJson(Map<String, dynamic> json) {
+    return BookingStatusChangeEvent(
+      eventId: json['eventId'] as String,
+      bookingId: json['bookingId'] as String,
+      status: publicBookingStatusFromJson(json['status']),
+      persistedStatus: bookingStatusFromJson(json['persistedStatus']),
+      previousStatus: bookingStatusFromJson(json['previousStatus']),
+      userId: json['userId'] as String,
+      partnerId: json['partnerId'] as String?,
+      specialistId: json['specialistId'] as String,
+      changedBy: BookingStatusChangedBy.fromJson(_requireJsonMap(json['changedBy'], 'BookingStatusChangeEvent.changedBy')),
+      occurredAt: json['occurredAt'] as String,
+    );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'eventId': eventId,
+      'bookingId': bookingId,
+      'status': publicBookingStatusToJson(status),
+      'persistedStatus': bookingStatusToJson(persistedStatus),
+      'previousStatus': bookingStatusToJson(previousStatus),
+      'userId': userId,
+      if (partnerId != null) 'partnerId': partnerId!,
+      'specialistId': specialistId,
+      'changedBy': changedBy.toJson(),
+      'occurredAt': occurredAt,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'BookingStatusChangeEvent(eventId: $eventId, bookingId: $bookingId, status: $status, persistedStatus: $persistedStatus, previousStatus: $previousStatus, userId: $userId, partnerId: $partnerId, specialistId: $specialistId, changedBy: $changedBy, occurredAt: $occurredAt)';
   }
 }
 
@@ -593,6 +752,41 @@ class WsNewMessageNotification {
   @override
   String toString() {
     return 'WsNewMessageNotification(conversationId: $conversationId, messageId: $messageId, senderId: $senderId, senderName: $senderName, senderAvatar: $senderAvatar, messagePreview: $messagePreview, messageType: $messageType, createdAt: $createdAt)';
+  }
+}
+
+/// Actor that changed a booking status
+class BookingStatusChangedBy {
+  /// 
+  final String accountId;
+
+  /// 
+  final String role;
+
+  const BookingStatusChangedBy({
+    required this.accountId,
+    required this.role,
+  });
+
+  /// Deserialize from a Socket.IO JSON map.
+  factory BookingStatusChangedBy.fromJson(Map<String, dynamic> json) {
+    return BookingStatusChangedBy(
+      accountId: json['accountId'] as String,
+      role: json['role'] as String,
+    );
+  }
+
+  /// Serialize to a JSON map.
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'accountId': accountId,
+      'role': role,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'BookingStatusChangedBy(accountId: $accountId, role: $role)';
   }
 }
 

@@ -32,9 +32,12 @@ import 'package:user_app/features/orders/presentation/screens/orders.screen.dart
 import 'package:user_app/features/orders/presentation/screens/service_manual.screen.dart';
 import 'package:user_app/features/profile/presentation/screens/profile.screen.dart';
 import 'package:user_app/features/profile/presentation/screens/edit_profile.screen.dart';
+import 'package:user_app/features/profile/presentation/screens/payment_cards.screen.dart';
 import 'package:user_app/features/checkout/presentation/screens/checkout.screen.dart';
 import 'package:user_app/features/authenticate/presentation/screens/signin.screen.dart';
 import 'package:user_app/features/authenticate/presentation/screens/forgot_password.screen.dart';
+import 'package:user_app/features/authenticate/presentation/screens/password_reset_code.screen.dart';
+import 'package:user_app/features/authenticate/presentation/screens/reset_password.screen.dart';
 import 'package:user_app/features/employee/domain/entities/certificate.entity.dart';
 import 'package:user_app/features/employee/presentation/screens/certificate_viewer.screen.dart';
 import 'package:user_app/features/employee/presentation/screens/certificates_list.screen.dart';
@@ -294,6 +297,23 @@ class ProfileRoute extends GoRouteData with $ProfileRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const ProfilePage(),
+    );
+  }
+}
+
+@TypedGoRoute<PaymentCardsRoute>(
+  path: '/profile/payment-cards',
+  name: PaymentCardsRoute.name,
+)
+class PaymentCardsRoute extends GoRouteData with $PaymentCardsRoute {
+  const PaymentCardsRoute();
+  static const name = 'payment_cards';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const PaymentCardsScreen(),
     );
   }
 }
@@ -724,6 +744,50 @@ class ForgotPasswordRoute extends GoRouteData with $ForgotPasswordRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const ForgotPasswordScreen(),
+    );
+  }
+}
+
+@TypedGoRoute<PasswordResetCodeRoute>(
+  path: '/password-reset-code',
+  name: PasswordResetCodeRoute.name,
+)
+class PasswordResetCodeRoute extends GoRouteData with $PasswordResetCodeRoute {
+  static const String pathPattern = '/password-reset-code';
+  static const bool isPublic = true;
+
+  const PasswordResetCodeRoute({required this.email});
+  static const name = 'password_reset_code';
+
+  final String email;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: PasswordResetCodeScreen(email: email),
+    );
+  }
+}
+
+@TypedGoRoute<ResetPasswordRoute>(
+  path: '/reset-password',
+  name: ResetPasswordRoute.name,
+)
+class ResetPasswordRoute extends GoRouteData with $ResetPasswordRoute {
+  static const String pathPattern = '/reset-password';
+  static const bool isPublic = true;
+
+  const ResetPasswordRoute({this.token});
+  static const name = 'reset_password';
+
+  final String? token;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ResetPasswordScreen(token: token),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:user_app/features/checkout/data/datasources/remote/checkout_remo
 import 'package:user_app/features/checkout/domain/entities/booking.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/momo_payment.entity.dart';
+import 'package:user_app/features/checkout/domain/entities/payment_card.entity.dart';
 import 'package:user_app/features/checkout/domain/entities/stripe_payment.entity.dart';
 import 'package:user_app/features/checkout/domain/repositories/checkout.repository.dart';
 
@@ -24,6 +25,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
     required String startTime,
     String? productId,
     required String idempotencyKey,
+    bool payLater = false,
   }) {
     return remoteDatasource.asyncCheckout(
       userId: userId,
@@ -31,20 +33,17 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
       startTime: startTime,
       productId: productId,
       idempotencyKey: idempotencyKey,
+      payLater: payLater,
     );
   }
 
   @override
-  Future<CheckoutTicketEntity> getTicketStatus(
-    String ticketId,
-  ) {
+  Future<CheckoutTicketEntity> getTicketStatus(String ticketId) {
     return remoteDatasource.getTicketStatus(ticketId);
   }
 
   @override
-  Future<BookingEntity> getBookingById(
-    String bookingId,
-  ) {
+  Future<BookingEntity> getBookingById(String bookingId) {
     return remoteDatasource.getBookingById(bookingId);
   }
 
@@ -62,9 +61,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
   }
 
   @override
-  Future<MoMoPaymentResult> createMoMoPayment(
-    String bookingId,
-  ) {
+  Future<MoMoPaymentResult> createMoMoPayment(String bookingId) {
     return remoteDatasource.createMoMoPayment(bookingId);
   }
 
@@ -81,19 +78,45 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
 
   @override
   Future<StripePaymentResult> createStripePayment(
-    String bookingId,
-  ) {
-    return remoteDatasource.createStripePayment(
-      bookingId,
+    String bookingId, {
+    String? cardId,
+  }) {
+    return remoteDatasource.createStripePayment(bookingId, cardId: cardId);
+  }
+
+  @override
+  Future<StripeRefundResult> refundStripePayment(String bookingId) {
+    return remoteDatasource.refundStripePayment(bookingId);
+  }
+
+  @override
+  Future<List<SavedPaymentCard>> listSavedPaymentCards() {
+    return remoteDatasource.listSavedPaymentCards();
+  }
+
+  @override
+  Future<StripeSetupIntentResult> createStripeSetupIntent() {
+    return remoteDatasource.createStripeSetupIntent();
+  }
+
+  @override
+  Future<SavedPaymentCard> confirmStripeSetupIntent({
+    required String setupIntentId,
+    bool setDefault = false,
+  }) {
+    return remoteDatasource.confirmStripeSetupIntent(
+      setupIntentId: setupIntentId,
+      setDefault: setDefault,
     );
   }
 
   @override
-  Future<StripeRefundResult> refundStripePayment(
-    String bookingId,
-  ) {
-    return remoteDatasource.refundStripePayment(
-      bookingId,
-    );
+  Future<SavedPaymentCard> setDefaultPaymentCard(String cardId) {
+    return remoteDatasource.setDefaultPaymentCard(cardId);
+  }
+
+  @override
+  Future<List<SavedPaymentCard>> deletePaymentCard(String cardId) {
+    return remoteDatasource.deletePaymentCard(cardId);
   }
 }

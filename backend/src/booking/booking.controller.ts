@@ -83,8 +83,9 @@ export class BookingController {
   @ApiOkResponse({ type: BookingResponseDto })
   @ApiNotFoundResponse({ description: 'Booking not found' })
   async getBooking(
+    @CurrentUser('id') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<BookingResponseDto> {
-    return this.bookingService.getBooking(id);
+    return this.bookingService.getBooking(userId, id);
   }
 }

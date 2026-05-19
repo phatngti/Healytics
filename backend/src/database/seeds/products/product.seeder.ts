@@ -1015,15 +1015,14 @@ export class ProductSeeder implements ISeeder {
       }));
 
     for (const prodData of SEED_PRODUCTS) {
-      const exists = await this.productRepo.findOne({
-        where: { slug: prodData.slug },
-      });
-
-      if (exists) {
-        this.logger.log(
-          `  ⏭ Product "${prodData.name}" already exists, skipping`,
+      // Resolve partner FK first (needed for duplicate check)
+      const partnerId = (prodData as any).partnerTaxCode
+        ? (partnerMap.get((prodData as any).partnerTaxCode) ?? null)
+        : null;
+      if ((prodData as any).partnerTaxCode && !partnerId) {
+        this.logger.warn(
+          `  ⚠ Partner "${(prodData as any).partnerTaxCode}" not found — product "${prodData.name}" will have null partnerId`,
         );
-        continue;
       }
 
       const categoryId = categoryMap.get(prodData.categorySlug) || null;
@@ -1033,14 +1032,47 @@ export class ProductSeeder implements ISeeder {
         );
       }
 
-      // Resolve partner FK
-      const partnerId = (prodData as any).partnerTaxCode
-        ? (partnerMap.get((prodData as any).partnerTaxCode) ?? null)
-        : null;
-      if ((prodData as any).partnerTaxCode && !partnerId) {
-        this.logger.warn(
-          `  ⚠ Partner "${(prodData as any).partnerTaxCode}" not found — product "${prodData.name}" will have null partnerId`,
+      // Check by (partnerId, slug) with withDeleted to catch soft-deleted rows
+      // that still occupy the unique constraint UQ_PRODUCT_PARTNER_SLUG
+      const whereClause: Record<string, any> = { slug: prodData.slug };
+      if (partnerId !== null) {
+        whereClause.partnerId = partnerId;
+      }
+      const exists = await this.productRepo.findOne({
+        where: whereClause,
+        withDeleted: true,
+      });
+
+      if (exists) {
+        // Upsert: update existing (or restore if soft-deleted)
+        await this.productRepo.update(exists.id, {
+          name: prodData.name,
+          description: prodData.description,
+          type: prodData.type,
+          basePrice: prodData.basePrice,
+          salePrice: (prodData as any).salePrice ?? null,
+          vendorName: (prodData as any).vendorName ?? null,
+          serviceManual: (prodData as any).serviceManual ?? null,
+          currency: 'VND',
+          status: HealthServiceStatus.ACTIVE,
+          isVisibleOnline: true,
+          categoryId,
+          partnerId,
+          deletedAt: null, // restore if soft-deleted
+        });
+        this.logger.log(
+          `  🔄 Updated product "${prodData.name}" (${prodData.type})`,
         );
+
+        // Use the existing product for child-row seeding below
+        const product = { ...exists, categoryId, partnerId } as Product;
+        await this.seedProductChildren(
+          product,
+          prodData,
+          employeeMap,
+          tagOwner,
+        );
+        continue;
       }
 
       // 1. Create the product
@@ -1065,140 +1097,176 @@ export class ProductSeeder implements ISeeder {
         `  ✅ Created product "${prodData.name}" (${prodData.type})`,
       );
 
-      // 2. Product Media (images for all product types)
-      if (prodData.media?.length) {
-        for (const m of prodData.media) {
-          const media = this.mediaRepo.create({
+      await this.seedProductChildren(product, prodData, employeeMap, tagOwner);
+    }
+
+    this.logger.log('Products seeding completed');
+  }
+
+  private async seedProductChildren(
+    product: Product,
+    prodData: (typeof SEED_PRODUCTS)[number],
+    employeeMap: Map<string, string>,
+    tagOwner: Account | null,
+  ): Promise<void> {
+    // Child tables without natural unique keys are replaced for deterministic reruns.
+    await Promise.all([
+      this.mediaRepo.delete({ productId: product.id }),
+      this.resourceReqRepo.delete({ productId: product.id }),
+      this.facilityImageRepo.delete({ productId: product.id }),
+    ]);
+
+    // Product Media (images for all product types)
+    if (prodData.media?.length) {
+      for (const m of prodData.media) {
+        await this.mediaRepo.save(
+          this.mediaRepo.create({
             productId: product.id,
             url: m.url,
             mediaType: MediaType.IMAGE,
             isThumbnail: m.isThumbnail,
             sortOrder: m.sortOrder,
-          });
-          await this.mediaRepo.save(media);
-        }
-        this.logger.log(`    📷 Added ${prodData.media.length} media image(s)`);
-      }
-
-      // 3. TreatmentReviews — seed from completed bookings for this product
-      await this.seedTreatmentReviews(product.id);
-
-      // 4. Employee Eligibility (for all product types)
-      if ((prodData as any).eligibleEmployees?.length) {
-        for (const emp of (prodData as any).eligibleEmployees) {
-          const employeeId = employeeMap.get(emp.code);
-
-          if (!employeeId) {
-            this.logger.warn(
-              `    ⚠ Employee "${emp.code}" not found — skipping eligibility`,
-            );
-            continue;
-          }
-
-          const eligibility = this.eligibilityRepo.create({
-            productId: product.id,
-            employeeId,
-            isPrimary: emp.isPrimary,
-          });
-          await this.eligibilityRepo.save(eligibility);
-          this.logger.log(
-            `    👤 Employee "${emp.code}" eligible${emp.isPrimary ? ' (primary)' : ''}`,
-          );
-        }
-      }
-
-      // Only seed service-specific details for SERVICE-type products
-      if (prodData.type !== HealthServiceType.SERVICE) continue;
-
-      // 4. Service Definition (1:1)
-      if ((prodData as any).serviceDefinition) {
-        const serviceDef = this.serviceDefRepo.create({
-          productId: product.id,
-          ...(prodData as any).serviceDefinition,
-        });
-        await this.serviceDefRepo.save(serviceDef);
-        this.logger.log(
-          `    📋 Service definition: ${(prodData as any).serviceDefinition.durationMinutes}min + ${(prodData as any).serviceDefinition.bufferMinutes}min buffer`,
+          }),
         );
       }
+      this.logger.log(
+        `    📷 Upserted ${prodData.media.length} media image(s)`,
+      );
+    }
 
-      // 5. Resource Requirements (upsert ResourceType, then create requirement)
-      if ((prodData as any).resourceRequirements?.length) {
-        for (const req of (prodData as any).resourceRequirements) {
-          let resourceType = await this.resourceTypeRepo.findOne({
-            where: { name: req.resourceTypeName },
-          });
+    // TreatmentReviews are naturally idempotent by appointmentId.
+    await this.seedTreatmentReviews(product.id);
 
-          if (!resourceType) {
-            resourceType = this.resourceTypeRepo.create({
-              name: req.resourceTypeName,
-              totalQuantity: 5, // default seed quantity
+    // Employee Eligibility (for all product types)
+    if ((prodData as any).eligibleEmployees?.length) {
+      for (const emp of (prodData as any).eligibleEmployees) {
+        const employeeId = employeeMap.get(emp.code);
+
+        if (!employeeId) {
+          this.logger.warn(
+            `    ⚠ Employee "${emp.code}" not found — skipping eligibility`,
+          );
+          continue;
+        }
+
+        const existing = await this.eligibilityRepo.findOne({
+          where: { productId: product.id, employeeId },
+        });
+        if (existing) {
+          if (existing.isPrimary !== emp.isPrimary) {
+            await this.eligibilityRepo.update(existing.id, {
+              isPrimary: emp.isPrimary,
             });
-            await this.resourceTypeRepo.save(resourceType);
-            this.logger.log(
-              `    🏗️ Created resource type "${req.resourceTypeName}"`,
-            );
           }
-
-          const resourceReq = this.resourceReqRepo.create({
-            productId: product.id,
-            resourceTypeId: resourceType.id,
-            quantityRequired: req.quantityRequired,
-          });
-          await this.resourceReqRepo.save(resourceReq);
-          this.logger.log(
-            `    🔧 Resource requirement: ${req.quantityRequired}x "${req.resourceTypeName}"`,
+        } else {
+          await this.eligibilityRepo.save(
+            this.eligibilityRepo.create({
+              productId: product.id,
+              employeeId,
+              isPrimary: emp.isPrimary,
+            }),
           );
         }
-      }
-
-      // 6. Service Tags (via product_tags junction)
-      if ((prodData as any).tagNames?.length && tagOwner) {
-        for (const tagName of (prodData as any).tagNames) {
-          const tag = await this.serviceTagRepo.findOne({
-            where: { name: tagName, userId: tagOwner.id },
-          });
-
-          if (!tag) {
-            this.logger.warn(
-              `    ⚠ Service tag "${tagName}" not found — skipping tag assignment`,
-            );
-            continue;
-          }
-
-          const existingTag = await this.productTagRepo.findOne({
-            where: { productId: product.id, tagId: tag.id },
-          });
-
-          if (!existingTag) {
-            const productTag = this.productTagRepo.create({
-              productId: product.id,
-              tagId: tag.id,
-            });
-            await this.productTagRepo.save(productTag);
-            this.logger.log(`    🏷️ Tagged with "${tagName}"`);
-          }
-        }
-      }
-
-      // 7. Facility Images
-      if ((prodData as any).facilityImages?.length) {
-        for (const fi of (prodData as any).facilityImages) {
-          const facilityImage = this.facilityImageRepo.create({
-            productId: product.id,
-            imageUrl: fi.imageUrl,
-            label: fi.label,
-            sortOrder: fi.sortOrder ?? 0,
-          });
-          await this.facilityImageRepo.save(facilityImage);
-        }
         this.logger.log(
-          `    🏢 Added ${(prodData as any).facilityImages.length} facility image(s)`,
+          `    👤 Employee "${emp.code}" eligible${emp.isPrimary ? ' (primary)' : ''}`,
         );
       }
     }
 
-    this.logger.log('Products seeding completed');
+    // Only seed service-specific details for SERVICE-type products
+    if (prodData.type !== HealthServiceType.SERVICE) return;
+
+    // Service Definition (1:1)
+    if ((prodData as any).serviceDefinition) {
+      await this.serviceDefRepo.save(
+        this.serviceDefRepo.create({
+          productId: product.id,
+          ...(prodData as any).serviceDefinition,
+        }),
+      );
+      this.logger.log(
+        `    📋 Service definition: ${(prodData as any).serviceDefinition.durationMinutes}min + ${(prodData as any).serviceDefinition.bufferMinutes}min buffer`,
+      );
+    }
+
+    // Resource Requirements (upsert ResourceType, then replace requirements)
+    if ((prodData as any).resourceRequirements?.length) {
+      for (const req of (prodData as any).resourceRequirements) {
+        let resourceType = await this.resourceTypeRepo.findOne({
+          where: { name: req.resourceTypeName },
+        });
+
+        if (!resourceType) {
+          resourceType = await this.resourceTypeRepo.save(
+            this.resourceTypeRepo.create({
+              name: req.resourceTypeName,
+              totalQuantity: 5,
+            }),
+          );
+          this.logger.log(
+            `    🏗️ Created resource type "${req.resourceTypeName}"`,
+          );
+        }
+
+        await this.resourceReqRepo.save(
+          this.resourceReqRepo.create({
+            productId: product.id,
+            resourceTypeId: resourceType.id,
+            quantityRequired: req.quantityRequired,
+          }),
+        );
+        this.logger.log(
+          `    🔧 Resource requirement: ${req.quantityRequired}x "${req.resourceTypeName}"`,
+        );
+      }
+    }
+
+    // Service Tags (via product_tags junction)
+    if ((prodData as any).tagNames?.length && tagOwner) {
+      for (const tagName of (prodData as any).tagNames) {
+        const tag = await this.serviceTagRepo.findOne({
+          where: { name: tagName, userId: tagOwner.id },
+        });
+
+        if (!tag) {
+          this.logger.warn(
+            `    ⚠ Service tag "${tagName}" not found — skipping tag assignment`,
+          );
+          continue;
+        }
+
+        const existingTag = await this.productTagRepo.findOne({
+          where: { productId: product.id, tagId: tag.id },
+        });
+
+        if (!existingTag) {
+          await this.productTagRepo.save(
+            this.productTagRepo.create({
+              productId: product.id,
+              tagId: tag.id,
+            }),
+          );
+          this.logger.log(`    🏷️ Tagged with "${tagName}"`);
+        }
+      }
+    }
+
+    // Facility Images
+    if ((prodData as any).facilityImages?.length) {
+      for (const fi of (prodData as any).facilityImages) {
+        await this.facilityImageRepo.save(
+          this.facilityImageRepo.create({
+            productId: product.id,
+            imageUrl: fi.imageUrl,
+            label: fi.label,
+            sortOrder: fi.sortOrder ?? 0,
+          }),
+        );
+      }
+      this.logger.log(
+        `    🏢 Upserted ${(prodData as any).facilityImages.length} facility image(s)`,
+      );
+    }
   }
 
   /**
