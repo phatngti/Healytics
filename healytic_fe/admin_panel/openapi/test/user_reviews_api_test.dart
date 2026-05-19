@@ -17,6 +17,13 @@ void main() {
   // final instance = UserReviewsApi();
 
   group('tests for UserReviewsApi', () {
+    // Submit a facility review for a completed appointment
+    //
+    //Future<FacilityReviewResponseDto> userReviewControllerSubmitFacilityReview(CreateFacilityReviewDto createFacilityReviewDto) async
+    test('test userReviewControllerSubmitFacilityReview', () async {
+      // TODO
+    });
+
     // Submit a specialist review for a completed appointment
     //
     //Future<SpecialistReviewResponseDto> userReviewControllerSubmitSpecialistReview(CreateSpecialistReviewDto createSpecialistReviewDto) async

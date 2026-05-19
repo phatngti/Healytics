@@ -31,6 +31,7 @@ class UpdatePartnerHealthServiceDto {
     this.serviceManual,
   });
 
+
   String? categoryId;
 
   String? description;
@@ -101,49 +102,46 @@ class UpdatePartnerHealthServiceDto {
   ServiceManualInputDto? serviceManual;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is UpdatePartnerHealthServiceDto &&
-          other.categoryId == categoryId &&
-          other.description == description &&
-          other.salePrice == salePrice &&
-          other.name == name &&
-          other.slug == slug &&
-          other.type == type &&
-          other.basePrice == basePrice &&
-          other.currency == currency &&
-          other.status == status &&
-          other.isVisibleOnline == isVisibleOnline &&
-          _deepEquality.equals(other.employeeIds, employeeIds) &&
-          _deepEquality.equals(other.tagIds, tagIds) &&
-          _deepEquality.equals(other.media, media) &&
-          other.productDefinition == productDefinition &&
-          _deepEquality.equals(other.facilityImages, facilityImages) &&
-          other.serviceManual == serviceManual;
+  bool operator ==(Object other) => identical(this, other) || other is UpdatePartnerHealthServiceDto &&
+    other.categoryId == categoryId &&
+    other.description == description &&
+    other.salePrice == salePrice &&
+    other.name == name &&
+    other.slug == slug &&
+    other.type == type &&
+    other.basePrice == basePrice &&
+    other.currency == currency &&
+    other.status == status &&
+    other.isVisibleOnline == isVisibleOnline &&
+    _deepEquality.equals(other.employeeIds, employeeIds) &&
+    _deepEquality.equals(other.tagIds, tagIds) &&
+    _deepEquality.equals(other.media, media) &&
+    other.productDefinition == productDefinition &&
+    _deepEquality.equals(other.facilityImages, facilityImages) &&
+    other.serviceManual == serviceManual;
 
   @override
   int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (categoryId == null ? 0 : categoryId!.hashCode) +
-      (description == null ? 0 : description!.hashCode) +
-      (salePrice == null ? 0 : salePrice!.hashCode) +
-      (name == null ? 0 : name!.hashCode) +
-      (slug == null ? 0 : slug!.hashCode) +
-      (type == null ? 0 : type!.hashCode) +
-      (basePrice == null ? 0 : basePrice!.hashCode) +
-      (currency == null ? 0 : currency!.hashCode) +
-      (status == null ? 0 : status!.hashCode) +
-      (isVisibleOnline == null ? 0 : isVisibleOnline!.hashCode) +
-      (employeeIds == null ? 0 : employeeIds!.hashCode) +
-      (tagIds == null ? 0 : tagIds!.hashCode) +
-      (media == null ? 0 : media!.hashCode) +
-      (productDefinition == null ? 0 : productDefinition!.hashCode) +
-      (facilityImages == null ? 0 : facilityImages!.hashCode) +
-      (serviceManual == null ? 0 : serviceManual!.hashCode);
+    // ignore: unnecessary_parenthesis
+    (categoryId == null ? 0 : categoryId!.hashCode) +
+    (description == null ? 0 : description!.hashCode) +
+    (salePrice == null ? 0 : salePrice!.hashCode) +
+    (name == null ? 0 : name!.hashCode) +
+    (slug == null ? 0 : slug!.hashCode) +
+    (type == null ? 0 : type!.hashCode) +
+    (basePrice == null ? 0 : basePrice!.hashCode) +
+    (currency == null ? 0 : currency!.hashCode) +
+    (status == null ? 0 : status!.hashCode) +
+    (isVisibleOnline == null ? 0 : isVisibleOnline!.hashCode) +
+    (employeeIds == null ? 0 : employeeIds!.hashCode) +
+    (tagIds == null ? 0 : tagIds!.hashCode) +
+    (media == null ? 0 : media!.hashCode) +
+    (productDefinition == null ? 0 : productDefinition!.hashCode) +
+    (facilityImages == null ? 0 : facilityImages!.hashCode) +
+    (serviceManual == null ? 0 : serviceManual!.hashCode);
 
   @override
-  String toString() =>
-      'UpdatePartnerHealthServiceDto[categoryId=$categoryId, description=$description, salePrice=$salePrice, name=$name, slug=$slug, type=$type, basePrice=$basePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, tagIds=$tagIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, serviceManual=$serviceManual]';
+  String toString() => 'UpdatePartnerHealthServiceDto[categoryId=$categoryId, description=$description, salePrice=$salePrice, name=$name, slug=$slug, type=$type, basePrice=$basePrice, currency=$currency, status=$status, isVisibleOnline=$isVisibleOnline, employeeIds=$employeeIds, tagIds=$tagIds, media=$media, productDefinition=$productDefinition, facilityImages=$facilityImages, serviceManual=$serviceManual]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -242,10 +240,8 @@ class UpdatePartnerHealthServiceDto {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "UpdatePartnerHealthServiceDto[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "UpdatePartnerHealthServiceDto[$key]" has a null value in JSON.');
+          assert(json.containsKey(key), 'Required key "UpdatePartnerHealthServiceDto[$key]" is missing from JSON.');
+          assert(json[key] != null, 'Required key "UpdatePartnerHealthServiceDto[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -261,34 +257,24 @@ class UpdatePartnerHealthServiceDto {
         type: HealthServiceType.fromJson(json[r'type']),
         basePrice: num.parse('${json[r'basePrice']}'),
         currency: mapValueOfType<String>(json, r'currency'),
-        status:
-            UpdatePartnerHealthServiceDtoStatusEnum.fromJson(json[r'status']),
+        status: UpdatePartnerHealthServiceDtoStatusEnum.fromJson(json[r'status']),
         isVisibleOnline: mapValueOfType<bool>(json, r'isVisibleOnline'),
         employeeIds: json[r'employeeIds'] is Iterable
-            ? (json[r'employeeIds'] as Iterable)
-                .cast<String>()
-                .toList(growable: false)
+            ? (json[r'employeeIds'] as Iterable).cast<String>().toList(growable: false)
             : const [],
         tagIds: json[r'tagIds'] is Iterable
-            ? (json[r'tagIds'] as Iterable)
-                .cast<String>()
-                .toList(growable: false)
+            ? (json[r'tagIds'] as Iterable).cast<String>().toList(growable: false)
             : const [],
         media: CreatePartnerHealthServiceMediaDto.listFromJson(json[r'media']),
-        productDefinition: UpdatePartnerHealthServiceDefinitionDto.fromJson(
-            json[r'productDefinition']),
-        facilityImages: CreatePartnerHealthServiceFacilityImageDto.listFromJson(
-            json[r'facilityImages']),
+        productDefinition: UpdatePartnerHealthServiceDefinitionDto.fromJson(json[r'productDefinition']),
+        facilityImages: CreatePartnerHealthServiceFacilityImageDto.listFromJson(json[r'facilityImages']),
         serviceManual: ServiceManualInputDto.fromJson(json[r'serviceManual']),
       );
     }
     return null;
   }
 
-  static List<UpdatePartnerHealthServiceDto> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
+  static List<UpdatePartnerHealthServiceDto> listFromJson(dynamic json, {bool growable = false,}) {
     final result = <UpdatePartnerHealthServiceDto>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -316,27 +302,23 @@ class UpdatePartnerHealthServiceDto {
   }
 
   // maps a json object with a list of UpdatePartnerHealthServiceDto-objects as value to a dart map
-  static Map<String, List<UpdatePartnerHealthServiceDto>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
+  static Map<String, List<UpdatePartnerHealthServiceDto>> mapListFromJson(dynamic json, {bool growable = false,}) {
     final map = <String, List<UpdatePartnerHealthServiceDto>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = UpdatePartnerHealthServiceDto.listFromJson(
-          entry.value,
-          growable: growable,
-        );
+        map[entry.key] = UpdatePartnerHealthServiceDto.listFromJson(entry.value, growable: growable,);
       }
     }
     return map;
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{};
+  static const requiredKeys = <String>{
+  };
 }
+
 
 class UpdatePartnerHealthServiceDtoStatusEnum {
   /// Instantiate a new enum with the provided [value].
@@ -352,8 +334,7 @@ class UpdatePartnerHealthServiceDtoStatusEnum {
 
   static const draft = UpdatePartnerHealthServiceDtoStatusEnum._(r'draft');
   static const active = UpdatePartnerHealthServiceDtoStatusEnum._(r'active');
-  static const archived =
-      UpdatePartnerHealthServiceDtoStatusEnum._(r'archived');
+  static const archived = UpdatePartnerHealthServiceDtoStatusEnum._(r'archived');
 
   /// List of all possible values in this [enum][UpdatePartnerHealthServiceDtoStatusEnum].
   static const values = <UpdatePartnerHealthServiceDtoStatusEnum>[
@@ -362,13 +343,9 @@ class UpdatePartnerHealthServiceDtoStatusEnum {
     archived,
   ];
 
-  static UpdatePartnerHealthServiceDtoStatusEnum? fromJson(dynamic value) =>
-      UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer().decode(value);
+  static UpdatePartnerHealthServiceDtoStatusEnum? fromJson(dynamic value) => UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer().decode(value);
 
-  static List<UpdatePartnerHealthServiceDtoStatusEnum> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
+  static List<UpdatePartnerHealthServiceDtoStatusEnum> listFromJson(dynamic json, {bool growable = false,}) {
     final result = <UpdatePartnerHealthServiceDtoStatusEnum>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -385,9 +362,7 @@ class UpdatePartnerHealthServiceDtoStatusEnum {
 /// Transformation class that can [encode] an instance of [UpdatePartnerHealthServiceDtoStatusEnum] to String,
 /// and [decode] dynamic data back to [UpdatePartnerHealthServiceDtoStatusEnum].
 class UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer {
-  factory UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer() =>
-      _instance ??=
-          const UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer._();
+  factory UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer() => _instance ??= const UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer._();
 
   const UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer._();
 
@@ -401,16 +376,12 @@ class UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer {
   ///
   /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
   /// and users are still using an old app with the old code.
-  UpdatePartnerHealthServiceDtoStatusEnum? decode(dynamic data,
-      {bool allowNull = true}) {
+  UpdatePartnerHealthServiceDtoStatusEnum? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'draft':
-          return UpdatePartnerHealthServiceDtoStatusEnum.draft;
-        case r'active':
-          return UpdatePartnerHealthServiceDtoStatusEnum.active;
-        case r'archived':
-          return UpdatePartnerHealthServiceDtoStatusEnum.archived;
+        case r'draft': return UpdatePartnerHealthServiceDtoStatusEnum.draft;
+        case r'active': return UpdatePartnerHealthServiceDtoStatusEnum.active;
+        case r'archived': return UpdatePartnerHealthServiceDtoStatusEnum.archived;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -423,3 +394,5 @@ class UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer {
   /// Singleton [UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer] instance.
   static UpdatePartnerHealthServiceDtoStatusEnumTypeTransformer? _instance;
 }
+
+

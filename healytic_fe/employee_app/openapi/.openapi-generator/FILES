@@ -135,6 +135,7 @@ doc/ClinicReviewsResponseDto.md
 doc/ClinicSpecialistPreviewDto.md
 doc/ClinicTrustMetricsDto.md
 doc/CompletionChecklistItemDto.md
+doc/ConfirmStripeSetupIntentDto.md
 doc/ConversationResponse.md
 doc/ConversationResponseDto.md
 doc/ConversationStatus.md
@@ -144,6 +145,7 @@ doc/CreateCategoryDto.md
 doc/CreateConversationDto.md
 doc/CreateDoctorDto.md
 doc/CreateDoctorProfileDto.md
+doc/CreateFacilityReviewDto.md
 doc/CreateMassageTherapistDto.md
 doc/CreateMoMoPaymentDto.md
 doc/CreateMoMoRefundDto.md
@@ -155,6 +157,8 @@ doc/CreateServiceTagDto.md
 doc/CreateSkillDto.md
 doc/CreateSpaTherapistDto.md
 doc/CreateSpecialistReviewDto.md
+doc/CreateStripePaymentDto.md
+doc/CreateStripeSetupIntentResponseDto.md
 doc/CreateTherapistProfileDto.md
 doc/CreateTreatmentReviewDto.md
 doc/DashboardNotificationDto.md
@@ -164,6 +168,8 @@ doc/DashboardTimePeriod.md
 doc/DayScheduleDto.md
 doc/DeleteFileResponseDto.md
 doc/DevicePlatform.md
+doc/DirectionsCoordinateDto.md
+doc/DirectionsResponseDto.md
 doc/DistanceMatrixElementDto.md
 doc/DistanceMatrixResponseDto.md
 doc/DistanceMatrixRowDto.md
@@ -195,6 +201,7 @@ doc/EmployeeStatus.md
 doc/EmployeeTimeSlotsResponseDto.md
 doc/EmployeeTrendPointDto.md
 doc/FacilityDto.md
+doc/FacilityReviewResponseDto.md
 doc/FeaturedSpecialistResponseDto.md
 doc/FileUrlResponseDto.md
 doc/FlagReviewDto.md
@@ -352,6 +359,7 @@ doc/ReviewPartnerProfileDto.md
 doc/ReviewPartnerResponseDto.md
 doc/ReviewSummaryDto.md
 doc/S3Api.md
+doc/SavedPaymentCardDto.md
 doc/ServiceInfoDto.md
 doc/ServiceManualInputDto.md
 doc/ServiceManualResponseDto.md
@@ -380,6 +388,7 @@ doc/UpdateEmployeeDto.md
 doc/UpdateEmployeeProfileDto.md
 doc/UpdatePartnerCertificationDto.md
 doc/UpdatePartnerDto.md
+doc/UpdatePartnerHealthServiceDefinitionDto.md
 doc/UpdatePartnerHealthServiceDto.md
 doc/UpdatePartnerProfileCompletionDto.md
 doc/UpdatePartnerPublicProfileDto.md
@@ -587,6 +596,7 @@ lib/model/clinic_reviews_response_dto.dart
 lib/model/clinic_specialist_preview_dto.dart
 lib/model/clinic_trust_metrics_dto.dart
 lib/model/completion_checklist_item_dto.dart
+lib/model/confirm_stripe_setup_intent_dto.dart
 lib/model/conversation_response.dart
 lib/model/conversation_response_dto.dart
 lib/model/conversation_status.dart
@@ -596,6 +606,7 @@ lib/model/create_category_dto.dart
 lib/model/create_conversation_dto.dart
 lib/model/create_doctor_dto.dart
 lib/model/create_doctor_profile_dto.dart
+lib/model/create_facility_review_dto.dart
 lib/model/create_massage_therapist_dto.dart
 lib/model/create_mo_mo_payment_dto.dart
 lib/model/create_mo_mo_refund_dto.dart
@@ -607,6 +618,8 @@ lib/model/create_service_tag_dto.dart
 lib/model/create_skill_dto.dart
 lib/model/create_spa_therapist_dto.dart
 lib/model/create_specialist_review_dto.dart
+lib/model/create_stripe_payment_dto.dart
+lib/model/create_stripe_setup_intent_response_dto.dart
 lib/model/create_therapist_profile_dto.dart
 lib/model/create_treatment_review_dto.dart
 lib/model/dashboard_notification_dto.dart
@@ -616,6 +629,8 @@ lib/model/dashboard_time_period.dart
 lib/model/day_schedule_dto.dart
 lib/model/delete_file_response_dto.dart
 lib/model/device_platform.dart
+lib/model/directions_coordinate_dto.dart
+lib/model/directions_response_dto.dart
 lib/model/distance_matrix_element_dto.dart
 lib/model/distance_matrix_response_dto.dart
 lib/model/distance_matrix_row_dto.dart
@@ -644,6 +659,7 @@ lib/model/employee_status.dart
 lib/model/employee_time_slots_response_dto.dart
 lib/model/employee_trend_point_dto.dart
 lib/model/facility_dto.dart
+lib/model/facility_review_response_dto.dart
 lib/model/featured_specialist_response_dto.dart
 lib/model/file_url_response_dto.dart
 lib/model/flag_review_dto.dart
@@ -784,6 +800,7 @@ lib/model/review_item_dto.dart
 lib/model/review_partner_profile_dto.dart
 lib/model/review_partner_response_dto.dart
 lib/model/review_summary_dto.dart
+lib/model/saved_payment_card_dto.dart
 lib/model/service_info_dto.dart
 lib/model/service_manual_input_dto.dart
 lib/model/service_manual_response_dto.dart
@@ -811,6 +828,7 @@ lib/model/update_employee_dto.dart
 lib/model/update_employee_profile_dto.dart
 lib/model/update_partner_certification_dto.dart
 lib/model/update_partner_dto.dart
+lib/model/update_partner_health_service_definition_dto.dart
 lib/model/update_partner_health_service_dto.dart
 lib/model/update_partner_profile_completion_dto.dart
 lib/model/update_partner_public_profile_dto.dart
@@ -958,6 +976,7 @@ test/clinic_reviews_response_dto_test.dart
 test/clinic_specialist_preview_dto_test.dart
 test/clinic_trust_metrics_dto_test.dart
 test/completion_checklist_item_dto_test.dart
+test/confirm_stripe_setup_intent_dto_test.dart
 test/conversation_response_dto_test.dart
 test/conversation_response_test.dart
 test/conversation_status_test.dart
@@ -967,6 +986,7 @@ test/create_category_dto_test.dart
 test/create_conversation_dto_test.dart
 test/create_doctor_dto_test.dart
 test/create_doctor_profile_dto_test.dart
+test/create_facility_review_dto_test.dart
 test/create_massage_therapist_dto_test.dart
 test/create_mo_mo_payment_dto_test.dart
 test/create_mo_mo_refund_dto_test.dart
@@ -978,6 +998,8 @@ test/create_service_tag_dto_test.dart
 test/create_skill_dto_test.dart
 test/create_spa_therapist_dto_test.dart
 test/create_specialist_review_dto_test.dart
+test/create_stripe_payment_dto_test.dart
+test/create_stripe_setup_intent_response_dto_test.dart
 test/create_therapist_profile_dto_test.dart
 test/create_treatment_review_dto_test.dart
 test/dashboard_notification_dto_test.dart
@@ -987,6 +1009,8 @@ test/dashboard_time_period_test.dart
 test/day_schedule_dto_test.dart
 test/delete_file_response_dto_test.dart
 test/device_platform_test.dart
+test/directions_coordinate_dto_test.dart
+test/directions_response_dto_test.dart
 test/distance_matrix_element_dto_test.dart
 test/distance_matrix_response_dto_test.dart
 test/distance_matrix_row_dto_test.dart
@@ -1018,6 +1042,7 @@ test/employee_status_test.dart
 test/employee_time_slots_response_dto_test.dart
 test/employee_trend_point_dto_test.dart
 test/facility_dto_test.dart
+test/facility_review_response_dto_test.dart
 test/featured_specialist_response_dto_test.dart
 test/file_url_response_dto_test.dart
 test/flag_review_dto_test.dart
@@ -1175,6 +1200,7 @@ test/review_partner_profile_dto_test.dart
 test/review_partner_response_dto_test.dart
 test/review_summary_dto_test.dart
 test/s3_api_test.dart
+test/saved_payment_card_dto_test.dart
 test/service_info_dto_test.dart
 test/service_manual_input_dto_test.dart
 test/service_manual_response_dto_test.dart
@@ -1203,6 +1229,7 @@ test/update_employee_dto_test.dart
 test/update_employee_profile_dto_test.dart
 test/update_partner_certification_dto_test.dart
 test/update_partner_dto_test.dart
+test/update_partner_health_service_definition_dto_test.dart
 test/update_partner_health_service_dto_test.dart
 test/update_partner_profile_completion_dto_test.dart
 test/update_partner_public_profile_dto_test.dart

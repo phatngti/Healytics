@@ -10,6 +10,7 @@
 
 part of openapi.api;
 
+
 class AppointmentStatus {
   /// Instantiate a new enum with the provided [value].
   const AppointmentStatus._(this.value);
@@ -37,13 +38,9 @@ class AppointmentStatus {
     canceled,
   ];
 
-  static AppointmentStatus? fromJson(dynamic value) =>
-      AppointmentStatusTypeTransformer().decode(value);
+  static AppointmentStatus? fromJson(dynamic value) => AppointmentStatusTypeTransformer().decode(value);
 
-  static List<AppointmentStatus> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
+  static List<AppointmentStatus> listFromJson(dynamic json, {bool growable = false,}) {
     final result = <AppointmentStatus>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -60,8 +57,7 @@ class AppointmentStatus {
 /// Transformation class that can [encode] an instance of [AppointmentStatus] to String,
 /// and [decode] dynamic data back to [AppointmentStatus].
 class AppointmentStatusTypeTransformer {
-  factory AppointmentStatusTypeTransformer() =>
-      _instance ??= const AppointmentStatusTypeTransformer._();
+  factory AppointmentStatusTypeTransformer() => _instance ??= const AppointmentStatusTypeTransformer._();
 
   const AppointmentStatusTypeTransformer._();
 
@@ -78,16 +74,11 @@ class AppointmentStatusTypeTransformer {
   AppointmentStatus? decode(dynamic data, {bool allowNull = true}) {
     if (data != null) {
       switch (data) {
-        case r'pending_payment':
-          return AppointmentStatus.pendingPayment;
-        case r'upcoming':
-          return AppointmentStatus.upcoming;
-        case r'processing':
-          return AppointmentStatus.processing;
-        case r'completed':
-          return AppointmentStatus.completed;
-        case r'canceled':
-          return AppointmentStatus.canceled;
+        case r'pending_payment': return AppointmentStatus.pendingPayment;
+        case r'upcoming': return AppointmentStatus.upcoming;
+        case r'processing': return AppointmentStatus.processing;
+        case r'completed': return AppointmentStatus.completed;
+        case r'canceled': return AppointmentStatus.canceled;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');
@@ -100,3 +91,4 @@ class AppointmentStatusTypeTransformer {
   /// Singleton [AppointmentStatusTypeTransformer] instance.
   static AppointmentStatusTypeTransformer? _instance;
 }
+
