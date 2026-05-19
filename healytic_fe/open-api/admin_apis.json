@@ -1167,6 +1167,49 @@
         ]
       }
     },
+    "/mapbox/directions": {
+      "get": {
+        "operationId": "MapboxController_directions",
+        "summary": "Get driving directions route geometry",
+        "parameters": [
+          {
+            "name": "origin",
+            "required": true,
+            "in": "query",
+            "description": "Origin coordinate in lat,lng format",
+            "schema": {
+              "example": "10.762622,106.660172",
+              "type": "string"
+            }
+          },
+          {
+            "name": "destination",
+            "required": true,
+            "in": "query",
+            "description": "Destination coordinate in lat,lng format",
+            "schema": {
+              "example": "10.823099,106.629662",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectionsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
+        ]
+      }
+    },
     "/mapbox/client-key": {
       "get": {
         "operationId": "MapboxController_getClientKey",
@@ -8058,6 +8101,52 @@
         ]
       }
     },
+    "/user/reviews/facility": {
+      "post": {
+        "operationId": "UserReviewController_submitFacilityReview",
+        "summary": "Submit a facility review for a completed appointment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFacilityReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Facility review submitted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FacilityReviewResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or appointment not completed"
+          },
+          "404": {
+            "description": "Appointment not found"
+          },
+          "409": {
+            "description": "Facility review already submitted"
+          }
+        },
+        "tags": [
+          "User Reviews"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/momo/ipn": {
       "post": {
         "operationId": "MoMoController_handleMoMoIPN",
@@ -8199,6 +8288,193 @@
           },
           "404": {
             "description": "Booking not found"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/cards": {
+      "get": {
+        "operationId": "UserPaymentController_listCards",
+        "summary": "List saved payment cards",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SavedPaymentCardDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/stripe/setup-intents": {
+      "post": {
+        "operationId": "UserPaymentController_createStripeSetupIntent",
+        "summary": "Create Stripe SetupIntent for adding a card",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateStripeSetupIntentResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/stripe/setup-intents/{setupIntentId}/confirm": {
+      "post": {
+        "operationId": "UserPaymentController_confirmStripeSetupIntent",
+        "summary": "Confirm and persist a saved Stripe card",
+        "parameters": [
+          {
+            "name": "setupIntentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmStripeSetupIntentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedPaymentCardDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "SetupIntent is not valid/succeeded"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/cards/{cardId}/default": {
+      "patch": {
+        "operationId": "UserPaymentController_setDefaultCard",
+        "summary": "Set a saved card as the default card",
+        "parameters": [
+          {
+            "name": "cardId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedPaymentCardDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Saved card not found"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/cards/{cardId}": {
+      "delete": {
+        "operationId": "UserPaymentController_deleteCard",
+        "summary": "Delete a saved payment card",
+        "parameters": [
+          {
+            "name": "cardId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SavedPaymentCardDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Saved card not found"
           }
         },
         "tags": [
@@ -10713,52 +10989,6 @@
           }
         }
       }
-    },
-    "/user/reviews/facility": {
-      "post": {
-        "operationId": "UserReviewController_submitFacilityReview",
-        "summary": "Submit a facility review for a completed appointment",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateFacilityReviewDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Facility review submitted successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FacilityReviewResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation error or appointment not completed"
-          },
-          "404": {
-            "description": "Appointment not found"
-          },
-          "409": {
-            "description": "Facility review already submitted"
-          }
-        },
-        "tags": [
-          "User Reviews"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
     }
   },
   "info": {
@@ -11552,7 +11782,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-18T16:08:34.169Z"
+              "submittedAt": "2026-05-19T07:56:43.411Z"
             }
           }
         },
@@ -12874,6 +13104,57 @@
           "originAddresses",
           "destinationAddresses",
           "rows"
+        ]
+      },
+      "DirectionsCoordinateDto": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "example": 10.762622
+          },
+          "longitude": {
+            "type": "number",
+            "example": 106.660172
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
+        ]
+      },
+      "DirectionsResponseDto": {
+        "type": "object",
+        "properties": {
+          "route": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DirectionsCoordinateDto"
+            }
+          },
+          "distanceText": {
+            "type": "string",
+            "example": "12.3 km"
+          },
+          "distanceValue": {
+            "type": "number",
+            "example": 12300
+          },
+          "durationText": {
+            "type": "string",
+            "example": "25 mins"
+          },
+          "durationValue": {
+            "type": "number",
+            "example": 1500
+          }
+        },
+        "required": [
+          "route",
+          "distanceText",
+          "distanceValue",
+          "durationText",
+          "durationValue"
         ]
       },
       "ClientKeyResponseDto": {
@@ -15204,40 +15485,6 @@
           "updatedAt"
         ]
       },
-      "BookingSpecialistResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique specialist/employee ID"
-          },
-          "eligibilityId": {
-            "type": "string",
-            "description": "product_employee_eligibility surrogate PK"
-          },
-          "name": {
-            "type": "string",
-            "description": "Full display name",
-            "example": "Dr. Anna Nguyen"
-          },
-          "specialty": {
-            "type": "string",
-            "description": "Short specialty label",
-            "example": "Spa Therapist"
-          },
-          "avatarUrl": {
-            "type": "object",
-            "description": "URL to avatar image",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "eligibilityId",
-          "name",
-          "specialty"
-        ]
-      },
       "AdminCategoryResponseDto": {
         "type": "object",
         "properties": {
@@ -16840,6 +17087,36 @@
           "type"
         ]
       },
+      "UpdatePartnerHealthServiceDefinitionDto": {
+        "type": "object",
+        "properties": {
+          "durationMinutes": {
+            "type": "number",
+            "example": 60,
+            "description": "Duration in minutes"
+          },
+          "bufferMinutes": {
+            "type": "number",
+            "example": 15
+          },
+          "maxCapacity": {
+            "type": "number",
+            "example": 1
+          },
+          "minLeadTimeHours": {
+            "type": "number",
+            "example": 2
+          },
+          "staffAssignmentType": {
+            "type": "string",
+            "enum": [
+              "any",
+              "specific"
+            ],
+            "example": "any"
+          }
+        }
+      },
       "UpdatePartnerHealthServiceDto": {
         "type": "object",
         "properties": {
@@ -16908,7 +17185,7 @@
             "nullable": true,
             "allOf": [
               {
-                "$ref": "#/components/schemas/CreatePartnerHealthServiceDefinitionDto"
+                "$ref": "#/components/schemas/UpdatePartnerHealthServiceDefinitionDto"
               }
             ]
           },
@@ -17099,6 +17376,16 @@
           "mapUrl": {
             "type": "object",
             "example": "https://maps.example.com/..."
+          },
+          "latitude": {
+            "type": "number",
+            "example": 10.7758,
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "example": 106.7009,
+            "nullable": true
           }
         },
         "required": [
@@ -19916,6 +20203,12 @@
             "type": "string",
             "description": "Webhook URL to receive checkout result",
             "example": "https://ai-service.com/webhook/booking-result"
+          },
+          "payLater": {
+            "type": "boolean",
+            "description": "If true, booking is immediately CONFIRMED without requiring payment. The booking has no payment URL or expiry — suitable for in-person pay-later scenarios.",
+            "example": false,
+            "default": false
           }
         },
         "required": [
@@ -21206,6 +21499,117 @@
           "createdAt"
         ]
       },
+      "CreateFacilityReviewDto": {
+        "type": "object",
+        "properties": {
+          "appointmentId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "description": "ID of the completed appointment to review"
+          },
+          "facilityId": {
+            "type": "string",
+            "example": "660e8400-e29b-41d4-a716-556655440000",
+            "description": "ID of the clinic or facility being reviewed"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5,
+            "description": "Rating from 1 to 5"
+          },
+          "comment": {
+            "type": "string",
+            "example": "Clean facility and easy to find.",
+            "description": "Free-text comment (max 2000 chars)"
+          },
+          "tags": {
+            "example": [
+              "Clean",
+              "Comfortable",
+              "Easy to Find"
+            ],
+            "description": "Feedback tags (max 10)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "photoKeys": {
+            "example": [
+              "review-photos/1234-photo1.jpg"
+            ],
+            "description": "S3 keys of uploaded photos (max 5). Upload via POST /v1/s3/presign first.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "appointmentId",
+          "facilityId",
+          "rating"
+        ]
+      },
+      "FacilityReviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "appointmentId": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "facilityId": {
+            "type": "string",
+            "example": "660e8400-e29b-41d4-a716-556655440000"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5
+          },
+          "comment": {
+            "type": "object",
+            "example": "Clean facility and easy to find."
+          },
+          "tags": {
+            "example": [
+              "Clean",
+              "Comfortable",
+              "Easy to Find"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "photoUrls": {
+            "example": [
+              "https://cdn.healytics.com/reviews/photo1.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-03-29T13:02:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "appointmentId",
+          "facilityId",
+          "rating",
+          "tags",
+          "photoUrls",
+          "createdAt"
+        ]
+      },
       "MoMoIPNDto": {
         "type": "object",
         "properties": {}
@@ -21241,9 +21645,88 @@
         "type": "object",
         "properties": {}
       },
+      "SavedPaymentCardDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "brand": {
+            "type": "string",
+            "example": "visa"
+          },
+          "last4": {
+            "type": "string",
+            "example": "4242"
+          },
+          "expMonth": {
+            "type": "number",
+            "example": 12
+          },
+          "expYear": {
+            "type": "number",
+            "example": 2030
+          },
+          "funding": {
+            "type": "string",
+            "nullable": true,
+            "example": "credit"
+          },
+          "country": {
+            "type": "string",
+            "nullable": true,
+            "example": "US"
+          },
+          "isDefault": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "brand",
+          "last4",
+          "expMonth",
+          "expYear",
+          "isDefault"
+        ]
+      },
+      "CreateStripeSetupIntentResponseDto": {
+        "type": "object",
+        "properties": {
+          "setupIntentId": {
+            "type": "string",
+            "description": "Stripe SetupIntent ID"
+          },
+          "clientSecret": {
+            "type": "string",
+            "description": "Client secret used by Stripe PaymentSheet to add a card"
+          }
+        },
+        "required": [
+          "setupIntentId",
+          "clientSecret"
+        ]
+      },
+      "ConfirmStripeSetupIntentDto": {
+        "type": "object",
+        "properties": {
+          "setDefault": {
+            "type": "boolean",
+            "description": "Make the added card the default card",
+            "default": false
+          }
+        }
+      },
       "CreateStripePaymentDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "cardId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Saved card ID to use for this on-session card payment"
+          }
+        }
       },
       "StripePaymentResponseDto": {
         "type": "object",
@@ -23316,115 +23799,6 @@
           "timestamp"
         ],
         "title": "RecommendationResponse"
-      },
-      "CreateFacilityReviewDto": {
-        "type": "object",
-        "properties": {
-          "appointmentId": {
-            "type": "string",
-            "example": "550e8400-e29b-41d4-a716-446655440000",
-            "description": "ID of the completed appointment to review"
-          },
-          "facilityId": {
-            "type": "string",
-            "example": "660e8400-e29b-41d4-a716-556655440000",
-            "description": "ID of the clinic or facility being reviewed"
-          },
-          "rating": {
-            "type": "number",
-            "example": 5,
-            "description": "Rating from 1 to 5"
-          },
-          "comment": {
-            "type": "string",
-            "example": "Clean facility and easy to find.",
-            "description": "Free-text comment (max 2000 chars)"
-          },
-          "tags": {
-            "example": [
-              "Clean",
-              "Comfortable",
-              "Easy to Find"
-            ],
-            "description": "Feedback tags (max 10)",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "photoKeys": {
-            "example": [
-              "review-photos/1234-photo1.jpg"
-            ],
-            "description": "S3 keys of uploaded photos (max 5). Upload via POST /v1/s3/presign first.",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "appointmentId",
-          "facilityId",
-          "rating"
-        ]
-      },
-      "FacilityReviewResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "550e8400-e29b-41d4-a716-446655440000"
-          },
-          "appointmentId": {
-            "type": "string",
-            "example": "550e8400-e29b-41d4-a716-446655440000"
-          },
-          "facilityId": {
-            "type": "string",
-            "example": "660e8400-e29b-41d4-a716-556655440000"
-          },
-          "rating": {
-            "type": "number",
-            "example": 5
-          },
-          "comment": {
-            "type": "object",
-            "example": "Clean facility and easy to find."
-          },
-          "tags": {
-            "example": [
-              "Clean",
-              "Comfortable",
-              "Easy to Find"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "photoUrls": {
-            "example": [
-              "https://cdn.healytics.com/reviews/photo1.jpg"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2026-03-29T13:02:00.000Z"
-          }
-        },
-        "required": [
-          "id",
-          "appointmentId",
-          "facilityId",
-          "rating",
-          "createdAt"
-        ]
       }
     }
   }

@@ -14,9 +14,7 @@ Map<String, dynamic> _requireJsonMap(dynamic value, String context) {
   if (value is Map) {
     return Map<String, dynamic>.from(value);
   }
-  throw FormatException(
-    'Expected JSON object for $context, got ${value.runtimeType}',
-  );
+  throw FormatException('Expected JSON object for $context, got ${value.runtimeType}');
 }
 
 Map<String, dynamic>? _jsonMapOrNull(dynamic value, String context) {
@@ -27,9 +25,7 @@ Map<String, dynamic>? _jsonMapOrNull(dynamic value, String context) {
 DateTime _requireDateTime(dynamic value, String context) {
   if (value is DateTime) return value;
   if (value is String) return DateTime.parse(value);
-  throw FormatException(
-    'Expected DateTime string for $context, got ${value.runtimeType}',
-  );
+  throw FormatException('Expected DateTime string for $context, got ${value.runtimeType}');
 }
 
 DateTime? _dateTimeOrNull(dynamic value, String context) {
@@ -43,9 +39,7 @@ List<T> _requireJsonList<T>(
   T Function(dynamic item) convert,
 ) {
   if (value is! List) {
-    throw FormatException(
-      'Expected JSON list for $context, got ${value.runtimeType}',
-    );
+    throw FormatException('Expected JSON list for $context, got ${value.runtimeType}');
   }
   return value.map(convert).toList(growable: false);
 }
@@ -60,7 +54,12 @@ List<T>? _jsonListOrNull<T>(
 }
 
 /// Type of chat message content
-enum WsMessageType { text, image, file, system }
+enum WsMessageType {
+  text,
+  image,
+  file,
+  system,
+}
 
 WsMessageType wsMessageTypeFromJson(dynamic value) {
   if (value == null) return WsMessageType.text;
@@ -93,7 +92,10 @@ String wsMessageTypeToJson(WsMessageType value) {
 }
 
 /// Public booking status emitted to realtime clients
-enum PublicBookingStatus { processing, completed }
+enum PublicBookingStatus {
+  processing,
+  completed,
+}
 
 PublicBookingStatus publicBookingStatusFromJson(dynamic value) {
   if (value == null) return PublicBookingStatus.processing;
@@ -196,9 +198,7 @@ class WsSendMessagePayload {
       conversationId: json['conversationId'] as String,
       receiverId: json['receiverId'] as String,
       content: json['content'] as String,
-      messageType: json['messageType'] != null
-          ? wsMessageTypeFromJson(json['messageType'])
-          : null,
+      messageType: json['messageType'] != null ? wsMessageTypeFromJson(json['messageType']) : null,
       clientMessageId: json['clientMessageId'] as String?,
     );
   }
@@ -295,7 +295,9 @@ class WsJoinConversationPayload {
   /// Conversation UUID
   final String conversationId;
 
-  const WsJoinConversationPayload({required this.conversationId});
+  const WsJoinConversationPayload({
+    required this.conversationId,
+  });
 
   /// Deserialize from a Socket.IO JSON map.
   factory WsJoinConversationPayload.fromJson(Map<String, dynamic> json) {
@@ -306,7 +308,9 @@ class WsJoinConversationPayload {
 
   /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{'conversationId': conversationId};
+    return <String, dynamic>{
+      'conversationId': conversationId,
+    };
   }
 
   @override
@@ -317,34 +321,34 @@ class WsJoinConversationPayload {
 
 /// Server event emitted when a booking status changes through the lifecycle API
 class BookingStatusChangeEvent {
-  ///
+  /// 
   final String eventId;
 
-  ///
+  /// 
   final String bookingId;
 
-  ///
+  /// 
   final PublicBookingStatus status;
 
-  ///
+  /// 
   final BookingStatus persistedStatus;
 
-  ///
+  /// 
   final BookingStatus previousStatus;
 
-  ///
+  /// 
   final String userId;
 
-  ///
+  /// 
   final String? partnerId;
 
-  ///
+  /// 
   final String specialistId;
 
-  ///
+  /// 
   final BookingStatusChangedBy changedBy;
 
-  ///
+  /// 
   final String occurredAt;
 
   const BookingStatusChangeEvent({
@@ -371,12 +375,7 @@ class BookingStatusChangeEvent {
       userId: json['userId'] as String,
       partnerId: json['partnerId'] as String?,
       specialistId: json['specialistId'] as String,
-      changedBy: BookingStatusChangedBy.fromJson(
-        _requireJsonMap(
-          json['changedBy'],
-          'BookingStatusChangeEvent.changedBy',
-        ),
-      ),
+      changedBy: BookingStatusChangedBy.fromJson(_requireJsonMap(json['changedBy'], 'BookingStatusChangeEvent.changedBy')),
       occurredAt: json['occurredAt'] as String,
     );
   }
@@ -411,7 +410,10 @@ class WsMessageSentAck {
   /// Echoed client message ID for matching
   final String? clientMessageId;
 
-  const WsMessageSentAck({required this.id, this.clientMessageId});
+  const WsMessageSentAck({
+    required this.id,
+    this.clientMessageId,
+  });
 
   /// Deserialize from a Socket.IO JSON map.
   factory WsMessageSentAck.fromJson(Map<String, dynamic> json) {
@@ -492,10 +494,7 @@ class WsNewMessageEvent {
       content: json['content'] as String,
       messageType: wsMessageTypeFromJson(json['messageType']),
       clientMessageId: json['clientMessageId'] as String?,
-      createdAt: _requireDateTime(
-        json['createdAt'],
-        'WsNewMessageEvent.createdAt',
-      ),
+      createdAt: _requireDateTime(json['createdAt'], 'WsNewMessageEvent.createdAt'),
     );
   }
 
@@ -661,16 +660,22 @@ class WsErrorEvent {
   /// Error message
   final String message;
 
-  const WsErrorEvent({required this.message});
+  const WsErrorEvent({
+    required this.message,
+  });
 
   /// Deserialize from a Socket.IO JSON map.
   factory WsErrorEvent.fromJson(Map<String, dynamic> json) {
-    return WsErrorEvent(message: json['message'] as String);
+    return WsErrorEvent(
+      message: json['message'] as String,
+    );
   }
 
   /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{'message': message};
+    return <String, dynamic>{
+      'message': message,
+    };
   }
 
   @override
@@ -726,10 +731,7 @@ class WsNewMessageNotification {
       senderAvatar: json['senderAvatar'] as String?,
       messagePreview: json['messagePreview'] as String,
       messageType: wsMessageTypeFromJson(json['messageType']),
-      createdAt: _requireDateTime(
-        json['createdAt'],
-        'WsNewMessageNotification.createdAt',
-      ),
+      createdAt: _requireDateTime(json['createdAt'], 'WsNewMessageNotification.createdAt'),
     );
   }
 
@@ -755,13 +757,16 @@ class WsNewMessageNotification {
 
 /// Actor that changed a booking status
 class BookingStatusChangedBy {
-  ///
+  /// 
   final String accountId;
 
-  ///
+  /// 
   final String role;
 
-  const BookingStatusChangedBy({required this.accountId, required this.role});
+  const BookingStatusChangedBy({
+    required this.accountId,
+    required this.role,
+  });
 
   /// Deserialize from a Socket.IO JSON map.
   factory BookingStatusChangedBy.fromJson(Map<String, dynamic> json) {
@@ -773,7 +778,10 @@ class BookingStatusChangedBy {
 
   /// Serialize to a JSON map.
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{'accountId': accountId, 'role': role};
+    return <String, dynamic>{
+      'accountId': accountId,
+      'role': role,
+    };
   }
 
   @override
@@ -781,3 +789,4 @@ class BookingStatusChangedBy {
     return 'BookingStatusChangedBy(accountId: $accountId, role: $role)';
   }
 }
+

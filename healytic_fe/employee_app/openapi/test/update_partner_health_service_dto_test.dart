@@ -82,7 +82,7 @@ void main() {
       // TODO
     });
 
-    // CreatePartnerHealthServiceDefinitionDto productDefinition
+    // UpdatePartnerHealthServiceDefinitionDto productDefinition
     test('to test the property `productDefinition`', () async {
       // TODO
     });

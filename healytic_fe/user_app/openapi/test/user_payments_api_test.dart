@@ -11,6 +11,7 @@
 import 'package:user_openapi/api.dart';
 import 'package:test/test.dart';
 
+
 /// tests for UserPaymentsApi
 void main() {
   // final instance = UserPaymentsApi();
@@ -78,5 +79,6 @@ void main() {
     test('test userPaymentControllerSetDefaultCard', () async {
       // TODO
     });
+
   });
 }

@@ -11,6 +11,7 @@
 import 'package:admin_openapi/api.dart';
 import 'package:test/test.dart';
 
+
 /// tests for AuthenticationApi
 void main() {
   // final instance = AuthenticationApi();
@@ -119,5 +120,6 @@ void main() {
     test('test authControllerValidateUserPasswordResetCode', () async {
       // TODO
     });
+
   });
 }

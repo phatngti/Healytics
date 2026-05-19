@@ -117,7 +117,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AccountApi();
-final surveyDto = SurveyDto(); // SurveyDto |
+final surveyDto = SurveyDto(); // SurveyDto | 
 
 try {
     final result = api_instance.accountControllerPostSurvey(surveyDto);
@@ -131,7 +131,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **surveyDto** | [**SurveyDto**](SurveyDto.md)|  |
+ **surveyDto** | [**SurveyDto**](SurveyDto.md)|  | 
 
 ### Return type
 

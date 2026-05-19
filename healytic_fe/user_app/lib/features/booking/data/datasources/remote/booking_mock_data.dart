@@ -1505,12 +1505,7 @@ final Map<String, List<BookingService>> kMockServicesByCategory = {
 /// Default mock time-slot response used across
 /// all specialists. In production the API returns
 /// schedule specific to employee + date range.
-<<<<<<< HEAD
 final kMockEmployeeTimeSlots = EmployeeTimeSlotsEntity(
-=======
-final kMockEmployeeTimeSlots =
-    EmployeeTimeSlotsEntity(
->>>>>>> origin/develop
   employeeId: 'mock-employee',
   employeeName: 'Mock Employee',
   slotDurationMinutes: 30,
@@ -1593,12 +1588,7 @@ final kMockEmployeeTimeSlots =
 /// Generates a YYYY-MM-DD date string [daysFromNow]
 /// days from today.
 String _mockDate(int daysFromNow) {
-<<<<<<< HEAD
   final date = DateTime.now().add(Duration(days: daysFromNow));
-=======
-  final date =
-      DateTime.now().add(Duration(days: daysFromNow));
->>>>>>> origin/develop
   return '${date.year}-'
       '${date.month.toString().padLeft(2, '0')}-'
       '${date.day.toString().padLeft(2, '0')}';
@@ -1615,12 +1605,7 @@ String _mockDayOfWeek(int daysFromNow) {
     'Saturday',
     'Sunday',
   ];
-<<<<<<< HEAD
   final date = DateTime.now().add(Duration(days: daysFromNow));
-=======
-  final date =
-      DateTime.now().add(Duration(days: daysFromNow));
->>>>>>> origin/develop
   // DateTime.weekday: 1 = Monday ... 7 = Sunday
   return days[date.weekday - 1];
 }
@@ -1629,12 +1614,7 @@ String _mockDayOfWeek(int daysFromNow) {
 
 /// Mock eligibility detail returned by the mock
 /// data source for any eligibility ID.
-<<<<<<< HEAD
 const kMockEligibilityDetail = EligibilityDetailEntity(
-=======
-const kMockEligibilityDetail =
-    EligibilityDetailEntity(
->>>>>>> origin/develop
   isCompletedStep: true,
   specialist: EligibilitySpecialist(
     id: 'spec-1',
@@ -1654,7 +1634,6 @@ const kMockEligibilityDetail =
         'photo-1544161515-4ab6ce6db874'
         '?w=400&h=250&fit=crop',
   ),
-<<<<<<< HEAD
   category: EligibilityCategory(id: 'cat-1', name: 'Spa'),
   location: EligibilityLocation(
     name: 'Healytics Spa & Wellness',
@@ -1663,16 +1642,6 @@ const kMockEligibilityDetail =
         'Ho Chi Minh City',
     latitude: 10.7758,
     longitude: 106.7009,
-=======
-  category: EligibilityCategory(
-    id: 'cat-1',
-    name: 'Spa',
-  ),
-  location: EligibilityLocation(
-    name: 'Healytics Spa & Wellness',
-    address: '123 Nguyen Hue, District 1, '
-        'Ho Chi Minh City',
->>>>>>> origin/develop
   ),
   priceBreakdown: EligibilityPriceBreakdown(
     subTotal: 850000,

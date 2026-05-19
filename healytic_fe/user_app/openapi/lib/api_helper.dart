@@ -17,16 +17,11 @@ class QueryParam {
   final String value;
 
   @override
-  String toString() =>
-      '${Uri.encodeQueryComponent(name)}=${Uri.encodeQueryComponent(value)}';
+  String toString() => '${Uri.encodeQueryComponent(name)}=${Uri.encodeQueryComponent(value)}';
 }
 
 // Ported from the Java version.
-Iterable<QueryParam> _queryParams(
-  String collectionFormat,
-  String name,
-  dynamic value,
-) {
+Iterable<QueryParam> _queryParams(String collectionFormat, String name, dynamic value,) {
   // Assertions to run in debug mode only.
   assert(name.isNotEmpty, 'Parameter cannot be an empty string.');
 
@@ -34,9 +29,7 @@ Iterable<QueryParam> _queryParams(
 
   if (value is List) {
     if (collectionFormat == 'multi') {
-      return value.map(
-        (dynamic v) => QueryParam(name, parameterToString(v)),
-      );
+      return value.map((dynamic v) => QueryParam(name, parameterToString(v)),);
     }
 
     // Default collection format is 'csv'.
@@ -46,10 +39,7 @@ Iterable<QueryParam> _queryParams(
 
     final delimiter = _delimiters[collectionFormat] ?? ',';
 
-    params.add(QueryParam(
-      name,
-      value.map<dynamic>(parameterToString).join(delimiter),
-    ));
+    params.add(QueryParam(name, value.map<dynamic>(parameterToString).join(delimiter),));
   } else if (value != null) {
     params.add(QueryParam(name, parameterToString(value)));
   }
@@ -66,14 +56,10 @@ String parameterToString(dynamic value) {
     return value.toUtc().toIso8601String();
   }
   if (value is AdminDashboardNotificationPriority) {
-    return AdminDashboardNotificationPriorityTypeTransformer()
-        .encode(value)
-        .toString();
+    return AdminDashboardNotificationPriorityTypeTransformer().encode(value).toString();
   }
   if (value is AdminDashboardNotificationType) {
-    return AdminDashboardNotificationTypeTypeTransformer()
-        .encode(value)
-        .toString();
+    return AdminDashboardNotificationTypeTypeTransformer().encode(value).toString();
   }
   if (value is AdminFinanceExportStatus) {
     return AdminFinanceExportStatusTypeTransformer().encode(value).toString();
@@ -91,22 +77,16 @@ String parameterToString(dynamic value) {
     return AdminFinanceProviderTypeTransformer().encode(value).toString();
   }
   if (value is AdminFinanceReconciliationStatus) {
-    return AdminFinanceReconciliationStatusTypeTransformer()
-        .encode(value)
-        .toString();
+    return AdminFinanceReconciliationStatusTypeTransformer().encode(value).toString();
   }
   if (value is AdminFinanceReconciliationType) {
-    return AdminFinanceReconciliationTypeTypeTransformer()
-        .encode(value)
-        .toString();
+    return AdminFinanceReconciliationTypeTypeTransformer().encode(value).toString();
   }
   if (value is AdminFinanceRiskTone) {
     return AdminFinanceRiskToneTypeTransformer().encode(value).toString();
   }
   if (value is AdminPartnerRankingVerificationStatus) {
-    return AdminPartnerRankingVerificationStatusTypeTransformer()
-        .encode(value)
-        .toString();
+    return AdminPartnerRankingVerificationStatusTypeTransformer().encode(value).toString();
   }
   if (value is AdminPartnerScope) {
     return AdminPartnerScopeTypeTransformer().encode(value).toString();
@@ -139,9 +119,7 @@ String parameterToString(dynamic value) {
     return DevicePlatformTypeTransformer().encode(value).toString();
   }
   if (value is EmployeeBookingStatusFilter) {
-    return EmployeeBookingStatusFilterTypeTransformer()
-        .encode(value)
-        .toString();
+    return EmployeeBookingStatusFilterTypeTransformer().encode(value).toString();
   }
   if (value is EmployeeRevenuePeriod) {
     return EmployeeRevenuePeriodTypeTransformer().encode(value).toString();
@@ -204,12 +182,9 @@ String parameterToString(dynamic value) {
 /// content type. Otherwise, returns the decoded body as decoded by dart:http package.
 Future<String> _decodeBodyBytes(Response response) async {
   final contentType = response.headers['content-type'];
-  return contentType != null &&
-          contentType.toLowerCase().startsWith('application/json')
-      ? response.bodyBytes.isEmpty
-          ? ''
-          : utf8.decode(response.bodyBytes)
-      : response.body;
+  return contentType != null && contentType.toLowerCase().startsWith('application/json')
+    ? response.bodyBytes.isEmpty ? '' : utf8.decode(response.bodyBytes)
+    : response.body;
 }
 
 /// Returns a valid [T] value found at the specified Map [key], null otherwise.

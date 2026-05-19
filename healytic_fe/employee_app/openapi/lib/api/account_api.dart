@@ -10,9 +10,9 @@
 
 part of openapi.api;
 
+
 class AccountApi {
-  AccountApi([ApiClient? apiClient])
-      : apiClient = apiClient ?? defaultApiClient;
+  AccountApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
 
   final ApiClient apiClient;
 
@@ -31,6 +31,7 @@ class AccountApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
+
 
     return apiClient.invokeAPI(
       path,
@@ -52,12 +53,9 @@ class AccountApi {
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty &&
-        response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(
-        await _decodeBodyBytes(response),
-        'AccountMeResponseDto',
-      ) as AccountMeResponseDto;
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AccountMeResponseDto',) as AccountMeResponseDto;
+    
     }
     return null;
   }
@@ -77,6 +75,7 @@ class AccountApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
+
 
     return apiClient.invokeAPI(
       path,
@@ -98,12 +97,9 @@ class AccountApi {
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty &&
-        response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(
-        await _decodeBodyBytes(response),
-        'SurveyResponseDto',
-      ) as SurveyResponseDto;
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SurveyResponseDto',) as SurveyResponseDto;
+    
     }
     return null;
   }
@@ -115,9 +111,7 @@ class AccountApi {
   /// Parameters:
   ///
   /// * [SurveyDto] surveyDto (required):
-  Future<Response> accountControllerPostSurveyWithHttpInfo(
-    SurveyDto surveyDto,
-  ) async {
+  Future<Response> accountControllerPostSurveyWithHttpInfo(SurveyDto surveyDto,) async {
     // ignore: prefer_const_declarations
     final path = r'/account/survey';
 
@@ -129,6 +123,7 @@ class AccountApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>['application/json'];
+
 
     return apiClient.invokeAPI(
       path,
@@ -146,24 +141,17 @@ class AccountApi {
   /// Parameters:
   ///
   /// * [SurveyDto] surveyDto (required):
-  Future<SurveyResponseDto?> accountControllerPostSurvey(
-    SurveyDto surveyDto,
-  ) async {
-    final response = await accountControllerPostSurveyWithHttpInfo(
-      surveyDto,
-    );
+  Future<SurveyResponseDto?> accountControllerPostSurvey(SurveyDto surveyDto,) async {
+    final response = await accountControllerPostSurveyWithHttpInfo(surveyDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty &&
-        response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(
-        await _decodeBodyBytes(response),
-        'SurveyResponseDto',
-      ) as SurveyResponseDto;
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SurveyResponseDto',) as SurveyResponseDto;
+    
     }
     return null;
   }
@@ -175,9 +163,7 @@ class AccountApi {
   /// Parameters:
   ///
   /// * [UpdateAvatarDto] updateAvatarDto (required):
-  Future<Response> accountControllerUpdateAvatarWithHttpInfo(
-    UpdateAvatarDto updateAvatarDto,
-  ) async {
+  Future<Response> accountControllerUpdateAvatarWithHttpInfo(UpdateAvatarDto updateAvatarDto,) async {
     // ignore: prefer_const_declarations
     final path = r'/account/me/avatar';
 
@@ -189,6 +175,7 @@ class AccountApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>['application/json'];
+
 
     return apiClient.invokeAPI(
       path,
@@ -206,24 +193,17 @@ class AccountApi {
   /// Parameters:
   ///
   /// * [UpdateAvatarDto] updateAvatarDto (required):
-  Future<AccountMeResponseDto?> accountControllerUpdateAvatar(
-    UpdateAvatarDto updateAvatarDto,
-  ) async {
-    final response = await accountControllerUpdateAvatarWithHttpInfo(
-      updateAvatarDto,
-    );
+  Future<AccountMeResponseDto?> accountControllerUpdateAvatar(UpdateAvatarDto updateAvatarDto,) async {
+    final response = await accountControllerUpdateAvatarWithHttpInfo(updateAvatarDto,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty &&
-        response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(
-        await _decodeBodyBytes(response),
-        'AccountMeResponseDto',
-      ) as AccountMeResponseDto;
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AccountMeResponseDto',) as AccountMeResponseDto;
+    
     }
     return null;
   }

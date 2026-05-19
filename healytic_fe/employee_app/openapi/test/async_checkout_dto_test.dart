@@ -52,6 +52,12 @@ void main() {
       // TODO
     });
 
+    // If true, booking is immediately CONFIRMED without requiring payment. The booking has no payment URL or expiry — suitable for in-person pay-later scenarios.
+    // bool payLater (default value: false)
+    test('to test the property `payLater`', () async {
+      // TODO
+    });
+
 
   });
 
