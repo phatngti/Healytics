@@ -10,13 +10,19 @@ import { Repository } from 'typeorm';
 import Stripe from 'stripe';
 import type { Stripe as StripeClient } from 'stripe/cjs/stripe.core.js';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 import { BookingPaymentService } from './booking-payment.service';
+import { Account } from '@/common/entities/account.entity';
 import { Payment } from '@/common/entities/payment.entity';
 import { PaymentTransactionLog } from '@/common/entities/payment-transaction-log.entity';
+import { UserPaymentCustomer } from '@/common/entities/user-payment-customer.entity';
+import { UserPaymentMethod } from '@/common/entities/user-payment-method.entity';
 import { PaymentMethod } from './enums/payment-method.enum';
 import { PaymentStatus } from './enums/payment-status.enum';
 import { TransactionAction } from './enums/transaction-action.enum';
 import {
+  CreateStripeSetupIntentResponseDto,
+  SavedPaymentCardDto,
   StripePaymentResponseDto,
   StripeRefundResponseDto,
 } from './dto';
@@ -31,12 +37,19 @@ export class StripePaymentService {
   constructor(
     private readonly configService: ConfigService,
     private readonly bookingPaymentService: BookingPaymentService,
+    @InjectRepository(Account)
+    private readonly accountRepo: Repository<Account>,
     @InjectRepository(Payment)
     private readonly paymentRepo: Repository<Payment>,
     @InjectRepository(PaymentTransactionLog)
     private readonly txLogRepo: Repository<PaymentTransactionLog>,
+    @InjectRepository(UserPaymentCustomer)
+    private readonly customerRepo: Repository<UserPaymentCustomer>,
+    @InjectRepository(UserPaymentMethod)
+    private readonly cardRepo: Repository<UserPaymentMethod>,
   ) {
-    const secretKey = this.configService.getOrThrow<string>('STRIPE_SECRET_KEY');
+    const secretKey =
+      this.configService.getOrThrow<string>('STRIPE_SECRET_KEY');
     this.webhookSecret = this.configService.getOrThrow<string>(
       'STRIPE_WEBHOOK_SECRET',
     );
@@ -45,6 +58,168 @@ export class StripePaymentService {
     this.stripe = new Stripe(secretKey, {
       apiVersion: '2026-04-22.dahlia',
     });
+  }
+
+  async listCards(userId: string): Promise<SavedPaymentCardDto[]> {
+    const cards = await this.cardRepo.find({
+      where: { userId, provider: PaymentMethod.STRIPE },
+      order: { isDefault: 'DESC', createdAt: 'DESC' },
+    });
+
+    return cards.map((card) => this.toCardDto(card));
+  }
+
+  async createSetupIntent(
+    userId: string,
+  ): Promise<CreateStripeSetupIntentResponseDto> {
+    const customer = await this.ensureStripeCustomer(userId);
+    const setupIntent = await this.stripe.setupIntents.create({
+      customer: customer.gatewayCustomerId,
+      payment_method_types: ['card'],
+      usage: 'on_session',
+      metadata: { userId },
+    });
+
+    return CreateStripeSetupIntentResponseDto.create({
+      setupIntentId: setupIntent.id,
+      clientSecret: setupIntent.client_secret!,
+    });
+  }
+
+  async confirmSetupIntent(
+    setupIntentId: string,
+    userId: string,
+    setDefault: boolean,
+  ): Promise<SavedPaymentCardDto> {
+    const customer = await this.ensureStripeCustomer(userId);
+    const setupIntent = await this.stripe.setupIntents.retrieve(setupIntentId);
+
+    if (
+      this.resolveCustomerId(setupIntent.customer) !==
+      customer.gatewayCustomerId
+    ) {
+      throw new BadRequestException('SetupIntent does not belong to this user');
+    }
+
+    if (setupIntent.status !== 'succeeded') {
+      throw new BadRequestException(
+        `SetupIntent is not ready: ${setupIntent.status}`,
+      );
+    }
+
+    const paymentMethodId = this.resolvePaymentMethodId(
+      setupIntent.payment_method,
+    );
+    if (!paymentMethodId) {
+      throw new BadRequestException('SetupIntent has no payment method');
+    }
+
+    const stripePaymentMethod =
+      await this.stripe.paymentMethods.retrieve(paymentMethodId);
+
+    if (!stripePaymentMethod.card) {
+      throw new BadRequestException('Only card payment methods are supported');
+    }
+
+    let card = await this.cardRepo.findOne({
+      where: { gatewayPaymentMethodId: paymentMethodId },
+      withDeleted: true,
+    });
+
+    if (card && card.userId !== userId) {
+      throw new BadRequestException('Payment method is already registered');
+    }
+
+    const existingCardCount = await this.cardRepo.count({
+      where: { userId, provider: PaymentMethod.STRIPE },
+    });
+    const shouldSetDefault = setDefault || existingCardCount === 0;
+    const cardMetadata = this.buildCardMetadata(
+      stripePaymentMethod.card,
+      stripePaymentMethod,
+    );
+
+    if (card) {
+      card.customerId = customer.id;
+      card.provider = PaymentMethod.STRIPE;
+      card.gatewayPaymentMethodId = paymentMethodId;
+      card.deletedAt = null;
+      Object.assign(card, cardMetadata);
+    } else {
+      card = this.cardRepo.create({
+        userId,
+        customerId: customer.id,
+        provider: PaymentMethod.STRIPE,
+        gatewayPaymentMethodId: paymentMethodId,
+        ...cardMetadata,
+      });
+    }
+
+    if (shouldSetDefault) {
+      await this.clearDefaultCards(userId);
+      card.isDefault = true;
+    } else {
+      card.isDefault = card.isDefault ?? false;
+    }
+
+    const saved = await this.cardRepo.save(card);
+    return this.toCardDto(saved);
+  }
+
+  async setDefaultCard(
+    userId: string,
+    cardId: string,
+  ): Promise<SavedPaymentCardDto> {
+    const card = await this.cardRepo.findOne({
+      where: { id: cardId, userId, provider: PaymentMethod.STRIPE },
+    });
+
+    if (!card) {
+      throw new NotFoundException(`Saved card not found: ${cardId}`);
+    }
+
+    await this.clearDefaultCards(userId);
+    card.isDefault = true;
+    return this.toCardDto(await this.cardRepo.save(card));
+  }
+
+  async deleteCard(
+    userId: string,
+    cardId: string,
+  ): Promise<SavedPaymentCardDto[]> {
+    const card = await this.cardRepo.findOne({
+      where: { id: cardId, userId, provider: PaymentMethod.STRIPE },
+    });
+
+    if (!card) {
+      throw new NotFoundException(`Saved card not found: ${cardId}`);
+    }
+
+    try {
+      await this.stripe.paymentMethods.detach(card.gatewayPaymentMethodId);
+    } catch (error) {
+      this.logger.warn(
+        `Failed to detach Stripe payment method ${card.gatewayPaymentMethodId}: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      );
+    }
+
+    const wasDefault = card.isDefault;
+    await this.cardRepo.softDelete({ id: card.id, userId });
+
+    if (wasDefault) {
+      const nextDefault = await this.cardRepo.findOne({
+        where: { userId, provider: PaymentMethod.STRIPE },
+        order: { createdAt: 'DESC' },
+      });
+      if (nextDefault) {
+        nextDefault.isDefault = true;
+        await this.cardRepo.save(nextDefault);
+      }
+    }
+
+    return this.listCards(userId);
   }
 
   /**
@@ -61,6 +236,7 @@ export class StripePaymentService {
   async createPayment(
     bookingId: string,
     userId: string,
+    cardId?: string,
   ): Promise<StripePaymentResponseDto> {
     const booking = await this.bookingPaymentService.findByIdAndUser(
       bookingId,
@@ -89,17 +265,28 @@ export class StripePaymentService {
     });
     const savedPayment = await this.paymentRepo.save(payment);
 
-    // 2. Create Stripe PaymentIntent
-    const paymentIntent = await this.stripe.paymentIntents.create({
+    const paymentIntentParams: StripeClient.PaymentIntentCreateParams = {
       amount,
       currency: this.currency,
-      automatic_payment_methods: { enabled: true },
       metadata: {
         bookingId: booking.id,
         paymentId: savedPayment.id,
         userId,
       },
-    });
+    };
+
+    if (cardId) {
+      const { card, customer } = await this.resolveSavedCard(userId, cardId);
+      paymentIntentParams.customer = customer.gatewayCustomerId;
+      paymentIntentParams.payment_method = card.gatewayPaymentMethodId;
+      paymentIntentParams.payment_method_types = ['card'];
+    } else {
+      paymentIntentParams.automatic_payment_methods = { enabled: true };
+    }
+
+    // 2. Create Stripe PaymentIntent
+    const paymentIntent =
+      await this.stripe.paymentIntents.create(paymentIntentParams);
 
     // 3. Log transaction
     await this.txLogRepo.save(
@@ -113,6 +300,7 @@ export class StripePaymentService {
           amount,
           currency: this.currency,
           bookingId: booking.id,
+          cardId,
         },
         responsePayload: {
           paymentIntentId: paymentIntent.id,
@@ -139,6 +327,110 @@ export class StripePaymentService {
       amount,
       currency: this.currency,
       status: paymentIntent.status,
+    });
+  }
+
+  private async ensureStripeCustomer(
+    userId: string,
+  ): Promise<UserPaymentCustomer> {
+    const existing = await this.customerRepo.findOne({
+      where: { userId, provider: PaymentMethod.STRIPE },
+    });
+    if (existing) return existing;
+
+    const account = await this.accountRepo.findOne({ where: { id: userId } });
+    if (!account) {
+      throw new NotFoundException(`Account not found: ${userId}`);
+    }
+
+    const customer = await this.stripe.customers.create({
+      email: account.email,
+      metadata: { userId },
+    });
+
+    return this.customerRepo.save(
+      this.customerRepo.create({
+        userId,
+        provider: PaymentMethod.STRIPE,
+        gatewayCustomerId: customer.id,
+      }),
+    );
+  }
+
+  private async clearDefaultCards(userId: string): Promise<void> {
+    await this.cardRepo.update(
+      { userId, provider: PaymentMethod.STRIPE },
+      { isDefault: false },
+    );
+  }
+
+  private async resolveSavedCard(
+    userId: string,
+    cardId: string,
+  ): Promise<{ card: UserPaymentMethod; customer: UserPaymentCustomer }> {
+    const card = await this.cardRepo.findOne({
+      where: { id: cardId, userId, provider: PaymentMethod.STRIPE },
+    });
+    if (!card) {
+      throw new NotFoundException(`Saved card not found: ${cardId}`);
+    }
+
+    const customer = await this.customerRepo.findOne({
+      where: { id: card.customerId, userId, provider: PaymentMethod.STRIPE },
+    });
+    if (!customer) {
+      throw new NotFoundException('Payment customer not found for saved card');
+    }
+
+    return { card, customer };
+  }
+
+  private resolvePaymentMethodId(
+    paymentMethod: string | StripeClient.PaymentMethod | null,
+  ): string | null {
+    if (!paymentMethod) return null;
+    return typeof paymentMethod === 'string' ? paymentMethod : paymentMethod.id;
+  }
+
+  private resolveCustomerId(
+    customer:
+      | string
+      | StripeClient.Customer
+      | StripeClient.DeletedCustomer
+      | null,
+  ): string | null {
+    if (!customer) return null;
+    return typeof customer === 'string' ? customer : customer.id;
+  }
+
+  private buildCardMetadata(
+    card: StripeClient.PaymentMethod.Card,
+    paymentMethod: StripeClient.PaymentMethod,
+  ): Pick<
+    UserPaymentMethod,
+    'brand' | 'last4' | 'expMonth' | 'expYear' | 'funding' | 'country'
+  > {
+    return {
+      brand: card.brand,
+      last4: card.last4,
+      expMonth: card.exp_month,
+      expYear: card.exp_year,
+      funding: card.funding ?? null,
+      country:
+        card.country ?? paymentMethod.billing_details?.address?.country ?? null,
+    };
+  }
+
+  private toCardDto(card: UserPaymentMethod): SavedPaymentCardDto {
+    return SavedPaymentCardDto.create({
+      id: card.id,
+      brand: card.brand,
+      last4: card.last4,
+      expMonth: card.expMonth,
+      expYear: card.expYear,
+      funding: card.funding,
+      country: card.country,
+      isDefault: card.isDefault,
     });
   }
 
@@ -217,6 +509,7 @@ export class StripePaymentService {
         BookingStatus.CANCELLED,
         userId,
         'Refund successful via Stripe',
+        BookingStatusReasonCode.PAYMENT_REFUND_STRIPE_CANCELLED,
       );
     }
 
@@ -340,6 +633,7 @@ export class StripePaymentService {
         BookingStatus.CONFIRMED,
         'system',
         `Stripe payment confirmed: ${paymentIntent.id}`,
+        BookingStatusReasonCode.PAYMENT_CONFIRMED_STRIPE,
       );
 
       this.logger.log(
@@ -394,8 +688,6 @@ export class StripePaymentService {
     payment.gatewayMessage = failureMessage;
     await this.paymentRepo.save(payment);
 
-    this.logger.warn(
-      `Webhook failed: ${paymentIntent.id} - ${failureMessage}`,
-    );
+    this.logger.warn(`Webhook failed: ${paymentIntent.id} - ${failureMessage}`);
   }
 }

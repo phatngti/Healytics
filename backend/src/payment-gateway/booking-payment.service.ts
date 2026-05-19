@@ -2,9 +2,10 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Booking } from '@/common/entities/booking.entity';
-import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
 import { Product } from '@/common/entities/product.entity';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
+import { BookingStatusLogWriterService } from '@/booking/services/booking-status-log-writer.service';
 
 /**
  * Booking-focused service for payment gateway.
@@ -19,10 +20,9 @@ export class BookingPaymentService {
   constructor(
     @InjectRepository(Booking)
     private readonly bookingRepo: Repository<Booking>,
-    @InjectRepository(BookingStatusLog)
-    private readonly bookingStatusLogRepo: Repository<BookingStatusLog>,
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
+    private readonly logWriter: BookingStatusLogWriterService,
   ) {}
 
   /**
@@ -110,6 +110,7 @@ export class BookingPaymentService {
     status: BookingStatus,
     changedBy = 'system',
     reason?: string,
+    reasonCode: BookingStatusReasonCode = BookingStatusReasonCode.LEGACY_STATUS_CHANGE,
   ): Promise<Booking> {
     const booking = await this.findById(bookingId);
 
@@ -121,15 +122,14 @@ export class BookingPaymentService {
     booking.status = status;
 
     const updated = await this.bookingRepo.save(booking);
-    await this.bookingStatusLogRepo.save(
-      this.bookingStatusLogRepo.create({
-        bookingId: booking.id,
-        fromStatus,
-        toStatus: status,
-        changedBy,
-        reason: reason ?? `Payment status changed to ${status}`,
-      }),
-    );
+    await this.logWriter.write(this.bookingRepo.manager, {
+      bookingId: booking.id,
+      fromStatus,
+      toStatus: status,
+      changedBy,
+      reasonCode,
+      reason: reason ?? `Payment status changed to ${status}`,
+    });
 
     this.logger.log(`Booking ${booking.id}: status ${fromStatus} -> ${status}`);
     return updated;

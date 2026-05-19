@@ -25,9 +25,11 @@ class AuthHttpClient extends http.BaseClient {
 
   static const _authPaths = [
     '/auth/admin/login',
+    '/auth/employee/login',
     '/auth/user/login',
     '/auth/partner/login',
     '/auth/refresh',
+    '/auth/employee/refresh',
     '/auth/partner/refresh',
     '/auth/user/register',
     '/auth/partner/register',
@@ -67,7 +69,7 @@ class AuthHttpClient extends http.BaseClient {
         return false;
       }
 
-      final uri = Uri.parse('$backendBasePath/auth/refresh');
+      final uri = Uri.parse('$backendBasePath/auth/employee/refresh');
       final res = await _inner.post(
         uri,
         headers: {'Content-Type': 'application/json'},

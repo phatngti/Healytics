@@ -3,9 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Booking } from '@/common/entities/booking.entity';
-import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { RedisService } from '@/redis/redis.service';
+import { BookingStatusLogWriterService } from './booking-status-log-writer.service';
 
 /**
  * CRON-based scheduler that auto-cancels bookings whose payment
@@ -21,9 +22,8 @@ export class PaymentExpiryService {
   constructor(
     @InjectRepository(Booking)
     private readonly bookingRepo: Repository<Booking>,
-    @InjectRepository(BookingStatusLog)
-    private readonly bookingStatusLogRepo: Repository<BookingStatusLog>,
     private readonly redisService: RedisService,
+    private readonly logWriter: BookingStatusLogWriterService,
   ) {}
 
   /**
@@ -51,16 +51,14 @@ export class PaymentExpiryService {
         booking.status = BookingStatus.CANCELLED;
         await this.bookingRepo.save(booking);
 
-        // Log status transition for audit trail
-        await this.bookingStatusLogRepo.save(
-          this.bookingStatusLogRepo.create({
-            bookingId: booking.id,
-            fromStatus,
-            toStatus: BookingStatus.CANCELLED,
-            changedBy: 'system:payment-expiry',
-            reason: 'Payment expired after 10-minute window',
-          }),
-        );
+        await this.logWriter.write(this.bookingRepo.manager, {
+          bookingId: booking.id,
+          fromStatus,
+          toStatus: BookingStatus.CANCELLED,
+          changedBy: 'system:payment-expiry',
+          reasonCode: BookingStatusReasonCode.PAYMENT_EXPIRED_AUTO_CANCEL,
+          reason: 'Payment expired after 10-minute window',
+        });
 
         // Release the slot lock in Redis so the time slot is available again.
         // We use `del` instead of `releaseLock` because the cron doesn't

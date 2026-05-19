@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/admin/category/presentation/category_add.dart';
+import 'package:admin_panel/features/admin/category/presentation/category_edit.dart';
 import 'package:admin_panel/features/admin/finance_manager/presentation/admin_finance_manager_screen.dart';
 import 'package:admin_panel/features/admin/finance_manager/presentation/admin_finance_transaction_detail.screen.dart';
 import 'package:admin_panel/features/admin/finance_manager/presentation/admin_finance_payout_detail.screen.dart';
@@ -147,6 +148,10 @@ class SuccessRegistrationRoute extends GoRouteData
       path: '/admin/category/add',
       name: CategoryAddRoute.name,
     ),
+    TypedGoRoute<CategoryEditRoute>(
+      path: '/admin/category/edit/:id',
+      name: CategoryEditRoute.name,
+    ),
     TypedGoRoute<AdminNotificationCampaignIndexRoute>(
       path: '/admin/notifications',
       name: AdminNotificationCampaignIndexRoute.name,
@@ -280,6 +285,25 @@ class CategoryAddRoute extends GoRouteData with $CategoryAddRoute {
   }
 }
 
+class CategoryEditRoute extends GoRouteData with $CategoryEditRoute {
+  const CategoryEditRoute({required this.id, this.autofill});
+  static const name = 'admin-category-edit';
+
+  /// The category ID to edit.
+  final String id;
+
+  /// Dev flag: `?autofill=true` pre-fills fields.
+  final bool? autofill;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: CategoryEditScreen(categoryId: id, autofill: autofill ?? false),
+    );
+  }
+}
+
 class AdminNotificationCampaignIndexRoute extends GoRouteData
     with $AdminNotificationCampaignIndexRoute {
   const AdminNotificationCampaignIndexRoute();
@@ -345,9 +369,7 @@ class AdminFinanceManagerRoute extends GoRouteData
 
 class AdminFinanceTransactionDetailRoute extends GoRouteData
     with $AdminFinanceTransactionDetailRoute {
-  const AdminFinanceTransactionDetailRoute({
-    required this.transactionId,
-  });
+  const AdminFinanceTransactionDetailRoute({required this.transactionId});
   static const name = 'admin-finance-transaction-detail';
   final String transactionId;
 
@@ -355,18 +377,14 @@ class AdminFinanceTransactionDetailRoute extends GoRouteData
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: AdminFinanceTransactionDetailScreen(
-        transactionId: transactionId,
-      ),
+      child: AdminFinanceTransactionDetailScreen(transactionId: transactionId),
     );
   }
 }
 
 class AdminFinancePayoutDetailRoute extends GoRouteData
     with $AdminFinancePayoutDetailRoute {
-  const AdminFinancePayoutDetailRoute({
-    required this.payoutId,
-  });
+  const AdminFinancePayoutDetailRoute({required this.payoutId});
   static const name = 'admin-finance-payout-detail';
   final String payoutId;
 
@@ -374,18 +392,14 @@ class AdminFinancePayoutDetailRoute extends GoRouteData
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: AdminFinancePayoutDetailScreen(
-        payoutId: payoutId,
-      ),
+      child: AdminFinancePayoutDetailScreen(payoutId: payoutId),
     );
   }
 }
 
 class AdminFinanceRefundCaseDetailRoute extends GoRouteData
     with $AdminFinanceRefundCaseDetailRoute {
-  const AdminFinanceRefundCaseDetailRoute({
-    required this.caseId,
-  });
+  const AdminFinanceRefundCaseDetailRoute({required this.caseId});
   static const name = 'admin-finance-refund-case-detail';
   final String caseId;
 
@@ -393,18 +407,14 @@ class AdminFinanceRefundCaseDetailRoute extends GoRouteData
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: AdminFinanceRefundCaseDetailScreen(
-        caseId: caseId,
-      ),
+      child: AdminFinanceRefundCaseDetailScreen(caseId: caseId),
     );
   }
 }
 
 class AdminFinanceReconciliationDetailRoute extends GoRouteData
     with $AdminFinanceReconciliationDetailRoute {
-  const AdminFinanceReconciliationDetailRoute({
-    required this.exceptionId,
-  });
+  const AdminFinanceReconciliationDetailRoute({required this.exceptionId});
   static const name = 'admin-finance-reconciliation-detail';
   final String exceptionId;
 
@@ -412,9 +422,7 @@ class AdminFinanceReconciliationDetailRoute extends GoRouteData
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: AdminFinanceReconciliationDetailScreen(
-        exceptionId: exceptionId,
-      ),
+      child: AdminFinanceReconciliationDetailScreen(exceptionId: exceptionId),
     );
   }
 }

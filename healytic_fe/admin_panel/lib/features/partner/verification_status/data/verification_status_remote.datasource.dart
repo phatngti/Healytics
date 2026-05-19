@@ -1,6 +1,7 @@
 import 'package:admin_openapi/api.dart' as api;
 import 'package:admin_panel/constants/field_keys.dart';
 import 'package:admin_panel/core/services/api.service.dart';
+import 'package:admin_panel/core/utils/user_role_helper.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/field_category.dart';
 import 'package:admin_panel/features/partner/verification_status/domain/verification_status.entity.dart';
 import 'package:admin_panel/features/partner/verification_status/presentation/widgets/document_verification_section.widget.dart';
@@ -23,11 +24,178 @@ abstract class VerificationStatusRemoteDataSource {
 /// Mock implementation of [VerificationStatusRemoteDataSource].
 ///
 /// Returns sample data matching the design for development and testing.
+///
+/// When the dev mock account flag indicates the
+/// partner is verified, returns a fully-approved
+/// entity. Otherwise returns a `requiredResubmit`
+/// payload with admin feedback for testing the
+/// revision flow.
 class VerificationStatusRemoteDataSourceMock
     implements VerificationStatusRemoteDataSource {
   @override
   Future<ProviderVerificationStatusEntity> getVerificationStatus() async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
+
+    if (UserRoleHelper.isProviderVerified()) {
+      return _buildApprovedStatus();
+    }
+    return _buildRevisionRequiredStatus();
+  }
+
+  ProviderVerificationStatusEntity _buildApprovedStatus() {
+    const businessInfo = BusinessInfo(
+      brandName: VerifiedField(
+        fieldKey: 'brand_name',
+        value: 'Healytics Wellness Center',
+        isVerified: true,
+      ),
+      taxRegistrationCode: VerifiedField(
+        fieldKey: 'tax_registration_code',
+        value: '0123456789',
+        isVerified: true,
+      ),
+      serviceTags: VerifiedField(
+        fieldKey: 'service_tags',
+        value: ['Spa', 'Wellness', 'Massage'],
+        isVerified: true,
+      ),
+      address: AddressInfo(
+        streetAddress: VerifiedField(
+          fieldKey: 'street_address',
+          value: '123 Nguyen Hue, Ward 1',
+          isVerified: true,
+        ),
+        ward: VerifiedField(
+          fieldKey: 'ward',
+          value: {'id': 'ward-1', 'name': 'Phường 1'},
+          isVerified: true,
+        ),
+        district: VerifiedField(
+          fieldKey: 'district',
+          value: {'id': 'dist-1', 'name': 'Quận 1'},
+          isVerified: true,
+        ),
+        city: VerifiedField(
+          fieldKey: 'city',
+          value: {
+            'id': 'prov-hcm',
+            'name': 'TP. Hồ Chí Minh',
+          },
+          isVerified: true,
+        ),
+        country: 'Vietnam',
+      ),
+      phoneNumber: VerifiedField(
+        fieldKey: 'phone_number',
+        value: '+84 901 234 567',
+        isVerified: true,
+      ),
+      email: VerifiedField(
+        fieldKey: 'email',
+        value: 'partner@healytics.dev',
+        isVerified: true,
+      ),
+    );
+
+    const legalRepresentative = LegalRepresentativeInfo(
+      fullName: VerifiedField(
+        fieldKey: 'full_name',
+        value: 'Nguyễn Văn A',
+        isVerified: true,
+      ),
+      position: VerifiedField(
+        fieldKey: 'position',
+        value: 'Giám đốc',
+        isVerified: true,
+      ),
+      phoneNumber: VerifiedField(
+        fieldKey: 'legal_rep_phone_number',
+        value: '+84 901 234 567',
+        isVerified: true,
+      ),
+      idType: VerifiedField(
+        fieldKey: 'id_type',
+        value: 'CITIZEN_ID',
+        isVerified: true,
+      ),
+      idNumber: VerifiedField(
+        fieldKey: 'id_number',
+        value: '012345678901',
+        isVerified: true,
+      ),
+      idIssueDate: VerifiedField(
+        fieldKey: 'id_issue_date',
+        value: '2020-01-15',
+        isVerified: true,
+      ),
+    );
+
+    const kycDocuments = <VerifiedField>[
+      VerifiedField(
+        fieldKey: 'id_front_image',
+        value: 'https://example.com/id_front.jpg',
+        isVerified: true,
+      ),
+      VerifiedField(
+        fieldKey: 'id_back_image',
+        value: 'https://example.com/id_back.jpg',
+        isVerified: true,
+      ),
+      VerifiedField(
+        fieldKey: 'business_license',
+        value: 'https://example.com/business_license.pdf',
+        isVerified: true,
+      ),
+      VerifiedField(
+        fieldKey: 'authorization_letter',
+        value: 'https://example.com/auth_letter.pdf',
+        isVerified: true,
+      ),
+      VerifiedField(
+        fieldKey: 'tax_certificate',
+        value: 'https://example.com/tax_certificate.pdf',
+        isVerified: true,
+      ),
+    ];
+
+    return ProviderVerificationStatusEntity(
+      id: 'mock-partner-id-12345678',
+      businessInfo: businessInfo,
+      legalRepresentative: legalRepresentative,
+      kycDocuments: kycDocuments,
+      verificationStatus: VerificationRevisionStatus.approved,
+      createdAt: DateTime.now(),
+      sections: const [
+        VerificationSectionEntity(
+          type: VerificationSectionType.businessEntity,
+          label: 'Business Entity',
+          status: SectionStatus.completed,
+          stepNumber: 1,
+        ),
+        VerificationSectionEntity(
+          type: VerificationSectionType.locationDetails,
+          label: 'Location Details',
+          status: SectionStatus.completed,
+          stepNumber: 2,
+        ),
+        VerificationSectionEntity(
+          type: VerificationSectionType.legalRepresentative,
+          label: 'Legal Representative',
+          status: SectionStatus.completed,
+          stepNumber: 3,
+        ),
+        VerificationSectionEntity(
+          type: VerificationSectionType.accountSecurity,
+          label: 'Documents',
+          status: SectionStatus.completed,
+          stepNumber: 4,
+        ),
+      ],
+    );
+  }
+
+  Future<ProviderVerificationStatusEntity>
+      _buildRevisionRequiredStatus() async {
 
     const businessInfo = BusinessInfo(
       brandName: VerifiedField(

@@ -233,6 +233,7 @@ export class CreateCheckoutTicketHandler {
       productId: dto.productId,
       webhookUrl: dto.webhookUrl,
       lockToken,
+      payLater: dto.payLater ?? false,
     };
     try {
       this.rmqClient.emit('checkout.process', rmqPayload);

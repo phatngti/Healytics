@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, LessThan, Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 import {
   SearchIndexOutbox,
   SearchIndexOutboxStatus,
@@ -22,10 +23,15 @@ export class SearchIndexWorkerService {
     @InjectRepository(SearchIndexOutbox)
     private readonly outboxRepository: Repository<SearchIndexOutbox>,
     private readonly indexer: BookingSearchIndexerService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Cron(CronExpression.EVERY_10_SECONDS)
   async processPending(): Promise<void> {
+    if (this.configService.get<string>('NODE_ENV') !== 'production') {
+      return;
+    }
+    this.logger.log('Processing pending search index events...');
     const hasLock = await this.tryAcquireLock(
       SearchIndexWorkerService.PROCESS_LOCK_ID,
     );
@@ -54,6 +60,11 @@ export class SearchIndexWorkerService {
 
   @Cron(CronExpression.EVERY_5_MINUTES)
   async reconcile(): Promise<void> {
+    if (this.configService.get<string>('NODE_ENV') !== 'production') {
+      return;
+    }
+    this.logger.log('Reconciling search index events...');
+
     const hasLock = await this.tryAcquireLock(
       SearchIndexWorkerService.RECONCILE_LOCK_ID,
     );
@@ -72,10 +83,12 @@ export class SearchIndexWorkerService {
   }
 
   async reindexAllNow(): Promise<void> {
+    this.logger.log('Reindexing all search index events...');
     await this.indexer.refreshAll();
   }
 
   private async processEvent(event: SearchIndexOutbox): Promise<void> {
+    this.logger.log('Processing search index event...');
     await this.outboxRepository.update(
       {
         id: event.id,

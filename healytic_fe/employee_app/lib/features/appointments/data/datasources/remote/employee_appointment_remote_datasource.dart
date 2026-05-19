@@ -1,6 +1,6 @@
 import 'dart:developer' show log;
 
-import 'package:user_openapi/api.dart'
+import 'package:employee_openapi/api.dart'
     show
         ApiException,
         CancelEmployeeAppointmentDto,
@@ -34,10 +34,7 @@ abstract class EmployeeAppointmentRemoteDatasource {
   Future<bool> completeService(String id);
 
   /// Cancels an appointment with optional [reason].
-  Future<bool> cancelAppointment(
-    String id, {
-    String? reason,
-  });
+  Future<bool> cancelAppointment(String id, {String? reason});
 }
 
 /// Real implementation using OpenAPI client.
@@ -45,48 +42,38 @@ class EmployeeAppointmentRemoteDatasourceImpl
     implements EmployeeAppointmentRemoteDatasource {
   final ApiService apiService;
 
-  EmployeeAppointmentRemoteDatasourceImpl({
-    required this.apiService,
-  });
+  EmployeeAppointmentRemoteDatasourceImpl({required this.apiService});
 
   // ── Mapping helpers ─────────────────────────
 
   /// Maps OpenAPI status → domain status.
   EmployeeAppointmentStatus _mapStatus(
     EmployeeBookingStatusFilter status,
-  ) =>
-      switch (status) {
-        EmployeeBookingStatusFilter.upcoming =>
-          EmployeeAppointmentStatus.upcoming,
-        EmployeeBookingStatusFilter.inProgress =>
-          EmployeeAppointmentStatus.inProgress,
-        EmployeeBookingStatusFilter.completed =>
-          EmployeeAppointmentStatus.completed,
-        EmployeeBookingStatusFilter.canceled =>
-          EmployeeAppointmentStatus.canceled,
-        _ => EmployeeAppointmentStatus.upcoming,
-      };
+  ) => switch (status) {
+    EmployeeBookingStatusFilter.upcoming => EmployeeAppointmentStatus.upcoming,
+    EmployeeBookingStatusFilter.inProgress =>
+      EmployeeAppointmentStatus.inProgress,
+    EmployeeBookingStatusFilter.completed =>
+      EmployeeAppointmentStatus.completed,
+    EmployeeBookingStatusFilter.canceled => EmployeeAppointmentStatus.canceled,
+    _ => EmployeeAppointmentStatus.upcoming,
+  };
 
   /// Maps domain status → OpenAPI filter.
   EmployeeBookingStatusFilter? _mapStatusToFilter(
     EmployeeAppointmentStatus? status,
-  ) =>
-      switch (status) {
-        EmployeeAppointmentStatus.upcoming =>
-          EmployeeBookingStatusFilter.upcoming,
-        EmployeeAppointmentStatus.inProgress =>
-          EmployeeBookingStatusFilter.inProgress,
-        EmployeeAppointmentStatus.completed =>
-          EmployeeBookingStatusFilter.completed,
-        EmployeeAppointmentStatus.canceled =>
-          EmployeeBookingStatusFilter.canceled,
-        null => null,
-      };
+  ) => switch (status) {
+    EmployeeAppointmentStatus.upcoming => EmployeeBookingStatusFilter.upcoming,
+    EmployeeAppointmentStatus.inProgress =>
+      EmployeeBookingStatusFilter.inProgress,
+    EmployeeAppointmentStatus.completed =>
+      EmployeeBookingStatusFilter.completed,
+    EmployeeAppointmentStatus.canceled => EmployeeBookingStatusFilter.canceled,
+    null => null,
+  };
 
   /// Defensively maps a DTO to the domain entity.
-  EmployeeAppointmentEntity _mapToEntity(
-    EmployeeAppointmentResponseDto dto,
-  ) =>
+  EmployeeAppointmentEntity _mapToEntity(EmployeeAppointmentResponseDto dto) =>
       EmployeeAppointmentEntity(
         id: dto.id,
         serviceName: dto.serviceName,
@@ -113,17 +100,14 @@ class EmployeeAppointmentRemoteDatasourceImpl
   }) async {
     try {
       final statusFilter = _mapStatusToFilter(status);
-      final response = await apiService
-          .employeeAppointmentsApi
+      final response = await apiService.employeeAppointmentsApi
           .employeeAppointmentsControllerListMyAppointments(
-        status: statusFilter,
-        page: 1,
-        limit: 100,
-      );
+            status: statusFilter,
+            page: 1,
+            limit: 100,
+          );
       if (response == null) return [];
-      return response.data
-          .map(_mapToEntity)
-          .toList();
+      return response.data.map(_mapToEntity).toList();
     } on ApiException catch (e) {
       log(
         'Failed to fetch appointments: ${e.code}',
@@ -134,15 +118,10 @@ class EmployeeAppointmentRemoteDatasourceImpl
   }
 
   @override
-  Future<EmployeeAppointmentEntity?> getById(
-    String id,
-  ) async {
+  Future<EmployeeAppointmentEntity?> getById(String id) async {
     try {
-      final dto = await apiService
-          .employeeAppointmentsApi
-          .employeeAppointmentsControllerGetAppointment(
-            id,
-          );
+      final dto = await apiService.employeeAppointmentsApi
+          .employeeAppointmentsControllerGetAppointment(id);
       return dto != null ? _mapToEntity(dto) : null;
     } on ApiException catch (e) {
       if (e.code == 404) return null;
@@ -159,7 +138,9 @@ class EmployeeAppointmentRemoteDatasourceImpl
     try {
       final dto = await apiService
           .employeeAppointmentsApi
-          .employeeAppointmentsControllerStartService(id);
+          .employeeAppointmentsControllerStartService(
+            id,
+          );
       return dto != null;
     } on ApiException catch (e) {
       log(
@@ -189,20 +170,11 @@ class EmployeeAppointmentRemoteDatasourceImpl
   }
 
   @override
-  Future<bool> cancelAppointment(
-    String id, {
-    String? reason,
-  }) async {
+  Future<bool> cancelAppointment(String id, {String? reason}) async {
     try {
-      final cancelDto = CancelEmployeeAppointmentDto(
-        reason: reason,
-      );
-      final dto = await apiService
-          .employeeAppointmentsApi
-          .employeeAppointmentsControllerCancelAppointment(
-            id,
-            cancelDto,
-          );
+      final cancelDto = CancelEmployeeAppointmentDto(reason: reason);
+      final dto = await apiService.employeeAppointmentsApi
+          .employeeAppointmentsControllerCancelAppointment(id, cancelDto);
       return dto != null;
     } on ApiException catch (e) {
       log(
@@ -260,10 +232,7 @@ class EmployeeAppointmentRemoteDatasourceMock
   }
 
   @override
-  Future<bool> cancelAppointment(
-    String id, {
-    String? reason,
-  }) async {
+  Future<bool> cancelAppointment(String id, {String? reason}) async {
     await Future.delayed(const Duration(milliseconds: 400));
     final idx = _store.indexWhere((a) => a.id == id);
     if (idx == -1) return false;
@@ -275,13 +244,12 @@ class EmployeeAppointmentRemoteDatasourceMock
 }
 
 @Riverpod(keepAlive: true)
-EmployeeAppointmentRemoteDatasource
-    employeeAppointmentRemoteDatasource(Ref ref) {
+EmployeeAppointmentRemoteDatasource employeeAppointmentRemoteDatasource(
+  Ref ref,
+) {
   if (AppEnvironment.current.useMock) {
     return EmployeeAppointmentRemoteDatasourceMock();
   }
   final apiService = ref.read(apiServiceProvider);
-  return EmployeeAppointmentRemoteDatasourceImpl(
-    apiService: apiService,
-  );
+  return EmployeeAppointmentRemoteDatasourceImpl(apiService: apiService);
 }

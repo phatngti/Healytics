@@ -40,7 +40,7 @@ describe('GetBookingHandler', () => {
     bookingRepo.findOne.mockResolvedValue(bookingEntity);
 
     // Act
-    const result = await handler.execute('bk-test-1');
+    const result = await handler.execute(bookingEntity.userId, 'bk-test-1');
 
     // Assert
     expect(result).toBeInstanceOf(BookingResponseDto);
@@ -49,7 +49,7 @@ describe('GetBookingHandler', () => {
     expect(result.staffId).toBe(bookingEntity.staffId);
     expect(result.status).toBe(bookingEntity.status);
     expect(bookingRepo.findOne).toHaveBeenCalledWith({
-      where: { id: 'bk-test-1' },
+      where: { id: 'bk-test-1', userId: bookingEntity.userId },
     });
   });
 
@@ -58,10 +58,10 @@ describe('GetBookingHandler', () => {
     bookingRepo.findOne.mockResolvedValue(null);
 
     // Act & Assert
-    await expect(handler.execute('non-existent')).rejects.toThrow(
+    await expect(handler.execute('user-1', 'non-existent')).rejects.toThrow(
       NotFoundException,
     );
-    await expect(handler.execute('non-existent')).rejects.toThrow(
+    await expect(handler.execute('user-1', 'non-existent')).rejects.toThrow(
       'Booking with ID non-existent not found',
     );
   });

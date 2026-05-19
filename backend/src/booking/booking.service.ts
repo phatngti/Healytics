@@ -67,9 +67,9 @@ export class BookingService {
     return this.getCheckoutTicketHandler.execute(id);
   }
 
-  async getBooking(id: string): Promise<BookingResponseDto> {
-    this.logger.log(`getBooking: ${id}`);
-    return this.getBookingHandler.execute(id);
+  async getBooking(userId: string, id: string): Promise<BookingResponseDto> {
+    this.logger.log(`getBooking: user=${userId}, booking=${id}`);
+    return this.getBookingHandler.execute(userId, id);
   }
 
   async listMyBookings(

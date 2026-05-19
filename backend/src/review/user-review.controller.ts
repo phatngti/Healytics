@@ -12,8 +12,10 @@ import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import { ReviewService } from './review.service';
 import { CreateTreatmentReviewDto } from './dto/create-treatment-review.dto';
 import { CreateSpecialistReviewDto } from './dto/create-specialist-review.dto';
+import { CreateFacilityReviewDto } from './dto/create-facility-review.dto';
 import { TreatmentReviewResponseDto } from './dto/treatment-review-response.dto';
 import { SpecialistReviewResponseDto } from './dto/specialist-review-response.dto';
+import { FacilityReviewResponseDto } from './dto/facility-review-response.dto';
 
 /**
  * User controller for review endpoints.
@@ -70,5 +72,29 @@ export class UserReviewController {
     @Body() dto: CreateSpecialistReviewDto,
   ): Promise<SpecialistReviewResponseDto> {
     return this.reviewService.submitSpecialistReview(userId, dto);
+  }
+
+  /**
+   * Submit a facility/clinic review for a completed appointment.
+   */
+  @Post('facility')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @ApiOperation({
+    summary: 'Submit a facility review for a completed appointment',
+  })
+  @ApiCreatedResponse({
+    description: 'Facility review submitted successfully.',
+    type: FacilityReviewResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation error or appointment not completed',
+  })
+  @ApiNotFoundResponse({ description: 'Appointment not found' })
+  @ApiConflictResponse({ description: 'Facility review already submitted' })
+  async submitFacilityReview(
+    @CurrentUser('id') userId: string,
+    @Body() dto: CreateFacilityReviewDto,
+  ): Promise<FacilityReviewResponseDto> {
+    return this.reviewService.submitFacilityReview(userId, dto);
   }
 }

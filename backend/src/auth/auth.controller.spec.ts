@@ -19,6 +19,7 @@ describe('AuthController', () => {
       refresh: jest.fn(),
       logout: jest.fn(),
       requestUserPasswordReset: jest.fn(),
+      validateUserPasswordResetCode: jest.fn(),
       resetUserPassword: jest.fn(),
     };
 
@@ -93,7 +94,7 @@ describe('AuthController', () => {
       const dto = { email: 'user@test.com' };
       const expectedResponse = {
         message:
-          'If the email is registered, a password reset link has been sent.',
+          'If the email is registered, a password reset code has been sent.',
       };
       authService.requestUserPasswordReset!.mockResolvedValue(expectedResponse);
 
@@ -101,6 +102,26 @@ describe('AuthController', () => {
 
       expect(result).toEqual(expectedResponse);
       expect(authService.requestUserPasswordReset).toHaveBeenCalledWith(dto);
+    });
+  });
+
+  describe('validateUserPasswordResetCode', () => {
+    it('should delegate to authService.validateUserPasswordResetCode', async () => {
+      const dto = { email: 'user@test.com', code: '123456' };
+      const expectedResponse = {
+        message: 'Password reset code verified.',
+        resetToken: 'reset-token',
+      };
+      authService.validateUserPasswordResetCode!.mockResolvedValue(
+        expectedResponse,
+      );
+
+      const result = await controller.validateUserPasswordResetCode(dto);
+
+      expect(result).toEqual(expectedResponse);
+      expect(authService.validateUserPasswordResetCode).toHaveBeenCalledWith(
+        dto,
+      );
     });
   });
 

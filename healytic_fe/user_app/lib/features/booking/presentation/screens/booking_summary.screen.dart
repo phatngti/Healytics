@@ -55,8 +55,7 @@ class BookingSummaryScreen extends ConsumerStatefulWidget {
       _BookingSummaryScreenState();
 }
 
-class _BookingSummaryScreenState
-    extends ConsumerState<BookingSummaryScreen> {
+class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
   bool _isAddingToCart = false;
 
   void _handleBack() {
@@ -74,10 +73,7 @@ class _BookingSummaryScreenState
       detail: detail,
     );
     if (bookingParams == null) {
-      AppToast.error(
-        context,
-        'Select a specialist and time slot first',
-      );
+      AppToast.error(context, 'Select a specialist and time slot first');
       return;
     }
 
@@ -98,10 +94,7 @@ class _BookingSummaryScreenState
       AppToast.success(context, 'Added to cart');
     } catch (e) {
       if (!mounted) return;
-      AppToast.error(
-        context,
-        'Failed to add to cart',
-      );
+      AppToast.error(context, 'Failed to add to cart');
     } finally {
       if (mounted) {
         setState(() => _isAddingToCart = false);
@@ -109,10 +102,7 @@ class _BookingSummaryScreenState
     }
   }
 
-  DateTime _buildCartTimeSlot(
-    DateTime date,
-    String timeLabel,
-  ) {
+  DateTime _buildCartTimeSlot(DateTime date, String timeLabel) {
     final parts = timeLabel.split(RegExp(r'[\s:]+'));
     if (parts.length >= 3) {
       var hour = int.tryParse(parts[0]) ?? 0;
@@ -121,20 +111,10 @@ class _BookingSummaryScreenState
       if (period == 'PM' && hour != 12) hour += 12;
       if (period == 'AM' && hour == 12) hour = 0;
 
-      return DateTime(
-        date.year,
-        date.month,
-        date.day,
-        hour,
-        minute,
-      );
+      return DateTime(date.year, date.month, date.day, hour, minute);
     }
 
-    return DateTime(
-      date.year,
-      date.month,
-      date.day,
-    );
+    return DateTime(date.year, date.month, date.day);
   }
 
   void _handleConfirm(
@@ -156,9 +136,7 @@ class _BookingSummaryScreenState
       );
       return;
     }
-    ref.read(bookingParamsProvider.notifier).set(
-          bookingParams,
-        );
+    ref.read(bookingParamsProvider.notifier).set(bookingParams);
     const CheckoutRoute().push(context);
   }
 
@@ -170,14 +148,12 @@ class _BookingSummaryScreenState
     final specialist = flowState.selectedSpecialist;
     final selectedDate = flowState.selectedDate;
     final selectedTimeSlot =
-        flowState.selectedTimeSlotLabel ??
-            detail?.schedule?.timeSlotLabel;
+        flowState.selectedTimeSlotLabel ?? detail?.schedule?.timeSlotLabel;
 
     final serviceId = detail?.service.id ?? service?.id;
     final serviceName = detail?.service.title ?? service?.title;
     final employeeId = detail?.specialist.id ?? specialist?.id;
-    final employeeName =
-        detail?.specialist.name ?? specialist?.name;
+    final employeeName = detail?.specialist.name ?? specialist?.name;
 
     if (serviceId == null ||
         serviceName == null ||
@@ -192,22 +168,15 @@ class _BookingSummaryScreenState
     return BookingParams(
       serviceId: serviceId,
       serviceName: serviceName,
-      serviceImageUrl:
-          detail?.service.imageUrl ?? service?.imageUrl ?? '',
-      price:
-          detail?.priceBreakdown.formattedTotal ??
-              service?.price ??
-              '0 VND',
+      serviceImageUrl: detail?.service.imageUrl ?? service?.imageUrl ?? '',
+      price: detail?.priceBreakdown.formattedTotal ?? service?.price ?? '0 VND',
       clinicName:
-          detail?.location.name ??
-              service?.clinicName ??
-              'Unknown clinic',
+          detail?.location.name ?? service?.clinicName ?? 'Unknown clinic',
       clinicAddress:
           detail?.location.address ??
-              service?.clinicAddress ??
-              'Unknown address',
-      clinicImageUrl:
-          detail?.service.imageUrl ?? service?.imageUrl ?? '',
+          service?.clinicAddress ??
+          'Unknown address',
+      clinicImageUrl: detail?.service.imageUrl ?? service?.imageUrl ?? '',
       employeeId: employeeId,
       employeeName: employeeName,
       selectedDate: selectedDate,
@@ -217,20 +186,13 @@ class _BookingSummaryScreenState
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final hPad = AppDimens.horizontalPadding(context);
     final sectionGap = AppDimens.sectionSpacing(context);
     final flowState = ref.watch(bookingFlowProvider);
 
-    final eligibilityId =
-        flowState.selectedSpecialist?.eligibilityId;
+    final eligibilityId = flowState.selectedSpecialist?.eligibilityId;
     final detail = eligibilityId != null
-        ? ref
-            .watch(
-              eligibilityDetailProvider(eligibilityId),
-            )
-            .asData
-            ?.value
+        ? ref.watch(eligibilityDetailProvider(eligibilityId)).asData?.value
         : null;
 
     return Scaffold(
@@ -256,14 +218,10 @@ class _BookingSummaryScreenState
             ),
       bottomNavigationBar: BookingBottomAction(
         canContinue: flowState.isStep2Complete,
-        onContinue: () =>
-            _handleConfirm(flowState, detail),
+        onContinue: () => _handleConfirm(flowState, detail),
         label: 'Confirm & Pay',
         icon: Symbols.arrow_forward,
-        onAddToCart: () => _handleAddToCart(
-          flowState,
-          detail,
-        ),
+        onAddToCart: () => _handleAddToCart(flowState, detail),
         isAddingToCart: _isAddingToCart,
       ),
     );
@@ -371,6 +329,8 @@ class _SummaryBody extends StatelessWidget {
             LocationDetailsCard(
               partnerName: detail.location.name,
               address: detail.location.address,
+              latitude: detail.location.latitude,
+              longitude: detail.location.longitude,
             ),
             SizedBox(height: sectionGap),
 

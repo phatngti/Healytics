@@ -9,11 +9,55 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**mapboxControllerDirections**](MapboxApi.md#mapboxcontrollerdirections) | **GET** /mapbox/directions | Get driving directions route geometry
 [**mapboxControllerDistanceMatrix**](MapboxApi.md#mapboxcontrollerdistancematrix) | **GET** /mapbox/distance-matrix | Get travel distance and duration
 [**mapboxControllerGeocode**](MapboxApi.md#mapboxcontrollergeocode) | **GET** /mapbox/geocode | Geocode an address to lat/lng
 [**mapboxControllerGetClientKey**](MapboxApi.md#mapboxcontrollergetclientkey) | **GET** /mapbox/client-key | Get public access token for frontend/mobile SDKs
 [**mapboxControllerReverseGeocode**](MapboxApi.md#mapboxcontrollerreversegeocode) | **GET** /mapbox/reverse-geocode | Reverse geocode lat/lng to address
 
+
+# **mapboxControllerDirections**
+> DirectionsResponseDto mapboxControllerDirections(origin, destination)
+
+Get driving directions route geometry
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+
+final api_instance = MapboxApi();
+final origin = 10.762622,106.660172; // String | Origin coordinate in lat,lng format
+final destination = 10.823099,106.629662; // String | Destination coordinate in lat,lng format
+
+try {
+    final result = api_instance.mapboxControllerDirections(origin, destination);
+    print(result);
+} catch (e) {
+    print('Exception when calling MapboxApi->mapboxControllerDirections: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **origin** | **String**| Origin coordinate in lat,lng format | 
+ **destination** | **String**| Destination coordinate in lat,lng format | 
+
+### Return type
+
+[**DirectionsResponseDto**](DirectionsResponseDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **mapboxControllerDistanceMatrix**
 > DistanceMatrixResponseDto mapboxControllerDistanceMatrix(origins, destinations)

@@ -10,10 +10,14 @@ import { Payment } from '@/common/entities/payment.entity';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
 import { SpecialistReview } from '@/common/entities/specialist-review.entity';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 import { PaymentMethod } from '@/payment-gateway/enums/payment-method.enum';
 import { PaymentStatus } from '@/payment-gateway/enums/payment-status.enum';
 import { Role } from '@/account/enum/role.enum';
 import { ISeeder } from '../seeder.interface';
+
+const seedAppointmentMarker = (idempotencyKey: string): string =>
+  `SEED_APPOINTMENT:${idempotencyKey}`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Relative booking time helpers (so data stays realistic when seeded later)
@@ -69,6 +73,8 @@ const SEED_APPOINTMENTS: {
     fromStatus: BookingStatus | null;
     toStatus: BookingStatus;
     changedBy: string;
+    reason?: string;
+    reasonCode?: BookingStatusReasonCode;
   }[];
   /** Present only when isReviewed = true */
   treatmentReview?: {
@@ -826,14 +832,17 @@ export class AppointmentSeeder implements ISeeder {
         continue;
       }
 
-      // Idempotency: check if a booking already exists at this staff + startTime
-      const existing = await this.bookingRepo.findOne({
-        where: { staffId: employee.id, startTime: apt.startTime },
-      });
+      const existing = await this.findExistingSeedBooking(
+        apt,
+        userAccount.id,
+        employee.id,
+        product?.id ?? null,
+      );
 
       if (existing) {
+        await this.markSeedBooking(existing.id, apt.idempotencyKey);
         this.logger.log(
-          `  ⏭ Booking ${apt.idempotencyKey} already exists (staffId=${employee.id}, startTime=${apt.startTime.toISOString()}), skipping`,
+          `  ⏭ Booking ${apt.idempotencyKey} already exists, skipping`,
         );
         continue;
       }
@@ -860,12 +869,19 @@ export class AppointmentSeeder implements ISeeder {
 
       // 2. Booking Status Logs (audit trail)
       for (const log of apt.statusLogs) {
+        const reasonCode =
+          log.reasonCode ??
+          this.inferSeedReasonCode(log.fromStatus, log.toStatus);
         const statusLog = this.statusLogRepo.create({
           bookingId: booking.id,
           fromStatus: log.fromStatus,
           toStatus: log.toStatus,
           changedBy: log.changedBy,
-          reason: null,
+          reasonCode,
+          reason: this.buildSeedStatusLogReason(
+            apt.idempotencyKey,
+            log.reason ?? this.defaultSeedReason(log.fromStatus, log.toStatus),
+          ),
         });
         await this.statusLogRepo.save(statusLog);
       }
@@ -1015,9 +1031,7 @@ export class AppointmentSeeder implements ISeeder {
     staffIds?: string[],
   ): Promise<void> {
     const params = staffIds?.length ? [staffIds] : [];
-    const scope = staffIds?.length
-      ? 'WHERE e.id = ANY($1::uuid[])'
-      : '';
+    const scope = staffIds?.length ? 'WHERE e.id = ANY($1::uuid[])' : '';
     const reviewScope = staffIds?.length
       ? 'WHERE sr.specialist_id = ANY($1::uuid[])'
       : '';
@@ -1071,5 +1085,114 @@ export class AppointmentSeeder implements ISeeder {
       `,
       params,
     );
+  }
+
+  private async findExistingSeedBooking(
+    apt: (typeof SEED_APPOINTMENTS)[number],
+    userId: string,
+    staffId: string,
+    productId: string | null,
+  ): Promise<Booking | null> {
+    const marker = seedAppointmentMarker(apt.idempotencyKey);
+    const markedBooking = await this.bookingRepo
+      .createQueryBuilder('booking')
+      .innerJoin(
+        BookingStatusLog,
+        'statusLog',
+        'statusLog.booking_id = booking.id',
+      )
+      .where(
+        '(statusLog.reason = :marker OR statusLog.reason LIKE :markerPrefix)',
+        {
+          marker,
+          markerPrefix: `${marker} - %`,
+        },
+      )
+      .getOne();
+
+    if (markedBooking) {
+      return markedBooking;
+    }
+
+    let query = this.bookingRepo
+      .createQueryBuilder('booking')
+      .where('booking.user_id = :userId', { userId })
+      .andWhere('booking.staff_id = :staffId', { staffId })
+      .andWhere('booking.status = :status', { status: apt.status });
+
+    query = productId
+      ? query.andWhere('booking.product_id = :productId', { productId })
+      : query.andWhere('booking.product_id IS NULL');
+
+    query =
+      apt.notes === null
+        ? query.andWhere('booking.notes IS NULL')
+        : query.andWhere('booking.notes = :notes', { notes: apt.notes });
+
+    const candidates = await query
+      .orderBy('booking.created_at', 'ASC')
+      .getMany();
+    if (candidates.length > 1) {
+      this.logger.warn(
+        `  ⚠ Found ${candidates.length} existing logical booking rows for ${apt.idempotencyKey}; keeping the oldest and skipping new insert`,
+      );
+    }
+
+    return candidates[0] ?? null;
+  }
+
+  private async markSeedBooking(
+    bookingId: string,
+    idempotencyKey: string,
+  ): Promise<void> {
+    await this.statusLogRepo.update(
+      { bookingId },
+      {
+        reason: this.buildSeedStatusLogReason(
+          idempotencyKey,
+          'Existing seed booking marker',
+        ),
+        reasonCode: BookingStatusReasonCode.LEGACY_STATUS_CHANGE,
+      },
+    );
+  }
+
+  private buildSeedStatusLogReason(
+    idempotencyKey: string,
+    reason: string,
+  ): string {
+    return `${seedAppointmentMarker(idempotencyKey)} - ${reason}`;
+  }
+
+  private inferSeedReasonCode(
+    fromStatus: BookingStatus | null,
+    toStatus: BookingStatus,
+  ): BookingStatusReasonCode {
+    if (fromStatus === null && toStatus === BookingStatus.PENDING_PAYMENT) {
+      return BookingStatusReasonCode.CHECKOUT_CREATED_PENDING_PAYMENT;
+    }
+    if (
+      fromStatus === BookingStatus.PENDING_PAYMENT &&
+      toStatus === BookingStatus.CONFIRMED
+    ) {
+      return BookingStatusReasonCode.LEGACY_STATUS_CHANGE;
+    }
+    if (
+      fromStatus === BookingStatus.CONFIRMED &&
+      toStatus === BookingStatus.COMPLETED
+    ) {
+      return BookingStatusReasonCode.EMPLOYEE_COMPLETED_SERVICE;
+    }
+    if (toStatus === BookingStatus.CANCELLED) {
+      return BookingStatusReasonCode.LEGACY_STATUS_CHANGE;
+    }
+    return BookingStatusReasonCode.LEGACY_STATUS_CHANGE;
+  }
+
+  private defaultSeedReason(
+    fromStatus: BookingStatus | null,
+    toStatus: BookingStatus,
+  ): string {
+    return `Seed booking status change from ${fromStatus ?? 'none'} to ${toStatus}`;
   }
 }

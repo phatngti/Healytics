@@ -184,7 +184,7 @@ class _ProductOrganizationCardState
             ),
             FormFieldBuilders.buildChipSelectorField(
               context,
-              label: 'Tags',
+              label: 'Tags (optional)',
               emptyPlaceholder: 'Select tags...',
               chips: _selectedTagIds
                   .map((id) {

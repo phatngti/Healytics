@@ -30,7 +30,7 @@ class ProductHeaderButtons {
           Icon(Icons.add, color: colorScheme.onPrimary),
           AppDimens.horizontalSmall,
           Text(
-            'Add Product',
+            'Add Service',
             style: textTheme.bodyMedium?.copyWith(color: colorScheme.onPrimary),
           ),
         ],

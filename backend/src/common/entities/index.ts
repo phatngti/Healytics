@@ -57,14 +57,18 @@ export { UserWishlistItem } from './user-wishlist-item.entity';
 export { Booking } from './booking.entity';
 export { CheckoutTicket } from './checkout-ticket.entity';
 export { BookingStatusLog } from './booking-status-log.entity';
+export { PartnerStatistics } from './partner-statistics.entity';
 
 // Payment Gateway
 export { Payment } from './payment.entity';
 export { PaymentTransactionLog } from './payment-transaction-log.entity';
+export { UserPaymentCustomer } from './user-payment-customer.entity';
+export { UserPaymentMethod } from './user-payment-method.entity';
 
 // Reviews
 export { TreatmentReview } from './treatment-review.entity';
 export { SpecialistReview } from './specialist-review.entity';
+export { FacilityReview } from './facility-review.entity';
 
 // AI Chat
 export { AiConversation } from './conversation.entity';

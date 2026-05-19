@@ -64,6 +64,12 @@ export class LocationInfoDto {
 
   @ApiPropertyOptional({ example: 'https://maps.example.com/...' })
   mapUrl: string | null;
+
+  @ApiPropertyOptional({ example: 10.7758, nullable: true, type: Number })
+  latitude: number | null;
+
+  @ApiPropertyOptional({ example: 106.7009, nullable: true, type: Number })
+  longitude: number | null;
 }
 
 export class PriceBreakdownDto {
@@ -160,12 +166,16 @@ export class UserEligibilityDetailResponseDto {
         name: partner.brandName,
         address: addressParts.join(', '),
         mapUrl: null, // Depending on if we have it in partner. For now null
+        latitude: partner.latitude,
+        longitude: partner.longitude,
       };
     } else {
       dto.location = {
         name: 'Healytics Wellness Center',
         address: '123 Health Street, District 1, Ho Chi Minh City',
         mapUrl: null,
+        latitude: null,
+        longitude: null,
       };
     }
 

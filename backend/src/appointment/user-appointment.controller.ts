@@ -90,9 +90,10 @@ export class UserAppointmentController {
   @ApiOkResponse({ type: AppointmentResponseDto })
   @ApiNotFoundResponse({ description: 'Appointment not found' })
   async getAppointment(
+    @CurrentUser('id') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<AppointmentResponseDto> {
-    return this.appointmentService.getAppointment(id);
+    return this.appointmentService.getAppointment(userId, id);
   }
 
   /**

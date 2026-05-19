@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:user_app/features/clinic_info/domain/entities/clinic_info.entity.dart';
 import 'package:user_app/features/clinic_info/data/provider/clinic_info.provider.dart';
@@ -161,6 +163,116 @@ class _ClinicInfoBodyState extends ConsumerState<_ClinicInfoBody>
     ).push(context);
   }
 
+  String get _clinicShareLink =>
+      'https://healytics.me/clinics/${widget.clinicId}';
+
+  Future<void> _shareClinic() async {
+    await Share.share(
+      '${_clinic.name}\n$_clinicShareLink',
+      subject: _clinic.name,
+    );
+  }
+
+  Future<void> _copyClinicLink() async {
+    await Clipboard.setData(ClipboardData(text: _clinicShareLink));
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Clinic link copied')));
+  }
+
+  void _openMoreMenu() {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.link),
+                title: const Text('Copy link'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _copyClinicLink();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.flag_outlined),
+                title: const Text('Report clinic'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _openReportSheet();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _openReportSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Report clinic',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Send this clinic to the Healytics team for review.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(sheetContext).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () {
+                          // TODO(product): Persist clinic reports when a
+                          // moderation endpoint is available.
+                          Navigator.of(sheetContext).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Report submitted for review'),
+                            ),
+                          );
+                        },
+                        child: const Text('Submit'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   String _formatCount(int value) {
     if (value >= 1000000) {
       return '${(value / 1000000).toStringAsFixed(1)}m';
@@ -203,6 +315,10 @@ class _ClinicInfoBodyState extends ConsumerState<_ClinicInfoBody>
                 logoUrl: _clinic.logoImageUrl,
                 showBlur: _showBlur,
                 onBack: _handleBack,
+                onShare: () {
+                  _shareClinic();
+                },
+                onMore: _openMoreMenu,
               ),
             ),
           ),

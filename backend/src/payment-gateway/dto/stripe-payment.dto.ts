@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
+import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
 
 // ═══════════════════════════════════════════════
 //  1. INPUT DTO — Flutter/Web gửi lên Backend
@@ -10,13 +11,109 @@ import { Expose } from 'class-transformer';
  *
  * `POST /v1/user/payments/stripe/:bookingId`
  *
- * Hiện tại không yêu cầu thêm dữ liệu.
+ * Có thể truyền `cardId` để dùng thẻ Stripe đã lưu.
  * Stripe PaymentIntent sẽ được tạo server-side,
  * client nhận `clientSecret` để confirm on-device.
  */
 export class CreateStripePaymentDto {
-  // Intentionally empty — server derives everything from bookingId.
-  // Keep class for future extensibility (e.g., save card for later).
+  @ApiPropertyOptional({
+    type: String,
+    format: 'uuid',
+    description: 'Saved card ID to use for this on-session card payment',
+  })
+  @IsOptional()
+  @IsUUID()
+  cardId?: string;
+}
+
+export class CreateStripeSetupIntentResponseDto {
+  @ApiProperty({ type: String, description: 'Stripe SetupIntent ID' })
+  @Expose()
+  setupIntentId: string;
+
+  @ApiProperty({
+    type: String,
+    description: 'Client secret used by Stripe PaymentSheet to add a card',
+  })
+  @Expose()
+  clientSecret: string;
+
+  static create(params: {
+    setupIntentId: string;
+    clientSecret: string;
+  }): CreateStripeSetupIntentResponseDto {
+    const dto = new CreateStripeSetupIntentResponseDto();
+    dto.setupIntentId = params.setupIntentId;
+    dto.clientSecret = params.clientSecret;
+    return dto;
+  }
+}
+
+export class ConfirmStripeSetupIntentDto {
+  @ApiPropertyOptional({
+    type: Boolean,
+    description: 'Make the added card the default card',
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  setDefault?: boolean;
+}
+
+export class SavedPaymentCardDto {
+  @ApiProperty({ type: String, format: 'uuid' })
+  @Expose()
+  id: string;
+
+  @ApiProperty({ type: String, example: 'visa' })
+  @Expose()
+  brand: string;
+
+  @ApiProperty({ type: String, example: '4242' })
+  @Expose()
+  last4: string;
+
+  @ApiProperty({ type: Number, example: 12 })
+  @Expose()
+  expMonth: number;
+
+  @ApiProperty({ type: Number, example: 2030 })
+  @Expose()
+  expYear: number;
+
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'credit' })
+  @Expose()
+  funding: string | null;
+
+  @ApiPropertyOptional({ type: String, nullable: true, example: 'US' })
+  @Expose()
+  country: string | null;
+
+  @ApiProperty({ type: Boolean })
+  @Expose()
+  isDefault: boolean;
+
+  static create(params: {
+    id: string;
+    brand: string;
+    last4: string;
+    expMonth: number;
+    expYear: number;
+    funding: string | null;
+    country: string | null;
+    isDefault: boolean;
+  }): SavedPaymentCardDto {
+    const dto = new SavedPaymentCardDto();
+    dto.id = params.id;
+    dto.brand = params.brand;
+    dto.last4 = params.last4;
+    dto.expMonth = params.expMonth;
+    dto.expYear = params.expYear;
+    dto.funding = params.funding;
+    dto.country = params.country;
+    dto.isDefault = params.isDefault;
+    return dto;
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -34,7 +131,6 @@ export class CreateStripePaymentDto {
  * final response = await api.post('/payments/stripe/$bookingId');
  * await Stripe.instance.confirmPayment(
  *   paymentIntentClientSecret: response.clientSecret,
- *   data: PaymentMethodParams.card(...),
  * );
  * ```
  */

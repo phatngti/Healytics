@@ -84,10 +84,13 @@ describe('BookingController', () => {
       const expected = { id: bookingId, status: 'CONFIRMED' };
       bookingService.getBooking.mockResolvedValue(expected);
 
-      const result = await controller.getBooking(bookingId);
+      const result = await controller.getBooking('user-1', bookingId);
 
       expect(result).toEqual(expected);
-      expect(bookingService.getBooking).toHaveBeenCalledWith(bookingId);
+      expect(bookingService.getBooking).toHaveBeenCalledWith(
+        'user-1',
+        bookingId,
+      );
     });
   });
 });

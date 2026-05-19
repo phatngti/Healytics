@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Employee } from '@/common/entities/employee.entity';
+import { Account } from '@/common/entities/account.entity';
 import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
 import { TherapistProfile } from '@/common/entities/therapist-profile.entity';
 import { Partner } from '@/common/entities/partner.entity';
@@ -366,6 +367,72 @@ const SEED_EMPLOYEES = [
       'Karen Pham coordinates intake forms, appointment reminders and follow-up scheduling for MindSkin patients.',
     schedule: schedule('08:00', '17:00', '08:00', '12:00'),
   },
+  {
+    employeeCode: 'EMP-015',
+    partnerTaxCode: '0123456789',
+    accountEmail: 'doctor@healytics.vn',
+    firstName: 'Minh',
+    lastName: 'Tran',
+    email: 'doctor.tran@healytics.vn',
+    phone: '0901000015',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Minh',
+    jobTitle: 'Internal Medicine Physician',
+    role: EmployeeRole.DOCTOR,
+    gender: Gender.MALE,
+    dob: new Date('1982-11-20'),
+    startDate: new Date('2019-03-01'),
+    employmentType: 'Full-time',
+    description:
+      'Dr. Minh Tran is a skilled Internal Medicine Physician with deep expertise in cardiovascular health screening and chronic disease prevention. He provides evidence-based consultations and personalized treatment plans.',
+    schedule: schedule('08:00', '17:00', '08:00', '12:00'),
+    workHistory: [
+      {
+        facility: 'Healytics Medical Center',
+        position: 'Internal Medicine Physician',
+        period: '2019–Present',
+        isCurrent: true,
+      },
+      {
+        facility: 'University Medical Center HCMC',
+        position: 'Attending Physician',
+        period: '2012–2019',
+        isCurrent: false,
+      },
+    ],
+  },
+  {
+    employeeCode: 'EMP-016',
+    partnerTaxCode: '0123456789',
+    accountEmail: 'therapist@healytics.vn',
+    firstName: 'Thuy',
+    lastName: 'Nguyen',
+    email: 'therapist.nguyen@healytics.vn',
+    phone: '0901000016',
+    avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Thuy',
+    jobTitle: 'Rehabilitation Therapist',
+    role: EmployeeRole.THERAPIST,
+    gender: Gender.FEMALE,
+    dob: new Date('1993-05-12'),
+    startDate: new Date('2021-08-15'),
+    employmentType: 'Full-time',
+    description:
+      'Thuy Nguyen is a dedicated Rehabilitation Therapist specializing in post-operative recovery, therapeutic massage, and functional movement restoration. She combines hands-on techniques with modern equipment for optimal patient recovery.',
+    schedule: schedule('09:00', '18:00', '09:00', '13:00'),
+    workHistory: [
+      {
+        facility: 'Healytics Medical Center',
+        position: 'Rehabilitation Therapist',
+        period: '2021–Present',
+        isCurrent: true,
+      },
+      {
+        facility: 'Saigon Physiotherapy Clinic',
+        position: 'Physical Therapist',
+        period: '2018–2021',
+        isCurrent: false,
+      },
+    ],
+  },
 ];
 
 /** Doctor profile seed data keyed by employee code */
@@ -461,6 +528,27 @@ const SEED_DOCTOR_PROFILES: Record<
     ],
     certifications: ['Cognitive Behavioral Therapy Certificate (2021)'],
   },
+  'EMP-015': {
+    title: 'M.D.',
+    medicalCredentials: [
+      { title: 'Internal Medicine Physician', license: 'IM-2019-128' },
+    ],
+    experienceYears: 14,
+    consultationFee: 450000,
+    specializations: [
+      'Internal Medicine',
+      'Cardiovascular Screening',
+      'Chronic Disease Prevention',
+    ],
+    education: [
+      'Doctor of Medicine - University of Medicine HCMC (2008)',
+      'Residency – Internal Medicine - University Medical Center HCMC (2012)',
+    ],
+    certifications: [
+      'Board Certified – Internal Medicine - Vietnam Medical Council (2013)',
+      'Cardiovascular Health Screening Certificate - Vietnam Heart Association (2022)',
+    ],
+  },
 };
 
 /** Therapist profile seed data keyed by employee code */
@@ -517,6 +605,20 @@ const SEED_THERAPIST_PROFILES: Record<
     ],
     deviceProficiency: ['Infrared Therapy Lamp', 'Sterilization Cabinet'],
   },
+  'EMP-016': {
+    level: TherapistLevel.SENIOR,
+    type: 'Rehabilitation',
+    strengthLevel: StrengthLevel.MEDIUM,
+    commissionRate: 16,
+    healthCheckDate: new Date('2026-03-10'),
+    skills: [
+      'Post-Operative Recovery',
+      'Therapeutic Massage',
+      'Functional Movement Restoration',
+      'Pain Management',
+    ],
+    deviceProficiency: ['TENS Unit', 'Ultrasound Therapy', 'Hot/Cold Packs'],
+  },
 };
 
 @Injectable()
@@ -526,6 +628,8 @@ export class EmployeeSeeder implements ISeeder {
   constructor(
     @InjectRepository(Employee)
     private readonly employeeRepo: Repository<Employee>,
+    @InjectRepository(Account)
+    private readonly accountRepo: Repository<Account>,
     @InjectRepository(DoctorProfile)
     private readonly doctorProfileRepo: Repository<DoctorProfile>,
     @InjectRepository(TherapistProfile)
@@ -558,11 +662,25 @@ export class EmployeeSeeder implements ISeeder {
     }
 
     for (const empData of SEED_EMPLOYEES) {
-      const { partnerTaxCode, ...employeeData } = empData;
+      const { partnerTaxCode, accountEmail, ...employeeData } = empData;
       const partner = partnerMap.get(partnerTaxCode ?? '0123456789') ?? null;
       const exists = await this.employeeRepo.findOne({
         where: { employeeCode: employeeData.employeeCode },
       });
+
+      // Resolve linked account if accountEmail is provided
+      let accountId: string | null = null;
+      if (accountEmail) {
+        const account = await this.accountRepo.findOne({
+          where: { email: accountEmail },
+        });
+        accountId = account?.id ?? null;
+        if (!account) {
+          this.logger.warn(
+            `  ⚠ Account "${accountEmail}" not found for employee "${employeeData.employeeCode}"`,
+          );
+        }
+      }
 
       if (exists) {
         // Update fields that may have been added after initial seeding
@@ -574,6 +692,8 @@ export class EmployeeSeeder implements ISeeder {
         if (employeeData.schedule && !exists.schedule)
           fieldsToUpdate.schedule = employeeData.schedule;
         if (partner && !exists.partnerId) fieldsToUpdate.partnerId = partner.id;
+        if (accountId && !exists.accountId)
+          fieldsToUpdate.accountId = accountId;
 
         if (Object.keys(fieldsToUpdate).length > 0) {
           await this.employeeRepo.update(exists.id, fieldsToUpdate);
@@ -595,6 +715,7 @@ export class EmployeeSeeder implements ISeeder {
         rating: 0,
         reviewCount: 0,
         partnerId: partner?.id ?? null,
+        accountId,
       });
 
       await this.employeeRepo.save(employee);

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 import {
   SearchIndexEntityType,
   SearchIndexOperation,
@@ -9,6 +10,8 @@ import {
 
 @Injectable()
 export class SearchIndexOutboxService {
+  constructor(private readonly configService: ConfigService) {}
+
   async enqueue(
     manager: EntityManager,
     entityType: SearchIndexEntityType,
@@ -17,6 +20,10 @@ export class SearchIndexOutboxService {
     payload?: Record<string, unknown>,
   ): Promise<void> {
     if (!entityId) return;
+
+    if (this.configService.get<string>('NODE_ENV') !== 'production') {
+      return;
+    }
 
     const event = manager.create(SearchIndexOutbox, {
       entityType,

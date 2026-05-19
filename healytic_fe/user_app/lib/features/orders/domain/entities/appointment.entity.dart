@@ -70,6 +70,52 @@ class AppointmentEntity {
     this.paymentExpiresAt,
   });
 
+  AppointmentEntity copyWith({
+    String? id,
+    String? serviceName,
+    String? healthPartnerName,
+    String? healthPartnerId,
+    String? imageUrl,
+    String? status,
+    String? category,
+    String? specialistName,
+    String? address,
+    DateTime? date,
+    String? checkInTime,
+    String? checkOutTime,
+    String? duration,
+    double? distanceKm,
+    String? specialistId,
+    String? serviceId,
+    bool? isReviewed,
+    String? paymentUrl,
+    String? paymentDeeplink,
+    DateTime? paymentExpiresAt,
+  }) {
+    return AppointmentEntity(
+      id: id ?? this.id,
+      serviceName: serviceName ?? this.serviceName,
+      healthPartnerName: healthPartnerName ?? this.healthPartnerName,
+      healthPartnerId: healthPartnerId ?? this.healthPartnerId,
+      imageUrl: imageUrl ?? this.imageUrl,
+      status: status ?? this.status,
+      category: category ?? this.category,
+      specialistName: specialistName ?? this.specialistName,
+      address: address ?? this.address,
+      date: date ?? this.date,
+      checkInTime: checkInTime ?? this.checkInTime,
+      checkOutTime: checkOutTime ?? this.checkOutTime,
+      duration: duration ?? this.duration,
+      distanceKm: distanceKm ?? this.distanceKm,
+      specialistId: specialistId ?? this.specialistId,
+      serviceId: serviceId ?? this.serviceId,
+      isReviewed: isReviewed ?? this.isReviewed,
+      paymentUrl: paymentUrl ?? this.paymentUrl,
+      paymentDeeplink: paymentDeeplink ?? this.paymentDeeplink,
+      paymentExpiresAt: paymentExpiresAt ?? this.paymentExpiresAt,
+    );
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

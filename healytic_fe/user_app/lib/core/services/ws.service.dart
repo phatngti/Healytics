@@ -31,19 +31,22 @@ class WsService {
   // ── Socket instances ─────────────────────────────
 
   UserChatSocket? _userChatSocket;
+  BookingEventsSocket? _bookingEventsSocket;
   ChatNotificationsSocket? _chatNotificationsSocket;
 
   /// The `/user-chat` namespace socket.
   ///
   /// Created lazily on first access to avoid
   /// allocating resources when not needed.
-  UserChatSocket get userChat =>
-      _userChatSocket ??= UserChatSocket();
+  UserChatSocket get userChat => _userChatSocket ??= UserChatSocket();
+
+  /// The `/booking-events` namespace socket.
+  BookingEventsSocket get bookingEvents =>
+      _bookingEventsSocket ??= BookingEventsSocket();
 
   /// The `/chat-notifications` namespace socket.
   ChatNotificationsSocket get chatNotifications =>
-      _chatNotificationsSocket ??=
-          ChatNotificationsSocket();
+      _chatNotificationsSocket ??= ChatNotificationsSocket();
 
   // ── Lifecycle ────────────────────────────────────
 
@@ -54,19 +57,19 @@ class WsService {
   /// Call this after the user has authenticated.
   void connectAll() {
     _log.info('Connecting all WS namespaces');
-    _connectSocket(
-      userChat,
-      ServicePrefix.userChat,
-    );
-    _connectSocket(
-      chatNotifications,
-      ServicePrefix.chatNotifications,
-    );
+    _connectSocket(userChat, ServicePrefix.userChat);
+    _connectSocket(bookingEvents, ServicePrefix.bookingEvents);
+    _connectSocket(chatNotifications, ServicePrefix.chatNotifications);
   }
 
   /// Connect only the user-chat namespace.
   void connectUserChat() {
     _connectSocket(userChat, ServicePrefix.userChat);
+  }
+
+  /// Connect only the booking-events namespace.
+  void connectBookingEvents() {
+    _connectSocket(bookingEvents, ServicePrefix.bookingEvents);
   }
 
   /// Connect only the chat-notifications namespace.
@@ -84,6 +87,7 @@ class WsService {
   void disconnectAll() {
     _log.info('Disconnecting all WS namespaces');
     _userChatSocket?.disconnect();
+    _bookingEventsSocket?.disconnect();
     _chatNotificationsSocket?.disconnect();
   }
 
@@ -94,8 +98,10 @@ class WsService {
   void dispose() {
     _log.info('Disposing WS service');
     _userChatSocket?.dispose();
+    _bookingEventsSocket?.dispose();
     _chatNotificationsSocket?.dispose();
     _userChatSocket = null;
+    _bookingEventsSocket = null;
     _chatNotificationsSocket = null;
   }
 

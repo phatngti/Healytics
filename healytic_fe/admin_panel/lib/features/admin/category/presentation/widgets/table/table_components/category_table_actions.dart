@@ -1,6 +1,7 @@
 import 'package:admin_panel/core/extension/local_key_ext.dart';
 import 'package:admin_panel/features/admin/category/presentation/providers/category.provider.dart';
 import 'package:admin_panel/features/common/widgets/table/management_table_controls.dart';
+import 'package:admin_panel/router/admin_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -15,8 +16,9 @@ class CategoryTableActions {
   ];
 
   static void _onEditCategory(BuildContext context, LocalKey? key) {
-    // TODO: Implement edit category functionality
-    debugPrint('Edit category: ${key?.toString()}');
+    final id = key?.toCleanString();
+    if (id == null || id.isEmpty) return;
+    CategoryEditRoute(id: id).go(context);
   }
 
   static Future<void> _onDeleteCategory(

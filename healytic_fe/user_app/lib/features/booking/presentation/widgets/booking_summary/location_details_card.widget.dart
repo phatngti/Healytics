@@ -1,6 +1,9 @@
+import 'package:common/widgets/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/widgets/directions_route_sheet.widget.dart';
+import 'package:user_app/core/widgets/map_preview.widget.dart';
 
 /// Card showing the booking location / partner
 /// details with a map placeholder thumbnail.
@@ -11,8 +14,9 @@ class LocationDetailsCard extends StatelessWidget {
   const LocationDetailsCard({
     super.key,
     this.partnerName = 'Healytics Spa Retreat',
-    this.address =
-        'District 1, Ho Chi Minh City',
+    this.address = 'District 1, Ho Chi Minh City',
+    this.latitude,
+    this.longitude,
   });
 
   /// Name of the partner / venue.
@@ -20,6 +24,12 @@ class LocationDetailsCard extends StatelessWidget {
 
   /// Full address string.
   final String address;
+
+  /// Optional map latitude.
+  final double? latitude;
+
+  /// Optional map longitude.
+  final double? longitude;
 
   @override
   Widget build(BuildContext context) {
@@ -31,106 +41,82 @@ class LocationDetailsCard extends StatelessWidget {
       padding: EdgeInsets.all(cardPad),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(
-          AppDimens.cardRadius(context),
-        ),
+        borderRadius: BorderRadius.circular(AppDimens.cardRadius(context)),
         border: Border.all(
-          color: colorScheme.outlineVariant
-              .withValues(alpha: 0.3),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
-            icon: Symbols.location_on,
-            label: 'Location Details',
-          ),
+          _SectionHeader(icon: Symbols.location_on, label: 'Location Details'),
           SizedBox(height: AppDimens.spaceMd),
           Row(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       partnerName,
-                      style: theme
-                          .textTheme.titleSmall
-                          ?.copyWith(
+                      style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color:
-                            colorScheme.onSurface,
+                        color: colorScheme.onSurface,
                       ),
                     ),
-                    SizedBox(
-                      height: AppDimens.spaceXs,
-                    ),
+                    SizedBox(height: AppDimens.spaceXs),
                     Text(
                       address,
-                      style: theme
-                          .textTheme.bodySmall
-                          ?.copyWith(
-                        color: colorScheme
-                            .onSurfaceVariant,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                         height: 1.4,
                       ),
                       maxLines: 3,
-                      overflow:
-                          TextOverflow.ellipsis,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
               SizedBox(width: AppDimens.spaceLg),
-              _MapPlaceholder(),
+              MapPreviewWidget(
+                latitude: latitude,
+                longitude: longitude,
+                width: 86,
+                height: 86,
+                onTap: () => _openDirections(context),
+              ),
             ],
           ),
         ],
       ),
     );
   }
-}
 
-/// Placeholder square representing a map
-/// thumbnail.
-class _MapPlaceholder extends StatelessWidget {
-  const _MapPlaceholder();
+  void _openDirections(BuildContext context) {
+    final destinationLatitude = latitude;
+    final destinationLongitude = longitude;
+    if (destinationLatitude == null || destinationLongitude == null) {
+      AppToast.warning(
+        context,
+        'Directions are unavailable for this location.',
+      );
+      return;
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    const size = 72.0;
-
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest
-            .withValues(alpha: 0.5),
-        borderRadius: AppDimens.radiusMediumSmall,
-      ),
-      child: Icon(
-        Symbols.map,
-        size: AppDimens.iconXxl,
-        color: colorScheme.onSurfaceVariant
-            .withValues(alpha: 0.4),
-      ),
+    DirectionsRouteSheet.show(
+      context,
+      destinationLatitude: destinationLatitude,
+      destinationLongitude: destinationLongitude,
+      destinationName: partnerName,
+      destinationAddress: address,
     );
   }
 }
 
 /// Uppercase section header with icon.
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.icon,
-    required this.label,
-  });
+  const _SectionHeader({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -142,16 +128,11 @@ class _SectionHeader extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(
-          icon,
-          size: AppDimens.iconMd,
-          color: colorScheme.onSurfaceVariant,
-        ),
+        Icon(icon, size: AppDimens.iconMd, color: colorScheme.onSurfaceVariant),
         SizedBox(width: AppDimens.spaceSm),
         Text(
           label.toUpperCase(),
-          style:
-              theme.textTheme.labelSmall?.copyWith(
+          style: theme.textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w700,
             letterSpacing: 1.0,
             color: colorScheme.onSurfaceVariant,

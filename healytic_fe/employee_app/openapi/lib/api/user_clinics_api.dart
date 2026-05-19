@@ -139,10 +139,25 @@ class UserClinicsApi {
   /// * [String] search:
   ///   Case-insensitive service name search
   ///
+  /// * [num] minPrice:
+  ///   Minimum current price
+  ///
+  /// * [num] maxPrice:
+  ///   Maximum current price
+  ///
+  /// * [num] minDuration:
+  ///   Minimum service duration in minutes
+  ///
+  /// * [num] maxDuration:
+  ///   Maximum service duration in minutes
+  ///
+  /// * [bool] discountOnly:
+  ///   Only discounted products
+  ///
   /// * [num] page:
   ///
   /// * [num] limit:
-  Future<Response> userClinicControllerGetClinicProductsWithHttpInfo(String id, { String? categoryId, String? sort, String? search, num? page, num? limit, }) async {
+  Future<Response> userClinicControllerGetClinicProductsWithHttpInfo(String id, { String? categoryId, String? sort, String? search, num? minPrice, num? maxPrice, num? minDuration, num? maxDuration, bool? discountOnly, num? page, num? limit, }) async {
     // ignore: prefer_const_declarations
     final path = r'/user/clinics/{id}/products'
       .replaceAll('{id}', id);
@@ -162,6 +177,21 @@ class UserClinicsApi {
     }
     if (search != null) {
       queryParams.addAll(_queryParams('', 'search', search));
+    }
+    if (minPrice != null) {
+      queryParams.addAll(_queryParams('', 'minPrice', minPrice));
+    }
+    if (maxPrice != null) {
+      queryParams.addAll(_queryParams('', 'maxPrice', maxPrice));
+    }
+    if (minDuration != null) {
+      queryParams.addAll(_queryParams('', 'minDuration', minDuration));
+    }
+    if (maxDuration != null) {
+      queryParams.addAll(_queryParams('', 'maxDuration', maxDuration));
+    }
+    if (discountOnly != null) {
+      queryParams.addAll(_queryParams('', 'discountOnly', discountOnly));
     }
     if (page != null) {
       queryParams.addAll(_queryParams('', 'page', page));
@@ -199,11 +229,26 @@ class UserClinicsApi {
   /// * [String] search:
   ///   Case-insensitive service name search
   ///
+  /// * [num] minPrice:
+  ///   Minimum current price
+  ///
+  /// * [num] maxPrice:
+  ///   Maximum current price
+  ///
+  /// * [num] minDuration:
+  ///   Minimum service duration in minutes
+  ///
+  /// * [num] maxDuration:
+  ///   Maximum service duration in minutes
+  ///
+  /// * [bool] discountOnly:
+  ///   Only discounted products
+  ///
   /// * [num] page:
   ///
   /// * [num] limit:
-  Future<ClinicProductsResponseDto?> userClinicControllerGetClinicProducts(String id, { String? categoryId, String? sort, String? search, num? page, num? limit, }) async {
-    final response = await userClinicControllerGetClinicProductsWithHttpInfo(id,  categoryId: categoryId, sort: sort, search: search, page: page, limit: limit, );
+  Future<ClinicProductsResponseDto?> userClinicControllerGetClinicProducts(String id, { String? categoryId, String? sort, String? search, num? minPrice, num? maxPrice, num? minDuration, num? maxDuration, bool? discountOnly, num? page, num? limit, }) async {
+    final response = await userClinicControllerGetClinicProductsWithHttpInfo(id,  categoryId: categoryId, sort: sort, search: search, minPrice: minPrice, maxPrice: maxPrice, minDuration: minDuration, maxDuration: maxDuration, discountOnly: discountOnly, page: page, limit: limit, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

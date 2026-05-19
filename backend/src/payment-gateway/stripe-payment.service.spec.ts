@@ -2,12 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Account } from '@/common/entities/account.entity';
 import { Payment } from '@/common/entities/payment.entity';
 import { PaymentTransactionLog } from '@/common/entities/payment-transaction-log.entity';
+import { UserPaymentCustomer } from '@/common/entities/user-payment-customer.entity';
+import { UserPaymentMethod } from '@/common/entities/user-payment-method.entity';
 import { BookingPaymentService } from './booking-payment.service';
 import { PaymentMethod } from './enums/payment-method.enum';
 import { PaymentStatus } from './enums/payment-status.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 import {
   MockRepository,
   createMockRepository,
@@ -26,6 +30,17 @@ jest.mock('stripe', () => {
     paymentIntents: {
       create: jest.fn(),
     },
+    setupIntents: {
+      create: jest.fn(),
+      retrieve: jest.fn(),
+    },
+    customers: {
+      create: jest.fn(),
+    },
+    paymentMethods: {
+      retrieve: jest.fn(),
+      detach: jest.fn(),
+    },
     refunds: {
       create: jest.fn(),
     },
@@ -39,8 +54,11 @@ import { StripePaymentService } from './stripe-payment.service';
 
 describe('StripePaymentService', () => {
   let service: StripePaymentService;
+  let accountRepo: MockRepository<Account>;
   let paymentRepo: MockRepository<Payment>;
   let txLogRepo: MockRepository<PaymentTransactionLog>;
+  let customerRepo: MockRepository<UserPaymentCustomer>;
+  let cardRepo: MockRepository<UserPaymentMethod>;
   let bookingPaymentService: {
     findByIdAndUser: jest.Mock;
     findById: jest.Mock;
@@ -50,8 +68,11 @@ describe('StripePaymentService', () => {
   };
 
   beforeEach(async () => {
+    accountRepo = createMockRepository<Account>();
     paymentRepo = createMockRepository<Payment>();
     txLogRepo = createMockRepository<PaymentTransactionLog>();
+    customerRepo = createMockRepository<UserPaymentCustomer>();
+    cardRepo = createMockRepository<UserPaymentMethod>();
     bookingPaymentService = {
       findByIdAndUser: jest.fn(),
       findById: jest.fn(),
@@ -64,12 +85,24 @@ describe('StripePaymentService', () => {
       providers: [
         StripePaymentService,
         {
+          provide: getRepositoryToken(Account),
+          useValue: accountRepo,
+        },
+        {
           provide: getRepositoryToken(Payment),
           useValue: paymentRepo,
         },
         {
           provide: getRepositoryToken(PaymentTransactionLog),
           useValue: txLogRepo,
+        },
+        {
+          provide: getRepositoryToken(UserPaymentCustomer),
+          useValue: customerRepo,
+        },
+        {
+          provide: getRepositoryToken(UserPaymentMethod),
+          useValue: cardRepo,
         },
         {
           provide: BookingPaymentService,
@@ -86,6 +119,29 @@ describe('StripePaymentService', () => {
     }).compile();
 
     service = module.get<StripePaymentService>(StripePaymentService);
+    accountRepo.findOne.mockResolvedValue({
+      id: 'user-1',
+      email: 'user@example.com',
+    });
+    customerRepo.findOne.mockResolvedValue(null);
+    customerRepo.save.mockImplementation(async (value) => ({
+      id: 'customer-row-1',
+      ...value,
+    }));
+    customerRepo.create.mockImplementation((value) => value);
+    cardRepo.find.mockResolvedValue([]);
+    cardRepo.count.mockResolvedValue(0);
+    cardRepo.update.mockResolvedValue({ affected: 1 });
+    cardRepo.save.mockImplementation(async (value) => ({
+      id: value.id ?? 'card-row-1',
+      isDefault: value.isDefault ?? false,
+      ...value,
+    }));
+    cardRepo.create.mockImplementation((value) => value);
+    cardRepo.softDelete.mockResolvedValue({ affected: 1 });
+
+    const stripe = (service as any).stripe;
+    stripe.customers.create.mockResolvedValue({ id: 'cus_test_123' });
   });
 
   afterEach(() => {
@@ -156,6 +212,188 @@ describe('StripePaymentService', () => {
         }),
       );
     });
+
+    it('should create payment intent using a saved card', async () => {
+      const mockBooking = {
+        id: 'booking-1',
+        status: BookingStatus.PENDING_PAYMENT,
+      };
+      bookingPaymentService.findByIdAndUser.mockResolvedValue(mockBooking);
+      bookingPaymentService.resolveBookingAmount.mockResolvedValue(500000);
+
+      const savedPayment = { id: 'payment-1', bookingId: 'booking-1' };
+      paymentRepo.create.mockReturnValue(savedPayment);
+      paymentRepo.save.mockResolvedValue(savedPayment);
+      txLogRepo.create.mockReturnValue({});
+      txLogRepo.save.mockResolvedValue({});
+      cardRepo.findOne.mockResolvedValue({
+        id: 'card-1',
+        userId: 'user-1',
+        customerId: 'customer-row-1',
+        provider: PaymentMethod.STRIPE,
+        gatewayPaymentMethodId: 'pm_test_123',
+      });
+      customerRepo.findOne.mockResolvedValue({
+        id: 'customer-row-1',
+        userId: 'user-1',
+        provider: PaymentMethod.STRIPE,
+        gatewayCustomerId: 'cus_test_123',
+      });
+
+      const stripe = (service as any).stripe;
+      stripe.paymentIntents.create.mockResolvedValue({
+        id: 'pi_test_123',
+        client_secret: 'pi_test_123_secret_abc',
+        status: 'requires_confirmation',
+        amount: 500000,
+      });
+
+      await service.createPayment('booking-1', 'user-1', 'card-1');
+
+      expect(stripe.paymentIntents.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          customer: 'cus_test_123',
+          payment_method: 'pm_test_123',
+          payment_method_types: ['card'],
+        }),
+      );
+    });
+  });
+
+  describe('saved cards', () => {
+    it('should create a SetupIntent for the current user customer', async () => {
+      const stripe = (service as any).stripe;
+      stripe.setupIntents.create.mockResolvedValue({
+        id: 'seti_test_123',
+        client_secret: 'seti_test_123_secret_abc',
+      });
+
+      const result = await service.createSetupIntent('user-1');
+
+      expect(result.setupIntentId).toBe('seti_test_123');
+      expect(stripe.customers.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'user@example.com',
+          metadata: { userId: 'user-1' },
+        }),
+      );
+      expect(stripe.setupIntents.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          customer: 'cus_test_123',
+          payment_method_types: ['card'],
+          usage: 'on_session',
+        }),
+      );
+    });
+
+    it('should persist confirmed SetupIntent card and set it default when first card', async () => {
+      customerRepo.findOne.mockResolvedValue({
+        id: 'customer-row-1',
+        userId: 'user-1',
+        provider: PaymentMethod.STRIPE,
+        gatewayCustomerId: 'cus_test_123',
+      });
+      cardRepo.findOne.mockResolvedValue(null);
+      cardRepo.count.mockResolvedValue(0);
+
+      const stripe = (service as any).stripe;
+      stripe.setupIntents.retrieve.mockResolvedValue({
+        id: 'seti_test_123',
+        customer: 'cus_test_123',
+        status: 'succeeded',
+        payment_method: 'pm_test_123',
+      });
+      stripe.paymentMethods.retrieve.mockResolvedValue({
+        id: 'pm_test_123',
+        billing_details: { address: { country: 'US' } },
+        card: {
+          brand: 'visa',
+          last4: '4242',
+          exp_month: 12,
+          exp_year: 2030,
+          funding: 'credit',
+          country: 'US',
+        },
+      });
+
+      const result = await service.confirmSetupIntent(
+        'seti_test_123',
+        'user-1',
+        false,
+      );
+
+      expect(result.last4).toBe('4242');
+      expect(cardRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          gatewayPaymentMethodId: 'pm_test_123',
+          isDefault: true,
+        }),
+      );
+    });
+
+    it('should replace the default card exclusively', async () => {
+      const card = {
+        id: 'card-1',
+        userId: 'user-1',
+        provider: PaymentMethod.STRIPE,
+        isDefault: false,
+        brand: 'visa',
+        last4: '4242',
+        expMonth: 12,
+        expYear: 2030,
+        funding: 'credit',
+        country: 'US',
+      };
+      cardRepo.findOne.mockResolvedValue(card);
+
+      const result = await service.setDefaultCard('user-1', 'card-1');
+
+      expect(cardRepo.update).toHaveBeenCalledWith(
+        { userId: 'user-1', provider: PaymentMethod.STRIPE },
+        { isDefault: false },
+      );
+      expect(result.isDefault).toBe(true);
+    });
+
+    it('should detach and remove a default card, then promote newest card', async () => {
+      cardRepo.findOne
+        .mockResolvedValueOnce({
+          id: 'card-1',
+          userId: 'user-1',
+          provider: PaymentMethod.STRIPE,
+          gatewayPaymentMethodId: 'pm_test_123',
+          isDefault: true,
+        })
+        .mockResolvedValueOnce({
+          id: 'card-2',
+          userId: 'user-1',
+          provider: PaymentMethod.STRIPE,
+          gatewayPaymentMethodId: 'pm_test_456',
+          isDefault: false,
+        });
+      cardRepo.find.mockResolvedValue([
+        {
+          id: 'card-2',
+          brand: 'mastercard',
+          last4: '4444',
+          expMonth: 11,
+          expYear: 2031,
+          funding: 'debit',
+          country: 'US',
+          isDefault: true,
+        },
+      ]);
+
+      const result = await service.deleteCard('user-1', 'card-1');
+
+      const stripe = (service as any).stripe;
+      expect(stripe.paymentMethods.detach).toHaveBeenCalledWith('pm_test_123');
+      expect(cardRepo.softDelete).toHaveBeenCalledWith({
+        id: 'card-1',
+        userId: 'user-1',
+      });
+      expect(result[0].id).toBe('card-2');
+    });
   });
 
   // ── refundPayment ──────────────────────────────────────────
@@ -206,6 +444,7 @@ describe('StripePaymentService', () => {
         BookingStatus.CANCELLED,
         'user-1',
         expect.stringContaining('Refund successful'),
+        BookingStatusReasonCode.PAYMENT_REFUND_STRIPE_CANCELLED,
       );
     });
   });
@@ -264,6 +503,7 @@ describe('StripePaymentService', () => {
         BookingStatus.CONFIRMED,
         'system',
         expect.any(String),
+        BookingStatusReasonCode.PAYMENT_CONFIRMED_STRIPE,
       );
     });
 
@@ -276,7 +516,10 @@ describe('StripePaymentService', () => {
           object: {
             id: 'pi_test_fail',
             status: 'requires_payment_method',
-            last_payment_error: { message: 'Card declined', code: 'card_declined' },
+            last_payment_error: {
+              message: 'Card declined',
+              code: 'card_declined',
+            },
           },
         },
       });
