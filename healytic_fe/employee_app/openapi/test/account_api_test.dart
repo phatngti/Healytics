@@ -11,7 +11,6 @@
 import 'package:employee_openapi/api.dart';
 import 'package:test/test.dart';
 
-
 /// tests for AccountApi
 void main() {
   // final instance = AccountApi();
@@ -44,6 +43,5 @@ void main() {
     test('test accountControllerUpdateAvatar', () async {
       // TODO
     });
-
   });
 }

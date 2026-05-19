@@ -68,9 +68,7 @@ class FilteredAppointmentsNotifier extends _$FilteredAppointmentsNotifier {
     // window has already closed on the client side.
     // The backend CRON cancels them within ~1 minute,
     // but this eliminates the visible race window.
-    return raw
-        .where((a) => !_isExpiredPayment(a))
-        .toList(growable: false);
+    return raw.where((a) => !_isExpiredPayment(a)).toList(growable: false);
   }
 
   /// Re-fetches from the API and updates state

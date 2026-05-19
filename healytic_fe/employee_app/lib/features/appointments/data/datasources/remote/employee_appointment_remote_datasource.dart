@@ -136,11 +136,8 @@ class EmployeeAppointmentRemoteDatasourceImpl
   @override
   Future<bool> startService(String id) async {
     try {
-      final dto = await apiService
-          .employeeAppointmentsApi
-          .employeeAppointmentsControllerStartService(
-            id,
-          );
+      final dto = await apiService.employeeAppointmentsApi
+          .employeeAppointmentsControllerStartService(id);
       return dto != null;
     } on ApiException catch (e) {
       log(
@@ -154,11 +151,8 @@ class EmployeeAppointmentRemoteDatasourceImpl
   @override
   Future<bool> completeService(String id) async {
     try {
-      final dto = await apiService
-          .employeeAppointmentsApi
-          .employeeAppointmentsControllerCompleteService(
-            id,
-          );
+      final dto = await apiService.employeeAppointmentsApi
+          .employeeAppointmentsControllerCompleteService(id);
       return dto != null;
     } on ApiException catch (e) {
       log(

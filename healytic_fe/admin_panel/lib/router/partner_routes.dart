@@ -324,16 +324,12 @@ class PartnerChatInboxRoute extends GoRouteData with $PartnerChatInboxRoute {
   }
 }
 
-class PartnerBookingsRoute extends GoRouteData
-    with $PartnerBookingsRoute {
+class PartnerBookingsRoute extends GoRouteData with $PartnerBookingsRoute {
   const PartnerBookingsRoute();
   static const name = 'provider-bookings';
 
   @override
-  Page<void> buildPage(
-    BuildContext context,
-    GoRouterState state,
-  ) {
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const BookingsScreen(),

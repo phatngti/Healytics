@@ -10,9 +10,9 @@
 
 part of openapi.api;
 
-
 class UserClinicsApi {
-  UserClinicsApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
+  UserClinicsApi([ApiClient? apiClient])
+      : apiClient = apiClient ?? defaultApiClient;
 
   final ApiClient apiClient;
 
@@ -23,10 +23,11 @@ class UserClinicsApi {
   /// Parameters:
   ///
   /// * [String] id (required):
-  Future<Response> userClinicControllerFollowClinicWithHttpInfo(String id,) async {
+  Future<Response> userClinicControllerFollowClinicWithHttpInfo(
+    String id,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/user/clinics/{id}/follow'
-      .replaceAll('{id}', id);
+    final path = r'/user/clinics/{id}/follow'.replaceAll('{id}', id);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -36,7 +37,6 @@ class UserClinicsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -54,17 +54,24 @@ class UserClinicsApi {
   /// Parameters:
   ///
   /// * [String] id (required):
-  Future<ClinicInfoResponseDto?> userClinicControllerFollowClinic(String id,) async {
-    final response = await userClinicControllerFollowClinicWithHttpInfo(id,);
+  Future<ClinicInfoResponseDto?> userClinicControllerFollowClinic(
+    String id,
+  ) async {
+    final response = await userClinicControllerFollowClinicWithHttpInfo(
+      id,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ClinicInfoResponseDto',) as ClinicInfoResponseDto;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'ClinicInfoResponseDto',
+      ) as ClinicInfoResponseDto;
     }
     return null;
   }
@@ -76,10 +83,11 @@ class UserClinicsApi {
   /// Parameters:
   ///
   /// * [String] id (required):
-  Future<Response> userClinicControllerGetClinicInfoWithHttpInfo(String id,) async {
+  Future<Response> userClinicControllerGetClinicInfoWithHttpInfo(
+    String id,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/user/clinics/{id}/info'
-      .replaceAll('{id}', id);
+    final path = r'/user/clinics/{id}/info'.replaceAll('{id}', id);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -89,7 +97,6 @@ class UserClinicsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -107,17 +114,24 @@ class UserClinicsApi {
   /// Parameters:
   ///
   /// * [String] id (required):
-  Future<ClinicInfoResponseDto?> userClinicControllerGetClinicInfo(String id,) async {
-    final response = await userClinicControllerGetClinicInfoWithHttpInfo(id,);
+  Future<ClinicInfoResponseDto?> userClinicControllerGetClinicInfo(
+    String id,
+  ) async {
+    final response = await userClinicControllerGetClinicInfoWithHttpInfo(
+      id,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ClinicInfoResponseDto',) as ClinicInfoResponseDto;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'ClinicInfoResponseDto',
+      ) as ClinicInfoResponseDto;
     }
     return null;
   }
@@ -157,10 +171,21 @@ class UserClinicsApi {
   /// * [num] page:
   ///
   /// * [num] limit:
-  Future<Response> userClinicControllerGetClinicProductsWithHttpInfo(String id, { String? categoryId, String? sort, String? search, num? minPrice, num? maxPrice, num? minDuration, num? maxDuration, bool? discountOnly, num? page, num? limit, }) async {
+  Future<Response> userClinicControllerGetClinicProductsWithHttpInfo(
+    String id, {
+    String? categoryId,
+    String? sort,
+    String? search,
+    num? minPrice,
+    num? maxPrice,
+    num? minDuration,
+    num? maxDuration,
+    bool? discountOnly,
+    num? page,
+    num? limit,
+  }) async {
     // ignore: prefer_const_declarations
-    final path = r'/user/clinics/{id}/products'
-      .replaceAll('{id}', id);
+    final path = r'/user/clinics/{id}/products'.replaceAll('{id}', id);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -202,7 +227,6 @@ class UserClinicsApi {
 
     const contentTypes = <String>[];
 
-
     return apiClient.invokeAPI(
       path,
       'GET',
@@ -247,17 +271,44 @@ class UserClinicsApi {
   /// * [num] page:
   ///
   /// * [num] limit:
-  Future<ClinicProductsResponseDto?> userClinicControllerGetClinicProducts(String id, { String? categoryId, String? sort, String? search, num? minPrice, num? maxPrice, num? minDuration, num? maxDuration, bool? discountOnly, num? page, num? limit, }) async {
-    final response = await userClinicControllerGetClinicProductsWithHttpInfo(id,  categoryId: categoryId, sort: sort, search: search, minPrice: minPrice, maxPrice: maxPrice, minDuration: minDuration, maxDuration: maxDuration, discountOnly: discountOnly, page: page, limit: limit, );
+  Future<ClinicProductsResponseDto?> userClinicControllerGetClinicProducts(
+    String id, {
+    String? categoryId,
+    String? sort,
+    String? search,
+    num? minPrice,
+    num? maxPrice,
+    num? minDuration,
+    num? maxDuration,
+    bool? discountOnly,
+    num? page,
+    num? limit,
+  }) async {
+    final response = await userClinicControllerGetClinicProductsWithHttpInfo(
+      id,
+      categoryId: categoryId,
+      sort: sort,
+      search: search,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+      minDuration: minDuration,
+      maxDuration: maxDuration,
+      discountOnly: discountOnly,
+      page: page,
+      limit: limit,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ClinicProductsResponseDto',) as ClinicProductsResponseDto;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'ClinicProductsResponseDto',
+      ) as ClinicProductsResponseDto;
     }
     return null;
   }
@@ -279,10 +330,15 @@ class UserClinicsApi {
   ///
   /// * [bool] hasMedia:
   ///   Filter: only reviews with photos
-  Future<Response> userClinicControllerGetClinicReviewsWithHttpInfo(String id, { num? page, num? limit, num? starCount, bool? hasMedia, }) async {
+  Future<Response> userClinicControllerGetClinicReviewsWithHttpInfo(
+    String id, {
+    num? page,
+    num? limit,
+    num? starCount,
+    bool? hasMedia,
+  }) async {
     // ignore: prefer_const_declarations
-    final path = r'/user/clinics/{id}/reviews'
-      .replaceAll('{id}', id);
+    final path = r'/user/clinics/{id}/reviews'.replaceAll('{id}', id);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -305,7 +361,6 @@ class UserClinicsApi {
     }
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -333,17 +388,32 @@ class UserClinicsApi {
   ///
   /// * [bool] hasMedia:
   ///   Filter: only reviews with photos
-  Future<ClinicReviewsResponseDto?> userClinicControllerGetClinicReviews(String id, { num? page, num? limit, num? starCount, bool? hasMedia, }) async {
-    final response = await userClinicControllerGetClinicReviewsWithHttpInfo(id,  page: page, limit: limit, starCount: starCount, hasMedia: hasMedia, );
+  Future<ClinicReviewsResponseDto?> userClinicControllerGetClinicReviews(
+    String id, {
+    num? page,
+    num? limit,
+    num? starCount,
+    bool? hasMedia,
+  }) async {
+    final response = await userClinicControllerGetClinicReviewsWithHttpInfo(
+      id,
+      page: page,
+      limit: limit,
+      starCount: starCount,
+      hasMedia: hasMedia,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ClinicReviewsResponseDto',) as ClinicReviewsResponseDto;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'ClinicReviewsResponseDto',
+      ) as ClinicReviewsResponseDto;
     }
     return null;
   }
@@ -355,10 +425,11 @@ class UserClinicsApi {
   /// Parameters:
   ///
   /// * [String] id (required):
-  Future<Response> userClinicControllerUnfollowClinicWithHttpInfo(String id,) async {
+  Future<Response> userClinicControllerUnfollowClinicWithHttpInfo(
+    String id,
+  ) async {
     // ignore: prefer_const_declarations
-    final path = r'/user/clinics/{id}/follow'
-      .replaceAll('{id}', id);
+    final path = r'/user/clinics/{id}/follow'.replaceAll('{id}', id);
 
     // ignore: prefer_final_locals
     Object? postBody;
@@ -368,7 +439,6 @@ class UserClinicsApi {
     final formParams = <String, String>{};
 
     const contentTypes = <String>[];
-
 
     return apiClient.invokeAPI(
       path,
@@ -386,17 +456,24 @@ class UserClinicsApi {
   /// Parameters:
   ///
   /// * [String] id (required):
-  Future<ClinicInfoResponseDto?> userClinicControllerUnfollowClinic(String id,) async {
-    final response = await userClinicControllerUnfollowClinicWithHttpInfo(id,);
+  Future<ClinicInfoResponseDto?> userClinicControllerUnfollowClinic(
+    String id,
+  ) async {
+    final response = await userClinicControllerUnfollowClinicWithHttpInfo(
+      id,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ClinicInfoResponseDto',) as ClinicInfoResponseDto;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'ClinicInfoResponseDto',
+      ) as ClinicInfoResponseDto;
     }
     return null;
   }
