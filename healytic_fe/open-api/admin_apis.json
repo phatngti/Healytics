@@ -15204,6 +15204,40 @@
           "updatedAt"
         ]
       },
+      "BookingSpecialistResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique specialist/employee ID"
+          },
+          "eligibilityId": {
+            "type": "string",
+            "description": "product_employee_eligibility surrogate PK"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full display name",
+            "example": "Dr. Anna Nguyen"
+          },
+          "specialty": {
+            "type": "string",
+            "description": "Short specialty label",
+            "example": "Spa Therapist"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "description": "URL to avatar image",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "eligibilityId",
+          "name",
+          "specialty"
+        ]
+      },
       "AdminCategoryResponseDto": {
         "type": "object",
         "properties": {

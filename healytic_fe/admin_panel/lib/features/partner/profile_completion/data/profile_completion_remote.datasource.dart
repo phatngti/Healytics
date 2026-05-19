@@ -176,10 +176,8 @@ class ProfileCompletionRemoteDataSourceMock
     _entity = e;
   }
 
-  static PartnerProfileCompletionEntity
-      _buildInitialEntity() {
-    final isCompleted =
-        UserRoleHelper.isProviderProfileCompleted();
+  static PartnerProfileCompletionEntity _buildInitialEntity() {
+    final isCompleted = UserRoleHelper.isProviderProfileCompleted();
 
     if (isCompleted) {
       return _buildCompletedEntity();
@@ -187,27 +185,20 @@ class ProfileCompletionRemoteDataSourceMock
     return _buildIncompleteEntity();
   }
 
-  static PartnerProfileCompletionEntity
-      _buildCompletedEntity() {
+  static PartnerProfileCompletionEntity _buildCompletedEntity() {
     return PartnerProfileCompletionEntity(
       id: 'mock-partner-id',
       clinicIdentity: const ClinicIdentity(
         brandName: 'Healytics Wellness Center',
-        legalName:
-            'Healytics Wellness Joint Stock Company',
-        businessType: [
-          'SPA_BEAUTY',
-          'MASSAGE_THERAPY',
-        ],
+        legalName: 'Healytics Wellness Joint Stock Company',
+        businessType: ['SPA_BEAUTY', 'MASSAGE_THERAPY'],
         phoneNumber: '0901234567',
         address:
             '123 Main Street, District 1, '
             'Ho Chi Minh City',
       ),
-      coverImageUrl:
-          'https://picsum.photos/seed/cover/800/400',
-      logoImageUrl:
-          'https://picsum.photos/seed/logo/200/200',
+      coverImageUrl: 'https://picsum.photos/seed/cover/800/400',
+      logoImageUrl: 'https://picsum.photos/seed/logo/200/200',
       description:
           'Healytics Wellness Center is a premier '
           'health and beauty destination offering '
@@ -273,18 +264,13 @@ class ProfileCompletionRemoteDataSourceMock
     );
   }
 
-  static PartnerProfileCompletionEntity
-      _buildIncompleteEntity() {
+  static PartnerProfileCompletionEntity _buildIncompleteEntity() {
     return PartnerProfileCompletionEntity(
       id: 'mock-partner-id',
       clinicIdentity: const ClinicIdentity(
         brandName: 'Healytics Wellness Center',
-        legalName:
-            'Healytics Wellness Joint Stock Company',
-        businessType: [
-          'SPA_BEAUTY',
-          'MASSAGE_THERAPY',
-        ],
+        legalName: 'Healytics Wellness Joint Stock Company',
+        businessType: ['SPA_BEAUTY', 'MASSAGE_THERAPY'],
         phoneNumber: '0901234567',
         address:
             '123 Main Street, District 1, '
@@ -316,11 +302,8 @@ class ProfileCompletionRemoteDataSourceMock
   }
 
   @override
-  Future<PartnerProfileCompletionEntity>
-      getProfileCompletion() async {
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+  Future<PartnerProfileCompletionEntity> getProfileCompletion() async {
+    await Future.delayed(const Duration(milliseconds: 500));
     return _currentEntity;
   }
 
@@ -331,24 +314,17 @@ class ProfileCompletionRemoteDataSourceMock
   }
 
   @override
-  Future<PartnerProfileCompletionEntity>
-      updateProfileCompletion(
+  Future<PartnerProfileCompletionEntity> updateProfileCompletion(
     PartnerProfileCompletionUpdateRequest request,
   ) async {
-    await Future.delayed(
-      const Duration(milliseconds: 600),
-    );
+    await Future.delayed(const Duration(milliseconds: 600));
 
-    final gallery =
-        request.gallery ?? _currentEntity.gallery;
-    final description =
-        request.description ?? _currentEntity.description;
-    final coverImageUrl = request.coverImageUrl ??
-        _currentEntity.coverImageUrl;
-    final logoImageUrl = request.logoImageUrl ??
-        _currentEntity.logoImageUrl;
-    final certifications = request.certifications ??
-        _currentEntity.certifications;
+    final gallery = request.gallery ?? _currentEntity.gallery;
+    final description = request.description ?? _currentEntity.description;
+    final coverImageUrl = request.coverImageUrl ?? _currentEntity.coverImageUrl;
+    final logoImageUrl = request.logoImageUrl ?? _currentEntity.logoImageUrl;
+    final certifications =
+        request.certifications ?? _currentEntity.certifications;
 
     final checklist = [
       CompletionChecklistItem(

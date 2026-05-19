@@ -11,7 +11,6 @@
 import 'package:admin_openapi/api.dart';
 import 'package:test/test.dart';
 
-
 /// tests for UserClinicsApi
 void main() {
   // final instance = UserClinicsApi();
@@ -51,6 +50,5 @@ void main() {
     test('test userClinicControllerUnfollowClinic', () async {
       // TODO
     });
-
   });
 }

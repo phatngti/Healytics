@@ -23,7 +23,6 @@ class UserProfileDto {
     required this.profileCompleted,
   });
 
-
   /// Profile ID
   String id;
 
@@ -85,34 +84,37 @@ class UserProfileDto {
   bool profileCompleted;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is UserProfileDto &&
-    other.id == id &&
-    other.firstName == firstName &&
-    other.lastName == lastName &&
-    other.phone == phone &&
-    other.bio == bio &&
-    other.dateOfBirth == dateOfBirth &&
-    other.avatarUrl == avatarUrl &&
-    other.profileCompleted == profileCompleted;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserProfileDto &&
+          other.id == id &&
+          other.firstName == firstName &&
+          other.lastName == lastName &&
+          other.phone == phone &&
+          other.bio == bio &&
+          other.dateOfBirth == dateOfBirth &&
+          other.avatarUrl == avatarUrl &&
+          other.profileCompleted == profileCompleted;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (id.hashCode) +
-    (firstName == null ? 0 : firstName!.hashCode) +
-    (lastName == null ? 0 : lastName!.hashCode) +
-    (phone == null ? 0 : phone!.hashCode) +
-    (bio == null ? 0 : bio!.hashCode) +
-    (dateOfBirth == null ? 0 : dateOfBirth!.hashCode) +
-    (avatarUrl == null ? 0 : avatarUrl!.hashCode) +
-    (profileCompleted.hashCode);
+      // ignore: unnecessary_parenthesis
+      (id.hashCode) +
+      (firstName == null ? 0 : firstName!.hashCode) +
+      (lastName == null ? 0 : lastName!.hashCode) +
+      (phone == null ? 0 : phone!.hashCode) +
+      (bio == null ? 0 : bio!.hashCode) +
+      (dateOfBirth == null ? 0 : dateOfBirth!.hashCode) +
+      (avatarUrl == null ? 0 : avatarUrl!.hashCode) +
+      (profileCompleted.hashCode);
 
   @override
-  String toString() => 'UserProfileDto[id=$id, firstName=$firstName, lastName=$lastName, phone=$phone, bio=$bio, dateOfBirth=$dateOfBirth, avatarUrl=$avatarUrl, profileCompleted=$profileCompleted]';
+  String toString() =>
+      'UserProfileDto[id=$id, firstName=$firstName, lastName=$lastName, phone=$phone, bio=$bio, dateOfBirth=$dateOfBirth, avatarUrl=$avatarUrl, profileCompleted=$profileCompleted]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'id'] = this.id;
+    json[r'id'] = this.id;
     if (this.firstName != null) {
       json[r'firstName'] = this.firstName;
     } else {
@@ -143,7 +145,7 @@ class UserProfileDto {
     } else {
       json[r'avatarUrl'] = null;
     }
-      json[r'profileCompleted'] = this.profileCompleted;
+    json[r'profileCompleted'] = this.profileCompleted;
     return json;
   }
 
@@ -159,8 +161,10 @@ class UserProfileDto {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "UserProfileDto[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "UserProfileDto[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "UserProfileDto[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "UserProfileDto[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -179,7 +183,10 @@ class UserProfileDto {
     return null;
   }
 
-  static List<UserProfileDto> listFromJson(dynamic json, {bool growable = false,}) {
+  static List<UserProfileDto> listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <UserProfileDto>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -207,13 +214,19 @@ class UserProfileDto {
   }
 
   // maps a json object with a list of UserProfileDto-objects as value to a dart map
-  static Map<String, List<UserProfileDto>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<UserProfileDto>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<UserProfileDto>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = UserProfileDto.listFromJson(entry.value, growable: growable,);
+        map[entry.key] = UserProfileDto.listFromJson(
+          entry.value,
+          growable: growable,
+        );
       }
     }
     return map;
@@ -225,4 +238,3 @@ class UserProfileDto {
     'profileCompleted',
   };
 }
-

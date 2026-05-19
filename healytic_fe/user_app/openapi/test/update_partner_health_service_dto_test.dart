@@ -96,8 +96,5 @@ void main() {
     test('to test the property `serviceManual`', () async {
       // TODO
     });
-
-
   });
-
 }

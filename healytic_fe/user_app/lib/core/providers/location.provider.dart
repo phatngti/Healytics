@@ -7,8 +7,7 @@ final locationServiceProvider = Provider<LocationService>((ref) {
 
 /// Resolves the current device location into a
 /// human-readable "City - Country" string.
-final currentLocationAddressProvider =
-    FutureProvider<String?>((ref) async {
+final currentLocationAddressProvider = FutureProvider<String?>((ref) async {
   final service = ref.read(locationServiceProvider);
   return service.getCurrentlyLocationAddress();
 });

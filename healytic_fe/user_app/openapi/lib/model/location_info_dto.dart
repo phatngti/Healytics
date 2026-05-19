@@ -20,7 +20,6 @@ class LocationInfoDto {
     this.longitude,
   });
 
-
   String name;
 
   String address;
@@ -38,29 +37,32 @@ class LocationInfoDto {
   num? longitude;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is LocationInfoDto &&
-    other.name == name &&
-    other.address == address &&
-    other.mapUrl == mapUrl &&
-    other.latitude == latitude &&
-    other.longitude == longitude;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LocationInfoDto &&
+          other.name == name &&
+          other.address == address &&
+          other.mapUrl == mapUrl &&
+          other.latitude == latitude &&
+          other.longitude == longitude;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (name.hashCode) +
-    (address.hashCode) +
-    (mapUrl == null ? 0 : mapUrl!.hashCode) +
-    (latitude == null ? 0 : latitude!.hashCode) +
-    (longitude == null ? 0 : longitude!.hashCode);
+      // ignore: unnecessary_parenthesis
+      (name.hashCode) +
+      (address.hashCode) +
+      (mapUrl == null ? 0 : mapUrl!.hashCode) +
+      (latitude == null ? 0 : latitude!.hashCode) +
+      (longitude == null ? 0 : longitude!.hashCode);
 
   @override
-  String toString() => 'LocationInfoDto[name=$name, address=$address, mapUrl=$mapUrl, latitude=$latitude, longitude=$longitude]';
+  String toString() =>
+      'LocationInfoDto[name=$name, address=$address, mapUrl=$mapUrl, latitude=$latitude, longitude=$longitude]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'name'] = this.name;
-      json[r'address'] = this.address;
+    json[r'name'] = this.name;
+    json[r'address'] = this.address;
     if (this.mapUrl != null) {
       json[r'mapUrl'] = this.mapUrl;
     } else {
@@ -91,8 +93,10 @@ class LocationInfoDto {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "LocationInfoDto[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "LocationInfoDto[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "LocationInfoDto[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "LocationInfoDto[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -112,7 +116,10 @@ class LocationInfoDto {
     return null;
   }
 
-  static List<LocationInfoDto> listFromJson(dynamic json, {bool growable = false,}) {
+  static List<LocationInfoDto> listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <LocationInfoDto>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -140,13 +147,19 @@ class LocationInfoDto {
   }
 
   // maps a json object with a list of LocationInfoDto-objects as value to a dart map
-  static Map<String, List<LocationInfoDto>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<LocationInfoDto>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<LocationInfoDto>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = LocationInfoDto.listFromJson(entry.value, growable: growable,);
+        map[entry.key] = LocationInfoDto.listFromJson(
+          entry.value,
+          growable: growable,
+        );
       }
     }
     return map;
@@ -158,4 +171,3 @@ class LocationInfoDto {
     'address',
   };
 }
-
