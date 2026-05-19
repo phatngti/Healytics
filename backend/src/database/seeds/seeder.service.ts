@@ -64,6 +64,7 @@ const REQUIRED_SEED_TABLES = [
   'product_media',
   'product_treatment_reviews',
   'specialist_reviews',
+  'facility_reviews',
   'checkout_tickets',
   'coupons',
   'cart_items',

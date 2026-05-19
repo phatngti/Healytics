@@ -9,6 +9,19 @@
 // ignore_for_file: lines_longer_than_80_chars
 // ignore_for_file: unused_element
 
+/// WebSocket event constants for the WsBookingEventsEvent namespace(s).
+///
+/// Client → Server events are used with `socket.emit()`.
+/// Server → Client events are used with `socket.on()`.
+abstract final class WsBookingEventsEvent {
+  WsBookingEventsEvent._();
+
+  // ── Server → Client ────────────────────────────────
+
+  /// A booking status changed and should update local UI state
+  static const bookingStatusChanged = 'booking.status.changed';
+}
+
 /// WebSocket event constants for the WsChatEvent namespace(s).
 ///
 /// Client → Server events are used with `socket.emit()`.

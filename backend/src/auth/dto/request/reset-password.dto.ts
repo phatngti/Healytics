@@ -3,7 +3,7 @@ import { IsString, MinLength } from 'class-validator';
 
 export class ResetPasswordDto {
   @ApiProperty({
-    description: 'Password reset token received from the reset email link',
+    description: 'Password reset token returned after validating email code',
   })
   @IsString()
   token: string;

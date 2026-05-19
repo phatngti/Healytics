@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/partner/bookings/presentation/widgets/booking_status_colors.theme.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -264,8 +265,8 @@ class AppTheme {
             error: Colors.red,
             onError: Colors.white,
             onErrorContainer: Colors.red.shade300,
-            // Light Blue
           ),
+          BookingStatusColors.light,
         ],
       );
 
@@ -306,6 +307,7 @@ class AppTheme {
             onError: Colors.white,
             onErrorContainer: Colors.red.shade300,
           ),
+          BookingStatusColors.dark,
         ],
       );
 }

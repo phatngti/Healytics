@@ -2,6 +2,23 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Auto-generated from backend WS decorators — DO NOT EDIT BY HAND. Run: yarn generate:ws-contract",
   "namespaces": {
+    "booking-events": {
+      "description": "Booking lifecycle event gateway",
+      "auth": {
+        "type": "jwt",
+        "roles": [
+          "user",
+          "health_partner"
+        ]
+      },
+      "clientToServer": {},
+      "serverToClient": {
+        "booking.status.changed": {
+          "description": "A booking status changed and should update local UI state",
+          "payload": "BookingStatusChangeEvent"
+        }
+      }
+    },
     "notifications": {
       "description": "Real-time notification delivery gateway",
       "auth": {
@@ -188,6 +205,65 @@
           "type": "String",
           "required": true,
           "description": "Conversation UUID"
+        }
+      }
+    },
+    "BookingStatusChangeEvent": {
+      "description": "Server event emitted when a booking status changes through the lifecycle API",
+      "direction": "serverToClient",
+      "properties": {
+        "eventId": {
+          "type": "String",
+          "required": true,
+          "description": ""
+        },
+        "bookingId": {
+          "type": "String",
+          "required": true,
+          "description": ""
+        },
+        "status": {
+          "type": "PublicBookingStatus",
+          "required": true,
+          "description": "",
+          "isEnum": true
+        },
+        "persistedStatus": {
+          "type": "BookingStatus",
+          "required": true,
+          "description": "",
+          "isEnum": true
+        },
+        "previousStatus": {
+          "type": "BookingStatus",
+          "required": true,
+          "description": "",
+          "isEnum": true
+        },
+        "userId": {
+          "type": "String",
+          "required": true,
+          "description": ""
+        },
+        "partnerId": {
+          "type": "String",
+          "required": false,
+          "description": ""
+        },
+        "specialistId": {
+          "type": "String",
+          "required": true,
+          "description": ""
+        },
+        "changedBy": {
+          "type": "BookingStatusChangedBy",
+          "required": true,
+          "description": ""
+        },
+        "occurredAt": {
+          "type": "String",
+          "required": true,
+          "description": ""
         }
       }
     },
@@ -483,6 +559,22 @@
           "description": "When the message was created"
         }
       }
+    },
+    "BookingStatusChangedBy": {
+      "description": "Actor that changed a booking status",
+      "direction": "serverToClient",
+      "properties": {
+        "accountId": {
+          "type": "String",
+          "required": true,
+          "description": ""
+        },
+        "role": {
+          "type": "String",
+          "required": true,
+          "description": ""
+        }
+      }
     }
   },
   "enums": {
@@ -510,6 +602,24 @@
         "system_maintenance",
         "partner_verified",
         "partner_rejected"
+      ]
+    },
+    "PublicBookingStatus": {
+      "description": "Public booking status emitted to realtime clients",
+      "values": [
+        "PROCESSING",
+        "COMPLETED"
+      ]
+    },
+    "BookingStatus": {
+      "description": "Persisted booking lifecycle status",
+      "values": [
+        "PENDING_PAYMENT",
+        "CONFIRMED",
+        "IN_PROGRESS",
+        "CANCELLED",
+        "COMPLETED",
+        "NO_SHOW"
       ]
     }
   }

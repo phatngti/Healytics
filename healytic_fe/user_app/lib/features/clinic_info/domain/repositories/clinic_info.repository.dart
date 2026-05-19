@@ -6,9 +6,7 @@ import '../entities/clinic_review.entity.dart';
 abstract class ClinicInfoRepository {
   /// Fetches the full clinic profile by partner/clinic
   /// [clinicId].
-  Future<ClinicInfoEntity> getClinicInfo(
-    String clinicId,
-  );
+  Future<ClinicInfoEntity> getClinicInfo(String clinicId);
 
   /// Fetches products for a clinic with server-side
   /// filtering, sorting, and pagination.
@@ -17,6 +15,7 @@ abstract class ClinicInfoRepository {
     String? categoryId,
     ClinicProductSort sort = ClinicProductSort.popular,
     String? search,
+    ClinicProductFilters filters = const ClinicProductFilters(),
     int page = 1,
     int limit = 20,
   });

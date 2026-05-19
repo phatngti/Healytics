@@ -4,11 +4,18 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/features/orders/presentation/providers/appointment.provider.dart';
 
 /// Horizontal tab bar for switching between
-/// Upcoming / Completed / Canceled appointment lists.
+/// Pending / Upcoming / Processing / Completed /
+/// Canceled appointment lists.
 class OrdersTabBar extends HookConsumerWidget {
   const OrdersTabBar({super.key});
 
-  static const _tabs = ['Pending', 'Upcoming', 'Completed', 'Canceled'];
+  static const _tabs = [
+    'Pending',
+    'Upcoming',
+    'Processing',
+    'Completed',
+    'Canceled',
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -38,21 +38,16 @@ import '../widgets/employee_booking_summary/'
 /// Reads [eligibilityId] from [bookingFlowProvider]
 /// to fetch detailed booking info via the
 /// eligibility detail API.
-class EmployeeBookingSummaryScreen
-    extends ConsumerStatefulWidget {
-  const EmployeeBookingSummaryScreen({
-    super.key,
-  });
+class EmployeeBookingSummaryScreen extends ConsumerStatefulWidget {
+  const EmployeeBookingSummaryScreen({super.key});
 
   @override
-  ConsumerState<EmployeeBookingSummaryScreen>
-      createState() =>
-          _EmployeeBookingSummaryScreenState();
+  ConsumerState<EmployeeBookingSummaryScreen> createState() =>
+      _EmployeeBookingSummaryScreenState();
 }
 
 class _EmployeeBookingSummaryScreenState
-    extends ConsumerState<
-        EmployeeBookingSummaryScreen> {
+    extends ConsumerState<EmployeeBookingSummaryScreen> {
   bool _isAddingToCart = false;
 
   void _handleBack() {
@@ -72,10 +67,7 @@ class _EmployeeBookingSummaryScreenState
       detail: detail,
     );
     if (bookingParams == null) {
-      AppToast.error(
-        context,
-        'Select a specialist and time slot first',
-      );
+      AppToast.error(context, 'Select a specialist and time slot first');
       return;
     }
 
@@ -93,16 +85,10 @@ class _EmployeeBookingSummaryScreenState
             timeSlot: timeSlot,
           );
       if (!mounted) return;
-      AppToast.success(
-        context,
-        'Added to cart',
-      );
+      AppToast.success(context, 'Added to cart');
     } catch (e) {
       if (!mounted) return;
-      AppToast.error(
-        context,
-        'Failed to add to cart',
-      );
+      AppToast.error(context, 'Failed to add to cart');
     } finally {
       if (mounted) {
         setState(() => _isAddingToCart = false);
@@ -110,10 +96,7 @@ class _EmployeeBookingSummaryScreenState
     }
   }
 
-  DateTime _buildCartTimeSlot(
-    DateTime date,
-    String timeLabel,
-  ) {
+  DateTime _buildCartTimeSlot(DateTime date, String timeLabel) {
     final parts = timeLabel.split(RegExp(r'[\s:]+'));
     if (parts.length >= 3) {
       var hour = int.tryParse(parts[0]) ?? 0;
@@ -122,20 +105,10 @@ class _EmployeeBookingSummaryScreenState
       if (period == 'PM' && hour != 12) hour += 12;
       if (period == 'AM' && hour == 12) hour = 0;
 
-      return DateTime(
-        date.year,
-        date.month,
-        date.day,
-        hour,
-        minute,
-      );
+      return DateTime(date.year, date.month, date.day, hour, minute);
     }
 
-    return DateTime(
-      date.year,
-      date.month,
-      date.day,
-    );
+    return DateTime(date.year, date.month, date.day);
   }
 
   void _handleConfirm(
@@ -157,9 +130,7 @@ class _EmployeeBookingSummaryScreenState
       );
       return;
     }
-    ref.read(bookingParamsProvider.notifier).set(
-          bookingParams,
-        );
+    ref.read(bookingParamsProvider.notifier).set(bookingParams);
     const CheckoutRoute().push(context);
   }
 
@@ -171,14 +142,12 @@ class _EmployeeBookingSummaryScreenState
     final specialist = flowState.selectedSpecialist;
     final selectedDate = flowState.selectedDate;
     final selectedTimeSlot =
-        flowState.selectedTimeSlotLabel ??
-            detail?.schedule?.timeSlotLabel;
+        flowState.selectedTimeSlotLabel ?? detail?.schedule?.timeSlotLabel;
 
     final serviceId = detail?.service.id ?? service?.id;
     final serviceName = detail?.service.title ?? service?.title;
     final employeeId = detail?.specialist.id ?? specialist?.id;
-    final employeeName =
-        detail?.specialist.name ?? specialist?.name;
+    final employeeName = detail?.specialist.name ?? specialist?.name;
 
     if (serviceId == null ||
         serviceName == null ||
@@ -193,22 +162,15 @@ class _EmployeeBookingSummaryScreenState
     return BookingParams(
       serviceId: serviceId,
       serviceName: serviceName,
-      serviceImageUrl:
-          detail?.service.imageUrl ?? service?.imageUrl ?? '',
-      price:
-          detail?.priceBreakdown.formattedTotal ??
-              service?.price ??
-              '0 VND',
+      serviceImageUrl: detail?.service.imageUrl ?? service?.imageUrl ?? '',
+      price: detail?.priceBreakdown.formattedTotal ?? service?.price ?? '0 VND',
       clinicName:
-          detail?.location.name ??
-              service?.clinicName ??
-              'Unknown clinic',
+          detail?.location.name ?? service?.clinicName ?? 'Unknown clinic',
       clinicAddress:
           detail?.location.address ??
-              service?.clinicAddress ??
-              'Unknown address',
-      clinicImageUrl:
-          detail?.service.imageUrl ?? service?.imageUrl ?? '',
+          service?.clinicAddress ??
+          'Unknown address',
+      clinicImageUrl: detail?.service.imageUrl ?? service?.imageUrl ?? '',
       employeeId: employeeId,
       employeeName: employeeName,
       selectedDate: selectedDate,
@@ -218,24 +180,13 @@ class _EmployeeBookingSummaryScreenState
 
   @override
   Widget build(BuildContext context) {
-    final hPad =
-        AppDimens.horizontalPadding(context);
-    final sectionGap =
-        AppDimens.sectionSpacing(context);
-    final flowState =
-        ref.watch(bookingFlowProvider);
+    final hPad = AppDimens.horizontalPadding(context);
+    final sectionGap = AppDimens.sectionSpacing(context);
+    final flowState = ref.watch(bookingFlowProvider);
 
-    final eligibilityId = flowState
-        .selectedSpecialist?.eligibilityId;
+    final eligibilityId = flowState.selectedSpecialist?.eligibilityId;
     final detail = eligibilityId != null
-        ? ref
-            .watch(
-              eligibilityDetailProvider(
-                eligibilityId,
-              ),
-            )
-            .asData
-            ?.value
+        ? ref.watch(eligibilityDetailProvider(eligibilityId)).asData?.value
         : null;
 
     return Scaffold(
@@ -261,14 +212,10 @@ class _EmployeeBookingSummaryScreenState
             ),
       bottomNavigationBar: BookingBottomAction(
         canContinue: flowState.isStep2Complete,
-        onContinue: () =>
-            _handleConfirm(flowState, detail),
+        onContinue: () => _handleConfirm(flowState, detail),
         label: 'Confirm & Pay',
         icon: Symbols.arrow_forward,
-        onAddToCart: () => _handleAddToCart(
-          flowState,
-          detail,
-        ),
+        onAddToCart: () => _handleAddToCart(flowState, detail),
         isAddingToCart: _isAddingToCart,
       ),
     );
@@ -293,21 +240,12 @@ class _EligibilityBody extends ConsumerWidget {
   final double sectionGap;
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
-    final detailAsync = ref.watch(
-      eligibilityDetailProvider(eligibilityId),
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final detailAsync = ref.watch(eligibilityDetailProvider(eligibilityId));
 
     return detailAsync.when(
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      error: (e, _) => Center(
-        child: Text('Error: $e'),
-      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
       data: (detail) => _SummaryBody(
         flowState: flowState,
         detail: detail,
@@ -337,17 +275,13 @@ class _SummaryBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasCategory =
-        detail.category.name.isNotEmpty;
+    final hasCategory = detail.category.name.isNotEmpty;
 
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
         textScaler: MediaQuery.of(
           context,
-        ).textScaler.clamp(
-          minScaleFactor: 0.8,
-          maxScaleFactor: 1.3,
-        ),
+        ).textScaler.clamp(minScaleFactor: 0.8, maxScaleFactor: 1.3),
       ),
       child: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -355,67 +289,50 @@ class _SummaryBody extends StatelessWidget {
           vertical: AppDimens.spaceLg,
         ),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Specialist hero card
             SpecialistServiceCard(
-              specialistName:
-                  detail.specialist.name,
-              formattedDate: _formatDate(
-                flowState.selectedDate,
-              ),
-              formattedTime: flowState
-                      .selectedTimeSlotLabel ??
-                  '—',
-              avatarUrl:
-                  detail.specialist.avatarUrl,
-              specialty:
-                  detail.specialist.specialty,
+              specialistName: detail.specialist.name,
+              formattedDate: _formatDate(flowState.selectedDate),
+              formattedTime: flowState.selectedTimeSlotLabel ?? '—',
+              avatarUrl: detail.specialist.avatarUrl,
+              specialty: detail.specialist.specialty,
             ),
             SizedBox(height: sectionGap),
 
             // Service details card
             ServiceDetailsCard(
-              serviceName:
-                  detail.service.title,
-              duration:
-                  detail.service.duration,
+              serviceName: detail.service.title,
+              duration: detail.service.duration,
             ),
             SizedBox(height: sectionGap),
 
             // Category & Service info
             if (hasCategory) ...[
               CategoryServiceInfo(
-                categoryName:
-                    detail.category.name,
-                serviceTitle:
-                    detail.service.title,
-                serviceSubtitle:
-                    detail.service.subtitle,
-                serviceImageUrl:
-                    detail.service.imageUrl,
+                categoryName: detail.category.name,
+                serviceTitle: detail.service.title,
+                serviceSubtitle: detail.service.subtitle,
+                serviceImageUrl: detail.service.imageUrl,
               ),
               SizedBox(height: sectionGap),
             ],
 
             // Location details (API data)
             LocationDetailsCard(
-              partnerName:
-                  detail.location.name,
-              address:
-                  detail.location.address,
+              partnerName: detail.location.name,
+              address: detail.location.address,
+              latitude: detail.location.latitude,
+              longitude: detail.location.longitude,
             ),
             SizedBox(height: sectionGap),
 
             // Price breakdown (API data)
             PriceBreakdownCard(
-              subtotal: detail.priceBreakdown
-                  .formattedSubTotal,
-              discount: detail.priceBreakdown
-                  .formattedDiscount,
-              totalAmount: detail.priceBreakdown
-                  .formattedTotal,
+              subtotal: detail.priceBreakdown.formattedSubTotal,
+              discount: detail.priceBreakdown.formattedDiscount,
+              totalAmount: detail.priceBreakdown.formattedTotal,
             ),
             SizedBox(height: sectionGap),
           ],
@@ -448,17 +365,13 @@ class _FallbackBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasCategory =
-        flowState.selectedCategory != null;
+    final hasCategory = flowState.selectedCategory != null;
 
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
         textScaler: MediaQuery.of(
           context,
-        ).textScaler.clamp(
-          minScaleFactor: 0.8,
-          maxScaleFactor: 1.3,
-        ),
+        ).textScaler.clamp(minScaleFactor: 0.8, maxScaleFactor: 1.3),
       ),
       child: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
@@ -466,51 +379,27 @@ class _FallbackBody extends StatelessWidget {
           vertical: AppDimens.spaceLg,
         ),
         child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SpecialistServiceCard(
-              specialistName: flowState
-                      .selectedSpecialist
-                      ?.name ??
-                  '—',
-              formattedDate: _formatDate(
-                flowState.selectedDate,
-              ),
-              formattedTime: flowState
-                      .selectedTimeSlotLabel ??
-                  '—',
-              avatarUrl: flowState
-                  .selectedSpecialist?.avatarUrl,
-              specialty: flowState
-                  .selectedSpecialist?.specialty,
+              specialistName: flowState.selectedSpecialist?.name ?? '—',
+              formattedDate: _formatDate(flowState.selectedDate),
+              formattedTime: flowState.selectedTimeSlotLabel ?? '—',
+              avatarUrl: flowState.selectedSpecialist?.avatarUrl,
+              specialty: flowState.selectedSpecialist?.specialty,
             ),
             SizedBox(height: sectionGap),
             ServiceDetailsCard(
-              serviceName: flowState
-                      .selectedService
-                      ?.title ??
-                  '—',
-              duration: flowState
-                      .selectedService
-                      ?.duration ??
-                  '—',
+              serviceName: flowState.selectedService?.title ?? '—',
+              duration: flowState.selectedService?.duration ?? '—',
             ),
             SizedBox(height: sectionGap),
             if (hasCategory) ...[
               CategoryServiceInfo(
-                categoryName: flowState
-                        .selectedCategory
-                        ?.name ??
-                    '—',
-                serviceTitle: flowState
-                        .selectedService
-                        ?.title ??
-                    '—',
-                serviceSubtitle: flowState
-                    .selectedService?.subtitle,
-                serviceImageUrl: flowState
-                    .selectedService?.imageUrl,
+                categoryName: flowState.selectedCategory?.name ?? '—',
+                serviceTitle: flowState.selectedService?.title ?? '—',
+                serviceSubtitle: flowState.selectedService?.subtitle,
+                serviceImageUrl: flowState.selectedService?.imageUrl,
               ),
               SizedBox(height: sectionGap),
             ],

@@ -17,6 +17,8 @@ class ClinicFloatingHeader extends StatelessWidget {
     required this.logoUrl,
     required this.showBlur,
     required this.onBack,
+    required this.onShare,
+    required this.onMore,
   });
 
   /// Clinic name shown in collapsed state.
@@ -31,18 +33,22 @@ class ClinicFloatingHeader extends StatelessWidget {
   /// Back navigation callback.
   final VoidCallback onBack;
 
+  /// Share action callback.
+  final VoidCallback onShare;
+
+  /// More-menu callback.
+  final VoidCallback onMore;
+
   /// Cached identity filter to avoid allocation
   /// when blur is off.
   static final _noBlur = ImageFilter.blur();
 
   /// Active blur filter for the header backdrop.
-  static final _activeBlur =
-      ImageFilter.blur(sigmaX: 12, sigmaY: 12);
+  static final _activeBlur = ImageFilter.blur(sigmaX: 12, sigmaY: 12);
 
   @override
   Widget build(BuildContext context) {
-    final topPad =
-        MediaQuery.paddingOf(context).top;
+    final topPad = MediaQuery.paddingOf(context).top;
 
     return ValueListenableBuilder<bool>(
       valueListenable: showBlur,
@@ -51,42 +57,34 @@ class ClinicFloatingHeader extends StatelessWidget {
           child: BackdropFilter(
             filter: blur ? _activeBlur : _noBlur,
             child: AnimatedContainer(
-              duration: const Duration(
-                milliseconds: 250,
-              ),
+              duration: const Duration(milliseconds: 250),
               padding: EdgeInsets.fromLTRB(
                 AppDimens.spaceSm,
                 topPad + AppDimens.spaceXs,
                 AppDimens.spaceSm,
                 AppDimens.spaceXs,
               ),
-              color: blur
-                  ? const Color(0x33000000)
-                  : Colors.transparent,
+              color: blur ? const Color(0x33000000) : Colors.transparent,
               child: Row(
                 children: [
-                  _GlassCircleButton(
-                    icon: Icons.arrow_back,
-                    onTap: onBack,
-                  ),
+                  _GlassCircleButton(icon: Icons.arrow_back, onTap: onBack),
                   // Collapsed title with avatar
                   if (blur) ...[
                     AppDimens.horizontalSmall,
-                    _CollapsedTitle(
-                      name: clinicName,
-                      logoUrl: logoUrl,
-                    ),
+                    _CollapsedTitle(name: clinicName, logoUrl: logoUrl),
                   ] else
                     const Spacer(),
                   AppDimens.horizontalSmall,
                   _GlassCircleButton(
                     icon: Icons.share,
-                    onTap: () {},
+                    label: 'Share clinic',
+                    onTap: onShare,
                   ),
                   const SizedBox(width: 8),
                   _GlassCircleButton(
                     icon: Icons.more_vert,
-                    onTap: () {},
+                    label: 'More clinic actions',
+                    onTap: onMore,
                   ),
                 ],
               ),
@@ -101,10 +99,7 @@ class ClinicFloatingHeader extends StatelessWidget {
 /// Mini avatar + clinic name shown in the collapsed
 /// app bar state.
 class _CollapsedTitle extends StatelessWidget {
-  const _CollapsedTitle({
-    required this.name,
-    required this.logoUrl,
-  });
+  const _CollapsedTitle({required this.name, required this.logoUrl});
 
   final String name;
   final String? logoUrl;
@@ -116,19 +111,14 @@ class _CollapsedTitle extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          AvatarImage(
-            name: name,
-            imageUrl: logoUrl,
-            radius: 14,
-          ),
+          AvatarImage(name: name, imageUrl: logoUrl, radius: 14),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
               name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style:
-                  textTheme.titleSmall?.copyWith(
+              style: textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -146,30 +136,27 @@ class _CollapsedTitle extends StatelessWidget {
 /// Uses the parent header's [BackdropFilter] for
 /// the blur effect — no individual blur needed.
 class _GlassCircleButton extends StatelessWidget {
-  const _GlassCircleButton({
-    required this.icon,
-    this.onTap,
-  });
+  const _GlassCircleButton({required this.icon, this.label, this.onTap});
 
   final IconData icon;
+  final String? label;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color:
-              Colors.black.withValues(alpha: 0.3),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          icon,
-          size: 20,
-          color: Colors.white,
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.3),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, size: 20, color: Colors.white),
         ),
       ),
     );

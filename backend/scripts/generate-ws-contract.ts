@@ -21,7 +21,9 @@ import '@/notification/enums/notification-type.enum';
 // ── Import gateway classes (side-effect: registers decorators) ──
 import { UserChatGateway } from '@/chat/ws/user-chat.gateway';
 import { PartnerChatGateway } from '@/chat/ws/partner-chat.gateway';
+import { ChatNotificationGateway } from '@/chat/ws/chat-notification.gateway';
 import { NotificationGateway } from '@/notification/ws/notification.gateway';
+import { BookingEventsGateway } from '@/booking/gateways/booking-events.gateway';
 
 import { generateWsContract } from '@/common/decorators/ws';
 
@@ -30,16 +32,23 @@ import { generateWsContract } from '@/common/decorators/ws';
 const args = process.argv.slice(2);
 const outputIdx = args.indexOf('--output');
 const defaultOutput = path.resolve(__dirname, '../openapi/ws-contract.json');
-const outputPath = outputIdx !== -1 && args[outputIdx + 1]
-  ? path.resolve(args[outputIdx + 1])
-  : defaultOutput;
+const outputPath =
+  outputIdx !== -1 && args[outputIdx + 1]
+    ? path.resolve(args[outputIdx + 1])
+    : defaultOutput;
 
 // ── Generate ──────────────────────────────────────────────────
 
 console.log('\n🔌  WS Contract Generator (CLI)');
 console.log(`   Output: ${outputPath}\n`);
 
-const contract = generateWsContract([UserChatGateway, PartnerChatGateway, NotificationGateway]);
+const contract = generateWsContract([
+  BookingEventsGateway,
+  UserChatGateway,
+  PartnerChatGateway,
+  ChatNotificationGateway,
+  NotificationGateway,
+]);
 
 // Ensure output directory exists
 const outputDir = path.dirname(outputPath);
@@ -62,5 +71,7 @@ for (const ns of Object.values(contract.namespaces)) {
 }
 
 console.log('📦  Generation complete!');
-console.log(`   ${nsCount} namespaces, ${eventCount} events, ${modelCount} models, ${enumCount} enums`);
+console.log(
+  `   ${nsCount} namespaces, ${eventCount} events, ${modelCount} models, ${enumCount} enums`,
+);
 console.log(`   Written to: ${outputPath}\n`);

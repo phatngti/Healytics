@@ -71,6 +71,11 @@ describe('UserClinicController', () => {
         categoryId,
         search: 'laser',
         sort: 'price_asc',
+        minPrice: '100000',
+        maxPrice: '500000',
+        minDuration: '30',
+        maxDuration: '90',
+        discountOnly: 'true',
         page: '2',
         limit: '5',
       },
@@ -85,6 +90,11 @@ describe('UserClinicController', () => {
         categoryId,
         search: 'laser',
         sort: 'price_asc',
+        minPrice: 100000,
+        maxPrice: 500000,
+        minDuration: 30,
+        maxDuration: 90,
+        discountOnly: true,
         page: 2,
         limit: 5,
       }),
@@ -109,10 +119,7 @@ describe('UserClinicController', () => {
     await controller.unfollowClinic(clinicId, userId);
 
     expect(clinicService.followClinic).toHaveBeenCalledWith(clinicId, userId);
-    expect(clinicService.unfollowClinic).toHaveBeenCalledWith(
-      clinicId,
-      userId,
-    );
+    expect(clinicService.unfollowClinic).toHaveBeenCalledWith(clinicId, userId);
   });
 
   it('rejects invalid page values', async () => {
@@ -137,6 +144,22 @@ describe('UserClinicController', () => {
     await expect(
       validationPipe.transform(
         { categoryId: 'all' },
+        queryMetadata(GetClinicProductsQueryDto),
+      ),
+    ).rejects.toThrow();
+  });
+
+  it('rejects invalid product filter values', async () => {
+    await expect(
+      validationPipe.transform(
+        { minPrice: '-1' },
+        queryMetadata(GetClinicProductsQueryDto),
+      ),
+    ).rejects.toThrow();
+
+    await expect(
+      validationPipe.transform(
+        { maxDuration: '-1' },
         queryMetadata(GetClinicProductsQueryDto),
       ),
     ).rejects.toThrow();

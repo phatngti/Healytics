@@ -2,7 +2,6 @@ import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/entities/app_exception.dart';
 import 'package:user_app/features/authenticate/presentation/providers/authenticate.provider.dart';
@@ -126,18 +125,24 @@ class LoginForm extends HookConsumerWidget {
             if (signInError.value != null)
               _SignInErrorBanner(message: signInError.value!),
             SizedBox(
-              child: AppButton(
-                key: keys.signInPage.forgotPasswordButton,
-                buttonType: ButtonType.text,
-                onPressed: () {
-                  context.pushNamed(ForgotPasswordRoute.name);
-                },
-                customStyle: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  foregroundColor: Theme.of(context).colorScheme.primary,
-                  textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+              width: double.infinity,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  key: keys.signInPage.forgotPasswordButton,
+                  onPressed: () {
+                    const ForgotPasswordRoute().push(context);
+                  },
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    alignment: Alignment.centerLeft,
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                    textStyle: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  child: const Text('Forgot Password?'),
                 ),
-                child: Text('Forgot Password?'),
               ),
             ),
             AppDimens.verticalExtraLarge,

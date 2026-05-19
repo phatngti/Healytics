@@ -23,13 +23,11 @@ final List<AppointmentEntity> kMockAppointments = [
     distanceKm: 2.5,
     specialistId: 'emp-doctor-1',
     serviceId: 'svc-hot-stone',
-    paymentUrl:
-        'https://checkout.stripe.com/c/pay/cs_mock_123',
-    paymentDeeplink: 'momo://app?action=payWithApp'
+    paymentUrl: 'https://checkout.stripe.com/c/pay/cs_mock_123',
+    paymentDeeplink:
+        'momo://app?action=payWithApp'
         '&amount=500000&isScanQR=false',
-    paymentExpiresAt: DateTime.now().add(
-      const Duration(minutes: 10),
-    ),
+    paymentExpiresAt: DateTime.now().add(const Duration(minutes: 10)),
   ),
   AppointmentEntity(
     id: 'apt-pending-2',
@@ -52,14 +50,44 @@ final List<AppointmentEntity> kMockAppointments = [
     distanceKm: 4.2,
     specialistId: 'emp-doctor-1',
     serviceId: 'svc-hydrating-facial',
-    paymentUrl:
-        'https://checkout.stripe.com/c/pay/cs_mock_456',
-    paymentDeeplink: 'momo://app?action=payWithApp'
+    paymentUrl: 'https://checkout.stripe.com/c/pay/cs_mock_456',
+    paymentDeeplink:
+        'momo://app?action=payWithApp'
         '&amount=350000&isScanQR=false',
-    paymentExpiresAt: DateTime.now().add(
-      const Duration(minutes: 7),
-    ),
+    paymentExpiresAt: DateTime.now().add(const Duration(minutes: 7)),
   ),
+
+  // ── Already-expired pending payment ──────────────
+  // paymentExpiresAt is in the past →
+  // _isExpiredPayment() should filter this out.
+  // This entry must NOT appear in the Pending tab.
+  AppointmentEntity(
+    id: 'apt-pending-expired',
+    serviceName: 'Vitamin Infusion Drip',
+    healthPartnerName: 'HealthTech Clinic',
+    healthPartnerId: 'vendor-healthtech-1',
+    imageUrl:
+        'https://images.unsplash.com/photo-1559757148-5c350d0d3c56'
+        '?w=800&h=400&fit=crop',
+    status: 'pending_payment',
+    category: 'wellness',
+    specialistName: 'Dr Nguyen Minh',
+    address:
+        '10 Pham Ngoc Thach, Ward 7\n'
+        'District 3, HCM City, VN',
+    date: DateTime.now().add(const Duration(days: 3)),
+    checkInTime: '11:00 AM',
+    checkOutTime: '12:00 PM',
+    duration: '60 min',
+    distanceKm: 3.7,
+    specialistId: 'emp-doctor-2',
+    serviceId: 'svc-vitamin-drip',
+    paymentUrl: 'https://checkout.stripe.com/c/pay/cs_mock_expired',
+    paymentDeeplink: null,
+    // 30 minutes ago — already expired
+    paymentExpiresAt: DateTime.now().subtract(const Duration(minutes: 30)),
+  ),
+
   AppointmentEntity(
     id: 'apt-1',
     serviceName: 'Swedish Relax',
@@ -197,38 +225,27 @@ final List<AppointmentEntity> kMockAppointments = [
 ];
 
 /// Mock category filters.
-const List<AppointmentCategory>
-    kMockAppointmentCategories = [
+const List<AppointmentCategory> kMockAppointmentCategories = [
   AppointmentCategory(
     id: 'cat-all',
     name: 'All',
     iconSlug: 'check_circle_outline',
   ),
-  AppointmentCategory(
-    id: 'cat-spa',
-    name: 'Spa',
-    iconSlug: 'spa',
-  ),
+  AppointmentCategory(id: 'cat-spa', name: 'Spa', iconSlug: 'spa'),
   AppointmentCategory(
     id: 'cat-wellness',
     name: 'Wellness',
     iconSlug: 'self_improvement',
   ),
-  AppointmentCategory(
-    id: 'cat-beauty',
-    name: 'Beauty',
-    iconSlug: 'face',
-  ),
+  AppointmentCategory(id: 'cat-beauty', name: 'Beauty', iconSlug: 'face'),
 ];
 
 /// Mock recommended services.
-const List<RecommendedServiceEntity>
-    kMockRecommendedServices = [
+const List<RecommendedServiceEntity> kMockRecommendedServices = [
   RecommendedServiceEntity(
     id: 'rec-1',
     name: 'Relaxation Massage',
-    description:
-        'Based on your stress levels and preference',
+    description: 'Based on your stress levels and preference',
     imageUrl:
         'https://images.unsplash.com/photo-1544161515-4ab6ce6db874'
         '?w=400&h=400&fit=crop',
@@ -238,8 +255,7 @@ const List<RecommendedServiceEntity>
   RecommendedServiceEntity(
     id: 'rec-2',
     name: 'Aroma Therapy',
-    description:
-        'Essential oils to boost your mood',
+    description: 'Essential oils to boost your mood',
     imageUrl:
         'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108'
         '?w=400&h=400&fit=crop',

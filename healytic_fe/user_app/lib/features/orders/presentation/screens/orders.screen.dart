@@ -19,6 +19,8 @@ class OrdersPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(bookingStatusRealtimeProvider);
+
     // Silently re-fetch appointments on every
     // screen access; only re-renders when data
     // has actually changed.

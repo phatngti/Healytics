@@ -6,6 +6,7 @@ import 'package:user_app/core/providers/api.provider.dart';
 import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/review/domain/'
     'entities/facility_review.entity.dart';
+import 'package:user_openapi/api.dart';
 
 // ─── Abstract Interface ────────────────────────────
 
@@ -13,9 +14,7 @@ import 'package:user_app/features/review/domain/'
 /// to a remote source.
 abstract class FacilityReviewRemoteDatasource {
   /// Sends the facility review to the backend.
-  Future<void> submitReview(
-    FacilityReviewEntity review,
-  );
+  Future<void> submitReview(FacilityReviewEntity review);
 }
 
 // ─── Real Implementation ───────────────────────────
@@ -26,9 +25,6 @@ abstract class FacilityReviewRemoteDatasource {
 /// Note: [photoPaths] are local file paths. S3
 /// upload is handled separately; [photoKeys] is
 /// left empty until that flow is integrated.
-///
-/// TODO: Wire to backend once
-/// `POST /v1/user/reviews/facility` is available.
 class FacilityReviewRemoteDatasourceImpl
     implements FacilityReviewRemoteDatasource {
   final ApiService _apiService;
@@ -36,24 +32,15 @@ class FacilityReviewRemoteDatasourceImpl
   FacilityReviewRemoteDatasourceImpl(this._apiService);
 
   @override
-  Future<void> submitReview(
-    FacilityReviewEntity review,
-  ) async {
-    // Placeholder until backend endpoint exists.
-    // Once the OpenAPI spec is regenerated with the
-    // facility review endpoint, replace with:
-    //
-    // final dto = CreateFacilityReviewDto(
-    //   appointmentId: review.appointmentId,
-    //   facilityId: review.facilityId,
-    //   rating: review.rating,
-    //   comment: review.comment.isEmpty
-    //       ? null : review.comment,
-    //   tags: review.tags,
-    //   photoKeys: const [],
-    // );
-    // await _apiService.userReviewsApi
-    //   .userReviewControllerSubmitFacilityReview(dto);
+  Future<void> submitReview(FacilityReviewEntity review) async {
+    final dto = CreateFacilityReviewDto(
+      appointmentId: review.appointmentId,
+      facilityId: review.facilityId,
+      rating: review.rating,
+      comment: review.comment.isEmpty ? null : review.comment,
+      tags: review.tags,
+      photoKeys: const [],
+    );
 
     log(
       'Submitting facility review: '
@@ -63,9 +50,8 @@ class FacilityReviewRemoteDatasourceImpl
       name: 'FacilityReviewDatasource',
     );
 
-    throw UnimplementedError(
-      'Backend facility review endpoint '
-      'not yet available.',
+    await _apiService.userReviewsApi.userReviewControllerSubmitFacilityReview(
+      dto,
     );
   }
 }
@@ -77,9 +63,7 @@ class FacilityReviewRemoteDatasourceImpl
 class FacilityReviewRemoteDatasourceMock
     implements FacilityReviewRemoteDatasource {
   @override
-  Future<void> submitReview(
-    FacilityReviewEntity review,
-  ) async {
+  Future<void> submitReview(FacilityReviewEntity review) async {
     log(
       'Mock submit facility review: '
       'rating=${review.rating}, '
@@ -87,9 +71,7 @@ class FacilityReviewRemoteDatasourceMock
       'photos=${review.photoPaths.length}',
       name: 'FacilityReviewDatasource',
     );
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    );
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 }
 
@@ -99,12 +81,12 @@ class FacilityReviewRemoteDatasourceMock
 /// real and mock implementations at runtime.
 final facilityReviewRemoteDatasourceProvider =
     Provider<FacilityReviewRemoteDatasource>((ref) {
-  final useMock = AppEnvironment.current.useMock;
+      final useMock = AppEnvironment.current.useMock;
 
-  if (useMock) {
-    return FacilityReviewRemoteDatasourceMock();
-  }
+      if (useMock) {
+        return FacilityReviewRemoteDatasourceMock();
+      }
 
-  final apiService = ref.read(apiServiceProvider);
-  return FacilityReviewRemoteDatasourceImpl(apiService);
-});
+      final apiService = ref.read(apiServiceProvider);
+      return FacilityReviewRemoteDatasourceImpl(apiService);
+    });

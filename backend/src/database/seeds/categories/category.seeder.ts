@@ -164,11 +164,13 @@ export class CategorySeeder implements ISeeder {
     for (const catData of SEED_CATEGORIES) {
       const exists = await this.categoryRepo.findOne({
         where: { slug: catData.slug },
+        withDeleted: true,
       });
       const parent = catData.parentSlug
         ? await this.categoryRepo.findOne({
             where: { slug: catData.parentSlug },
             select: ['id', 'slug'],
+            withDeleted: true,
           })
         : null;
       const payload = {
@@ -184,7 +186,10 @@ export class CategorySeeder implements ISeeder {
       };
 
       if (exists) {
-        await this.categoryRepo.save({ ...exists, ...payload });
+        await this.categoryRepo.update(exists.id, {
+          ...payload,
+          deletedAt: null,
+        });
         this.logger.log(`  🔄 Updated category "${catData.name}"`);
         continue;
       }

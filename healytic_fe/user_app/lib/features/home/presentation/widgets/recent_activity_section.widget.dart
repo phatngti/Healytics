@@ -354,6 +354,15 @@ class _ActivityCard extends StatelessWidget {
           statusBgColor: semantic.success!.withValues(alpha: 0.1),
           label: 'Completed',
         );
+      case 'processing':
+        return _StatusStyle(
+          icon: Symbols.pending_actions,
+          iconColor: semantic.info!,
+          iconBgColor: semantic.info!.withValues(alpha: 0.1),
+          statusColor: semantic.info!,
+          statusBgColor: semantic.info!.withValues(alpha: 0.1),
+          label: 'Processing',
+        );
       case 'canceled':
       case 'cancelled':
         return _StatusStyle(

@@ -9,7 +9,8 @@ import { Booking } from '@/common/entities/booking.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { Partner } from '@/common/entities/partner.entity';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
-import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
+import { BookingStatusLogWriterService } from '@/booking/services/booking-status-log-writer.service';
 import { EmployeeAppointmentResponseDto } from '../../dto/employee/employee-appointment-response.dto';
 
 /**
@@ -26,7 +27,10 @@ export class CancelEmployeeAppointmentHandler {
     BookingStatus.IN_PROGRESS,
   ];
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly logWriter: BookingStatusLogWriterService,
+  ) {}
 
   async execute(
     accountId: string,
@@ -73,23 +77,23 @@ export class CancelEmployeeAppointmentHandler {
 
       // 4. Transition
       const previousStatus = booking.status;
+      const trimmedReason = reason?.trim();
       booking.status = BookingStatus.CANCELLED;
-      if (reason) {
+      if (trimmedReason) {
         booking.notes = booking.notes
-          ? `${booking.notes}\n[Cancelled] ${reason}`
-          : `[Cancelled] ${reason}`;
+          ? `${booking.notes}\n[Cancelled] ${trimmedReason}`
+          : `[Cancelled] ${trimmedReason}`;
       }
       await queryRunner.manager.save(Booking, booking);
 
-      // 5. Add status log
-      const log = queryRunner.manager.create(BookingStatusLog, {
+      await this.logWriter.write(queryRunner.manager, {
         bookingId: booking.id,
-        previousStatus,
-        newStatus: BookingStatus.CANCELLED,
+        fromStatus: previousStatus,
+        toStatus: BookingStatus.CANCELLED,
         changedBy: accountId,
-        reason: reason ?? 'Employee cancelled appointment',
+        reasonCode: BookingStatusReasonCode.EMPLOYEE_CANCELLED,
+        reason: trimmedReason,
       });
-      await queryRunner.manager.save(BookingStatusLog, log);
 
       // 6. Commit
       await queryRunner.commitTransaction();

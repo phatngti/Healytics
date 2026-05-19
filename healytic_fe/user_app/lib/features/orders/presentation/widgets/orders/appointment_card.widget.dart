@@ -9,11 +9,7 @@ import 'package:user_app/router/routes.dart';
 /// Card displaying a single appointment with image,
 /// status badge, provider info, address, and check-in.
 class AppointmentCard extends StatelessWidget {
-  const AppointmentCard({
-    super.key,
-    required this.appointment,
-    this.onExpired,
-  });
+  const AppointmentCard({super.key, required this.appointment, this.onExpired});
 
   final AppointmentEntity appointment;
 
@@ -60,8 +56,7 @@ class AppointmentCard extends StatelessWidget {
                       AppDimens.verticalMediumSmall,
                       _ReviewAction(appointment: appointment),
                     ],
-                    if (appointment.status ==
-                        'pending_payment') ...[
+                    if (appointment.status == 'pending_payment') ...[
                       AppDimens.verticalMediumSmall,
                       _PaymentAction(
                         appointment: appointment,
@@ -168,6 +163,11 @@ class _StatusBadge extends StatelessWidget {
         'Pending Payment',
       ),
       'upcoming' => (colors.primaryContainer, colors.primary, 'Upcoming'),
+      'processing' => (
+        colors.secondaryContainer,
+        colors.secondary,
+        'Processing',
+      ),
       'completed' => (colors.tertiaryContainer, colors.tertiary, 'Completed'),
       'canceled' => (colors.errorContainer, colors.error, 'Canceled'),
       _ => (colors.surfaceContainerHighest, colors.onSurfaceVariant, status),
@@ -583,10 +583,7 @@ class _ReviewedChip extends StatelessWidget {
 /// Payment CTA banner with countdown timer.
 /// Shown only for `pending_payment` appointments.
 class _PaymentAction extends StatelessWidget {
-  const _PaymentAction({
-    required this.appointment,
-    this.onExpired,
-  });
+  const _PaymentAction({required this.appointment, this.onExpired});
 
   final AppointmentEntity appointment;
 
@@ -605,28 +602,19 @@ class _PaymentAction extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: () => _openPayment(
-        context,
-        appointment,
-      ),
+      onTap: () => _openPayment(context, appointment),
       child: Container(
         width: double.infinity,
         padding: AppDimens.paddingAllMedium,
         decoration: BoxDecoration(
-          color: colors.secondaryContainer.withValues(
-            alpha: 0.3,
-          ),
+          color: colors.secondaryContainer.withValues(alpha: 0.3),
           borderRadius: AppDimens.radiusMediumSmall,
-          border: Border.all(
-            color: colors.secondaryContainer,
-          ),
+          border: Border.all(color: colors.secondaryContainer),
         ),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(
-                AppDimens.spaceSm,
-              ),
+              padding: EdgeInsets.all(AppDimens.spaceSm),
               decoration: BoxDecoration(
                 color: colors.secondaryContainer,
                 shape: BoxShape.circle,
@@ -640,21 +628,18 @@ class _PaymentAction extends StatelessWidget {
             AppDimens.horizontalMedium,
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Complete Payment',
-                    style: theme.textTheme.labelLarge
-                        ?.copyWith(
+                    style: theme.textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: colors.secondary,
                     ),
                   ),
                   AppDimens.verticalExtraSmall,
                   _CountdownText(
-                    expiresAt:
-                        appointment.paymentExpiresAt,
+                    expiresAt: appointment.paymentExpiresAt,
                     onExpired: onExpired,
                   ),
                 ],
@@ -673,22 +658,15 @@ class _PaymentAction extends StatelessWidget {
 
   /// Try deep link first (MoMo app), fall back to
   /// web checkout URL.
-  Future<void> _openPayment(
-    BuildContext context,
-    AppointmentEntity apt,
-  ) async {
+  Future<void> _openPayment(BuildContext context, AppointmentEntity apt) async {
     final deeplink = apt.paymentDeeplink;
     final webUrl = apt.paymentUrl;
 
     // Prefer native app via deep link.
     if (deeplink != null && deeplink.isNotEmpty) {
       final uri = Uri.tryParse(deeplink);
-      if (uri != null &&
-          await canLaunchUrl(uri)) {
-        await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
+      if (uri != null && await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
         return;
       }
     }
@@ -697,10 +675,7 @@ class _PaymentAction extends StatelessWidget {
     if (webUrl != null && webUrl.isNotEmpty) {
       final uri = Uri.tryParse(webUrl);
       if (uri == null) return;
-      await launchUrl(
-        uri,
-        mode: LaunchMode.inAppBrowserView,
-      );
+      await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
     }
   }
 }
@@ -721,9 +696,7 @@ class _PreparingPaymentBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerLow,
         borderRadius: AppDimens.radiusMediumSmall,
-        border: Border.all(
-          color: colors.outlineVariant,
-        ),
+        border: Border.all(color: colors.outlineVariant),
       ),
       child: Row(
         children: [
@@ -739,8 +712,7 @@ class _PreparingPaymentBanner extends StatelessWidget {
           Expanded(
             child: Text(
               'Preparing payment...',
-              style: theme.textTheme.labelLarge
-                  ?.copyWith(
+              style: theme.textTheme.labelLarge?.copyWith(
                 color: colors.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
               ),
@@ -756,10 +728,7 @@ class _PreparingPaymentBanner extends StatelessWidget {
 /// Falls back to "Payment required" when no
 /// expiration is set.
 class _CountdownText extends StatefulWidget {
-  const _CountdownText({
-    required this.expiresAt,
-    this.onExpired,
-  });
+  const _CountdownText({required this.expiresAt, this.onExpired});
 
   final DateTime? expiresAt;
 
@@ -767,8 +736,7 @@ class _CountdownText extends StatefulWidget {
   final VoidCallback? onExpired;
 
   @override
-  State<_CountdownText> createState() =>
-      _CountdownTextState();
+  State<_CountdownText> createState() => _CountdownTextState();
 }
 
 class _CountdownTextState extends State<_CountdownText> {
@@ -794,18 +762,14 @@ class _CountdownTextState extends State<_CountdownText> {
 
   void _updateRemaining() {
     if (widget.expiresAt == null) return;
-    final diff =
-        widget.expiresAt!.difference(DateTime.now());
+    final diff = widget.expiresAt!.difference(DateTime.now());
     final wasPositive = _remaining > Duration.zero;
     setState(() {
-      _remaining =
-          diff.isNegative ? Duration.zero : diff;
+      _remaining = diff.isNegative ? Duration.zero : diff;
     });
 
     // Fire onExpired exactly once.
-    if (wasPositive &&
-        _remaining == Duration.zero &&
-        !_hasExpired) {
+    if (wasPositive && _remaining == Duration.zero && !_hasExpired) {
       _hasExpired = true;
       widget.onExpired?.call();
     }

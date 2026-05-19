@@ -23,7 +23,12 @@ describe('NotificationService', () => {
   let service: NotificationService;
   let notificationRepo: { find: jest.Mock };
   let createBroadcastHandler: { execute: jest.Mock };
-  let notificationGateway: { pushBroadcast: jest.Mock };
+  let markReadHandler: { execute: jest.Mock };
+  let markAllReadHandler: { execute: jest.Mock };
+  let notificationGateway: {
+    pushBroadcast: jest.Mock;
+    pushUnreadCount: jest.Mock;
+  };
   let pushService: { sendBroadcast: jest.Mock };
 
   const createdAt = new Date('2026-04-25T00:00:00.000Z');
@@ -44,7 +49,14 @@ describe('NotificationService', () => {
     createBroadcastHandler = {
       execute: jest.fn().mockResolvedValue(broadcastDto),
     };
-    notificationGateway = { pushBroadcast: jest.fn() };
+    markReadHandler = { execute: jest.fn().mockResolvedValue(undefined) };
+    markAllReadHandler = {
+      execute: jest.fn().mockResolvedValue({ markedCount: 3 }),
+    };
+    notificationGateway = {
+      pushBroadcast: jest.fn(),
+      pushUnreadCount: jest.fn(),
+    };
     pushService = { sendBroadcast: jest.fn().mockResolvedValue(undefined) };
 
     service = new NotificationService(
@@ -54,8 +66,8 @@ describe('NotificationService', () => {
       {} as unknown as Repository<Account>,
       {} as unknown as CreateNotificationHandler,
       createBroadcastHandler as unknown as CreateBroadcastHandler,
-      {} as unknown as MarkNotificationReadHandler,
-      {} as unknown as MarkAllReadHandler,
+      markReadHandler as unknown as MarkNotificationReadHandler,
+      markAllReadHandler as unknown as MarkAllReadHandler,
       notificationGateway as unknown as NotificationGateway,
       pushService as unknown as PushNotificationService,
     );
@@ -168,6 +180,38 @@ describe('NotificationService', () => {
       });
       expect(result).toEqual(
         NotificationResponseDto.fromEntities([newer, older]),
+      );
+    });
+  });
+
+  describe('markRead', () => {
+    it('marks a notification as read and pushes the refreshed unread count', async () => {
+      jest.spyOn(service, 'getUnreadCount').mockResolvedValue(4);
+
+      await service.markRead('notification-id', 'user-id');
+
+      expect(markReadHandler.execute).toHaveBeenCalledWith(
+        'notification-id',
+        'user-id',
+      );
+      expect(notificationGateway.pushUnreadCount).toHaveBeenCalledWith(
+        'user-id',
+        4,
+      );
+    });
+  });
+
+  describe('markAllRead', () => {
+    it('marks all notifications as read and pushes the refreshed unread count', async () => {
+      jest.spyOn(service, 'getUnreadCount').mockResolvedValue(0);
+
+      const result = await service.markAllRead('user-id');
+
+      expect(result).toEqual({ markedCount: 3 });
+      expect(markAllReadHandler.execute).toHaveBeenCalledWith('user-id');
+      expect(notificationGateway.pushUnreadCount).toHaveBeenCalledWith(
+        'user-id',
+        0,
       );
     });
   });

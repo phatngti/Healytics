@@ -201,6 +201,68 @@ abstract class _$ClinicProductSearchNotifier extends $Notifier<String> {
   }
 }
 
+/// Tracks additional filter-sheet criteria.
+
+@ProviderFor(ClinicProductFilterNotifier)
+const clinicProductFilterProvider = ClinicProductFilterNotifierProvider._();
+
+/// Tracks additional filter-sheet criteria.
+final class ClinicProductFilterNotifierProvider
+    extends
+        $NotifierProvider<ClinicProductFilterNotifier, ClinicProductFilters> {
+  /// Tracks additional filter-sheet criteria.
+  const ClinicProductFilterNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'clinicProductFilterProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$clinicProductFilterNotifierHash();
+
+  @$internal
+  @override
+  ClinicProductFilterNotifier create() => ClinicProductFilterNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ClinicProductFilters value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ClinicProductFilters>(value),
+    );
+  }
+}
+
+String _$clinicProductFilterNotifierHash() =>
+    r'3c6366a40431a6ab5389d74c50023164d45111dc';
+
+/// Tracks additional filter-sheet criteria.
+
+abstract class _$ClinicProductFilterNotifier
+    extends $Notifier<ClinicProductFilters> {
+  ClinicProductFilters build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<ClinicProductFilters, ClinicProductFilters>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<ClinicProductFilters, ClinicProductFilters>,
+              ClinicProductFilters,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
 /// Manages server-side paginated product loading.
 ///
 /// Watches sort, category, and search state.
@@ -264,7 +326,7 @@ final class ClinicProductsPaginatedProvider
 }
 
 String _$clinicProductsPaginatedHash() =>
-    r'19c56b1673fb310d83fc746b3368bd46823a8fcc';
+    r'd827c2a0f5485137efcf3a4994e215ae95dd7cec';
 
 /// Manages server-side paginated product loading.
 ///

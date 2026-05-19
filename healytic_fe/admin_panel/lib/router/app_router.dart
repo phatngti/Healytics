@@ -40,6 +40,11 @@ final List<Map<String, dynamic>> providerSlideMenuItems = [
     "route": partner.TransactionHomeRoute().location,
   },
   {
+    "icon": Icons.calendar_month_outlined,
+    "label": 'Bookings',
+    "route": partner.PartnerBookingsRoute().location,
+  },
+  {
     "icon": Icons.chat_bubble_outline_rounded,
     "label": 'Messages',
     "route": partner.PartnerChatInboxRoute().location,
@@ -132,14 +137,12 @@ GoRouter router(Ref ref) {
       }
 
       // Admin on a provider route → redirect to admin dashboard.
-      if (role == Role.admin.value &&
-          path.startsWith('/provider/')) {
+      if (role == Role.admin.value && path.startsWith('/provider/')) {
         return '/admin/dashboard';
       }
 
       // Provider on an admin route → redirect to provider home.
-      if (role == Role.health_partner.value &&
-          path.startsWith('/admin/')) {
+      if (role == Role.health_partner.value && path.startsWith('/admin/')) {
         return isProviderVerified
             ? (isProviderProfileCompleted
                   ? '/provider/dashboard'
@@ -151,15 +154,13 @@ GoRouter router(Ref ref) {
       if (role == Role.health_partner.value) {
         if (!isProviderVerified && !isVerificationRoute) {
           return '/provider/verification-status';
-        } else if (isProviderVerified &&
-            !isProviderProfileCompleted) {
+        } else if (isProviderVerified && !isProviderProfileCompleted) {
           if (!isProfileCompletionRoute) {
             return '/provider/profile-completion';
           }
         } else if (isProviderVerified &&
             isProviderProfileCompleted &&
-            (isVerificationRoute ||
-                isProfileCompletionRoute)) {
+            (isVerificationRoute || isProfileCompletionRoute)) {
           return '/provider/dashboard';
         }
       }
@@ -196,14 +197,12 @@ class RouterListenable extends _$RouterListenable implements Listenable {
   FutureOr<void> build() {
     // Watch auth state changes to trigger redirects.
     final subscriptions = [
-      Store.watch(StoreKey.accessToken)
-          .listen((_) => _notifyListeners()),
-      Store.watch(StoreKey.mockRole)
-          .listen((_) => _notifyListeners()),
-      Store.watch(StoreKey.partnerVerified)
-          .listen((_) => _notifyListeners()),
-      Store.watch(StoreKey.partnerProfileCompleted)
-          .listen((_) => _notifyListeners()),
+      Store.watch(StoreKey.accessToken).listen((_) => _notifyListeners()),
+      Store.watch(StoreKey.mockRole).listen((_) => _notifyListeners()),
+      Store.watch(StoreKey.partnerVerified).listen((_) => _notifyListeners()),
+      Store.watch(
+        StoreKey.partnerProfileCompleted,
+      ).listen((_) => _notifyListeners()),
     ];
     ref.onDispose(() {
       for (final subscription in subscriptions) {

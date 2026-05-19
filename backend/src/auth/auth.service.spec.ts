@@ -28,7 +28,7 @@ describe('AuthService', () => {
   };
 
   const mockPasswordResetMailer = {
-    sendPasswordResetEmail: jest.fn(),
+    sendPasswordResetCode: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -78,8 +78,7 @@ describe('AuthService', () => {
     );
   });
 
-  it('should send reset email for active account', async () => {
-    mockJwtService.sign.mockReturnValue('reset-token');
+  it('should send reset code for active account', async () => {
     mockAccountService.findByEmail.mockResolvedValue({
       id: 'account-uuid',
       email: 'user@test.com',
@@ -91,10 +90,10 @@ describe('AuthService', () => {
       email: 'USER@Test.com',
     });
 
-    expect(result.message).toContain('password reset link has been sent');
-    expect(mockPasswordResetMailer.sendPasswordResetEmail).toHaveBeenCalledWith(
+    expect(result.message).toContain('password reset code has been sent');
+    expect(mockPasswordResetMailer.sendPasswordResetCode).toHaveBeenCalledWith(
       'user@test.com',
-      'reset-token',
+      expect.stringMatching(/^\d{6}$/),
     );
   });
 
@@ -105,10 +104,58 @@ describe('AuthService', () => {
       email: 'missing@test.com',
     });
 
-    expect(result.message).toContain('password reset link has been sent');
+    expect(result.message).toContain('password reset code has been sent');
     expect(
-      mockPasswordResetMailer.sendPasswordResetEmail,
+      mockPasswordResetMailer.sendPasswordResetCode,
     ).not.toHaveBeenCalled();
+  });
+
+  it('should validate reset code and return reset token', async () => {
+    mockAccountService.findByEmail.mockResolvedValue({
+      id: 'account-uuid',
+      email: 'user@test.com',
+      role: Role.USER,
+      isActive: true,
+    });
+    mockJwtService.sign.mockReturnValue('reset-token');
+
+    await service.requestUserPasswordReset({ email: 'user@test.com' });
+    const code = mockPasswordResetMailer.sendPasswordResetCode.mock.calls[0][1];
+
+    const result = await service.validateUserPasswordResetCode({
+      email: 'USER@test.com',
+      code,
+    });
+
+    expect(result).toEqual({
+      message: 'Password reset code verified.',
+      resetToken: 'reset-token',
+    });
+    expect(mockJwtService.sign).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sub: 'account-uuid',
+        purpose: 'password_reset',
+      }),
+      expect.any(Object),
+    );
+  });
+
+  it('should reject an invalid reset code', async () => {
+    mockAccountService.findByEmail.mockResolvedValue({
+      id: 'account-uuid',
+      email: 'user@test.com',
+      role: Role.USER,
+      isActive: true,
+    });
+
+    await service.requestUserPasswordReset({ email: 'user@test.com' });
+
+    await expect(
+      service.validateUserPasswordResetCode({
+        email: 'user@test.com',
+        code: '000000',
+      }),
+    ).rejects.toThrow('Invalid or expired password reset code');
   });
 
   it('should reset password with valid reset token', async () => {

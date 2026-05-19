@@ -165,6 +165,16 @@ const SEED_USERS = [
     role: Role.HEALTH_PARTNER,
   },
   {
+    email: 'doctor@healytics.vn',
+    password: 'employee@123',
+    role: Role.EMPLOYEE,
+  },
+  {
+    email: 'therapist@healytics.vn',
+    password: 'employee@123',
+    role: Role.EMPLOYEE,
+  },
+  {
     email: 'partner2@healytics.vn',
     password: 'partner@123',
     role: Role.HEALTH_PARTNER,

@@ -105,10 +105,13 @@ describe('BookingService', () => {
       const expected = { id: bookingId, status: 'CONFIRMED' };
       getBookingHandler.execute.mockResolvedValue(expected);
 
-      const result = await service.getBooking(bookingId);
+      const result = await service.getBooking('user-1', bookingId);
 
       expect(result).toEqual(expected);
-      expect(getBookingHandler.execute).toHaveBeenCalledWith(bookingId);
+      expect(getBookingHandler.execute).toHaveBeenCalledWith(
+        'user-1',
+        bookingId,
+      );
       expect(getBookingHandler.execute).toHaveBeenCalledTimes(1);
     });
   });

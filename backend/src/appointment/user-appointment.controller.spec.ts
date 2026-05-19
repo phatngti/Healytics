@@ -99,10 +99,11 @@ describe('UserAppointmentController', () => {
       const expected = { id: appointmentId, serviceName: 'Massage' };
       appointmentService.getAppointment.mockResolvedValue(expected);
 
-      const result = await controller.getAppointment(appointmentId);
+      const result = await controller.getAppointment('user-1', appointmentId);
 
       expect(result).toEqual(expected);
       expect(appointmentService.getAppointment).toHaveBeenCalledWith(
+        'user-1',
         appointmentId,
       );
     });

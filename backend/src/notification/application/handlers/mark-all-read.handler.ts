@@ -26,11 +26,14 @@ export class MarkAllReadHandler {
     this.logger.log(`Marking all notifications as read for userId=${userId}`);
 
     // Resolve join date so we only touch broadcasts this user can see
-    const account = await this.accountRepo.findOne({
-      where: { id: userId },
-      select: ['createdAt'],
-    });
-    const accountCreatedAt = account?.createdAt ?? new Date(0);
+    const account = await this.accountRepo
+      .createQueryBuilder('a')
+      .select('a.created_at', 'createdAt')
+      .where('a.id = :userId', { userId })
+      .getRawOne<{ createdAt: Date }>();
+    const accountCreatedAt = account?.createdAt
+      ? new Date(account.createdAt)
+      : new Date(0);
 
     // 1. Mark all targeted unread notifications as read
     const targetedResult = await this.notificationRepo.update(
@@ -64,8 +67,7 @@ export class MarkAllReadHandler {
       await this.notifReadRepo.save(readRecords);
     }
 
-    const total =
-      (targetedResult.affected ?? 0) + unreadBroadcasts.length;
+    const total = (targetedResult.affected ?? 0) + unreadBroadcasts.length;
     this.logger.log(
       `Marked ${total} notifications as read for userId=${userId}`,
     );

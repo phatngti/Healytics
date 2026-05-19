@@ -61,7 +61,7 @@ function ws_client {
   node $BASE_DIR/open-api/bin/generate-ws-client.js \
     --spec $BASE_DIR/open-api/ws-contract.json \
     --output $BASE_DIR/user_app/lib/core/services/ws \
-    --namespaces user-chat,chat-notifications
+    --namespaces booking-events,user-chat,chat-notifications
 }
 
 function ws_admin {
@@ -69,7 +69,7 @@ function ws_admin {
   node $BASE_DIR/open-api/bin/generate-ws-client.js \
     --spec $BASE_DIR/open-api/ws-contract.json \
     --output $BASE_DIR/admin_panel/lib/core/services/ws \
-    --namespaces partner-chat,chat-notifications
+    --namespaces booking-events,partner-chat,chat-notifications
 }
 
 function test_backdoor {

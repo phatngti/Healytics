@@ -93,6 +93,138 @@ abstract interface class WsNamespaceSocket {
   void dispose();
 }
 
+/// Typed Socket.IO client for the `/booking-events` namespace.
+///
+/// Booking lifecycle event gateway
+///
+/// **Auth:** JWT — roles: user, health_partner
+///
+/// Usage:
+/// ```dart
+/// final socket = BookingEventsSocket();
+/// socket.connect(
+///   server: (url: gateway, path: '/booking-events/socket.io/'),
+///   token: token,
+/// );
+/// socket.onBookingStatusChanged.listen((event) => print(event));
+/// ```
+class BookingEventsSocket implements WsNamespaceSocket {
+  static final _log = Logger('BookingEventsSocket');
+
+  io.Socket? _socket;
+
+  final _bookingStatusChangedController =
+      StreamController<BookingStatusChangeEvent>.broadcast();
+  final _connectionController =
+      StreamController<WsConnectionStatus>.broadcast();
+
+  /// A booking status changed and should update local UI state
+  Stream<BookingStatusChangeEvent> get onBookingStatusChanged =>
+      _bookingStatusChangedController.stream;
+
+  /// Stream of connection state changes.
+  @override
+  Stream<WsConnectionStatus> get onConnectionChange =>
+      _connectionController.stream;
+
+  /// Current connection status.
+  WsConnectionStatus _status = WsConnectionStatus.disconnected;
+  @override
+  WsConnectionStatus get status => _status;
+
+  /// Connect to the `/booking-events` WebSocket namespace.
+  ///
+  /// [server] provides the base URL and Socket.IO
+  /// transport path.
+  /// [token] is the JWT access token.
+  @override
+  void connect({
+    required WsServerConfig server,
+    required String token,
+  }) {
+    _silenceSocketIoLoggers();
+
+    if (_socket != null) {
+      _log.info('Already connected, disconnecting first');
+      disconnect();
+    }
+
+    _updateStatus(WsConnectionStatus.connecting);
+
+    _socket = io.io(
+      server.url,
+      io.OptionBuilder()
+          .setTransports(['websocket'])
+          .disableAutoConnect()
+          .setPath(server.path)
+          .setAuth({'token': token})
+          .build(),
+    );
+
+    _socket!.onConnect((_) {
+      _log.info('Connected to /booking-events');
+      _updateStatus(WsConnectionStatus.connected);
+    });
+
+    _socket!.onDisconnect((_) {
+      _log.info('Disconnected from /booking-events');
+      _updateStatus(WsConnectionStatus.disconnected);
+    });
+
+    _socket!.on('reconnecting', (_) {
+      _log.info('Reconnecting to /booking-events');
+      _updateStatus(WsConnectionStatus.reconnecting);
+    });
+
+    _socket!.onConnectError((err) {
+      _log.severe('Connection error: $err');
+      _updateStatus(WsConnectionStatus.error);
+    });
+
+    _socket!.onError((err) {
+      _log.severe('Socket error: $err');
+    });
+
+    // ── Server → Client event listeners ─────────────
+
+    _socket!.on(WsBookingEventsEvent.bookingStatusChanged, (data) {
+      try {
+        final map = _requireEventMap(data, 'booking-events.booking.status.changed');
+        _bookingStatusChangedController.add(BookingStatusChangeEvent.fromJson(map));
+      } catch (e, st) {
+        _log.severe('Error parsing booking.status.changed', e, st);
+      }
+    });
+
+    _socket!.connect();
+  }
+
+  // ── Client → Server emitters ──────────────────────
+
+  /// Disconnect from the WebSocket server.
+  @override
+  void disconnect() {
+    _socket?.disconnect();
+    _socket?.dispose();
+    _socket = null;
+    _updateStatus(WsConnectionStatus.disconnected);
+  }
+
+  /// Clean up all resources. Call when the service
+  /// is permanently disposed.
+  @override
+  void dispose() {
+    disconnect();
+    _bookingStatusChangedController.close();
+    _connectionController.close();
+  }
+
+  void _updateStatus(WsConnectionStatus newStatus) {
+    _status = newStatus;
+    _connectionController.add(newStatus);
+  }
+}
+
 /// Typed Socket.IO client for the `/user-chat` namespace.
 ///
 /// User (patient) WebSocket gateway

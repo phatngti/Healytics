@@ -52,6 +52,12 @@ void main() {
       // TODO
     });
 
+    // Avatar image URL
+    // Object avatarUrl
+    test('to test the property `avatarUrl`', () async {
+      // TODO
+    });
+
     // Whether the profile is completed
     // bool profileCompleted
     test('to test the property `profileCompleted`', () async {

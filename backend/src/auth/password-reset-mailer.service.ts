@@ -4,13 +4,12 @@ import { Injectable, Logger } from '@nestjs/common';
 export class PasswordResetMailerService {
   private readonly logger = new Logger(PasswordResetMailerService.name);
 
-  async sendPasswordResetEmail(email: string, token: string): Promise<void> {
-    const resetUrl = this.buildResetUrl(token);
+  async sendPasswordResetCode(email: string, code: string): Promise<void> {
     const apiKey = process.env.RESEND_API_KEY;
 
     if (!apiKey) {
       this.logger.warn(
-        `RESEND_API_KEY is not configured. Password reset link for ${email}: ${resetUrl}`,
+        `RESEND_API_KEY is not configured. Password reset code for ${email}: ${code}`,
       );
       return;
     }
@@ -27,17 +26,19 @@ export class PasswordResetMailerService {
           process.env.MAIL_FROM ||
           'Healytics <no-reply@healytics.vn>',
         to: [email],
-        subject: 'Reset your Healytics password',
+        subject: 'Your Healytics password reset code',
         text: [
           'We received a request to reset your Healytics password.',
           '',
-          `Open this link to reset your password: ${resetUrl}`,
+          `Your password reset code is: ${code}`,
           '',
+          'This code expires shortly.',
           'If you did not request this, you can ignore this email.',
         ].join('\n'),
         html: [
           '<p>We received a request to reset your Healytics password.</p>',
-          `<p><a href="${this.escapeHtml(resetUrl)}">Reset your password</a></p>`,
+          `<p>Your password reset code is:</p><p><strong style="font-size: 24px; letter-spacing: 4px;">${this.escapeHtml(code)}</strong></p>`,
+          '<p>This code expires shortly.</p>',
           '<p>If you did not request this, you can ignore this email.</p>',
         ].join(''),
       }),
@@ -49,21 +50,6 @@ export class PasswordResetMailerService {
         `Resend password reset email failed (${response.status}): ${body}`,
       );
     }
-  }
-
-  private buildResetUrl(token: string): string {
-    const configured =
-      process.env.PASSWORD_RESET_URL ||
-      process.env.APP_PASSWORD_RESET_URL ||
-      process.env.FRONTEND_RESET_PASSWORD_URL ||
-      'https://dev.healytics.me/reset-password';
-
-    if (configured.includes('{token}')) {
-      return configured.replace('{token}', encodeURIComponent(token));
-    }
-
-    const separator = configured.includes('?') ? '&' : '?';
-    return `${configured}${separator}token=${encodeURIComponent(token)}`;
   }
 
   private escapeHtml(value: string): string {

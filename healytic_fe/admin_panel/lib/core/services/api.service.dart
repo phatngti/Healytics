@@ -35,6 +35,10 @@ enum ServicePrefix {
   /// `/partner-chat`
   partnerChat('/partner-chat', isRest: false),
 
+  /// WebSocket booking status namespace:
+  /// `/booking-events`
+  bookingEvents('/booking-events', isRest: false),
+
   /// WebSocket global chat-notifications namespace:
   /// `/chat-notifications`
   chatNotifications('/chat-notifications', isRest: false);
@@ -68,6 +72,7 @@ class ApiService implements Authentication {
   late PartnerHealthServicesApi partnerHealthServicesApi;
   late PartnerChatApi partnerChatApi;
   late PartnerDashboardApi partnerDashboardApi;
+  late PartnerBookingsApi partnerBookingsApi;
 
   // ── Partner Finance ───────────────────────────────
   late AdminFinanceApi adminFinanceApi;
@@ -163,6 +168,7 @@ class ApiService implements Authentication {
     locationsApi = LocationsApi(backend);
     partnerChatApi = PartnerChatApi(backend);
     partnerDashboardApi = PartnerDashboardApi(backend);
+    partnerBookingsApi = PartnerBookingsApi(backend);
 
     // ── Admin Finance APIs ────────────────────────────
     adminFinanceApi = AdminFinanceApi(backend);

@@ -212,7 +212,16 @@ export class ClinicService {
   ): Promise<ClinicProductsResponseDto> {
     await this.ensureClinicExists(partnerId);
 
-    const { categoryId, sort = 'popular', search } = options;
+    const {
+      categoryId,
+      sort = 'popular',
+      search,
+      minPrice,
+      maxPrice,
+      minDuration,
+      maxDuration,
+      discountOnly,
+    } = options;
     const page = options.page ?? 1;
     const limit = Math.min(options.limit ?? 20, 50);
 
@@ -226,6 +235,31 @@ export class ClinicService {
     }
     if (categoryId) {
       qb = qb.andWhere('p.category_id = :categoryId', { categoryId });
+    }
+    if (minPrice != null) {
+      qb = qb.andWhere('COALESCE(p.sale_price, p.base_price) >= :minPrice', {
+        minPrice,
+      });
+    }
+    if (maxPrice != null) {
+      qb = qb.andWhere('COALESCE(p.sale_price, p.base_price) <= :maxPrice', {
+        maxPrice,
+      });
+    }
+    if (minDuration != null) {
+      qb = qb.andWhere('pd.duration_minutes >= :minDuration', {
+        minDuration,
+      });
+    }
+    if (maxDuration != null) {
+      qb = qb.andWhere('pd.duration_minutes <= :maxDuration', {
+        maxDuration,
+      });
+    }
+    if (discountOnly === true) {
+      qb = qb.andWhere(
+        'p.sale_price IS NOT NULL AND p.sale_price < p.base_price',
+      );
     }
 
     const totalCount = await qb.getCount();

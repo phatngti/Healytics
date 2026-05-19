@@ -11,7 +11,9 @@ export {
 export { MoMoIPNDto } from './momo-ipn.dto';
 export {
   CreateStripePaymentDto,
+  CreateStripeSetupIntentResponseDto,
+  ConfirmStripeSetupIntentDto,
+  SavedPaymentCardDto,
   StripePaymentResponseDto,
   StripeRefundResponseDto,
 } from './stripe-payment.dto';
-

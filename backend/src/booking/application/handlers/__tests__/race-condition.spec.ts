@@ -14,6 +14,7 @@ import { Employee } from '@/common/entities/employee.entity';
 import { Product } from '@/common/entities/product.entity';
 import { RedisService } from '@/redis/redis.service';
 import { WebhookService } from '../../../services/webhook.service';
+import { BookingStatusLogWriterService } from '../../../services/booking-status-log-writer.service';
 import { NotificationEventService } from '@/notification/services/notification-event.service';
 import { CheckoutTicketStatus } from '@/booking/enums/checkout-ticket-status.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
@@ -85,6 +86,7 @@ describe('Race Condition: ProcessCheckoutHandler — Redis lock contention', () 
         { provide: DataSource, useValue: mockDataSource },
         { provide: RedisService, useValue: redisService },
         { provide: WebhookService, useValue: webhookService },
+        BookingStatusLogWriterService,
         {
           provide: NotificationEventService,
           useValue: notificationEventService,
@@ -493,6 +495,7 @@ describe('Race Condition: Transaction rollback on failure', () => {
         { provide: DataSource, useValue: mockDataSource },
         { provide: RedisService, useValue: redisService },
         { provide: WebhookService, useValue: webhookService },
+        BookingStatusLogWriterService,
         {
           provide: NotificationEventService,
           useValue: notificationEventService,
@@ -644,6 +647,7 @@ describe('Race Condition: Message ACK behavior', () => {
         { provide: DataSource, useValue: mockDataSource },
         { provide: RedisService, useValue: redisService },
         { provide: WebhookService, useValue: webhookService },
+        BookingStatusLogWriterService,
         {
           provide: NotificationEventService,
           useValue: notificationEventService,

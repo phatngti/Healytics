@@ -39,6 +39,10 @@ enum ServicePrefix {
   /// WebSocket user-chat namespace: `/user-chat`
   userChat('/user-chat', isRest: false),
 
+  /// WebSocket booking status namespace:
+  /// `/booking-events`
+  bookingEvents('/booking-events', isRest: false),
+
   /// WebSocket partner-chat namespace:
   /// `/partner-chat`
   partnerChat('/partner-chat', isRest: false),
@@ -154,6 +158,9 @@ class ApiService implements Authentication {
   // ── Cart ────────────────────────────────────────
   late CartApi cartApi;
 
+  // ── Mapbox ──────────────────────────────────────
+  late MapboxApi mapboxApi;
+
   ApiService({AuthHttpClient? httpClient}) : _authHttpClient = httpClient {
     // Eagerly initialise so late fields are never
     // accessed before the endpoint is resolved.
@@ -235,6 +242,7 @@ class ApiService implements Authentication {
     userNotificationsApi = UserNotificationsApi(backend);
     userDevicesApi = UserDevicesApi(backend);
     userChatApi = UserChatApi(backend);
+    mapboxApi = MapboxApi(backend);
 
     // ── AI APIs ─────────────────────────────────────
     chatbotApi = ChatbotApi(ai);

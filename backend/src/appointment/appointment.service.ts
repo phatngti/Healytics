@@ -41,9 +41,12 @@ export class AppointmentService {
     return this.listAppointmentsHandler.execute(userId, query);
   }
 
-  async getAppointment(id: string): Promise<AppointmentResponseDto> {
-    this.logger.log(`getAppointment: ${id}`);
-    return this.getAppointmentHandler.execute(id);
+  async getAppointment(
+    userId: string,
+    id: string,
+  ): Promise<AppointmentResponseDto> {
+    this.logger.log(`getAppointment: user=${userId}, appointment=${id}`);
+    return this.getAppointmentHandler.execute(userId, id);
   }
 
   // ── Categories ───────────────────────────────────────────────

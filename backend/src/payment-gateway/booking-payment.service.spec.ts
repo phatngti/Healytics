@@ -3,9 +3,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { BookingPaymentService } from './booking-payment.service';
 import { Booking } from '@/common/entities/booking.entity';
-import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
 import { Product } from '@/common/entities/product.entity';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { BookingStatusLogWriterService } from '@/booking/services/booking-status-log-writer.service';
 import {
   MockRepository,
   createMockRepository,
@@ -14,13 +15,14 @@ import {
 describe('BookingPaymentService', () => {
   let service: BookingPaymentService;
   let bookingRepo: MockRepository<Booking>;
-  let statusLogRepo: MockRepository<BookingStatusLog>;
   let productRepo: MockRepository<Product>;
+  let logWriter: jest.Mocked<Pick<BookingStatusLogWriterService, 'write'>>;
 
   beforeEach(async () => {
     bookingRepo = createMockRepository<Booking>();
-    statusLogRepo = createMockRepository<BookingStatusLog>();
+    (bookingRepo as MockRepository<Booking> & { manager: unknown }).manager = {};
     productRepo = createMockRepository<Product>();
+    logWriter = { write: jest.fn().mockResolvedValue({}) };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -30,13 +32,10 @@ describe('BookingPaymentService', () => {
           useValue: bookingRepo,
         },
         {
-          provide: getRepositoryToken(BookingStatusLog),
-          useValue: statusLogRepo,
-        },
-        {
           provide: getRepositoryToken(Product),
           useValue: productRepo,
         },
+        { provide: BookingStatusLogWriterService, useValue: logWriter },
       ],
     }).compile();
 
@@ -175,18 +174,26 @@ describe('BookingPaymentService', () => {
         ...booking,
         status: BookingStatus.CONFIRMED,
       });
-      statusLogRepo.create.mockReturnValue({});
-      statusLogRepo.save.mockResolvedValue({});
-
       const result = await service.updateBookingStatus(
         'booking-1',
         BookingStatus.CONFIRMED,
         'system',
         'Payment confirmed',
+        BookingStatusReasonCode.PAYMENT_CONFIRMED_MOMO,
       );
 
       expect(result.status).toBe(BookingStatus.CONFIRMED);
-      expect(statusLogRepo.save).toHaveBeenCalled();
+      expect(logWriter.write).toHaveBeenCalledWith(
+        (bookingRepo as MockRepository<Booking> & { manager: unknown }).manager,
+        expect.objectContaining({
+          bookingId: 'booking-1',
+          fromStatus: BookingStatus.PENDING_PAYMENT,
+          toStatus: BookingStatus.CONFIRMED,
+          changedBy: 'system',
+          reason: 'Payment confirmed',
+          reasonCode: BookingStatusReasonCode.PAYMENT_CONFIRMED_MOMO,
+        }),
+      );
     });
 
     it('should return unchanged booking when status is already the same', async () => {
@@ -199,7 +206,7 @@ describe('BookingPaymentService', () => {
       );
 
       expect(result).toBe(booking);
-      expect(statusLogRepo.save).not.toHaveBeenCalled();
+      expect(logWriter.write).not.toHaveBeenCalled();
     });
   });
 });

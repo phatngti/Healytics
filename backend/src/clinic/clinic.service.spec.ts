@@ -239,9 +239,7 @@ describe('ClinicService', () => {
     employeeRepo.find.mockResolvedValue([]);
     certificationRepo.find.mockResolvedValue([]);
     jest.spyOn(service as any, 'buildRatingsMap').mockResolvedValue(new Map());
-    jest
-      .spyOn(service as any, 'countUniqueBookingUsers')
-      .mockResolvedValue(0);
+    jest.spyOn(service as any, 'countUniqueBookingUsers').mockResolvedValue(0);
 
     clinicFollowRepo.findOne.mockResolvedValueOnce(null);
 
@@ -266,9 +264,7 @@ describe('ClinicService', () => {
     employeeRepo.find.mockResolvedValue([]);
     certificationRepo.find.mockResolvedValue([]);
     jest.spyOn(service as any, 'buildRatingsMap').mockResolvedValue(new Map());
-    jest
-      .spyOn(service as any, 'countUniqueBookingUsers')
-      .mockResolvedValue(0);
+    jest.spyOn(service as any, 'countUniqueBookingUsers').mockResolvedValue(0);
 
     clinicFollowRepo.findOne.mockResolvedValueOnce({ id: 'follow-1' });
 
@@ -314,6 +310,11 @@ describe('ClinicService', () => {
       categoryId: 'cat-1',
       search: 'laser',
       sort: ClinicProductSortOption.PRICE_ASC,
+      minPrice: 500000,
+      maxPrice: 1000000,
+      minDuration: 45,
+      maxDuration: 90,
+      discountOnly: true,
       page: 2,
       limit: 1,
     });
@@ -350,6 +351,25 @@ describe('ClinicService', () => {
     expect(productsQb.andWhere).toHaveBeenCalledWith(
       'p.category_id = :categoryId',
       { categoryId: 'cat-1' },
+    );
+    expect(productsQb.andWhere).toHaveBeenCalledWith(
+      'COALESCE(p.sale_price, p.base_price) >= :minPrice',
+      { minPrice: 500000 },
+    );
+    expect(productsQb.andWhere).toHaveBeenCalledWith(
+      'COALESCE(p.sale_price, p.base_price) <= :maxPrice',
+      { maxPrice: 1000000 },
+    );
+    expect(productsQb.andWhere).toHaveBeenCalledWith(
+      'pd.duration_minutes >= :minDuration',
+      { minDuration: 45 },
+    );
+    expect(productsQb.andWhere).toHaveBeenCalledWith(
+      'pd.duration_minutes <= :maxDuration',
+      { maxDuration: 90 },
+    );
+    expect(productsQb.andWhere).toHaveBeenCalledWith(
+      'p.sale_price IS NOT NULL AND p.sale_price < p.base_price',
     );
     expect(productsQb.addSelect).toHaveBeenCalledWith(
       'COALESCE(p.sale_price, p.base_price)',

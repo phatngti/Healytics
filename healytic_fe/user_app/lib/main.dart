@@ -8,6 +8,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
 import 'package:timezone/data/latest_all.dart';
+import 'package:user_app/core/entities/store.entity.dart';
+import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/providers/error_observer.dart';
 import 'package:user_app/features/app/app.dart';
 import 'package:user_app/hooks/bootstrap.dart';
@@ -18,12 +20,7 @@ void main() async {
   await Bootstrap.initDomain(db);
   await initApp();
 
-  runApp(
-    ProviderScope(
-      observers: [ErrorObserver()],
-      child: const App(),
-    ),
-  );
+  runApp(ProviderScope(observers: [ErrorObserver()], child: const App()));
 }
 
 Future<void> initApp() async {
@@ -32,8 +29,11 @@ Future<void> initApp() async {
 
   // ── Stripe SDK initialisation ──────────────────
   const stripePk = String.fromEnvironment('STRIPE_PK');
-  if (stripePk.isNotEmpty) {
-    Stripe.publishableKey = stripePk;
+  final configuredStripePk = stripePk.isNotEmpty
+      ? stripePk
+      : Store.tryGet(StoreKey.stripePublishableKey) ?? '';
+  if (configuredStripePk.isNotEmpty) {
+    Stripe.publishableKey = configuredStripePk;
     await Stripe.instance.applySettings();
   }
 

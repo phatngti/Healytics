@@ -141,10 +141,7 @@ class _ProductOrganizationCardState
           },
           items: categories
               .map(
-                (cat) => DropdownMenuItem(
-                  value: cat.id,
-                  child: Text(cat.name),
-                ),
+                (cat) => DropdownMenuItem(value: cat.id, child: Text(cat.name)),
               )
               .toList(),
           onChanged: (val) {
@@ -184,24 +181,22 @@ class _ProductOrganizationCardState
             ),
             FormFieldBuilders.buildChipSelectorField(
               context,
-              label: 'Tags',
+              label: 'Tags (optional)',
               emptyPlaceholder: 'Select tags...',
-              chips: _selectedTagIds
-                  .map((id) {
-                    final name = tagNameById[id] ?? id;
-                    return Chip(
-                      label: Text(name),
-                      deleteIcon: const Icon(Icons.close, size: 14),
-                      onDeleted: () {
-                        final updated = List<String>.from(_selectedTagIds)
-                          ..remove(id);
-                        setState(() => _selectedTagIds = updated);
-                        _syncFormField(updated);
-                        widget.onTagsChanged?.call(updated);
-                      },
-                    );
-                  })
-                  .toList(),
+              chips: _selectedTagIds.map((id) {
+                final name = tagNameById[id] ?? id;
+                return Chip(
+                  label: Text(name),
+                  deleteIcon: const Icon(Icons.close, size: 14),
+                  onDeleted: () {
+                    final updated = List<String>.from(_selectedTagIds)
+                      ..remove(id);
+                    setState(() => _selectedTagIds = updated);
+                    _syncFormField(updated);
+                    widget.onTagsChanged?.call(updated);
+                  },
+                );
+              }).toList(),
               onTap: () => _showTagSelectionDialog(context, allTags),
             ),
           ],

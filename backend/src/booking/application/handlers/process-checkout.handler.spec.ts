@@ -3,11 +3,14 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { ProcessCheckoutHandler } from './process-checkout.handler';
 import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
+import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
 import { RedisService } from '@/redis/redis.service';
 import { WebhookService } from '../../services/webhook.service';
+import { BookingStatusLogWriterService } from '../../services/booking-status-log-writer.service';
 import { NotificationEventService } from '@/notification/services/notification-event.service';
 import { CheckoutTicketStatus } from '@/booking/enums/checkout-ticket-status.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 import {
   MockRepository,
   MockQueryRunner,
@@ -62,6 +65,7 @@ describe('ProcessCheckoutHandler', () => {
         { provide: DataSource, useValue: mockDataSource },
         { provide: RedisService, useValue: redisService },
         { provide: WebhookService, useValue: webhookService },
+        BookingStatusLogWriterService,
         { provide: NotificationEventService, useValue: notificationEventService },
       ],
     }).compile();
@@ -127,6 +131,62 @@ describe('ProcessCheckoutHandler', () => {
 
       // 5. Message was ACK'd
       expect(context.getChannelRef().ack).toHaveBeenCalled();
+    });
+
+    it('should create a confirmed booking with no payment expiry for pay later', async () => {
+      // Arrange
+      const context = createMockContext();
+      redisService.acquireLock.mockResolvedValue('lock-token');
+      queryRunner.manager.findOne.mockResolvedValue({ durationMinutes: 60 });
+
+      const savedBooking = {
+        id: 'booking-pay-later',
+        paymentUrl: null,
+      };
+      queryRunner.manager.create.mockReturnValue({});
+      queryRunner.manager.save
+        .mockResolvedValueOnce(savedBooking)
+        .mockResolvedValueOnce({});
+
+      // Act
+      await handler.handle({ ...baseMessage, payLater: true }, context as any);
+
+      // Assert
+      expect(queryRunner.manager.create).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.objectContaining({
+          status: BookingStatus.CONFIRMED,
+          paymentUrl: null,
+          paymentExpiresAt: null,
+        }),
+      );
+      expect(queryRunner.manager.create).toHaveBeenCalledWith(
+        BookingStatusLog,
+        expect.objectContaining({
+          bookingId: 'booking-pay-later',
+          fromStatus: null,
+          toStatus: BookingStatus.CONFIRMED,
+          changedBy: 'system',
+          reasonCode: BookingStatusReasonCode.CHECKOUT_CREATED_CONFIRMED,
+        }),
+      );
+      expect(webhookService.notify).toHaveBeenCalledWith(
+        'https://hook.example.com',
+        expect.objectContaining({
+          ticket_id: 'ticket-1',
+          status: 'SUCCESS',
+          data: expect.objectContaining({
+            booking_id: 'booking-pay-later',
+            payment_url: '',
+            expires_at: '',
+          }),
+        }),
+      );
+      expect(notificationEventService.emit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.stringContaining('Payment is due at the clinic.'),
+        }),
+      );
     });
   });
 

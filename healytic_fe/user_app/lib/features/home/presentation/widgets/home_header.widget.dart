@@ -4,6 +4,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/images/avatar.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
+import 'package:user_app/core/providers/location.provider.dart';
 import 'package:user_app/features/cart/presentation/providers/cart.provider.dart';
 import 'package:user_app/router/routes.dart';
 
@@ -11,15 +12,12 @@ class HomeHeader extends ConsumerWidget {
   final String userName;
   final String? avatarUrl;
 
-  const HomeHeader({
-    super.key,
-    required this.userName,
-    this.avatarUrl,
-  });
+  const HomeHeader({super.key, required this.userName, this.avatarUrl});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cartCount = ref.watch(cartBadgeCountProvider);
+    final locationAsync = ref.watch(currentLocationAddressProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -76,6 +74,7 @@ class HomeHeader extends ConsumerWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      _LocationAddress(locationAsync: locationAsync),
                     ],
                   ),
                 ),
@@ -151,6 +150,72 @@ class _HeaderIconButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _LocationAddress extends StatelessWidget {
+  final AsyncValue<String?> locationAsync;
+
+  const _LocationAddress({required this.locationAsync});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return locationAsync.when(
+      data: (address) {
+        if (address == null || address.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return Padding(
+          padding: EdgeInsets.only(top: AppDimens.spaceXxs),
+          child: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  address + ' ',
+                  style: textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Icon(
+                Icons.location_on_outlined,
+                size: AppDimens.iconSm,
+                color: colorScheme.primary,
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => Padding(
+        padding: EdgeInsets.only(top: AppDimens.spaceXxs),
+        child: Row(
+          children: [
+            Icon(
+              Icons.location_on_outlined,
+              size: AppDimens.iconSm,
+              color: colorScheme.outline,
+            ),
+            SizedBox(width: AppDimens.spaceXxs),
+            SizedBox(
+              width: 80,
+              height: 10,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: AppDimens.radiusMd,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

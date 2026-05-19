@@ -10,6 +10,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**authControllerCheckEmail**](AuthenticationApi.md#authcontrollercheckemail) | **POST** /auth/check-email | Check if email is already registered
+[**authControllerForgotUserPassword**](AuthenticationApi.md#authcontrollerforgotuserpassword) | **POST** /auth/user/forgot-password | Request a user password reset code
 [**authControllerLoginAdmin**](AuthenticationApi.md#authcontrollerloginadmin) | **POST** /auth/admin/login | Login as admin
 [**authControllerLoginEmployee**](AuthenticationApi.md#authcontrollerloginemployee) | **POST** /auth/employee/login | Login as an employee
 [**authControllerLoginPartner**](AuthenticationApi.md#authcontrollerloginpartner) | **POST** /auth/partner/login | Login as a partner
@@ -20,6 +21,8 @@ Method | HTTP request | Description
 [**authControllerRefreshPartner**](AuthenticationApi.md#authcontrollerrefreshpartner) | **POST** /auth/partner/refresh | Refresh partner tokens with verification info
 [**authControllerRegisterPartner**](AuthenticationApi.md#authcontrollerregisterpartner) | **POST** /auth/partner/register | Register a new business partner
 [**authControllerRegisterUser**](AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | Register a new user
+[**authControllerResetUserPassword**](AuthenticationApi.md#authcontrollerresetuserpassword) | **POST** /auth/user/reset-password | Reset a user password with validated reset token
+[**authControllerValidateUserPasswordResetCode**](AuthenticationApi.md#authcontrollervalidateuserpasswordresetcode) | **POST** /auth/user/validate-reset-code | Validate a user password reset code
 
 
 # **authControllerCheckEmail**
@@ -53,6 +56,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**CheckEmailResponseDto**](CheckEmailResponseDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerForgotUserPassword**
+> PasswordResetResponseDto authControllerForgotUserPassword(forgotPasswordDto)
+
+Request a user password reset code
+
+Returns a generic success response to avoid exposing whether an email is registered.
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+final forgotPasswordDto = ForgotPasswordDto(); // ForgotPasswordDto | 
+
+try {
+    final result = api_instance.authControllerForgotUserPassword(forgotPasswordDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerForgotUserPassword: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **forgotPasswordDto** | [**ForgotPasswordDto**](ForgotPasswordDto.md)|  | 
+
+### Return type
+
+[**PasswordResetResponseDto**](PasswordResetResponseDto.md)
 
 ### Authorization
 
@@ -461,6 +507,88 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**AuthTokensDto**](AuthTokensDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerResetUserPassword**
+> PasswordResetResponseDto authControllerResetUserPassword(resetPasswordDto)
+
+Reset a user password with validated reset token
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+final resetPasswordDto = ResetPasswordDto(); // ResetPasswordDto | 
+
+try {
+    final result = api_instance.authControllerResetUserPassword(resetPasswordDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerResetUserPassword: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **resetPasswordDto** | [**ResetPasswordDto**](ResetPasswordDto.md)|  | 
+
+### Return type
+
+[**PasswordResetResponseDto**](PasswordResetResponseDto.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerValidateUserPasswordResetCode**
+> ValidatePasswordResetCodeResponseDto authControllerValidateUserPasswordResetCode(validatePasswordResetCodeDto)
+
+Validate a user password reset code
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+
+final api_instance = AuthenticationApi();
+final validatePasswordResetCodeDto = ValidatePasswordResetCodeDto(); // ValidatePasswordResetCodeDto | 
+
+try {
+    final result = api_instance.authControllerValidateUserPasswordResetCode(validatePasswordResetCodeDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling AuthenticationApi->authControllerValidateUserPasswordResetCode: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **validatePasswordResetCodeDto** | [**ValidatePasswordResetCodeDto**](ValidatePasswordResetCodeDto.md)|  | 
+
+### Return type
+
+[**ValidatePasswordResetCodeResponseDto**](ValidatePasswordResetCodeResponseDto.md)
 
 ### Authorization
 

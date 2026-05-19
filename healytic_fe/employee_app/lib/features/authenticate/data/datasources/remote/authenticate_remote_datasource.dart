@@ -8,7 +8,7 @@ import '../../../../../core/config/app_environment.dart';
 import '../../../../../core/providers/api.provider.dart';
 import '../../../../../core/services/api.service.dart';
 import '../../../domain/entities/authenticate.entity.dart';
-import 'package:user_openapi/api.dart';
+import 'package:employee_openapi/api.dart';
 
 part 'authenticate_remote_datasource.g.dart';
 
@@ -33,9 +33,10 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
     required String email,
     required String password,
   }) async {
-    final response = await apiService.authenticateApi.authControllerLoginAdmin(
-      AdminLoginDto(email: email, password: password),
-    );
+    final response = await apiService.authenticateApi
+        .authControllerLoginEmployee(
+          EmployeeLoginDto(email: email, password: password),
+        );
 
     if (response == null) {
       throw ApiException(HttpStatus.notFound, 'Login response is null');

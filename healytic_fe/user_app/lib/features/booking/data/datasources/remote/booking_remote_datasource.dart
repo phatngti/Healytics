@@ -378,6 +378,8 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
     final priceJ =
         j['priceBreakdown'] as Map<String, dynamic>? ?? <String, dynamic>{};
     final schedJ = j['bookingSchedule'] as Map<String, dynamic>?;
+    final mapUrl = _stringFrom(locJ['mapUrl']);
+    final coordinates = _parseLocationCoordinates(locJ, mapUrl);
 
     return EligibilityDetailEntity(
       isCompletedStep: j['isCompletedStep'] as bool? ?? false,
@@ -407,7 +409,9 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
       location: EligibilityLocation(
         name: locJ['name']?.toString() ?? '',
         address: locJ['address']?.toString() ?? '',
-        mapUrl: locJ['mapUrl']?.toString(),
+        mapUrl: mapUrl,
+        latitude: coordinates.$1,
+        longitude: coordinates.$2,
       ),
       priceBreakdown: EligibilityPriceBreakdown(
         subTotal: (priceJ['subTotal'] as num?) ?? 0,
@@ -416,6 +420,67 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
         currency: priceJ['currency']?.toString() ?? 'VND',
       ),
     );
+  }
+
+  String? _stringFrom(Object? value) {
+    if (value is String) {
+      final trimmed = value.trim();
+      return trimmed.isEmpty ? null : trimmed;
+    }
+    return null;
+  }
+
+  (double?, double?) _parseLocationCoordinates(
+    Map<String, dynamic> location,
+    String? mapUrl,
+  ) {
+    final latitude = _parseDouble(location['latitude'] ?? location['lat']);
+    final longitude = _parseDouble(location['longitude'] ?? location['lng']);
+
+    if (latitude != null && longitude != null) {
+      return (latitude, longitude);
+    }
+
+    final rawMapUrl = location['mapUrl'];
+    if (rawMapUrl is Map<String, dynamic>) {
+      final mapLatitude = _parseDouble(
+        rawMapUrl['latitude'] ?? rawMapUrl['lat'],
+      );
+      final mapLongitude = _parseDouble(
+        rawMapUrl['longitude'] ?? rawMapUrl['lng'],
+      );
+      if (mapLatitude != null && mapLongitude != null) {
+        return (mapLatitude, mapLongitude);
+      }
+    }
+
+    return _parseCoordinatesFromUrl(mapUrl);
+  }
+
+  (double?, double?) _parseCoordinatesFromUrl(String? mapUrl) {
+    if (mapUrl == null) return (null, null);
+
+    final atMatch = RegExp(
+      r'@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)',
+    ).firstMatch(mapUrl);
+    if (atMatch != null) {
+      return (_parseDouble(atMatch.group(1)), _parseDouble(atMatch.group(2)));
+    }
+
+    final queryMatch = RegExp(
+      r'(?:[?&](?:q|query|ll)=)(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)',
+    ).firstMatch(mapUrl);
+
+    return (
+      _parseDouble(queryMatch?.group(1)),
+      _parseDouble(queryMatch?.group(2)),
+    );
+  }
+
+  double? _parseDouble(Object? value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value.trim());
+    return null;
   }
 }
 

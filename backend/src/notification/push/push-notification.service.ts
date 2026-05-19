@@ -80,15 +80,32 @@ export class PushNotificationService {
    * Send a push notification to all active devices for a given user.
    */
   async sendToUser(userId: string, payload: PushPayload): Promise<void> {
-    const tokens = await this.deviceTokenRepo.find({
+    const rows = await this.deviceTokenRepo.find({
       where: { userId, isActive: true },
     });
 
-    if (tokens.length === 0) {
+    if (rows.length === 0) {
       this.logger.debug(
         `No active device tokens for userId=${userId} — skipping push`,
       );
       return;
+    }
+
+    // Deduplicate by token value — the DB guarantees UQ_DEVICE_TOKEN, but
+    // seed data or race conditions can produce multiple rows with the same
+    // token string (different platform columns). Without deduplication every
+    // duplicate row results in a separate push to the same physical device.
+    const seen = new Set<string>();
+    const tokens = rows.filter((t) => {
+      if (seen.has(t.token)) return false;
+      seen.add(t.token);
+      return true;
+    });
+
+    if (tokens.length < rows.length) {
+      this.logger.warn(
+        `Deduplicated ${rows.length - tokens.length} duplicate token(s) for userId=${userId} before push`,
+      );
     }
 
     this.logger.log(
