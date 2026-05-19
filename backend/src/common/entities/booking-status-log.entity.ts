@@ -8,8 +8,13 @@ import {
   Index,
 } from 'typeorm';
 import { Booking } from './booking.entity';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 
 @Entity('booking_status_logs')
+@Index('IDX_BOOKING_STATUS_LOGS_REASON_CODE_CREATED', [
+  'reasonCode',
+  'createdAt',
+])
 export class BookingStatusLog {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -29,6 +34,9 @@ export class BookingStatusLog {
 
   @Column({ type: 'text', nullable: true })
   reason: string | null;
+
+  @Column({ name: 'reason_code', type: 'varchar', length: 80, nullable: true })
+  reasonCode: BookingStatusReasonCode | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

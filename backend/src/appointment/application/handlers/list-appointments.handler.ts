@@ -22,6 +22,8 @@ export class ListAppointmentsHandler {
         return [BookingStatus.PENDING_PAYMENT];
       case AppointmentStatus.UPCOMING:
         return [BookingStatus.CONFIRMED];
+      case AppointmentStatus.PROCESSING:
+        return [BookingStatus.IN_PROGRESS];
       case AppointmentStatus.COMPLETED:
         return [BookingStatus.COMPLETED];
       case AppointmentStatus.CANCELED:
@@ -60,6 +62,21 @@ export class ListAppointmentsHandler {
       qb.andWhere('booking.status IN (:...bookingStatuses)', {
         bookingStatuses,
       });
+
+      if (
+        query.status === AppointmentStatus.PENDING_PAYMENT ||
+        query.status === AppointmentStatus.UPCOMING
+      ) {
+        const now = new Date();
+        qb.andWhere('booking.start_time >= :now', { now });
+
+        if (query.status === AppointmentStatus.PENDING_PAYMENT) {
+          qb.andWhere(
+            '(booking.payment_expires_at IS NULL OR booking.payment_expires_at >= :now)',
+            { now },
+          );
+        }
+      }
     }
 
     // ── Filter by category ──────────────────────────────────────

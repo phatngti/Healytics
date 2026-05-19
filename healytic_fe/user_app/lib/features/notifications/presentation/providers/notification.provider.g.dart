@@ -115,7 +115,7 @@ final class NotificationNotifierProvider
 }
 
 String _$notificationNotifierHash() =>
-    r'2e4c99149c5ba7bbba77acf8e388ae0c59e74587';
+    r'c74e67a8ad02099891728dae04c2411450f81fb6';
 
 /// Stateful async notifier managing the paginated
 /// notification list.

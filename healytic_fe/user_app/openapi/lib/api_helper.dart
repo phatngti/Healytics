@@ -103,6 +103,9 @@ String parameterToString(dynamic value) {
   if (value is BookingStatus) {
     return BookingStatusTypeTransformer().encode(value).toString();
   }
+  if (value is BookingStatusUpdate) {
+    return BookingStatusUpdateTypeTransformer().encode(value).toString();
+  }
   if (value is BusinessType) {
     return BusinessTypeTypeTransformer().encode(value).toString();
   }
@@ -136,6 +139,9 @@ String parameterToString(dynamic value) {
   if (value is HealthServiceType) {
     return HealthServiceTypeTypeTransformer().encode(value).toString();
   }
+  if (value is PartnerBookingStatus) {
+    return PartnerBookingStatusTypeTransformer().encode(value).toString();
+  }
   if (value is PartnerCommerceSourceType) {
     return PartnerCommerceSourceTypeTypeTransformer().encode(value).toString();
   }
@@ -165,6 +171,9 @@ String parameterToString(dynamic value) {
   }
   if (value is PartnerVerificationStatus) {
     return PartnerVerificationStatusTypeTransformer().encode(value).toString();
+  }
+  if (value is PublicBookingStatus) {
+    return PublicBookingStatusTypeTransformer().encode(value).toString();
   }
   return value.toString();
 }

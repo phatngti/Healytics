@@ -5,7 +5,10 @@ import { AppointmentStatus } from '../enums/appointment-status.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 
 export class AppointmentResponseDto {
-  @ApiProperty({ type: String, example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiProperty({
+    type: String,
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   @Expose()
   id: string;
 
@@ -21,7 +24,11 @@ export class AppointmentResponseDto {
   @Expose()
   imageUrl: string;
 
-  @ApiProperty({ enum: AppointmentStatus, enumName: 'AppointmentStatus', example: AppointmentStatus.UPCOMING })
+  @ApiProperty({
+    enum: AppointmentStatus,
+    enumName: 'AppointmentStatus',
+    example: AppointmentStatus.UPCOMING,
+  })
   @Expose()
   status: AppointmentStatus;
 
@@ -33,7 +40,10 @@ export class AppointmentResponseDto {
   @Expose()
   specialistName: string;
 
-  @ApiProperty({ type: String, example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiProperty({
+    type: String,
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   @Expose()
   specialistId: string;
 
@@ -133,6 +143,8 @@ export class AppointmentResponseDto {
         return AppointmentStatus.PENDING_PAYMENT;
       case BookingStatus.CONFIRMED:
         return AppointmentStatus.UPCOMING;
+      case BookingStatus.IN_PROGRESS:
+        return AppointmentStatus.PROCESSING;
       case BookingStatus.COMPLETED:
         return AppointmentStatus.COMPLETED;
       case BookingStatus.CANCELLED:

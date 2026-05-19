@@ -13,13 +13,15 @@ export class GetBookingHandler {
     private readonly bookingRepo: Repository<Booking>,
   ) {}
 
-  async execute(id: string): Promise<BookingResponseDto> {
+  async execute(userId: string, id: string): Promise<BookingResponseDto> {
     const booking = await this.bookingRepo.findOne({
-      where: { id },
+      where: { id, userId },
     });
 
     if (!booking) {
-      this.logger.warn(`Booking not found: ${id}`);
+      this.logger.warn(
+        `Booking not found or forbidden: user=${userId}, booking=${id}`,
+      );
       throw new NotFoundException(`Booking with ID ${id} not found`);
     }
 

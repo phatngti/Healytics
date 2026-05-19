@@ -27,12 +27,18 @@ class EmployeeLoginForm extends HookConsumerWidget {
     final isPasswordVisible = useState(false);
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
-    useListenable(emailController);
-    useListenable(passwordController);
 
-    final hasValidInput =
-        FormValidators.email(emailController.text.trim()) == null &&
-        FormValidators.password(passwordController.text) == null;
+    // Track input validity without useListenable to avoid
+    // full rebuilds that destroy and recreate text fields,
+    // which causes the keyboard show/cancel loop.
+    final hasValidInput = useState(false);
+
+    void revalidateInputs() {
+      final emailOk = FormValidators.email(emailController.text.trim()) == null;
+      final passwordOk =
+          FormValidators.password(passwordController.text) == null;
+      hasValidInput.value = emailOk && passwordOk;
+    }
 
     ref.listen(authenticateProvider, (prev, next) {
       _log.fine('Auth state: $next');
@@ -75,7 +81,8 @@ class EmployeeLoginForm extends HookConsumerWidget {
             .read(authenticateProvider.notifier)
             .login(email: email, password: password);
       } catch (_) {
-        // The provider owns the error state; the listener above shows feedback.
+        // The provider owns the error state;
+        // the listener above shows feedback.
       }
     }
 
@@ -91,10 +98,12 @@ class EmployeeLoginForm extends HookConsumerWidget {
               fieldKey: 'email',
               label: 'Email',
               controller: emailController,
-              suffixIcon: Icon(Icons.email),
+              suffixIcon: const Icon(Icons.email),
               uppercaseLabel: false,
               widgetKey: keys.signInPage.emailTextField,
               validator: FormValidators.email,
+              keyboardType: TextInputType.emailAddress,
+              onChanged: (_) => revalidateInputs(),
             ),
             AppDimens.verticalSmall,
             FormFieldBuilders.buildTextField(
@@ -110,10 +119,11 @@ class EmployeeLoginForm extends HookConsumerWidget {
                   isPasswordVisible.value = !isPasswordVisible.value;
                 },
                 icon: isPasswordVisible.value
-                    ? Icon(Icons.visibility_off)
-                    : Icon(Icons.visibility),
+                    ? const Icon(Icons.visibility_off)
+                    : const Icon(Icons.visibility),
               ),
               validator: FormValidators.password,
+              onChanged: (_) => revalidateInputs(),
             ),
             AppDimens.verticalExtraLarge,
             SizedBox(
@@ -122,14 +132,14 @@ class EmployeeLoginForm extends HookConsumerWidget {
                 widthFactor: 0.8,
                 child: AppButton(
                   key: keys.signInPage.signInButton,
-                  onPressed: (isLoading.value || !hasValidInput)
+                  onPressed: (isLoading.value || !hasValidInput.value)
                       ? null
                       : signIn,
                   buttonType: ButtonType.elevated,
                   customStyle: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    minimumSize: Size(double.infinity, 50),
+                    minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: AppDimens.radiusSmall,
                     ),
@@ -137,7 +147,7 @@ class EmployeeLoginForm extends HookConsumerWidget {
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   isLoading: isLoading.value,
-                  child: Text('Sign In'),
+                  child: const Text('Sign In'),
                 ),
               ),
             ),

@@ -951,7 +951,7 @@ export class PartnerFinanceSeeder implements ISeeder {
     const accounts = accountIds.length
       ? await this.accountRepo.find({
           where: { id: In(accountIds) },
-          select: ['id'],
+          select: ['id', 'email'],
         })
       : [];
     const accountIdSet = new Set(accounts.map((account) => account.id));

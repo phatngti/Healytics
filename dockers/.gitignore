@@ -4,3 +4,7 @@ deploy.env
 deploy-panel.env
 jenkins-agent.env
 jenkins_home/
+.env*
+.env.prod
+backend.env.prod
+deploy.env.prod

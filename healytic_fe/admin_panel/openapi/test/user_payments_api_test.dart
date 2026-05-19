@@ -17,6 +17,13 @@ void main() {
   // final instance = UserPaymentsApi();
 
   group('tests for UserPaymentsApi', () {
+    // Confirm and persist a saved Stripe card
+    //
+    //Future<SavedPaymentCardDto> userPaymentControllerConfirmStripeSetupIntent(String setupIntentId, ConfirmStripeSetupIntentDto confirmStripeSetupIntentDto) async
+    test('test userPaymentControllerConfirmStripeSetupIntent', () async {
+      // TODO
+    });
+
     // Create MoMo payment for booking
     //
     //Future<Object> userPaymentControllerCreateMoMoPayment(String bookingId, CreateMoMoPaymentDto createMoMoPaymentDto) async
@@ -26,8 +33,29 @@ void main() {
 
     // Create Stripe payment for booking (card)
     //
-    //Future<StripePaymentResponseDto> userPaymentControllerCreateStripePayment(String bookingId, Object body) async
+    //Future<StripePaymentResponseDto> userPaymentControllerCreateStripePayment(String bookingId, CreateStripePaymentDto createStripePaymentDto) async
     test('test userPaymentControllerCreateStripePayment', () async {
+      // TODO
+    });
+
+    // Create Stripe SetupIntent for adding a card
+    //
+    //Future<CreateStripeSetupIntentResponseDto> userPaymentControllerCreateStripeSetupIntent() async
+    test('test userPaymentControllerCreateStripeSetupIntent', () async {
+      // TODO
+    });
+
+    // Delete a saved payment card
+    //
+    //Future<List<SavedPaymentCardDto>> userPaymentControllerDeleteCard(String cardId) async
+    test('test userPaymentControllerDeleteCard', () async {
+      // TODO
+    });
+
+    // List saved payment cards
+    //
+    //Future<List<SavedPaymentCardDto>> userPaymentControllerListCards() async
+    test('test userPaymentControllerListCards', () async {
       // TODO
     });
 
@@ -42,6 +70,13 @@ void main() {
     //
     //Future<StripeRefundResponseDto> userPaymentControllerRefundStripePayment(String bookingId) async
     test('test userPaymentControllerRefundStripePayment', () async {
+      // TODO
+    });
+
+    // Set a saved card as the default card
+    //
+    //Future<SavedPaymentCardDto> userPaymentControllerSetDefaultCard(String cardId) async
+    test('test userPaymentControllerSetDefaultCard', () async {
       // TODO
     });
 

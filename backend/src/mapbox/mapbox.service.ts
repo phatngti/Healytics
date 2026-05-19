@@ -1,6 +1,7 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
+import { isAxiosError } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import {
   GeocodeResultDto,
@@ -11,10 +12,12 @@ import {
   DistanceMatrixRowDto,
   DistanceMatrixElementDto,
 } from './dto/distance-matrix-response.dto';
+import { DirectionsResponseDto } from './dto/directions-response.dto';
 
 const GEOCODING_BASE = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
 const MATRIX_BASE =
   'https://api.mapbox.com/directions-matrix/v1/mapbox/driving';
+const DIRECTIONS_BASE = 'https://api.mapbox.com/directions/v5/mapbox/driving';
 
 @Injectable()
 export class MapboxService {
@@ -180,6 +183,68 @@ export class MapboxService {
     return { originAddresses, destinationAddresses, rows };
   }
 
+  // ── Directions ──────────────────────────────────────────
+
+  /**
+   * Get a single driving route between two lat/lng coordinates.
+   * Uses Mapbox Directions API with GeoJSON geometry.
+   */
+  async directions(
+    origin: string,
+    destination: string,
+  ): Promise<DirectionsResponseDto> {
+    this.logger.log(`Directions: ${origin} → ${destination}`);
+
+    const [originCoord] = this.parseCoordinates(origin);
+    const [destinationCoord] = this.parseCoordinates(destination);
+    this.assertValidCoordinate(originCoord, 'origin');
+    this.assertValidCoordinate(destinationCoord, 'destination');
+
+    const coordString = `${originCoord.lng},${originCoord.lat};${destinationCoord.lng},${destinationCoord.lat}`;
+    const url = `${DIRECTIONS_BASE}/${coordString}`;
+
+    let data: any;
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(url, {
+          params: {
+            access_token: this.accessToken,
+            alternatives: false,
+            geometries: 'geojson',
+            overview: 'full',
+            steps: false,
+          },
+        }),
+      );
+      data = response.data;
+    } catch (error) {
+      this.handleMapboxHttpError('Directions', error);
+    }
+
+    if (data.code !== 'Ok') {
+      this.logger.error(
+        `Directions failed: ${data.code} — ${data.message || ''}`,
+      );
+      throw new BadRequestException(`Directions failed: ${data.code}`);
+    }
+
+    const route = data.routes?.[0];
+    if (!route?.geometry?.coordinates?.length) {
+      throw new BadRequestException('Directions failed: no route found');
+    }
+
+    return {
+      route: route.geometry.coordinates.map((coord: number[]) => ({
+        latitude: coord[1],
+        longitude: coord[0],
+      })),
+      distanceText: this.formatDistance(route.distance),
+      distanceValue: Math.round(route.distance),
+      durationText: this.formatDuration(route.duration),
+      durationValue: Math.round(route.duration),
+    };
+  }
+
   // ── Client Key ───────────────────────────────────────────
 
   /**
@@ -199,6 +264,44 @@ export class MapboxService {
       const [lat, lng] = pair.split(',').map(Number);
       return { lat, lng };
     });
+  }
+
+  private assertValidCoordinate(
+    coord: { lat: number; lng: number } | undefined,
+    label: string,
+  ) {
+    if (
+      !coord ||
+      !Number.isFinite(coord.lat) ||
+      !Number.isFinite(coord.lng) ||
+      coord.lat < -90 ||
+      coord.lat > 90 ||
+      coord.lng < -180 ||
+      coord.lng > 180
+    ) {
+      throw new BadRequestException(`Invalid ${label} coordinate`);
+    }
+  }
+
+  private handleMapboxHttpError(operation: string, error: unknown): never {
+    if (!isAxiosError(error)) {
+      throw error;
+    }
+
+    const responseData = error.response?.data as
+      | { code?: string; message?: string }
+      | undefined;
+    const code = responseData?.code;
+    const status = error.response?.status;
+    const message =
+      code === 'NoRoute'
+        ? 'No driving route is available between these coordinates.'
+        : responseData?.message || error.message;
+
+    this.logger.error(
+      `${operation} failed: ${status ?? 'network'} ${code ?? ''} — ${message}`,
+    );
+    throw new BadRequestException(`${operation} failed: ${message}`);
   }
 
   /**

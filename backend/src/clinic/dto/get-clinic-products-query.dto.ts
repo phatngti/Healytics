@@ -1,14 +1,16 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsOptional,
   IsString,
   IsInt,
   IsEnum,
+  IsNumber,
   IsUUID,
   Min,
   Max,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export enum ClinicProductSortOption {
   POPULAR = 'popular',
@@ -43,6 +45,46 @@ export class GetClinicProductsQueryDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @ApiPropertyOptional({ description: 'Minimum current price', minimum: 0 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  minPrice?: number;
+
+  @ApiPropertyOptional({ description: 'Maximum current price', minimum: 0 })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  maxPrice?: number;
+
+  @ApiPropertyOptional({
+    description: 'Minimum service duration in minutes',
+    minimum: 0,
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Type(() => Number)
+  minDuration?: number;
+
+  @ApiPropertyOptional({
+    description: 'Maximum service duration in minutes',
+    minimum: 0,
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Type(() => Number)
+  maxDuration?: number;
+
+  @ApiPropertyOptional({ description: 'Only discounted products' })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true' || value === true)
+  discountOnly?: boolean;
 
   @ApiPropertyOptional({ default: 1, minimum: 1 })
   @IsOptional()

@@ -271,7 +271,6 @@ class _AppTextField extends StatelessWidget {
                 onTapOutside: (_) {
                   if (isEnabled) {
                     field.validate();
-                    FocusScope.of(context).unfocus();
                   }
                 },
               ),

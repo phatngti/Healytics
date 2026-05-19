@@ -235,7 +235,36 @@ describe('CreateCheckoutTicketHandler', () => {
         productId: dto.productId,
         webhookUrl: dto.webhookUrl,
         lockToken: 'mock-lock-token',
+        payLater: false,
       });
+    });
+
+    it('should publish payLater=true when requested', async () => {
+      // Arrange
+      ticketRepo.findOne.mockResolvedValue(null);
+      slotChecker.execute.mockResolvedValue(true);
+
+      const savedTicket = createCheckoutTicketEntity({ id: 'tk-pay-later' });
+      ticketRepo.create.mockReturnValue(savedTicket);
+      ticketRepo.save.mockResolvedValue(savedTicket);
+
+      const dto = {
+        ...baseDto,
+        productId: 'prod-1',
+        payLater: true,
+      };
+
+      // Act
+      await handler.execute(dto as any);
+
+      // Assert
+      expect(rmqClient.emit).toHaveBeenCalledWith(
+        'checkout.process',
+        expect.objectContaining({
+          ticketId: 'tk-pay-later',
+          payLater: true,
+        }),
+      );
     });
   });
 });

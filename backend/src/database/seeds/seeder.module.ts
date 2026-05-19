@@ -21,6 +21,7 @@ import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
 import { Location } from '@/common/entities/location.entity';
 import { TreatmentReview } from '@/common/entities/treatment-review.entity';
 import { SpecialistReview } from '@/common/entities/specialist-review.entity';
+import { FacilityReview } from '@/common/entities/facility-review.entity';
 import { Booking } from '@/common/entities/booking.entity';
 import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
 import { Payment } from '@/common/entities/payment.entity';
@@ -90,6 +91,7 @@ import { SeederService } from './seeder.service';
       Location,
       TreatmentReview,
       SpecialistReview,
+      FacilityReview,
       Booking,
       BookingStatusLog,
       Payment,

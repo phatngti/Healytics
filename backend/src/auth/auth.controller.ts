@@ -15,6 +15,7 @@ import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto'
 import { CheckEmailDto } from './dto/request/check-email.dto';
 import { ForgotPasswordDto } from './dto/request/forgot-password.dto';
 import { ResetPasswordDto } from './dto/request/reset-password.dto';
+import { ValidatePasswordResetCodeDto } from './dto/request/validate-password-reset-code.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import {
   ApiBody,
@@ -32,6 +33,7 @@ import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import { CheckEmailResponseDto } from './dto/response/check-email-response.dto';
 import { LogoutResponseDto } from './dto/response/logout-response.dto';
 import { PasswordResetResponseDto } from './dto/response/password-reset-response.dto';
+import { ValidatePasswordResetCodeResponseDto } from './dto/response/validate-password-reset-code-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from '../common/decorators/auth/public.decorator';
 import { LoginDto } from './dto/request/login.dto';
@@ -132,14 +134,14 @@ export class AuthController {
   }
 
   /**
-   * Sends a password reset link to a user account email.
+   * Sends a password reset code to a user account email.
    */
   @Post('user/forgot-password')
   @Public()
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Request a user password reset email',
+    summary: 'Request a user password reset code',
     description:
       'Returns a generic success response to avoid exposing whether an email is registered.',
   })
@@ -155,13 +157,32 @@ export class AuthController {
   }
 
   /**
-   * Resets a user password using the token received by email.
+   * Validates a password reset code and returns a reset token.
+   */
+  @Post('user/validate-reset-code')
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Validate a user password reset code' })
+  @ApiOkResponse({
+    description: 'Password reset code verified.',
+    type: ValidatePasswordResetCodeResponseDto,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid or expired code.' })
+  async validateUserPasswordResetCode(
+    @Body() dto: ValidatePasswordResetCodeDto,
+  ): Promise<ValidatePasswordResetCodeResponseDto> {
+    return this.authService.validateUserPasswordResetCode(dto);
+  }
+
+  /**
+   * Resets a user password using the token returned after OTP validation.
    */
   @Post('user/reset-password')
   @Public()
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Reset a user password with email token' })
+  @ApiOperation({ summary: 'Reset a user password with validated reset token' })
   @ApiOkResponse({
     description: 'Password reset successfully.',
     type: PasswordResetResponseDto,

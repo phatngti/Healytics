@@ -17,6 +17,13 @@ void main() {
   // final instance = MapboxApi();
 
   group('tests for MapboxApi', () {
+    // Get driving directions route geometry
+    //
+    //Future<DirectionsResponseDto> mapboxControllerDirections(String origin, String destination) async
+    test('test mapboxControllerDirections', () async {
+      // TODO
+    });
+
     // Get travel distance and duration
     //
     //Future<DistanceMatrixResponseDto> mapboxControllerDistanceMatrix(String origins, String destinations) async

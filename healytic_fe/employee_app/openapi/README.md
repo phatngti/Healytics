@@ -67,6 +67,7 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**accountControllerGetMe**](doc//AccountApi.md#accountcontrollergetme) | **GET** /account/me | Get current user account details
 *AccountApi* | [**accountControllerGetSurvey**](doc//AccountApi.md#accountcontrollergetsurvey) | **GET** /account/survey | Get current user survey
 *AccountApi* | [**accountControllerPostSurvey**](doc//AccountApi.md#accountcontrollerpostsurvey) | **POST** /account/survey | Create one-shot survey for current user
+*AccountApi* | [**accountControllerUpdateAvatar**](doc//AccountApi.md#accountcontrollerupdateavatar) | **PATCH** /account/me/avatar | Update current user avatar
 *AdminAuditLogsApi* | [**auditControllerGetAuditLogs**](doc//AdminAuditLogsApi.md#auditcontrollergetauditlogs) | **GET** /admin/audit-logs | Get audit logs with optional filters
 *AdminCategoriesApi* | [**adminCategoriesControllerCreate**](doc//AdminCategoriesApi.md#admincategoriescontrollercreate) | **POST** /admin/categories | Create a new category
 *AdminCategoriesApi* | [**adminCategoriesControllerFindAll**](doc//AdminCategoriesApi.md#admincategoriescontrollerfindall) | **GET** /admin/categories | List all categories (admin view)
@@ -113,6 +114,7 @@ Class | Method | HTTP request | Description
 *AdminPartnersApi* | [**adminPartnersControllerGetTotalPartners**](doc//AdminPartnersApi.md#adminpartnerscontrollergettotalpartners) | **GET** /admin/partners/total | Get total number of partners
 *AdminPartnersApi* | [**adminPartnersControllerReviewPartner**](doc//AdminPartnersApi.md#adminpartnerscontrollerreviewpartner) | **PUT** /admin/partners/{id}/review | Review partner profile
 *AuthenticationApi* | [**authControllerCheckEmail**](doc//AuthenticationApi.md#authcontrollercheckemail) | **POST** /auth/check-email | Check if email is already registered
+*AuthenticationApi* | [**authControllerForgotUserPassword**](doc//AuthenticationApi.md#authcontrollerforgotuserpassword) | **POST** /auth/user/forgot-password | Request a user password reset code
 *AuthenticationApi* | [**authControllerLoginAdmin**](doc//AuthenticationApi.md#authcontrollerloginadmin) | **POST** /auth/admin/login | Login as admin
 *AuthenticationApi* | [**authControllerLoginEmployee**](doc//AuthenticationApi.md#authcontrollerloginemployee) | **POST** /auth/employee/login | Login as an employee
 *AuthenticationApi* | [**authControllerLoginPartner**](doc//AuthenticationApi.md#authcontrollerloginpartner) | **POST** /auth/partner/login | Login as a partner
@@ -123,6 +125,9 @@ Class | Method | HTTP request | Description
 *AuthenticationApi* | [**authControllerRefreshPartner**](doc//AuthenticationApi.md#authcontrollerrefreshpartner) | **POST** /auth/partner/refresh | Refresh partner tokens with verification info
 *AuthenticationApi* | [**authControllerRegisterPartner**](doc//AuthenticationApi.md#authcontrollerregisterpartner) | **POST** /auth/partner/register | Register a new business partner
 *AuthenticationApi* | [**authControllerRegisterUser**](doc//AuthenticationApi.md#authcontrollerregisteruser) | **POST** /auth/user/register | Register a new user
+*AuthenticationApi* | [**authControllerResetUserPassword**](doc//AuthenticationApi.md#authcontrollerresetuserpassword) | **POST** /auth/user/reset-password | Reset a user password with validated reset token
+*AuthenticationApi* | [**authControllerValidateUserPasswordResetCode**](doc//AuthenticationApi.md#authcontrollervalidateuserpasswordresetcode) | **POST** /auth/user/validate-reset-code | Validate a user password reset code
+*BookingsApi* | [**bookingStatusControllerUpdateStatus**](doc//BookingsApi.md#bookingstatuscontrollerupdatestatus) | **PATCH** /bookings/{id}/status | Update booking status through the shared booking lifecycle
 *CartApi* | [**cartControllerAddItem**](doc//CartApi.md#cartcontrolleradditem) | **POST** /cart | Add service to cart
 *CartApi* | [**cartControllerClearCart**](doc//CartApi.md#cartcontrollerclearcart) | **DELETE** /cart | Clear all cart items
 *CartApi* | [**cartControllerGetItems**](doc//CartApi.md#cartcontrollergetitems) | **GET** /cart | Get all cart items for current user
@@ -147,11 +152,14 @@ Class | Method | HTTP request | Description
 *LocationsApi* | [**locationsControllerGetDistricts**](doc//LocationsApi.md#locationscontrollergetdistricts) | **GET** /locations/provinces/{provinceId}/districts | Get all districts in a province
 *LocationsApi* | [**locationsControllerGetProvinces**](doc//LocationsApi.md#locationscontrollergetprovinces) | **GET** /locations/provinces | Get all provinces in Vietnam
 *LocationsApi* | [**locationsControllerGetWards**](doc//LocationsApi.md#locationscontrollergetwards) | **GET** /locations/districts/{districtId}/wards | Get all wards in a district
+*MapboxApi* | [**mapboxControllerDirections**](doc//MapboxApi.md#mapboxcontrollerdirections) | **GET** /mapbox/directions | Get driving directions route geometry
 *MapboxApi* | [**mapboxControllerDistanceMatrix**](doc//MapboxApi.md#mapboxcontrollerdistancematrix) | **GET** /mapbox/distance-matrix | Get travel distance and duration
 *MapboxApi* | [**mapboxControllerGeocode**](doc//MapboxApi.md#mapboxcontrollergeocode) | **GET** /mapbox/geocode | Geocode an address to lat/lng
 *MapboxApi* | [**mapboxControllerGetClientKey**](doc//MapboxApi.md#mapboxcontrollergetclientkey) | **GET** /mapbox/client-key | Get public access token for frontend/mobile SDKs
 *MapboxApi* | [**mapboxControllerReverseGeocode**](doc//MapboxApi.md#mapboxcontrollerreversegeocode) | **GET** /mapbox/reverse-geocode | Reverse geocode lat/lng to address
 *MomoApi* | [**moMoControllerHandleMoMoIPN**](doc//MomoApi.md#momocontrollerhandlemomoipn) | **POST** /momo/ipn | MoMo IPN callback (server-to-server)
+*PartnerBookingsApi* | [**partnerBookingsControllerGetBooking**](doc//PartnerBookingsApi.md#partnerbookingscontrollergetbooking) | **GET** /partner/bookings/{id} | Get partner booking detail
+*PartnerBookingsApi* | [**partnerBookingsControllerListBookings**](doc//PartnerBookingsApi.md#partnerbookingscontrollerlistbookings) | **GET** /partner/bookings | List bookings for the authenticated partner
 *PartnerChatApi* | [**partnerChatControllerCreateConversation**](doc//PartnerChatApi.md#partnerchatcontrollercreateconversation) | **POST** /partner/chat/conversations | Create a new conversation with a user
 *PartnerChatApi* | [**partnerChatControllerGetConversations**](doc//PartnerChatApi.md#partnerchatcontrollergetconversations) | **GET** /partner/chat/conversations | List all conversations for the current partner
 *PartnerChatApi* | [**partnerChatControllerGetMessages**](doc//PartnerChatApi.md#partnerchatcontrollergetmessages) | **GET** /partner/chat/conversations/{id}/messages | Get message history for a conversation (cursor-paginated)
@@ -226,6 +234,7 @@ Class | Method | HTTP request | Description
 *UserAppointmentsApi* | [**userAppointmentControllerListCategories**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistcategories) | **GET** /user/appointments/categories | Get appointment categories for filter chips
 *UserAppointmentsApi* | [**userAppointmentControllerListRecentActivity**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistrecentactivity) | **GET** /user/appointments/recent-activity | Get recent appointment activity for home dashboard
 *UserAppointmentsApi* | [**userAppointmentControllerListRecommendedServices**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistrecommendedservices) | **GET** /user/appointments/recommendations | Get recommended services
+*UserBookingSearchApi* | [**bookingSearchControllerSearch**](doc//UserBookingSearchApi.md#bookingsearchcontrollersearch) | **GET** /user/booking-search | Search booking services and specialists
 *UserBookingsApi* | [**bookingControllerAsyncCheckout**](doc//UserBookingsApi.md#bookingcontrollerasynccheckout) | **POST** /user/bookings/async-checkout | Start async checkout (returns 202 with ticket ID)
 *UserBookingsApi* | [**bookingControllerGetBooking**](doc//UserBookingsApi.md#bookingcontrollergetbooking) | **GET** /user/bookings/{id} | Get booking by ID
 *UserBookingsApi* | [**bookingControllerGetTicketStatus**](doc//UserBookingsApi.md#bookingcontrollergetticketstatus) | **GET** /user/bookings/tickets/{id} | Get checkout ticket status
@@ -262,11 +271,17 @@ Class | Method | HTTP request | Description
 *UserNotificationsApi* | [**userNotificationControllerGetUnreadCount**](doc//UserNotificationsApi.md#usernotificationcontrollergetunreadcount) | **GET** /user/notifications/unread-count | Get unread notification count
 *UserNotificationsApi* | [**userNotificationControllerMarkAllRead**](doc//UserNotificationsApi.md#usernotificationcontrollermarkallread) | **PATCH** /user/notifications/read-all | Mark all notifications as read
 *UserNotificationsApi* | [**userNotificationControllerMarkRead**](doc//UserNotificationsApi.md#usernotificationcontrollermarkread) | **PATCH** /user/notifications/{id}/read | Mark a specific notification as read
+*UserPaymentsApi* | [**userPaymentControllerConfirmStripeSetupIntent**](doc//UserPaymentsApi.md#userpaymentcontrollerconfirmstripesetupintent) | **POST** /user/payments/stripe/setup-intents/{setupIntentId}/confirm | Confirm and persist a saved Stripe card
 *UserPaymentsApi* | [**userPaymentControllerCreateMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollercreatemomopayment) | **POST** /user/payments/momo/{bookingId} | Create MoMo payment for booking
 *UserPaymentsApi* | [**userPaymentControllerCreateStripePayment**](doc//UserPaymentsApi.md#userpaymentcontrollercreatestripepayment) | **POST** /user/payments/stripe/{bookingId} | Create Stripe payment for booking (card)
+*UserPaymentsApi* | [**userPaymentControllerCreateStripeSetupIntent**](doc//UserPaymentsApi.md#userpaymentcontrollercreatestripesetupintent) | **POST** /user/payments/stripe/setup-intents | Create Stripe SetupIntent for adding a card
+*UserPaymentsApi* | [**userPaymentControllerDeleteCard**](doc//UserPaymentsApi.md#userpaymentcontrollerdeletecard) | **DELETE** /user/payments/cards/{cardId} | Delete a saved payment card
+*UserPaymentsApi* | [**userPaymentControllerListCards**](doc//UserPaymentsApi.md#userpaymentcontrollerlistcards) | **GET** /user/payments/cards | List saved payment cards
 *UserPaymentsApi* | [**userPaymentControllerRefundMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollerrefundmomopayment) | **POST** /user/payments/momo/{bookingId}/refund | Request MoMo refund for booking
 *UserPaymentsApi* | [**userPaymentControllerRefundStripePayment**](doc//UserPaymentsApi.md#userpaymentcontrollerrefundstripepayment) | **POST** /user/payments/stripe/{bookingId}/refund | Request Stripe refund for booking
+*UserPaymentsApi* | [**userPaymentControllerSetDefaultCard**](doc//UserPaymentsApi.md#userpaymentcontrollersetdefaultcard) | **PATCH** /user/payments/cards/{cardId}/default | Set a saved card as the default card
 *UserProfileApi* | [**userProfileControllerGetSummary**](doc//UserProfileApi.md#userprofilecontrollergetsummary) | **GET** /user/profile/summary | Get current user profile summary counters
+*UserReviewsApi* | [**userReviewControllerSubmitFacilityReview**](doc//UserReviewsApi.md#userreviewcontrollersubmitfacilityreview) | **POST** /user/reviews/facility | Submit a facility review for a completed appointment
 *UserReviewsApi* | [**userReviewControllerSubmitSpecialistReview**](doc//UserReviewsApi.md#userreviewcontrollersubmitspecialistreview) | **POST** /user/reviews/specialist | Submit a specialist review for a completed appointment
 *UserReviewsApi* | [**userReviewControllerSubmitTreatmentReview**](doc//UserReviewsApi.md#userreviewcontrollersubmittreatmentreview) | **POST** /user/reviews/treatment | Submit a treatment review for a completed appointment
 *UserSlotsApi* | [**slotsControllerCheckDuplicateSlot**](doc//UserSlotsApi.md#slotscontrollercheckduplicateslot) | **POST** /user/slots/check-duplicate | Check if the user already has a booking at the same datetime
@@ -358,10 +373,14 @@ Class | Method | HTTP request | Description
  - [AuthTokensDto](doc//AuthTokensDto.md)
  - [BookingResponseDto](doc//BookingResponseDto.md)
  - [BookingScheduleDto](doc//BookingScheduleDto.md)
+ - [BookingSearchResponseDto](doc//BookingSearchResponseDto.md)
  - [BookingServiceResponseDto](doc//BookingServiceResponseDto.md)
  - [BookingSpecialistResponseDto](doc//BookingSpecialistResponseDto.md)
  - [BookingStatus](doc//BookingStatus.md)
  - [BookingStatusBreakdownDto](doc//BookingStatusBreakdownDto.md)
+ - [BookingStatusChangeEventDto](doc//BookingStatusChangeEventDto.md)
+ - [BookingStatusChangedByDto](doc//BookingStatusChangedByDto.md)
+ - [BookingStatusUpdate](doc//BookingStatusUpdate.md)
  - [BusinessInfo](doc//BusinessInfo.md)
  - [BusinessInfoDto](doc//BusinessInfoDto.md)
  - [BusinessServiceDto](doc//BusinessServiceDto.md)
@@ -394,6 +413,7 @@ Class | Method | HTTP request | Description
  - [ClinicSpecialistPreviewDto](doc//ClinicSpecialistPreviewDto.md)
  - [ClinicTrustMetricsDto](doc//ClinicTrustMetricsDto.md)
  - [CompletionChecklistItemDto](doc//CompletionChecklistItemDto.md)
+ - [ConfirmStripeSetupIntentDto](doc//ConfirmStripeSetupIntentDto.md)
  - [ConversationResponse](doc//ConversationResponse.md)
  - [ConversationResponseDto](doc//ConversationResponseDto.md)
  - [ConversationStatus](doc//ConversationStatus.md)
@@ -403,6 +423,7 @@ Class | Method | HTTP request | Description
  - [CreateConversationDto](doc//CreateConversationDto.md)
  - [CreateDoctorDto](doc//CreateDoctorDto.md)
  - [CreateDoctorProfileDto](doc//CreateDoctorProfileDto.md)
+ - [CreateFacilityReviewDto](doc//CreateFacilityReviewDto.md)
  - [CreateMassageTherapistDto](doc//CreateMassageTherapistDto.md)
  - [CreateMoMoPaymentDto](doc//CreateMoMoPaymentDto.md)
  - [CreateMoMoRefundDto](doc//CreateMoMoRefundDto.md)
@@ -414,6 +435,8 @@ Class | Method | HTTP request | Description
  - [CreateSkillDto](doc//CreateSkillDto.md)
  - [CreateSpaTherapistDto](doc//CreateSpaTherapistDto.md)
  - [CreateSpecialistReviewDto](doc//CreateSpecialistReviewDto.md)
+ - [CreateStripePaymentDto](doc//CreateStripePaymentDto.md)
+ - [CreateStripeSetupIntentResponseDto](doc//CreateStripeSetupIntentResponseDto.md)
  - [CreateTherapistProfileDto](doc//CreateTherapistProfileDto.md)
  - [CreateTreatmentReviewDto](doc//CreateTreatmentReviewDto.md)
  - [DashboardNotificationDto](doc//DashboardNotificationDto.md)
@@ -423,6 +446,8 @@ Class | Method | HTTP request | Description
  - [DayScheduleDto](doc//DayScheduleDto.md)
  - [DeleteFileResponseDto](doc//DeleteFileResponseDto.md)
  - [DevicePlatform](doc//DevicePlatform.md)
+ - [DirectionsCoordinateDto](doc//DirectionsCoordinateDto.md)
+ - [DirectionsResponseDto](doc//DirectionsResponseDto.md)
  - [DistanceMatrixElementDto](doc//DistanceMatrixElementDto.md)
  - [DistanceMatrixResponseDto](doc//DistanceMatrixResponseDto.md)
  - [DistanceMatrixRowDto](doc//DistanceMatrixRowDto.md)
@@ -451,9 +476,11 @@ Class | Method | HTTP request | Description
  - [EmployeeTimeSlotsResponseDto](doc//EmployeeTimeSlotsResponseDto.md)
  - [EmployeeTrendPointDto](doc//EmployeeTrendPointDto.md)
  - [FacilityDto](doc//FacilityDto.md)
+ - [FacilityReviewResponseDto](doc//FacilityReviewResponseDto.md)
  - [FeaturedSpecialistResponseDto](doc//FeaturedSpecialistResponseDto.md)
  - [FileUrlResponseDto](doc//FileUrlResponseDto.md)
  - [FlagReviewDto](doc//FlagReviewDto.md)
+ - [ForgotPasswordDto](doc//ForgotPasswordDto.md)
  - [Gender](doc//Gender.md)
  - [GeocodeResponseDto](doc//GeocodeResponseDto.md)
  - [GeocodeResultDto](doc//GeocodeResultDto.md)
@@ -485,6 +512,12 @@ Class | Method | HTTP request | Description
  - [PaginationMeta](doc//PaginationMeta.md)
  - [PaginationMetaResponseDto](doc//PaginationMetaResponseDto.md)
  - [ParticipantInfoDto](doc//ParticipantInfoDto.md)
+ - [PartnerBookingCustomerDto](doc//PartnerBookingCustomerDto.md)
+ - [PartnerBookingResponseDto](doc//PartnerBookingResponseDto.md)
+ - [PartnerBookingServiceDto](doc//PartnerBookingServiceDto.md)
+ - [PartnerBookingSlotDto](doc//PartnerBookingSlotDto.md)
+ - [PartnerBookingSpecialistDto](doc//PartnerBookingSpecialistDto.md)
+ - [PartnerBookingStatus](doc//PartnerBookingStatus.md)
  - [PartnerCategorySummaryDto](doc//PartnerCategorySummaryDto.md)
  - [PartnerClinicDto](doc//PartnerClinicDto.md)
  - [PartnerCommerceSourceType](doc//PartnerCommerceSourceType.md)
@@ -530,11 +563,13 @@ Class | Method | HTTP request | Description
  - [PartnerTransactionTimelineEventDto](doc//PartnerTransactionTimelineEventDto.md)
  - [PartnerTransactionType](doc//PartnerTransactionType.md)
  - [PartnerVerificationStatus](doc//PartnerVerificationStatus.md)
+ - [PasswordResetResponseDto](doc//PasswordResetResponseDto.md)
  - [PresignRequestDto](doc//PresignRequestDto.md)
  - [PresignResponseDto](doc//PresignResponseDto.md)
  - [PriceBreakdownDto](doc//PriceBreakdownDto.md)
  - [ProcedureStepDto](doc//ProcedureStepDto.md)
  - [ProcedureStepInputDto](doc//ProcedureStepInputDto.md)
+ - [PublicBookingStatus](doc//PublicBookingStatus.md)
  - [PublicCategoryDto](doc//PublicCategoryDto.md)
  - [PublicCategorySummaryDto](doc//PublicCategorySummaryDto.md)
  - [PublicClinicCertificationDto](doc//PublicClinicCertificationDto.md)
@@ -575,12 +610,14 @@ Class | Method | HTTP request | Description
  - [RegisterPartnerDto](doc//RegisterPartnerDto.md)
  - [RegisterPartnerResponseDto](doc//RegisterPartnerResponseDto.md)
  - [RegisterProfileDto](doc//RegisterProfileDto.md)
+ - [ResetPasswordDto](doc//ResetPasswordDto.md)
  - [RetryPayoutDto](doc//RetryPayoutDto.md)
  - [RevenueDataPointDto](doc//RevenueDataPointDto.md)
  - [ReviewItemDto](doc//ReviewItemDto.md)
  - [ReviewPartnerProfileDto](doc//ReviewPartnerProfileDto.md)
  - [ReviewPartnerResponseDto](doc//ReviewPartnerResponseDto.md)
  - [ReviewSummaryDto](doc//ReviewSummaryDto.md)
+ - [SavedPaymentCardDto](doc//SavedPaymentCardDto.md)
  - [ServiceInfoDto](doc//ServiceInfoDto.md)
  - [ServiceManualInputDto](doc//ServiceManualInputDto.md)
  - [ServiceManualResponseDto](doc//ServiceManualResponseDto.md)
@@ -601,11 +638,14 @@ Class | Method | HTTP request | Description
  - [TotalPartnersResponseDto](doc//TotalPartnersResponseDto.md)
  - [TreatmentReviewResponseDto](doc//TreatmentReviewResponseDto.md)
  - [UpcomingAppointmentDto](doc//UpcomingAppointmentDto.md)
+ - [UpdateAvatarDto](doc//UpdateAvatarDto.md)
+ - [UpdateBookingStatusDto](doc//UpdateBookingStatusDto.md)
  - [UpdateCategoryDto](doc//UpdateCategoryDto.md)
  - [UpdateEmployeeDto](doc//UpdateEmployeeDto.md)
  - [UpdateEmployeeProfileDto](doc//UpdateEmployeeProfileDto.md)
  - [UpdatePartnerCertificationDto](doc//UpdatePartnerCertificationDto.md)
  - [UpdatePartnerDto](doc//UpdatePartnerDto.md)
+ - [UpdatePartnerHealthServiceDefinitionDto](doc//UpdatePartnerHealthServiceDefinitionDto.md)
  - [UpdatePartnerHealthServiceDto](doc//UpdatePartnerHealthServiceDto.md)
  - [UpdatePartnerProfileCompletionDto](doc//UpdatePartnerProfileCompletionDto.md)
  - [UpdatePartnerPublicProfileDto](doc//UpdatePartnerPublicProfileDto.md)
@@ -613,6 +653,8 @@ Class | Method | HTTP request | Description
  - [UserEligibilityDetailResponseDto](doc//UserEligibilityDetailResponseDto.md)
  - [UserProfileDto](doc//UserProfileDto.md)
  - [UserProfileSummaryResponseDto](doc//UserProfileSummaryResponseDto.md)
+ - [ValidatePasswordResetCodeDto](doc//ValidatePasswordResetCodeDto.md)
+ - [ValidatePasswordResetCodeResponseDto](doc//ValidatePasswordResetCodeResponseDto.md)
  - [VerificationDocumentEntryDto](doc//VerificationDocumentEntryDto.md)
  - [VerifiedField](doc//VerifiedField.md)
  - [WishlistItemResponseDto](doc//WishlistItemResponseDto.md)

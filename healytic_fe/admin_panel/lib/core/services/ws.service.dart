@@ -31,6 +31,7 @@ class WsService {
   // ── Socket instances ─────────────────────────────
 
   PartnerChatSocket? _partnerChatSocket;
+  BookingEventsSocket? _bookingEventsSocket;
   ChatNotificationsSocket? _chatNotificationsSocket;
 
   /// The `/partner-chat` namespace socket.
@@ -39,6 +40,10 @@ class WsService {
   /// allocating resources when not needed.
   PartnerChatSocket get partnerChat =>
       _partnerChatSocket ??= PartnerChatSocket();
+
+  /// The `/booking-events` namespace socket.
+  BookingEventsSocket get bookingEvents =>
+      _bookingEventsSocket ??= BookingEventsSocket();
 
   /// The `/chat-notifications` namespace socket.
   ///
@@ -57,12 +62,18 @@ class WsService {
   void connectAll() {
     _log.info('Connecting all WS namespaces');
     _connectSocket(partnerChat, ServicePrefix.partnerChat);
+    _connectSocket(bookingEvents, ServicePrefix.bookingEvents);
     _connectSocket(chatNotifications, ServicePrefix.chatNotifications);
   }
 
   /// Connect only the partner-chat namespace.
   void connectPartnerChat() {
     _connectSocket(partnerChat, ServicePrefix.partnerChat);
+  }
+
+  /// Connect only the booking-events namespace.
+  void connectBookingEvents() {
+    _connectSocket(bookingEvents, ServicePrefix.bookingEvents);
   }
 
   /// Connect only the global chat-notifications namespace.
@@ -74,6 +85,7 @@ class WsService {
   void disconnectAll() {
     _log.info('Disconnecting all WS namespaces');
     _partnerChatSocket?.disconnect();
+    _bookingEventsSocket?.disconnect();
     _chatNotificationsSocket?.disconnect();
   }
 
@@ -84,8 +96,10 @@ class WsService {
   void dispose() {
     _log.info('Disposing WS service');
     _partnerChatSocket?.dispose();
+    _bookingEventsSocket?.dispose();
     _chatNotificationsSocket?.dispose();
     _partnerChatSocket = null;
+    _bookingEventsSocket = null;
     _chatNotificationsSocket = null;
   }
 

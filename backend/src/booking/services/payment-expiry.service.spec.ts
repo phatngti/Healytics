@@ -2,24 +2,25 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PaymentExpiryService } from './payment-expiry.service';
 import { Booking } from '@/common/entities/booking.entity';
-import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { RedisService } from '@/redis/redis.service';
+import { BookingStatusLogWriterService } from './booking-status-log-writer.service';
 
 describe('PaymentExpiryService', () => {
   let service: PaymentExpiryService;
-  let bookingRepo: Record<string, jest.Mock>;
-  let bookingStatusLogRepo: Record<string, jest.Mock>;
+  let bookingRepo: any;
+  let logWriter: Record<string, jest.Mock>;
   let redisService: Record<string, jest.Mock>;
 
   beforeEach(async () => {
     bookingRepo = {
       find: jest.fn(),
       save: jest.fn(),
+      manager: {},
     };
-    bookingStatusLogRepo = {
-      save: jest.fn(),
-      create: jest.fn((data) => data),
+    logWriter = {
+      write: jest.fn().mockResolvedValue({}),
     };
     redisService = {
       del: jest.fn(),
@@ -29,11 +30,8 @@ describe('PaymentExpiryService', () => {
       providers: [
         PaymentExpiryService,
         { provide: getRepositoryToken(Booking), useValue: bookingRepo },
-        {
-          provide: getRepositoryToken(BookingStatusLog),
-          useValue: bookingStatusLogRepo,
-        },
         { provide: RedisService, useValue: redisService },
+        { provide: BookingStatusLogWriterService, useValue: logWriter },
       ],
     }).compile();
 
@@ -55,7 +53,7 @@ describe('PaymentExpiryService', () => {
       // Assert
       expect(bookingRepo.find).toHaveBeenCalledTimes(1);
       expect(bookingRepo.save).not.toHaveBeenCalled();
-      expect(bookingStatusLogRepo.save).not.toHaveBeenCalled();
+      expect(logWriter.write).not.toHaveBeenCalled();
       expect(redisService.del).not.toHaveBeenCalled();
     });
 
@@ -74,7 +72,6 @@ describe('PaymentExpiryService', () => {
         ...expiredBooking,
         status: BookingStatus.CANCELLED,
       });
-      bookingStatusLogRepo.save.mockResolvedValue({});
       redisService.del.mockResolvedValue(1);
 
       // Act
@@ -87,15 +84,18 @@ describe('PaymentExpiryService', () => {
           status: BookingStatus.CANCELLED,
         }),
       );
-      expect(bookingStatusLogRepo.create).toHaveBeenCalledWith(
+      expect(logWriter.write).toHaveBeenCalledWith(
+        bookingRepo.manager,
         expect.objectContaining({
           bookingId: 'booking-1',
           fromStatus: BookingStatus.PENDING_PAYMENT,
           toStatus: BookingStatus.CANCELLED,
           changedBy: 'system:payment-expiry',
+          reasonCode: BookingStatusReasonCode.PAYMENT_EXPIRED_AUTO_CANCEL,
+          reason: 'Payment expired after 10-minute window',
         }),
       );
-      expect(bookingStatusLogRepo.save).toHaveBeenCalledTimes(1);
+      expect(logWriter.write).toHaveBeenCalledTimes(1);
       expect(redisService.del).toHaveBeenCalledWith(
         'lock:checkout:staff-1_2026-04-14_0900',
       );
@@ -123,7 +123,6 @@ describe('PaymentExpiryService', () => {
       bookingRepo.save.mockImplementation((b) =>
         Promise.resolve({ ...b, status: BookingStatus.CANCELLED }),
       );
-      bookingStatusLogRepo.save.mockResolvedValue({});
       redisService.del.mockResolvedValue(1);
 
       // Act
@@ -131,7 +130,7 @@ describe('PaymentExpiryService', () => {
 
       // Assert
       expect(bookingRepo.save).toHaveBeenCalledTimes(2);
-      expect(bookingStatusLogRepo.save).toHaveBeenCalledTimes(2);
+      expect(logWriter.write).toHaveBeenCalledTimes(2);
       expect(redisService.del).toHaveBeenCalledTimes(2);
     });
 
@@ -160,7 +159,6 @@ describe('PaymentExpiryService', () => {
           ...booking2,
           status: BookingStatus.CANCELLED,
         });
-      bookingStatusLogRepo.save.mockResolvedValue({});
       redisService.del.mockResolvedValue(1);
 
       // Act
@@ -168,7 +166,7 @@ describe('PaymentExpiryService', () => {
 
       // Assert — second booking still processed despite first failing
       expect(bookingRepo.save).toHaveBeenCalledTimes(2);
-      expect(bookingStatusLogRepo.save).toHaveBeenCalledTimes(1); // only second succeeded
+      expect(logWriter.write).toHaveBeenCalledTimes(1); // only second succeeded
     });
 
     it('should not throw if Redis del fails', async () => {
@@ -186,7 +184,6 @@ describe('PaymentExpiryService', () => {
         ...booking,
         status: BookingStatus.CANCELLED,
       });
-      bookingStatusLogRepo.save.mockResolvedValue({});
       redisService.del.mockRejectedValue(new Error('Redis down'));
 
       // Act & Assert — should not throw

@@ -2,27 +2,20 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$comment": "Auto-generated from backend WS decorators — DO NOT EDIT BY HAND. Run: yarn generate:ws-contract",
   "namespaces": {
-    "notifications": {
-      "description": "Real-time notification delivery gateway",
+    "booking-events": {
+      "description": "Booking lifecycle event gateway",
       "auth": {
         "type": "jwt",
         "roles": [
-          "user"
+          "user",
+          "health_partner"
         ]
       },
       "clientToServer": {},
       "serverToClient": {
-        "new_notification": {
-          "description": "A new notification was pushed to the user",
-          "payload": "WsNewNotificationEvent"
-        },
-        "unread_count": {
-          "description": "The unread notification count changed (after new notification or mark-read)",
-          "payload": "WsUnreadCountEvent"
-        },
-        "broadcast_sent": {
-          "description": "A system-wide broadcast was sent (admin-facing)",
-          "payload": "WsBroadcastSentEvent"
+        "booking.status.changed": {
+          "description": "A booking status changed and should update local UI state",
+          "payload": "BookingStatusChangeEvent"
         }
       }
     },
@@ -112,6 +105,30 @@
           "payload": "WsNewMessageNotification"
         }
       }
+    },
+    "notifications": {
+      "description": "Real-time notification delivery gateway",
+      "auth": {
+        "type": "jwt",
+        "roles": [
+          "user"
+        ]
+      },
+      "clientToServer": {},
+      "serverToClient": {
+        "new_notification": {
+          "description": "A new notification was pushed to the user",
+          "payload": "WsNewNotificationEvent"
+        },
+        "unread_count": {
+          "description": "The unread notification count changed (after new notification or mark-read)",
+          "payload": "WsUnreadCountEvent"
+        },
+        "broadcast_sent": {
+          "description": "A system-wide broadcast was sent (admin-facing)",
+          "payload": "WsBroadcastSentEvent"
+        }
+      }
     }
   },
   "models": {
@@ -191,92 +208,62 @@
         }
       }
     },
-    "WsNewNotificationEvent": {
-      "description": "Server event: a new notification pushed to the user in real-time",
+    "BookingStatusChangeEvent": {
+      "description": "Server event emitted when a booking status changes through the lifecycle API",
       "direction": "serverToClient",
       "properties": {
-        "id": {
+        "eventId": {
           "type": "String",
           "required": true,
-          "description": "Notification UUID"
+          "description": ""
         },
-        "type": {
-          "type": "WsNotificationType",
+        "bookingId": {
+          "type": "String",
           "required": true,
-          "description": "The type of notification",
+          "description": ""
+        },
+        "status": {
+          "type": "PublicBookingStatus",
+          "required": true,
+          "description": "",
           "isEnum": true
         },
-        "title": {
+        "persistedStatus": {
+          "type": "BookingStatus",
+          "required": true,
+          "description": "",
+          "isEnum": true
+        },
+        "previousStatus": {
+          "type": "BookingStatus",
+          "required": true,
+          "description": "",
+          "isEnum": true
+        },
+        "userId": {
           "type": "String",
           "required": true,
-          "description": "Notification title"
+          "description": ""
         },
-        "body": {
+        "partnerId": {
           "type": "String",
-          "required": true,
-          "description": "Notification body text"
-        },
-        "data": {
-          "type": "object",
           "required": false,
-          "description": "Deep-link data for frontend routing"
+          "description": ""
         },
-        "isRead": {
-          "type": "bool",
-          "required": true,
-          "description": "Whether the notification has been read"
-        },
-        "readAt": {
-          "type": "DateTime",
-          "required": false,
-          "description": "When the notification was read"
-        },
-        "isBroadcast": {
-          "type": "bool",
-          "required": true,
-          "description": "Whether this is a system-wide broadcast"
-        },
-        "createdAt": {
-          "type": "DateTime",
-          "required": true,
-          "description": "When the notification was created"
-        }
-      }
-    },
-    "WsUnreadCountEvent": {
-      "description": "Server event: updated unread notification count for the user",
-      "direction": "serverToClient",
-      "properties": {
-        "count": {
-          "type": "num",
-          "required": true,
-          "description": "Current unread notification count"
-        }
-      }
-    },
-    "WsBroadcastSentEvent": {
-      "description": "Server event: a system-wide broadcast was sent (admin-facing)",
-      "direction": "serverToClient",
-      "properties": {
-        "id": {
+        "specialistId": {
           "type": "String",
           "required": true,
-          "description": "Notification UUID"
+          "description": ""
         },
-        "title": {
+        "changedBy": {
+          "type": "BookingStatusChangedBy",
+          "required": true,
+          "description": ""
+        },
+        "occurredAt": {
           "type": "String",
           "required": true,
-          "description": "Notification title"
-        },
-        "body": {
-          "type": "String",
-          "required": true,
-          "description": "Notification body text"
-        },
-        "createdAt": {
-          "type": "DateTime",
-          "required": true,
-          "description": "When the broadcast was created"
+          "description": ""
         }
       }
     },
@@ -483,6 +470,111 @@
           "description": "When the message was created"
         }
       }
+    },
+    "WsNewNotificationEvent": {
+      "description": "Server event: a new notification pushed to the user in real-time",
+      "direction": "serverToClient",
+      "properties": {
+        "id": {
+          "type": "String",
+          "required": true,
+          "description": "Notification UUID"
+        },
+        "type": {
+          "type": "WsNotificationType",
+          "required": true,
+          "description": "The type of notification",
+          "isEnum": true
+        },
+        "title": {
+          "type": "String",
+          "required": true,
+          "description": "Notification title"
+        },
+        "body": {
+          "type": "String",
+          "required": true,
+          "description": "Notification body text"
+        },
+        "data": {
+          "type": "object",
+          "required": false,
+          "description": "Deep-link data for frontend routing"
+        },
+        "isRead": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether the notification has been read"
+        },
+        "readAt": {
+          "type": "DateTime",
+          "required": false,
+          "description": "When the notification was read"
+        },
+        "isBroadcast": {
+          "type": "bool",
+          "required": true,
+          "description": "Whether this is a system-wide broadcast"
+        },
+        "createdAt": {
+          "type": "DateTime",
+          "required": true,
+          "description": "When the notification was created"
+        }
+      }
+    },
+    "WsUnreadCountEvent": {
+      "description": "Server event: updated unread notification count for the user",
+      "direction": "serverToClient",
+      "properties": {
+        "count": {
+          "type": "num",
+          "required": true,
+          "description": "Current unread notification count"
+        }
+      }
+    },
+    "WsBroadcastSentEvent": {
+      "description": "Server event: a system-wide broadcast was sent (admin-facing)",
+      "direction": "serverToClient",
+      "properties": {
+        "id": {
+          "type": "String",
+          "required": true,
+          "description": "Notification UUID"
+        },
+        "title": {
+          "type": "String",
+          "required": true,
+          "description": "Notification title"
+        },
+        "body": {
+          "type": "String",
+          "required": true,
+          "description": "Notification body text"
+        },
+        "createdAt": {
+          "type": "DateTime",
+          "required": true,
+          "description": "When the broadcast was created"
+        }
+      }
+    },
+    "BookingStatusChangedBy": {
+      "description": "Actor that changed a booking status",
+      "direction": "serverToClient",
+      "properties": {
+        "accountId": {
+          "type": "String",
+          "required": true,
+          "description": ""
+        },
+        "role": {
+          "type": "String",
+          "required": true,
+          "description": ""
+        }
+      }
     }
   },
   "enums": {
@@ -510,6 +602,24 @@
         "system_maintenance",
         "partner_verified",
         "partner_rejected"
+      ]
+    },
+    "PublicBookingStatus": {
+      "description": "Public booking status emitted to realtime clients",
+      "values": [
+        "PROCESSING",
+        "COMPLETED"
+      ]
+    },
+    "BookingStatus": {
+      "description": "Persisted booking lifecycle status",
+      "values": [
+        "PENDING_PAYMENT",
+        "CONFIRMED",
+        "IN_PROGRESS",
+        "CANCELLED",
+        "COMPLETED",
+        "NO_SHOW"
       ]
     }
   }

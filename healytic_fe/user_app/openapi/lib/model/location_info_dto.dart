@@ -16,6 +16,8 @@ class LocationInfoDto {
     required this.name,
     required this.address,
     this.mapUrl,
+    this.latitude,
+    this.longitude,
   });
 
 
@@ -31,21 +33,29 @@ class LocationInfoDto {
   ///
   Object? mapUrl;
 
+  num? latitude;
+
+  num? longitude;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is LocationInfoDto &&
     other.name == name &&
     other.address == address &&
-    other.mapUrl == mapUrl;
+    other.mapUrl == mapUrl &&
+    other.latitude == latitude &&
+    other.longitude == longitude;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (name.hashCode) +
     (address.hashCode) +
-    (mapUrl == null ? 0 : mapUrl!.hashCode);
+    (mapUrl == null ? 0 : mapUrl!.hashCode) +
+    (latitude == null ? 0 : latitude!.hashCode) +
+    (longitude == null ? 0 : longitude!.hashCode);
 
   @override
-  String toString() => 'LocationInfoDto[name=$name, address=$address, mapUrl=$mapUrl]';
+  String toString() => 'LocationInfoDto[name=$name, address=$address, mapUrl=$mapUrl, latitude=$latitude, longitude=$longitude]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -55,6 +65,16 @@ class LocationInfoDto {
       json[r'mapUrl'] = this.mapUrl;
     } else {
       json[r'mapUrl'] = null;
+    }
+    if (this.latitude != null) {
+      json[r'latitude'] = this.latitude;
+    } else {
+      json[r'latitude'] = null;
+    }
+    if (this.longitude != null) {
+      json[r'longitude'] = this.longitude;
+    } else {
+      json[r'longitude'] = null;
     }
     return json;
   }
@@ -81,6 +101,12 @@ class LocationInfoDto {
         name: mapValueOfType<String>(json, r'name')!,
         address: mapValueOfType<String>(json, r'address')!,
         mapUrl: mapValueOfType<Object>(json, r'mapUrl'),
+        latitude: json[r'latitude'] == null
+            ? null
+            : num.parse('${json[r'latitude']}'),
+        longitude: json[r'longitude'] == null
+            ? null
+            : num.parse('${json[r'longitude']}'),
       );
     }
     return null;

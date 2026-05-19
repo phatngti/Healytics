@@ -66,6 +66,7 @@ class CheckoutState {
   final CheckoutSubmissionStatus submissionStatus;
   final String? errorMessage;
   final BookingEntity? booking;
+  final String? selectedCardId;
 
   /// MoMo native deep link (e.g. `momo://…`).
   final String? moMoDeeplink;
@@ -85,6 +86,7 @@ class CheckoutState {
     this.submissionStatus = CheckoutSubmissionStatus.idle,
     this.errorMessage,
     this.booking,
+    this.selectedCardId,
     this.moMoDeeplink,
     this.moMoPayUrl,
     this.stripeClientSecret,
@@ -122,6 +124,8 @@ class CheckoutState {
     CheckoutSubmissionStatus? submissionStatus,
     String? errorMessage,
     BookingEntity? booking,
+    String? selectedCardId,
+    bool clearSelectedCard = false,
     String? moMoDeeplink,
     String? moMoPayUrl,
     String? stripeClientSecret,
@@ -134,6 +138,9 @@ class CheckoutState {
       submissionStatus: submissionStatus ?? this.submissionStatus,
       errorMessage: errorMessage,
       booking: booking ?? this.booking,
+      selectedCardId: clearSelectedCard
+          ? null
+          : selectedCardId ?? this.selectedCardId,
       moMoDeeplink: moMoDeeplink ?? this.moMoDeeplink,
       moMoPayUrl: moMoPayUrl ?? this.moMoPayUrl,
       stripeClientSecret: stripeClientSecret ?? this.stripeClientSecret,
@@ -228,6 +235,18 @@ class CheckoutNotifier extends _$CheckoutNotifier {
     state = AsyncValue.data(current.copyWith(selectedPayment: type));
   }
 
+  /// Selects a saved Stripe card for card checkout.
+  void selectSavedCard(String? cardId) {
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncValue.data(
+      current.copyWith(
+        selectedCardId: cardId,
+        clearSelectedCard: cardId == null,
+      ),
+    );
+  }
+
   /// Toggles the coin redemption switch.
   void toggleCoins(bool value) {
     final current = state.value;
@@ -274,6 +293,7 @@ class CheckoutNotifier extends _$CheckoutNotifier {
         startTime: startTime,
         productId: params.serviceId,
         idempotencyKey: idempotencyKey,
+        payLater: current.selectedPayment == PaymentMethodType.payLater,
       );
 
       // Fast-fail: slot already taken.
@@ -354,9 +374,15 @@ class CheckoutNotifier extends _$CheckoutNotifier {
   Future<void> _initiateStripePayment(BookingEntity booking) async {
     final repo = ref.read(checkoutRepositoryProvider);
     try {
-      final result = await repo.createStripePayment(booking.id);
-
       final current = state.value;
+      final cardId = current?.selectedCardId;
+      if (cardId == null || cardId.isEmpty) {
+        _setError('Please add or select a card to continue.');
+        return;
+      }
+
+      final result = await repo.createStripePayment(booking.id, cardId: cardId);
+
       if (current == null) return;
 
       state = AsyncValue.data(

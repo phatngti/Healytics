@@ -46,10 +46,7 @@ class EligibilitySchedule {
   final String? date;
   final String? timeSlotLabel;
 
-  const EligibilitySchedule({
-    this.date,
-    this.timeSlotLabel,
-  });
+  const EligibilitySchedule({this.date, this.timeSlotLabel});
 }
 
 /// Specialist info for summary display.
@@ -89,10 +86,7 @@ class EligibilityCategory {
   final String id;
   final String name;
 
-  const EligibilityCategory({
-    required this.id,
-    required this.name,
-  });
+  const EligibilityCategory({required this.id, required this.name});
 }
 
 /// Location / venue info for summary display.
@@ -100,11 +94,15 @@ class EligibilityLocation {
   final String name;
   final String address;
   final String? mapUrl;
+  final double? latitude;
+  final double? longitude;
 
   const EligibilityLocation({
     required this.name,
     required this.address,
     this.mapUrl,
+    this.latitude,
+    this.longitude,
   });
 }
 
@@ -137,14 +135,12 @@ class EligibilityPriceBreakdown {
   }
 
   /// Formatted subtotal string.
-  String get formattedSubTotal =>
-      _formatVnd(subTotal);
+  String get formattedSubTotal => _formatVnd(subTotal);
 
   /// Formatted discount string.
   String get formattedDiscount =>
       discount > 0 ? '-${_formatVnd(discount)}' : '—';
 
   /// Formatted total amount string.
-  String get formattedTotal =>
-      _formatVnd(totalAmount);
+  String get formattedTotal => _formatVnd(totalAmount);
 }

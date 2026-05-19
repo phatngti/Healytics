@@ -350,10 +350,14 @@ class ProductOperationsCardState extends ConsumerState<ProductOperationsCard> {
   }
 
   void _showStaffSelectionDialog(BuildContext context) {
+    final filteredStaff = _allStaff
+        .where((employee) => employee.role == _staffRole)
+        .toList();
+
     showDialog(
       context: context,
       builder: (context) => _EmployeeSelectionDialog(
-        allStaff: _allStaff,
+        allStaff: filteredStaff,
         selectedStaff: _selectedStaff,
         onConfirm: (selected) {
           setState(() {

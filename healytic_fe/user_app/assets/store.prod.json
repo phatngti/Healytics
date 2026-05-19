@@ -1,5 +1,6 @@
 {
     "serverEndpoint": "https://healytics.me",
+    "stripePublishableKey": "pk_test_51TOgqn93ayY18Bj3goDccVewnTWy1xiKqCi6HjIk7PxUzWInlR9y0jtl5GB5qAz8tKfkgxogpVHLr4rzfW3L9K1e00FkozYCV5",
     "customHeaders": {
         "deviceModel": "iPhone 13",
         "deviceType": "iOS"

@@ -23,21 +23,63 @@ enum ClinicProductSort {
 
   /// Converts this enum to the API query string.
   String toApiValue() => switch (this) {
-        popular => 'popular',
-        latest => 'latest',
-        topSales => 'top_sales',
-        priceAsc => 'price_asc',
-        priceDesc => 'price_desc',
-      };
+    popular => 'popular',
+    latest => 'latest',
+    topSales => 'top_sales',
+    priceAsc => 'price_asc',
+    priceDesc => 'price_desc',
+  };
+}
+
+/// Extra catalog filters controlled by the Services
+/// filter bottom sheet.
+class ClinicProductFilters {
+  const ClinicProductFilters({
+    this.minPrice,
+    this.maxPrice,
+    this.minDuration,
+    this.maxDuration,
+    this.discountOnly = false,
+  });
+
+  final double? minPrice;
+  final double? maxPrice;
+  final int? minDuration;
+  final int? maxDuration;
+  final bool discountOnly;
+
+  bool get hasActiveFilters =>
+      minPrice != null ||
+      maxPrice != null ||
+      minDuration != null ||
+      maxDuration != null ||
+      discountOnly;
+
+  ClinicProductFilters copyWith({
+    double? minPrice,
+    double? maxPrice,
+    int? minDuration,
+    int? maxDuration,
+    bool? discountOnly,
+    bool clearMinPrice = false,
+    bool clearMaxPrice = false,
+    bool clearMinDuration = false,
+    bool clearMaxDuration = false,
+  }) {
+    return ClinicProductFilters(
+      minPrice: clearMinPrice ? null : minPrice ?? this.minPrice,
+      maxPrice: clearMaxPrice ? null : maxPrice ?? this.maxPrice,
+      minDuration: clearMinDuration ? null : minDuration ?? this.minDuration,
+      maxDuration: clearMaxDuration ? null : maxDuration ?? this.maxDuration,
+      discountOnly: discountOnly ?? this.discountOnly,
+    );
+  }
 }
 
 /// A product category chip (e.g. "All Services",
 /// "Massage Therapy").
 class ClinicProductCategory {
-  const ClinicProductCategory({
-    required this.id,
-    required this.label,
-  });
+  const ClinicProductCategory({required this.id, required this.label});
 
   final String id;
   final String label;
@@ -102,8 +144,7 @@ class ClinicProductEntity {
   final int createdAtMs;
 
   /// Whether this product has a discount.
-  bool get hasDiscount =>
-      discountLabel != null && originalPrice != null;
+  bool get hasDiscount => discountLabel != null && originalPrice != null;
 }
 
 /// Paginated bundle returned by the clinic products

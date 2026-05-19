@@ -13,11 +13,11 @@ export class GetAppointmentHandler {
     private readonly bookingRepository: Repository<Booking>,
   ) {}
 
-  async execute(id: string): Promise<AppointmentResponseDto> {
-    this.logger.log(`Getting appointment: ${id}`);
+  async execute(userId: string, id: string): Promise<AppointmentResponseDto> {
+    this.logger.log(`Getting appointment: user=${userId}, appointment=${id}`);
 
     const booking = await this.bookingRepository.findOne({
-      where: { id },
+      where: { id, userId },
       relations: [
         'product',
         'product.partner',
@@ -30,7 +30,9 @@ export class GetAppointmentHandler {
     });
 
     if (!booking) {
-      this.logger.warn(`Appointment not found: ${id}`);
+      this.logger.warn(
+        `Appointment not found or forbidden: user=${userId}, appointment=${id}`,
+      );
       throw new NotFoundException(`Appointment with ID ${id} not found`);
     }
 

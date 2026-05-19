@@ -12,7 +12,7 @@ import { RegisterDto } from './dto/request/register.dto';
 import { AuthTokensDto } from './dto/response/auth-tokens-response.dto';
 import { LogoutResponseDto } from './dto/response/logout-response.dto';
 import * as bcrypt from 'bcrypt';
-import { createHash, randomBytes } from 'crypto';
+import { createHash, randomBytes, randomInt } from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@/account/enum/role.enum';
 import { UserProfile } from '@/common/entities/user-profile.entity';
@@ -23,7 +23,9 @@ import { RedisService } from '@/redis/redis.service';
 import { PasswordResetMailerService } from './password-reset-mailer.service';
 import { ForgotPasswordDto } from './dto/request/forgot-password.dto';
 import { ResetPasswordDto } from './dto/request/reset-password.dto';
+import { ValidatePasswordResetCodeDto } from './dto/request/validate-password-reset-code.dto';
 import { PasswordResetResponseDto } from './dto/response/password-reset-response.dto';
+import { ValidatePasswordResetCodeResponseDto } from './dto/response/validate-password-reset-code-response.dto';
 
 /** Roles allowed for admin/partner login */
 const ADMIN_ROLES: Role[] = [Role.ADMIN, Role.HEALTH_PARTNER, Role.EMPLOYEE];
@@ -76,6 +78,13 @@ interface PasswordResetJwtPayload extends AuthJwtPayload {
   nonce?: string;
 }
 
+interface PasswordResetCodeRecord {
+  accountId: string;
+  codeHash: string;
+  attempts: number;
+  expiresAt: string;
+}
+
 /** Validated user from authentication */
 export interface ValidatedUser {
   id: string;
@@ -108,6 +117,12 @@ export class AuthService {
   private readonly partnerVerificationCacheTtlSeconds: number;
   private readonly passwordResetExpires: string;
   private readonly passwordResetTtlSeconds: number;
+  private readonly passwordResetCodeTtlSeconds: number;
+  private readonly passwordResetMaxAttempts: number;
+  private readonly localPasswordResetCodes = new Map<
+    string,
+    PasswordResetCodeRecord
+  >();
 
   constructor(
     private readonly accountService: AccountService,
@@ -135,6 +150,14 @@ export class AuthService {
     this.passwordResetTtlSeconds = this.parseDurationSeconds(
       this.passwordResetExpires,
       15 * 60,
+    );
+    this.passwordResetCodeTtlSeconds = this.parsePositiveInteger(
+      process.env.AUTH_PASSWORD_RESET_CODE_TTL_SECONDS,
+      10 * 60,
+    );
+    this.passwordResetMaxAttempts = this.parsePositiveInteger(
+      process.env.AUTH_PASSWORD_RESET_MAX_ATTEMPTS,
+      5,
     );
   }
 
@@ -273,10 +296,29 @@ export class AuthService {
       return response;
     }
 
-    const token = await this.createPasswordResetToken(account);
-    await this.passwordResetMailer.sendPasswordResetEmail(account.email, token);
-    this.logger.log(`Password reset email queued for account: ${account.id}`);
+    const code = this.generatePasswordResetCode();
+    await this.storePasswordResetCode(account, code);
+    await this.passwordResetMailer.sendPasswordResetCode(account.email, code);
+    this.logger.log(`Password reset code queued for account: ${account.id}`);
     return response;
+  }
+
+  async validateUserPasswordResetCode(
+    dto: ValidatePasswordResetCodeDto,
+  ): Promise<ValidatePasswordResetCodeResponseDto> {
+    const email = dto.email.trim().toLowerCase();
+    const account = await this.accountService.findByEmail(email);
+    if (!account || !account.isActive) {
+      throw new BadRequestException('Invalid or expired password reset code');
+    }
+
+    await this.consumePasswordResetCode(email, dto.code);
+    const resetToken = await this.createPasswordResetToken(account);
+
+    return {
+      message: 'Password reset code verified.',
+      resetToken,
+    };
   }
 
   async resetUserPassword(
@@ -600,6 +642,99 @@ export class AuthService {
     return tokens;
   }
 
+  private generatePasswordResetCode(): string {
+    return randomInt(0, 1000000).toString().padStart(6, '0');
+  }
+
+  private async storePasswordResetCode(
+    account: Account,
+    code: string,
+  ): Promise<void> {
+    const email = account.email.trim().toLowerCase();
+    const key = this.passwordResetCodeKey(email);
+    const record: PasswordResetCodeRecord = {
+      accountId: account.id,
+      codeHash: this.hashPasswordResetCode(email, code),
+      attempts: 0,
+      expiresAt: new Date(
+        Date.now() + this.passwordResetCodeTtlSeconds * 1000,
+      ).toISOString(),
+    };
+
+    if (this.redisService && this.passwordResetCodeTtlSeconds > 0) {
+      await this.redisService.setJson(
+        key,
+        record,
+        this.passwordResetCodeTtlSeconds,
+      );
+      return;
+    }
+
+    this.localPasswordResetCodes.set(key, record);
+    this.logger.warn(
+      'Redis is unavailable for password reset codes; using process-local storage.',
+    );
+  }
+
+  private async consumePasswordResetCode(
+    email: string,
+    code: string,
+  ): Promise<void> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const key = this.passwordResetCodeKey(normalizedEmail);
+    const record = await this.getPasswordResetCodeRecord(key);
+
+    if (!record || new Date(record.expiresAt).getTime() <= Date.now()) {
+      await this.deletePasswordResetCodeRecord(key);
+      throw new BadRequestException('Invalid or expired password reset code');
+    }
+
+    const incomingHash = this.hashPasswordResetCode(normalizedEmail, code);
+    if (record.codeHash !== incomingHash) {
+      record.attempts += 1;
+      if (record.attempts >= this.passwordResetMaxAttempts) {
+        await this.deletePasswordResetCodeRecord(key);
+      } else {
+        await this.setPasswordResetCodeRecord(key, record);
+      }
+      throw new BadRequestException('Invalid or expired password reset code');
+    }
+
+    await this.deletePasswordResetCodeRecord(key);
+  }
+
+  private async getPasswordResetCodeRecord(
+    key: string,
+  ): Promise<PasswordResetCodeRecord | null> {
+    if (this.redisService) {
+      return this.redisService.getJson<PasswordResetCodeRecord>(key);
+    }
+    return this.localPasswordResetCodes.get(key) ?? null;
+  }
+
+  private async setPasswordResetCodeRecord(
+    key: string,
+    record: PasswordResetCodeRecord,
+  ): Promise<void> {
+    const ttlSeconds = Math.max(
+      1,
+      Math.ceil((new Date(record.expiresAt).getTime() - Date.now()) / 1000),
+    );
+    if (this.redisService) {
+      await this.redisService.setJson(key, record, ttlSeconds);
+      return;
+    }
+    this.localPasswordResetCodes.set(key, record);
+  }
+
+  private async deletePasswordResetCodeRecord(key: string): Promise<void> {
+    if (this.redisService) {
+      await this.redisService.del(key);
+      return;
+    }
+    this.localPasswordResetCodes.delete(key);
+  }
+
   private async createPasswordResetToken(account: Account): Promise<string> {
     const nonce = randomBytes(16).toString('hex');
     const payload: PasswordResetJwtPayload = {
@@ -654,7 +789,7 @@ export class AuthService {
   private passwordResetRequestedResponse(): PasswordResetResponseDto {
     const response = new PasswordResetResponseDto();
     response.message =
-      'If the email is registered, a password reset link has been sent.';
+      'If the email is registered, a password reset code has been sent.';
     return response;
   }
 
@@ -983,6 +1118,14 @@ export class AuthService {
     return `auth:password-reset:v1:${accountId}:${nonce}`;
   }
 
+  private passwordResetCodeKey(email: string): string {
+    return `auth:password-reset-code:v1:${this.sha256(email)}`;
+  }
+
+  private hashPasswordResetCode(email: string, code: string): string {
+    return this.sha256(`${email}:${code}`);
+  }
+
   private sha256(value: string): string {
     return createHash('sha256').update(value).digest('hex');
   }
@@ -1010,6 +1153,17 @@ export class AuthService {
     };
 
     return amount * multipliers[unit];
+  }
+
+  private parsePositiveInteger(
+    value: string | undefined,
+    fallback: number,
+  ): number {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || numeric <= 0) {
+      return fallback;
+    }
+    return Math.floor(numeric);
   }
 
   /**

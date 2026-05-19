@@ -2,6 +2,7 @@ import 'package:admin_openapi/api.dart';
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/services/api.service.dart';
+import 'package:admin_panel/core/utils/user_role_helper.dart';
 import 'package:admin_panel/features/partner/profile_completion/domain/checklist_key.dart';
 import 'package:admin_panel/features/partner/profile_completion/domain/profile_completion.entity.dart';
 
@@ -157,47 +158,153 @@ class ProfileCompletionRemoteDataSourceImpl
 
 /// Mock implementation for development and testing.
 /// Constructs domain entities directly without DTOs.
+///
+/// Uses [UserRoleHelper.isProviderProfileCompleted]
+/// to decide whether to return a fully completed
+/// profile or an incomplete one.
 class ProfileCompletionRemoteDataSourceMock
     implements ProfileCompletionRemoteDataSource {
-  PartnerProfileCompletionEntity _entity = PartnerProfileCompletionEntity(
-    id: 'mock-partner-id',
-    clinicIdentity: const ClinicIdentity(
-      brandName: 'Healytics Wellness Center',
-      legalName: 'Healytics Wellness Joint Stock Company',
-      businessType: ['SPA_BEAUTY', 'MASSAGE_THERAPY'],
-      phoneNumber: '0901234567',
-      address:
-          '123 Main Street, District 1, '
-          'Ho Chi Minh City',
-    ),
-    checklist: [
-      CompletionChecklistItem(
-        key: ChecklistKey.coverImageUrl.value,
-        label: ChecklistKey.coverImageUrl.label,
-        isRequired: true,
+  PartnerProfileCompletionEntity? _entity;
+
+  /// Lazily initializes the entity based on the
+  /// current mock account's profile-completed flag.
+  PartnerProfileCompletionEntity get _currentEntity {
+    return _entity ??= _buildInitialEntity();
+  }
+
+  set _currentEntity(PartnerProfileCompletionEntity e) {
+    _entity = e;
+  }
+
+  static PartnerProfileCompletionEntity _buildInitialEntity() {
+    final isCompleted = UserRoleHelper.isProviderProfileCompleted();
+
+    if (isCompleted) {
+      return _buildCompletedEntity();
+    }
+    return _buildIncompleteEntity();
+  }
+
+  static PartnerProfileCompletionEntity _buildCompletedEntity() {
+    return PartnerProfileCompletionEntity(
+      id: 'mock-partner-id',
+      clinicIdentity: const ClinicIdentity(
+        brandName: 'Healytics Wellness Center',
+        legalName: 'Healytics Wellness Joint Stock Company',
+        businessType: ['SPA_BEAUTY', 'MASSAGE_THERAPY'],
+        phoneNumber: '0901234567',
+        address:
+            '123 Main Street, District 1, '
+            'Ho Chi Minh City',
       ),
-      CompletionChecklistItem(
-        key: ChecklistKey.logoImageUrl.value,
-        label: ChecklistKey.logoImageUrl.label,
-        isRequired: true,
+      coverImageUrl: 'https://picsum.photos/seed/cover/800/400',
+      logoImageUrl: 'https://picsum.photos/seed/logo/200/200',
+      description:
+          'Healytics Wellness Center is a premier '
+          'health and beauty destination offering '
+          'spa treatments, massage therapy, and '
+          'holistic wellness services. Our team of '
+          'certified professionals is dedicated to '
+          'helping you achieve balance and vitality.',
+      gallery: [
+        'https://picsum.photos/seed/g1/600/400',
+        'https://picsum.photos/seed/g2/600/400',
+        'https://picsum.photos/seed/g3/600/400',
+        'https://picsum.photos/seed/g4/600/400',
+      ],
+      certifications: const [
+        PartnerCertificationItem(
+          id: 'cert-1',
+          title: 'Licensed Spa',
+          subtitle: 'Ministry of Health',
+          iconName: 'verified',
+          sortOrder: 0,
+        ),
+        PartnerCertificationItem(
+          id: 'cert-2',
+          title: 'ISO 9001:2015',
+          subtitle: 'Quality Management',
+          iconName: 'workspace_premium',
+          sortOrder: 1,
+        ),
+      ],
+      checklist: [
+        CompletionChecklistItem(
+          key: ChecklistKey.coverImageUrl.value,
+          label: ChecklistKey.coverImageUrl.label,
+          isRequired: true,
+          completed: true,
+        ),
+        CompletionChecklistItem(
+          key: ChecklistKey.logoImageUrl.value,
+          label: ChecklistKey.logoImageUrl.label,
+          isRequired: true,
+          completed: true,
+        ),
+        CompletionChecklistItem(
+          key: ChecklistKey.description.value,
+          label: ChecklistKey.description.label,
+          isRequired: true,
+          completed: true,
+        ),
+        CompletionChecklistItem(
+          key: ChecklistKey.gallery.value,
+          label: ChecklistKey.gallery.label,
+          isRequired: true,
+          completed: true,
+        ),
+        CompletionChecklistItem(
+          key: ChecklistKey.certifications.value,
+          label: ChecklistKey.certifications.label,
+          completed: true,
+        ),
+      ],
+      completionPercent: 100,
+      isCompleted: true,
+    );
+  }
+
+  static PartnerProfileCompletionEntity _buildIncompleteEntity() {
+    return PartnerProfileCompletionEntity(
+      id: 'mock-partner-id',
+      clinicIdentity: const ClinicIdentity(
+        brandName: 'Healytics Wellness Center',
+        legalName: 'Healytics Wellness Joint Stock Company',
+        businessType: ['SPA_BEAUTY', 'MASSAGE_THERAPY'],
+        phoneNumber: '0901234567',
+        address:
+            '123 Main Street, District 1, '
+            'Ho Chi Minh City',
       ),
-      CompletionChecklistItem(
-        key: ChecklistKey.description.value,
-        label: ChecklistKey.description.label,
-        isRequired: true,
-      ),
-      CompletionChecklistItem(
-        key: ChecklistKey.gallery.value,
-        label: ChecklistKey.gallery.label,
-        isRequired: true,
-      ),
-    ],
-  );
+      checklist: [
+        CompletionChecklistItem(
+          key: ChecklistKey.coverImageUrl.value,
+          label: ChecklistKey.coverImageUrl.label,
+          isRequired: true,
+        ),
+        CompletionChecklistItem(
+          key: ChecklistKey.logoImageUrl.value,
+          label: ChecklistKey.logoImageUrl.label,
+          isRequired: true,
+        ),
+        CompletionChecklistItem(
+          key: ChecklistKey.description.value,
+          label: ChecklistKey.description.label,
+          isRequired: true,
+        ),
+        CompletionChecklistItem(
+          key: ChecklistKey.gallery.value,
+          label: ChecklistKey.gallery.label,
+          isRequired: true,
+        ),
+      ],
+    );
+  }
 
   @override
   Future<PartnerProfileCompletionEntity> getProfileCompletion() async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return _entity;
+    return _currentEntity;
   }
 
   @override
@@ -212,11 +319,12 @@ class ProfileCompletionRemoteDataSourceMock
   ) async {
     await Future.delayed(const Duration(milliseconds: 600));
 
-    final gallery = request.gallery ?? _entity.gallery;
-    final description = request.description ?? _entity.description;
-    final coverImageUrl = request.coverImageUrl ?? _entity.coverImageUrl;
-    final logoImageUrl = request.logoImageUrl ?? _entity.logoImageUrl;
-    final certifications = request.certifications ?? _entity.certifications;
+    final gallery = request.gallery ?? _currentEntity.gallery;
+    final description = request.description ?? _currentEntity.description;
+    final coverImageUrl = request.coverImageUrl ?? _currentEntity.coverImageUrl;
+    final logoImageUrl = request.logoImageUrl ?? _currentEntity.logoImageUrl;
+    final certifications =
+        request.certifications ?? _currentEntity.certifications;
 
     final checklist = [
       CompletionChecklistItem(
@@ -253,9 +361,9 @@ class ProfileCompletionRemoteDataSourceMock
       ),
     ];
 
-    _entity = PartnerProfileCompletionEntity(
-      id: _entity.id,
-      clinicIdentity: _entity.clinicIdentity,
+    _currentEntity = PartnerProfileCompletionEntity(
+      id: _currentEntity.id,
+      clinicIdentity: _currentEntity.clinicIdentity,
       coverImageUrl: coverImageUrl,
       logoImageUrl: logoImageUrl,
       description: description,
@@ -272,6 +380,6 @@ class ProfileCompletionRemoteDataSourceMock
           .every((item) => item.completed),
     );
 
-    return _entity;
+    return _currentEntity;
   }
 }

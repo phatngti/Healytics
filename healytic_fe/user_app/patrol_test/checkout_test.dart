@@ -66,7 +66,7 @@ void main() {
 
     expect($('Booking Confirmed!'), findsOneWidget);
     expect(
-      $('Your booking has been created. Please proceed to payment.'),
+      $('Your booking has been confirmed. Payment is due at the clinic.'),
       findsOneWidget,
     );
   });

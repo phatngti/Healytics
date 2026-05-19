@@ -17,6 +17,7 @@ import {
   verifyIPNSignature,
 } from './utils/momo.security';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 import { BookingPaymentService } from './booking-payment.service';
 import { Payment } from '@/common/entities/payment.entity';
 import { PaymentTransactionLog } from '@/common/entities/payment-transaction-log.entity';
@@ -243,6 +244,7 @@ export class MoMoPaymentService {
         BookingStatus.CANCELLED,
         userId,
         'Refund successful via MoMo',
+        BookingStatusReasonCode.PAYMENT_REFUND_MOMO_CANCELLED,
       );
     }
 
@@ -322,6 +324,7 @@ export class MoMoPaymentService {
           BookingStatus.CONFIRMED,
           'system',
           `MoMo payment confirmed: transId=${ipn.transId}`,
+          BookingStatusReasonCode.PAYMENT_CONFIRMED_MOMO,
         );
 
         this.logger.log(`IPN success: ${ipn.orderId} -> booking ${bookingId}`);

@@ -12,7 +12,7 @@ import {
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { HealthServiceType } from '@/health-service/enums/health-service-type.enum';
 import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
 import {
@@ -21,6 +21,10 @@ import {
   CreatePartnerHealthServiceFacilityImageDto,
   ServiceManualInputDto,
 } from './create-partner-health-service.dto';
+
+export class UpdatePartnerHealthServiceDefinitionDto extends PartialType(
+  CreatePartnerHealthServiceDefinitionDto,
+) {}
 
 /**
  * Update DTO for health services.
@@ -121,13 +125,13 @@ export class UpdatePartnerHealthServiceDto {
   media?: CreatePartnerHealthServiceMediaDto[];
 
   @ApiPropertyOptional({
-    type: CreatePartnerHealthServiceDefinitionDto,
+    type: UpdatePartnerHealthServiceDefinitionDto,
     nullable: true,
   })
   @IsOptional()
   @ValidateNested()
-  @Type(() => CreatePartnerHealthServiceDefinitionDto)
-  productDefinition?: CreatePartnerHealthServiceDefinitionDto;
+  @Type(() => UpdatePartnerHealthServiceDefinitionDto)
+  productDefinition?: UpdatePartnerHealthServiceDefinitionDto;
 
   @ApiPropertyOptional({
     type: [CreatePartnerHealthServiceFacilityImageDto],

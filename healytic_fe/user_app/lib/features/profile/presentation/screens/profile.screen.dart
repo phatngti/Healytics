@@ -47,21 +47,11 @@ class ProfilePage extends HookConsumerWidget {
     }, const []);
 
     final accountMeState = ref.watch(accountMeProvider);
-    final profileSummaryState = ref.watch(
-      profileSummaryProvider,
-    );
-    final userNameFallback = ref.watch(
-      currentUserDisplayNameProvider,
-    );
-    final hPadding = AppDimens.horizontalPadding(
-      context,
-    );
-    final bottomPadding = AppDimens.bottomScrollPadding(
-      context,
-    );
-    final sectionGap = AppDimens.sectionSpacing(
-      context,
-    );
+    final profileSummaryState = ref.watch(profileSummaryProvider);
+    final userNameFallback = ref.watch(currentUserDisplayNameProvider);
+    final hPadding = AppDimens.horizontalPadding(context);
+    final bottomPadding = AppDimens.bottomScrollPadding(context);
+    final sectionGap = AppDimens.sectionSpacing(context);
 
     return MainScreenLayout(
       title: 'Profile',
@@ -83,22 +73,17 @@ class ProfilePage extends HookConsumerWidget {
                   displayName: user.displayName,
                   email: user.email,
                   avatarUrl: user.avatarUrl,
-                  onEditProfile: () => context
-                      .pushNamed('edit_profile'),
+                  onEditProfile: () => context.pushNamed('edit_profile'),
                 ),
                 loading: () => ProfileHeader(
-                  displayName:
-                      userNameFallback ?? 'Loading...',
+                  displayName: userNameFallback ?? 'Loading...',
                   email: '',
-                  onEditProfile: () => context
-                      .pushNamed('edit_profile'),
+                  onEditProfile: () => context.pushNamed('edit_profile'),
                 ),
                 error: (err, stack) => ProfileHeader(
-                  displayName:
-                      userNameFallback ?? 'Guest',
+                  displayName: userNameFallback ?? 'Guest',
                   email: 'Error loading profile',
-                  onEditProfile: () => context
-                      .pushNamed('edit_profile'),
+                  onEditProfile: () => context.pushNamed('edit_profile'),
                 ),
               ),
               SizedBox(height: sectionGap * 1.5),
@@ -108,27 +93,24 @@ class ProfilePage extends HookConsumerWidget {
                   ordersCount: summary.ordersCount,
                   wishlistCount: summary.wishlistCount,
                   points: summary.pointsLabel,
-                  onOrdersTap: () =>
-                      const OrderApprovedRoute()
-                          .go(context),
+                  onOrdersTap: () => const OrderApprovedRoute().go(context),
                 ),
-                loading: () =>
-                    const ProfileQuickStats(),
+                loading: () => const ProfileQuickStats(),
                 error: (_, _) => ProfileQuickStats(
-                  onOrdersTap: () =>
-                      const OrderApprovedRoute()
-                          .go(context),
+                  onOrdersTap: () => const OrderApprovedRoute().go(context),
                 ),
               ),
               SizedBox(height: sectionGap * 1.5),
 
-              // § 4 — Log Out
-              ProfileLogoutButton(
-                onPressed: () => _handleLogout(
-                  context,
-                  ref,
-                ),
+              _ProfileActionTile(
+                icon: Icons.credit_card,
+                label: 'Payment Cards',
+                onTap: () => context.pushNamed(PaymentCardsRoute.name),
               ),
+              SizedBox(height: sectionGap),
+
+              // § 4 — Log Out
+              ProfileLogoutButton(onPressed: () => _handleLogout(context, ref)),
               SizedBox(height: sectionGap),
             ],
           ),
@@ -195,5 +177,54 @@ class ProfilePage extends HookConsumerWidget {
         ref.read(authSessionStoreProvider).forceLogout();
       }
     });
+  }
+}
+
+class _ProfileActionTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _ProfileActionTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Material(
+      color: colorScheme.surface,
+      borderRadius: AppDimens.radiusMedium,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: AppDimens.radiusMedium,
+        child: Container(
+          padding: const EdgeInsets.all(AppDimens.spaceMd),
+          decoration: BoxDecoration(
+            borderRadius: AppDimens.radiusMedium,
+            border: Border.all(color: colorScheme.outlineVariant),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: colorScheme.primary),
+              AppDimens.horizontalMedium,
+              Expanded(
+                child: Text(
+                  label,
+                  style: textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

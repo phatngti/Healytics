@@ -6,16 +6,13 @@ import 'package:user_app/features/clinic_info/domain/repositories/clinic_info.re
 
 /// Concrete [ClinicInfoRepository] backed by a remote
 /// datasource.
-class ClinicInfoRepositoryImpl
-    implements ClinicInfoRepository {
+class ClinicInfoRepositoryImpl implements ClinicInfoRepository {
   const ClinicInfoRepositoryImpl(this._datasource);
 
   final ClinicInfoRemoteDatasource _datasource;
 
   @override
-  Future<ClinicInfoEntity> getClinicInfo(
-    String clinicId,
-  ) {
+  Future<ClinicInfoEntity> getClinicInfo(String clinicId) {
     return _datasource.getClinicInfo(clinicId);
   }
 
@@ -23,20 +20,20 @@ class ClinicInfoRepositoryImpl
   Future<ClinicProductsData> getClinicProducts(
     String clinicId, {
     String? categoryId,
-    ClinicProductSort sort =
-        ClinicProductSort.popular,
+    ClinicProductSort sort = ClinicProductSort.popular,
     String? search,
+    ClinicProductFilters filters = const ClinicProductFilters(),
     int page = 1,
     int limit = 20,
-  }) =>
-      _datasource.getClinicProducts(
-        clinicId,
-        categoryId: categoryId,
-        sort: sort,
-        search: search,
-        page: page,
-        limit: limit,
-      );
+  }) => _datasource.getClinicProducts(
+    clinicId,
+    categoryId: categoryId,
+    sort: sort,
+    search: search,
+    filters: filters,
+    page: page,
+    limit: limit,
+  );
 
   @override
   Future<ClinicReviewsData> getClinicReviews(
@@ -45,14 +42,13 @@ class ClinicInfoRepositoryImpl
     int limit = 10,
     int? starCount,
     bool? hasMedia,
-  }) =>
-      _datasource.getClinicReviews(
-        clinicId,
-        page: page,
-        limit: limit,
-        starCount: starCount,
-        hasMedia: hasMedia,
-      );
+  }) => _datasource.getClinicReviews(
+    clinicId,
+    page: page,
+    limit: limit,
+    starCount: starCount,
+    hasMedia: hasMedia,
+  );
 
   @override
   Future<ClinicInfoEntity> setFollowing(String clinicId, bool isFollowing) {

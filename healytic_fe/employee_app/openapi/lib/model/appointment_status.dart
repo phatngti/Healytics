@@ -25,6 +25,7 @@ class AppointmentStatus {
 
   static const pendingPayment = AppointmentStatus._(r'pending_payment');
   static const upcoming = AppointmentStatus._(r'upcoming');
+  static const processing = AppointmentStatus._(r'processing');
   static const completed = AppointmentStatus._(r'completed');
   static const canceled = AppointmentStatus._(r'canceled');
 
@@ -32,6 +33,7 @@ class AppointmentStatus {
   static const values = <AppointmentStatus>[
     pendingPayment,
     upcoming,
+    processing,
     completed,
     canceled,
   ];
@@ -74,6 +76,7 @@ class AppointmentStatusTypeTransformer {
       switch (data) {
         case r'pending_payment': return AppointmentStatus.pendingPayment;
         case r'upcoming': return AppointmentStatus.upcoming;
+        case r'processing': return AppointmentStatus.processing;
         case r'completed': return AppointmentStatus.completed;
         case r'canceled': return AppointmentStatus.canceled;
         default:

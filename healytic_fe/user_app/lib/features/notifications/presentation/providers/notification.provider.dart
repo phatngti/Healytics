@@ -42,6 +42,8 @@ class NotificationNotifier extends _$NotificationNotifier {
   List<NotificationEntity> _all = [];
   String? _nextCursor;
   bool _hasMore = true;
+  final Set<String> _markingReadIds = <String>{};
+  bool _isMarkingAllRead = false;
 
   @override
   FutureOr<List<NotificationEntity>> build() async {
@@ -73,8 +75,13 @@ class NotificationNotifier extends _$NotificationNotifier {
   /// Mark a single notification as read
   /// (optimistic update).
   Future<void> markRead(String id) async {
+    if (_isMarkingAllRead || _markingReadIds.contains(id)) {
+      return;
+    }
+
     final idx = _all.indexWhere((n) => n.id == id);
     if (idx == -1 || _all[idx].isRead) return;
+    _markingReadIds.add(id);
     final previousNotification = _all[idx];
     final previousUnreadCount = ref.read(unreadCountProvider).value;
 
@@ -96,15 +103,22 @@ class NotificationNotifier extends _$NotificationNotifier {
       } else {
         ref.invalidate(unreadCountProvider);
       }
+    } finally {
+      _markingReadIds.remove(id);
     }
   }
 
   /// Mark all notifications as read.
   Future<void> markAllRead() async {
+    if (_isMarkingAllRead) {
+      return;
+    }
+
     if (_all.every((notification) => notification.isRead)) {
       return;
     }
 
+    _isMarkingAllRead = true;
     final previousAll = List<NotificationEntity>.from(_all);
     final previousUnreadCount = ref.read(unreadCountProvider).value;
     _all = _all.map((n) => n.isRead ? n : n.copyWith(isRead: true)).toList();
@@ -124,6 +138,8 @@ class NotificationNotifier extends _$NotificationNotifier {
       } else {
         ref.invalidate(unreadCountProvider);
       }
+    } finally {
+      _isMarkingAllRead = false;
     }
   }
 

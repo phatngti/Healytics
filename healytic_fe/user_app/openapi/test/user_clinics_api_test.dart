@@ -33,7 +33,7 @@ void main() {
 
     // Get clinic products/services catalog
     //
-    //Future<ClinicProductsResponseDto> userClinicControllerGetClinicProducts(String id, { String categoryId, String sort, String search, num page, num limit }) async
+    //Future<ClinicProductsResponseDto> userClinicControllerGetClinicProducts(String id, { String categoryId, String sort, String search, num minPrice, num maxPrice, num minDuration, num maxDuration, bool discountOnly, num page, num limit }) async
     test('test userClinicControllerGetClinicProducts', () async {
       // TODO
     });

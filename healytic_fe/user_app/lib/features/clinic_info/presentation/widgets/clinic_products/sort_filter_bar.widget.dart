@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:user_app/features/clinic_info/domain/entities/clinic_product.entity.dart';
 import 'package:user_app/features/clinic_info/presentation/providers/clinic_products.provider.dart';
+import 'package:user_app/features/clinic_info/presentation/widgets/clinic_products/product_filter_sheet.widget.dart';
 
 /// Horizontal row of sort options (Popular, Latest,
 /// Top Sales, Price) with a trailing filter icon.
@@ -167,21 +168,20 @@ class _PriceSortButton extends ConsumerWidget {
 }
 
 /// Trailing filter icon button.
-class _FilterButton extends StatelessWidget {
+class _FilterButton extends ConsumerWidget {
   const _FilterButton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final filters = ref.watch(clinicProductFilterProvider);
 
     return Semantics(
       button: true,
       label: 'Filter products',
       child: GestureDetector(
-        onTap: () {
-          // TODO(product): Open filter bottom sheet
-        },
+        onTap: () => _showFilterSheet(context, ref, filters),
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
           height: AppDimens.touchTarget,
@@ -192,20 +192,44 @@ class _FilterButton extends StatelessWidget {
                 Text(
                   'Filter',
                   style: textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: filters.hasActiveFilters
+                        ? FontWeight.bold
+                        : FontWeight.w500,
+                    color: filters.hasActiveFilters
+                        ? colorScheme.primary
+                        : colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(width: AppDimens.spaceXs),
                 Icon(
                   Icons.filter_alt_outlined,
                   size: AppDimens.iconSm,
-                  color: colorScheme.onSurfaceVariant,
+                  color: filters.hasActiveFilters
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showFilterSheet(
+    BuildContext context,
+    WidgetRef ref,
+    ClinicProductFilters filters,
+  ) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => ProductFilterSheet(
+        initialFilters: filters,
+        onApply: (next) =>
+            ref.read(clinicProductFilterProvider.notifier).apply(next),
+        onReset: () => ref.read(clinicProductFilterProvider.notifier).reset(),
       ),
     );
   }

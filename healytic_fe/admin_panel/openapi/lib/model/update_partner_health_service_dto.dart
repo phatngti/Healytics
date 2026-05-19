@@ -95,7 +95,7 @@ class UpdatePartnerHealthServiceDto {
 
   List<CreatePartnerHealthServiceMediaDto>? media;
 
-  CreatePartnerHealthServiceDefinitionDto? productDefinition;
+  UpdatePartnerHealthServiceDefinitionDto? productDefinition;
 
   List<CreatePartnerHealthServiceFacilityImageDto>? facilityImages;
 
@@ -266,7 +266,7 @@ class UpdatePartnerHealthServiceDto {
             ? (json[r'tagIds'] as Iterable).cast<String>().toList(growable: false)
             : const [],
         media: CreatePartnerHealthServiceMediaDto.listFromJson(json[r'media']),
-        productDefinition: CreatePartnerHealthServiceDefinitionDto.fromJson(json[r'productDefinition']),
+        productDefinition: UpdatePartnerHealthServiceDefinitionDto.fromJson(json[r'productDefinition']),
         facilityImages: CreatePartnerHealthServiceFacilityImageDto.listFromJson(json[r'facilityImages']),
         serviceManual: ServiceManualInputDto.fromJson(json[r'serviceManual']),
       );

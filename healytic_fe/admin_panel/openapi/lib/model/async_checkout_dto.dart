@@ -19,6 +19,7 @@ class AsyncCheckoutDto {
     required this.productId,
     required this.idempotencyKey,
     this.webhookUrl,
+    this.payLater = false,
   });
 
 
@@ -46,6 +47,9 @@ class AsyncCheckoutDto {
   ///
   String? webhookUrl;
 
+  /// If true, booking is immediately CONFIRMED without requiring payment. The booking has no payment URL or expiry — suitable for in-person pay-later scenarios.
+  bool payLater;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is AsyncCheckoutDto &&
     other.userId == userId &&
@@ -53,7 +57,8 @@ class AsyncCheckoutDto {
     other.startTime == startTime &&
     other.productId == productId &&
     other.idempotencyKey == idempotencyKey &&
-    other.webhookUrl == webhookUrl;
+    other.webhookUrl == webhookUrl &&
+    other.payLater == payLater;
 
   @override
   int get hashCode =>
@@ -63,10 +68,11 @@ class AsyncCheckoutDto {
     (startTime.hashCode) +
     (productId.hashCode) +
     (idempotencyKey.hashCode) +
-    (webhookUrl == null ? 0 : webhookUrl!.hashCode);
+    (webhookUrl == null ? 0 : webhookUrl!.hashCode) +
+    (payLater.hashCode);
 
   @override
-  String toString() => 'AsyncCheckoutDto[userId=$userId, staffId=$staffId, startTime=$startTime, productId=$productId, idempotencyKey=$idempotencyKey, webhookUrl=$webhookUrl]';
+  String toString() => 'AsyncCheckoutDto[userId=$userId, staffId=$staffId, startTime=$startTime, productId=$productId, idempotencyKey=$idempotencyKey, webhookUrl=$webhookUrl, payLater=$payLater]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -80,6 +86,7 @@ class AsyncCheckoutDto {
     } else {
       json[r'webhookUrl'] = null;
     }
+      json[r'payLater'] = this.payLater;
     return json;
   }
 
@@ -108,6 +115,7 @@ class AsyncCheckoutDto {
         productId: mapValueOfType<String>(json, r'productId')!,
         idempotencyKey: mapValueOfType<String>(json, r'idempotencyKey')!,
         webhookUrl: mapValueOfType<String>(json, r'webhookUrl'),
+        payLater: mapValueOfType<bool>(json, r'payLater') ?? false,
       );
     }
     return null;

@@ -5,6 +5,7 @@ import {
   IsString,
   IsOptional,
   IsUrl,
+  IsBoolean,
   MaxLength,
 } from 'class-validator';
 
@@ -43,4 +44,16 @@ export class AsyncCheckoutDto {
   @IsUrl()
   @IsOptional()
   webhookUrl?: string;
+
+  @ApiPropertyOptional({
+    type: Boolean,
+    description:
+      'If true, booking is immediately CONFIRMED without requiring payment. ' +
+      'The booking has no payment URL or expiry — suitable for in-person pay-later scenarios.',
+    example: false,
+    default: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  payLater?: boolean;
 }

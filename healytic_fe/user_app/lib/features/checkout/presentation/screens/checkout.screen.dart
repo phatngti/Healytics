@@ -5,15 +5,19 @@ import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart'
+    as checkout;
+import 'package:user_app/features/checkout/domain/entities/payment_card.entity.dart';
 import 'package:user_app/features/checkout/presentation/providers/checkout.provider.dart';
 import 'package:user_app/features/checkout/presentation/providers/momo_launcher.dart';
+import 'package:user_app/features/checkout/presentation/providers/saved_cards.provider.dart';
 import 'package:user_app/features/checkout/presentation/widgets/checkout_bottom_bar.widget.dart';
 import 'package:user_app/features/checkout/presentation/widgets/checkout/checkout_submission_overlay.widget.dart';
 import 'package:user_app/features/checkout/presentation/widgets/order_items_section.widget.dart';
 import 'package:user_app/features/checkout/presentation/widgets/payment_details_section.widget.dart';
 import 'package:user_app/features/checkout/presentation/widgets/payment_method_section.widget.dart';
+import 'package:user_app/features/checkout/presentation/widgets/saved_cards_section.widget.dart';
 import 'package:user_app/features/checkout/presentation/widgets/vouchers_section.widget.dart';
 import 'package:user_app/router/routes.dart';
 
@@ -162,9 +166,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     try {
       await Stripe.instance.confirmPayment(
         paymentIntentClientSecret: clientSecret,
-        data: const PaymentMethodParams.card(
-          paymentMethodData: PaymentMethodData(),
-        ),
       );
 
       // On-device confirmation succeeded — verify
@@ -265,7 +266,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         content: Text(
-          booking?.paymentUrl != null
+          state.selectedPayment == checkout.PaymentMethodType.payLater
+              ? 'Your booking has been confirmed. '
+                    'Payment is due at the clinic.'
+              : booking?.paymentUrl != null
               ? 'Your booking has been created. '
                     'Please proceed to payment.'
               : 'Your booking has been created '
@@ -299,6 +303,11 @@ class _CheckoutBody extends ConsumerWidget {
     final data = state.checkoutData;
     final summary = data.summary;
     final notifier = ref.read(checkoutProvider.notifier);
+    final AsyncValue<List<SavedPaymentCard>> cardsAsync =
+        state.selectedPayment == checkout.PaymentMethodType.card
+        ? ref.watch(savedPaymentCardsProvider)
+        : const AsyncValue<List<SavedPaymentCard>>.data([]);
+    _syncSelectedCard(ref, state, cardsAsync);
     final hPad = AppDimens.horizontalPadding(context);
     final section = AppDimens.sectionSpacing(context);
     final bottomBar = AppDimens.adaptive(
@@ -329,6 +338,15 @@ class _CheckoutBody extends ConsumerWidget {
               selectedType: state.selectedPayment,
               onSelected: notifier.selectPaymentMethod,
             ),
+            if (state.selectedPayment == checkout.PaymentMethodType.card) ...[
+              SizedBox(height: section),
+              SavedCardsSection(
+                cardsAsync: cardsAsync,
+                selectedCardId: state.selectedCardId,
+                onSelected: notifier.selectSavedCard,
+                onAddCard: () => _addCard(context, ref),
+              ),
+            ],
             SizedBox(height: section),
             PaymentDetailsSection(
               subtotal: summary.subtotal,
@@ -360,5 +378,57 @@ class _CheckoutBody extends ConsumerWidget {
           Positioned.fill(child: CheckoutSubmissionOverlay(state: state)),
       ],
     );
+  }
+
+  Future<void> _addCard(BuildContext context, WidgetRef ref) async {
+    try {
+      final cards =
+          ref.read(savedPaymentCardsProvider).asData?.value ?? const [];
+      final card = await ref
+          .read(savedPaymentCardsControllerProvider)
+          .addCard(setDefault: cards.isEmpty);
+      ref.read(checkoutProvider.notifier).selectSavedCard(card.id);
+      if (!context.mounted) return;
+      ToastContext.showToast(context, ToastType.success, 'Card added.');
+    } on StripeException catch (e) {
+      if (e.error.code == FailureCode.Canceled) return;
+      if (!context.mounted) return;
+      ToastContext.showToast(
+        context,
+        ToastType.error,
+        e.error.localizedMessage ?? 'Failed to add card.',
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ToastContext.showToast(context, ToastType.error, '$e');
+    }
+  }
+
+  void _syncSelectedCard(
+    WidgetRef ref,
+    CheckoutState state,
+    AsyncValue<List<SavedPaymentCard>> cardsAsync,
+  ) {
+    if (state.selectedPayment != checkout.PaymentMethodType.card) return;
+    final cards = cardsAsync.asData?.value;
+    if (cards == null) return;
+
+    final selectedExists = cards.any((card) => card.id == state.selectedCardId);
+    if (cards.isEmpty && state.selectedCardId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(checkoutProvider.notifier).selectSavedCard(null);
+      });
+      return;
+    }
+
+    if (cards.isNotEmpty && !selectedExists) {
+      final defaultCard = cards.firstWhere(
+        (card) => card.isDefault,
+        orElse: () => cards.first,
+      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(checkoutProvider.notifier).selectSavedCard(defaultCard.id);
+      });
+    }
   }
 }

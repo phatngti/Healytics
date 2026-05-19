@@ -27,7 +27,21 @@ class SignInPageKeys {
 
 class ForgotPasswordPageKeys {
   final emailTextField = const Key('forgotPasswordEmailTextField');
-  final sendResetLinkButton = const Key('forgotPasswordSendResetLinkButton');
+  final sendResetCodeButton = const Key('forgotPasswordSendResetCodeButton');
+}
+
+class PasswordResetCodePageKeys {
+  final pinput = const Key('passwordResetCodePinput');
+  final submitButton = const Key('passwordResetCodeSubmitButton');
+  final resendButton = const Key('passwordResetCodeResendButton');
+}
+
+class ResetPasswordPageKeys {
+  final passwordTextField = const Key('resetPasswordPasswordTextField');
+  final confirmPasswordTextField = const Key(
+    'resetPasswordConfirmPasswordTextField',
+  );
+  final submitButton = const Key('resetPasswordSubmitButton');
 }
 
 // --- Sign Up: Email Form ---
@@ -121,6 +135,8 @@ class Keys {
   final onboardPage = OnboardPageKeys();
   final signInPage = SignInPageKeys();
   final forgotPasswordPage = ForgotPasswordPageKeys();
+  final passwordResetCodePage = PasswordResetCodePageKeys();
+  final resetPasswordPage = ResetPasswordPageKeys();
   final emailFormPage = EmailFormPageKeys();
   final codeConfirmationPage = CodeConfirmationPageKeys();
   final homePage = HomePageKeys();
