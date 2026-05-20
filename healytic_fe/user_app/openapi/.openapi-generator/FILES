@@ -3,6 +3,7 @@
 .travis.yml
 README.md
 analysis_options.yaml
+doc/AccountAddressDto.md
 doc/AccountApi.md
 doc/AccountMeResponseDto.md
 doc/AccountRequestDto.md
@@ -346,6 +347,7 @@ doc/RecommendedServiceResponseDto.md
 doc/RecommenderApi.md
 doc/RefreshTokenRequestDto.md
 doc/RefundCaseActionDto.md
+doc/RegisterAddressDto.md
 doc/RegisterDeviceDto.md
 doc/RegisterDto.md
 doc/RegisterPartnerDto.md
@@ -381,6 +383,7 @@ doc/TimeSlotDto.md
 doc/TotalPartnersResponseDto.md
 doc/TreatmentReviewResponseDto.md
 doc/UpcomingAppointmentDto.md
+doc/UpdateAccountAddressDto.md
 doc/UpdateAvatarDto.md
 doc/UpdateBookingStatusDto.md
 doc/UpdateCategoryDto.md
@@ -476,6 +479,7 @@ lib/auth/authentication.dart
 lib/auth/http_basic_auth.dart
 lib/auth/http_bearer_auth.dart
 lib/auth/oauth.dart
+lib/model/account_address_dto.dart
 lib/model/account_me_response_dto.dart
 lib/model/account_request_dto.dart
 lib/model/add_to_cart_dto.dart
@@ -788,6 +792,7 @@ lib/model/recommendation_response.dart
 lib/model/recommended_service_response_dto.dart
 lib/model/refresh_token_request_dto.dart
 lib/model/refund_case_action_dto.dart
+lib/model/register_address_dto.dart
 lib/model/register_device_dto.dart
 lib/model/register_dto.dart
 lib/model/register_partner_dto.dart
@@ -821,6 +826,7 @@ lib/model/time_slot_dto.dart
 lib/model/total_partners_response_dto.dart
 lib/model/treatment_review_response_dto.dart
 lib/model/upcoming_appointment_dto.dart
+lib/model/update_account_address_dto.dart
 lib/model/update_avatar_dto.dart
 lib/model/update_booking_status_dto.dart
 lib/model/update_category_dto.dart
@@ -844,6 +850,7 @@ lib/model/wishlist_item_response_dto.dart
 lib/model/work_history_entry_dto.dart
 lib/model/work_schedule_entry_dto.dart
 pubspec.yaml
+test/account_address_dto_test.dart
 test/account_api_test.dart
 test/account_me_response_dto_test.dart
 test/account_request_dto_test.dart
@@ -1187,6 +1194,7 @@ test/recommended_service_response_dto_test.dart
 test/recommender_api_test.dart
 test/refresh_token_request_dto_test.dart
 test/refund_case_action_dto_test.dart
+test/register_address_dto_test.dart
 test/register_device_dto_test.dart
 test/register_dto_test.dart
 test/register_partner_dto_test.dart
@@ -1222,6 +1230,7 @@ test/time_slot_dto_test.dart
 test/total_partners_response_dto_test.dart
 test/treatment_review_response_dto_test.dart
 test/upcoming_appointment_dto_test.dart
+test/update_account_address_dto_test.dart
 test/update_avatar_dto_test.dart
 test/update_booking_status_dto_test.dart
 test/update_category_dto_test.dart

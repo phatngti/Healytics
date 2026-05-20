@@ -12,11 +12,14 @@ import type { Stripe as StripeClient } from 'stripe/cjs/stripe.core.js';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 import { BookingPaymentService } from './booking-payment.service';
+import { NotificationEventService } from '@/notification/services/notification-event.service';
+import { NotificationType } from '@/notification/enums/notification-type.enum';
 import { Account } from '@/common/entities/account.entity';
 import { Payment } from '@/common/entities/payment.entity';
 import { PaymentTransactionLog } from '@/common/entities/payment-transaction-log.entity';
 import { UserPaymentCustomer } from '@/common/entities/user-payment-customer.entity';
 import { UserPaymentMethod } from '@/common/entities/user-payment-method.entity';
+import { Product } from '@/common/entities/product.entity';
 import { PaymentMethod } from './enums/payment-method.enum';
 import { PaymentStatus } from './enums/payment-status.enum';
 import { TransactionAction } from './enums/transaction-action.enum';
@@ -37,6 +40,7 @@ export class StripePaymentService {
   constructor(
     private readonly configService: ConfigService,
     private readonly bookingPaymentService: BookingPaymentService,
+    private readonly notificationEventService: NotificationEventService,
     @InjectRepository(Account)
     private readonly accountRepo: Repository<Account>,
     @InjectRepository(Payment)
@@ -47,6 +51,8 @@ export class StripePaymentService {
     private readonly customerRepo: Repository<UserPaymentCustomer>,
     @InjectRepository(UserPaymentMethod)
     private readonly cardRepo: Repository<UserPaymentMethod>,
+    @InjectRepository(Product)
+    private readonly productRepo: Repository<Product>,
   ) {
     const secretKey =
       this.configService.getOrThrow<string>('STRIPE_SECRET_KEY');
@@ -635,6 +641,46 @@ export class StripePaymentService {
         `Stripe payment confirmed: ${paymentIntent.id}`,
         BookingStatusReasonCode.PAYMENT_CONFIRMED_STRIPE,
       );
+
+      // Send booking confirmation notification after payment success
+      try {
+        const booking = await this.bookingPaymentService.findById(bookingId);
+        let serviceName: string | null = null;
+        if (booking.productId) {
+          const product = await this.productRepo.findOne({
+            where: { id: booking.productId },
+          });
+          serviceName = product?.name ?? null;
+        }
+
+        const startDate = booking.startTime;
+        const dateStr = startDate
+          ? startDate.toLocaleDateString('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+            })
+          : 'your scheduled date';
+
+        this.notificationEventService.emit({
+          type: NotificationType.BOOKING_CONFIRMED,
+          recipientId: booking.userId,
+          title: 'Payment Successful! 🎉',
+          body: serviceName
+            ? `Your payment for "${serviceName}" on ${dateStr} has been confirmed. Your booking is now confirmed!`
+            : `Your payment on ${dateStr} has been confirmed. Your booking is now confirmed!`,
+          data: {
+            bookingId: booking.id,
+            action: 'view_booking',
+          },
+        });
+      } catch (notifError) {
+        this.logger.error(
+          `Notification emit failed after Stripe webhook — bookingId=${bookingId}`,
+          notifError instanceof Error ? notifError.stack : undefined,
+        );
+        // Don't throw — payment is already confirmed
+      }
 
       this.logger.log(
         `Webhook success: ${paymentIntent.id} -> booking ${bookingId}`,

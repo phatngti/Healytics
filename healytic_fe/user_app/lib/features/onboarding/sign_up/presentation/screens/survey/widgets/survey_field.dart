@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
+import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/widgets/survey_text_styles.dart';
 
 /// A survey dropdown field that delegates to
 /// [FormFieldBuilders.buildCustomDropdownField] for consistent
@@ -32,9 +33,12 @@ class SurveyField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final optionTextStyle = SurveyTextStyles.optionText(context);
+
     return FormFieldBuilders.buildCustomDropdownField(
       context,
       label: label,
+      labelStyle: SurveyTextStyles.questionLabel(context),
       fieldKey: fieldKey,
       initialValue: initialValue,
       hintText: 'Select an option',
@@ -42,13 +46,14 @@ class SurveyField extends StatelessWidget {
           .map(
             (option) => DropdownMenuItem(
               value: option['value'],
-              child: Text(option['text'] as String),
+              child: Text(option['text'] as String, style: optionTextStyle),
             ),
           )
           .toList(),
       onChanged: onChanged,
       validator: validator,
       enabled: enabled,
+      style: optionTextStyle,
       uppercaseLabel: false,
     );
   }

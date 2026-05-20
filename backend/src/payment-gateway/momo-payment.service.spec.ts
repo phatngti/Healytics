@@ -1,9 +1,11 @@
+import { ArgumentMetadata, ValidationPipe } from '@nestjs/common';
 import {
   signHmacSha256,
   createPaymentRawSignature,
   createRefundRawSignature,
   verifyIPNSignature,
 } from './utils/momo.security';
+import { MoMoIPNDto } from './dto';
 
 /**
  * Unit tests cho MoMo Security Utility.
@@ -199,6 +201,45 @@ describe('MoMo Security Utility', () => {
 
       expect(verifyIPNSignature(accessKey, secretKey, tamperedIPN)).toBe(false);
     });
+  });
+});
+
+describe('MoMoIPNDto validation', () => {
+  it('keeps MoMo callback fields when global whitelist validation is enabled', async () => {
+    const pipe = new ValidationPipe({ whitelist: true });
+    const metadata: ArgumentMetadata = {
+      type: 'body',
+      metatype: MoMoIPNDto,
+      data: '',
+    };
+
+    const result = (await pipe.transform(
+      {
+        partnerCode: 'MOMO',
+        orderId: 'BK-46309d24_017d8',
+        requestId: 'BK-46309d24_017d8_376ea',
+        amount: 299000,
+        orderInfo: 'Thanh toan booking 46309d24-fb95-4879-918d-c681bf4d973d',
+        orderType: 'momo_wallet',
+        transId: 4750512745,
+        resultCode: 99,
+        message: 'Lỗi không xác định.',
+        payType: 'webApp',
+        responseTime: 1779184850926,
+        extraData: '46309d24-fb95-4879-918d-c681bf4d973d',
+        signature:
+          'bf733f3204fc0f1b3b361d24d112d80346c0b5c087dcf4063f7131f1ce521f6e',
+        unexpectedField: 'should be stripped',
+      },
+      metadata,
+    )) as Record<string, unknown>;
+
+    expect(result.orderId).toBe('BK-46309d24_017d8');
+    expect(result.resultCode).toBe(99);
+    expect(result.signature).toBe(
+      'bf733f3204fc0f1b3b361d24d112d80346c0b5c087dcf4063f7131f1ce521f6e',
+    );
+    expect(result.unexpectedField).toBeUndefined();
   });
 });
 

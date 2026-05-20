@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Product } from '@/common/entities/product.entity';
+import { TreatmentReview } from '@/common/entities/treatment-review.entity';
 import { PartnersService } from '@/partners/partners.service';
 import { AiRecommendationsResponseDto } from './dto/ai-recommendation-response.dto';
 
@@ -16,6 +17,8 @@ export class AiServiceService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(TreatmentReview)
+    private readonly treatmentReviewRepository: Repository<TreatmentReview>,
     private readonly partnersService: PartnersService,
   ) {}
 
@@ -38,6 +41,10 @@ export class AiServiceService {
         'category',
         'media',
         'productDefinition',
+        'partner',
+        'partner.province',
+        'partner.district',
+        'partner.ward',
         'productEmployeeEligibilities',
         'productEmployeeEligibilities.employee',
       ],
@@ -47,9 +54,44 @@ export class AiServiceService {
       `Found ${products.length} of ${serviceIds.length} requested services`,
     );
 
-    // Load partner for location data
-    const partner = await this.partnersService.getFirstHealthPartner();
+    // Use each product's own partner for clinic data. Keep the legacy first
+    // partner fallback only for orphaned/old product rows without partner loaded.
+    const needsFallbackPartner = products.some((product) => !product.partner);
+    const [fallbackPartner, ratingsMap] = await Promise.all([
+      needsFallbackPartner
+        ? this.partnersService.getFirstHealthPartner()
+        : Promise.resolve(null),
+      this.buildRatingsMap(products.map((product) => product.id)),
+    ]);
 
-    return AiRecommendationsResponseDto.create(products, partner);
+    return AiRecommendationsResponseDto.create(
+      products,
+      fallbackPartner,
+      ratingsMap,
+    );
+  }
+
+  private async buildRatingsMap(
+    productIds: string[],
+  ): Promise<Map<string, { rating: number; count: number }>> {
+    if (!productIds.length) return new Map();
+
+    const rows = await this.treatmentReviewRepository
+      .createQueryBuilder('tr')
+      .innerJoin('tr.booking', 'b')
+      .where('b.product_id IN (:...productIds)', { productIds })
+      .select('b.product_id', 'productId')
+      .addSelect('AVG(tr.rating)', 'avg')
+      .addSelect('COUNT(tr.id)', 'count')
+      .groupBy('b.product_id')
+      .getRawMany<{ productId: string; avg: string; count: string }>();
+
+    const map = new Map<string, { rating: number; count: number }>();
+    for (const row of rows) {
+      const count = parseInt(row.count, 10);
+      const rating = count > 0 ? Math.round(parseFloat(row.avg) * 10) / 10 : 0;
+      map.set(row.productId, { rating, count });
+    }
+    return map;
   }
 }

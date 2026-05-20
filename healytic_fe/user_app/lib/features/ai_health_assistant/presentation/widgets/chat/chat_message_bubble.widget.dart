@@ -128,10 +128,7 @@ final _boldPattern = RegExp(r'\*\*(.+?)\*\*');
 
 /// Parses [raw] text, converting `**bold**` segments
 /// into bold [TextSpan]s while keeping the rest normal.
-List<TextSpan> _parseFormattedText(
-  String raw,
-  TextStyle? baseStyle,
-) {
+List<TextSpan> _parseFormattedText(String raw, TextStyle? baseStyle) {
   final spans = <TextSpan>[];
   final matches = _boldPattern.allMatches(raw);
   var lastEnd = 0;
@@ -139,20 +136,14 @@ List<TextSpan> _parseFormattedText(
   for (final match in matches) {
     // Normal text before this bold segment.
     if (match.start > lastEnd) {
-      spans.add(
-        TextSpan(
-          text: raw.substring(lastEnd, match.start),
-        ),
-      );
+      spans.add(TextSpan(text: raw.substring(lastEnd, match.start)));
     }
 
     // Bold segment (group 1 = inner content).
     spans.add(
       TextSpan(
         text: match.group(1),
-        style: baseStyle?.copyWith(
-          fontWeight: FontWeight.w700,
-        ),
+        style: baseStyle?.copyWith(fontWeight: FontWeight.w700),
       ),
     );
 
@@ -173,8 +164,7 @@ class _TextBubbleContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final baseStyle = textTheme.bodyMedium?.copyWith(
       color: colorScheme.onSurface,
@@ -187,8 +177,7 @@ class _TextBubbleContent extends StatelessWidget {
         vertical: AppDimens.spaceSm,
       ),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest
-            .withValues(alpha: 0.5),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(18),
           topRight: Radius.circular(18),
@@ -199,10 +188,7 @@ class _TextBubbleContent extends StatelessWidget {
       child: Text.rich(
         TextSpan(
           style: baseStyle,
-          children: _parseFormattedText(
-            text,
-            baseStyle,
-          ),
+          children: _parseFormattedText(text, baseStyle),
         ),
       ),
     );
@@ -300,16 +286,25 @@ String _priceText(Object? value) {
   return '';
 }
 
-String _ratingText(Object? value) {
-  if (value is String) return value;
-  if (value is num) return value.toString();
+double? _ratingValue(Object? value) {
+  if (value is String) return double.tryParse(value);
+  if (value is num) return value.toDouble();
   if (value is Map) {
     final average = value['average'];
     if (average is num) {
-      return average.toStringAsFixed(1);
+      return average.toDouble();
+    }
+    if (average is String) {
+      return double.tryParse(average);
     }
   }
-  return '';
+  return null;
+}
+
+String _ratingText(Object? value) {
+  final rating = _ratingValue(value) ?? 0;
+  final displayRating = rating > 0 ? rating : 5.0;
+  return displayRating.toStringAsFixed(1);
 }
 
 String _locationText(Object? value) {

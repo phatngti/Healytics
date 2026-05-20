@@ -89,9 +89,9 @@ final class FormValidators {
     final normalized = _normalize(value);
     if (normalized == null || normalized.isEmpty) return null;
 
-    final phonePattern = RegExp(r'^\+?[0-9]{9,15}$');
+    final phonePattern = RegExp(r'^(?:\+84|84|0)(?:3|5|7|8|9)[0-9]{8}$');
     if (!phonePattern.hasMatch(normalized)) {
-      return 'Please enter a valid phone number';
+      return 'Please enter a valid Vietnamese phone number';
     }
     return null;
   }

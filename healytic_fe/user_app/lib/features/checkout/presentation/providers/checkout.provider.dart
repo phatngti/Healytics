@@ -204,7 +204,7 @@ class CheckoutNotifier extends _$CheckoutNotifier {
       ),
       PaymentMethodOption(
         type: PaymentMethodType.eWallet,
-        label: 'E-Wallet (Momo/ZaloPay)',
+        label: 'E-Wallet (Momo)',
       ),
       PaymentMethodOption(type: PaymentMethodType.payLater, label: 'Pay Later'),
     ];
@@ -452,7 +452,10 @@ class CheckoutNotifier extends _$CheckoutNotifier {
   ///
   /// Re-fetches the booking to verify the payment
   /// was captured by the backend IPN.
-  Future<void> verifyMoMoPayment(String bookingId) async {
+  Future<void> verifyMoMoPayment(
+    String bookingId, {
+    Map<String, String>? returnParams,
+  }) async {
     final current = state.value;
     if (current == null) return;
 
@@ -460,6 +463,13 @@ class CheckoutNotifier extends _$CheckoutNotifier {
 
     final repo = ref.read(checkoutRepositoryProvider);
     try {
+      if (returnParams != null && returnParams.isNotEmpty) {
+        await repo.confirmMoMoReturn(
+          bookingId: bookingId,
+          returnParams: returnParams,
+        );
+      }
+
       final booking = await repo.getBookingById(bookingId);
 
       if (booking.status == BookingStatus.confirmed) {

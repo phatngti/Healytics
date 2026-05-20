@@ -5,71 +5,108 @@ import '../../domain/entities/revenue.entity.dart';
 part 'revenue.provider.g.dart';
 
 @riverpod
-class RevenueNotifier extends _$RevenueNotifier {
-  RevenuePeriod _period = RevenuePeriod.day;
-  DateTime _selectedDate = DateTime.now();
-
-  RevenuePeriod get period => _period;
-  DateTime get selectedDate => _selectedDate;
-
+class RevenueFilter extends _$RevenueFilter {
   @override
-  Future<RevenueState> build() async {
-    return _load();
-  }
-
-  Future<RevenueState> _load() async {
-    final repo = ref.read(revenueRepositoryProvider);
-    final results = await Future.wait([
-      repo.getSummary(period: _period, date: _selectedDate),
-      repo.getTrendData(period: _period, date: _selectedDate),
-      repo.getBreakdown(period: _period, date: _selectedDate),
-    ]);
-    return RevenueState(
-      summary: results[0] as RevenueSummaryEntity,
-      trendData: results[1] as List<RevenueDataPoint>,
-      breakdown: results[2] as List<RevenueBreakdownItem>,
-      period: _period,
-      selectedDate: _selectedDate,
+  RevenueFilterState build() {
+    return RevenueFilterState(
+      period: RevenuePeriod.day,
+      selectedDate: DateTime.now(),
     );
   }
 
-  Future<void> setPeriod(RevenuePeriod period) async {
-    _period = period;
-    state = const AsyncLoading();
-    state = AsyncData(await _load());
+  void setPeriod(RevenuePeriod period) {
+    if (period == state.period) return;
+    state = state.copyWith(period: period);
   }
 
-  Future<void> navigatePrevious() async {
-    _selectedDate = switch (_period) {
-      RevenuePeriod.day => _selectedDate.subtract(const Duration(days: 1)),
-      RevenuePeriod.month => DateTime(
-        _selectedDate.year,
-        _selectedDate.month - 1,
-      ),
-      RevenuePeriod.year => DateTime(_selectedDate.year - 1),
+  void navigatePrevious() {
+    state = state.copyWith(
+      selectedDate: switch (state.period) {
+        RevenuePeriod.day => state.selectedDate.subtract(
+          const Duration(days: 1),
+        ),
+        RevenuePeriod.month => DateTime(
+          state.selectedDate.year,
+          state.selectedDate.month - 1,
+        ),
+        RevenuePeriod.year => DateTime(state.selectedDate.year - 1),
+      },
+    );
+  }
+
+  void navigateNext() {
+    state = state.copyWith(
+      selectedDate: switch (state.period) {
+        RevenuePeriod.day => state.selectedDate.add(const Duration(days: 1)),
+        RevenuePeriod.month => DateTime(
+          state.selectedDate.year,
+          state.selectedDate.month + 1,
+        ),
+        RevenuePeriod.year => DateTime(state.selectedDate.year + 1),
+      },
+    );
+  }
+
+  void goToToday() {
+    final today = DateTime.now();
+    if (_isSamePeriodDate(state.selectedDate, today, state.period)) {
+      return;
+    }
+    state = state.copyWith(selectedDate: today);
+  }
+
+  bool _isSamePeriodDate(DateTime a, DateTime b, RevenuePeriod period) {
+    return switch (period) {
+      RevenuePeriod.day =>
+        a.year == b.year && a.month == b.month && a.day == b.day,
+      RevenuePeriod.month => a.year == b.year && a.month == b.month,
+      RevenuePeriod.year => a.year == b.year,
     };
-    state = const AsyncLoading();
-    state = AsyncData(await _load());
+  }
+}
+
+@riverpod
+Future<RevenueState> revenue(Ref ref) async {
+  final filter = ref.watch(revenueFilterProvider);
+  final repo = ref.watch(revenueRepositoryProvider);
+  final results = await Future.wait([
+    repo.getSummary(period: filter.period, date: filter.selectedDate),
+    repo.getTrendData(period: filter.period, date: filter.selectedDate),
+    repo.getBreakdown(period: filter.period, date: filter.selectedDate),
+  ]);
+
+  return RevenueState(
+    summary: results[0] as RevenueSummaryEntity,
+    trendData: results[1] as List<RevenueDataPoint>,
+    breakdown: results[2] as List<RevenueBreakdownItem>,
+    period: filter.period,
+    selectedDate: filter.selectedDate,
+  );
+}
+
+class RevenueFilterState {
+  final RevenuePeriod period;
+  final DateTime selectedDate;
+
+  const RevenueFilterState({required this.period, required this.selectedDate});
+
+  RevenueFilterState copyWith({RevenuePeriod? period, DateTime? selectedDate}) {
+    return RevenueFilterState(
+      period: period ?? this.period,
+      selectedDate: selectedDate ?? this.selectedDate,
+    );
   }
 
-  Future<void> navigateNext() async {
-    _selectedDate = switch (_period) {
-      RevenuePeriod.day => _selectedDate.add(const Duration(days: 1)),
-      RevenuePeriod.month => DateTime(
-        _selectedDate.year,
-        _selectedDate.month + 1,
-      ),
-      RevenuePeriod.year => DateTime(_selectedDate.year + 1),
-    };
-    state = const AsyncLoading();
-    state = AsyncData(await _load());
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is RevenueFilterState &&
+            other.period == period &&
+            other.selectedDate == selectedDate;
   }
 
-  Future<void> goToToday() async {
-    _selectedDate = DateTime.now();
-    state = const AsyncLoading();
-    state = AsyncData(await _load());
-  }
+  @override
+  int get hashCode => Object.hash(period, selectedDate);
 }
 
 class RevenueState {

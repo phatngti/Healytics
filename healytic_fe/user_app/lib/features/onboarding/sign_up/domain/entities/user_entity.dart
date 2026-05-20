@@ -6,10 +6,10 @@ part 'user_entity.g.dart';
 @Freezed(toJson: true)
 abstract class AddressEntity with _$AddressEntity {
   const factory AddressEntity({
-    required String street,
-    required String ward,
-    required String district,
-    required String cityOrProvince,
+    required String streetAddress,
+    required String provinceId,
+    required String districtId,
+    required String wardId,
   }) = _AddressEntity;
 
   factory AddressEntity.fromJson(Map<String, dynamic> json) =>

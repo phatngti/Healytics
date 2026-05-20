@@ -3,5 +3,17 @@
     "customHeaders": {
         "deviceModel": "Android Emulator",
         "deviceType": "Android"
+    },
+    "notificationConfig": {
+        "inAppEnabled": true,
+        "webSocketEnabled": true,
+        "localNotificationsEnabled": false,
+        "pushRegistrationEnabled": false,
+        "mockPushTokenEnabled": true,
+        "androidChannel": {
+            "id": "healytics_notifications_test",
+            "name": "Healytics Test",
+            "description": "Healytics test notifications"
+        }
     }
 }

@@ -250,6 +250,7 @@ export class PartnerChatSeeder implements ISeeder {
     const accounts = await this.accountRepo.find({
       where: { email: In(accountEmails) },
       select: ['id', 'email'],
+      loadEagerRelations: false,
     });
     const accountMap = buildMapBy(accounts, (account) => account.email);
 
@@ -400,6 +401,7 @@ export class PartnerChatSeeder implements ISeeder {
     const accounts = await this.accountRepo.find({
       where: { email: In(accountEmails) },
       select: ['id', 'email'],
+      loadEagerRelations: false,
     });
     const accountMap = buildMapBy(accounts, (account) => account.email);
 

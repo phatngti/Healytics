@@ -12,6 +12,8 @@ import 'package:user_app/features/clinic_info/domain/entities/clinic_product.ent
 class ProductCard extends StatelessWidget {
   const ProductCard({super.key, required this.product, this.onTap});
 
+  static const contentHeight = 128.0;
+
   final ClinicProductEntity product;
   final VoidCallback? onTap;
 
@@ -43,11 +45,14 @@ class ProductCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Image + badge ──
-              Expanded(flex: 3, child: _ProductImage(product: product)),
-
-              // ── Content area ──
-              Expanded(flex: 2, child: _ProductContent(product: product)),
+              AspectRatio(
+                aspectRatio: 1,
+                child: _ProductImage(product: product),
+              ),
+              SizedBox(
+                height: contentHeight,
+                child: _ProductContent(product: product),
+              ),
             ],
           ),
         ),
@@ -130,8 +135,8 @@ class _ProductContent extends StatelessWidget {
           ),
           const SizedBox(height: AppDimens.spaceXs),
 
-          // Duration + specialist chips
-          _ChipRow(product: product),
+          // Duration + specialist chips (shrinkable)
+          Flexible(child: _ChipRow(product: product)),
 
           const Spacer(),
 

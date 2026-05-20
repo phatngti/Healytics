@@ -1,12 +1,16 @@
 import {
+  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
   InternalServerErrorException,
   Optional,
 } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { UpdateEmployeeDto } from '../../dto/update-employee.dto';
+import { Role } from '@/account/enum/role.enum';
+import { Account } from '@/common/entities/account.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
 import { TherapistProfile } from '@/common/entities/therapist-profile.entity';
@@ -50,7 +54,8 @@ export class UpdateEmployeeHandler {
         throw new NotFoundException(`Employee with ID ${id} not found`);
       }
 
-      const { doctorProfile, therapistProfile, ...employeeData } = command;
+      const { doctorProfile, therapistProfile, password, ...employeeData } =
+        command;
 
       // Strip null/undefined values so we never overwrite non-nullable DB columns
       // (e.g. employeeCode, fullName, email, role, status) with null.
@@ -58,6 +63,18 @@ export class UpdateEmployeeHandler {
         Object.entries(employeeData).filter(
           ([, v]) => v !== null && v !== undefined,
         ),
+      );
+      if (typeof sanitizedData.email === 'string') {
+        sanitizedData.email = sanitizedData.email.trim().toLowerCase();
+      }
+
+      await this.syncEmployeeAccount(
+        queryRunner.manager,
+        employee,
+        typeof sanitizedData.email === 'string'
+          ? sanitizedData.email
+          : undefined,
+        password,
       );
 
       // 2. Domain Action: Update Employee entity
@@ -116,7 +133,12 @@ export class UpdateEmployeeHandler {
       return completeEmployee!;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      if (error instanceof NotFoundException) throw error;
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ConflictException
+      ) {
+        throw error;
+      }
       this.logger.error(
         `Failed to update employee: ${error.message}`,
         error.stack,
@@ -126,6 +148,75 @@ export class UpdateEmployeeHandler {
       );
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  private async syncEmployeeAccount(
+    manager: EntityManager,
+    employee: Employee,
+    nextEmail?: string,
+    nextPassword?: string,
+  ): Promise<void> {
+    if (!nextEmail && !nextPassword) return;
+
+    let account: Account | null = null;
+    if (employee.accountId) {
+      account = await manager.findOne(Account, {
+        where: { id: employee.accountId },
+        withDeleted: true,
+      });
+    }
+
+    const accountEmail = nextEmail ?? employee.email?.trim().toLowerCase();
+    if (!accountEmail) return;
+
+    if (!account && nextPassword) {
+      const existingAccount = await manager.findOne(Account, {
+        where: { email: accountEmail },
+        withDeleted: true,
+      });
+      if (existingAccount) {
+        throw new ConflictException(
+          'An account with this email already exists',
+        );
+      }
+      const passwordHash = await bcrypt.hash(nextPassword, 10);
+      const created = manager.create(Account, {
+        email: accountEmail,
+        passwordHash,
+        role: Role.EMPLOYEE,
+        isActive: true,
+      });
+      const saved = await manager.save(Account, created);
+      employee.accountId = saved.id;
+      return;
+    }
+
+    if (!account) return;
+
+    let shouldSaveAccount = false;
+    if (nextEmail && nextEmail !== account.email) {
+      const existingAccount = await manager.findOne(Account, {
+        where: { email: nextEmail },
+        withDeleted: true,
+      });
+      if (existingAccount && existingAccount.id !== account.id) {
+        throw new ConflictException(
+          'An account with this email already exists',
+        );
+      }
+      account.email = nextEmail;
+      shouldSaveAccount = true;
+    }
+
+    if (nextPassword) {
+      account.passwordHash = await bcrypt.hash(nextPassword, 10);
+      account.refreshTokenHash = null;
+      shouldSaveAccount = true;
+    }
+
+    if (shouldSaveAccount) {
+      await manager.save(Account, account);
     }
   }
 }

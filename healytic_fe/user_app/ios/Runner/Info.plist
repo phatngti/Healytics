@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>User App</string>
+	<string>Healytics</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>user_app</string>
+	<string>Healytics</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -22,6 +22,11 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<!-- TODO(google-signin): Replace YOUR_IOS_CLIENT_ID with the iOS OAuth 2.0
+	     client ID from the Healytics Google Cloud project before any real iOS
+	     run. See .kiro/specs/google-signin/configuration-guide.md (Task 1.4). -->
+	<key>GIDClientID</key>
+	<string>YOUR_IOS_CLIENT_ID.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -30,6 +35,19 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>healytics</string>
+			</array>
+		</dict>
+		<!-- TODO(google-signin): Replace YOUR_IOS_CLIENT_SUFFIX with the suffix
+		     of the iOS OAuth client ID, reversed (i.e. the value of the
+		     reversed client ID exposed in Google Cloud Console). The full
+		     scheme must equal com.googleusercontent.apps.<suffix>. See
+		     .kiro/specs/google-signin/configuration-guide.md (Task 1.4). -->
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.YOUR_IOS_CLIENT_SUFFIX</string>
 			</array>
 		</dict>
 	</array>

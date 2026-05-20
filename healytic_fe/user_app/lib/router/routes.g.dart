@@ -39,6 +39,7 @@ List<RouteBase> get $appRoutes => [
   $emailFormRoute,
   $emailCodeConfirmationRoute,
   $finishSignUpRoute,
+  $finishGoogleSignUpRoute,
   $surveyScreenRoute,
   $generalGoalsStepRoute,
   $lifestyleActivityStepRoute,
@@ -1141,6 +1142,44 @@ mixin $FinishSignUpRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/finish_sign_up');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $finishGoogleSignUpRoute => GoRouteData.$route(
+  path: '/finish_google_sign_up',
+  name: 'finish_google_sign_up',
+  factory: $FinishGoogleSignUpRoute._fromState,
+);
+
+mixin $FinishGoogleSignUpRoute on GoRouteData {
+  static FinishGoogleSignUpRoute _fromState(GoRouterState state) =>
+      FinishGoogleSignUpRoute(
+        name: state.uri.queryParameters['name'],
+        email: state.uri.queryParameters['email'],
+      );
+
+  FinishGoogleSignUpRoute get _self => this as FinishGoogleSignUpRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/finish_google_sign_up',
+    queryParams: {
+      if (_self.name != null) 'name': _self.name,
+      if (_self.email != null) 'email': _self.email,
+    },
+  );
 
   @override
   void go(BuildContext context) => context.go(location);

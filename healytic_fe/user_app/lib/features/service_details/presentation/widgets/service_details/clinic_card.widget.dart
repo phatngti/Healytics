@@ -32,6 +32,7 @@ class ClinicCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
+    final displayAddress = _districtAndProvinceAddress(address);
 
     return Material(
       color: isDark ? colorScheme.surfaceContainerHighest : colorScheme.surface,
@@ -84,44 +85,39 @@ class ClinicCard extends StatelessWidget {
                     AppDimens.horizontalSmall,
                     // Name + address
                     Flexible(
-                      child: Container(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.sizeOf(context).width * 0.35,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              clinicName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            clinicName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ),
-                            AppDimens.verticalExtraSmall,
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.location_on,
-                                  size: AppDimens.iconXs,
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                                AppDimens.horizontalExtraSmall,
-                                Expanded(
-                                  child: Text(
-                                    address,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: textTheme.labelSmall?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
+                          ),
+                          AppDimens.verticalExtraSmall,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                size: AppDimens.iconXs,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              AppDimens.horizontalExtraSmall,
+                              Expanded(
+                                child: Text(
+                                  displayAddress,
+                                  softWrap: true,
+                                  style: textTheme.labelSmall?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -169,6 +165,43 @@ class ClinicCard extends StatelessWidget {
       ),
     );
   }
+}
+
+String _districtAndProvinceAddress(String address) {
+  final parts = address
+      .split(',')
+      .map((part) => part.trim())
+      .where((part) => part.isNotEmpty)
+      .toList();
+  if (parts.length < 2) return address;
+
+  final provinceIndex = parts.lastIndexWhere(_isProvincePart);
+  if (provinceIndex < 0) return address;
+
+  final districtCandidates = parts.take(provinceIndex).toList();
+  final districtIndex = districtCandidates.lastIndexWhere(_isDistrictPart);
+  if (districtIndex < 0) return parts[provinceIndex];
+
+  return '${districtCandidates[districtIndex]}, ${parts[provinceIndex]}';
+}
+
+bool _isProvincePart(String value) {
+  final part = value.toLowerCase();
+  return part.startsWith('thành phố ') ||
+      part.startsWith('tỉnh ') ||
+      part.startsWith('tp ') ||
+      part.startsWith('tp. ') ||
+      part.endsWith(' city') ||
+      part.endsWith(' province');
+}
+
+bool _isDistrictPart(String value) {
+  final part = value.toLowerCase();
+  return part.startsWith('quận ') ||
+      part.startsWith('huyện ') ||
+      part.startsWith('thị xã ') ||
+      part.startsWith('thành phố ') ||
+      part.startsWith('district ');
 }
 
 /// Small outlined icon button for the clinic card actions.

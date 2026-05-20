@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ReviewSpecialistState {
 
-/// Star rating (0 = unset, 1–5).
+/// Star rating (1–5).
  int get rating;/// Optional free-text comment.
  String get comment;/// Currently selected feedback tags.
  List<String> get selectedTags;/// Whether user would recommend the specialist.
@@ -217,10 +217,10 @@ return $default(_that.rating,_that.comment,_that.selectedTags,_that.wouldRecomme
 
 
 class _ReviewSpecialistState implements ReviewSpecialistState {
-  const _ReviewSpecialistState({this.rating = 0, this.comment = '', final  List<String> selectedTags = const [], this.wouldRecommend = true, this.isSubmitting = false, this.isSubmitted = false}): _selectedTags = selectedTags;
+  const _ReviewSpecialistState({this.rating = defaultReviewRating, this.comment = '', final  List<String> selectedTags = const [], this.wouldRecommend = true, this.isSubmitting = false, this.isSubmitted = false}): _selectedTags = selectedTags;
   
 
-/// Star rating (0 = unset, 1–5).
+/// Star rating (1–5).
 @override@JsonKey() final  int rating;
 /// Optional free-text comment.
 @override@JsonKey() final  String comment;

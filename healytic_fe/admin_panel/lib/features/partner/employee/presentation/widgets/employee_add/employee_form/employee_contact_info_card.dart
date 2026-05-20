@@ -4,10 +4,40 @@ import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 
-class EmployeeContactInfoCard extends StatelessWidget {
+class EmployeeContactInfoCard extends StatefulWidget {
   final bool enabled;
+  final bool showPasswordField;
+  final bool passwordRequired;
+  final String passwordLabel;
+  final String passwordHintText;
 
-  const EmployeeContactInfoCard({super.key, this.enabled = true});
+  const EmployeeContactInfoCard({
+    super.key,
+    this.enabled = true,
+    this.showPasswordField = false,
+    this.passwordRequired = false,
+    this.passwordLabel = 'Password',
+    this.passwordHintText = 'At least 8 characters',
+  });
+
+  @override
+  State<EmployeeContactInfoCard> createState() =>
+      _EmployeeContactInfoCardState();
+}
+
+class _EmployeeContactInfoCardState extends State<EmployeeContactInfoCard> {
+  bool _showPassword = false;
+
+  String? _validatePassword(dynamic value) {
+    final password = value?.toString() ?? '';
+    if (password.isEmpty) {
+      return widget.passwordRequired ? 'Password is required' : null;
+    }
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +86,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                   label: 'First Name',
                   hintText: 'e.g. Sarah',
                   isRequired: true,
-                  enabled: enabled,
+                  enabled: widget.enabled,
                 ),
               ),
               AppDimens.horizontalMedium,
@@ -67,7 +97,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                   label: 'Last Name',
                   hintText: 'e.g. Jenkins',
                   isRequired: true,
-                  enabled: enabled,
+                  enabled: widget.enabled,
                 ),
               ),
             ],
@@ -81,9 +111,37 @@ class EmployeeContactInfoCard extends StatelessWidget {
             hintText: 'sarah.j@spa.com',
             isRequired: true,
             prefixIcon: Icons.mail_outline,
-            enabled: enabled,
+            enabled: widget.enabled,
             keyboardType: TextInputType.emailAddress,
           ),
+          if (widget.showPasswordField) ...[
+            const SizedBox(height: 20),
+            FormFieldBuilders.buildTextField(
+              context,
+              fieldKey: EmployeeFormField.password.key,
+              label: widget.passwordLabel,
+              hintText: widget.passwordHintText,
+              isRequired: widget.passwordRequired,
+              prefixIcon: Icons.lock_outline,
+              enabled: widget.enabled,
+              obscureText: !_showPassword,
+              validator: _validatePassword,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _showPassword
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  size: AppDimens.iconSmMd,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                onPressed: widget.enabled
+                    ? () {
+                        setState(() => _showPassword = !_showPassword);
+                      }
+                    : null,
+              ),
+            ),
+          ],
           const SizedBox(height: 20),
           // Phone
           FormFieldBuilders.buildTextField(
@@ -93,7 +151,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
             hintText: '+1 (555) 000-0000',
             isRequired: true,
             prefixIcon: Icons.phone_outlined,
-            enabled: enabled,
+            enabled: widget.enabled,
             keyboardType: TextInputType.phone,
           ),
           const SizedBox(height: 20),
@@ -107,7 +165,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                   fieldKey: EmployeeFormField.dateOfBirth.key,
                   hintText: 'MM/DD/YYYY',
                   isRequired: true,
-                  enabled: enabled,
+                  enabled: widget.enabled,
                 ),
               ),
               AppDimens.horizontalMedium,
@@ -120,7 +178,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                       .map((e) => e.displayName)
                       .toList(),
                   isRequired: true,
-                  enabled: enabled,
+                  enabled: widget.enabled,
                 ),
               ),
             ],
@@ -151,7 +209,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                   label: 'Emergency Name',
                   hintText: 'Contact Name',
                   isRequired: true,
-                  enabled: enabled,
+                  enabled: widget.enabled,
                 ),
                 AppDimens.verticalMediumSmall,
                 FormFieldBuilders.buildTextField(
@@ -161,7 +219,7 @@ class EmployeeContactInfoCard extends StatelessWidget {
                   hintText: 'Contact Phone',
                   isRequired: true,
                   prefixIcon: Icons.phone_in_talk_outlined,
-                  enabled: enabled,
+                  enabled: widget.enabled,
                   keyboardType: TextInputType.phone,
                 ),
               ],

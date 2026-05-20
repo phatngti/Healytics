@@ -13,6 +13,8 @@ import 'package:user_app/features/notifications/'
 import 'package:user_app/features/partner_chat/'
     'presentation/widgets/'
     'chat_message_toast_listener.widget.dart';
+import 'package:user_app/features/review/presentation/widgets/'
+    'booking_completion_review_listener.widget.dart';
 import 'package:user_app/router/app_router.dart';
 import 'package:user_app/theme/app_theme.dart';
 
@@ -41,7 +43,9 @@ class App extends HookConsumerWidget {
         return GlobalErrorListener(
           child: NotificationToastListener(
             child: ChatMessageToastListener(
-              child: child ?? const SizedBox.shrink(),
+              child: BookingCompletionReviewListener(
+                child: child ?? const SizedBox.shrink(),
+              ),
             ),
           ),
         );

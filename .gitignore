@@ -29,3 +29,8 @@ ai_services/recommender2/.env
 # Ignore env files in ai_services
 ai_services/**/.env
 !ai_services/**/.env.example
+
+# Dockers production env files
+dockers/.env.prod
+dockers/backend.env.prod
+dockers/deploy.env.prod

@@ -67,6 +67,7 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**accountControllerGetMe**](doc//AccountApi.md#accountcontrollergetme) | **GET** /account/me | Get current user account details
 *AccountApi* | [**accountControllerGetSurvey**](doc//AccountApi.md#accountcontrollergetsurvey) | **GET** /account/survey | Get current user survey
 *AccountApi* | [**accountControllerPostSurvey**](doc//AccountApi.md#accountcontrollerpostsurvey) | **POST** /account/survey | Create one-shot survey for current user
+*AccountApi* | [**accountControllerUpdateAddress**](doc//AccountApi.md#accountcontrollerupdateaddress) | **PATCH** /account/me/address | Update current user address
 *AccountApi* | [**accountControllerUpdateAvatar**](doc//AccountApi.md#accountcontrollerupdateavatar) | **PATCH** /account/me/avatar | Update current user avatar
 *AdminAuditLogsApi* | [**auditControllerGetAuditLogs**](doc//AdminAuditLogsApi.md#auditcontrollergetauditlogs) | **GET** /admin/audit-logs | Get audit logs with optional filters
 *AdminCategoriesApi* | [**adminCategoriesControllerCreate**](doc//AdminCategoriesApi.md#admincategoriescontrollercreate) | **POST** /admin/categories | Create a new category
@@ -293,6 +294,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [AccountAddressDto](doc//AccountAddressDto.md)
  - [AccountMeResponseDto](doc//AccountMeResponseDto.md)
  - [AccountRequestDto](doc//AccountRequestDto.md)
  - [AddToCartDto](doc//AddToCartDto.md)
@@ -605,6 +607,7 @@ Class | Method | HTTP request | Description
  - [RecommendedServiceResponseDto](doc//RecommendedServiceResponseDto.md)
  - [RefreshTokenRequestDto](doc//RefreshTokenRequestDto.md)
  - [RefundCaseActionDto](doc//RefundCaseActionDto.md)
+ - [RegisterAddressDto](doc//RegisterAddressDto.md)
  - [RegisterDeviceDto](doc//RegisterDeviceDto.md)
  - [RegisterDto](doc//RegisterDto.md)
  - [RegisterPartnerDto](doc//RegisterPartnerDto.md)
@@ -638,6 +641,7 @@ Class | Method | HTTP request | Description
  - [TotalPartnersResponseDto](doc//TotalPartnersResponseDto.md)
  - [TreatmentReviewResponseDto](doc//TreatmentReviewResponseDto.md)
  - [UpcomingAppointmentDto](doc//UpcomingAppointmentDto.md)
+ - [UpdateAccountAddressDto](doc//UpdateAccountAddressDto.md)
  - [UpdateAvatarDto](doc//UpdateAvatarDto.md)
  - [UpdateBookingStatusDto](doc//UpdateBookingStatusDto.md)
  - [UpdateCategoryDto](doc//UpdateCategoryDto.md)

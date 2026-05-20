@@ -11,6 +11,8 @@ import 'package:user_app/features/review/'
 import 'package:user_app/features/review/domain/'
     'entities/treatment_review.entity.dart';
 
+import 'review_rating_defaults.dart';
+
 part 'review_treatment.provider.freezed.dart';
 part 'review_treatment.provider.g.dart';
 
@@ -18,11 +20,10 @@ part 'review_treatment.provider.g.dart';
 
 /// UI state for the treatment review form.
 @freezed
-abstract class ReviewTreatmentState
-    with _$ReviewTreatmentState {
+abstract class ReviewTreatmentState with _$ReviewTreatmentState {
   const factory ReviewTreatmentState({
-    /// Star rating (0 = unset, 1–5).
-    @Default(0) int rating,
+    /// Star rating (1–5).
+    @Default(defaultReviewRating) int rating,
 
     /// Optional free-text comment.
     @Default('') String comment,
@@ -53,11 +54,9 @@ abstract class ReviewTreatmentState
 /// Manages the treatment review form state and
 /// handles submission through the repository.
 @riverpod
-class ReviewTreatmentNotifier
-    extends _$ReviewTreatmentNotifier {
+class ReviewTreatmentNotifier extends _$ReviewTreatmentNotifier {
   @override
-  ReviewTreatmentState build() =>
-      const ReviewTreatmentState();
+  ReviewTreatmentState build() => const ReviewTreatmentState();
 
   /// Sets the star rating (1–5).
   void setRating(int rating) {
@@ -82,15 +81,12 @@ class ReviewTreatmentNotifier
 
   /// Appends new photo paths to the list.
   void addPhotos(List<String> paths) {
-    state = state.copyWith(
-      photoPaths: [...state.photoPaths, ...paths],
-    );
+    state = state.copyWith(photoPaths: [...state.photoPaths, ...paths]);
   }
 
   /// Removes a single photo by its path.
   void removePhoto(String path) {
-    final updated = List<String>.from(state.photoPaths)
-      ..remove(path);
+    final updated = List<String>.from(state.photoPaths)..remove(path);
     state = state.copyWith(photoPaths: updated);
   }
 
@@ -103,10 +99,7 @@ class ReviewTreatmentNotifier
   Future<void> submitReview(String appointmentId) async {
     if (state.isSubmitting) return;
 
-    state = state.copyWith(
-      isSubmitting: true,
-      errorMessage: null,
-    );
+    state = state.copyWith(isSubmitting: true, errorMessage: null);
 
     try {
       final entity = TreatmentReviewEntity(
@@ -117,9 +110,7 @@ class ReviewTreatmentNotifier
         photoPaths: state.photoPaths,
       );
 
-      final repo = ref.read(
-        treatmentReviewRepositoryProvider,
-      );
+      final repo = ref.read(treatmentReviewRepositoryProvider);
       await repo.submitReview(entity);
       if (!ref.mounted) return;
 
@@ -129,8 +120,7 @@ class ReviewTreatmentNotifier
       AppointmentEntity? appointment;
       try {
         appointment = await ref.read(
-          appointmentByIdProvider(appointmentId)
-              .future,
+          appointmentByIdProvider(appointmentId).future,
         );
       } catch (_) {
         // Non-critical: navigation still proceeds.
@@ -152,7 +142,8 @@ class ReviewTreatmentNotifier
       if (!ref.mounted) return;
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage: 'Failed to submit review. '
+        errorMessage:
+            'Failed to submit review. '
             'Please try again.',
       );
     }

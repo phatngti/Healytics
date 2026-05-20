@@ -177,6 +177,7 @@ export class CartSeeder implements ISeeder {
           ]),
         },
         select: ['id', 'email'],
+        loadEagerRelations: false,
       }),
       this.productRepo.find({
         where: {
@@ -338,6 +339,7 @@ export class CartSeeder implements ISeeder {
           ]),
         },
         select: ['id'],
+        loadEagerRelations: false,
       }),
       this.productRepo.find({
         where: { slug: In(productSlugs) },

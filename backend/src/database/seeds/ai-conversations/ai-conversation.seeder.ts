@@ -139,6 +139,7 @@ export class AiConversationSeeder implements ISeeder {
         ]),
       },
       select: ['id', 'email'],
+      loadEagerRelations: false,
     });
     const accountMap = buildMapBy(accounts, (account) => account.email);
 

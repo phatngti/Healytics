@@ -11,6 +11,7 @@ import 'package:timezone/data/latest_all.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/providers/error_observer.dart';
+import 'package:user_app/core/services/push_notification_flutter.service.dart';
 import 'package:user_app/features/app/app.dart';
 import 'package:user_app/hooks/bootstrap.dart';
 
@@ -19,6 +20,7 @@ void main() async {
   final db = Bootstrap.db;
   await Bootstrap.initDomain(db);
   await initApp();
+  await configureFirebaseMessagingBackgroundHandler();
 
   runApp(ProviderScope(observers: [ErrorObserver()], child: const App()));
 }

@@ -193,7 +193,7 @@ class _SpecialistDetails extends StatelessWidget {
             AppDimens.horizontalExtraSmall,
             Flexible(
               child: Text(
-                '${specialist.rating.toStringAsFixed(1)}'
+                '${specialist.rating > 0 ? specialist.rating : 5.0}'
                 ' · ${specialist.reviewCount} reviews',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,

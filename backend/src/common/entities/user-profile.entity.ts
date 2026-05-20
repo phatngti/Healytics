@@ -18,13 +18,13 @@ export class UserProfile {
   id: string;
 
   @Column({ name: 'first_name', nullable: true })
-  firstName?: string;
+  firstName?: string | null;
 
   @Column({ name: 'last_name', nullable: true })
-  lastName?: string;
+  lastName?: string | null;
 
   @Column({ nullable: true })
-  phone?: string;
+  phone?: string | null;
 
   @Column({ nullable: true, type: 'text' })
   bio?: string | null;

@@ -28,7 +28,14 @@ export class MoMoController {
   @ApiNoContentResponse({ description: 'IPN acknowledged' })
   async handleMoMoIPN(@Body() ipn: MoMoIPNDto): Promise<void> {
     this.logger.log(`MoMo IPN received: ${ipn.orderId}`);
-    await this.momoService.handleIPN(ipn);
+    try {
+      await this.momoService.handleIPN(ipn);
+    } catch (error) {
+      this.logger.error(
+        `MoMo IPN processing failed: ${ipn.orderId}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+    }
     // Luôn trả 204 — KHÔNG throw exception
   }
 }

@@ -18,6 +18,7 @@ class RegisterProfileDto {
     this.phone,
     this.bio,
     this.dateOfBirth,
+    this.address,
   });
 
 
@@ -63,13 +64,23 @@ class RegisterProfileDto {
   ///
   String? dateOfBirth;
 
+  /// Address provided during user registration
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  RegisterAddressDto? address;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is RegisterProfileDto &&
     other.firstName == firstName &&
     other.lastName == lastName &&
     other.phone == phone &&
     other.bio == bio &&
-    other.dateOfBirth == dateOfBirth;
+    other.dateOfBirth == dateOfBirth &&
+    other.address == address;
 
   @override
   int get hashCode =>
@@ -78,10 +89,11 @@ class RegisterProfileDto {
     (lastName == null ? 0 : lastName!.hashCode) +
     (phone == null ? 0 : phone!.hashCode) +
     (bio == null ? 0 : bio!.hashCode) +
-    (dateOfBirth == null ? 0 : dateOfBirth!.hashCode);
+    (dateOfBirth == null ? 0 : dateOfBirth!.hashCode) +
+    (address == null ? 0 : address!.hashCode);
 
   @override
-  String toString() => 'RegisterProfileDto[firstName=$firstName, lastName=$lastName, phone=$phone, bio=$bio, dateOfBirth=$dateOfBirth]';
+  String toString() => 'RegisterProfileDto[firstName=$firstName, lastName=$lastName, phone=$phone, bio=$bio, dateOfBirth=$dateOfBirth, address=$address]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -110,6 +122,11 @@ class RegisterProfileDto {
     } else {
       json[r'dateOfBirth'] = null;
     }
+    if (this.address != null) {
+      json[r'address'] = this.address;
+    } else {
+      json[r'address'] = null;
+    }
     return json;
   }
 
@@ -137,6 +154,7 @@ class RegisterProfileDto {
         phone: mapValueOfType<String>(json, r'phone'),
         bio: mapValueOfType<String>(json, r'bio'),
         dateOfBirth: mapValueOfType<String>(json, r'dateOfBirth'),
+        address: RegisterAddressDto.fromJson(json[r'address']),
       );
     }
     return null;

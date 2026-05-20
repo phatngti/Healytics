@@ -61,7 +61,7 @@ function ws_client {
   node $BASE_DIR/open-api/bin/generate-ws-client.js \
     --spec $BASE_DIR/open-api/ws-contract.json \
     --output $BASE_DIR/user_app/lib/core/services/ws \
-    --namespaces booking-events,user-chat,chat-notifications
+    --namespaces booking-events,user-chat,chat-notifications,notifications
 }
 
 function ws_admin {

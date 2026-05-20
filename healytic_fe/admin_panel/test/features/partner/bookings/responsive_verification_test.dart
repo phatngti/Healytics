@@ -21,6 +21,7 @@ import 'package:admin_panel/features/partner/bookings/presentation/widgets/booki
 import 'package:admin_panel/features/partner/bookings/presentation/widgets/booking_status_colors.theme.dart';
 import 'package:admin_panel/features/partner/bookings/presentation/widgets/bookings_dashboard.widget.dart';
 import 'package:admin_panel/features/partner/bookings/presentation/widgets/responsive_bookings_grid.widget.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -80,6 +81,7 @@ Widget _buildTestApp(double width) {
   return ProviderScope(
     overrides: [
       bookingsControllerProvider.overrideWith(() => _FakeController(state)),
+      partnerBookingStatusRealtimeProvider.overrideWithValue(null),
     ],
     child: MaterialApp(
       theme: ThemeData.light().copyWith(
@@ -313,5 +315,41 @@ void main() {
         });
       });
     }
+
+    testWidgets('collapses controls on mouse-wheel scroll over card grid', (
+      tester,
+    ) async {
+      const width = 1280.0;
+      tester.view.physicalSize = const Size(width, _viewportHeight);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(_buildTestApp(width));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('filter_sort_controls')), findsOneWidget);
+
+      final gridCenter = tester.getCenter(find.byType(GridView));
+      await tester.sendEventToBinding(
+        PointerScrollEvent(
+          position: gridCenter,
+          scrollDelta: const Offset(0, 48),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('filter_sort_controls')), findsNothing);
+
+      await tester.sendEventToBinding(
+        PointerScrollEvent(
+          position: gridCenter,
+          scrollDelta: const Offset(0, -48),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('filter_sort_controls')), findsOneWidget);
+    });
   });
 }

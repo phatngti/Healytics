@@ -19,8 +19,11 @@ import {
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { BookingStatusReasonCode } from '@/booking/enums/booking-status-reason-code.enum';
 import { BookingPaymentService } from './booking-payment.service';
+import { NotificationEventService } from '@/notification/services/notification-event.service';
+import { NotificationType } from '@/notification/enums/notification-type.enum';
 import { Payment } from '@/common/entities/payment.entity';
 import { PaymentTransactionLog } from '@/common/entities/payment-transaction-log.entity';
+import { Product } from '@/common/entities/product.entity';
 import { PaymentMethod } from './enums/payment-method.enum';
 import { PaymentStatus } from './enums/payment-status.enum';
 import { TransactionAction } from './enums/transaction-action.enum';
@@ -39,10 +42,13 @@ export class MoMoPaymentService {
   constructor(
     private readonly configService: ConfigService,
     private readonly bookingPaymentService: BookingPaymentService,
+    private readonly notificationEventService: NotificationEventService,
     @InjectRepository(Payment)
     private readonly paymentRepo: Repository<Payment>,
     @InjectRepository(PaymentTransactionLog)
     private readonly txLogRepo: Repository<PaymentTransactionLog>,
+    @InjectRepository(Product)
+    private readonly productRepo: Repository<Product>,
   ) {
     this.partnerCode = this.configService.getOrThrow('MOMO_PARTNER_CODE');
     this.accessKey = this.configService.getOrThrow('MOMO_ACCESS_KEY');
@@ -56,6 +62,50 @@ export class MoMoPaymentService {
     const redirectUrl = new URL(this.momoRedirectUrl);
     redirectUrl.searchParams.set('bookingId', bookingId);
     return redirectUrl.toString();
+  }
+
+  private normalizeCallbackPayload(payload: MoMoIPNDto): MoMoIPNDto {
+    return {
+      ...payload,
+      amount: this.toNullableNumber(payload.amount) ?? Number.NaN,
+      responseTime: this.toNullableNumber(payload.responseTime) ?? Number.NaN,
+      resultCode: this.toNullableNumber(payload.resultCode) ?? Number.NaN,
+      transId: this.toNullableNumber(payload.transId) ?? Number.NaN,
+    };
+  }
+
+  private toNullableNumber(value: unknown): number | null {
+    if (value === null || value === undefined || value === '') return null;
+    const numberValue =
+      typeof value === 'number' ? value : Number(String(value).trim());
+    return Number.isFinite(numberValue) ? numberValue : null;
+  }
+
+  private toNullableInt(value: unknown): number | null {
+    const numberValue = this.toNullableNumber(value);
+    return numberValue === null ? null : Math.trunc(numberValue);
+  }
+
+  private hasRequiredCallbackFields(payload: MoMoIPNDto): boolean {
+    const requiredStrings = [
+      payload.partnerCode,
+      payload.orderId,
+      payload.requestId,
+      payload.orderInfo,
+      payload.orderType,
+      payload.message,
+      payload.payType,
+      payload.extraData,
+      payload.signature,
+    ];
+
+    return (
+      requiredStrings.every((value) => typeof value === 'string') &&
+      Number.isFinite(payload.amount) &&
+      Number.isFinite(payload.responseTime) &&
+      Number.isFinite(payload.resultCode) &&
+      Number.isFinite(payload.transId)
+    );
   }
 
   /**
@@ -252,6 +302,40 @@ export class MoMoPaymentService {
   }
 
   /**
+   * Confirm the signed MoMo return payload received by the mobile app.
+   *
+   * This is a user-authenticated fallback for cases where Android receives the
+   * redirect before MoMo's server-to-server IPN has reached this backend.
+   */
+  async confirmReturn(
+    bookingId: string,
+    userId: string,
+    payload: MoMoIPNDto,
+  ): Promise<void> {
+    await this.bookingPaymentService.findByIdAndUser(bookingId, userId);
+
+    const callback = this.normalizeCallbackPayload({
+      ...payload,
+      extraData: payload.extraData || bookingId,
+    });
+
+    if (callback.extraData !== bookingId) {
+      throw new BadRequestException('MoMo return booking mismatch');
+    }
+
+    if (callback.resultCode !== 0) {
+      throw new BadRequestException(
+        callback.message || 'MoMo payment was not successful',
+      );
+    }
+
+    const accepted = await this.handleIPN(callback);
+    if (!accepted) {
+      throw new BadRequestException('Invalid MoMo return signature');
+    }
+  }
+
+  /**
    * Handle MoMo IPN callback.
    *
    * Flow:
@@ -261,15 +345,28 @@ export class MoMoPaymentService {
    * 4. Update booking status via BookingPaymentService
    */
   async handleIPN(ipn: MoMoIPNDto): Promise<boolean> {
-    const isValid = verifyIPNSignature(this.accessKey, this.secretKey, ipn);
+    const callback = this.normalizeCallbackPayload(ipn);
+
+    if (!this.hasRequiredCallbackFields(callback)) {
+      this.logger.warn(
+        `IPN malformed payload: orderId=${String(callback.orderId)}`,
+      );
+      return false;
+    }
+
+    const isValid = verifyIPNSignature(
+      this.accessKey,
+      this.secretKey,
+      callback,
+    );
 
     // Try to find the payment by gateway order ID
     const payment = await this.paymentRepo.findOne({
-      where: { gatewayOrderId: ipn.orderId },
+      where: { gatewayOrderId: callback.orderId },
     });
 
     if (!isValid) {
-      this.logger.warn(`IPN invalid signature: ${ipn.orderId}`);
+      this.logger.warn(`IPN invalid signature: ${callback.orderId}`);
 
       // Log rejection if payment exists
       if (payment) {
@@ -278,9 +375,9 @@ export class MoMoPaymentService {
             paymentId: payment.id,
             action: TransactionAction.IPN_REJECTED,
             gateway: PaymentMethod.MOMO,
-            resultCode: ipn.resultCode,
-            message: `Invalid signature: ${ipn.message}`,
-            requestPayload: ipn as unknown as Record<string, unknown>,
+            resultCode: this.toNullableInt(callback.resultCode),
+            message: `Invalid signature: ${callback.message}`,
+            requestPayload: callback as unknown as Record<string, unknown>,
             actor: 'system',
           }),
         );
@@ -289,7 +386,7 @@ export class MoMoPaymentService {
       return false;
     }
 
-    const bookingId = ipn.extraData;
+    const bookingId = callback.extraData;
 
     try {
       // Log IPN verified
@@ -299,22 +396,27 @@ export class MoMoPaymentService {
             paymentId: payment.id,
             action: TransactionAction.IPN_VERIFIED,
             gateway: PaymentMethod.MOMO,
-            resultCode: ipn.resultCode,
-            message: ipn.message,
-            requestPayload: ipn as unknown as Record<string, unknown>,
+            resultCode: this.toNullableInt(callback.resultCode),
+            message: callback.message,
+            requestPayload: callback as unknown as Record<string, unknown>,
             actor: 'system',
           }),
         );
       }
 
-      if (ipn.resultCode === 0) {
+      if (callback.resultCode === 0) {
+        const bookingBeforeUpdate =
+          await this.bookingPaymentService.findById(bookingId);
+        const shouldNotify =
+          bookingBeforeUpdate.status !== BookingStatus.CONFIRMED;
+
         // Update Payment record
         if (payment) {
           payment.paymentStatus = PaymentStatus.PAID;
           payment.paidAt = new Date();
-          payment.gatewayTransId = String(ipn.transId);
-          payment.gatewayResultCode = ipn.resultCode;
-          payment.gatewayMessage = ipn.message;
+          payment.gatewayTransId = String(callback.transId);
+          payment.gatewayResultCode = callback.resultCode;
+          payment.gatewayMessage = callback.message;
           await this.paymentRepo.save(payment);
         }
 
@@ -323,14 +425,59 @@ export class MoMoPaymentService {
           bookingId,
           BookingStatus.CONFIRMED,
           'system',
-          `MoMo payment confirmed: transId=${ipn.transId}`,
+          `MoMo payment confirmed: transId=${callback.transId}`,
           BookingStatusReasonCode.PAYMENT_CONFIRMED_MOMO,
         );
 
-        this.logger.log(`IPN success: ${ipn.orderId} -> booking ${bookingId}`);
+        // Send booking confirmation notification after payment success
+        if (shouldNotify) {
+          try {
+            const booking =
+              await this.bookingPaymentService.findById(bookingId);
+            let serviceName: string | null = null;
+            if (booking.productId) {
+              const product = await this.productRepo.findOne({
+                where: { id: booking.productId },
+              });
+              serviceName = product?.name ?? null;
+            }
+
+            const startDate = booking.startTime;
+            const dateStr = startDate
+              ? startDate.toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+              : 'your scheduled date';
+
+            this.notificationEventService.emit({
+              type: NotificationType.BOOKING_CONFIRMED,
+              recipientId: booking.userId,
+              title: 'Payment Successful! 🎉',
+              body: serviceName
+                ? `Your payment for "${serviceName}" on ${dateStr} has been confirmed. Your booking is now confirmed!`
+                : `Your payment on ${dateStr} has been confirmed. Your booking is now confirmed!`,
+              data: {
+                bookingId: booking.id,
+                action: 'view_booking',
+              },
+            });
+          } catch (notifError) {
+            this.logger.error(
+              `Notification emit failed after MoMo IPN — bookingId=${bookingId}`,
+              notifError instanceof Error ? notifError.stack : undefined,
+            );
+            // Don't throw — payment is already confirmed
+          }
+        }
+
+        this.logger.log(
+          `IPN success: ${callback.orderId} -> booking ${bookingId}`,
+        );
       } else {
         this.logger.warn(
-          `IPN failed: ${ipn.orderId} resultCode=${ipn.resultCode}`,
+          `IPN failed: ${callback.orderId} resultCode=${callback.resultCode}`,
         );
       }
     } catch (error) {

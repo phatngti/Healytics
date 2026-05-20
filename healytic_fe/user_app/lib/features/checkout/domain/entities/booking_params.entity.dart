@@ -4,6 +4,7 @@
 /// Pure Dart — no Flutter or Riverpod imports.
 class BookingParams {
   const BookingParams({
+    this.cartItemId,
     required this.serviceId,
     required this.serviceName,
     required this.serviceImageUrl,
@@ -16,6 +17,11 @@ class BookingParams {
     required this.selectedDate,
     required this.selectedTimeSlot,
   });
+
+  /// Source cart item identifier when checkout is
+  /// launched from the cart. Null for direct booking
+  /// flows.
+  final String? cartItemId;
 
   /// Service (product) identifier.
   final String serviceId;

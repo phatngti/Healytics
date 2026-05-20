@@ -41,14 +41,14 @@ class RatingPriceRow extends StatelessWidget {
                 ),
                 AppDimens.horizontalExtraSmall,
                 Text(
-                  rating.toStringAsFixed(1),
+                  '${rating > 0 ? rating : 5.0}',
                   style: textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 AppDimens.horizontalExtraSmall,
                 Text(
-                  '($reviewCount Reviews)',
+                  '($reviewCount  Reviews)',
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),

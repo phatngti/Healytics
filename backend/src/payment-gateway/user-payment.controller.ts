@@ -2,6 +2,8 @@ import {
   Body,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -24,6 +26,7 @@ import {
   ConfirmStripeSetupIntentDto,
   CreateStripePaymentDto,
   CreateStripeSetupIntentResponseDto,
+  MoMoIPNDto,
   MoMoPaymentResponseDto,
   MoMoRefundResponseDto,
   SavedPaymentCardDto,
@@ -65,6 +68,29 @@ export class UserPaymentController {
     @Body() dto: CreateMoMoPaymentDto,
   ): Promise<MoMoPaymentResponseDto> {
     return this.momoService.createPayment(bookingId, userId, dto.requestType);
+  }
+
+  /**
+   * Confirm a MoMo redirect payload returned to the mobile app.
+   *
+   * MoMo can redirect the user before the server-to-server IPN is processed.
+   * The mobile app forwards the signed redirect fields here so the backend can
+   * verify the signature and update the booking immediately.
+   */
+  @Post('momo/:bookingId/return')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Confirm signed MoMo return payload for booking' })
+  @ApiOkResponse({ description: 'MoMo return payload accepted' })
+  @ApiBadRequestResponse({
+    description: 'Invalid signature, failed payment, or booking mismatch',
+  })
+  @ApiNotFoundResponse({ description: 'Booking not found' })
+  async confirmMoMoReturn(
+    @Param('bookingId', ParseUUIDPipe) bookingId: string,
+    @CurrentUser('id') userId: string,
+    @Body() dto: MoMoIPNDto,
+  ): Promise<void> {
+    await this.momoService.confirmReturn(bookingId, userId, dto);
   }
 
   /**

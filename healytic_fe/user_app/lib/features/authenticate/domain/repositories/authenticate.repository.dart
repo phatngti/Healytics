@@ -6,6 +6,15 @@ abstract class AuthenticateRepository {
     required String password,
   });
 
+  /// Orchestrates the device-side Google Sign-In flow and exchanges the
+  /// resulting ID token with the backend for an [AuthenticateEntity].
+  ///
+  /// Implementations are responsible for invoking the Google Sign-In
+  /// service, handling user cancellation (by throwing a
+  /// `GoogleSignInCancelledException`), and forwarding the obtained
+  /// `idToken` to the remote datasource.
+  Future<AuthenticateEntity> signInWithGoogle();
+
   Future<void> requestPasswordReset({required String email});
 
   Future<String> validatePasswordResetCode({

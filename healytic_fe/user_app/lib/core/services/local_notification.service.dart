@@ -5,15 +5,11 @@ import 'dart:io' show Platform;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:user_app/core/config/notification_config.dart';
 
 part 'local_notification.service.g.dart';
 
 final _log = Logger('LocalNotification');
-
-/// Notification channel configuration constants.
-const _kChannelId = 'healytics_notifications';
-const _kChannelName = 'Healytics';
-const _kChannelDescription = 'Healytics app notifications';
 
 /// OS-level local notification service wrapping
 /// [FlutterLocalNotificationsPlugin].
@@ -26,11 +22,15 @@ const _kChannelDescription = 'Healytics app notifications';
 /// Initialised lazily via
 /// [localNotificationServiceProvider].
 class LocalNotificationService {
-  LocalNotificationService();
+  LocalNotificationService({required NotificationConfig config})
+    : _config = config;
+
+  final NotificationConfig _config;
 
   final _plugin = FlutterLocalNotificationsPlugin();
   bool _initialized = false;
   int _nextId = 0;
+  String? _initialPayload;
 
   final _tapController = StreamController<String?>.broadcast();
 
@@ -50,6 +50,11 @@ class LocalNotificationService {
   Future<void> initialize() async {
     if (_initialized) return;
     _initialized = true;
+
+    if (!_config.localNotificationsEnabled) {
+      _log.info('Local notifications disabled by config');
+      return;
+    }
 
     const androidSettings = AndroidInitializationSettings(
       '@mipmap/ic_launcher',
@@ -71,6 +76,8 @@ class LocalNotificationService {
       onDidReceiveNotificationResponse: _onNotificationResponse,
     );
 
+    await _captureLaunchPayload();
+
     // Create Android notification channel.
     if (Platform.isAndroid) {
       await _createAndroidChannel();
@@ -87,6 +94,10 @@ class LocalNotificationService {
   /// permission dialog. On iOS it requests alert,
   /// badge, and sound permissions.
   Future<bool> requestPermission() async {
+    if (!_config.localNotificationsEnabled) {
+      return false;
+    }
+
     if (Platform.isAndroid) {
       final androidPlugin = _plugin
           .resolvePlatformSpecificImplementation<
@@ -126,12 +137,16 @@ class LocalNotificationService {
     required String body,
     String? payload,
   }) async {
+    if (!_config.localNotificationsEnabled) {
+      return;
+    }
+
     final notificationId = id ?? _nextId++;
 
-    const androidDetails = AndroidNotificationDetails(
-      _kChannelId,
-      _kChannelName,
-      channelDescription: _kChannelDescription,
+    final androidDetails = AndroidNotificationDetails(
+      _config.androidChannelId,
+      _config.androidChannelName,
+      channelDescription: _config.androidChannelDescription,
       importance: Importance.high,
       priority: Priority.high,
       showWhen: true,
@@ -143,7 +158,7 @@ class LocalNotificationService {
       presentSound: true,
     );
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: androidDetails,
       iOS: darwinDetails,
     );
@@ -192,14 +207,22 @@ class LocalNotificationService {
     required String body,
     String? notificationId,
     String? type,
+    Map<String, dynamic>? data,
   }) async {
     final payload = jsonEncode({
-      'type': 'general',
+      'type': type ?? 'general',
       if (notificationId != null) 'notificationId': notificationId,
       if (type != null) 'notificationType': type,
+      ...?data,
     });
 
     await showNotification(title: title, body: body, payload: payload);
+  }
+
+  String? consumeInitialPayload() {
+    final payload = _initialPayload;
+    _initialPayload = null;
+    return payload;
   }
 
   // ── Tap Handler ────────────────────────────────
@@ -209,13 +232,20 @@ class LocalNotificationService {
     _tapController.add(response.payload);
   }
 
+  Future<void> _captureLaunchPayload() async {
+    final details = await _plugin.getNotificationAppLaunchDetails();
+    if (details?.didNotificationLaunchApp ?? false) {
+      _initialPayload = details?.notificationResponse?.payload;
+    }
+  }
+
   // ── Channel Setup ──────────────────────────────
 
   Future<void> _createAndroidChannel() async {
-    const channel = AndroidNotificationChannel(
-      _kChannelId,
-      _kChannelName,
-      description: _kChannelDescription,
+    final channel = AndroidNotificationChannel(
+      _config.androidChannelId,
+      _config.androidChannelName,
+      description: _config.androidChannelDescription,
       importance: Importance.high,
     );
 
@@ -242,9 +272,12 @@ class LocalNotificationService {
 /// persists for the entire app lifecycle.
 @Riverpod(keepAlive: true)
 Future<LocalNotificationService> localNotificationService(Ref ref) async {
-  final service = LocalNotificationService();
+  final config = NotificationConfig.fromStore();
+  final service = LocalNotificationService(config: config);
   await service.initialize();
-  await service.requestPermission();
+  if (config.localNotificationsEnabled) {
+    await service.requestPermission();
+  }
 
   ref.onDispose(service.dispose);
 

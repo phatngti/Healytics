@@ -5,6 +5,34 @@ import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/core/services/ws/ws_client.dart';
 
+/// Normalizes the gateway URL before passing it to `socket_io_client`.
+///
+/// The package treats a missing explicit port as `0` in parts of its URI
+/// handling. Supplying the scheme default avoids noisy `:0/socket.io` websocket
+/// errors while the transport still omits default ports on the wire.
+String normalizeSocketIoGatewayUrl(String gatewayUrl) {
+  final trimmed = gatewayUrl.trim();
+  if (trimmed.isEmpty) return '';
+
+  final uri = Uri.tryParse(trimmed);
+  if (uri == null || !uri.hasScheme || uri.host.isEmpty) {
+    return trimmed.replaceFirst(RegExp(r'/+$'), '');
+  }
+
+  final defaultPort = switch (uri.scheme) {
+    'https' || 'wss' => 443,
+    'http' || 'ws' => 80,
+    _ => null,
+  };
+  final port = uri.hasPort ? uri.port : defaultPort;
+  final path = uri.path.replaceFirst(RegExp(r'/+$'), '');
+  final host = uri.host.contains(':') ? '[${uri.host}]' : uri.host;
+  final userInfo = uri.userInfo.isEmpty ? '' : '${uri.userInfo}@';
+  final portSegment = port == null ? '' : ':$port';
+
+  return '${uri.scheme}://$userInfo$host$portSegment$path';
+}
+
 /// Centralised WebSocket service that wraps the
 /// auto-generated Socket.IO clients in `ws/`.
 ///
@@ -33,6 +61,7 @@ class WsService {
   UserChatSocket? _userChatSocket;
   BookingEventsSocket? _bookingEventsSocket;
   ChatNotificationsSocket? _chatNotificationsSocket;
+  NotificationsSocket? _notificationsSocket;
 
   /// The `/user-chat` namespace socket.
   ///
@@ -48,6 +77,10 @@ class WsService {
   ChatNotificationsSocket get chatNotifications =>
       _chatNotificationsSocket ??= ChatNotificationsSocket();
 
+  /// The `/notifications` namespace socket.
+  NotificationsSocket get notifications =>
+      _notificationsSocket ??= NotificationsSocket();
+
   // ── Lifecycle ────────────────────────────────────
 
   /// Connect **all** WebSocket namespaces using the
@@ -60,6 +93,7 @@ class WsService {
     _connectSocket(userChat, ServicePrefix.userChat);
     _connectSocket(bookingEvents, ServicePrefix.bookingEvents);
     _connectSocket(chatNotifications, ServicePrefix.chatNotifications);
+    _connectSocket(notifications, ServicePrefix.notifications);
   }
 
   /// Connect only the user-chat namespace.
@@ -77,10 +111,21 @@ class WsService {
     _connectSocket(chatNotifications, ServicePrefix.chatNotifications);
   }
 
+  /// Connect only the user notifications namespace.
+  void connectNotifications() {
+    _connectSocket(notifications, ServicePrefix.notifications);
+  }
+
   /// Force reconnect the chat-notifications namespace.
   void reconnectChatNotifications() {
     chatNotifications.disconnect();
     _connectSocket(chatNotifications, ServicePrefix.chatNotifications);
+  }
+
+  /// Force reconnect the user notifications namespace.
+  void reconnectNotifications() {
+    notifications.disconnect();
+    _connectSocket(notifications, ServicePrefix.notifications);
   }
 
   /// Disconnect **all** active sockets.
@@ -89,6 +134,7 @@ class WsService {
     _userChatSocket?.disconnect();
     _bookingEventsSocket?.disconnect();
     _chatNotificationsSocket?.disconnect();
+    _notificationsSocket?.disconnect();
   }
 
   /// Dispose **all** sockets and release resources.
@@ -100,9 +146,11 @@ class WsService {
     _userChatSocket?.dispose();
     _bookingEventsSocket?.dispose();
     _chatNotificationsSocket?.dispose();
+    _notificationsSocket?.dispose();
     _userChatSocket = null;
     _bookingEventsSocket = null;
     _chatNotificationsSocket = null;
+    _notificationsSocket = null;
   }
 
   // ── Helpers ──────────────────────────────────────
@@ -128,12 +176,14 @@ class WsService {
   /// handshake. The HTTP transport path is always the
   /// standard `/socket.io/`.
   void _connectSocket(WsNamespaceSocket socket, ServicePrefix prefix) {
-    if (socket.status == WsConnectionStatus.connected) {
-      _log.fine('${prefix.path} already connected');
+    if (socket.status == WsConnectionStatus.connected ||
+        socket.status == WsConnectionStatus.connecting ||
+        socket.status == WsConnectionStatus.reconnecting) {
+      _log.fine('${prefix.path} already ${socket.status.name}');
       return;
     }
 
-    final baseUrl = _apiService.gatewayUrl;
+    final baseUrl = normalizeSocketIoGatewayUrl(_apiService.gatewayUrl);
     final token = _resolveAccessToken();
 
     if (baseUrl.isEmpty || token.isEmpty) {

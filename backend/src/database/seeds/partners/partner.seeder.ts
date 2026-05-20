@@ -19,6 +19,7 @@ import { BusinessType } from '@/partners/enum/business-type.enum';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 import { IdType } from '@/partners/enum/id-type.enum';
 import { ISeeder } from '../seeder.interface';
+import { BULK_WELLNESS_PARTNERS } from '../wellness-bulk.seed';
 
 // ============================================================================
 // Seed Data Types
@@ -442,6 +443,7 @@ const SEED_PARTNERS: SeedPartner[] = [
       },
     ],
   },
+  ...BULK_WELLNESS_PARTNERS,
 ];
 
 // ============================================================================
@@ -489,6 +491,59 @@ export class PartnerSeeder implements ISeeder {
     return location.id;
   }
 
+  private async resolveFirstChildLocation(
+    parentId: string,
+    label: string,
+  ): Promise<string | null> {
+    const rows = await this.locationRepo.query(
+      `
+      SELECT id
+      FROM location
+      WHERE parent_id = $1
+      ORDER BY code ASC
+      LIMIT 1
+      `,
+      [parentId],
+    );
+
+    const id = rows?.[0]?.id ?? null;
+    if (!id) {
+      this.logger.warn(
+        `  ⚠ No child location found for ${label} parent "${parentId}" — setting to null.`,
+      );
+    }
+    return id;
+  }
+
+  private async resolveAddressIds(address: SeedAddress): Promise<{
+    provinceId: string | null;
+    districtId: string | null;
+    wardId: string | null;
+  }> {
+    const provinceId = await this.resolveLocationByCode(
+      address.provinceCode,
+      'province',
+    );
+
+    let districtId = await this.resolveLocationByCode(
+      address.districtCode,
+      'district',
+    );
+    if (!districtId && provinceId) {
+      districtId = await this.resolveFirstChildLocation(
+        provinceId,
+        'district',
+      );
+    }
+
+    let wardId = await this.resolveLocationByCode(address.wardCode, 'ward');
+    if (!wardId && districtId) {
+      wardId = await this.resolveFirstChildLocation(districtId, 'ward');
+    }
+
+    return { provinceId, districtId, wardId };
+  }
+
   async seed(): Promise<void> {
     this.logger.log('Seeding partners...');
 
@@ -531,6 +586,7 @@ export class PartnerSeeder implements ISeeder {
       // Resolve Account FK
       const account = await this.accountRepo.findOne({
         where: { email: partnerData.accountEmail, role: Role.HEALTH_PARTNER },
+        loadEagerRelations: false,
       });
 
       if (!account) {
@@ -553,12 +609,9 @@ export class PartnerSeeder implements ISeeder {
       }
 
       // ── Resolve Location FKs ──
-      const { address } = partnerData;
-      const [provinceId, districtId, wardId] = await Promise.all([
-        this.resolveLocationByCode(address.provinceCode, 'province'),
-        this.resolveLocationByCode(address.districtCode, 'district'),
-        this.resolveLocationByCode(address.wardCode, 'ward'),
-      ]);
+      const { provinceId, districtId, wardId } = await this.resolveAddressIds(
+        partnerData.address,
+      );
 
       // ── Create Partner ──
       const partner = this.partnerRepo.create({

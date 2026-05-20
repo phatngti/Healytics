@@ -89,6 +89,59 @@ describe('PushNotificationService', () => {
 
       expect(deviceTokenRepo.find).toHaveBeenCalledTimes(1);
     });
+
+    it('should deactivate synthetic mock tokens without sending them', async () => {
+      const sendFcmSpy = jest.spyOn(service as any, 'sendFcm');
+      deviceTokenRepo.find.mockResolvedValue([
+        {
+          id: 'token-1',
+          token: 'mock-fcm-token-17789',
+          platform: DevicePlatform.ANDROID,
+          isActive: true,
+        },
+      ]);
+
+      await service.sendToUser('user-1', {
+        title: 'Booking Confirmed!',
+        body: 'Your booking is confirmed',
+      });
+
+      expect(deviceTokenRepo.update).toHaveBeenCalledWith('token-1', {
+        isActive: false,
+      });
+      expect(sendFcmSpy).not.toHaveBeenCalled();
+    });
+
+    it('should deactivate invalid FCM registration tokens without error spam', async () => {
+      jest.spyOn(service as any, 'shouldSkipToken').mockResolvedValue(false);
+      jest
+        .spyOn(service as any, 'sendFcm')
+        .mockRejectedValue(
+          Object.assign(
+            new Error(
+              'The registration token is not a valid FCM registration token',
+            ),
+            { code: 'messaging/invalid-argument' },
+          ),
+        );
+      deviceTokenRepo.find.mockResolvedValue([
+        {
+          id: 'token-1',
+          token: 'real-looking-fcm-token',
+          platform: DevicePlatform.ANDROID,
+          isActive: true,
+        },
+      ]);
+
+      await service.sendToUser('user-1', {
+        title: 'Booking Confirmed!',
+        body: 'Your booking is confirmed',
+      });
+
+      expect(deviceTokenRepo.update).toHaveBeenCalledWith('token-1', {
+        isActive: false,
+      });
+    });
   });
 
   // ── sendBroadcast ──────────────────────────────────────────

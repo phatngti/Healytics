@@ -8,6 +8,7 @@ import {
   IsUUID,
   ValidateNested,
   IsArray,
+  MinLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
@@ -52,6 +53,16 @@ export class UpdateEmployeeDto {
   @IsEmail()
   @IsNotEmpty()
   email?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    minLength: 8,
+    description: 'New employee account password',
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(8)
+  password?: string;
 
   @ApiPropertyOptional({ enum: EmployeeRole, enumName: 'EmployeeRole' })
   @IsOptional()

@@ -92,7 +92,7 @@ describe('SubmitFacilityReviewHandler', () => {
 
     expect(queryRunner.manager.findOne).toHaveBeenNthCalledWith(1, Booking, {
       where: { id: appointmentId },
-      relations: { product: true },
+      relations: { product: { partner: true } },
     });
     expect(queryRunner.manager.findOne).toHaveBeenNthCalledWith(
       2,
@@ -119,6 +119,47 @@ describe('SubmitFacilityReviewHandler', () => {
       tags: ['Clean'],
       photoUrls: saved.photoUrls,
     });
+  });
+
+  it('accepts the facility partner account id from appointment responses', async () => {
+    const partnerAccountId = 'facility-account-1';
+    const booking = completedBooking({ partnerAccountId });
+    const saved = {
+      id: 'review-1',
+      appointmentId,
+      facilityId,
+      rating: 5,
+      comment: null,
+      tags: ['Comfortable'],
+      photoUrls: [],
+      createdAt: new Date('2026-05-19T00:00:00.000Z'),
+    };
+
+    queryRunner.manager.findOne
+      .mockResolvedValueOnce(booking)
+      .mockResolvedValueOnce(null);
+    queryRunner.manager.create.mockReturnValue(saved);
+    queryRunner.manager.save.mockResolvedValue(saved);
+
+    const result = await handler.execute(userId, {
+      appointmentId,
+      facilityId: partnerAccountId,
+      rating: 5,
+      tags: ['Comfortable'],
+    });
+
+    expect(queryRunner.manager.create).toHaveBeenCalledWith(FacilityReview, {
+      appointmentId,
+      facilityId,
+      userId,
+      rating: 5,
+      comment: null,
+      tags: ['Comfortable'],
+      photoUrls: [],
+    });
+    expect(result.facilityId).toBe(facilityId);
+    expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(1);
+    expect(queryRunner.rollbackTransaction).not.toHaveBeenCalled();
   });
 
   it('rejects reviews for another user appointment', async () => {
@@ -186,13 +227,17 @@ describe('SubmitFacilityReviewHandler', () => {
     expect(queryRunner.commitTransaction).not.toHaveBeenCalled();
   });
 
-  function completedBooking() {
+  function completedBooking(options?: { partnerAccountId?: string }) {
     return {
       id: appointmentId,
       userId,
       status: BookingStatus.COMPLETED,
       product: {
         partnerId: facilityId,
+        partner: {
+          id: facilityId,
+          accountId: options?.partnerAccountId ?? 'facility-account-1',
+        },
       },
     };
   }

@@ -111,7 +111,11 @@ class _CardImageSection extends StatelessWidget {
           Positioned(
             bottom: AppDimens.spaceSm,
             right: AppDimens.spaceSm,
-            child: _RatingBadge(rating: double.tryParse(product.rating) ?? 4.9),
+            child: _RatingBadge(
+              rating: double.tryParse(product.rating)! > 0
+                  ? double.tryParse(product.rating)!
+                  : 5.0,
+            ),
           ),
         ],
       ),

@@ -74,7 +74,7 @@ final class RouterListenableProvider
   RouterListenable create() => RouterListenable();
 }
 
-String _$routerListenableHash() => r'de864f340c72ae6f7a337a418242d580de87f1b9';
+String _$routerListenableHash() => r'e074059abcb5f269953365c05a43366a62bfe6d2';
 
 abstract class _$RouterListenable extends $AsyncNotifier<void> {
   FutureOr<void> build();

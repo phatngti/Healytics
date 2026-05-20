@@ -101,6 +101,7 @@ export class PartnerReviewLogSeeder implements ISeeder {
           ]),
         },
         select: ['id', 'email'],
+        loadEagerRelations: false,
       }),
     ]);
 

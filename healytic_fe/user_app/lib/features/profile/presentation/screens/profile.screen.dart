@@ -2,16 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:common/widgets/toast.dart';
+import 'package:user_app/core/providers/api.provider.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/core/widgets/main_screen_layout.widget.dart';
+import 'package:user_app/features/authenticate/data/services/google_sign_in.service.dart';
 import 'package:user_app/router/routes.dart';
 
 import '../providers/profile.provider.dart';
 import '../widgets/profile_header.widget.dart';
 import '../widgets/profile_quick_stats.widget.dart';
 import '../widgets/profile_logout_button.widget.dart';
+
+final _log = Logger('ProfileScreen');
 
 /// Personal profile screen rendered inside the
 /// bottom navigation shell.
@@ -135,8 +141,8 @@ class ProfilePage extends HookConsumerWidget {
   /// Shows a confirmation dialog, then clears
   /// the session and triggers redirect via the
   /// router guard.
-  void _handleLogout(BuildContext context, WidgetRef ref) {
-    showDialog<bool>(
+  Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Theme.of(ctx).colorScheme.surfaceContainerHigh,
@@ -172,11 +178,37 @@ class ProfilePage extends HookConsumerWidget {
           ),
         ],
       ),
-    ).then((confirmed) {
-      if (confirmed == true) {
-        ref.read(authSessionStoreProvider).forceLogout();
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    final apiService = ref.read(apiServiceProvider);
+    try {
+      await apiService.authenticateApi
+          .authControllerLogout()
+          .timeout(const Duration(seconds: 10));
+    } catch (e, s) {
+      _log.warning('Server logout failed; clearing locally', e, s);
+      if (context.mounted) {
+        AppToast.warning(
+          context,
+          'Logged out locally; the server did not confirm.',
+        );
       }
-    });
+    }
+
+    try {
+      await ref
+          .read(googleSignInServiceProvider)
+          .signOut()
+          .timeout(const Duration(seconds: 5));
+    } catch (_) {
+      // Best-effort; the service swallows errors internally too.
+    }
+
+    ref.read(authSessionStoreProvider).forceLogout();
   }
 }
 

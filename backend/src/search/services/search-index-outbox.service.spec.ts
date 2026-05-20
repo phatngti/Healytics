@@ -12,10 +12,13 @@ describe('SearchIndexOutboxService', () => {
     create: jest.fn(),
     save: jest.fn(),
   };
+  const configService = {
+    get: jest.fn().mockReturnValue('production'),
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new SearchIndexOutboxService();
+    service = new SearchIndexOutboxService(configService as any);
     manager.create.mockImplementation((_, payload) => payload);
     manager.save.mockResolvedValue(undefined);
   });

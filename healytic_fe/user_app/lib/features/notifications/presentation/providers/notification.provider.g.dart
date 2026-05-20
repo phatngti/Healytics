@@ -115,7 +115,7 @@ final class NotificationNotifierProvider
 }
 
 String _$notificationNotifierHash() =>
-    r'c74e67a8ad02099891728dae04c2411450f81fb6';
+    r'99c8e8a896eaa4d0426ebe46c28c6b47cfae71a7';
 
 /// Stateful async notifier managing the paginated
 /// notification list.
@@ -216,3 +216,112 @@ abstract class _$UnreadCount extends $AsyncNotifier<int> {
     element.handleValue(ref, created);
   }
 }
+
+/// Keeps the backend `/notifications` Socket.IO namespace connected for
+/// authenticated real-backend environments.
+
+@ProviderFor(notificationWsConnection)
+const notificationWsConnectionProvider = NotificationWsConnectionProvider._();
+
+/// Keeps the backend `/notifications` Socket.IO namespace connected for
+/// authenticated real-backend environments.
+
+final class NotificationWsConnectionProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<WsConnectionStatus>,
+          WsConnectionStatus,
+          Stream<WsConnectionStatus>
+        >
+    with
+        $FutureModifier<WsConnectionStatus>,
+        $StreamProvider<WsConnectionStatus> {
+  /// Keeps the backend `/notifications` Socket.IO namespace connected for
+  /// authenticated real-backend environments.
+  const NotificationWsConnectionProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'notificationWsConnectionProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$notificationWsConnectionHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<WsConnectionStatus> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<WsConnectionStatus> create(Ref ref) {
+    return notificationWsConnection(ref);
+  }
+}
+
+String _$notificationWsConnectionHash() =>
+    r'b876c259d299866158f7bb8f1cbc0100140f7ec4';
+
+/// Emits notification entities as they arrive from the backend in real time.
+///
+/// Side effects stay here so all global listeners share one subscription:
+/// - insert/update the in-memory notification list
+/// - update the unread badge when the backend sends `unread_count`
+
+@ProviderFor(latestNotificationEvent)
+const latestNotificationEventProvider = LatestNotificationEventProvider._();
+
+/// Emits notification entities as they arrive from the backend in real time.
+///
+/// Side effects stay here so all global listeners share one subscription:
+/// - insert/update the in-memory notification list
+/// - update the unread badge when the backend sends `unread_count`
+
+final class LatestNotificationEventProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<NotificationEntity>,
+          NotificationEntity,
+          Stream<NotificationEntity>
+        >
+    with
+        $FutureModifier<NotificationEntity>,
+        $StreamProvider<NotificationEntity> {
+  /// Emits notification entities as they arrive from the backend in real time.
+  ///
+  /// Side effects stay here so all global listeners share one subscription:
+  /// - insert/update the in-memory notification list
+  /// - update the unread badge when the backend sends `unread_count`
+  const LatestNotificationEventProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'latestNotificationEventProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$latestNotificationEventHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<NotificationEntity> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<NotificationEntity> create(Ref ref) {
+    return latestNotificationEvent(ref);
+  }
+}
+
+String _$latestNotificationEventHash() =>
+    r'cb2d84114945ead98698395bef44d55f78348a4b';
