@@ -31,17 +31,17 @@ void main() {
       // TODO
     });
 
-    // Object imageUrl
+    // String imageUrl
     test('to test the property `imageUrl`', () async {
       // TODO
     });
 
-    // Object degrees
+    // String degrees
     test('to test the property `degrees`', () async {
       // TODO
     });
 
-    // Object experience
+    // String experience
     test('to test the property `experience`', () async {
       // TODO
     });
@@ -51,12 +51,12 @@ void main() {
       // TODO
     });
 
-    // Object bio
+    // String bio
     test('to test the property `bio`', () async {
       // TODO
     });
 
-    // Object quote
+    // String quote
     test('to test the property `quote`', () async {
       // TODO
     });

@@ -1,10 +1,13 @@
 import 'package:common/widgets/button/back_button.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_analytics/employee_detail_analytics.widget.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/contact/employee_contact_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/contact/employee_notes_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_education_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_operational_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_skills_card.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_verification_documents_card.dart';
+import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/details_infonmation/employee_work_history_details_card.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_details/header/employee_header_card.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:common/utils/demensions.dart';
@@ -14,11 +17,15 @@ import 'package:go_router/go_router.dart';
 class EmployeeDetailsDesktop extends StatelessWidget {
   final EmployeeEntity employee;
   final VoidCallback onEdit;
+  final VoidCallback? onDeactivate;
+  final bool isDeactivating;
 
   const EmployeeDetailsDesktop({
     super.key,
     required this.employee,
     required this.onEdit,
+    this.onDeactivate,
+    this.isDeactivating = false,
   });
 
   @override
@@ -41,7 +48,11 @@ class EmployeeDetailsDesktop extends StatelessWidget {
               EmployeeHeaderCard(
                 employee: employee,
                 onEdit: onEdit,
+                onDeactivate: onDeactivate,
+                isDeactivating: isDeactivating,
               ),
+              AppDimens.verticalLarge,
+              EmployeeDetailAnalyticsSection(employee: employee),
               AppDimens.verticalLarge,
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,10 +65,15 @@ class EmployeeDetailsDesktop extends StatelessWidget {
                         EmployeeContactCard(
                           email: employee.email,
                           phone: employee.phone,
+                          emergencyContactName: employee.emergencyContactName,
+                          emergencyContactPhone: employee.emergencyContactPhone,
+                          onEdit: onEdit,
                         ),
                         AppDimens.verticalMedium,
-                        EmployeeNotesCard(
-                          description: employee.description,
+                        EmployeeNotesCard(description: employee.description),
+                        AppDimens.verticalMedium,
+                        EmployeeVerificationDocumentsCard(
+                          documents: employee.verificationDocuments,
                         ),
                       ],
                     ),
@@ -68,20 +84,17 @@ class EmployeeDetailsDesktop extends StatelessWidget {
                     flex: 2,
                     child: Column(
                       children: [
-                        EmployeeSkillsCard(
-                          employee: employee,
+                        EmployeeSkillsCard(employee: employee),
+                        AppDimens.verticalMedium,
+                        EmployeeWorkHistoryDetailsCard(
+                          workHistory: employee.workHistory,
                         ),
                         AppDimens.verticalMedium,
-                        if (employee case DoctorEntity doctor)
-                          ...[
-                            EmployeeEducationCard(
-                              doctor: doctor,
-                            ),
-                            AppDimens.verticalMedium,
-                          ],
-                        EmployeeOperationalCard(
-                          employee: employee,
-                        ),
+                        if (employee case DoctorEntity doctor) ...[
+                          EmployeeEducationCard(doctor: doctor),
+                          AppDimens.verticalMedium,
+                        ],
+                        EmployeeOperationalCard(employee: employee),
                       ],
                     ),
                   ),
@@ -96,16 +109,11 @@ class EmployeeDetailsDesktop extends StatelessWidget {
           left: 0,
           right: 0,
           child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 16,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             decoration: BoxDecoration(
               color: colorScheme.surface,
               border: Border(
-                bottom: BorderSide(
-                  color: colorScheme.outlineVariant,
-                ),
+                bottom: BorderSide(color: colorScheme.outlineVariant),
               ),
               boxShadow: [
                 BoxShadow(
@@ -116,27 +124,21 @@ class EmployeeDetailsDesktop extends StatelessWidget {
               ],
             ),
             child: Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
                     AppBackButton(
                       onTap: () {
-                        context.goNamed(
-                          EmployeeHomeRoute.name,
-                        );
+                        context.goNamed(EmployeeHomeRoute.name);
                       },
                     ),
                     AppDimens.horizontalMedium,
                     Text(
                       '${employee.role} Profile',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),

@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PartnerEmployeesController } from './partner-employees.controller';
 import { EmployeesService } from './employees.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
-import { CreateSpaTherapistDto, CreateMassageTherapistDto } from './dto/create-therapist.dto';
+import {
+  CreateSpaTherapistDto,
+  CreateMassageTherapistDto,
+} from './dto/create-therapist.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
 import { MockType } from '../../test/mocks/mock-types';
@@ -23,6 +26,7 @@ describe('PartnerEmployeesController', () => {
       createMassageTherapist: jest.fn(),
       findAll: jest.fn(),
       findOneForPartner: jest.fn(),
+      findAssignedServicesForPartner: jest.fn(),
       updateForPartner: jest.fn(),
       removeForPartner: jest.fn(),
     };
@@ -37,7 +41,9 @@ describe('PartnerEmployeesController', () => {
       ],
     }).compile();
 
-    controller = module.get<PartnerEmployeesController>(PartnerEmployeesController);
+    controller = module.get<PartnerEmployeesController>(
+      PartnerEmployeesController,
+    );
     employeesService = module.get(EmployeesService);
   });
 
@@ -54,7 +60,11 @@ describe('PartnerEmployeesController', () => {
         email: 'doctor.a@healytics.com',
         employeeId: 'DOC-001',
       } as CreateDoctorDto;
-      const expectedEmployee = { id: 'uuid-1', ...dto, role: EmployeeRole.DOCTOR };
+      const expectedEmployee = {
+        id: 'uuid-1',
+        ...dto,
+        role: EmployeeRole.DOCTOR,
+      };
       employeesService.createDoctor!.mockResolvedValue(expectedEmployee);
 
       // Act
@@ -62,8 +72,13 @@ describe('PartnerEmployeesController', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(mockAccountId);
-      expect(employeesService.createDoctor).toHaveBeenCalledWith(dto, mockPartnerId);
+      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(
+        mockAccountId,
+      );
+      expect(employeesService.createDoctor).toHaveBeenCalledWith(
+        dto,
+        mockPartnerId,
+      );
     });
   });
 
@@ -76,7 +91,11 @@ describe('PartnerEmployeesController', () => {
         email: 'spa@healytics.com',
         employeeId: 'SPA-001',
       } as CreateSpaTherapistDto;
-      const expectedEmployee = { id: 'uuid-2', ...dto, role: EmployeeRole.THERAPIST };
+      const expectedEmployee = {
+        id: 'uuid-2',
+        ...dto,
+        role: EmployeeRole.THERAPIST,
+      };
       employeesService.createSpaTherapist!.mockResolvedValue(expectedEmployee);
 
       // Act
@@ -84,8 +103,13 @@ describe('PartnerEmployeesController', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(mockAccountId);
-      expect(employeesService.createSpaTherapist).toHaveBeenCalledWith(dto, mockPartnerId);
+      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(
+        mockAccountId,
+      );
+      expect(employeesService.createSpaTherapist).toHaveBeenCalledWith(
+        dto,
+        mockPartnerId,
+      );
     });
   });
 
@@ -98,16 +122,30 @@ describe('PartnerEmployeesController', () => {
         email: 'massage@healytics.com',
         employeeId: 'MSG-001',
       } as CreateMassageTherapistDto;
-      const expectedEmployee = { id: 'uuid-3', ...dto, role: EmployeeRole.THERAPIST };
-      employeesService.createMassageTherapist!.mockResolvedValue(expectedEmployee);
+      const expectedEmployee = {
+        id: 'uuid-3',
+        ...dto,
+        role: EmployeeRole.THERAPIST,
+      };
+      employeesService.createMassageTherapist!.mockResolvedValue(
+        expectedEmployee,
+      );
 
       // Act
-      const result = await controller.createMassageTherapist(mockAccountId, dto);
+      const result = await controller.createMassageTherapist(
+        mockAccountId,
+        dto,
+      );
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(mockAccountId);
-      expect(employeesService.createMassageTherapist).toHaveBeenCalledWith(dto, mockPartnerId);
+      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(
+        mockAccountId,
+      );
+      expect(employeesService.createMassageTherapist).toHaveBeenCalledWith(
+        dto,
+        mockPartnerId,
+      );
     });
   });
 
@@ -123,8 +161,13 @@ describe('PartnerEmployeesController', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployees);
-      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(mockAccountId);
-      expect(employeesService.findAll).toHaveBeenCalledWith(query, mockPartnerId);
+      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(
+        mockAccountId,
+      );
+      expect(employeesService.findAll).toHaveBeenCalledWith(
+        query,
+        mockPartnerId,
+      );
     });
 
     it('should work with empty query', async () => {
@@ -138,7 +181,10 @@ describe('PartnerEmployeesController', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployees);
-      expect(employeesService.findAll).toHaveBeenCalledWith(query, mockPartnerId);
+      expect(employeesService.findAll).toHaveBeenCalledWith(
+        query,
+        mockPartnerId,
+      );
     });
   });
 
@@ -154,8 +200,42 @@ describe('PartnerEmployeesController', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(mockAccountId);
-      expect(employeesService.findOneForPartner).toHaveBeenCalledWith(id, mockPartnerId);
+      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(
+        mockAccountId,
+      );
+      expect(employeesService.findOneForPartner).toHaveBeenCalledWith(
+        id,
+        mockPartnerId,
+      );
+    });
+  });
+
+  describe('findAssignedServices', () => {
+    it('should resolve partnerId and call service.findAssignedServicesForPartner', async () => {
+      // Arrange
+      const id = 'uuid-1';
+      const expectedServices = [
+        {
+          id: 'service-1',
+          name: 'General Consultation',
+          isPrimary: true,
+        },
+      ];
+      employeesService.findAssignedServicesForPartner!.mockResolvedValue(
+        expectedServices,
+      );
+
+      // Act
+      const result = await controller.findAssignedServices(mockAccountId, id);
+
+      // Assert
+      expect(result).toEqual(expectedServices);
+      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(
+        mockAccountId,
+      );
+      expect(
+        employeesService.findAssignedServicesForPartner,
+      ).toHaveBeenCalledWith(id, mockPartnerId);
     });
   });
 
@@ -163,7 +243,9 @@ describe('PartnerEmployeesController', () => {
     it('should resolve partnerId and call service.updateForPartner', async () => {
       // Arrange
       const id = 'uuid-1';
-      const dto: UpdateEmployeeDto = { fullName: 'Updated Name' } as UpdateEmployeeDto;
+      const dto: UpdateEmployeeDto = {
+        fullName: 'Updated Name',
+      } as UpdateEmployeeDto;
       const expectedEmployee = { id, fullName: 'Updated Name' };
       employeesService.updateForPartner!.mockResolvedValue(expectedEmployee);
 
@@ -172,8 +254,14 @@ describe('PartnerEmployeesController', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(mockAccountId);
-      expect(employeesService.updateForPartner).toHaveBeenCalledWith(id, mockPartnerId, dto);
+      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(
+        mockAccountId,
+      );
+      expect(employeesService.updateForPartner).toHaveBeenCalledWith(
+        id,
+        mockPartnerId,
+        dto,
+      );
     });
   });
 
@@ -187,8 +275,13 @@ describe('PartnerEmployeesController', () => {
       await controller.remove(mockAccountId, id);
 
       // Assert
-      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(mockAccountId);
-      expect(employeesService.removeForPartner).toHaveBeenCalledWith(id, mockPartnerId);
+      expect(employeesService.getPartnerIdByAccountId).toHaveBeenCalledWith(
+        mockAccountId,
+      );
+      expect(employeesService.removeForPartner).toHaveBeenCalledWith(
+        id,
+        mockPartnerId,
+      );
     });
   });
 });

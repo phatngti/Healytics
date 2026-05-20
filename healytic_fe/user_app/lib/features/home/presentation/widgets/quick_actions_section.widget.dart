@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 
+import 'package:user_app/router/routes.dart';
+
 class QuickActionsSection extends StatelessWidget {
   const QuickActionsSection({super.key});
 
@@ -33,25 +35,25 @@ class QuickActionsSection extends StatelessWidget {
               child: _QuickActionCard(
                 icon: Symbols.calendar_add_on,
                 iconColor: theme.colorScheme.primary,
-                backgroundColor: theme.colorScheme.primaryContainer.withValues(
-                  alpha: 0.5,
-                ),
+                backgroundColor: theme.colorScheme.primaryContainer,
                 title: 'Book Appointment',
                 subtitle: 'Quick booking with AI suggestions',
-                onTap: () {},
+                onTap: () {
+                  const BookAppointmentRoute().push(context);
+                },
               ),
             ),
             SizedBox(width: cardGap),
             Expanded(
               child: _QuickActionCard(
                 icon: Symbols.smart_toy,
-                iconColor: theme.colorScheme.tertiary,
-                backgroundColor: theme.colorScheme.tertiaryContainer.withValues(
-                  alpha: 0.5,
-                ),
+                iconColor: theme.colorScheme.secondary,
+                backgroundColor: theme.colorScheme.secondaryContainer,
                 title: 'AI Health Assistant',
                 subtitle: 'Get instant health guidance',
-                onTap: () {},
+                onTap: () {
+                  const AiHealthAssistantRoute().push(context);
+                },
               ),
             ),
           ],

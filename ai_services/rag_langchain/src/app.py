@@ -1,6 +1,7 @@
 # chatbot-service/app.py
 import os
 import asyncio
+import re
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 from fastapi import FastAPI
@@ -67,6 +68,14 @@ class ChatStreamRequest(BaseModel):
     question: str
 
 
+class ChatTitleRequest(BaseModel):
+    """
+    Payload dùng để tạo tiêu đề ngắn cho conversation.
+    """
+    user_message: str
+    assistant_message: str = ""
+
+
 # ============================================================
 # RESPONSE PARSER  (giữ nguyên logic của app.py gốc)
 # ============================================================
@@ -82,6 +91,42 @@ def parse_llm_output(result) -> str:
     elif isinstance(result, AIMessage):
         return result.content.strip()
     return str(result).strip()
+
+
+def clean_conversation_title(text: str) -> str:
+    """Chuẩn hóa output LLM thành title ngắn để lưu DB/UI."""
+    title = parse_llm_output(text)
+    title = title.splitlines()[0] if title else ""
+    title = re.sub(r"^[\"'“”‘’`]+|[\"'“”‘’`]+$", "", title).strip()
+    title = re.sub(r"^(title|tiêu đề)\s*:\s*", "", title, flags=re.IGNORECASE).strip()
+    title = re.sub(r"\s+", " ", title)
+    if not title:
+        return "Cuộc trò chuyện mới"
+    return title[:80].rstrip(" .,-")
+
+
+async def generate_conversation_title(
+    user_message: str,
+    assistant_message: str = "",
+) -> str:
+    prompt = f"""
+You create short conversation titles for the Healytics chatbot UI.
+
+Rules:
+- Return ONLY the title text.
+- Use the same language as the user's message.
+- Keep it concise: 3 to 8 words.
+- No quotes, no markdown, no punctuation at the end.
+- The domain is wellness services: spa & massage, traditional medicine, physiotherapy and rehabilitation.
+
+User message:
+{user_message}
+
+Assistant answer:
+{assistant_message[:800]}
+"""
+    result = await asyncio.to_thread(llm.invoke, prompt)
+    return clean_conversation_title(result)
 
 
 # ============================================================
@@ -129,7 +174,11 @@ async def generative_ai(inputs: InputQA):
     Endpoint gốc — giữ nguyên, không đụng vào.
     Dùng để test trực tiếp qua Swagger docs.
     """
-    result = genai_chain.invoke(inputs.question)
+    result = genai_chain.invoke({
+        "history": "",
+        "services": "",
+        "question": inputs.question,
+    })
     answer = parse_llm_output(result)
     return {"answer": answer}
 
@@ -171,3 +220,15 @@ async def chat_stream(request: ChatStreamRequest):
             "X-Accel-Buffering": "no",   # tắt buffer nginx nếu có
         },
     )
+
+
+@app.post("/chat/title")
+async def chat_title(request: ChatTitleRequest):
+    """
+    Tạo tiêu đề ngắn cho conversation để Gateway lưu vào conversations.title.
+    """
+    title = await generate_conversation_title(
+        user_message=request.user_message,
+        assistant_message=request.assistant_message,
+    )
+    return {"title": title}

@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/widgets/adaptive_root_scaffold/adaptive_root_scraffold.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
-import 'package:user_app/features/bot_chat/presentation/screens/chat_page.dart';
-import 'package:user_app/features/bot_chat/presentation/screens/conversation_history_page.dart';
+import 'package:user_app/features/ai_health_assistant/presentation/screens/chat.screen.dart';
+import 'package:user_app/features/ai_health_assistant/presentation/screens/conversation_history.screen.dart';
+import 'package:user_app/features/home/presentation/screens/'
+    'home_premium_treatments.screen.dart';
+import 'package:user_app/features/home/presentation/screens/'
+    'home_recent_activity.screen.dart';
+import 'package:user_app/features/home/presentation/screens/'
+    'home_recommendations.screen.dart';
+import 'package:user_app/features/home/presentation/screens/'
+    'home_specialists.screen.dart';
 import 'package:user_app/features/home/presentation/screens/home_page.screen.dart';
-import 'package:user_app/features/home/presentation/screens/service_details.screen.dart';
-import 'package:user_app/features/home/presentation/screens/reviews.screen.dart';
+import 'package:user_app/features/service_details/presentation/screens/service_details.screen.dart';
+import 'package:user_app/features/service_details/presentation/screens/reviews.screen.dart';
 import 'package:user_app/features/notifications/presentation/screens/notifications.screen.dart';
 import 'package:user_app/features/onboarding/presentation/screens/lottie_splash.screen.dart';
 import 'package:user_app/features/onboarding/presentation/screens/onboard.screen.dart';
@@ -22,8 +31,35 @@ import 'package:user_app/features/orders/presentation/screens/order_details.scre
 import 'package:user_app/features/orders/presentation/screens/orders.screen.dart';
 import 'package:user_app/features/orders/presentation/screens/service_manual.screen.dart';
 import 'package:user_app/features/profile/presentation/screens/profile.screen.dart';
+import 'package:user_app/features/profile/presentation/screens/edit_profile.screen.dart';
+import 'package:user_app/features/profile/presentation/screens/payment_cards.screen.dart';
 import 'package:user_app/features/checkout/presentation/screens/checkout.screen.dart';
 import 'package:user_app/features/authenticate/presentation/screens/signin.screen.dart';
+import 'package:user_app/features/authenticate/presentation/screens/forgot_password.screen.dart';
+import 'package:user_app/features/authenticate/presentation/screens/password_reset_code.screen.dart';
+import 'package:user_app/features/authenticate/presentation/screens/reset_password.screen.dart';
+import 'package:user_app/features/employee/domain/entities/certificate.entity.dart';
+import 'package:user_app/features/employee/presentation/screens/certificate_viewer.screen.dart';
+import 'package:user_app/features/employee/presentation/screens/certificates_list.screen.dart';
+import 'package:user_app/features/employee/presentation/screens/employee_detail.screen.dart';
+import 'package:user_app/features/employee/presentation/screens/employee_reviews.screen.dart';
+import 'package:user_app/features/booking/presentation/screens/book_appointment.screen.dart';
+import 'package:user_app/features/booking/presentation/screens/select_specialist.screen.dart';
+import 'package:user_app/features/service_details/presentation/screens/service_specialist.screen.dart';
+import 'package:user_app/features/booking/presentation/screens/booking_summary.screen.dart';
+import 'package:user_app/features/ai_health_assistant/presentation/screens/ai_health_assistant.screen.dart';
+import 'package:user_app/features/employee/presentation/screens/employee_booking.screen.dart';
+import 'package:user_app/features/employee/presentation/screens/employee_booking_summary.screen.dart';
+import 'package:user_app/features/review/presentation/screens/review_treatment.screen.dart';
+import 'package:user_app/features/review/presentation/screens/review_specialist.screen.dart';
+import 'package:user_app/features/review/presentation/screens/review_submitted.screen.dart';
+import 'package:user_app/features/review/presentation/screens/review_facility.screen.dart';
+import 'package:user_app/features/partner_chat/presentation/screens/partner_chat.screen.dart';
+import 'package:user_app/features/clinic_info/presentation/screens/clinic_info.screen.dart';
+import 'package:user_app/features/clinic_info/presentation/screens/clinic_specialists.screen.dart';
+import 'package:user_app/features/cart/presentation/screens/cart.screen.dart';
+import 'package:user_app/features/notifications/'
+    'presentation/providers/notification.provider.dart';
 
 part 'routes.g.dart';
 
@@ -96,8 +132,24 @@ class MobileWrapperRoutes extends StatefulShellRouteData {
     GoRouterState state,
     StatefulNavigationShell navigationShell,
   ) {
+    return _MobileWrapperBody(navigationShell: navigationShell);
+  }
+}
+
+/// Extracted to a ConsumerWidget so we can
+/// watch the unread count provider.
+class _MobileWrapperBody extends ConsumerWidget {
+  const _MobileWrapperBody({required this.navigationShell});
+
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadCount = ref.watch(unreadCountProvider).value ?? 0;
+
     return AdaptiveRootScraffold(
       navigationShell: navigationShell,
+      notificationBadgeCount: unreadCount,
       destinationKeys: [
         keys.bottomNav.homeTab,
         keys.bottomNav.ordersTab,
@@ -125,6 +177,77 @@ class HomeRoute extends GoRouteData with $HomeRoute {
   }
 }
 
+@TypedGoRoute<HomeRecommendationsRoute>(
+  path: '/home/recommendations',
+  name: HomeRecommendationsRoute.name,
+)
+class HomeRecommendationsRoute extends GoRouteData
+    with $HomeRecommendationsRoute {
+  const HomeRecommendationsRoute();
+  static const name = 'home_recommendations';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const HomeRecommendationsScreen(),
+    );
+  }
+}
+
+@TypedGoRoute<HomeRecentActivityRoute>(
+  path: '/home/recent-activity',
+  name: HomeRecentActivityRoute.name,
+)
+class HomeRecentActivityRoute extends GoRouteData
+    with $HomeRecentActivityRoute {
+  const HomeRecentActivityRoute();
+  static const name = 'home_recent_activity';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const HomeRecentActivityScreen(),
+    );
+  }
+}
+
+@TypedGoRoute<HomeSpecialistsRoute>(
+  path: '/home/specialists',
+  name: HomeSpecialistsRoute.name,
+)
+class HomeSpecialistsRoute extends GoRouteData with $HomeSpecialistsRoute {
+  const HomeSpecialistsRoute();
+  static const name = 'home_specialists';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const HomeSpecialistsScreen(),
+    );
+  }
+}
+
+@TypedGoRoute<HomePremiumTreatmentsRoute>(
+  path: '/home/premium-treatments',
+  name: HomePremiumTreatmentsRoute.name,
+)
+class HomePremiumTreatmentsRoute extends GoRouteData
+    with $HomePremiumTreatmentsRoute {
+  const HomePremiumTreatmentsRoute();
+  static const name = 'home_premium_treatments';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const HomePremiumTreatmentsScreen(),
+    );
+  }
+}
+
 class OrderApprovedRoute extends GoRouteData with $OrderApprovedRoute {
   const OrderApprovedRoute();
   static const name = "order_approved";
@@ -147,7 +270,7 @@ class ConversationHistoryRoute extends GoRouteData
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: const ConversationHistoryPage(),
+      child: const ConversationHistoryScreen(),
     );
   }
 }
@@ -178,7 +301,24 @@ class ProfileRoute extends GoRouteData with $ProfileRoute {
   }
 }
 
-// --- BOT CHAT ROUTES ---
+@TypedGoRoute<PaymentCardsRoute>(
+  path: '/profile/payment-cards',
+  name: PaymentCardsRoute.name,
+)
+class PaymentCardsRoute extends GoRouteData with $PaymentCardsRoute {
+  const PaymentCardsRoute();
+  static const name = 'payment_cards';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const PaymentCardsScreen(),
+    );
+  }
+}
+
+// --- AI HEALTH ASSISTANT CHAT ROUTES ---
 
 @TypedGoRoute<ChatRoute>(path: '/chat', name: ChatRoute.name)
 class ChatRoute extends GoRouteData with $ChatRoute {
@@ -190,7 +330,7 @@ class ChatRoute extends GoRouteData with $ChatRoute {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
-      child: ChatPage(conversationId: conversationId),
+      child: ChatScreen(conversationId: conversationId),
     );
   }
 }
@@ -248,6 +388,150 @@ class CheckoutRoute extends GoRouteData with $CheckoutRoute {
   }
 }
 
+// --- BOOK APPOINTMENT ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<BookAppointmentRoute>(
+  path: '/book_appointment',
+  name: BookAppointmentRoute.name,
+)
+class BookAppointmentRoute extends GoRouteData with $BookAppointmentRoute {
+  const BookAppointmentRoute();
+  static const name = 'book_appointment';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const BookAppointmentScreen(),
+    );
+  }
+}
+
+// --- SELECT SPECIALIST ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<SelectSpecialistRoute>(
+  path: '/select_specialist',
+  name: SelectSpecialistRoute.name,
+)
+class SelectSpecialistRoute extends GoRouteData with $SelectSpecialistRoute {
+  final String categoryId;
+  const SelectSpecialistRoute({required this.categoryId});
+  static const name = 'select_specialist';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: SelectSpecialistScreen(categoryId: categoryId),
+    );
+  }
+}
+
+// --- SERVICE SPECIALIST ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ServiceSpecialistRoute>(
+  path: '/service_specialist',
+  name: ServiceSpecialistRoute.name,
+)
+class ServiceSpecialistRoute extends GoRouteData with $ServiceSpecialistRoute {
+  final String serviceId;
+  const ServiceSpecialistRoute({required this.serviceId});
+  static const name = 'service_specialist';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ServiceSpecialistScreen(serviceId: serviceId),
+    );
+  }
+}
+
+// --- EMPLOYEE BOOKING ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<EmployeeBookingRoute>(
+  path: '/employee_booking',
+  name: EmployeeBookingRoute.name,
+)
+class EmployeeBookingRoute extends GoRouteData with $EmployeeBookingRoute {
+  final String employeeId;
+  final String serviceId;
+  const EmployeeBookingRoute({
+    required this.employeeId,
+    required this.serviceId,
+  });
+  static const name = 'employee_booking';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: EmployeeBookingScreen(
+        employeeId: employeeId,
+        serviceId: serviceId,
+      ),
+    );
+  }
+}
+
+// --- EMPLOYEE BOOKING SUMMARY ROUTE (No Nav Bar) ---
+
+@TypedGoRoute<EmployeeBookingSummaryRoute>(
+  path: '/employee_booking_summary',
+  name: EmployeeBookingSummaryRoute.name,
+)
+class EmployeeBookingSummaryRoute extends GoRouteData
+    with $EmployeeBookingSummaryRoute {
+  const EmployeeBookingSummaryRoute();
+  static const name = 'employee_booking_summary';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const EmployeeBookingSummaryScreen(),
+    );
+  }
+}
+
+// --- BOOKING SUMMARY ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<BookingSummaryRoute>(
+  path: '/booking_summary',
+  name: BookingSummaryRoute.name,
+)
+class BookingSummaryRoute extends GoRouteData with $BookingSummaryRoute {
+  const BookingSummaryRoute();
+  static const name = 'booking_summary';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const BookingSummaryScreen(),
+    );
+  }
+}
+
+// --- AI HEALTH ASSISTANT ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<AiHealthAssistantRoute>(
+  path: '/ai_health_assistant',
+  name: AiHealthAssistantRoute.name,
+)
+class AiHealthAssistantRoute extends GoRouteData with $AiHealthAssistantRoute {
+  const AiHealthAssistantRoute();
+  static const name = 'ai_health_assistant';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const AiHealthAssistantScreen(),
+    );
+  }
+}
+
 // --- ORDER DETAILS ROUTE (No Navigation Bar) ---
 
 @TypedGoRoute<OrderDetailsRoute>(
@@ -284,6 +568,111 @@ class ServiceManualRoute extends GoRouteData with $ServiceManualRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: ServiceManualScreen(appointmentId: appointmentId),
+    );
+  }
+}
+
+// --- EMPLOYEE DETAIL ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<EmployeeDetailRoute>(
+  path: '/employee_detail',
+  name: EmployeeDetailRoute.name,
+)
+class EmployeeDetailRoute extends GoRouteData with $EmployeeDetailRoute {
+  final String employeeId;
+  const EmployeeDetailRoute({required this.employeeId});
+  static const name = 'employee_detail';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: EmployeeDetailScreen(employeeId: employeeId),
+    );
+  }
+}
+
+// --- CERTIFICATES ROUTES (No Navigation Bar) ---
+
+@TypedGoRoute<CertificatesListRoute>(
+  path: '/certificates_list',
+  name: CertificatesListRoute.name,
+)
+class CertificatesListRoute extends GoRouteData with $CertificatesListRoute {
+  final String employeeName;
+  final String employeeId;
+  const CertificatesListRoute({
+    required this.employeeName,
+    required this.employeeId,
+  });
+  static const name = 'certificates_list';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: CertificatesListScreen(
+        employeeId: employeeId,
+        employeeName: employeeName,
+      ),
+    );
+  }
+}
+
+@TypedGoRoute<EmployeeReviewsRoute>(
+  path: '/employee_reviews',
+  name: EmployeeReviewsRoute.name,
+)
+class EmployeeReviewsRoute extends GoRouteData with $EmployeeReviewsRoute {
+  final String employeeId;
+  final String employeeName;
+
+  const EmployeeReviewsRoute({
+    required this.employeeId,
+    required this.employeeName,
+  });
+
+  static const name = 'employee_reviews';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: EmployeeReviewsScreen(
+        employeeId: employeeId,
+        employeeName: employeeName,
+      ),
+    );
+  }
+}
+
+@TypedGoRoute<CertificateViewerRoute>(
+  path: '/certificate_viewer',
+  name: CertificateViewerRoute.routeName,
+)
+class CertificateViewerRoute extends GoRouteData with $CertificateViewerRoute {
+  final String certificateName;
+  final String url;
+  final String type;
+  const CertificateViewerRoute({
+    required this.certificateName,
+    required this.url,
+    required this.type,
+  });
+  static const routeName = 'certificate_viewer';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: CertificateViewerScreen(
+        name: certificateName,
+        url: url,
+        type: CertificateType.values.firstWhere(
+          (e) => e.name == type,
+          orElse: () => CertificateType.unknown,
+        ),
+      ),
     );
   }
 }
@@ -335,6 +724,70 @@ class SignInRoute extends GoRouteData with $SignInRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const SingInScreen(),
+    );
+  }
+}
+
+@TypedGoRoute<ForgotPasswordRoute>(
+  path: '/forgot-password',
+  name: ForgotPasswordRoute.name,
+)
+class ForgotPasswordRoute extends GoRouteData with $ForgotPasswordRoute {
+  static const String pathPattern = '/forgot-password';
+  static const bool isPublic = true;
+
+  const ForgotPasswordRoute();
+  static const name = 'forgot_password';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const ForgotPasswordScreen(),
+    );
+  }
+}
+
+@TypedGoRoute<PasswordResetCodeRoute>(
+  path: '/password-reset-code',
+  name: PasswordResetCodeRoute.name,
+)
+class PasswordResetCodeRoute extends GoRouteData with $PasswordResetCodeRoute {
+  static const String pathPattern = '/password-reset-code';
+  static const bool isPublic = true;
+
+  const PasswordResetCodeRoute({required this.email});
+  static const name = 'password_reset_code';
+
+  final String email;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: PasswordResetCodeScreen(email: email),
+    );
+  }
+}
+
+@TypedGoRoute<ResetPasswordRoute>(
+  path: '/reset-password',
+  name: ResetPasswordRoute.name,
+)
+class ResetPasswordRoute extends GoRouteData with $ResetPasswordRoute {
+  static const String pathPattern = '/reset-password';
+  static const bool isPublic = true;
+
+  const ResetPasswordRoute({this.token});
+  static const name = 'reset_password';
+
+  final String? token;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ResetPasswordScreen(token: token),
     );
   }
 }
@@ -496,6 +949,267 @@ class HealthSafetyStepRoute extends GoRouteData with $HealthSafetyStepRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const HealthSafetyStep(),
+    );
+  }
+}
+
+// --- EDIT PROFILE ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<EditProfileRoute>(
+  path: '/edit_profile',
+  name: EditProfileRoute.name,
+)
+class EditProfileRoute extends GoRouteData with $EditProfileRoute {
+  const EditProfileRoute();
+  static const name = 'edit_profile';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const EditProfileScreen(),
+    );
+  }
+}
+
+// --- REVIEW TREATMENT ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ReviewTreatmentRoute>(
+  path: '/review_treatment',
+  name: ReviewTreatmentRoute.name,
+)
+class ReviewTreatmentRoute extends GoRouteData with $ReviewTreatmentRoute {
+  final String appointmentId;
+  final String serviceName;
+  final String vendorName;
+
+  const ReviewTreatmentRoute({
+    required this.appointmentId,
+    required this.serviceName,
+    required this.vendorName,
+  });
+
+  static const name = 'review_treatment';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ReviewTreatmentScreen(
+        appointmentId: appointmentId,
+        serviceName: serviceName,
+        vendorName: vendorName,
+      ),
+    );
+  }
+}
+
+// --- REVIEW SPECIALIST ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ReviewSpecialistRoute>(
+  path: '/review_specialist',
+  name: ReviewSpecialistRoute.name,
+)
+class ReviewSpecialistRoute extends GoRouteData with $ReviewSpecialistRoute {
+  final String appointmentId;
+  final String specialistId;
+  final String specialistName;
+  final String specialistRole;
+  final String? specialistAvatarUrl;
+  final String facilityId;
+  final String facilityName;
+  final String? facilityAddress;
+
+  const ReviewSpecialistRoute({
+    required this.appointmentId,
+    required this.specialistId,
+    required this.specialistName,
+    required this.specialistRole,
+    this.specialistAvatarUrl,
+    required this.facilityId,
+    required this.facilityName,
+    this.facilityAddress,
+  });
+
+  static const name = 'review_specialist';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ReviewSpecialistScreen(
+        appointmentId: appointmentId,
+        specialistId: specialistId,
+        specialistName: specialistName,
+        specialistRole: specialistRole,
+        specialistAvatarUrl: specialistAvatarUrl,
+        facilityId: facilityId,
+        facilityName: facilityName,
+        facilityAddress: facilityAddress,
+      ),
+    );
+  }
+}
+
+// --- REVIEW FACILITY ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ReviewFacilityRoute>(
+  path: '/review_facility',
+  name: ReviewFacilityRoute.name,
+)
+class ReviewFacilityRoute extends GoRouteData with $ReviewFacilityRoute {
+  final String appointmentId;
+  final String facilityId;
+  final String facilityName;
+  final String? facilityAddress;
+  final String specialistName;
+  final String? specialistAvatarUrl;
+  final int specialistRating;
+
+  const ReviewFacilityRoute({
+    required this.appointmentId,
+    required this.facilityId,
+    required this.facilityName,
+    this.facilityAddress,
+    required this.specialistName,
+    this.specialistAvatarUrl,
+    required this.specialistRating,
+  });
+
+  static const name = 'review_facility';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ReviewFacilityScreen(
+        appointmentId: appointmentId,
+        facilityId: facilityId,
+        facilityName: facilityName,
+        facilityAddress: facilityAddress,
+        specialistName: specialistName,
+        specialistAvatarUrl: specialistAvatarUrl,
+        specialistRating: specialistRating,
+      ),
+    );
+  }
+}
+
+// --- REVIEW SUBMITTED ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ReviewSubmittedRoute>(
+  path: '/review_submitted',
+  name: ReviewSubmittedRoute.name,
+)
+class ReviewSubmittedRoute extends GoRouteData with $ReviewSubmittedRoute {
+  final String specialistName;
+  final String? specialistAvatarUrl;
+  final int rating;
+
+  const ReviewSubmittedRoute({
+    required this.specialistName,
+    this.specialistAvatarUrl,
+    required this.rating,
+  });
+
+  static const name = 'review_submitted';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ReviewSubmittedScreen(
+        specialistName: specialistName,
+        specialistAvatarUrl: specialistAvatarUrl,
+        rating: rating,
+      ),
+    );
+  }
+}
+
+// --- PARTNER CHAT ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<PartnerChatRoute>(
+  path: '/partner_chat',
+  name: PartnerChatRoute.name,
+)
+class PartnerChatRoute extends GoRouteData with $PartnerChatRoute {
+  final String partnerAccountId;
+  final String partnerName;
+  final String? partnerAvatar;
+
+  const PartnerChatRoute({
+    required this.partnerAccountId,
+    required this.partnerName,
+    this.partnerAvatar,
+  });
+
+  static const name = 'partner_chat';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: PartnerChatScreen(
+        partnerAccountId: partnerAccountId,
+        partnerName: partnerName,
+        partnerAvatar: partnerAvatar,
+      ),
+    );
+  }
+}
+
+// --- CLINIC INFO ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<ClinicInfoRoute>(path: '/clinic_info', name: ClinicInfoRoute.name)
+class ClinicInfoRoute extends GoRouteData with $ClinicInfoRoute {
+  final String clinicId;
+
+  const ClinicInfoRoute({required this.clinicId});
+
+  static const name = 'clinic_info';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ClinicInfoScreen(clinicId: clinicId),
+    );
+  }
+}
+
+@TypedGoRoute<ClinicSpecialistsRoute>(
+  path: '/clinic_specialists',
+  name: ClinicSpecialistsRoute.name,
+)
+class ClinicSpecialistsRoute extends GoRouteData with $ClinicSpecialistsRoute {
+  final String clinicId;
+
+  const ClinicSpecialistsRoute({required this.clinicId});
+
+  static const name = 'clinic_specialists';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: ClinicSpecialistsScreen(clinicId: clinicId),
+    );
+  }
+}
+
+// --- CART ROUTE (No Navigation Bar) ---
+
+@TypedGoRoute<CartRoute>(path: '/cart', name: CartRoute.name)
+class CartRoute extends GoRouteData with $CartRoute {
+  const CartRoute();
+  static const name = 'cart';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const CartScreen(),
     );
   }
 }

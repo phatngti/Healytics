@@ -93,21 +93,41 @@ def build_backend_query(entities: List[NerEntity], limit: int = 50, spatial_cont
     Optional spatial_context: SpatialContext object for spatial queries.
     """
     query: Dict[str, Any] = {}
+    business_types: list[str] = []
+    seen_business_types: set[str] = set()
+    distance_min_meters: float | None = None
+    distance_max_meters: float | None = None
+
+    def _set_distance_min(v: float | None) -> None:
+        nonlocal distance_min_meters
+        if v is None:
+            return
+        distance_min_meters = v if distance_min_meters is None else max(distance_min_meters, v)
+
+    def _set_distance_max(v: float | None) -> None:
+        nonlocal distance_max_meters
+        if v is None:
+            return
+        distance_max_meters = v if distance_max_meters is None else min(distance_max_meters, v)
 
     for e in entities:
         e_type = e.type
 
         if e_type == "BUSINESS_TYPE" and e.business_type:
             # Backend Partner.businessType là enum (SPA_BEAUTY, FITNESS, ...)
-            query["businessType"] = e.business_type
+            if e.business_type not in seen_business_types:
+                seen_business_types.add(e.business_type)
+                business_types.append(e.business_type)
 
-        elif e_type == "LOCATION" and e.location_code and e.location_intent is True:
-            # Backend Location.code — chỉ apply khi semantic adjudication xác nhận
+        elif e_type == "LOCATION" and e.location_code:
+            # LOCATION pruning/disambiguation happens upstream; apply resolved location directly.
             query["locationCode"] = e.location_code
-
-        elif e_type == "CATEGORY" and e.category_slug:
-            # Backend Category.slug
-            query["categorySlug"] = e.category_slug
+            # Propagate whether the user explicitly intended a location filter.
+            # Used downstream to avoid cross-location fallbacks when user said "ở Hà Nội", etc.
+            if getattr(e, "location_intent", None) is not None:
+                query["locationIntent"] = bool(e.location_intent)
+            else:
+                query["locationIntent"] = True
 
         elif e_type == "PRICE" and e.amount is not None:
             # Backend Product.basePrice/salePrice
@@ -120,20 +140,47 @@ def build_backend_query(entities: List[NerEntity], limit: int = 50, spatial_cont
                 query["minPrice"] = e.amount
                 query["maxPrice"] = e.amount_max
 
-        elif e_type == "RATING" and e.amount is not None:
-            op = e.operator
-            if op in ("gte", "between"):
-                query["minRating"] = e.amount
+        elif e_type == "DISTANCE":
+            op = (e.operator or "").strip().lower()
+
+            if op == "between":
+                _set_distance_min(float(e.amount) if e.amount is not None else None)
+                _set_distance_max(float(e.amount_max) if e.amount_max is not None else None)
+            elif op == "gte":
+                _set_distance_min(float(e.amount) if e.amount is not None else None)
+                if e.amount_max is not None:
+                    _set_distance_max(float(e.amount_max))
+            elif op == "lte":
+                _set_distance_max(float(e.amount) if e.amount is not None else None)
+            elif e.radius_meters is not None:
+                # Legacy explicit radius (treated as upper bound).
+                _set_distance_max(float(e.radius_meters))
+
+    if distance_min_meters is not None and distance_max_meters is not None and distance_min_meters > distance_max_meters:
+        distance_max_meters = distance_min_meters
+
+    if business_types:
+        query["businessTypes"] = business_types
+        # Keep backward compatibility for downstream consumers expecting singular key.
+        if len(business_types) == 1:
+            query["businessType"] = business_types[0]
 
     # Add spatial parameters if spatial context provided
     if spatial_context:
-        query["spatial_params"] = {
+        spatial_params = {
             "center_lat": spatial_context.center_lat,
             "center_lng": spatial_context.center_lng,
             "radius_meters": spatial_context.radius_meters,
             "fallback_used": spatial_context.fallback_used,
             "location_level": spatial_context.location_level,  # PROVINCE / DISTRICT / WARD / None
         }
+
+        if distance_min_meters is not None:
+            spatial_params["distance_min_meters"] = distance_min_meters
+        if distance_max_meters is not None:
+            spatial_params["distance_max_meters"] = distance_max_meters
+
+        query["spatial_params"] = spatial_params
         query["distance_sort"] = True
         query["fallback_used"] = spatial_context.fallback_used
         query["use_postgis"] = True
@@ -155,14 +202,21 @@ def filter_mock_services(
     if limit is None or limit <= 0:
         return []
 
+    scored_results: List[tuple[float, float, Dict]] = []
+
     for sid, svc in services.items():
         internal = svc.get("_internal", {})
 
-        # Business type filter - exact match if present
-        target_bt = query.get("businessType")
-        if target_bt:
+        # Business type filter - OR semantics for list input
+        target_bts = query.get("businessTypes")
+        if not target_bts:
+            target_bt = query.get("businessType")
+            if target_bt:
+                target_bts = [target_bt]
+
+        if target_bts:
             svc_bts = internal.get("businessType", [])
-            if target_bt not in svc_bts:
+            if not any(bt in svc_bts for bt in target_bts):
                 continue
 
         # Location filter - match code
@@ -170,13 +224,6 @@ def filter_mock_services(
         if target_loc_code:
             svc_loc_code = internal.get("locationCode")
             if svc_loc_code != target_loc_code:
-                continue
-
-        # Category filter - match slug
-        target_cat_slug = query.get("categorySlug")
-        if target_cat_slug:
-            svc_cat_slug = internal.get("categorySlug")
-            if svc_cat_slug != target_cat_slug:
                 continue
 
         # Price filter
@@ -188,13 +235,6 @@ def filter_mock_services(
         if min_price is not None and price_amount < min_price:
             continue
 
-        # Rating filter
-        min_rating = query.get("minRating")
-        if min_rating is not None:
-            avg_rating = internal.get("ratingValue", 0)
-            if avg_rating < min_rating:
-                continue
-
         normalized = dict(svc)
         internal = normalized.get("_internal", {})
         # Backward-compatible aliases used by legacy tests/consumers.
@@ -205,9 +245,14 @@ def filter_mock_services(
         if normalized.get("business_types"):
             normalized.setdefault("type", normalized["business_types"][0])
 
-        results.append(normalized)
-        if len(results) >= limit:
-            break
+        avg_rating = float(internal.get("ratingValue", 0.0) or 0.0)
+        confidence = _compute_business_type_match_confidence(normalized.get("business_types", []), target_bts)
+        scored_results.append((confidence, avg_rating, normalized))
+
+    scored_results.sort(key=lambda item: (item[0], item[1]), reverse=True)
+
+    for _, _, svc in scored_results[:limit]:
+        results.append(svc)
 
     return results
 
@@ -231,6 +276,22 @@ def _business_type_keywords(bt: str) -> list[str]:
         "PHARMACY": ["dược", "thuốc"],
     }
     return mapping.get(bt, [bt.lower()])
+
+
+def _compute_business_type_match_confidence(service_bts: list[str], target_bts: list[str] | None) -> float:
+    if not target_bts:
+        return 0.0
+
+    target_set = {str(bt).strip() for bt in target_bts if bt is not None and str(bt).strip()}
+    if not target_set:
+        return 0.0
+
+    service_set = {str(bt).strip() for bt in service_bts if bt is not None and str(bt).strip()}
+    if not service_set:
+        return 0.0
+
+    overlap = len(target_set.intersection(service_set))
+    return round(overlap / len(target_set), 4)
 
 
 def _location_matches(code: str, city: str, district: str) -> bool:

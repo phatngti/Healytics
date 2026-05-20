@@ -10,8 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **employeeId** | **String** | Employee ID (primary key) | [optional] 
 **title** | **String** | Doctor title | [optional] 
-**medicalTitles** | **List<String>** | Medical titles | [optional] [default to const []]
-**medicalLicenses** | **List<String>** | Medical license numbers | [optional] [default to const []]
+**medicalCredentials** | [**List<MedicalCredentialResponseDto>**](MedicalCredentialResponseDto.md) | Medical credentials (titles + licenses) | [optional] [default to const []]
 **experienceYears** | **num** | Years of experience | [optional] 
 **consultationFee** | **num** | Consultation fee | [optional] 
 **specializations** | **List<String>** | List of specializations | [optional] [default to const []]

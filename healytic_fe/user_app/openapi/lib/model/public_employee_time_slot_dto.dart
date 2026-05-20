@@ -17,6 +17,7 @@ class PublicEmployeeTimeSlotDto {
     required this.isAvailable,
   });
 
+
   String label;
 
   bool isAvailable;

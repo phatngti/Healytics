@@ -1,16 +1,23 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
+import { isAxiosError } from 'axios';
 import { firstValueFrom } from 'rxjs';
-import { GeocodeResultDto, GeocodeResponseDto } from './dto/geocode-response.dto';
+import {
+  GeocodeResultDto,
+  GeocodeResponseDto,
+} from './dto/geocode-response.dto';
 import {
   DistanceMatrixResponseDto,
   DistanceMatrixRowDto,
   DistanceMatrixElementDto,
 } from './dto/distance-matrix-response.dto';
+import { DirectionsResponseDto } from './dto/directions-response.dto';
 
 const GEOCODING_BASE = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
-const MATRIX_BASE = 'https://api.mapbox.com/directions-matrix/v1/mapbox/driving';
+const MATRIX_BASE =
+  'https://api.mapbox.com/directions-matrix/v1/mapbox/driving';
+const DIRECTIONS_BASE = 'https://api.mapbox.com/directions/v5/mapbox/driving';
 
 @Injectable()
 export class MapboxService {
@@ -22,12 +29,17 @@ export class MapboxService {
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
   ) {
-    const cfg = this.configService.get<{ accessToken: string; publicToken: string }>('mapbox');
+    const cfg = this.configService.get<{
+      accessToken: string;
+      publicToken: string;
+    }>('mapbox');
     this.accessToken = cfg?.accessToken || '';
     this.publicToken = cfg?.publicToken || '';
 
     if (!this.accessToken) {
-      this.logger.warn('MAPBOX_ACCESS_TOKEN is not set — server-side geocoding/matrix will fail');
+      this.logger.warn(
+        'MAPBOX_ACCESS_TOKEN is not set — server-side geocoding/matrix will fail',
+      );
     }
   }
 
@@ -80,7 +92,9 @@ export class MapboxService {
 
     if (data.message) {
       this.logger.error(`Reverse geocoding failed: ${data.message}`);
-      throw new BadRequestException(`Reverse geocoding failed: ${data.message}`);
+      throw new BadRequestException(
+        `Reverse geocoding failed: ${data.message}`,
+      );
     }
 
     const results: GeocodeResultDto[] = (data.features || []).map((f: any) => ({
@@ -119,7 +133,9 @@ export class MapboxService {
 
     // Build source/destination indices
     const sourceIndices = originCoords.map((_, i) => i).join(';');
-    const destIndices = destCoords.map((_, i) => i + originCoords.length).join(';');
+    const destIndices = destCoords
+      .map((_, i) => i + originCoords.length)
+      .join(';');
 
     const url = `${MATRIX_BASE}/${coordString}`;
 
@@ -135,13 +151,17 @@ export class MapboxService {
     );
 
     if (data.code !== 'Ok') {
-      this.logger.error(`Distance matrix failed: ${data.code} — ${data.message || ''}`);
+      this.logger.error(
+        `Distance matrix failed: ${data.code} — ${data.message || ''}`,
+      );
       throw new BadRequestException(`Distance matrix failed: ${data.code}`);
     }
 
     // Map Mapbox response to our DTO shape
     const originAddresses = (data.sources || []).map((s: any) => s.name || '');
-    const destinationAddresses = (data.destinations || []).map((d: any) => d.name || '');
+    const destinationAddresses = (data.destinations || []).map(
+      (d: any) => d.name || '',
+    );
 
     const rows: DistanceMatrixRowDto[] = (data.durations || []).map(
       (durationRow: number[], rowIdx: number) => ({
@@ -163,6 +183,68 @@ export class MapboxService {
     return { originAddresses, destinationAddresses, rows };
   }
 
+  // ── Directions ──────────────────────────────────────────
+
+  /**
+   * Get a single driving route between two lat/lng coordinates.
+   * Uses Mapbox Directions API with GeoJSON geometry.
+   */
+  async directions(
+    origin: string,
+    destination: string,
+  ): Promise<DirectionsResponseDto> {
+    this.logger.log(`Directions: ${origin} → ${destination}`);
+
+    const [originCoord] = this.parseCoordinates(origin);
+    const [destinationCoord] = this.parseCoordinates(destination);
+    this.assertValidCoordinate(originCoord, 'origin');
+    this.assertValidCoordinate(destinationCoord, 'destination');
+
+    const coordString = `${originCoord.lng},${originCoord.lat};${destinationCoord.lng},${destinationCoord.lat}`;
+    const url = `${DIRECTIONS_BASE}/${coordString}`;
+
+    let data: any;
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(url, {
+          params: {
+            access_token: this.accessToken,
+            alternatives: false,
+            geometries: 'geojson',
+            overview: 'full',
+            steps: false,
+          },
+        }),
+      );
+      data = response.data;
+    } catch (error) {
+      this.handleMapboxHttpError('Directions', error);
+    }
+
+    if (data.code !== 'Ok') {
+      this.logger.error(
+        `Directions failed: ${data.code} — ${data.message || ''}`,
+      );
+      throw new BadRequestException(`Directions failed: ${data.code}`);
+    }
+
+    const route = data.routes?.[0];
+    if (!route?.geometry?.coordinates?.length) {
+      throw new BadRequestException('Directions failed: no route found');
+    }
+
+    return {
+      route: route.geometry.coordinates.map((coord: number[]) => ({
+        latitude: coord[1],
+        longitude: coord[0],
+      })),
+      distanceText: this.formatDistance(route.distance),
+      distanceValue: Math.round(route.distance),
+      durationText: this.formatDuration(route.duration),
+      durationValue: Math.round(route.duration),
+    };
+  }
+
   // ── Client Key ───────────────────────────────────────────
 
   /**
@@ -182,6 +264,44 @@ export class MapboxService {
       const [lat, lng] = pair.split(',').map(Number);
       return { lat, lng };
     });
+  }
+
+  private assertValidCoordinate(
+    coord: { lat: number; lng: number } | undefined,
+    label: string,
+  ) {
+    if (
+      !coord ||
+      !Number.isFinite(coord.lat) ||
+      !Number.isFinite(coord.lng) ||
+      coord.lat < -90 ||
+      coord.lat > 90 ||
+      coord.lng < -180 ||
+      coord.lng > 180
+    ) {
+      throw new BadRequestException(`Invalid ${label} coordinate`);
+    }
+  }
+
+  private handleMapboxHttpError(operation: string, error: unknown): never {
+    if (!isAxiosError(error)) {
+      throw error;
+    }
+
+    const responseData = error.response?.data as
+      | { code?: string; message?: string }
+      | undefined;
+    const code = responseData?.code;
+    const status = error.response?.status;
+    const message =
+      code === 'NoRoute'
+        ? 'No driving route is available between these coordinates.'
+        : responseData?.message || error.message;
+
+    this.logger.error(
+      `${operation} failed: ${status ?? 'network'} ${code ?? ''} — ${message}`,
+    );
+    throw new BadRequestException(`${operation} failed: ${message}`);
   }
 
   /**

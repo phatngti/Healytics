@@ -1,4 +1,6 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/theme/app_theme.dart';
 
 /// Fixed bottom bar with total price, savings badge,
@@ -18,15 +20,15 @@ class CheckoutBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final semanticColors = Theme.of(context).extension<SemanticColors>();
+    final pad = AppDimens.horizontalPadding(context);
 
     return Container(
       padding: EdgeInsets.fromLTRB(
-        16,
-        16,
-        16,
-        16 + MediaQuery.paddingOf(context).bottom,
+        pad,
+        pad,
+        pad,
+        pad + MediaQuery.paddingOf(context).bottom,
       ),
       decoration: BoxDecoration(
         color: colorScheme.surface,
@@ -34,26 +36,43 @@ class CheckoutBottomBar extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
+            blurRadius: AppDimens.spaceXl,
+            offset: const Offset(0, -AppDimens.spaceXs),
           ),
         ],
       ),
       child: Row(
         children: [
-          _buildPriceColumn(colorScheme, textTheme, semanticColors),
-          const SizedBox(width: 16),
-          Expanded(child: _buildButton(colorScheme)),
+          _PriceColumn(
+            total: total,
+            saved: saved,
+            semanticColors: semanticColors,
+          ),
+          AppDimens.horizontalMedium,
+          Expanded(child: _ConfirmButton(onConfirm: onConfirm)),
         ],
       ),
     );
   }
+}
 
-  Widget _buildPriceColumn(
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-    SemanticColors? semanticColors,
-  ) {
+/// Displays total price and optional savings badge.
+class _PriceColumn extends StatelessWidget {
+  final int total;
+  final int saved;
+  final SemanticColors? semanticColors;
+
+  const _PriceColumn({
+    required this.total,
+    required this.saved,
+    this.semanticColors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,19 +92,23 @@ class CheckoutBottomBar extends StatelessWidget {
           ),
         ),
         if (saved > 0) ...[
-          const SizedBox(height: 2),
+          const SizedBox(height: AppDimens.spaceXxs),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimens.spaceXs + 2,
+              vertical: AppDimens.spaceXxs,
+            ),
             decoration: BoxDecoration(
               color: (semanticColors?.success ?? Colors.green).withValues(
                 alpha: 0.1,
               ),
-              borderRadius: BorderRadius.circular(6),
+              borderRadius:
+                  AppDimens.radiusExtraSmall +
+                  const BorderRadius.all(Radius.circular(2)),
             ),
             child: Text(
               'Save ${_formatCurrency(saved)}',
               style: textTheme.labelSmall?.copyWith(
-                fontSize: 10,
                 fontWeight: FontWeight.w500,
                 color: semanticColors?.success ?? Colors.green,
               ),
@@ -96,29 +119,45 @@ class CheckoutBottomBar extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(ColorScheme colorScheme) {
-    return FilledButton(
-      onPressed: onConfirm,
-      style: FilledButton.styleFrom(
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
-        shadowColor: colorScheme.primary.withValues(alpha: 0.3),
-      ),
-      child: const Text(
-        'Confirm Payment',
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-      ),
-    );
-  }
-
   String _formatCurrency(int amount) {
     final formatted = amount.toString().replaceAllMapped(
       RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
       (m) => '${m[1]},',
     );
     return '$formattedđ';
+  }
+}
+
+/// Filled "Confirm Payment" button.
+class _ConfirmButton extends StatelessWidget {
+  final VoidCallback onConfirm;
+
+  const _ConfirmButton({required this.onConfirm});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return FilledButton(
+      key: keys.checkoutPage.confirmButton,
+      onPressed: onConfirm,
+      style: FilledButton.styleFrom(
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        padding: EdgeInsets.symmetric(
+          vertical: AppDimens.contentPadding(context),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppDimens.radiusMediumSmall,
+        ),
+        elevation: 4,
+        shadowColor: colorScheme.primary.withValues(alpha: 0.3),
+      ),
+      child: Text(
+        'Confirm Payment',
+        style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+      ),
+    );
   }
 }

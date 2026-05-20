@@ -1,3 +1,4 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/features/orders/domain/entities/appointment.entity.dart';
@@ -7,29 +8,51 @@ import 'package:user_app/features/orders/presentation/widgets/orders/recommendat
 
 /// Scrollable list of filtered appointments followed
 /// by a recommendations carousel.
-class AppointmentList extends HookConsumerWidget {
+///
+/// Refresh is triggered at the screen level by
+/// [OrdersPage], so this widget only watches data.
+class AppointmentList extends ConsumerWidget {
   const AppointmentList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncFiltered = ref.watch(filteredAppointmentsProvider);
     final asyncRecs = ref.watch(appointmentRecommendationsProvider);
+    final hPad = AppDimens.horizontalPadding(context);
 
     return switch (asyncFiltered) {
       AsyncData(:final value) =>
         value.isEmpty
             ? const _EmptyState()
             : ListView(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                padding: EdgeInsets.fromLTRB(
+                  hPad,
+                  AppDimens.spaceXxl,
+                  hPad,
+                  AppDimens.spaceXxl,
+                ),
                 children: [
                   _VendorHeader(appointments: value),
                   ...value.map(
                     (apt) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: AppointmentCard(appointment: apt),
+                      padding: EdgeInsets.only(
+                        bottom: AppDimens.spaceLg,
+                      ),
+                      child: AppointmentCard(
+                        appointment: apt,
+                        onExpired: apt.status ==
+                                'pending_payment'
+                            ? () => ref
+                                .read(
+                                  filteredAppointmentsProvider
+                                      .notifier,
+                                )
+                                .silentRefresh()
+                            : null,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  AppDimens.verticalSmall,
                   _RecommendationsSection(asyncRecs: asyncRecs),
                 ],
               ),
@@ -41,26 +64,45 @@ class AppointmentList extends HookConsumerWidget {
 
 // ─── Empty state ───────────────────────────────────
 
-class _EmptyState extends StatelessWidget {
+class _EmptyState extends ConsumerWidget {
   const _EmptyState();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final tab = ref.watch(selectedTabProvider);
+
+    final (icon, message) = switch (tab) {
+      kTabPendingPayment => (
+        Icons.check_circle_outline_rounded,
+        'No pending payments\n'
+            'All your bookings are confirmed!',
+      ),
+      _ => (
+        Icons.event_busy_rounded,
+        'No appointments found',
+      ),
+    };
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            Icons.event_busy_rounded,
+            icon,
+            // 64dp — one-off illustration-size icon
             size: 64,
-            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+            color: theme.colorScheme.onSurfaceVariant
+                .withValues(alpha: 0.4),
           ),
-          const SizedBox(height: 16),
+          AppDimens.verticalMedium,
           Text(
-            'No appointments found',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+            message,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium
+                ?.copyWith(
+              color:
+                  theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -81,9 +123,9 @@ class _VendorHeader extends StatelessWidget {
       return const SizedBox.shrink();
     }
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
       child: Text(
-        appointments.first.vendorName,
+        appointments.first.healthPartnerName,
         style: Theme.of(
           context,
         ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
@@ -107,21 +149,21 @@ class _RecommendationsSection extends StatelessWidget {
       AsyncData(:final value) when value.isNotEmpty => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 8),
+          AppDimens.verticalSmall,
           Text(
             'Recommend For You',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          AppDimens.verticalMedium,
           SizedBox(
             height: 124,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               clipBehavior: Clip.none,
               itemCount: value.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 16),
+              separatorBuilder: (_, __) => AppDimens.horizontalMedium,
               itemBuilder: (context, index) {
                 return RecommendationCard(
                   service: value[index],
@@ -130,7 +172,7 @@ class _RecommendationsSection extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(height: 24),
+          AppDimens.verticalLarge,
         ],
       ),
       _ => const SizedBox.shrink(),

@@ -16,8 +16,10 @@ describe('UserEmployeesController', () => {
       createMassageTherapist: jest.fn(),
       findAll: jest.fn(),
       findOne: jest.fn(),
+      findReviewsByEmployee: jest.fn(),
       update: jest.fn(),
       remove: jest.fn(),
+      getFeaturedSpecialists: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -36,6 +38,21 @@ describe('UserEmployeesController', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('getFeaturedSpecialists', () => {
+    it('should delegate to service.getFeaturedSpecialists with limit', async () => {
+      // Arrange
+      const expected = [{ id: 'uuid-1', name: 'Dr. Anna', soldCount: 10 }];
+      employeesService.getFeaturedSpecialists!.mockResolvedValue(expected);
+
+      // Act
+      const result = await controller.getFeaturedSpecialists(5);
+
+      // Assert
+      expect(result).toEqual(expected);
+      expect(employeesService.getFeaturedSpecialists).toHaveBeenCalledWith(5);
+    });
   });
 
   describe('findAll', () => {
@@ -81,6 +98,30 @@ describe('UserEmployeesController', () => {
       // Assert
       expect(result).toEqual(expectedEmployee);
       expect(employeesService.findOne).toHaveBeenCalledWith(id);
+    });
+  });
+
+  describe('findReviews', () => {
+    it('should call service.findReviewsByEmployee with ID and return reviews', async () => {
+      // Arrange
+      const id = 'uuid-1';
+      const expectedReviews = [
+        {
+          id: 'review-1',
+          reviewerName: 'Jane Doe',
+          rating: 5,
+        },
+      ];
+      employeesService.findReviewsByEmployee!.mockResolvedValue(
+        expectedReviews,
+      );
+
+      // Act
+      const result = await controller.findReviews(id);
+
+      // Assert
+      expect(result).toEqual(expectedReviews);
+      expect(employeesService.findReviewsByEmployee).toHaveBeenCalledWith(id);
     });
   });
 });

@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-import asyncio
 import json
 import logging
 from typing import List
@@ -7,15 +6,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from app.core.config import settings
-from app.schemas.ner_schema import PreFilterRequest, NerEntity
+from app.schemas.ner_schema import PreFilterRequest, NerEntity, NerResponse, PreFilterResponse
 from app.ner import extractor, normalizer
-from app.ner.cache import get_feature_tags, get_category_list
-from app.ner.semantic_matcher import (
-    get_matcher,
-    group_tag_filters,
-    group_tag_filters_with_meta,
-    SemanticAdjudicator,
-)
+from app.ner.gemini_ner import select_requested_location_with_gemini
+from app.ner.semantic_matcher import get_matcher
 from app.ner.spatial_context import resolve_spatial_context
 from app.utils import db_fetcher
 from app.utils.query_builder import build_backend_query
@@ -23,6 +17,72 @@ from app.utils.query_builder import build_backend_query
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+def _extract_candidate_ids(candidates: list) -> list[str]:
+    return [
+        service_id
+        for service_id in (
+            c.get("service_id") if isinstance(c, dict) else getattr(c, "service_id", None)
+            for c in candidates
+        )
+        if service_id
+    ]
+
+
+async def _keep_only_requested_locations(text: str, entities: list[NerEntity]) -> None:
+    """
+    Use Gemini to keep only location(s) truly requested by user and drop incidental mentions.
+    """
+    location_entities = [e for e in entities if e.type == "LOCATION" and e.location_code]
+    if not location_entities:
+        return
+
+    by_code: dict[str, dict] = {}
+    for e in location_entities:
+        code = str(e.location_code)
+        current = by_code.get(code)
+        if current is None or float(e.confidence) > float(current["confidence"]):
+            by_code[code] = {
+                "location_code": code,
+                "value": e.value,
+                "location_level": e.location_level,
+                "confidence": e.confidence,
+            }
+
+    selection = await select_requested_location_with_gemini(text, list(by_code.values()))
+    if not selection:
+        return
+
+    selected_code = selection.get("selected_location_code")
+    apply_filter = bool(selection.get("apply_filter"))
+
+    if not selected_code or not apply_filter:
+        entities[:] = [
+            e for e in entities
+            if not (e.type == "LOCATION" and e.location_code)
+        ]
+        logger.info(
+            "[PreFilter] Gemini location select: no filter applied, removed all mapped LOCATION entities"
+        )
+        return
+
+    selected_code = str(selected_code)
+    entities[:] = [
+        e for e in entities
+        if not (e.type == "LOCATION" and e.location_code and str(e.location_code) != selected_code)
+    ]
+
+    for e in entities:
+        if e.type == "LOCATION" and e.location_code and str(e.location_code) == selected_code:
+            e.location_intent = True
+
+    logger.info(
+        "[PreFilter] Gemini location select: selected=%s excluded=%s confidence=%s",
+        selected_code,
+        selection.get("excluded_location_codes", []),
+        selection.get("confidence"),
+    )
 
 
 def _log_location_intent_samples(text: str, entities: list[NerEntity], query_params: dict) -> None:
@@ -50,7 +110,6 @@ def _log_location_intent_samples(text: str, entities: list[NerEntity], query_par
                     "location_value": e.value,
                     "location_code": e.location_code,
                     "location_level": e.location_level,
-                    "intent_score": e.location_intent_score,
                     "intent_decision": e.location_intent,
                     "applied_filter": bool(applied_code and applied_code == e.location_code),
                     "label": None,
@@ -59,27 +118,15 @@ def _log_location_intent_samples(text: str, entities: list[NerEntity], query_par
     except Exception as exc:
         logger.warning("[IntentLogging] Failed to write location-intent sample: %s", exc)
 
-@router.post("/prefilter/search", response_model=List[str])
-async def prefilter_search(request: PreFilterRequest):
-    """
-    Full pipeline natively within NER service:
-      1. Extract raw entities
-      2. Normalize entities (Entity Linking)
-      3. Resolve spatial context if DISTANCE entity found
-      4. Build query params từ entities + spatial context
-      4b. Semantic feature tag matching → tagFilters (AND/OR) + FEATURE_TAG entities
-      4c. Semantic category matching (fallback) → categorySlug + CATEGORY entity
-      5. Filter services từ DB (with PostGIS if spatial)
-      6. Return kết quả
-    """
+
+async def _run_prefilter_pipeline(
+    request: PreFilterRequest,
+    entities: list[NerEntity],
+) -> tuple[dict, list, list[str], bool]:
     text = request.text
     limit = request.limit
 
-    logger.info(f"[PreFilter] Processing: {text[:60]}...")
-
-    # 1. & 2.
-    raw_entities, _ = await extractor.extract_entities_with_source(text)
-    entities = normalizer.normalize_entities(raw_entities)
+    await _keep_only_requested_locations(text, entities)
 
     # 3. Resolve spatial context
     spatial_context = None
@@ -101,178 +148,66 @@ async def prefilter_search(request: PreFilterRequest):
     # 4. Build query params
     query_params = build_backend_query(entities, limit=limit, spatial_context=spatial_context)
 
-    matcher = get_matcher()
-    adjudicator = SemanticAdjudicator()
-    tag_filters_or_fallback = None
-    if settings.SEMANTIC_OFFLOAD_TO_THREAD:
-        semantic_ctx = await asyncio.to_thread(matcher.extract_semantic_context, text)
-    else:
-        semantic_ctx = matcher.extract_semantic_context(text)
-
-    # 4a. Unified semantic adjudication — BUSINESS_TYPE
-    bt_candidates = list({e.business_type for e in entities if e.type == "BUSINESS_TYPE" and e.business_type})
-    if not bt_candidates:
-        bt_candidates = matcher.bt_keys
-    if settings.SEMANTIC_OFFLOAD_TO_THREAD:
-        bt_decision = await asyncio.to_thread(
-            adjudicator.adjudicate_business_type,
-            text,
-            matcher,
-            bt_candidates,
-            semantic_ctx,
-        )
-    else:
-        bt_decision = adjudicator.adjudicate_business_type(
-            text,
-            matcher,
-            bt_candidates,
-            semantic_ctx=semantic_ctx,
-        )
-    if bt_decision and bt_decision.policy in ("hard", "soft"):
-        query_params["businessType"] = bt_decision.value
-        entities.append(NerEntity(
-            type="BUSINESS_TYPE",
-            value=bt_decision.value,
-            confidence=bt_decision.score,
-            business_type=bt_decision.value,
-        ))
-        logger.info(
-            f"[PreFilter] BT decision={bt_decision.policy} value={bt_decision.value} "
-            f"score={bt_decision.score}"
-        )
-
-    # 4b. Unified semantic adjudication — FEATURE_TAG
-    feature_tags = get_feature_tags()
-    if feature_tags:
-        if settings.SEMANTIC_OFFLOAD_TO_THREAD:
-            tag_matches = await asyncio.to_thread(
-                matcher.match_feature_tags,
-                text,
-                feature_tags,
-                settings.SEMANTIC_TAG_MEDIUM_THRESHOLD,
-                5,
-                semantic_ctx.get("query_emb"),
-            )
-        else:
-            tag_matches = matcher.match_feature_tags(
-                text,
-                feature_tags,
-                threshold=settings.SEMANTIC_TAG_MEDIUM_THRESHOLD,
-                top_k=5,
-                query_emb=semantic_ctx.get("query_emb"),
-            )
-        if tag_matches:
-            tag_decisions = adjudicator.adjudicate_tags(tag_matches)
-            hard_only = [d for d in tag_decisions if d.policy == "hard"]
-            selected_matches = [d.payload for d in hard_only if d.payload]
-            tag_filter_meta = {"implicit_and": False, "has_negation": False}
-
-            tag_filters, tag_filter_meta = group_tag_filters_with_meta(text, selected_matches)
-            if tag_filters:
-                query_params["tagFilters"] = tag_filters
-
-                if tag_filter_meta.get("implicit_and"):
-                    # Retry strategy: if strict implicit-AND returns empty, fallback to broad OR.
-                    tag_filters_or_fallback = group_tag_filters(text, selected_matches)
-
-                # tag_id → op map để gán tag_op vào entity
-                tag_id_to_op = {
-                    tid: group["op"]
-                    for group in tag_filters
-                    for tid in group["ids"]
-                }
-
-                for m in selected_matches:
-                    entities.append(NerEntity(
-                        type="FEATURE_TAG",
-                        value=m["tag_name"],
-                        confidence=m["score"],
-                        tag_id=m["tag_id"],
-                        tag_name=m["tag_name"],
-                        tag_op=tag_id_to_op.get(m["tag_id"], "OR"),
-                    ))
-
-                logger.info(
-                    f"[PreFilter] tagFilters={tag_filters} "
-                    f"(from {[m['tag_name'] for m in selected_matches]})"
-                )
-
-            soft_tag_names = [d.payload["tag_name"] for d in tag_decisions if d.policy == "soft" and d.payload]
-            if soft_tag_names:
-                logger.info("[PreFilter] Soft tag signals only (not hard filters): %s", soft_tag_names)
-
-            # Keep soft signals for future reranking layer.
-            soft_signals = [
-                {
-                    "slot": d.slot,
-                    "value": d.value,
-                    "score": d.score,
-                    "uncertainty": d.uncertainty,
-                    "rationale": d.rationale,
-                }
-                for d in tag_decisions if d.policy == "soft"
-            ]
-            if soft_signals:
-                query_params.setdefault("semanticSoftSignals", []).extend(soft_signals)
-
-    # 4c. Unified semantic adjudication — CATEGORY
-    if not query_params.get("categorySlug"):
-        categories = get_category_list()
-        if categories:
-            if settings.SEMANTIC_OFFLOAD_TO_THREAD:
-                cat_decision = await asyncio.to_thread(
-                    adjudicator.adjudicate_category,
-                    text,
-                    matcher,
-                    categories,
-                    semantic_ctx,
-                )
-            else:
-                cat_decision = adjudicator.adjudicate_category(
-                    text,
-                    matcher,
-                    categories,
-                    semantic_ctx=semantic_ctx,
-                )
-            if cat_decision and cat_decision.policy in ("hard", "soft"):
-                cat_payload = cat_decision.payload or {}
-                query_params["categorySlug"] = cat_decision.value
-                entities.append(NerEntity(
-                    type="CATEGORY",
-                    value=cat_payload.get("name", cat_decision.value),
-                    confidence=cat_decision.score,
-                    category_slug=cat_decision.value,
-                ))
-                logger.info(
-                    f"[PreFilter] Category decision={cat_decision.policy}: "
-                    f"{cat_decision.value} (score={cat_decision.score})"
-                )
-
     # 5. Fetch services
     use_postgis = bool(spatial_context)
 
     _log_location_intent_samples(text, entities, query_params)
 
     candidates = await db_fetcher.fetch_candidates_from_db(query_params, use_postgis=use_postgis)
-    if not candidates:
 
-        if tag_filters_or_fallback:
-            fallback_query_params = dict(query_params)
-            fallback_query_params["tagFilters"] = tag_filters_or_fallback
-            candidates = await db_fetcher.fetch_candidates_from_db(
-                fallback_query_params,
-                use_postgis=use_postgis,
-            )
-            logger.info("[PreFilter] No candidates with implicit-AND tags, retried with OR fallback")
-
-    candidate_ids = [
-        c.get("service_id") if isinstance(c, dict) else getattr(c, "service_id", None)
-        for c in candidates
-    ]
-    candidate_ids = [service_id for service_id in candidate_ids if service_id]
+    candidate_ids = _extract_candidate_ids(candidates)
 
     logger.info(
         f"[PreFilter] entities={len(entities)} | candidates={len(candidates)} | spatial={use_postgis}"
     )
 
+    return query_params, candidates, candidate_ids, use_postgis
+
+@router.post("/prefilter/search", response_model=List[str])
+async def prefilter_search(request: PreFilterRequest):
+    """
+    Full pipeline natively within NER service:
+      1. Extract raw entities
+      2. Normalize entities (Entity Linking)
+      3. Resolve spatial context if DISTANCE entity found
+            4. Build query params từ entities + spatial context
+      5. Filter services từ DB (with PostGIS if spatial)
+      6. Return kết quả
+    """
+    text = request.text
+
+    logger.info(f"[PreFilter] Processing: {text[:60]}...")
+
+    # 1. & 2.
+    raw_entities, _ = await extractor.extract_entities_with_source(text)
+    entities = normalizer.normalize_entities(raw_entities)
+
+    _, _, candidate_ids, _ = await _run_prefilter_pipeline(request, entities)
+
     return candidate_ids
+
+
+@router.post("/prefilter/search/debug", response_model=PreFilterResponse)
+async def prefilter_search_debug(request: PreFilterRequest):
+    """
+    Debug route for search pipeline.
+    Returns full PreFilterResponse using the existing NER response structure.
+    """
+    text = request.text
+    logger.info(f"[PreFilterDebug] Processing: {text[:60]}...")
+
+    raw_entities, extraction_source = await extractor.extract_entities_with_source(text)
+    ner_response = NerResponse(
+        entities=normalizer.normalize_entities(raw_entities),
+        extraction_source=extraction_source,
+    )
+
+    query_params, candidates, _, _ = await _run_prefilter_pipeline(request, ner_response.entities)
+
+    return PreFilterResponse(
+        text=text,
+        entities=ner_response.entities,
+        query_params=query_params,
+        candidates=candidates,
+        total=len(candidates),
+    )

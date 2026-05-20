@@ -6,6 +6,7 @@ import 'package:user_app/features/app/app.dart';
 import 'package:user_app/hooks/bootstrap.dart';
 
 import 'config/test_config.dart';
+import 'helpers/backend_backdoor_helper.dart';
 
 /// Shared Patrol test bootstrap.
 ///
@@ -13,16 +14,16 @@ import 'config/test_config.dart';
 /// - No `WidgetsFlutterBinding.ensureInitialized()`
 /// - No `runApp()` — uses `$.pumpWidgetAndSettle()`
 /// - No `FlutterError.onError` override
-Future<void> pumpApp(PatrolIntegrationTester $) async {
+Future<void> pumpApp(PatrolIntegrationTester $, {String? scenario}) async {
+  await TestConfig.load();
+  await prepareBackendScenario(scenario);
+
   final db = Bootstrap.db;
   await Bootstrap.initDomain(db);
   await initializeDateFormatting('vi');
   initializeTimeZones();
-  await TestConfig.load();
 
-  await $.pumpWidget(
-    const ProviderScope(child: App()),
-  );
+  await $.pumpWidget(const ProviderScope(child: App()));
   // Use pump instead of pumpAndSettle because
   // the splash screen has continuous animations
   // that prevent pumpAndSettle from completing.

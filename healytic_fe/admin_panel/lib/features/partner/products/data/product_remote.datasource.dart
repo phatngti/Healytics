@@ -3,8 +3,10 @@ import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/partner/products/data/data/product_mock_data.dart';
 import 'package:admin_panel/features/partner/products/domain/create_product.request.dart';
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/facility_image.entity.dart';
 
 import 'package:admin_panel/features/partner/products/domain/product.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/service_manual.entity.dart';
 import 'package:admin_panel/features/partner/products/domain/update_product.request.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:admin_openapi/api.dart';
@@ -22,6 +24,8 @@ abstract class ProductRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   );
+
+  Future<List<Product>> getAllProducts({String? sortedBy, bool? sortedAsc});
 
   Future<int> getTotalRows();
 
@@ -46,10 +50,8 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   PartnerHealthServicesApi get _partnerHealthServicesApi =>
       apiService.partnerHealthServicesApi;
-  CategoriesApi get _categoriesApi =>
-      apiService.categoriesApi;
-  PartnerServiceTagsApi get _serviceTagsApi =>
-      apiService.serviceTagsApi;
+  CategoriesApi get _categoriesApi => apiService.categoriesApi;
+  PartnerServiceTagsApi get _serviceTagsApi => apiService.serviceTagsApi;
 
   @override
   Future<List<CategoryEntity>> getCategories() async {
@@ -71,14 +73,10 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    final response = await _partnerHealthServicesApi
-        .partnerHealthServiceControllerFindAll();
-
-    if (response == null) {
-      return [];
-    }
-
-    final products = response.map(_mapToProduct).toList();
+    final products = await getAllProducts(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
 
     // Local pagination since API doesn't support it
     if (startingAt >= products.length) return [];
@@ -86,6 +84,21 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     if (end > products.length) end = products.length;
 
     return products.sublist(startingAt, end);
+  }
+
+  @override
+  Future<List<Product>> getAllProducts({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
+    final response = await _partnerHealthServicesApi
+        .partnerHealthServiceControllerFindAll();
+
+    if (response == null) {
+      return [];
+    }
+
+    return response.map(_mapToProduct).toList();
   }
 
   @override
@@ -110,7 +123,54 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       throw Exception('Product not found');
     }
 
-    return _mapToProduct(match.first);
+    final dto = match.first;
+    final product = _mapToProduct(dto);
+    final details = await _partnerHealthServicesApi
+        .partnerHealthServiceControllerGetDetails(dto.slug);
+
+    if (details == null) {
+      return product;
+    }
+
+    final resolvedTagIds = await _getAssignedTagIds(
+      productId: dto.id,
+      detailTags: details.featureTags,
+    );
+
+    return product.copyWith(
+      facilityImages: _mapFacilityImagesFromDetailDto(details.facilityImages),
+      tags: resolvedTagIds,
+    );
+  }
+
+  Future<List<String>> _getAssignedTagIds({
+    required String productId,
+    required List<PartnerFeatureTagDto> detailTags,
+  }) async {
+    try {
+      final tags = await _serviceTagsApi.serviceTagsControllerGetTagsForProduct(
+        productId,
+      );
+      return tags?.map((tag) => tag.id).toList() ?? [];
+    } catch (error, stackTrace) {
+      debugPrint(
+        'Failed to load assigned service tag IDs for product $productId: '
+        '$error\n$stackTrace',
+      );
+    }
+
+    // Fallback for older backend builds: the detail endpoint only exposes
+    // labels, so resolve them against active tags when the product-specific
+    // endpoint is not available.
+    final allTags = await getServiceTags();
+    final labelToId = {
+      for (final tag in allTags) tag.name.trim().toLowerCase(): tag.id,
+    };
+
+    return detailTags
+        .map((tag) => labelToId[tag.label.trim().toLowerCase()])
+        .whereType<String>()
+        .toList();
   }
 
   @override
@@ -118,15 +178,13 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     final typeEnum = _mapProductType(request.productType);
 
     CreatePartnerHealthServiceDefinitionDto? productDefinition;
-    if (typeEnum == CreatePartnerHealthServiceDtoTypeEnum.service) {
+    if (typeEnum == HealthServiceType.service) {
       productDefinition = CreatePartnerHealthServiceDefinitionDto(
         durationMinutes: request.duration ?? 60,
         bufferMinutes: request.buffer,
         maxCapacity: request.capacity,
-        minLeadTimeHours: request.leadTime,
-        staffAssignmentType: _mapStaffAssignment(
-          request.staffAllocation,
-        ),
+
+        staffAssignmentType: _mapStaffAssignment(request.staffAllocation),
       );
     }
 
@@ -134,16 +192,13 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       name: request.name,
       description: request.description,
       categoryId: request.category,
-      slug: request.name.toLowerCase().replaceAll(
-        RegExp(r'\s+'),
-        '-',
-      ),
       type: typeEnum,
       basePrice: request.basePrice,
       salePrice: request.salePrice,
       status: _mapStatus(request.status),
       isVisibleOnline: request.onlineStore,
       employeeIds: request.staffIds,
+      tagIds: request.tags,
       productDefinition: productDefinition,
       media: request.images
           .asMap()
@@ -151,9 +206,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
           .map(
             (entry) => CreatePartnerHealthServiceMediaDto(
               url: entry.value,
-              mediaType:
-                  CreatePartnerHealthServiceMediaDtoMediaTypeEnum
-                      .image,
+              mediaType: CreatePartnerHealthServiceMediaDtoMediaTypeEnum.image,
               isThumbnail: entry.key == 0,
               sortOrder: entry.key,
             ),
@@ -170,27 +223,11 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
             ),
           )
           .toList(),
-      reviews: request.reviews
-          .map(
-            (review) => CreatePartnerHealthServiceReviewDto(
-              reviewerName: review.reviewerName,
-              avatarUrl: review.avatarUrl,
-              rating: review.rating,
-              status: review.status,
-              date: review.date,
-              text: review.text,
-              imageUrls: review.imageUrls,
-            ),
-          )
-          .toList(),
+      serviceManual: _mapServiceManual(request.serviceManual),
     );
 
-    final response =
-        await _partnerHealthServicesApi
-            .partnerHealthServiceControllerCreate(
-              dto,
-            
-    );
+    final response = await _partnerHealthServicesApi
+        .partnerHealthServiceControllerCreate(dto);
 
     if (response == null) {
       throw Exception('Failed to create product');
@@ -201,46 +238,83 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   @override
   Future<void> updateProduct(UpdateProductRequest request) async {
-    final dto = UpdatePartnerHealthServiceDto(
+    final hasProductDefinitionChanges =
+        request.duration != null ||
+        request.buffer != null ||
+        request.capacity != null ||
+        request.staffAllocation != null;
+    final dto = _SparseUpdatePartnerHealthServiceDto(
       name: request.name,
+      type: request.productType != null
+          ? _mapProductType(request.productType!)
+          : null,
       basePrice: request.basePrice,
+      salePrice: request.salePrice,
+      includeSalePrice: request.salePrice != null || request.clearSalePrice,
       description: request.description,
+      status: request.status != null ? _mapUpdateStatus(request.status!) : null,
+      isVisibleOnline: request.onlineStore,
       categoryId: request.category,
-      employeeIds: request.staffIds ?? [],
-      media:
-          request.images?.asMap().entries.map((entry) {
-            return CreatePartnerHealthServiceMediaDto(
+      employeeIds: request.staffIds,
+      tagIds: request.tagIds,
+      productDefinition: hasProductDefinitionChanges
+          ? _SparseCreatePartnerHealthServiceDefinitionDto(
+              durationMinutes: request.duration ?? 1,
+              includeDurationMinutes: request.duration != null,
+              bufferMinutes: request.buffer,
+              includeBufferMinutes: request.buffer != null,
+              maxCapacity: request.capacity,
+              includeMaxCapacity: request.capacity != null,
+              staffAssignmentType: request.staffAllocation == null
+                  ? null
+                  : _mapStaffAssignment(request.staffAllocation!),
+              includeStaffAssignmentType: request.staffAllocation != null,
+            )
+          : null,
+      media: request.images
+          ?.asMap()
+          .entries
+          .map(
+            (entry) => CreatePartnerHealthServiceMediaDto(
               url: entry.value,
-              mediaType:
-                  CreatePartnerHealthServiceMediaDtoMediaTypeEnum
-                      .image,
+              mediaType: CreatePartnerHealthServiceMediaDtoMediaTypeEnum.image,
               isThumbnail: entry.key == 0,
               sortOrder: entry.key,
-            );
-          }).toList() ??
-          [],
+            ),
+          )
+          .toList(),
+      facilityImages: request.facilityImages
+          ?.asMap()
+          .entries
+          .map(
+            (entry) => CreatePartnerHealthServiceFacilityImageDto(
+              imageUrl: entry.value.imageUrl,
+              label: entry.value.label,
+              sortOrder: entry.key,
+            ),
+          )
+          .toList(),
+      serviceManual: _mapServiceManual(request.serviceManual),
+      includeServiceManual:
+          request.serviceManual != null || request.clearServiceManual,
     );
 
-    await _partnerHealthServicesApi
-        .partnerHealthServiceControllerUpdate(
-          request.id.value.toString(),
-          dto,
-        );
+    await _partnerHealthServicesApi.partnerHealthServiceControllerUpdate(
+      request.id.value.toString(),
+      dto,
+    );
   }
 
   @override
   Future<void> deleteProduct(ProductId id) async {
-    await _partnerHealthServicesApi
-        .partnerHealthServiceControllerRemove(
-          id.value.toString(),
-        );
+    await _partnerHealthServicesApi.partnerHealthServiceControllerRemove(
+      id.value.toString(),
+    );
   }
 
   /// Maps a [PartnerProductResponseDto] to the
   /// domain [Product] entity.
-  Product _mapToProduct(
-    PartnerHealthServiceResponseDto dto,
-  ) {
+  Product _mapToProduct(PartnerHealthServiceResponseDto dto) {
     final service = dto.productDefinition;
     final category = dto.category;
 
@@ -259,6 +333,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       ),
       onlineStore: dto.isVisibleOnline,
       images: dto.media.map((m) => m.url).where((s) => s.isNotEmpty).toList(),
+      facilityImages: const [],
 
       // Service details
       duration: service?.durationMinutes.toInt(),
@@ -266,45 +341,50 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       capacity: service?.maxCapacity?.toInt(),
       leadTime: service?.minLeadTimeHours?.toInt(),
       staffAllocation: service?.staffAssignmentType?.toLowerCase() ?? 'any',
+      staffIds: dto.productEmployeeEligibilities
+          .map((eligibility) => eligibility.employeeId)
+          .toList(),
+
+      // Service Manual
+      serviceManual: _mapServiceManualFromDto(dto.serviceManual),
     );
   }
 
-  CreatePartnerHealthServiceDtoTypeEnum _mapProductType(
-    String type,
-  ) {
+  HealthServiceType _mapProductType(String type) {
     switch (type.toLowerCase()) {
-      case 'physical':
-        return CreatePartnerHealthServiceDtoTypeEnum
-            .physical;
       case 'service':
       default:
-        return CreatePartnerHealthServiceDtoTypeEnum
-            .service;
+        return HealthServiceType.service;
     }
   }
 
-  CreatePartnerHealthServiceDtoStatusEnum _mapStatus(
-    String status,
-  ) {
+  CreatePartnerHealthServiceDtoStatusEnum _mapStatus(String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return CreatePartnerHealthServiceDtoStatusEnum
-            .active;
+        return CreatePartnerHealthServiceDtoStatusEnum.active;
       case 'archived':
-        return CreatePartnerHealthServiceDtoStatusEnum
-            .archived;
+        return CreatePartnerHealthServiceDtoStatusEnum.archived;
       case 'draft':
       default:
-        return CreatePartnerHealthServiceDtoStatusEnum
-            .draft;
+        return CreatePartnerHealthServiceDtoStatusEnum.draft;
+    }
+  }
+
+  UpdatePartnerHealthServiceDtoStatusEnum _mapUpdateStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return UpdatePartnerHealthServiceDtoStatusEnum.active;
+      case 'archived':
+        return UpdatePartnerHealthServiceDtoStatusEnum.archived;
+      case 'draft':
+      default:
+        return UpdatePartnerHealthServiceDtoStatusEnum.draft;
     }
   }
 
   // ignore: lines_longer_than_80_chars
   CreatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum?
-      _mapStaffAssignment(
-    String assignment,
-  ) {
+  _mapStaffAssignment(String assignment) {
     switch (assignment.toLowerCase()) {
       case 'specific':
         return CreatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum
@@ -316,15 +396,212 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     }
   }
 
+  /// Maps a domain [ServiceManualEntity] to the
+  /// OpenAPI [ServiceManualInputDto].
+  ServiceManualInputDto? _mapServiceManual(ServiceManualEntity? manual) {
+    if (manual == null) return null;
+    return ServiceManualInputDto(
+      preServiceGuidelines: manual.preServiceGuidelines,
+      serviceRules: manual.serviceRules
+          .map(
+            (r) => ServiceRuleInputDto(
+              iconSlug: r.iconSlug,
+              title: r.title,
+              description: r.description,
+            ),
+          )
+          .toList(),
+      procedureSteps: manual.procedureSteps
+          .asMap()
+          .entries
+          .map(
+            (e) => ProcedureStepInputDto(
+              stepNumber: e.key + 1,
+              title: e.value.title,
+              description: e.value.description,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  /// Maps a [PartnerServiceManualDto] from the API
+  /// response to the domain [ServiceManualEntity].
+  ServiceManualEntity? _mapServiceManualFromDto(PartnerServiceManualDto? dto) {
+    if (dto == null) return null;
+    return ServiceManualEntity(
+      preServiceGuidelines: dto.preServiceGuidelines,
+      serviceRules: dto.serviceRules
+          .map(
+            (r) => ServiceRuleEntity(
+              iconSlug: r.iconSlug,
+              title: r.title,
+              description: r.description,
+            ),
+          )
+          .toList(),
+      procedureSteps: dto.procedureSteps
+          .map(
+            (s) => ProcedureStepEntity(
+              stepNumber: s.stepNumber.toInt(),
+              title: s.title,
+              description: s.description,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  List<FacilityImageEntity> _mapFacilityImagesFromDetailDto(
+    List<PartnerFacilityImageDto> dto,
+  ) {
+    return dto
+        .asMap()
+        .entries
+        .map(
+          (entry) => FacilityImageEntity(
+            imageUrl: entry.value.imageUrl,
+            label: entry.value.label,
+            sortOrder: entry.key,
+          ),
+        )
+        .toList();
+  }
+
   @override
   Future<List<ServiceTagResponseDto>> getServiceTags() async {
-    final response = await _serviceTagsApi
-        .serviceTagsControllerFindActive();
+    final response = await _serviceTagsApi.serviceTagsControllerFindActive();
     return response ?? [];
   }
 }
 
+class _SparseCreatePartnerHealthServiceDefinitionDto
+    extends CreatePartnerHealthServiceDefinitionDto {
+  _SparseCreatePartnerHealthServiceDefinitionDto({
+    required super.durationMinutes,
+    super.bufferMinutes,
+    super.maxCapacity,
+    super.staffAssignmentType,
+    this.includeDurationMinutes = false,
+    this.includeBufferMinutes = false,
+    this.includeMaxCapacity = false,
+    this.includeStaffAssignmentType = false,
+  });
+
+  final bool includeDurationMinutes;
+  final bool includeBufferMinutes;
+  final bool includeMaxCapacity;
+  final bool includeStaffAssignmentType;
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = <String, dynamic>{};
+
+    if (includeDurationMinutes) {
+      json[r'durationMinutes'] = durationMinutes;
+    }
+    if (includeBufferMinutes) {
+      json[r'bufferMinutes'] = bufferMinutes;
+    }
+    if (includeMaxCapacity) {
+      json[r'maxCapacity'] = maxCapacity;
+    }
+    if (includeStaffAssignmentType) {
+      json[r'staffAssignmentType'] = staffAssignmentType;
+    }
+
+    return json;
+  }
+}
+
+class _SparseUpdatePartnerHealthServiceDto
+    extends UpdatePartnerHealthServiceDto {
+  _SparseUpdatePartnerHealthServiceDto({
+    super.categoryId,
+    super.description,
+    super.salePrice,
+    super.name,
+    super.type,
+    super.basePrice,
+    super.status,
+    super.isVisibleOnline,
+    super.employeeIds,
+    super.media,
+    super.facilityImages,
+    super.productDefinition,
+    super.serviceManual,
+    this.includeSalePrice = false,
+    this.includeServiceManual = false,
+    this.tagIds,
+  });
+
+  final bool includeSalePrice;
+  final bool includeServiceManual;
+
+  /// Tag IDs to associate with this service.
+  final List<String>? tagIds;
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = <String, dynamic>{};
+
+    void addIfPresent(String key, Object? value) {
+      if (value != null) {
+        json[key] = value;
+      }
+    }
+
+    addIfPresent(r'categoryId', categoryId);
+    addIfPresent(r'description', description);
+    if (includeSalePrice) {
+      json[r'salePrice'] = salePrice;
+    }
+    addIfPresent(r'name', name);
+    addIfPresent(r'type', type);
+    addIfPresent(r'basePrice', basePrice);
+    addIfPresent(r'status', status);
+    addIfPresent(r'isVisibleOnline', isVisibleOnline);
+    addIfPresent(r'employeeIds', employeeIds);
+    addIfPresent(r'tagIds', tagIds);
+    addIfPresent(r'media', media);
+    addIfPresent(r'facilityImages', facilityImages);
+    addIfPresent(r'productDefinition', productDefinition);
+    if (includeServiceManual) {
+      json[r'serviceManual'] = serviceManual;
+    }
+
+    return json;
+  }
+}
+
 class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
+  final List<Product> _products = List.generate(100, _mockProductAt);
+
+  static Product _mockProductAt(int index) {
+    return Product(
+      id: ProductId('mock-id-$index'),
+      name: 'Mock Product $index',
+      description: 'Description for mock product $index',
+      basePrice: 100.0 + index,
+      salePrice: 90.0 + index,
+      productType: index % 2 == 0 ? 'service' : 'physical',
+      status: index % 5 == 0 ? 'draft' : 'active',
+      category: CategoryEntity(
+        id: 'cat-${index % 5}',
+        name: 'Category ${index % 5}',
+        slug: 'category-${index % 5}',
+      ),
+      onlineStore: true,
+      images: ['https://picsum.photos/200/300?random=$index'],
+      costPerItem: index % 2 != 0 ? 50.0 : null,
+      duration: index % 2 == 0 ? 60 : null,
+      buffer: index % 2 == 0 ? 15 : null,
+      capacity: index % 2 == 0 ? 1 : null,
+      leadTime: index % 2 == 0 ? 24 : null,
+      staffAllocation: 'any',
+    );
+  }
+
   @override
   Future<List<Product>> getProducts(
     int startingAt,
@@ -332,48 +609,36 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return List.generate(
-      count,
-      (index) => Product(
-        id: ProductId('mock-id-${startingAt + index}'),
-        name: 'Mock Product ${startingAt + index}',
-        description:
-            'Description for mock product '
-            '${startingAt + index}',
-        basePrice: 100.0 + index,
-        salePrice: 90.0 + index,
-        productType: index % 2 == 0 ? 'service' : 'physical',
-        status: 'active',
-        category: CategoryEntity(
-          id: 'cat-${index % 5}',
-          name: 'Category ${index % 5}',
-          slug: 'category-${index % 5}',
-        ),
-        onlineStore: true,
-        images: [
-          'https://picsum.photos/200/300'
-              '?random=${startingAt + index}',
-        ],
-        costPerItem: index % 2 != 0 ? 50.0 : null,
-        duration: index % 2 == 0 ? 60 : null,
-        buffer: index % 2 == 0 ? 15 : null,
-        capacity: index % 2 == 0 ? 1 : null,
-        leadTime: index % 2 == 0 ? 24 : null,
-        staffAllocation: 'any',
-      ),
+    final products = await getAllProducts(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
     );
+    final end = (startingAt + count).clamp(0, products.length);
+    return products.sublist(startingAt.clamp(0, products.length), end);
+  }
+
+  @override
+  Future<List<Product>> getAllProducts({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return [..._products];
   }
 
   @override
   Future<int> getTotalRows() async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return 100;
+    return _products.length;
   }
 
   @override
   Future<Product> getProductById(ProductId id) async {
     await Future.delayed(const Duration(seconds: 1));
+    final existing = _products.where((product) => product.id == id);
+    if (existing.isNotEmpty) {
+      return existing.first;
+    }
 
     final product = productMockData[id.value] ?? productMockDefault;
 
@@ -387,8 +652,8 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
   @override
   Future<Product> createProduct(CreateProductRequest request) async {
     await Future.delayed(const Duration(seconds: 1));
-    return Product(
-      id: ProductId('new-mock-id'),
+    final product = Product(
+      id: ProductId('new-mock-id-${DateTime.now().millisecondsSinceEpoch}'),
       name: request.name,
       description: request.description,
       basePrice: request.basePrice,
@@ -406,9 +671,11 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
       duration: request.duration,
       buffer: request.buffer,
       capacity: request.capacity,
-      leadTime: request.leadTime,
+
       staffAllocation: request.staffAllocation,
     );
+    _products.insert(0, product);
+    return product;
   }
 
   @override
@@ -420,6 +687,7 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
   @override
   Future<void> deleteProduct(ProductId id) async {
     await Future.delayed(const Duration(seconds: 1));
+    _products.removeWhere((product) => product.id == id);
     debugPrint('Mock delete product: $id');
   }
 

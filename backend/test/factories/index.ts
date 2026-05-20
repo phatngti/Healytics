@@ -53,13 +53,15 @@ export interface TestProductData {
 /**
  * Creates a test product with sensible defaults.
  */
-export const createTestProduct = (overrides: TestProductData = {}): TestProductData => ({
+export const createTestProduct = (
+  overrides: TestProductData = {},
+): TestProductData => ({
   id: generateTestId(),
   name: 'Test Product',
   slug: 'test-product',
   description: 'A test product description',
   type: HealthServiceType.PHYSICAL,
-  basePrice: 100.00,
+  basePrice: 100.0,
   salePrice: null,
   currency: 'VND',
   status: HealthServiceStatus.DRAFT,
@@ -89,7 +91,9 @@ export interface TestCategoryData {
 /**
  * Creates a test category with sensible defaults.
  */
-export const createTestCategory = (overrides: TestCategoryData = {}): TestCategoryData => ({
+export const createTestCategory = (
+  overrides: TestCategoryData = {},
+): TestCategoryData => ({
   id: generateTestId(),
   name: 'Test Category',
   slug: 'test-category',
@@ -122,7 +126,9 @@ export interface TestEmployeeData {
 /**
  * Creates a test employee with sensible defaults.
  */
-export const createTestEmployee = (overrides: TestEmployeeData = {}): TestEmployeeData => ({
+export const createTestEmployee = (
+  overrides: TestEmployeeData = {},
+): TestEmployeeData => ({
   id: generateTestId(),
   employeeCode: `EMP-${Date.now()}`,
   fullName: 'Test Employee',
@@ -139,7 +145,9 @@ export const createTestEmployee = (overrides: TestEmployeeData = {}): TestEmploy
 /**
  * Creates a test doctor employee.
  */
-export const createTestDoctor = (overrides: TestEmployeeData = {}): TestEmployeeData =>
+export const createTestDoctor = (
+  overrides: TestEmployeeData = {},
+): TestEmployeeData =>
   createTestEmployee({
     role: EmployeeRole.DOCTOR,
     fullName: 'Dr. Test Doctor',
@@ -149,7 +157,9 @@ export const createTestDoctor = (overrides: TestEmployeeData = {}): TestEmployee
 /**
  * Creates a test therapist employee.
  */
-export const createTestTherapist = (overrides: TestEmployeeData = {}): TestEmployeeData =>
+export const createTestTherapist = (
+  overrides: TestEmployeeData = {},
+): TestEmployeeData =>
   createTestEmployee({
     role: EmployeeRole.THERAPIST,
     fullName: 'Test Therapist',
@@ -173,7 +183,9 @@ export interface TestAccountData {
 /**
  * Creates a test account with sensible defaults.
  */
-export const createTestAccount = (overrides: TestAccountData = {}): TestAccountData => ({
+export const createTestAccount = (
+  overrides: TestAccountData = {},
+): TestAccountData => ({
   id: generateTestId(),
   email: `test-${Date.now()}@example.com`,
   passwordHash: 'hashed-password',
@@ -187,7 +199,9 @@ export const createTestAccount = (overrides: TestAccountData = {}): TestAccountD
 /**
  * Creates a test admin account.
  */
-export const createTestAdminAccount = (overrides: TestAccountData = {}): TestAccountData =>
+export const createTestAdminAccount = (
+  overrides: TestAccountData = {},
+): TestAccountData =>
   createTestAccount({
     role: Role.ADMIN,
     email: 'admin@example.com',
@@ -213,10 +227,12 @@ export interface TestServiceTagData {
 /**
  * Creates a test service tag with sensible defaults.
  */
-export const createTestServiceTag = (overrides: TestServiceTagData = {}): TestServiceTagData => ({
+export const createTestServiceTag = (
+  overrides: TestServiceTagData = {},
+): TestServiceTagData => ({
   id: generateTestId(),
   name: 'Test Tag',
-  colorValue: 0xFF6366F1,
+  colorValue: 0xff6366f1,
   isActive: true,
   sortOrder: 0,
   usage: 0,

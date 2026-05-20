@@ -23,8 +23,13 @@ export class CreateServiceTagHandler {
    * @param userId - The ID of the user (partner) creating the tag
    * @returns The created ServiceTag entity
    */
-  async execute(command: CreateServiceTagDto, userId: string): Promise<ProductFeatureTag> {
-    this.logger.log(`Executing CreateProductFeatureTagHandler for user: ${userId}`);
+  async execute(
+    command: CreateServiceTagDto,
+    userId: string,
+  ): Promise<ProductFeatureTag> {
+    this.logger.log(
+      `Executing CreateProductFeatureTagHandler for user: ${userId}`,
+    );
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();

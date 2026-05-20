@@ -26,6 +26,14 @@ class ProductImplRepository implements ProductRepository {
   }
 
   @override
+  Future<List<Product>> getAllProducts({String? sortedBy, bool? sortedAsc}) {
+    return remoteDataSource.getAllProducts(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
+  }
+
+  @override
   Future<int> getTotalRows() {
     return remoteDataSource.getTotalRows();
   }

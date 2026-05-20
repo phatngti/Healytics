@@ -18,6 +18,7 @@ class RegisterDto {
     this.profile,
   });
 
+
   /// Email address for registration
   String email;
 

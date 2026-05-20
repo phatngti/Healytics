@@ -24,7 +24,7 @@ from app.repositories import conversation_repo, message_repo
 # Config — tweak these to suit your local testing needs
 # ---------------------------------------------------------------------------
 
-SEED_USER_ID = "test_user_seed_001"
+SEED_USER_ID = uuid.UUID("00000000-0000-4000-8000-000000000001")
 
 CONVERSATIONS = [
     {
@@ -76,7 +76,7 @@ async def seed_database() -> None:
         await session.commit()
 
     print(
-        f"\n✅  Done. user_id for manual testing: '{SEED_USER_ID}'\n"
+        f"\n✅  Done. user_id for manual testing: {SEED_USER_ID!s}\n"
         f"    Hit http://localhost:8000/docs to explore the API."
     )
 

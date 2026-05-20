@@ -7,10 +7,16 @@ import {
 } from '@nestjs/common';
 import { DataSource, In } from 'typeorm';
 import { Partner } from '@/common/entities/partner.entity';
-import { PartnerDocument, PartnerDocumentStatuses } from '@/common/entities/partner-document.entity';
+import {
+  PartnerDocument,
+  PartnerDocumentStatuses,
+} from '@/common/entities/partner-document.entity';
 import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
 import { DocumentRequirement } from '@/common/entities/document-requirement.entity';
-import { ReviewPartnerProfileDto, ReviewDecision } from '../../dto/review-partner-profile.dto';
+import {
+  ReviewPartnerProfileDto,
+  ReviewDecision,
+} from '../../dto/review-partner-profile.dto';
 import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 import { PartnerFieldKeys } from '@/common/constants/partner-form-keys';
 
@@ -19,7 +25,7 @@ import { PartnerFieldKeys } from '@/common/constants/partner-form-keys';
  * Extracted from AdminPartnersService per enterprise handler pattern (§5).
  *
  * Follows the domain handler pattern:
- * 1. Invariant Check — partner must be PENDING
+ * 1. Invariant Check — partner must be PENDING or REQUIRED_RESUBMIT
  * 2. Domain Action — process field/document reviews
  * 3. Persistence — update statuses and create review log
  * 4. Commit/Rollback with proper finally { release }
@@ -46,16 +52,27 @@ export class ReviewPartnerHandler {
       // 1. Hydration + Invariant Check
       const partner = await manager.findOne(Partner, {
         where: { id: partnerId },
-        relations: ['legalRepresentative', 'province', 'district', 'ward', 'account', 'documents'],
+        relations: [
+          'legalRepresentative',
+          'province',
+          'district',
+          'ward',
+          'account',
+          'documents',
+        ],
       });
 
       if (!partner) {
         throw new NotFoundException('Partner not found');
       }
 
-      if (partner.verificationStatus !== PartnerVerificationStatus.PENDING) {
+      const reviewableStatuses = [
+        PartnerVerificationStatus.PENDING,
+        PartnerVerificationStatus.REQUIRED_RESUBMIT,
+      ];
+      if (!reviewableStatuses.includes(partner.verificationStatus)) {
         throw new BadRequestException(
-          `Partner is not in PENDING state (Current: ${partner.verificationStatus}). Cannot review.`,
+          `Partner is not in a reviewable state (Current: ${partner.verificationStatus}). Cannot review.`,
         );
       }
 
@@ -72,10 +89,19 @@ export class ReviewPartnerHandler {
 
       for (const item of dto.items ?? []) {
         if (item.fieldKey && this.isPartnerFieldKey(item.fieldKey)) {
-          this.processFieldReviewItem(partner, item, fieldReviews, finalRejections);
+          this.processFieldReviewItem(
+            partner,
+            item,
+            fieldReviews,
+            finalRejections,
+          );
         } else if (item.fieldKey) {
           await this.processDocumentReviewItem(
-            manager, item, docMap, documentReviews, finalRejections,
+            manager,
+            item,
+            docMap,
+            documentReviews,
+            finalRejections,
           );
         }
       }
@@ -89,14 +115,17 @@ export class ReviewPartnerHandler {
         partner.verificationStatus = PartnerVerificationStatus.REJECTED;
       } else if (hasErrors) {
         verdict = PartnerVerificationStatus.REQUIRED_RESUBMIT;
-        partner.verificationStatus = PartnerVerificationStatus.REQUIRED_RESUBMIT;
+        partner.verificationStatus =
+          PartnerVerificationStatus.REQUIRED_RESUBMIT;
       } else if (dto.decision === ReviewDecision.APPROVED) {
         const requirements = await manager.find(DocumentRequirement, {
           where: { businessType: In(partner.businessType), isRequired: true },
         });
 
         if (existingDocs.length === 0 && requirements.length > 0) {
-          throw new BadRequestException('Cannot approve: Missing required documents');
+          throw new BadRequestException(
+            'Cannot approve: Missing required documents',
+          );
         }
 
         verdict = PartnerVerificationStatus.APPROVED;
@@ -109,7 +138,8 @@ export class ReviewPartnerHandler {
           );
         }
         verdict = PartnerVerificationStatus.REQUIRED_RESUBMIT;
-        partner.verificationStatus = PartnerVerificationStatus.REQUIRED_RESUBMIT;
+        partner.verificationStatus =
+          PartnerVerificationStatus.REQUIRED_RESUBMIT;
       }
 
       await manager.save(partner);
@@ -120,8 +150,10 @@ export class ReviewPartnerHandler {
         reviewerId: adminId,
         verdict,
         generalComment: dto.generalComment,
-        fieldReviews: Object.keys(fieldReviews).length > 0 ? fieldReviews : null,
-        documentReviews: Object.keys(documentReviews).length > 0 ? documentReviews : null,
+        fieldReviews:
+          Object.keys(fieldReviews).length > 0 ? fieldReviews : null,
+        documentReviews:
+          Object.keys(documentReviews).length > 0 ? documentReviews : null,
       });
       await manager.save(reviewLog);
 
@@ -137,7 +169,9 @@ export class ReviewPartnerHandler {
         throw error;
       }
       this.logger.error(`Review failed: ${error.message}`, error.stack);
-      throw new InternalServerErrorException('Transaction failed during partner review');
+      throw new InternalServerErrorException(
+        'Transaction failed during partner review',
+      );
     } finally {
       await queryRunner.release();
     }
@@ -155,9 +189,18 @@ export class ReviewPartnerHandler {
   private sanitizeRecordValue(value: any): any {
     if (value === null || value === undefined) return null;
     if (typeof value !== 'object' || value instanceof Date) return value;
-    if (Array.isArray(value)) return value.map((item) => this.sanitizeRecordValue(item));
+    if (Array.isArray(value))
+      return value.map((item) => this.sanitizeRecordValue(item));
 
-    const { createdAt, created_at, deletedAt, deleted_at, updatedAt, updated_at, ...rest } = value;
+    const {
+      createdAt,
+      created_at,
+      deletedAt,
+      deleted_at,
+      updatedAt,
+      updated_at,
+      ...rest
+    } = value;
     return rest;
   }
 
@@ -173,16 +216,20 @@ export class ReviewPartnerHandler {
       [PartnerFieldKeys.streetAddress]: () => partner.streetAddress,
       [PartnerFieldKeys.phoneNumber]: () => partner.phoneNumber,
       [PartnerFieldKeys.email]: () => partner.account?.email ?? null,
-      [PartnerFieldKeys.username]: () => partner.account?.username ?? null,
-      [PartnerFieldKeys.idType]: () => partner.legalRepresentative?.idType ?? null,
-      [PartnerFieldKeys.idNumber]: () => partner.legalRepresentative?.idNumber ?? null,
-      [PartnerFieldKeys.idIssueDate]: () => partner.legalRepresentative?.idIssueDate ?? null,
-      [PartnerFieldKeys.fullName]: () => partner.legalRepresentative?.fullName ?? null,
-      [PartnerFieldKeys.position]: () => partner.legalRepresentative?.position ?? null,
+      [PartnerFieldKeys.idType]: () =>
+        partner.legalRepresentative?.idType ?? null,
+      [PartnerFieldKeys.idNumber]: () =>
+        partner.legalRepresentative?.idNumber ?? null,
+      [PartnerFieldKeys.idIssueDate]: () =>
+        partner.legalRepresentative?.idIssueDate ?? null,
+      [PartnerFieldKeys.fullName]: () =>
+        partner.legalRepresentative?.fullName ?? null,
+      [PartnerFieldKeys.position]: () =>
+        partner.legalRepresentative?.position ?? null,
     };
 
     const resolver = fieldResolvers[fieldKey];
-    return resolver ? resolver() : (partner as any)[fieldKey] ?? null;
+    return resolver ? resolver() : ((partner as any)[fieldKey] ?? null);
   }
 
   private async processDocumentReviewItem(
@@ -196,7 +243,11 @@ export class ReviewPartnerHandler {
     const doc = docMap.get(documentKey);
     if (!doc) return;
 
-    await manager.update(PartnerDocument, { id: doc.id }, { status: PartnerDocumentStatuses.REJECTED });
+    await manager.update(
+      PartnerDocument,
+      { id: doc.id },
+      { status: PartnerDocumentStatuses.REJECTED },
+    );
 
     documentReviews[documentKey] = {
       documentType: doc.type,

@@ -1,13 +1,19 @@
+import 'package:admin_panel/features/partner/bookings/presentation/screens/bookings.screen.dart';
+import 'package:admin_panel/features/partner/chat/presentation/screens/partner_chat_inbox.screen.dart';
 import 'package:admin_panel/features/partner/dashboard/presentation/dashboard.dart';
 import 'package:admin_panel/features/partner/employee/presentation/screens/employee_add.screen.dart';
 import 'package:admin_panel/features/partner/employee/presentation/screens/employee_edit.screen.dart';
 import 'package:admin_panel/features/partner/employee/presentation/screens/employee_details.screen.dart';
 import 'package:admin_panel/features/partner/employee/presentation/screens/employee_home.screen.dart';
+import 'package:admin_panel/features/partner/profile_completion/presentation/screens/profile_completion.screen.dart';
+import 'package:admin_panel/features/partner/profile_edit/presentation/screens/profile_edit.screen.dart';
 import 'package:admin_panel/features/partner/products/presentation/product_add.screen.dart';
 import 'package:admin_panel/features/partner/products/presentation/product_details.screen.dart';
 import 'package:admin_panel/features/partner/products/presentation/product_edit.screen.dart';
 import 'package:admin_panel/features/partner/products/presentation/product_home.screen.dart';
 import 'package:admin_panel/features/partner/service_tags/presentation/service_tags_home.screen.dart';
+import 'package:admin_panel/features/partner/transactions/presentation/transaction_details.screen.dart';
+import 'package:admin_panel/features/partner/transactions/presentation/transaction_home.screen.dart';
 import 'package:admin_panel/features/partner/verification_status/verification_status.screen.dart';
 import 'package:admin_panel/router/utils.dart';
 import 'package:flutter/material.dart';
@@ -57,9 +63,33 @@ part 'partner_routes.g.dart';
       path: '/provider/service_tags',
       name: ServiceTagsHomeRoute.name,
     ),
+    TypedGoRoute<TransactionHomeRoute>(
+      path: '/provider/transactions',
+      name: TransactionHomeRoute.name,
+    ),
+    TypedGoRoute<TransactionDetailsRoute>(
+      path: '/provider/transactions/:id',
+      name: TransactionDetailsRoute.name,
+    ),
     TypedGoRoute<VerificationStatusRoute>(
       path: '/provider/verification-status',
       name: VerificationStatusRoute.name,
+    ),
+    TypedGoRoute<ProfileCompletionRoute>(
+      path: '/provider/profile-completion',
+      name: ProfileCompletionRoute.name,
+    ),
+    TypedGoRoute<ProfileEditRoute>(
+      path: '/provider/profile-edit',
+      name: ProfileEditRoute.name,
+    ),
+    TypedGoRoute<PartnerChatInboxRoute>(
+      path: '/provider/chat',
+      name: PartnerChatInboxRoute.name,
+    ),
+    TypedGoRoute<PartnerBookingsRoute>(
+      path: '/provider/bookings',
+      name: PartnerBookingsRoute.name,
     ),
   ],
 )
@@ -213,6 +243,34 @@ class ServiceTagsHomeRoute extends GoRouteData with $ServiceTagsHomeRoute {
   }
 }
 
+class TransactionHomeRoute extends GoRouteData with $TransactionHomeRoute {
+  const TransactionHomeRoute();
+  static const name = "provider-transaction-home";
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const TransactionHomeScreen(),
+    );
+  }
+}
+
+class TransactionDetailsRoute extends GoRouteData
+    with $TransactionDetailsRoute {
+  const TransactionDetailsRoute({required this.id});
+  static const name = "provider-transaction-details";
+  final String id;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: TransactionDetailsScreen(transactionId: id),
+    );
+  }
+}
+
 class VerificationStatusRoute extends GoRouteData
     with $VerificationStatusRoute {
   const VerificationStatusRoute();
@@ -223,6 +281,58 @@ class VerificationStatusRoute extends GoRouteData
     return buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const VerificationStatusScreen(),
+    );
+  }
+}
+
+class ProfileCompletionRoute extends GoRouteData with $ProfileCompletionRoute {
+  const ProfileCompletionRoute();
+  static const name = 'provider-profile-completion';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const ProfileCompletionScreen(),
+    );
+  }
+}
+
+class ProfileEditRoute extends GoRouteData with $ProfileEditRoute {
+  const ProfileEditRoute();
+  static const name = 'provider-profile-edit';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const ProfileEditScreen(),
+    );
+  }
+}
+
+class PartnerChatInboxRoute extends GoRouteData with $PartnerChatInboxRoute {
+  const PartnerChatInboxRoute();
+  static const name = 'provider-chat-inbox';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const PartnerChatInboxScreen(),
+    );
+  }
+}
+
+class PartnerBookingsRoute extends GoRouteData with $PartnerBookingsRoute {
+  const PartnerBookingsRoute();
+  static const name = 'provider-bookings';
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: const BookingsScreen(),
     );
   }
 }

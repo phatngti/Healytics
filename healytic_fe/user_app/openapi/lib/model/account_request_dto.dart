@@ -13,13 +13,10 @@ part of openapi.api;
 class AccountRequestDto {
   /// Returns a new [AccountRequestDto] instance.
   AccountRequestDto({
-    required this.username,
     required this.password,
     required this.email,
   });
 
-  /// Username
-  String username;
 
   /// Password (min 8 characters)
   String password;
@@ -29,23 +26,20 @@ class AccountRequestDto {
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is AccountRequestDto &&
-    other.username == username &&
     other.password == password &&
     other.email == email;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (username.hashCode) +
     (password.hashCode) +
     (email.hashCode);
 
   @override
-  String toString() => 'AccountRequestDto[username=$username, password=$password, email=$email]';
+  String toString() => 'AccountRequestDto[password=$password, email=$email]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-      json[r'username'] = this.username;
       json[r'password'] = this.password;
       json[r'email'] = this.email;
     return json;
@@ -70,7 +64,6 @@ class AccountRequestDto {
       }());
 
       return AccountRequestDto(
-        username: mapValueOfType<String>(json, r'username')!,
         password: mapValueOfType<String>(json, r'password')!,
         email: mapValueOfType<String>(json, r'email')!,
       );
@@ -120,7 +113,6 @@ class AccountRequestDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'username',
     'password',
     'email',
   };

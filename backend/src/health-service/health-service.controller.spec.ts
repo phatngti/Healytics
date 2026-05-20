@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HealthServiceController } from './health-service.controller';
+import { UserHealthServiceController } from './user-health-service.controller';
 import { HealthServiceService } from './health-service.service';
 import { MockType } from '../../test/mocks/mock-types';
 
-describe('HealthServiceController', () => {
-  let controller: HealthServiceController;
+describe('UserHealthServiceController', () => {
+  let controller: UserHealthServiceController;
   let healthServiceService: MockType<HealthServiceService>;
 
   beforeEach(async () => {
@@ -18,7 +18,7 @@ describe('HealthServiceController', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [HealthServiceController],
+      controllers: [UserHealthServiceController],
       providers: [
         {
           provide: HealthServiceService,
@@ -27,7 +27,7 @@ describe('HealthServiceController', () => {
       ],
     }).compile();
 
-    controller = module.get<HealthServiceController>(HealthServiceController);
+    controller = module.get<UserHealthServiceController>(UserHealthServiceController);
     healthServiceService = module.get(HealthServiceService);
   });
 
@@ -50,7 +50,9 @@ describe('HealthServiceController', () => {
 
       // Assert
       expect(result).toEqual(expected);
-      expect(healthServiceService.getPremiumTreatments!).toHaveBeenCalledTimes(1);
+      expect(healthServiceService.getPremiumTreatments!).toHaveBeenCalledTimes(
+        1,
+      );
     });
   });
 

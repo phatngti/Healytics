@@ -184,18 +184,154 @@ class ApiClient {
           return value is DateTime ? value : DateTime.tryParse(value);
         case 'Object':
           return value;
+        case 'AccountMeResponseDto':
+          return AccountMeResponseDto.fromJson(value);
         case 'AccountRequestDto':
           return AccountRequestDto.fromJson(value);
+        case 'AddToCartDto':
+          return AddToCartDto.fromJson(value);
         case 'AddressDto':
           return AddressDto.fromJson(value);
         case 'AddressInfoDto':
           return AddressInfoDto.fromJson(value);
+        case 'AdminCategoryHealthDto':
+          return AdminCategoryHealthDto.fromJson(value);
         case 'AdminCategoryResponseDto':
           return AdminCategoryResponseDto.fromJson(value);
+        case 'AdminCategorySnapshotDto':
+          return AdminCategorySnapshotDto.fromJson(value);
+        case 'AdminDashboardBookingOutcomeSummaryDto':
+          return AdminDashboardBookingOutcomeSummaryDto.fromJson(value);
+        case 'AdminDashboardNotificationItemDto':
+          return AdminDashboardNotificationItemDto.fromJson(value);
+        case 'AdminDashboardNotificationPriority':
+          return AdminDashboardNotificationPriorityTypeTransformer().decode(value);
+        case 'AdminDashboardNotificationType':
+          return AdminDashboardNotificationTypeTypeTransformer().decode(value);
+        case 'AdminDashboardOverviewDto':
+          return AdminDashboardOverviewDto.fromJson(value);
+        case 'AdminDashboardRevenueTrendPointDto':
+          return AdminDashboardRevenueTrendPointDto.fromJson(value);
+        case 'AdminDashboardTransactionHealthDto':
+          return AdminDashboardTransactionHealthDto.fromJson(value);
+        case 'AdminFinanceAlertDto':
+          return AdminFinanceAlertDto.fromJson(value);
+        case 'AdminFinanceAuditEventDto':
+          return AdminFinanceAuditEventDto.fromJson(value);
+        case 'AdminFinanceCreateExportDto':
+          return AdminFinanceCreateExportDto.fromJson(value);
+        case 'AdminFinanceCreateNoteDto':
+          return AdminFinanceCreateNoteDto.fromJson(value);
+        case 'AdminFinanceExportJobDto':
+          return AdminFinanceExportJobDto.fromJson(value);
+        case 'AdminFinanceExportStatus':
+          return AdminFinanceExportStatusTypeTransformer().decode(value);
+        case 'AdminFinanceExportType':
+          return AdminFinanceExportTypeTypeTransformer().decode(value);
+        case 'AdminFinanceNoteActionDto':
+          return AdminFinanceNoteActionDto.fromJson(value);
+        case 'AdminFinanceNoteDto':
+          return AdminFinanceNoteDto.fromJson(value);
+        case 'AdminFinanceNoteEntityType':
+          return AdminFinanceNoteEntityTypeTypeTransformer().decode(value);
+        case 'AdminFinanceOverviewDto':
+          return AdminFinanceOverviewDto.fromJson(value);
+        case 'AdminFinancePageMetaDto':
+          return AdminFinancePageMetaDto.fromJson(value);
+        case 'AdminFinancePartnerExposureDto':
+          return AdminFinancePartnerExposureDto.fromJson(value);
+        case 'AdminFinancePayoutAttemptDto':
+          return AdminFinancePayoutAttemptDto.fromJson(value);
+        case 'AdminFinancePayoutDetailDto':
+          return AdminFinancePayoutDetailDto.fromJson(value);
+        case 'AdminFinancePayoutPageDto':
+          return AdminFinancePayoutPageDto.fromJson(value);
+        case 'AdminFinancePayoutRecordDto':
+          return AdminFinancePayoutRecordDto.fromJson(value);
+        case 'AdminFinancePeriod':
+          return AdminFinancePeriodTypeTransformer().decode(value);
+        case 'AdminFinanceProvider':
+          return AdminFinanceProviderTypeTransformer().decode(value);
+        case 'AdminFinanceProviderEventDto':
+          return AdminFinanceProviderEventDto.fromJson(value);
+        case 'AdminFinanceReconciliationDetailDto':
+          return AdminFinanceReconciliationDetailDto.fromJson(value);
+        case 'AdminFinanceReconciliationExceptionDto':
+          return AdminFinanceReconciliationExceptionDto.fromJson(value);
+        case 'AdminFinanceReconciliationPageDto':
+          return AdminFinanceReconciliationPageDto.fromJson(value);
+        case 'AdminFinanceReconciliationStatus':
+          return AdminFinanceReconciliationStatusTypeTransformer().decode(value);
+        case 'AdminFinanceReconciliationType':
+          return AdminFinanceReconciliationTypeTypeTransformer().decode(value);
+        case 'AdminFinanceRefundCaseDetailDto':
+          return AdminFinanceRefundCaseDetailDto.fromJson(value);
+        case 'AdminFinanceRefundCasePageDto':
+          return AdminFinanceRefundCasePageDto.fromJson(value);
+        case 'AdminFinanceRefundCaseRecordDto':
+          return AdminFinanceRefundCaseRecordDto.fromJson(value);
+        case 'AdminFinanceRequiredNoteActionDto':
+          return AdminFinanceRequiredNoteActionDto.fromJson(value);
+        case 'AdminFinanceReviewFlagActionDto':
+          return AdminFinanceReviewFlagActionDto.fromJson(value);
+        case 'AdminFinanceRiskTone':
+          return AdminFinanceRiskToneTypeTransformer().decode(value);
+        case 'AdminFinanceSettlementActionDto':
+          return AdminFinanceSettlementActionDto.fromJson(value);
+        case 'AdminFinanceTransactionDetailDto':
+          return AdminFinanceTransactionDetailDto.fromJson(value);
+        case 'AdminFinanceTransactionPageDto':
+          return AdminFinanceTransactionPageDto.fromJson(value);
+        case 'AdminFinanceTransactionRecordDto':
+          return AdminFinanceTransactionRecordDto.fromJson(value);
+        case 'AdminFinanceTrendPointDto':
+          return AdminFinanceTrendPointDto.fromJson(value);
         case 'AdminLoginDto':
           return AdminLoginDto.fromJson(value);
+        case 'AdminOutcomeMetricDto':
+          return AdminOutcomeMetricDto.fromJson(value);
         case 'AdminPartnerDetailResponseDto':
           return AdminPartnerDetailResponseDto.fromJson(value);
+        case 'AdminPartnerItemDto':
+          return AdminPartnerItemDto.fromJson(value);
+        case 'AdminPartnerRankingItemDto':
+          return AdminPartnerRankingItemDto.fromJson(value);
+        case 'AdminPartnerRankingVerificationStatus':
+          return AdminPartnerRankingVerificationStatusTypeTransformer().decode(value);
+        case 'AdminPartnerScope':
+          return AdminPartnerScopeTypeTransformer().decode(value);
+        case 'AdminPartnerSortBy':
+          return AdminPartnerSortByTypeTransformer().decode(value);
+        case 'AdminPartnerSortDirection':
+          return AdminPartnerSortDirectionTypeTransformer().decode(value);
+        case 'AdminPartnerStatsResponseDto':
+          return AdminPartnerStatsResponseDto.fromJson(value);
+        case 'AdminPartnersResponseDto':
+          return AdminPartnersResponseDto.fromJson(value);
+        case 'AdminServiceRankingItemDto':
+          return AdminServiceRankingItemDto.fromJson(value);
+        case 'AiRecommendationItemDto':
+          return AiRecommendationItemDto.fromJson(value);
+        case 'AnalyticsAlertDto':
+          return AnalyticsAlertDto.fromJson(value);
+        case 'AnalyticsBookingMetricsDto':
+          return AnalyticsBookingMetricsDto.fromJson(value);
+        case 'AnalyticsCategoryPerformanceDto':
+          return AnalyticsCategoryPerformanceDto.fromJson(value);
+        case 'AnalyticsOperationalMetricDto':
+          return AnalyticsOperationalMetricDto.fromJson(value);
+        case 'AnalyticsReviewBucketDto':
+          return AnalyticsReviewBucketDto.fromJson(value);
+        case 'AnalyticsServicePerformanceDto':
+          return AnalyticsServicePerformanceDto.fromJson(value);
+        case 'AnalyticsTrendPointDto':
+          return AnalyticsTrendPointDto.fromJson(value);
+        case 'AppointmentCategoryResponseDto':
+          return AppointmentCategoryResponseDto.fromJson(value);
+        case 'AppointmentResponseDto':
+          return AppointmentResponseDto.fromJson(value);
+        case 'AppointmentStatus':
+          return AppointmentStatusTypeTransformer().decode(value);
         case 'AsyncCheckoutDto':
           return AsyncCheckoutDto.fromJson(value);
         case 'AsyncCheckoutResponseDto':
@@ -206,6 +342,24 @@ class ApiClient {
           return AuthTokensDto.fromJson(value);
         case 'BookingResponseDto':
           return BookingResponseDto.fromJson(value);
+        case 'BookingScheduleDto':
+          return BookingScheduleDto.fromJson(value);
+        case 'BookingSearchResponseDto':
+          return BookingSearchResponseDto.fromJson(value);
+        case 'BookingServiceResponseDto':
+          return BookingServiceResponseDto.fromJson(value);
+        case 'BookingSpecialistResponseDto':
+          return BookingSpecialistResponseDto.fromJson(value);
+        case 'BookingStatus':
+          return BookingStatusTypeTransformer().decode(value);
+        case 'BookingStatusBreakdownDto':
+          return BookingStatusBreakdownDto.fromJson(value);
+        case 'BookingStatusChangeEventDto':
+          return BookingStatusChangeEventDto.fromJson(value);
+        case 'BookingStatusChangedByDto':
+          return BookingStatusChangedByDto.fromJson(value);
+        case 'BookingStatusUpdate':
+          return BookingStatusUpdateTypeTransformer().decode(value);
         case 'BusinessInfo':
           return BusinessInfo.fromJson(value);
         case 'BusinessInfoDto':
@@ -216,6 +370,12 @@ class ApiClient {
           return BusinessServicesResponseDto.fromJson(value);
         case 'BusinessType':
           return BusinessTypeTypeTransformer().decode(value);
+        case 'CancelEmployeeAppointmentDto':
+          return CancelEmployeeAppointmentDto.fromJson(value);
+        case 'CartItemResponseDto':
+          return CartItemResponseDto.fromJson(value);
+        case 'CategoryInfoDto':
+          return CategoryInfoDto.fromJson(value);
         case 'CategoryResponseDto':
           return CategoryResponseDto.fromJson(value);
         case 'CategorySummaryDto':
@@ -226,18 +386,72 @@ class ApiClient {
           return ChatbotRecommenderRequest.fromJson(value);
         case 'ChatbotRequest':
           return ChatbotRequest.fromJson(value);
+        case 'CheckDuplicateSlotDto':
+          return CheckDuplicateSlotDto.fromJson(value);
+        case 'CheckDuplicateSlotResponseDto':
+          return CheckDuplicateSlotResponseDto.fromJson(value);
+        case 'CheckEmailDto':
+          return CheckEmailDto.fromJson(value);
+        case 'CheckEmailResponseDto':
+          return CheckEmailResponseDto.fromJson(value);
         case 'CheckoutTicketResponseDto':
           return CheckoutTicketResponseDto.fromJson(value);
         case 'ClientKeyResponseDto':
           return ClientKeyResponseDto.fromJson(value);
+        case 'ClinicCertificationDto':
+          return ClinicCertificationDto.fromJson(value);
+        case 'ClinicInfoResponseDto':
+          return ClinicInfoResponseDto.fromJson(value);
+        case 'ClinicProductCategoryDto':
+          return ClinicProductCategoryDto.fromJson(value);
+        case 'ClinicProductDto':
+          return ClinicProductDto.fromJson(value);
+        case 'ClinicProductsResponseDto':
+          return ClinicProductsResponseDto.fromJson(value);
+        case 'ClinicReviewDto':
+          return ClinicReviewDto.fromJson(value);
+        case 'ClinicReviewFilterDto':
+          return ClinicReviewFilterDto.fromJson(value);
+        case 'ClinicReviewResponseSubDto':
+          return ClinicReviewResponseSubDto.fromJson(value);
+        case 'ClinicReviewSummaryDto':
+          return ClinicReviewSummaryDto.fromJson(value);
+        case 'ClinicReviewsResponseDto':
+          return ClinicReviewsResponseDto.fromJson(value);
+        case 'ClinicSpecialistPreviewDto':
+          return ClinicSpecialistPreviewDto.fromJson(value);
+        case 'ClinicTrustMetricsDto':
+          return ClinicTrustMetricsDto.fromJson(value);
+        case 'CompletionChecklistItemDto':
+          return CompletionChecklistItemDto.fromJson(value);
+        case 'ConfirmStripeSetupIntentDto':
+          return ConfirmStripeSetupIntentDto.fromJson(value);
+        case 'ConversationResponse':
+          return ConversationResponse.fromJson(value);
+        case 'ConversationResponseDto':
+          return ConversationResponseDto.fromJson(value);
+        case 'ConversationStatus':
+          return ConversationStatusTypeTransformer().decode(value);
+        case 'ConversationsPageResponse':
+          return ConversationsPageResponse.fromJson(value);
+        case 'CreateBroadcastDto':
+          return CreateBroadcastDto.fromJson(value);
         case 'CreateCategoryDto':
           return CreateCategoryDto.fromJson(value);
+        case 'CreateConversationDto':
+          return CreateConversationDto.fromJson(value);
         case 'CreateDoctorDto':
           return CreateDoctorDto.fromJson(value);
         case 'CreateDoctorProfileDto':
           return CreateDoctorProfileDto.fromJson(value);
+        case 'CreateFacilityReviewDto':
+          return CreateFacilityReviewDto.fromJson(value);
         case 'CreateMassageTherapistDto':
           return CreateMassageTherapistDto.fromJson(value);
+        case 'CreateMoMoPaymentDto':
+          return CreateMoMoPaymentDto.fromJson(value);
+        case 'CreateMoMoRefundDto':
+          return CreateMoMoRefundDto.fromJson(value);
         case 'CreatePartnerHealthServiceDefinitionDto':
           return CreatePartnerHealthServiceDefinitionDto.fromJson(value);
         case 'CreatePartnerHealthServiceDto':
@@ -246,16 +460,40 @@ class ApiClient {
           return CreatePartnerHealthServiceFacilityImageDto.fromJson(value);
         case 'CreatePartnerHealthServiceMediaDto':
           return CreatePartnerHealthServiceMediaDto.fromJson(value);
-        case 'CreatePartnerHealthServiceReviewDto':
-          return CreatePartnerHealthServiceReviewDto.fromJson(value);
         case 'CreateServiceTagDto':
           return CreateServiceTagDto.fromJson(value);
+        case 'CreateSkillDto':
+          return CreateSkillDto.fromJson(value);
         case 'CreateSpaTherapistDto':
           return CreateSpaTherapistDto.fromJson(value);
+        case 'CreateSpecialistReviewDto':
+          return CreateSpecialistReviewDto.fromJson(value);
+        case 'CreateStripePaymentDto':
+          return CreateStripePaymentDto.fromJson(value);
+        case 'CreateStripeSetupIntentResponseDto':
+          return CreateStripeSetupIntentResponseDto.fromJson(value);
         case 'CreateTherapistProfileDto':
           return CreateTherapistProfileDto.fromJson(value);
+        case 'CreateTreatmentReviewDto':
+          return CreateTreatmentReviewDto.fromJson(value);
+        case 'DashboardNotificationDto':
+          return DashboardNotificationDto.fromJson(value);
+        case 'DashboardReviewDto':
+          return DashboardReviewDto.fromJson(value);
+        case 'DashboardStatsResponseDto':
+          return DashboardStatsResponseDto.fromJson(value);
+        case 'DashboardTimePeriod':
+          return DashboardTimePeriodTypeTransformer().decode(value);
+        case 'DayScheduleDto':
+          return DayScheduleDto.fromJson(value);
         case 'DeleteFileResponseDto':
           return DeleteFileResponseDto.fromJson(value);
+        case 'DevicePlatform':
+          return DevicePlatformTypeTransformer().decode(value);
+        case 'DirectionsCoordinateDto':
+          return DirectionsCoordinateDto.fromJson(value);
+        case 'DirectionsResponseDto':
+          return DirectionsResponseDto.fromJson(value);
         case 'DistanceMatrixElementDto':
           return DistanceMatrixElementDto.fromJson(value);
         case 'DistanceMatrixResponseDto':
@@ -264,24 +502,92 @@ class ApiClient {
           return DistanceMatrixRowDto.fromJson(value);
         case 'DoctorProfileResponseDto':
           return DoctorProfileResponseDto.fromJson(value);
+        case 'DocumentEntryDto':
+          return DocumentEntryDto.fromJson(value);
+        case 'EmployeeAppointmentResponseDto':
+          return EmployeeAppointmentResponseDto.fromJson(value);
+        case 'EmployeeAssignedServiceDto':
+          return EmployeeAssignedServiceDto.fromJson(value);
+        case 'EmployeeBookingStatusFilter':
+          return EmployeeBookingStatusFilterTypeTransformer().decode(value);
+        case 'EmployeeComplianceItemDto':
+          return EmployeeComplianceItemDto.fromJson(value);
+        case 'EmployeeDetailAnalyticsResponseDto':
+          return EmployeeDetailAnalyticsResponseDto.fromJson(value);
+        case 'EmployeeDistributionDto':
+          return EmployeeDistributionDto.fromJson(value);
+        case 'EmployeeLoginDto':
+          return EmployeeLoginDto.fromJson(value);
+        case 'EmployeeMixMetricDto':
+          return EmployeeMixMetricDto.fromJson(value);
+        case 'EmployeeOverviewAnalyticsResponseDto':
+          return EmployeeOverviewAnalyticsResponseDto.fromJson(value);
+        case 'EmployeePerformanceSummaryDto':
+          return EmployeePerformanceSummaryDto.fromJson(value);
+        case 'EmployeeQualityMetricDto':
+          return EmployeeQualityMetricDto.fromJson(value);
         case 'EmployeeResponseDto':
           return EmployeeResponseDto.fromJson(value);
+        case 'EmployeeRevenueBreakdownItemDto':
+          return EmployeeRevenueBreakdownItemDto.fromJson(value);
+        case 'EmployeeRevenuePeriod':
+          return EmployeeRevenuePeriodTypeTransformer().decode(value);
+        case 'EmployeeRevenueSummaryResponseDto':
+          return EmployeeRevenueSummaryResponseDto.fromJson(value);
+        case 'EmployeeRevenueTrendPointDto':
+          return EmployeeRevenueTrendPointDto.fromJson(value);
+        case 'EmployeeRole':
+          return EmployeeRoleTypeTransformer().decode(value);
+        case 'EmployeeRoleDistributionDto':
+          return EmployeeRoleDistributionDto.fromJson(value);
+        case 'EmployeeScheduleLoadDto':
+          return EmployeeScheduleLoadDto.fromJson(value);
+        case 'EmployeeStatus':
+          return EmployeeStatusTypeTransformer().decode(value);
+        case 'EmployeeTimeSlotsResponseDto':
+          return EmployeeTimeSlotsResponseDto.fromJson(value);
+        case 'EmployeeTrendPointDto':
+          return EmployeeTrendPointDto.fromJson(value);
+        case 'FacilityDto':
+          return FacilityDto.fromJson(value);
+        case 'FacilityReviewResponseDto':
+          return FacilityReviewResponseDto.fromJson(value);
+        case 'FeaturedSpecialistResponseDto':
+          return FeaturedSpecialistResponseDto.fromJson(value);
         case 'FileUrlResponseDto':
           return FileUrlResponseDto.fromJson(value);
+        case 'FlagReviewDto':
+          return FlagReviewDto.fromJson(value);
+        case 'ForgotPasswordDto':
+          return ForgotPasswordDto.fromJson(value);
+        case 'Gender':
+          return GenderTypeTransformer().decode(value);
         case 'GeocodeResponseDto':
           return GeocodeResponseDto.fromJson(value);
         case 'GeocodeResultDto':
           return GeocodeResultDto.fromJson(value);
+        case 'HealthServiceDetailAnalyticsResponseDto':
+          return HealthServiceDetailAnalyticsResponseDto.fromJson(value);
+        case 'HealthServiceOverviewAnalyticsResponseDto':
+          return HealthServiceOverviewAnalyticsResponseDto.fromJson(value);
+        case 'HealthServiceStatus':
+          return HealthServiceStatusTypeTransformer().decode(value);
+        case 'HealthServiceType':
+          return HealthServiceTypeTypeTransformer().decode(value);
         case 'HomeRecommenderRequest':
           return HomeRecommenderRequest.fromJson(value);
+        case 'InventoryAlertDto':
+          return InventoryAlertDto.fromJson(value);
         case 'KycDocumentDto':
           return KycDocumentDto.fromJson(value);
+        case 'LastMessageDto':
+          return LastMessageDto.fromJson(value);
         case 'LegalRepresentativeDto':
           return LegalRepresentativeDto.fromJson(value);
         case 'LegalRepresentativeRequestDto':
           return LegalRepresentativeRequestDto.fromJson(value);
-        case 'LocationInfo':
-          return LocationInfo.fromJson(value);
+        case 'LocationInfoDto':
+          return LocationInfoDto.fromJson(value);
         case 'LocationListResponseDto':
           return LocationListResponseDto.fromJson(value);
         case 'LocationResponseDto':
@@ -290,24 +596,70 @@ class ApiClient {
           return LoginDto.fromJson(value);
         case 'LogoutResponseDto':
           return LogoutResponseDto.fromJson(value);
+        case 'MarkSettlementDto':
+          return MarkSettlementDto.fromJson(value);
+        case 'MedicalCredentialResponseDto':
+          return MedicalCredentialResponseDto.fromJson(value);
+        case 'MessageResponse':
+          return MessageResponse.fromJson(value);
+        case 'MessagesPageResponse':
+          return MessagesPageResponse.fromJson(value);
         case 'MicroLockDto':
           return MicroLockDto.fromJson(value);
         case 'MicroLockResponseDto':
           return MicroLockResponseDto.fromJson(value);
+        case 'MyProfileCompletionResponseDto':
+          return MyProfileCompletionResponseDto.fromJson(value);
         case 'MyProfileResponseDto':
           return MyProfileResponseDto.fromJson(value);
+        case 'NotificationResponseDto':
+          return NotificationResponseDto.fromJson(value);
+        case 'PaginatedEmployeeAppointmentsResponseDto':
+          return PaginatedEmployeeAppointmentsResponseDto.fromJson(value);
+        case 'PaginationMeta':
+          return PaginationMeta.fromJson(value);
+        case 'PaginationMetaResponseDto':
+          return PaginationMetaResponseDto.fromJson(value);
+        case 'ParticipantInfoDto':
+          return ParticipantInfoDto.fromJson(value);
+        case 'PartnerBookingCustomerDto':
+          return PartnerBookingCustomerDto.fromJson(value);
+        case 'PartnerBookingResponseDto':
+          return PartnerBookingResponseDto.fromJson(value);
+        case 'PartnerBookingServiceDto':
+          return PartnerBookingServiceDto.fromJson(value);
+        case 'PartnerBookingSlotDto':
+          return PartnerBookingSlotDto.fromJson(value);
+        case 'PartnerBookingSpecialistDto':
+          return PartnerBookingSpecialistDto.fromJson(value);
+        case 'PartnerBookingStatus':
+          return PartnerBookingStatusTypeTransformer().decode(value);
         case 'PartnerCategorySummaryDto':
           return PartnerCategorySummaryDto.fromJson(value);
         case 'PartnerClinicDto':
           return PartnerClinicDto.fromJson(value);
+        case 'PartnerCommerceSourceType':
+          return PartnerCommerceSourceTypeTypeTransformer().decode(value);
         case 'PartnerDayScheduleDto':
           return PartnerDayScheduleDto.fromJson(value);
+        case 'PartnerDetailProcedureStepDto':
+          return PartnerDetailProcedureStepDto.fromJson(value);
+        case 'PartnerDetailServiceManualDto':
+          return PartnerDetailServiceManualDto.fromJson(value);
+        case 'PartnerDetailServiceRuleDto':
+          return PartnerDetailServiceRuleDto.fromJson(value);
         case 'PartnerDocumentVerificationDto':
           return PartnerDocumentVerificationDto.fromJson(value);
         case 'PartnerFacilityImageDto':
           return PartnerFacilityImageDto.fromJson(value);
         case 'PartnerFeatureTagDto':
           return PartnerFeatureTagDto.fromJson(value);
+        case 'PartnerFinancePeriod':
+          return PartnerFinancePeriodTypeTransformer().decode(value);
+        case 'PartnerFinanceSummaryDto':
+          return PartnerFinanceSummaryDto.fromJson(value);
+        case 'PartnerFinanceTrendPointDto':
+          return PartnerFinanceTrendPointDto.fromJson(value);
         case 'PartnerHealthServiceDefinitionDto':
           return PartnerHealthServiceDefinitionDto.fromJson(value);
         case 'PartnerHealthServiceDetailResponseDto':
@@ -318,36 +670,94 @@ class ApiClient {
           return PartnerHealthServiceMediaDto.fromJson(value);
         case 'PartnerHealthServiceResponseDto':
           return PartnerHealthServiceResponseDto.fromJson(value);
-        case 'PartnerItemDto':
-          return PartnerItemDto.fromJson(value);
         case 'PartnerLoginDto':
           return PartnerLoginDto.fromJson(value);
+        case 'PartnerPayoutRecordDto':
+          return PartnerPayoutRecordDto.fromJson(value);
+        case 'PartnerPayoutStatus':
+          return PartnerPayoutStatusTypeTransformer().decode(value);
+        case 'PartnerPriority':
+          return PartnerPriorityTypeTransformer().decode(value);
+        case 'PartnerProcedureStepDto':
+          return PartnerProcedureStepDto.fromJson(value);
+        case 'PartnerProductTagDetailDto':
+          return PartnerProductTagDetailDto.fromJson(value);
+        case 'PartnerProductTagDto':
+          return PartnerProductTagDto.fromJson(value);
+        case 'PartnerProfileCompletionCertificationDto':
+          return PartnerProfileCompletionCertificationDto.fromJson(value);
+        case 'PartnerProfileCompletionIdentityDto':
+          return PartnerProfileCompletionIdentityDto.fromJson(value);
+        case 'PartnerPublicProfileResponseDto':
+          return PartnerPublicProfileResponseDto.fromJson(value);
         case 'PartnerRecommendedServiceDto':
           return PartnerRecommendedServiceDto.fromJson(value);
+        case 'PartnerRefundCaseRecordDto':
+          return PartnerRefundCaseRecordDto.fromJson(value);
+        case 'PartnerRefundCaseStatus':
+          return PartnerRefundCaseStatusTypeTransformer().decode(value);
+        case 'PartnerRefundCaseType':
+          return PartnerRefundCaseTypeTypeTransformer().decode(value);
         case 'PartnerRequestDto':
           return PartnerRequestDto.fromJson(value);
         case 'PartnerReviewDto':
           return PartnerReviewDto.fromJson(value);
+        case 'PartnerServiceManualDto':
+          return PartnerServiceManualDto.fromJson(value);
+        case 'PartnerServiceRuleDto':
+          return PartnerServiceRuleDto.fromJson(value);
+        case 'PartnerSettlementStatus':
+          return PartnerSettlementStatusTypeTransformer().decode(value);
         case 'PartnerSpecialistDto':
           return PartnerSpecialistDto.fromJson(value);
         case 'PartnerTimeSlotDto':
           return PartnerTimeSlotDto.fromJson(value);
+        case 'PartnerTransactionDetailDto':
+          return PartnerTransactionDetailDto.fromJson(value);
+        case 'PartnerTransactionRecordDto':
+          return PartnerTransactionRecordDto.fromJson(value);
+        case 'PartnerTransactionStatus':
+          return PartnerTransactionStatusTypeTransformer().decode(value);
+        case 'PartnerTransactionTimelineEventDto':
+          return PartnerTransactionTimelineEventDto.fromJson(value);
+        case 'PartnerTransactionType':
+          return PartnerTransactionTypeTypeTransformer().decode(value);
         case 'PartnerVerificationStatus':
           return PartnerVerificationStatusTypeTransformer().decode(value);
-        case 'PartnersResponseDto':
-          return PartnersResponseDto.fromJson(value);
+        case 'PasswordResetResponseDto':
+          return PasswordResetResponseDto.fromJson(value);
         case 'PresignRequestDto':
           return PresignRequestDto.fromJson(value);
         case 'PresignResponseDto':
           return PresignResponseDto.fromJson(value);
-        case 'PriceInfo':
-          return PriceInfo.fromJson(value);
+        case 'PriceBreakdownDto':
+          return PriceBreakdownDto.fromJson(value);
+        case 'ProcedureStepDto':
+          return ProcedureStepDto.fromJson(value);
+        case 'ProcedureStepInputDto':
+          return ProcedureStepInputDto.fromJson(value);
+        case 'PublicBookingStatus':
+          return PublicBookingStatusTypeTransformer().decode(value);
         case 'PublicCategoryDto':
           return PublicCategoryDto.fromJson(value);
         case 'PublicCategorySummaryDto':
           return PublicCategorySummaryDto.fromJson(value);
+        case 'PublicClinicCertificationDto':
+          return PublicClinicCertificationDto.fromJson(value);
         case 'PublicClinicDto':
           return PublicClinicDto.fromJson(value);
+        case 'PublicClinicFacilityImageDto':
+          return PublicClinicFacilityImageDto.fromJson(value);
+        case 'PublicClinicFeaturedServiceDto':
+          return PublicClinicFeaturedServiceDto.fromJson(value);
+        case 'PublicClinicInfoResponseDto':
+          return PublicClinicInfoResponseDto.fromJson(value);
+        case 'PublicClinicSpecialistPreviewDto':
+          return PublicClinicSpecialistPreviewDto.fromJson(value);
+        case 'PublicClinicTrustMetricsDto':
+          return PublicClinicTrustMetricsDto.fromJson(value);
+        case 'PublicEmployeeReviewResponseDto':
+          return PublicEmployeeReviewResponseDto.fromJson(value);
         case 'PublicEmployeeTimeSlotDto':
           return PublicEmployeeTimeSlotDto.fromJson(value);
         case 'PublicFacilityImageDto':
@@ -374,14 +784,32 @@ class ApiClient {
           return PublicHealthServiceResponseDto.fromJson(value);
         case 'PublicHealthServiceReviewResponseDto':
           return PublicHealthServiceReviewResponseDto.fromJson(value);
+        case 'PublicProfileAddressDto':
+          return PublicProfileAddressDto.fromJson(value);
+        case 'PublicProfileBusinessInfoDto':
+          return PublicProfileBusinessInfoDto.fromJson(value);
+        case 'PublicProfileCertificationDto':
+          return PublicProfileCertificationDto.fromJson(value);
+        case 'PublicProfileChecklistItemDto':
+          return PublicProfileChecklistItemDto.fromJson(value);
+        case 'PublicProfileCompletionSummaryDto':
+          return PublicProfileCompletionSummaryDto.fromJson(value);
+        case 'PublicProfileLegalSummaryDto':
+          return PublicProfileLegalSummaryDto.fromJson(value);
+        case 'PublicProfileStorefrontDto':
+          return PublicProfileStorefrontDto.fromJson(value);
         case 'PublicServiceTagDto':
           return PublicServiceTagDto.fromJson(value);
-        case 'RatingInfo':
-          return RatingInfo.fromJson(value);
         case 'RecommendationResponse':
           return RecommendationResponse.fromJson(value);
+        case 'RecommendedServiceResponseDto':
+          return RecommendedServiceResponseDto.fromJson(value);
         case 'RefreshTokenRequestDto':
           return RefreshTokenRequestDto.fromJson(value);
+        case 'RefundCaseActionDto':
+          return RefundCaseActionDto.fromJson(value);
+        case 'RegisterDeviceDto':
+          return RegisterDeviceDto.fromJson(value);
         case 'RegisterDto':
           return RegisterDto.fromJson(value);
         case 'RegisterPartnerDto':
@@ -390,36 +818,104 @@ class ApiClient {
           return RegisterPartnerResponseDto.fromJson(value);
         case 'RegisterProfileDto':
           return RegisterProfileDto.fromJson(value);
+        case 'ResetPasswordDto':
+          return ResetPasswordDto.fromJson(value);
+        case 'RetryPayoutDto':
+          return RetryPayoutDto.fromJson(value);
+        case 'RevenueDataPointDto':
+          return RevenueDataPointDto.fromJson(value);
         case 'ReviewItemDto':
           return ReviewItemDto.fromJson(value);
         case 'ReviewPartnerProfileDto':
           return ReviewPartnerProfileDto.fromJson(value);
         case 'ReviewPartnerResponseDto':
           return ReviewPartnerResponseDto.fromJson(value);
-        case 'ServiceDetail':
-          return ServiceDetail.fromJson(value);
+        case 'ReviewSummaryDto':
+          return ReviewSummaryDto.fromJson(value);
+        case 'SavedPaymentCardDto':
+          return SavedPaymentCardDto.fromJson(value);
+        case 'ServiceInfoDto':
+          return ServiceInfoDto.fromJson(value);
+        case 'ServiceManualInputDto':
+          return ServiceManualInputDto.fromJson(value);
+        case 'ServiceManualResponseDto':
+          return ServiceManualResponseDto.fromJson(value);
+        case 'ServicePerformanceDto':
+          return ServicePerformanceDto.fromJson(value);
+        case 'ServiceRuleDto':
+          return ServiceRuleDto.fromJson(value);
+        case 'ServiceRuleInputDto':
+          return ServiceRuleInputDto.fromJson(value);
         case 'ServiceTagResponseDto':
           return ServiceTagResponseDto.fromJson(value);
+        case 'SkillCatalogResponseDto':
+          return SkillCatalogResponseDto.fromJson(value);
+        case 'SpecialistInfoDto':
+          return SpecialistInfoDto.fromJson(value);
+        case 'SpecialistReviewResponseDto':
+          return SpecialistReviewResponseDto.fromJson(value);
+        case 'StaffScheduleEntryDto':
+          return StaffScheduleEntryDto.fromJson(value);
+        case 'StripePaymentResponseDto':
+          return StripePaymentResponseDto.fromJson(value);
+        case 'StripeRefundResponseDto':
+          return StripeRefundResponseDto.fromJson(value);
         case 'SurveyDto':
           return SurveyDto.fromJson(value);
         case 'SurveyResponseDto':
           return SurveyResponseDto.fromJson(value);
         case 'TherapistProfileResponseDto':
           return TherapistProfileResponseDto.fromJson(value);
+        case 'TimeSlotDto':
+          return TimeSlotDto.fromJson(value);
         case 'TotalPartnersResponseDto':
           return TotalPartnersResponseDto.fromJson(value);
+        case 'TreatmentReviewResponseDto':
+          return TreatmentReviewResponseDto.fromJson(value);
+        case 'UpcomingAppointmentDto':
+          return UpcomingAppointmentDto.fromJson(value);
+        case 'UpdateAvatarDto':
+          return UpdateAvatarDto.fromJson(value);
+        case 'UpdateBookingStatusDto':
+          return UpdateBookingStatusDto.fromJson(value);
         case 'UpdateCategoryDto':
           return UpdateCategoryDto.fromJson(value);
         case 'UpdateEmployeeDto':
           return UpdateEmployeeDto.fromJson(value);
+        case 'UpdateEmployeeProfileDto':
+          return UpdateEmployeeProfileDto.fromJson(value);
+        case 'UpdatePartnerCertificationDto':
+          return UpdatePartnerCertificationDto.fromJson(value);
         case 'UpdatePartnerDto':
           return UpdatePartnerDto.fromJson(value);
+        case 'UpdatePartnerHealthServiceDefinitionDto':
+          return UpdatePartnerHealthServiceDefinitionDto.fromJson(value);
         case 'UpdatePartnerHealthServiceDto':
           return UpdatePartnerHealthServiceDto.fromJson(value);
+        case 'UpdatePartnerProfileCompletionDto':
+          return UpdatePartnerProfileCompletionDto.fromJson(value);
+        case 'UpdatePartnerPublicProfileDto':
+          return UpdatePartnerPublicProfileDto.fromJson(value);
         case 'UpdateServiceTagDto':
           return UpdateServiceTagDto.fromJson(value);
+        case 'UserEligibilityDetailResponseDto':
+          return UserEligibilityDetailResponseDto.fromJson(value);
+        case 'UserProfileDto':
+          return UserProfileDto.fromJson(value);
+        case 'UserProfileSummaryResponseDto':
+          return UserProfileSummaryResponseDto.fromJson(value);
+        case 'ValidatePasswordResetCodeDto':
+          return ValidatePasswordResetCodeDto.fromJson(value);
+        case 'ValidatePasswordResetCodeResponseDto':
+          return ValidatePasswordResetCodeResponseDto.fromJson(value);
+        case 'VerificationDocumentEntryDto':
+          return VerificationDocumentEntryDto.fromJson(value);
         case 'VerifiedField':
           return VerifiedField.fromJson(value);
+        case 'WishlistItemResponseDto':
+          return WishlistItemResponseDto.fromJson(value);
+        case 'WorkHistoryEntryDto':
+          return WorkHistoryEntryDto.fromJson(value);
         case 'WorkScheduleEntryDto':
           return WorkScheduleEntryDto.fromJson(value);
         default:

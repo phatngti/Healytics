@@ -1,38 +1,112 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
+import 'package:user_app/core/services/sse_client.dart';
+import 'package:user_app/core/services/sse_event.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
 import 'package:user_app/core/utils/url_helper.dart';
 import 'package:user_app/core/utils/user_agent.dart';
 import 'package:user_openapi/api.dart';
 
+import 'auth_http_client.dart';
+
 /// Prefixes for different backend services behind
 /// the API gateway (Kong).
 ///
-/// Each value maps to a path segment appended to the
-/// base endpoint URL when creating its [ApiClient].
+/// **REST** entries produce an [ApiClient] in
+/// [ApiService.setEndpoint].
+/// **Real-time** entries (SSE / WS) are URL-only –
+/// used to build full URIs without duplicating path
+/// constants.
 enum ServicePrefix {
+  // ── REST (get an ApiClient) ───────────────────
   /// NestJS main backend: `/backend`
   backend('/backend'),
 
   /// AI / chatbot service: `/ai`
-  ai('/ai');
+  ai('/ai'),
 
-  const ServicePrefix(this.path);
+  // ── Real-time (URL-only, no ApiClient) ────────
+  /// SSE streaming via the AI service: `/ai`
+  aiSse('/ai', isRest: false),
+
+  /// WebSocket user-chat namespace: `/user-chat`
+  userChat('/user-chat', isRest: false),
+
+  /// WebSocket booking status namespace:
+  /// `/booking-events`
+  bookingEvents('/booking-events', isRest: false),
+
+  /// WebSocket partner-chat namespace:
+  /// `/partner-chat`
+  partnerChat('/partner-chat', isRest: false),
+
+  /// WebSocket notifications namespace:
+  /// `/notifications`
+  notifications('/notifications', isRest: false),
+
+  /// WebSocket chat notifications namespace:
+  /// `/chat-notifications`
+  chatNotifications('/chat-notifications', isRest: false);
+
+  const ServicePrefix(this.path, {this.isRest = true});
 
   /// The URL path segment for this service.
   final String path;
+
+  /// Whether an [ApiClient] should be created for
+  /// this prefix. `false` for SSE / WS entries.
+  final bool isRest;
+
+  /// All entries that need an [ApiClient].
+  static List<ServicePrefix> get restValues =>
+      values.where((v) => v.isRest).toList();
+
+  /// Builds a full HTTP URL from a gateway base.
+  ///
+  /// Example:
+  /// ```dart
+  /// ServicePrefix.backend.httpUrl(gateway)
+  /// // → 'https://api.healytics.vn/backend'
+  /// ```
+  String httpUrl(String gatewayUrl) => '$gatewayUrl$path';
+
+  /// Builds a WebSocket URL from a gateway base by
+  /// replacing http(s) with ws(s).
+  ///
+  /// Example:
+  /// ```dart
+  /// ServicePrefix.userChat.wsUrl(gateway)
+  /// // → 'wss://api.healytics.vn/user-chat'
+  /// ```
+  String wsUrl(String gatewayUrl) {
+    final wsBase = gatewayUrl
+        .replaceFirst('https://', 'wss://')
+        .replaceFirst('http://', 'ws://');
+    return '$wsBase$path';
+  }
 }
 
 class ApiService implements Authentication {
   final _clients = <ServicePrefix, ApiClient>{};
+  final AuthHttpClient? _authHttpClient;
+
+  /// The raw API gateway URL **without** any service
+  /// prefix (e.g. `https://api.healytics.vn`).
+  ///
+  /// Useful for WebSocket / Socket.IO connections
+  /// that append their own namespace.
+  String get gatewayUrl => _gatewayUrl;
+  String _gatewayUrl = '';
+
+  /// The current access token, or `null` if not set.
+  String? get accessToken => _accessToken;
 
   // ── Authentication & Account ──────────────────────
   late AuthenticationApi authenticateApi;
@@ -41,12 +115,53 @@ class ApiService implements Authentication {
   // ── Home / Products ───────────────────────────────
   late CategoriesApi categoriesApi;
   late PartnerServiceTagsApi partnerServiceTagsApi;
-  late HealthServicesApi healthServicesApi;
+  late UserHealthServicesApi userHealthServicesApi;
+
+  // ── Booking / Slots ───────────────────────────────
+  late UserBookingSearchApi userBookingSearchApi;
+  late UserBookingsApi userBookingsApi;
+  late UserSlotsApi userSlotsApi;
+
+  // ── Appointments ──────────────────────────────────
+  late UserAppointmentsApi userAppointmentsApi;
+
+  // ── Reviews ───────────────────────────────────────
+  late UserReviewsApi userReviewsApi;
+
+  // ── Recommender (AI service) ──────────────────
+  late RecommenderApi recommenderApi;
+
+  // ── Notifications ─────────────────────────────────
+  late UserNotificationsApi userNotificationsApi;
+
+  // ── Devices ────────────────────────────────────────
+  late UserDevicesApi userDevicesApi;
+
+  // ── Chat ───────────────────────────────────────────
+  late UserChatApi userChatApi;
 
   // ── Chatbot (AI service) ──────────────────────────
   late ChatbotApi chatbotApi;
 
-  ApiService() {
+  // ── Employees ─────────────────────────────────────
+  late UserEmployeesApi userEmployeesApi;
+
+  // ── User Categories ───────────────────────────────
+  late UserCategoriesApi userCategoriesApi;
+
+  // ── Payments ──────────────────────────────────────
+  late UserPaymentsApi userPaymentsApi;
+
+  // ── Clinics ───────────────────────────────────────
+  late UserClinicsApi userClinicsApi;
+
+  // ── Cart ────────────────────────────────────────
+  late CartApi cartApi;
+
+  // ── Mapbox ──────────────────────────────────────
+  late MapboxApi mapboxApi;
+
+  ApiService({AuthHttpClient? httpClient}) : _authHttpClient = httpClient {
     // Eagerly initialise so late fields are never
     // accessed before the endpoint is resolved.
     setEndpoint('');
@@ -82,13 +197,22 @@ class ApiService implements Authentication {
   // ── Endpoint management ───────────────────────────
 
   dynamic setEndpoint(String endPoint) {
+    _gatewayUrl = endPoint;
+
     // Create one ApiClient per service prefix.
-    for (final prefix in ServicePrefix.values) {
-      _clients[prefix] = ApiClient(
+    for (final prefix in ServicePrefix.restValues) {
+      final client = ApiClient(
         basePath: '$endPoint${prefix.path}',
         authentication: this,
       );
+      if (_authHttpClient != null) {
+        client.client = _authHttpClient;
+      }
+      _clients[prefix] = client;
     }
+
+    // Update backend base path for refresh calls.
+    _authHttpClient?.backendBasePath = '$endPoint${ServicePrefix.backend.path}';
 
     _setUserAgentHeaders();
 
@@ -104,10 +228,25 @@ class ApiService implements Authentication {
     accountApi = AccountApi(backend);
     categoriesApi = CategoriesApi(backend);
     partnerServiceTagsApi = PartnerServiceTagsApi(backend);
-    healthServicesApi = HealthServicesApi(backend);
+    userBookingSearchApi = UserBookingSearchApi(backend);
+    userBookingsApi = UserBookingsApi(backend);
+    userSlotsApi = UserSlotsApi(backend);
+    userAppointmentsApi = UserAppointmentsApi(backend);
+    userEmployeesApi = UserEmployeesApi(backend);
+    userCategoriesApi = UserCategoriesApi(backend);
+    userPaymentsApi = UserPaymentsApi(backend);
+    userClinicsApi = UserClinicsApi(backend);
+    cartApi = CartApi(backend);
+    userHealthServicesApi = UserHealthServicesApi(backend);
+    userReviewsApi = UserReviewsApi(backend);
+    userNotificationsApi = UserNotificationsApi(backend);
+    userDevicesApi = UserDevicesApi(backend);
+    userChatApi = UserChatApi(backend);
+    mapboxApi = MapboxApi(backend);
 
     // ── AI APIs ─────────────────────────────────────
     chatbotApi = ChatbotApi(ai);
+    recommenderApi = RecommenderApi(ai);
   }
 
   /// Applies the User-Agent header to every client.
@@ -201,7 +340,7 @@ class ApiService implements Authentication {
   Future<void> setAccessToken(String accessToken) async {
     _accessToken = accessToken;
     await Store.put(StoreKey.accessToken, accessToken);
-    log('Access token updated', name: 'ApiService');
+    _log.info('Access token updated');
   }
 
   Future<void> setDeviceInfoHeader() async {
@@ -240,5 +379,32 @@ class ApiService implements Authentication {
     });
 
     return header;
+  }
+
+  // ── SSE convenience ─────────────────────────────
+
+  /// Opens an SSE stream to [path] on [prefix] with
+  /// the current auth headers injected automatically.
+  ///
+  /// [method] must be `'GET'` or `'POST'`.
+  /// For POST requests, pass a JSON [body].
+  Stream<SseEvent> openSseStream({
+    required ServicePrefix prefix,
+    required String method,
+    required String path,
+    Map<String, dynamic>? body,
+  }) {
+    final basePath = clientFor(prefix).basePath;
+    final url = '$basePath$path';
+    final headers = getRequestHeaders();
+
+    return switch (method.toUpperCase()) {
+      'POST' => SseClient.instance.post(
+        url,
+        headers: headers,
+        body: body ?? {},
+      ),
+      _ => SseClient.instance.get(url, headers: headers),
+    };
   }
 }

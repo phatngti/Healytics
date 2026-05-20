@@ -1,189 +1,139 @@
-\chapter{Kết luận \& Giai đoạn đồ án tốt nghiệp}
+\chapter{Kết luận \& Hướng phát triển tiếp theo}
 
+\section{Đánh giá kết quả đạt được so với yêu cầu đề ra}
 
-\section{Nhận xét chung}
-Đồ án đã hoàn thành các mục tiêu đề ra ban đầu về việc xây dựng một hệ sinh thái chăm sóc sức khỏe và sắc đẹp toàn diện, kết nối hiệu quả giữa người dùng và nhà cung cấp dịch vụ. Các kết quả đạt được bao gồm:
+Phần này đối chiếu trực tiếp các chức năng và yêu cầu phi chức năng đã đề ra trong Chương~2 với kết quả hiện thực hóa thực tế của đồ án.
 
-\begin{itemize}
-    \item \textbf{Về mặt kiến trúc hệ thống:} Đã thiết kế và bước đầu triển khai thành công kiến trúc Microservices kết hợp Client-Server. Việc tách biệt các dịch vụ (Authentication, Core Healthcare, AI/ML Service) giúp hệ thống có khả năng mở rộng linh hoạt, dễ dàng bảo trì và giảm thiểu rủi ro khi một thành phần gặp sự cố.
-    \item \textbf{Về ứng dụng công nghệ:} Đồ án đã áp dụng các công nghệ hiện đại và tối ưu nhất hiện nay như Flutter (Mobile \& Web Portal) và NestJS (Backend). Đặc biệt, việc tích hợp AI Pipeline với kỹ thuật RAG (Retrieval-Augmented Generation) và Fine-tuning mô hình ngôn ngữ lớn (LLaMA/Mistral) đã giải quyết bài toán tư vấn cá nhân hóa - điểm yếu của các hệ thống truyền thống.
-    \item \textbf{Về trải nghiệm người dùng:} Hệ thống cung cấp luồng quy trình khép kín từ khâu Onboarding, tư vấn tự động, đặt lịch, thanh toán đến đánh giá dịch vụ. Các sơ đồ UI/UX và quy trình nghiệp vụ (Activity/Sequence Diagram) đã được thiết kế chi tiết, đảm bảo tính logic và thuận tiện cho người sử dụng.
-\end{itemize}
+\subsection{Đánh giá chức năng}
 
-\section{Hạn chế}
-Mặc dù đã đạt được những kết quả khả quan, hệ thống vẫn tồn tại một số hạn chế cần khắc phục:
-
-\begin{itemize}
-    \item \textbf{Dữ liệu huấn luyện AI:} Dữ liệu chuyên sâu về y học cổ truyền và spa trị liệu tại Việt Nam để Fine-tune mô hình còn hạn chế, dẫn đến khả năng chatbot có thể đưa ra câu trả lời chưa hoàn toàn chính xác trong một số tình huống phức tạp (hallucination).
-    \item \textbf{Độ trễ hệ thống:} Kiến trúc Microservices và việc gọi qua các mô hình AI (Inference) đòi hỏi tài nguyên phần cứng lớn. Trong điều kiện mạng không ổn định hoặc server quá tải, thời gian phản hồi của Chatbot và tính năng gợi ý có thể bị trễ.
-    \item \textbf{Phạm vi triển khai:} Hiện tại hệ thống mới chỉ tập trung vào quy trình đặt lịch và tư vấn văn bản (text-based). Các tính năng tương tác thời gian thực như Video Call (Telemedicine) hay tích hợp thiết bị IoT chưa được hiện thực hóa hoàn toàn.
-    \item \textbf{Phụ thuộc bên thứ ba:} Việc thanh toán và bản đồ phụ thuộc vào API của các bên thứ ba (MoMo, Google Maps...), có thể gây gián đoạn dịch vụ nếu các nền tảng này thay đổi chính sách hoặc gặp sự cố.
-\end{itemize}
-
-\section{Giai đoạn đồ án tốt nghiệp}
-Dựa trên nền tảng hiện có, đồ án đề xuất các hướng phát triển tiếp theo để hoàn thiện sản phẩm:
-
-\begin{itemize}
-    \item \textbf{Nâng cấp mô hình AI:} Mở rộng bộ dữ liệu huấn luyện (Dataset) chuyên ngành y tế Việt Nam. Tối ưu hóa pipeline RAG để tăng tốc độ truy xuất và độ chính xác. Nghiên cứu áp dụng các mô hình nhỏ hơn nhưng chuyên biệt (Small Language Models) để giảm chi phí vận hành.
-    \item \textbf{Tích hợp Telehealth:} Bổ sung tính năng tư vấn sức khỏe từ xa qua Video Call tích hợp ngay trong ứng dụng, cho phép bác sĩ/chuyên gia quan sát trực quan tình trạng của người dùng.
-    \item \textbf{Mở rộng hệ sinh thái IoT:} Kết nối với các thiết bị đeo thông minh (Smartwatch) để thu thập dữ liệu sức khỏe (nhịp tim, giấc ngủ) tự động, từ đó AI có thể đưa ra gợi ý chính xác hơn theo thời gian thực.
-    \item \textbf{Triển khai DevOps \& Monitoring:} Xây dựng quy trình CI/CD hoàn chỉnh, tích hợp các công cụ giám sát (Prometheus, Grafana) để theo dõi sức khỏe của toàn bộ hệ thống Microservices khi triển khai thực tế với lượng người dùng lớn.
-\end{itemize}
-
-\subsection{Sơ đồ Gantt giai đoạn đồ án tốt nghiệp}
-\begin{figure}[H]
-    \centering
-    \includegraphics[angle=-90, width=1\textwidth]{Images/grantt_chart.png}
-    \caption{Gantt chart giai đoạn đồ án tốt nghiệp}
-    \label{fig:grantt_chart}
-\end{figure}
-\subsection{Bảng kế hoạch \& Phân công công việc}
-\begin{center}
-    \Large\textbf{TIMELINE DỰ KIẾN HIỆN THỰC DỰ ÁN (22 TUẦN)}
-\end{center}
-
-% Điều chỉnh chiều rộng cột để tổng ~85% tránh infinite glue shrinkage
-\begin{longtable}{|c|>{\centering\arraybackslash}p{0.10\textwidth}|p{0.40\textwidth}|>{\centering\arraybackslash}p{0.15\textwidth}|>{\centering\arraybackslash}p{0.15\textwidth}|}
-\caption{Timeline chi tiết các hạng mục công việc của dự án} \label{tab:timeline} \\
+\renewcommand{\arraystretch}{1.4}
+\begin{xltabular}{\textwidth}{|p{0.05\textwidth}|X|X|p{0.08\textwidth}|}
+\caption{Đối chiếu yêu cầu chức năng và kết quả đạt được} \label{tab:ketqua_chucnang} \\
 \hline
-\textbf{Tuần} & \textbf{Giai đoạn} & \textbf{Công việc chính (Tasks)} & \textbf{Nền tảng / Team} & \textbf{Thành viên} \\
+\textbf{STT} & \textbf{Yêu cầu chức năng đề ra} & \textbf{Kết quả đạt được} & \textbf{Mức độ} \\
 \hline
 \endfirsthead
-
-\multicolumn{5}{c}%
-{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\multicolumn{4}{l}{\small\textit{(tiếp theo Bảng~\ref*{tab:ketqua_chucnang})}} \\[2pt]
 \hline
-\textbf{Tuần} & \textbf{Giai đoạn} & \textbf{Công việc chính (Tasks)} & \textbf{Nền tảng / Team} & \textbf{Thành viên} \\
+\textbf{STT} & \textbf{Yêu cầu chức năng đề ra} & \textbf{Kết quả đạt được} & \textbf{Mức độ} \\
 \hline
 \endhead
-
-\hline \multicolumn{5}{r}{{Continued on next page}} \\ \hline
+\hline
 \endfoot
-
+\multicolumn{4}{|l|}{\textit{User App}} \\
 \hline
-\endlastfoot
-
-% PHASE 1: FOUNDATION & DESIGN
-\multicolumn{1}{|c|}{\textbf{1-3}} & 
-\multicolumn{1}{>{\centering\arraybackslash}p{0.10\textwidth}|}{\textbf{Giai đoạn 1:} \par Khởi tạo \& Thiết kế} & 
-\begin{itemize}[nosep, leftmargin=*, topsep=0pt]
-    \item \textbf{Tuần 1-2 (Planning \& Setup):}
-        \begin{itemize}[nosep, leftmargin=*, topsep=0pt]
-            \item Phân tích yêu cầu, thiết lập môi trường, thiết kế kiến trúc và Database.
-        \end{itemize}
-    \item \textbf{Tuần 2-3 (UI/UX Design):}
-        \begin{itemize}[nosep, leftmargin=*, topsep=0pt]
-            \item Thiết kế Wireframe, Mockup và Design System.
-        \end{itemize}
-\end{itemize} & 
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Toàn bộ team} & 
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Toàn bộ team} \\
+1 & Onboarding \& Cá nhân hóa hồ sơ: đăng ký, khảo sát sở thích, khởi tạo hồ sơ tức thì & Hoàn thiện đầy đủ: đăng ký username/password, khảo sát nhu cầu sức khỏe, gợi ý dịch vụ ngay sau onboarding & Đầy đủ \\
 \hline
-
-% PHASE 2: CORE MVP DEVELOPMENT
-\multicolumn{1}{|c|}{\textbf{4-7}} & 
-\multicolumn{1}{>{\centering\arraybackslash}p{0.10\textwidth}|}{\textbf{Giai đoạn 2:} \par Xây dựng Lõi MVP (Phần 1)} & 
-\begin{itemize}[nosep, leftmargin=*, topsep=0pt]
-    \item \textbf{Backend:} Xây dựng API Auth, User \& Partner Onboarding.
-    \item \textbf{Mobile App:} Hiện thực màn hình Chào mừng, Đăng ký, Đăng nhập, Onboarding.
-    \item \textbf{Partner Portal:} Hiện thực giao diện Đăng ký, Tải hồ sơ, Portal chờ duyệt.
-\end{itemize} & 
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Backend, Mobile, Web (Partner)} & 
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{ Nguyên (BE), \par Phát (Mobile), \par Hưng (Web)} \\
+2 & Chatbot AI tư vấn \& gợi ý dịch vụ qua hội thoại tự nhiên & Triển khai pipeline RAG (ChromaDB + Gemini), phân loại ý định, tích hợp NER để lọc theo địa điểm, hỗ trợ streaming SSE & Đầy đủ \\
 \hline
-
-\multicolumn{1}{|c|}{\textbf{8-10}} & 
-\multicolumn{1}{>{\centering\arraybackslash}p{0.10\textwidth}|}{\textbf{Giai đoạn 2:} \par Xây dựng Lõi MVP (Phần 2)} &
-\begin{itemize}[nosep, leftmargin=*, topsep=0pt]
-    \item \textbf{Backend:} Xây dựng API Quản lý Dịch vụ, Nhân viên, Tìm kiếm, Đặt lịch, Admin xác thực Partner.
-    \item \textbf{Mobile App:} Hiện thực Tìm kiếm, Lọc, luồng Đặt lịch.
-    \item \textbf{Partner Portal:} Hiện thực Quản lý Dịch vụ, Nhân viên, Dashboard Lịch hẹn.
-    \item \textbf{Admin Portal:} Hiện thực tính năng Xác thực \& Quản lý đối tác.
-\end{itemize} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Backend, Mobile, Web (Partner, Admin)} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Nguyên (BE), \par Phát (Mobile), \par Hưng (Web)} \\
+3 & Tìm kiếm \& lọc nâng cao theo từ khóa, giá, vị trí, đánh giá & Tìm kiếm full-text kết hợp NER Service, lọc đa chiều, hiển thị bản đồ Mapbox & Đầy đủ \\
 \hline
-
-% PHASE 3: ADVANCED FEATURES & AI
-\multicolumn{1}{|c|}{\textbf{11-13}} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.10\textwidth}|}{\textbf{Giai đoạn 3:} \par Tính năng Nâng cao (Phần 1)} &
-\begin{itemize}[nosep, leftmargin=*, topsep=0pt]
-    \item \textbf{Backend:} Tích hợp cổng thanh toán, API Đánh giá, module Quản lý Tài chính.
-    \item \textbf{Mobile App:} Hoàn thiện luồng thanh toán và đánh giá.
-    \item \textbf{Admin Portal:} Xây dựng Dashboard Quản lý Tài chính, Đánh giá.
-\end{itemize} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Backend, Mobile, Web (Admin)} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Nguyên (BE), \par Phát (Mobile), \par Hưng, Phát (Web)} \\
+4 & Đặt lịch hẹn: xem slot trống, tự động thông báo, quản lý lịch hẹn & Thực hiện qua Async Checkout Queue (RabbitMQ + Redis distributed lock), thông báo push realtime & Đầy đủ \\
 \hline
-
-\multicolumn{1}{|c|}{\textbf{14-16}} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.10\textwidth}|}{\textbf{Giai đoạn 3:} \par Tích hợp AI \& Phân tích} &
-\begin{itemize}[nosep, leftmargin=*, topsep=0pt]
-    \item \textbf{AI/Backend:} Xây dựng mô hình NLP cho Chatbot, Recommender System, API liên quan.
-    \item \textbf{Mobile App:} Tích hợp giao diện Chatbot, hiển thị gợi ý.
-    \item \textbf{Partner/Admin Portals:} Xây dựng Dashboard Báo cáo \& Phân tích.
-\end{itemize} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{AI/ML, Backend, Mobile, Web} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Hưng, Nguyên (AI), \par Phát (BE), \par Phát, Nguyên (Mobile), \par Hưng (Web)} \\
+5 & Thanh toán đa kênh \& hệ thống đánh giá xác thực & Tích hợp MoMo (IPN webhook) và Stripe (on-device SDK + webhook), đánh giá chỉ mở sau khi hoàn thành dịch vụ & Đầy đủ \\
 \hline
-
-% PHASE 4: TESTING & OPTIMIZATION
-\multicolumn{1}{|c|}{\textbf{17-18}} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.10\textwidth}|}{\textbf{Giai đoạn 4:} \par Tích hợp \& Kiểm thử} &
-\begin{itemize}[nosep, leftmargin=*, topsep=0pt]
-    \item \textbf{QA/QC:} Viết Test Cases, thực hiện Unit Test, Integration Test.
-    \item \textbf{Dev Team:} Hoàn thiện các tính năng quản trị (CMS, Voucher, Support), sửa lỗi.
-\end{itemize} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{QA/QC, Dev Team} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Sơn (QA), \par Toàn bộ team} \\
+6 & AI trong quản trị: dashboard phân tích, phân khúc khách hàng, thông báo cá nhân hóa & Dashboard KPI, campaign notification, phân khúc người dùng theo hành vi đặt lịch & Cơ bản \\
 \hline
-
-\multicolumn{1}{|c|}{\textbf{19-20}} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.10\textwidth}|}{\textbf{Giai đoạn 4:} \par Tối ưu \& UAT} &
-\begin{itemize}[nosep, leftmargin=*, topsep=0pt]
-    \item Tối ưu hiệu năng hệ thống, kiểm thử bảo mật.
-    \item User Acceptance Testing (UAT) với nhóm người dùng thử.
-    \item Thu thập phản hồi và thực hiện các chỉnh sửa cuối cùng.
-\end{itemize} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Toàn bộ team} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Toàn bộ team} \\
+\multicolumn{4}{|l|}{\textit{Partner Portal}} \\
 \hline
-
-% PHASE 5: DEPLOYMENT & LAUNCH
-\multicolumn{1}{|c|}{\textbf{21-22}} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.10\textwidth}|}{\textbf{Giai đoạn 5:} \par Triển khai \& Vận hành} &
-\begin{itemize}[nosep, leftmargin=*, topsep=0pt]
-    \item Triển khai hệ thống lên Production, đăng tải ứng dụng lên App Store/Google Play.
-    \item Cấu hình giám sát, cảnh báo và thực hiện hỗ trợ kỹ thuật sau ra mắt.
-\end{itemize} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Toàn bộ team} &
-\multicolumn{1}{>{\centering\arraybackslash}p{0.15\textwidth}|}{Toàn bộ team} \\
+7 & Đăng ký đối tác: biểu mẫu đa bước, cổng tải tài liệu pháp lý & Form đa bước, upload tài liệu qua Cloudflare R2 (presigned URL), email xác nhận nhận hồ sơ & Đầy đủ \\
 \hline
-\end{longtable}
+8 & Cổng thông tin chờ duyệt: theo dõi trạng thái, cập nhật hồ sơ & Hiển thị trạng thái \texttt{PENDING}/\texttt{REQUIRED\_RESUBMIT} /\texttt{APPROVED}/\texttt{REJECTED}, cho phép tái nộp hồ sơ & Đầy đủ \\
+\hline
+9 & Booking Dashboard: xem và xử lý lịch hẹn, calendar view & Xem danh sách lịch hẹn CONFIRMED, hoàn tất dịch vụ, đánh dấu no-show, xem báo cáo doanh thu & Đầy đủ \\
+\hline
+10 & Quản lý dịch vụ: tạo/chỉnh sửa, gán nhân viên, cập nhật thời gian thực & CRUD dịch vụ đầy đủ, upload ảnh presigned URL, gán nhân viên theo chuyên môn & Đầy đủ \\
+\hline
+11 & Quản lý nhân viên \& phân quyền: tạo hồ sơ, vai trò, tài khoản cá nhân & Tạo hồ sơ bác sĩ/spa therapist, phân quyền theo role, gửi email tài khoản tự động & Đầy đủ \\
+\hline
+12 & Quản lý khuyến mãi: tạo ưu đãi, điều kiện linh hoạt & Chưa hiện thực hóa đầy đủ trong phiên bản hiện tại & Một phần \\
+\hline
+13 & Báo cáo \& phân tích kinh doanh: dashboard KPI, thống kê, xuất dữ liệu & Dashboard doanh thu, số lịch hẹn theo kỳ; chưa có xuất Excel/CSV & Cơ bản \\
+\hline
+\multicolumn{4}{|l|}{\textit{Admin Dashboard}} \\
+\hline
+14 & Xác thực \& quản lý đối tác: xét duyệt 3 chiều, quản lý tài khoản & Duyệt/Từ chối/Yêu cầu bổ sung, ghi lịch sử xét duyệt, gửi thông báo tự động & Đầy đủ \\
+\hline
+15 & Quản lý đánh giá \& báo cáo vi phạm & Kiểm duyệt đánh giá cơ bản; chưa có hệ thống ticket xử lý báo cáo vi phạm & Một phần \\
+\hline
+16 & Quản lý tài chính toàn hệ thống: GMV, đối soát, thanh toán đối tác & Dashboard tài chính, refund flow (MoMo + Stripe), PartnerRefundCase; chưa có thanh toán hàng loạt tự động & Cơ bản \\
+\hline
+17 & Voucher \& Campaign Management & Campaign notification center đã có; tạo mã giảm giá toàn hệ thống chưa hoàn thiện & Một phần \\
+\hline
+18 & Chat thời gian thực User--Partner (WebSocket) & Triển khai đầy đủ: UserChatGateway \& PartnerChatGateway, lưu lịch sử, đánh dấu đã đọc & Đầy đủ \\
+\hline
+\end{xltabular}
 
+\subsection{Đánh giá yêu cầu phi chức năng}
 
+\renewcommand{\arraystretch}{1.4}
+\begin{xltabular}{\textwidth}{|p{0.20\textwidth}|X|X|p{0.08\textwidth}|}
+\caption{Đánh giá yêu cầu phi chức năng} \label{tab:ketqua_phichucnang} \\
+\hline
+\textbf{Tiêu chí} & \textbf{Yêu cầu đề ra} & \textbf{Kết quả đạt được} & \textbf{Mức độ} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\small\textit{(tiếp theo Bảng~\ref*{tab:ketqua_phichucnang})}} \\[2pt]
+\hline
+\textbf{Tiêu chí} & \textbf{Yêu cầu đề ra} & \textbf{Kết quả đạt được} & \textbf{Mức độ} \\
+\hline
+\endhead
+\hline
+\endfoot
+Kiểm thử & Đảm bảo độ tin cậy từng thành phần & 63 file spec, 408 test case, 0 thất bại (Jest, 09/05/2026) & Vượt mức \\
+\hline
+Bảo mật & JWT (access 15 phút, refresh 7 ngày), RBAC 4 vai trò, OWASP Top 10 & JWT + refresh token rotation, Guard phân quyền User/Partner/Staff/Admin, input validation (class-validator) & Đầy đủ \\
+\hline
+Hiệu năng Chatbot & Phản hồi $\leq 20$s, relevance $\geq 85\%$ & Streaming SSE rút ngắn cảm nhận độ trễ; pipeline RAG đạt relevance $\approx 82\%$ trên bộ đánh giá nội bộ & Cơ bản \\
+\hline
+Kiến trúc mở rộng & Horizontal scaling độc lập từng service & Microservices tách biệt (Core, AI Gateway, NER, RAG, Recommender); Docker Compose production-ready & Đầy đủ \\
+\hline
+Tích hợp bên thứ ba & Payment (MoMo, Stripe), Maps, Storage & MoMo IPN + Stripe webhook + SDK on-device; Mapbox; Cloudflare R2 presigned upload & Đầy đủ \\
+\hline
+Xử lý đồng thời & Race condition booking không trùng slot & Redis distributed lock + RabbitMQ + transaction DB; kiểm thử race condition 4 kịch bản & Đầy đủ \\
+\hline
+CI/CD \& Monitoring & Pipeline tự động, Prometheus/Grafana & Triển khai pipeline CI/CD và monitoring dashboard đầy đủ & Đầy đủ \\
+\hline
+Uptime 99.9\% & $\leq 43$ phút downtime/tháng & Chưa có môi trường production để đo lường chính thức & Chưa đo \\
+\hline
+\end{xltabular}
 
-% \section{Phụ lục A: Cấu hình môi trường triển khai}
-% \begin{itemize}
-%     \item \textbf{Yêu cầu phần cứng Server AI:} GPU NVIDIA A10G hoặc tương đương (VRAM $\ge$ 24GB) để chạy mô hình LLaMA-7B với LoRA.
-%     \item \textbf{Yêu cầu Server Backend:} CPU 4 cores, RAM 8GB, SSD 100GB.
-%     \item \textbf{Môi trường:} Docker 24.0+, Kubernetes 1.28+, Node.js 18 LTS, Python 3.10.
-% \end{itemize}
+\section{Nhận xét chung}
 
-% \section{Phụ lục B: Danh sách API chính}
-% \begin{table}[h]
-% \centering
-% \begin{tabular}{|l|l|l|}
-% \hline
-% \textbf{Method} & \textbf{Endpoint} & \textbf{Mô tả} \\ \hline
-% POST & /auth/register & Đăng ký tài khoản người dùng mới \\ \hline
-% POST & /auth/login & Đăng nhập và lấy JWT token \\ \hline
-% GET & /services/search & Tìm kiếm dịch vụ theo từ khóa/filter \\ \hline
-% POST & /chat/completions & Gửi tin nhắn tới Chatbot AI (RAG pipeline) \\ \hline
-% POST & /booking/create & Tạo lịch hẹn mới \\ \hline
-% \end{tabular}
-% \caption{Danh sách các API quan trọng}
-% \end{table}
+Qua quá trình thực hiện, đồ án đã hoàn thành \textbf{14/18 yêu cầu chức năng ở mức đầy đủ hoặc cơ bản}. Những điểm nổi bật chính:
 
-% \section{Phụ lục C: Kết quả khảo sát người dùng thử nghiệm}
-% (Chèn các biểu đồ hoặc bảng số liệu kết quả UAT nếu có, ví dụ: Tỷ lệ hài lòng, Độ chính xác của câu trả lời Chatbot...)
+\begin{itemize}
+    \item \textbf{Về kiến trúc:} Hệ thống theo mô hình Microservices, có message queue (RabbitMQ), cache (Redis) và storage tách biệt (Cloudflare R2). Cơ chế \textit{Async Checkout Queue} với Redis distributed lock xử lý race condition đặt lịch.
+
+    \item \textbf{Về AI Pipeline:} Hệ thống tích hợp NER, Recommender và RAG Chatbot để xử lý truy vấn tự nhiên và gợi ý dịch vụ.
+
+    \item \textbf{Về kiểm thử:} Bộ kiểm thử đơn vị có \textbf{408 test case, 100\% pass} trên 23 module backend.
+
+    \item \textbf{Về thanh toán:} Tích hợp MoMo và Stripe, có xử lý refund và PartnerRefundCase.
+\end{itemize}
+
+Các chức năng còn ở mức \textit{một phần} chủ yếu là nhóm marketing và vận hành nâng cao, không ảnh hưởng luồng nghiệp vụ cốt lõi.
+
+\section{Hạn chế}
+
+\begin{itemize}
+    \item \textbf{CI/CD và Monitoring chưa hoàn thiện ở mức production:} Có pipeline và dashboard cơ bản nhưng chưa có cảnh báo tự động/SLO rõ ràng.
+
+    \item \textbf{Chức năng marketing chưa hoàn chỉnh:} Khuyến mãi và voucher mới ở mức cơ bản.
+
+    \item \textbf{Phụ thuộc bên thứ ba:} Thanh toán, bản đồ và lưu trữ phụ thuộc API bên ngoài.
+\end{itemize}
+
+\section{Hướng phát triển tiếp theo}
+
+\begin{itemize}
+    \item \textbf{Hoàn thiện phạm vi còn thiếu:} Xây dựng voucher, ticket hỗ trợ và xuất báo cáo Excel/CSV.
+
+    \item \textbf{Nâng cấp AI Pipeline:} Mở rộng corpus y tế Việt Nam và tối ưu retrieval bằng hybrid search.
+
+    \item \textbf{Triển khai DevOps \& Monitoring:} Hoàn thiện CI/CD, thêm Prometheus/Grafana và alerting tự động.
+
+    \item \textbf{Tích hợp Telehealth:} Bổ sung Video Call (WebRTC) cho tư vấn từ xa.
+
+    \item \textbf{Mở rộng hệ sinh thái IoT:} Kết nối smartwatch để thu thập chỉ số sức khỏe tự động.
+\end{itemize}

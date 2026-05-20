@@ -10,8 +10,16 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
   AppointmentRepositoryImpl(this._datasource);
 
   @override
-  Future<List<AppointmentEntity>> getAppointments() =>
-      _datasource.getAppointments();
+  Future<List<AppointmentEntity>> getAppointments({
+    String? status,
+    String? categoryId,
+    String? sortBy,
+  }) =>
+      _datasource.getAppointments(
+        status: status,
+        categoryId: categoryId,
+        sortBy: sortBy,
+      );
 
   @override
   Future<List<AppointmentCategory>> getCategories() =>

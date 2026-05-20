@@ -8,10 +8,12 @@ import 'package:common/widgets/button/button.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:common/widgets/toast.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/utils/form_validators.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/utils/device.dart';
+
 
 class EmailFormScreen extends HookConsumerWidget {
   const EmailFormScreen({super.key});
@@ -25,13 +27,10 @@ class EmailFormScreen extends HookConsumerWidget {
 
     ref.listen(registerFlowProvider, (previous, next) {
       if (next.hasError && !next.isLoading) {
-        if (context.mounted) {
-          ToastContext.showToast(
-            context,
-            ToastType.success,
-            next.error.toString(),
-          );
-        }
+        AppToast.error(
+          context,
+          'Failed to send verification code. Please try again.',
+        );
       }
     });
 
@@ -65,26 +64,45 @@ class EmailFormScreen extends HookConsumerWidget {
     // }, [asyncState.hasValue ? asyncState.requireValue.user?.email : null]);
 
     Future<void> submit() async {
-      if (formKey.currentState?.saveAndValidate() ?? false) {
-        FocusScope.of(context).unfocus();
+      final isValid = formKey.currentState?.saveAndValidate() ?? false;
+      if (!isValid) {
+        AppToast.warning(
+          context,
+          'Please enter a valid email address.',
+        );
+        return;
+      }
 
-        submitLoading.value = true;
-        try {
-          final email = emailController.text;
-          await ref.read(registerFlowProvider.notifier).sendCode(email);
-          if (context.mounted) {
-            // Chuyển sang màn OTP
-            context.pushReplacementNamed(EmailCodeConfirmationRoute.name);
-          }
-        } catch (e) {
-          debugPrint('Error sending code: $e');
-        } finally {
-          if (context.mounted) {
-            submitLoading.value = false;
-          }
+      FocusScope.of(context).unfocus();
+      submitLoading.value = true;
+      try {
+        final email = emailController.text.trim();
+        await ref
+            .read(registerFlowProvider.notifier)
+            .sendCode(email);
+        if (context.mounted) {
+          AppToast.success(
+            context,
+            'Verification code sent to your email.',
+          );
+          context.pushReplacementNamed(
+            EmailCodeConfirmationRoute.name,
+          );
         }
-      } else {
-        debugPrint('Validation failed');
+      } on EmailAlreadyExistsException {
+        if (context.mounted) {
+          AppToast.error(
+            context,
+            'This email is already registered.'
+                ' Please sign in instead.',
+          );
+        }
+      } catch (_) {
+        // Other errors are handled by ref.listen
+      } finally {
+        if (context.mounted) {
+          submitLoading.value = false;
+        }
       }
     }
 
@@ -137,6 +155,7 @@ class EmailFormScreen extends HookConsumerWidget {
                           suffixIcon: Icon(Icons.email),
                           controller: emailController,
                           widgetKey: keys.emailFormPage.emailTextField,
+                          validator: FormValidators.email,
                         ),
                         AppDimens.verticalSmall,
                         Text.rich(
@@ -194,7 +213,10 @@ class EmailFormScreen extends HookConsumerWidget {
                       key: keys.emailFormPage.continueButton,
                       // 3. Disable nút khi: Email rỗng HOẶC đang Loading
                       onPressed:
-                          (emailController.text.isEmpty ||
+                          (FormValidators.email(
+                                emailController.text.trim(),
+                              ) !=
+                              null ||
                               submitLoading.value ||
                               asyncState.isLoading)
                           ? null

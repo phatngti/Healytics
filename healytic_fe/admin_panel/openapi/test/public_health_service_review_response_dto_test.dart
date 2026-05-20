@@ -16,6 +16,11 @@ void main() {
   // final instance = PublicHealthServiceReviewResponseDto();
 
   group('test PublicHealthServiceReviewResponseDto', () {
+    // String id
+    test('to test the property `id`', () async {
+      // TODO
+    });
+
     // String reviewerName
     test('to test the property `reviewerName`', () async {
       // TODO
@@ -31,23 +36,23 @@ void main() {
       // TODO
     });
 
-    // String status
-    test('to test the property `status`', () async {
+    // Object comment
+    test('to test the property `comment`', () async {
       // TODO
     });
 
-    // String date
-    test('to test the property `date`', () async {
+    // List<String> tags (default value: const [])
+    test('to test the property `tags`', () async {
       // TODO
     });
 
-    // String text
-    test('to test the property `text`', () async {
+    // List<String> photoUrls (default value: const [])
+    test('to test the property `photoUrls`', () async {
       // TODO
     });
 
-    // List<String> imageUrls (default value: const [])
-    test('to test the property `imageUrls`', () async {
+    // String createdAt
+    test('to test the property `createdAt`', () async {
       // TODO
     });
 

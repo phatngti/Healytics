@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PartnersController, PartnerSelfController } from './partners.controller';
+import {
+  PartnersController,
+  PartnerSelfController,
+} from './partners.controller';
 import { PartnersService } from './partners.service';
 import { NotFoundException } from '@nestjs/common';
 import { BusinessType } from './enum/business-type.enum';
@@ -13,6 +16,8 @@ describe('PartnersController', () => {
     getBusinessServices: jest.fn(),
     getMyProfile: jest.fn(),
     updateMyProfile: jest.fn(),
+    getMyProfileCompletion: jest.fn(),
+    updateMyProfileCompletion: jest.fn(),
   };
 
   const mockBusinessServices = {
@@ -46,7 +51,9 @@ describe('PartnersController', () => {
   describe('getBusinessServices', () => {
     it('should return all business services', () => {
       // Arrange
-      mockPartnersService.getBusinessServices.mockReturnValue(mockBusinessServices);
+      mockPartnersService.getBusinessServices.mockReturnValue(
+        mockBusinessServices,
+      );
 
       // Act
       const result = controller.getBusinessServices();
@@ -66,6 +73,8 @@ describe('PartnerSelfController', () => {
     getBusinessServices: jest.fn(),
     getMyProfile: jest.fn(),
     updateMyProfile: jest.fn(),
+    getMyProfileCompletion: jest.fn(),
+    updateMyProfileCompletion: jest.fn(),
   };
 
   const mockProfile = {
@@ -132,7 +141,9 @@ describe('PartnerSelfController', () => {
       );
 
       // Act & Assert
-      await expect(controller.getMyProfile(userId)).rejects.toThrow(NotFoundException);
+      await expect(controller.getMyProfile(userId)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -157,6 +168,49 @@ describe('PartnerSelfController', () => {
         userId,
         updateDto,
       );
+    });
+  });
+
+  describe('profile completion', () => {
+    it('should return profile completion data', async () => {
+      const userId = 'account-uuid';
+      const completion = {
+        id: 'partner-uuid',
+        isCompleted: false,
+        completionPercent: 25,
+      };
+      mockPartnersService.getMyProfileCompletion.mockResolvedValue(completion);
+
+      const result = await controller.getMyProfileCompletion(userId);
+
+      expect(result).toEqual(completion);
+      expect(mockPartnersService.getMyProfileCompletion).toHaveBeenCalledWith(
+        userId,
+      );
+    });
+
+    it('should update profile completion data', async () => {
+      const userId = 'account-uuid';
+      const dto = {
+        coverImageUrl: 'https://cdn.example.com/cover.jpg',
+        gallery: ['https://cdn.example.com/gallery-1.jpg'],
+      };
+      const updated = {
+        id: 'partner-uuid',
+        isCompleted: false,
+        completionPercent: 50,
+      };
+      mockPartnersService.updateMyProfileCompletion.mockResolvedValue(updated);
+
+      const result = await controller.updateMyProfileCompletion(
+        userId,
+        dto as any,
+      );
+
+      expect(result).toEqual(updated);
+      expect(
+        mockPartnersService.updateMyProfileCompletion,
+      ).toHaveBeenCalledWith(userId, dto);
     });
   });
 });

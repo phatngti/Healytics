@@ -1,6 +1,9 @@
+import 'package:admin_panel/features/partner/products/domain/product_form_field.dart';
+import 'package:admin_panel/features/partner/products/domain/product_status.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class ProductVisibilityCard extends StatefulWidget {
   final String initialStatus;
@@ -29,6 +32,18 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
     super.initState();
     _status = widget.initialStatus;
     _onlineStore = widget.initialOnlineStore;
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductVisibilityCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.initialStatus != widget.initialStatus) {
+      _status = widget.initialStatus;
+    }
+    if (oldWidget.initialOnlineStore != widget.initialOnlineStore) {
+      _onlineStore = widget.initialOnlineStore;
+    }
   }
 
   @override
@@ -67,20 +82,31 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
             children: [
               FormFieldBuilders.buildCustomDropdownField<String>(
                 context,
-                fieldKey: 'status',
+                fieldKey: ProductFormField.visibilityStatus.key,
                 label: 'Status',
                 initialValue: _status,
-                items: const [
-                  DropdownMenuItem(value: 'draft', child: Text('Draft')),
-                  DropdownMenuItem(value: 'active', child: Text('Active')),
-                  DropdownMenuItem(value: 'archived', child: Text('Archived')),
-                ],
+                isRequired: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Status is required';
+                  }
+                  return null;
+                },
+                items: ProductStatus.values
+                    .map(
+                      (s) => DropdownMenuItem(
+                        value: s.apiValue,
+                        child: Text(s.displayName),
+                      ),
+                    )
+                    .toList(),
                 onChanged: (value) {
                   if (value != null) {
                     setState(() {
                       _status = value.toString();
                     });
-                    widget.onStatusChanged?.call(value.toString());
+                    widget.onStatusChanged
+                        ?.call(value.toString());
                   }
                 },
               ),
@@ -112,13 +138,20 @@ class _ProductVisibilityCardState extends State<ProductVisibilityCard> {
                     ],
                   ),
                 ),
-                Switch(
-                  value: _onlineStore,
-                  onChanged: (value) {
-                    setState(() {
-                      _onlineStore = value;
-                    });
-                    widget.onOnlineStoreChanged?.call(value);
+                FormBuilderField<bool>(
+                  name: ProductFormField.onlineStore.key,
+                  initialValue: _onlineStore,
+                  builder: (field) {
+                    return Switch(
+                      value: field.value ?? _onlineStore,
+                      onChanged: (value) {
+                        setState(() {
+                          _onlineStore = value;
+                        });
+                        field.didChange(value);
+                        widget.onOnlineStoreChanged?.call(value);
+                      },
+                    );
                   },
                 ),
               ],

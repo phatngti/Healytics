@@ -23,6 +23,30 @@ class AuthenticateRepositoryImplement implements AuthenticateRepository {
     );
     return authenticate;
   }
+
+  @override
+  Future<void> requestPasswordReset({required String email}) {
+    return _remoteDatasource.requestPasswordReset(email: email);
+  }
+
+  @override
+  Future<String> validatePasswordResetCode({
+    required String email,
+    required String code,
+  }) {
+    return _remoteDatasource.validatePasswordResetCode(
+      email: email,
+      code: code,
+    );
+  }
+
+  @override
+  Future<void> resetPassword({
+    required String token,
+    required String password,
+  }) {
+    return _remoteDatasource.resetPassword(token: token, password: password);
+  }
 }
 
 @Riverpod(keepAlive: true)

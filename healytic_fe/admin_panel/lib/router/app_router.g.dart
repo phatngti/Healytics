@@ -48,7 +48,7 @@ final class RouterProvider
   }
 }
 
-String _$routerHash() => r'33670cf4c67352ecc9d20f8d31ce94eac8df8358';
+String _$routerHash() => r'd229c626d91d7b74d2f3b0c44994f9629634ffb6';
 
 @ProviderFor(RouterListenable)
 const routerListenableProvider = RouterListenableProvider._();
@@ -74,7 +74,7 @@ final class RouterListenableProvider
   RouterListenable create() => RouterListenable();
 }
 
-String _$routerListenableHash() => r'a72729efab5bb4e7a5e7e7151edcace1ed19cda0';
+String _$routerListenableHash() => r'256b68f259bc1a5efe784babb005e7f4adc8d4c4';
 
 abstract class _$RouterListenable extends $AsyncNotifier<void> {
   FutureOr<void> build();

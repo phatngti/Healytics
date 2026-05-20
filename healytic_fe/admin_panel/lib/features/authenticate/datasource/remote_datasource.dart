@@ -6,6 +6,7 @@ import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
 import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/core/services/api.service.dart';
+import 'package:admin_panel/features/authenticate/datasource/auth_mock_data.dart';
 import 'package:admin_panel/features/authenticate/domain/authenticate.entity.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -66,10 +67,6 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
     if (role == Role.admin.value) {
       response = await _authApi.authControllerLoginAdmin(
         AdminLoginDto(email: request.email, password: request.password),
-      );
-    } else if (role == Role.user.value) {
-      response = await _authApi.authControllerLoginUser(
-        LoginDto(email: request.email, password: request.password),
       );
     } else if (role == Role.health_partner.value) {
       response = await _authApi.authControllerLoginPartner(
@@ -143,7 +140,6 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
     // Map domain entities to OpenAPI DTOs
     final dto = RegisterPartnerDto(
       account: AccountRequestDto(
-        username: request.account.username,
         email: request.account.email,
         password: request.account.password,
       ),
@@ -208,22 +204,34 @@ class AuthenticateRemoteDatasourceImpl implements AuthenticateRemoteDatasource {
   // Private Helper Methods
   // ===========================================================================
 
+  static const _businessTypeMap = {
+    'MASSAGE_THERAPY': BusinessType.MASSAGE_THERAPY,
+    'MASSAGE_REHABILITATION': BusinessType.MASSAGE_REHABILITATION,
+    'SPA_BEAUTY': BusinessType.SPA_BEAUTY,
+    'FITNESS': BusinessType.FITNESS,
+    'PHARMACY': BusinessType.PHARMACY,
+    'DENTAL': BusinessType.DENTAL,
+    'TRADITIONAL_MEDICINE': BusinessType.TRADITIONAL_MEDICINE,
+    'PSYCHOLOGY': BusinessType.PSYCHOLOGY,
+    'DERMATOLOGY': BusinessType.DERMATOLOGY,
+    'NUTRITION': BusinessType.NUTRITION,
+    'PSYCHIATRY': BusinessType.PSYCHIATRY,
+  };
+
   List<BusinessType> _mapBusinessTypes(List<String> businessTypes) {
     return businessTypes.map((type) {
-      return switch (type.toUpperCase()) {
-        'MASSAGE_THERAPY' => BusinessType.MASSAGE_THERAPY,
-        'MASSAGE_REHABILITATION' => BusinessType.MASSAGE_REHABILITATION,
-        'SPA_BEAUTY' => BusinessType.SPA_BEAUTY,
-        'FITNESS' => BusinessType.FITNESS,
-        'PHARMACY' => BusinessType.PHARMACY,
-        'DENTAL' => BusinessType.DENTAL,
-        'TRADITIONAL_MEDICINE' => BusinessType.TRADITIONAL_MEDICINE,
-        'PSYCHOLOGY' => BusinessType.PSYCHOLOGY,
-        'DERMATOLOGY' => BusinessType.DERMATOLOGY,
-        'NUTRITION' => BusinessType.NUTRITION,
-        'PSYCHIATRY' => BusinessType.PSYCHIATRY,
-        _ => BusinessType.SPA_BEAUTY,
-      };
+      final key = type.toUpperCase();
+      final mapped = _businessTypeMap[key];
+      if (mapped == null) {
+        developer.log(
+          'Unknown business type "$type", '
+          'falling back to SPA_BEAUTY',
+          name: 'AuthenticateRemoteDatasource',
+          level: 900,
+        );
+        return BusinessType.SPA_BEAUTY;
+      }
+      return mapped;
     }).toList();
   }
 
@@ -250,11 +258,16 @@ class AuthenticateRemoteDatasourceMock implements AuthenticateRemoteDatasource {
     SignInRequestEntity request,
     String role,
   ) async {
-    await Future<void>.delayed(const Duration(seconds: 1));
-    return SignInResponseEntity(
-      accessToken: 'mock_access_token',
-      refreshToken: 'mock_refresh_token',
-      role: role,
+    await Future<void>.delayed(
+      const Duration(seconds: 1),
+    );
+
+    if (role == Role.admin.value) {
+      return DevMockAccounts.buildAdminResponse();
+    }
+
+    return DevMockAccounts.buildPartnerResponse(
+      request.email,
     );
   }
 

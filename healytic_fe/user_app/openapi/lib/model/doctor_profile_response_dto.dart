@@ -15,8 +15,7 @@ class DoctorProfileResponseDto {
   DoctorProfileResponseDto({
     this.employeeId,
     this.title,
-    this.medicalTitles = const [],
-    this.medicalLicenses = const [],
+    this.medicalCredentials = const [],
     this.experienceYears,
     this.consultationFee,
     this.specializations = const [],
@@ -24,46 +23,20 @@ class DoctorProfileResponseDto {
     this.certifications = const [],
   });
 
+
   /// Employee ID (primary key)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   String? employeeId;
 
   /// Doctor title
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   String? title;
 
-  /// Medical titles
-  List<String> medicalTitles;
-
-  /// Medical license numbers
-  List<String> medicalLicenses;
+  /// Medical credentials (titles + licenses)
+  List<MedicalCredentialResponseDto> medicalCredentials;
 
   /// Years of experience
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   num? experienceYears;
 
   /// Consultation fee
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   num? consultationFee;
 
   /// List of specializations
@@ -79,8 +52,7 @@ class DoctorProfileResponseDto {
   bool operator ==(Object other) => identical(this, other) || other is DoctorProfileResponseDto &&
     other.employeeId == employeeId &&
     other.title == title &&
-    _deepEquality.equals(other.medicalTitles, medicalTitles) &&
-    _deepEquality.equals(other.medicalLicenses, medicalLicenses) &&
+    _deepEquality.equals(other.medicalCredentials, medicalCredentials) &&
     other.experienceYears == experienceYears &&
     other.consultationFee == consultationFee &&
     _deepEquality.equals(other.specializations, specializations) &&
@@ -92,8 +64,7 @@ class DoctorProfileResponseDto {
     // ignore: unnecessary_parenthesis
     (employeeId == null ? 0 : employeeId!.hashCode) +
     (title == null ? 0 : title!.hashCode) +
-    (medicalTitles.hashCode) +
-    (medicalLicenses.hashCode) +
+    (medicalCredentials.hashCode) +
     (experienceYears == null ? 0 : experienceYears!.hashCode) +
     (consultationFee == null ? 0 : consultationFee!.hashCode) +
     (specializations.hashCode) +
@@ -101,7 +72,7 @@ class DoctorProfileResponseDto {
     (certifications.hashCode);
 
   @override
-  String toString() => 'DoctorProfileResponseDto[employeeId=$employeeId, title=$title, medicalTitles=$medicalTitles, medicalLicenses=$medicalLicenses, experienceYears=$experienceYears, consultationFee=$consultationFee, specializations=$specializations, education=$education, certifications=$certifications]';
+  String toString() => 'DoctorProfileResponseDto[employeeId=$employeeId, title=$title, medicalCredentials=$medicalCredentials, experienceYears=$experienceYears, consultationFee=$consultationFee, specializations=$specializations, education=$education, certifications=$certifications]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -115,8 +86,7 @@ class DoctorProfileResponseDto {
     } else {
       json[r'title'] = null;
     }
-      json[r'medicalTitles'] = this.medicalTitles;
-      json[r'medicalLicenses'] = this.medicalLicenses;
+      json[r'medicalCredentials'] = this.medicalCredentials;
     if (this.experienceYears != null) {
       json[r'experienceYears'] = this.experienceYears;
     } else {
@@ -154,14 +124,13 @@ class DoctorProfileResponseDto {
       return DoctorProfileResponseDto(
         employeeId: mapValueOfType<String>(json, r'employeeId'),
         title: mapValueOfType<String>(json, r'title'),
-        medicalTitles: json[r'medicalTitles'] is Iterable
-            ? (json[r'medicalTitles'] as Iterable).cast<String>().toList(growable: false)
-            : const [],
-        medicalLicenses: json[r'medicalLicenses'] is Iterable
-            ? (json[r'medicalLicenses'] as Iterable).cast<String>().toList(growable: false)
-            : const [],
-        experienceYears: num.parse('${json[r'experienceYears']}'),
-        consultationFee: num.parse('${json[r'consultationFee']}'),
+        medicalCredentials: MedicalCredentialResponseDto.listFromJson(json[r'medicalCredentials']),
+        experienceYears: json[r'experienceYears'] == null
+            ? null
+            : num.parse('${json[r'experienceYears']}'),
+        consultationFee: json[r'consultationFee'] == null
+            ? null
+            : num.parse('${json[r'consultationFee']}'),
         specializations: json[r'specializations'] is Iterable
             ? (json[r'specializations'] as Iterable).cast<String>().toList(growable: false)
             : const [],

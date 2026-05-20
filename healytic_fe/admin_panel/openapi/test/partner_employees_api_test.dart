@@ -24,10 +24,24 @@ void main() {
       // TODO
     });
 
+    // Create a massage skill
+    //
+    //Future<SkillCatalogResponseDto> partnerEmployeesControllerCreateMassageSkill(CreateSkillDto createSkillDto) async
+    test('test partnerEmployeesControllerCreateMassageSkill', () async {
+      // TODO
+    });
+
     // Create a new massage therapist
     //
     //Future<EmployeeResponseDto> partnerEmployeesControllerCreateMassageTherapist(CreateMassageTherapistDto createMassageTherapistDto) async
     test('test partnerEmployeesControllerCreateMassageTherapist', () async {
+      // TODO
+    });
+
+    // Create a spa skill
+    //
+    //Future<SkillCatalogResponseDto> partnerEmployeesControllerCreateSpaSkill(CreateSkillDto createSkillDto) async
+    test('test partnerEmployeesControllerCreateSpaSkill', () async {
       // TODO
     });
 
@@ -45,10 +59,45 @@ void main() {
       // TODO
     });
 
+    // Get services assigned to an employee
+    //
+    //Future<List<EmployeeAssignedServiceDto>> partnerEmployeesControllerFindAssignedServices(String id) async
+    test('test partnerEmployeesControllerFindAssignedServices', () async {
+      // TODO
+    });
+
     // Get an employee by id
     //
     //Future<EmployeeResponseDto> partnerEmployeesControllerFindOne(String id) async
     test('test partnerEmployeesControllerFindOne', () async {
+      // TODO
+    });
+
+    // Get per-employee detail analytics
+    //
+    //Future<EmployeeDetailAnalyticsResponseDto> partnerEmployeesControllerGetDetailAnalytics(String employeeId, { DashboardTimePeriod period }) async
+    test('test partnerEmployeesControllerGetDetailAnalytics', () async {
+      // TODO
+    });
+
+    // Get massage skill catalog
+    //
+    //Future<List<SkillCatalogResponseDto>> partnerEmployeesControllerGetMassageSkills() async
+    test('test partnerEmployeesControllerGetMassageSkills', () async {
+      // TODO
+    });
+
+    // Get employee overview analytics
+    //
+    //Future<EmployeeOverviewAnalyticsResponseDto> partnerEmployeesControllerGetOverviewAnalytics({ DashboardTimePeriod period }) async
+    test('test partnerEmployeesControllerGetOverviewAnalytics', () async {
+      // TODO
+    });
+
+    // Get spa skill catalog
+    //
+    //Future<List<SkillCatalogResponseDto>> partnerEmployeesControllerGetSpaSkills() async
+    test('test partnerEmployeesControllerGetSpaSkills', () async {
       // TODO
     });
 

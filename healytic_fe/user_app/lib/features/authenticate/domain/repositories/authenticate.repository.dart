@@ -5,4 +5,13 @@ abstract class AuthenticateRepository {
     required String email,
     required String password,
   });
+
+  Future<void> requestPasswordReset({required String email});
+
+  Future<String> validatePasswordResetCode({
+    required String email,
+    required String code,
+  });
+
+  Future<void> resetPassword({required String token, required String password});
 }

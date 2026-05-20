@@ -1,0 +1,36 @@
+FROM node:22-bookworm
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# ── 1. OS packages (no Docker here — installed via official repo below) ──
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      ca-certificates \
+      curl \
+      gnupg \
+      git \
+      openjdk-17-jre-headless \
+      openssh-client \
+    && rm -rf /var/lib/apt/lists/* \
+    && corepack enable
+
+# ── 2. Docker CLI only (no daemon/containerd — we use the host socket) ──
+RUN install -m 0755 -d /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/debian/gpg \
+       | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+    && chmod a+r /etc/apt/keyrings/docker.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+       https://download.docker.com/linux/debian bookworm stable" \
+       > /etc/apt/sources.list.d/docker.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+       docker-ce-cli \
+       docker-buildx-plugin \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /home/jenkins/agent
+
+COPY start-agent.sh /usr/local/bin/start-agent.sh
+RUN chmod +x /usr/local/bin/start-agent.sh
+
+ENTRYPOINT ["bash", "/usr/local/bin/start-agent.sh"]

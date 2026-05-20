@@ -21,6 +21,16 @@ void main() {
       // TODO
     });
 
+    // String description
+    test('to test the property `description`', () async {
+      // TODO
+    });
+
+    // num salePrice
+    test('to test the property `salePrice`', () async {
+      // TODO
+    });
+
     // String name
     test('to test the property `name`', () async {
       // TODO
@@ -31,23 +41,13 @@ void main() {
       // TODO
     });
 
-    // String description
-    test('to test the property `description`', () async {
-      // TODO
-    });
-
-    // String type
+    // HealthServiceType type
     test('to test the property `type`', () async {
       // TODO
     });
 
     // num basePrice
     test('to test the property `basePrice`', () async {
-      // TODO
-    });
-
-    // num salePrice
-    test('to test the property `salePrice`', () async {
       // TODO
     });
 
@@ -71,27 +71,29 @@ void main() {
       // TODO
     });
 
-    // Product media (images/videos)
+    // Feature tag IDs to associate with this service (full replacement)
+    // List<String> tagIds (default value: const [])
+    test('to test the property `tagIds`', () async {
+      // TODO
+    });
+
     // List<CreatePartnerHealthServiceMediaDto> media (default value: const [])
     test('to test the property `media`', () async {
       // TODO
     });
 
-    // Product definition (required if type is service)
-    // CreatePartnerHealthServiceDefinitionDto productDefinition
+    // UpdatePartnerHealthServiceDefinitionDto productDefinition
     test('to test the property `productDefinition`', () async {
       // TODO
     });
 
-    // Facility/clinic images
     // List<CreatePartnerHealthServiceFacilityImageDto> facilityImages (default value: const [])
     test('to test the property `facilityImages`', () async {
       // TODO
     });
 
-    // Product reviews
-    // List<CreatePartnerHealthServiceReviewDto> reviews (default value: const [])
-    test('to test the property `reviews`', () async {
+    // ServiceManualInputDto serviceManual
+    test('to test the property `serviceManual`', () async {
       // TODO
     });
 

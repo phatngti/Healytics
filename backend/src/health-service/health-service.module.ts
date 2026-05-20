@@ -4,40 +4,54 @@ import { HealthServiceService } from './health-service.service';
 import { CreateHealthServiceHandler } from './application/handlers/create-health-service.handler';
 import { UpdateHealthServiceHandler } from './application/handlers/update-health-service.handler';
 import { RemoveHealthServiceHandler } from './application/handlers/remove-health-service.handler';
-import { HealthServiceController } from './health-service.controller';
+import { GetOverviewAnalyticsHandler } from './application/handlers/get-overview-analytics.handler';
+import { GetDetailAnalyticsHandler } from './application/handlers/get-detail-analytics.handler';
 import { PartnerHealthServiceController } from './partner-health-service.controller';
+import { UserHealthServiceController } from './user-health-service.controller';
 import { Product } from '@/common/entities/product.entity';
+import { UserWishlistItem } from '@/common/entities/user-wishlist-item.entity';
 import { ProductMedia } from '@/common/entities/product-media.entity';
-import { ProductReview } from '@/common/entities/product-review.entity';
+import { TreatmentReview } from '@/common/entities/treatment-review.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
 import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { ResourceType } from '@/common/entities/resource-type.entity';
 import { ProductResourceRequirement } from '@/common/entities/product-resource-requirement.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { Employee } from '@/common/entities/employee.entity';
+import { Booking } from '@/common/entities/booking.entity';
+import { Payment } from '@/common/entities/payment.entity';
+import { Category } from '@/common/entities/category.entity';
 import { PartnersModule } from '@/partners/partners.module';
+import { SearchModule } from '@/search/search.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Product,
+      UserWishlistItem,
       ProductMedia,
-      ProductReview,
+      TreatmentReview,
       ProductFacilityImage,
       ProductDefinition,
       ResourceType,
       ProductResourceRequirement,
       ProductEmployeeEligibility,
       Employee,
+      Booking,
+      Payment,
+      Category,
     ]),
     PartnersModule,
+    SearchModule,
   ],
-  controllers: [HealthServiceController, PartnerHealthServiceController],
+  controllers: [PartnerHealthServiceController, UserHealthServiceController],
   providers: [
     HealthServiceService,
     CreateHealthServiceHandler,
     UpdateHealthServiceHandler,
     RemoveHealthServiceHandler,
+    GetOverviewAnalyticsHandler,
+    GetDetailAnalyticsHandler,
   ],
   exports: [HealthServiceService],
 })

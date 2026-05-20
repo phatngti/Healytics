@@ -1,10 +1,14 @@
-/// Dev-only autofill defaults for the Product Add form.
+import 'package:admin_panel/features/partner/products/domain/facility_image_key.dart';
+import 'package:admin_panel/features/partner/products/domain/service_manual_key.dart';
+
+/// UAT-only autofill defaults for the Product Add form.
 ///
 /// Used when navigating to the Add Product screen with
-/// `?autofill=true` (e.g. `/provider/products/add?autofill=true`).
+/// `?autofill=true`
+/// (e.g. `/provider/products/add?autofill=true`).
 ///
-/// Only active when [kDebugMode] is `true` — the guard lives
-/// in [ProductAddScreen], not here, so this class stays pure.
+/// The UAT guard lives in [ProductAddScreen],
+/// so this class stays pure.
 abstract final class ProductAddAutofill {
   static const name = 'Signature Rejuvenating Facial';
 
@@ -35,46 +39,108 @@ abstract final class ProductAddAutofill {
   static const duration = '90';
   static const buffer = '15';
   static const capacity = '1';
-  static const leadTime = '2';
 
-  /// Product image URLs for autofill.
-  static const productImages = <String>[
-    'https://pub-58a545087a6b4221b1b0dab10d8d3517'
-        '.r2.dev/1770314548932-'
-        'Gemini_Generated_Image_86fd6v86fd6v86fd.png',
-    'https://pub-58a545087a6b4221b1b0dab10d8d3517'
-        '.r2.dev/1770314552105-'
-        'Gemini_Generated_Image_eq0jpneq0jpneq0j.png',
-    'https://pub-58a545087a6b4221b1b0dab10d8d3517'
-        '.r2.dev/1770314560561-Gemini_Generated_Image'
-        '_86fd6v86fd6v86fd-Photoroom.png',
-    'https://pub-58a545087a6b4221b1b0dab10d8d3517'
-        '.r2.dev/1770314567024-'
-        'istockphoto-1460619599-1024x1024.jpg',
-  ];
 
-  /// Facility image entries (URL + label) for autofill.
+  /// Facility image entries (URL + label)
+  /// for autofill.
   static const facilityImages = <Map<String, String>>[
     {
-      'imageUrl':
+      FacilityImageKey.imageUrl:
           'https://pub-58a545087a6b4221b1b0dab10d8d3517'
           '.r2.dev/1770315713692-Gemini_Generated_Image'
           '_86fd6v86fd6v86fd-Photoroom.png',
-      'label': 'Reception Area',
+      FacilityImageKey.label: 'Reception Area',
     },
     {
-      'imageUrl':
+      FacilityImageKey.imageUrl:
           'https://pub-58a545087a6b4221b1b0dab10d8d3517'
           '.r2.dev/1770315725051-Gemini_Generated_Image'
           '_eq0jpneq0jpneq0j-Photoroom.png',
-      'label': 'Treatment Room',
+      FacilityImageKey.label: 'Treatment Room',
     },
     {
-      'imageUrl':
+      FacilityImageKey.imageUrl:
           'https://pub-58a545087a6b4221b1b0dab10d8d3517'
           '.r2.dev/1770316458784-Gemini_Generated_Image'
           '_86fd6v86fd6v86fd-Photoroom.png',
-      'label': 'Relaxation Lounge',
+      FacilityImageKey.label: 'Relaxation Lounge',
+    },
+  ];
+
+  // ── Service Manual ──────────────────────────────
+
+  /// Pre-service guidelines for autofill.
+  static const guidelines = <String>[
+    'Arrive at least 15 minutes before'
+        ' your appointment',
+    'Remove all makeup and jewelry'
+        ' before the session',
+    'Inform your therapist of any'
+        ' skin allergies or sensitivities',
+    'Avoid direct sun exposure for'
+        ' 24 hours prior to treatment',
+  ];
+
+  /// Service rules for autofill.
+  /// Each map: {iconSlug, title, description}.
+  static const rules = <Map<String, String>>[
+    {
+      ServiceManualKey.iconSlug: 'schedule',
+      ServiceManualKey.title: 'Punctuality',
+      ServiceManualKey.description:
+          'Clients arriving more than 15 minutes '
+          'late may have their session shortened.',
+    },
+    {
+      ServiceManualKey.iconSlug: 'shield',
+      ServiceManualKey.title: 'Hygiene Standards',
+      ServiceManualKey.description:
+          'All tools are sterilized between '
+          'sessions. Fresh linens are provided '
+          'for every client.',
+    },
+    {
+      ServiceManualKey.iconSlug: 'warning',
+      ServiceManualKey.title: 'Contraindications',
+      ServiceManualKey.description:
+          'Not recommended for clients with '
+          'active skin infections, open wounds, '
+          'or severe sunburn.',
+    },
+  ];
+
+  /// Procedure steps for autofill.
+  /// Each map: {title, description}.
+  static const steps = <Map<String, String>>[
+    {
+      ServiceManualKey.title: 'Consultation',
+      ServiceManualKey.description:
+          'Assess skin type and discuss '
+          'client concerns and goals.',
+    },
+    {
+      ServiceManualKey.title: 'Deep Cleansing',
+      ServiceManualKey.description:
+          'Double-cleanse to remove impurities '
+          'and prepare the skin.',
+    },
+    {
+      ServiceManualKey.title: 'Exfoliation',
+      ServiceManualKey.description:
+          'Gentle enzyme exfoliation to promote '
+          'cell turnover.',
+    },
+    {
+      ServiceManualKey.title: 'Serum Application',
+      ServiceManualKey.description:
+          'Apply botanical extract serums '
+          'targeting hydration and brightening.',
+    },
+    {
+      ServiceManualKey.title: 'Massage & Mask',
+      ServiceManualKey.description:
+          'Relaxing facial massage followed by '
+          'a nourishing collagen mask.',
     },
   ];
 }

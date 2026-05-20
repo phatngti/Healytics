@@ -13,9 +13,7 @@ describe('SlotsController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SlotsController],
-      providers: [
-        { provide: BookingService, useValue: bookingService },
-      ],
+      providers: [{ provide: BookingService, useValue: bookingService }],
     }).compile();
 
     controller = module.get<SlotsController>(SlotsController);

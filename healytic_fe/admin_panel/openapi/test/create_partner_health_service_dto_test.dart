@@ -26,6 +26,7 @@ void main() {
       // TODO
     });
 
+    // Ignored — slug is auto-generated as {partner_brand}_{product_name}_{random}.
     // String slug
     test('to test the property `slug`', () async {
       // TODO
@@ -36,7 +37,7 @@ void main() {
       // TODO
     });
 
-    // String type
+    // HealthServiceType type
     test('to test the property `type`', () async {
       // TODO
     });
@@ -71,6 +72,12 @@ void main() {
       // TODO
     });
 
+    // Feature tag IDs to associate with this service
+    // List<String> tagIds (default value: const [])
+    test('to test the property `tagIds`', () async {
+      // TODO
+    });
+
     // Product media (images/videos)
     // List<CreatePartnerHealthServiceMediaDto> media (default value: const [])
     test('to test the property `media`', () async {
@@ -89,9 +96,9 @@ void main() {
       // TODO
     });
 
-    // Product reviews
-    // List<CreatePartnerHealthServiceReviewDto> reviews (default value: const [])
-    test('to test the property `reviews`', () async {
+    // Service manual (guidelines, rules, procedure steps)
+    // ServiceManualInputDto serviceManual
+    test('to test the property `serviceManual`', () async {
       // TODO
     });
 

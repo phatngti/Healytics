@@ -12,7 +12,7 @@
 .swiftpm/
 .vscode/
 migrate_working_dir/
-
+.kiro
 # IntelliJ related
 *.iml
 *.ipr
@@ -118,6 +118,9 @@ crash_log.txt
 *.tmp
 *.temp
 *~
+
+# Patrol generated test bundle
+patrol_test/test_bundle.dart
 
 # Node modules (if using any Node.js tooling)
 node_modules/

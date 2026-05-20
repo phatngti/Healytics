@@ -1,0 +1,194 @@
+text,business_type,location_code,price_op,price_amount,price_max,distance_meters,distance_implicit
+massage tri lieu,MASSAGE_REHABILITATION,,,,,,
+phong kham dong y,TRADITIONAL_MEDICINE,,,,,,
+massage khoang 400k gan day,MASSAGE_THERAPY,,between,340000,460000,10000,true
+phong kham dong y o thu duc khoang 1 trieu,TRADITIONAL_MEDICINE,762,between,850000,1150000,,
+spa o quan 1 gan day,SPA_BEAUTY,760,,,,10000,true
+yoga o ha noi lan can,FITNESS,01,,,,10000,true
+phong kham o q3 cach 2 cay so,TRADITIONAL_MEDICINE,770,,,,2000,false
+hieu thuoc o q10 gan nha,PHARMACY,771,,,,10000,true
+phong kham dong y o thu duc trong vong 10km,TRADITIONAL_MEDICINE,762,,,,10000,false
+gym o binh thanh cach 1 cay so,FITNESS,765,,,,1000,false
+spa duoi 500k gan day,SPA_BEAUTY,,lte,500000,,10000,true
+spa tu 100k den 300k gan day,SPA_BEAUTY,,between,100000,300000,10000,true
+phong kham gia 800k lan can,TRADITIONAL_MEDICINE,,between,680000,920000,10000,true
+yoga tren 200k gan nha,FITNESS,,gte,200000,,10000,true
+hieu thuoc duoi 300k trong vong 3km,PHARMACY,,lte,300000,,3000,false
+phong kham dong y khoang 1 trieu trong vong 10km,TRADITIONAL_MEDICINE,,between,850000,1150000,10000,false
+gym khoang 500k cach 1 cay so,FITNESS,,between,425000,575000,1000,false
+massage gia 2tr xung quanh day,MASSAGE_THERAPY,,between,1700000,2300000,10000,true
+nha khoa gia 1.5 trieu trong vong 3km,DENTAL,,between,1275000,1725000,3000,false
+spa tu 200k den 400k gan day,SPA_BEAUTY,,between,200000,400000,10000,true
+trung tam yoga o q7 gia 250k trong vong 2km,FITNESS,778,between,212500,287500,2000,false
+cho tap gym re q7,FITNESS,778,lte,300000,,,
+Tìm spa,SPA_BEAUTY,,,,,,
+Cần gym,FITNESS,,,,,,
+Tìm nha sĩ,DENTAL,,,,,,
+Phòng khám nha khoa,DENTAL,,,,,,
+Massage trị liệu,MASSAGE_REHABILITATION,,,,,,
+Tiệm làm đẹp,SPA_BEAUTY,,,,,,
+Hiệu thuốc,PHARMACY,,,,,,
+Phòng khám đa khoa,TRADITIONAL_MEDICINE,,,,,,
+Trung tâm yoga,FITNESS,,,,,,
+Phòng khám đông y,TRADITIONAL_MEDICINE,,,,,,
+Spa thư giãn,SPA_BEAUTY,,,,,,
+Phòng khám da liễu,DERMATOLOGY,,,,,,
+Dịch vụ ở Quận 1,,760,,,,,
+Ở Q1,,760,,,,,
+Khu vực Q.1,,760,,,,,
+Ở quận một,,760,,,,,
+Ở TPHCM,,79,,,,,
+Ở HCM,,79,,,,,
+Ở Hồ Chí Minh,,79,,,,,
+Ở Quận 3,,770,,,,,
+Khu vực Q7,,778,,,,,
+Ở Quận Tân Bình,,766,,,,,
+Ở Hà Nội,,01,,,,,
+Ở Đà Nẵng,,48,,,,,
+Khu vực Q10,,771,,,,,
+Ở Thủ Đức,,762,,,,,
+Gần Bình Thạnh,,765,,,,,
+Ở Q5,,774,,,,,
+Giá dưới 500k,,,lte,500000,,,
+Chi phí 2 triệu,,,between,1700000,2300000,,
+Giá 2tr,,,between,1700000,2300000,,
+Khoảng 1.5 triệu,,,between,1275000,1725000,,
+Giá khoảng 300k,,,between,255000,345000,,
+Từ 100k đến 300k,,,between,100000,300000,,
+Trên 1 triệu,,,gte,1000000,,,
+Chi phí 500 nghìn,,,between,425000,575000,,
+Giá 1.5tr,,,between,1275000,1725000,,
+Dưới 1tr,,,lte,1000000,,,
+Giá 800k,,,between,680000,920000,,
+Khoảng 200 nghìn,,,between,170000,230000,,
+Từ 200k đến 500k,,,between,200000,500000,,
+Trên 2 triệu,,,gte,2000000,,,
+Gần đây,,,,,,10000,true
+Trong vòng 5km,,,,,,5000,false
+Cách 2 cây số,,,,,,2000,false
+Xung quanh đây,,,,,,10000,true
+Trong vòng 3km,,,,,,3000,false
+Lân cận,,,,,,10000,true
+Gần nhà,,,,,,10000,true
+Trong bán kính 2km,,,,,,2000,false
+Cách 1 cây số,,,,,,1000,false
+Trong vòng 10km,,,,,,10000,false
+Spa ở Quận 1,SPA_BEAUTY,760,,,,,
+Gym ở Q7,FITNESS,778,,,,,
+Nha khoa ở HCM,DENTAL,79,,,,,
+Massage ở Đà Nẵng,MASSAGE_THERAPY,48,,,,,
+Phòng khám ở Q3,TRADITIONAL_MEDICINE,770,,,,,
+Spa gần Tân Bình,SPA_BEAUTY,766,,,,,
+Yoga ở Hà Nội,FITNESS,01,,,,,
+Hiệu thuốc ở Q10,PHARMACY,771,,,,,
+Phòng khám đông y ở Thủ Đức,TRADITIONAL_MEDICINE,762,,,,,
+Spa ở Q.1,SPA_BEAUTY,760,,,,,
+Gym ở quận một,FITNESS,760,,,,,
+Nha sĩ ở TPHCM,DENTAL,79,,,,,
+Phòng khám ở Bình Thạnh,TRADITIONAL_MEDICINE,765,,,,,
+Gym dưới 500k,FITNESS,,lte,500000,,,
+Spa khoảng 300k,SPA_BEAUTY,,between,255000,345000,,
+Nha sĩ chi phí 2 triệu,DENTAL,,between,1700000,2300000,,
+Massage giá 400k,MASSAGE_THERAPY,,between,340000,460000,,
+Phòng khám trên 1 triệu,TRADITIONAL_MEDICINE,,gte,1000000,,,
+Spa từ 100k đến 300k,SPA_BEAUTY,,between,100000,300000,,
+Gym giá 1.5tr,FITNESS,,between,1275000,1725000,,
+Nha khoa dưới 3 triệu,DENTAL,,lte,3000000,,,
+Massage khoảng 800k,MASSAGE_THERAPY,,between,680000,920000,,
+Yoga giá 200k,FITNESS,,between,170000,230000,,
+Hiệu thuốc dưới 200k,PHARMACY,,lte,200000,,,
+Spa gần đây,SPA_BEAUTY,,,,,10000,true
+Gym trong vòng 3km,FITNESS,,,,,3000,false
+Nha khoa gần đây,DENTAL,,,,,10000,true
+Phòng khám cách 2 cây số,TRADITIONAL_MEDICINE,,,,,2000,false
+Massage xung quanh,MASSAGE_THERAPY,,,,,10000,true
+Yoga lân cận,FITNESS,,,,,10000,true
+Hiệu thuốc gần nhà,PHARMACY,,,,,10000,true
+Phòng khám đông y trong vòng 10km,TRADITIONAL_MEDICINE,,,,,10000,false
+Spa trong vòng 5km,SPA_BEAUTY,,,,,5000,false
+Gym cách 1 cây số,FITNESS,,,,,1000,false
+Ở Q1 giá dưới 500k,,760,lte,500000,,,
+Ở Quận 3 khoảng 300k,,770,between,255000,345000,,
+Ở HCM giá 2 triệu,,79,between,1700000,2300000,,
+Ở Q7 trên 1 triệu,,778,gte,1000000,,,
+Ở Đà Nẵng dưới 800k,,48,lte,800000,,,
+Giá dưới 500k gần đây,,,lte,500000,,10000,true
+Khoảng 300k trong vòng 3km,,,between,255000,345000,3000,false
+Giá 2 triệu lân cận,,,between,1700000,2300000,10000,true
+Từ 100k đến 300k xung quanh,,,between,100000,300000,10000,true
+Ở Q1 gần đây,,760,,,,10000,true
+Ở HCM trong vòng 5km,,79,,,,5000,false
+Spa ở Q1 dưới 500k,SPA_BEAUTY,760,lte,500000,,,
+Gym ở HCM trong vòng 3km,FITNESS,79,,,,3000,false
+Massage khoảng 400k gần đây,MASSAGE_THERAPY,,between,340000,460000,10000,true
+Nha khoa ở HCM khoảng 2 triệu,DENTAL,79,between,1700000,2300000,,
+Phòng khám ở Q3 giá 300k,TRADITIONAL_MEDICINE,770,between,255000,345000,,
+Spa ở Quận 1 từ 100k đến 300k,SPA_BEAUTY,760,between,100000,300000,,
+Gym ở Q7 giá 1.5tr,FITNESS,778,between,1275000,1725000,,
+Massage ở Đà Nẵng dưới 800k,MASSAGE_THERAPY,48,lte,800000,,,
+Yoga ở Hà Nội trên 500k,FITNESS,01,gte,500000,,,
+Hiệu thuốc ở Q10 giá 200k,PHARMACY,771,between,170000,230000,,
+Phòng khám đông y ở Thủ Đức khoảng 1 triệu,TRADITIONAL_MEDICINE,762,between,850000,1150000,,
+Nha sĩ ở Tân Bình chi phí 2tr,DENTAL,766,between,1700000,2300000,,
+Spa ở Q.1 dưới 600k,SPA_BEAUTY,760,lte,600000,,,
+Gym gần quận một giá 250k,FITNESS,760,between,212500,287500,,
+Phòng khám ở TPHCM giá 500 nghìn,TRADITIONAL_MEDICINE,79,between,425000,575000,,
+Spa ở Quận 1 gần đây,SPA_BEAUTY,760,,,,10000,true
+Gym ở Q7 trong vòng 5km,FITNESS,778,,,,5000,false
+Nha khoa ở HCM cách 3km,DENTAL,79,,,,3000,false
+Massage ở Đà Nẵng xung quanh,MASSAGE_THERAPY,48,,,,10000,true
+Yoga ở Hà Nội lân cận,FITNESS,01,,,,10000,true
+Phòng khám ở Q3 cách 2 cây số,TRADITIONAL_MEDICINE,770,,,,2000,false
+Hiệu thuốc ở Q10 gần nhà,PHARMACY,771,,,,10000,true
+Phòng khám đông y ở Thủ Đức trong vòng 10km,TRADITIONAL_MEDICINE,762,,,,10000,false
+Spa ở Tân Bình trong bán kính 2km,SPA_BEAUTY,766,,,,2000,false
+Gym ở Bình Thạnh cách 1 cây số,FITNESS,765,,,,1000,false
+Spa dưới 500k gần đây,SPA_BEAUTY,,lte,500000,,10000,true
+Gym giá 300k trong vòng 2km,FITNESS,,between,255000,345000,2000,false
+Massage khoảng 400k cách 5km,MASSAGE_THERAPY,,between,340000,460000,5000,false
+Nha khoa chi phí 2 triệu xung quanh,DENTAL,,between,1700000,2300000,10000,true
+Spa từ 100k đến 300k gần đây,SPA_BEAUTY,,between,100000,300000,10000,true
+Phòng khám giá 800k lân cận,TRADITIONAL_MEDICINE,,between,680000,920000,10000,true
+Yoga trên 200k gần nhà,FITNESS,,gte,200000,,10000,true
+Hiệu thuốc dưới 300k trong vòng 3km,PHARMACY,,lte,300000,,3000,false
+Phòng khám đông y khoảng 1 triệu trong vòng 10km,TRADITIONAL_MEDICINE,,between,850000,1150000,10000,false
+Gym khoảng 500k cách 1 cây số,FITNESS,,between,425000,575000,1000,false
+Massage giá 2tr xung quanh đây,MASSAGE_THERAPY,,between,1700000,2300000,10000,true
+Nha khoa giá 1.5 triệu trong vòng 3km,DENTAL,,between,1275000,1725000,3000,false
+Spa từ 200k đến 400k gần đây,SPA_BEAUTY,,between,200000,400000,10000,true
+Tìm spa ở Quận 1 giá dưới 500k trong vòng 2km,SPA_BEAUTY,760,lte,500000,,2000,false
+Gym gần Q7 chi phí khoảng 300k cách 5km,FITNESS,778,between,255000,345000,5000,false
+Nha khoa ở HCM khoảng 2 triệu gần đây,DENTAL,79,between,1700000,2300000,10000,true
+Massage ở Đà Nẵng từ 100k đến 300k trong vòng 3km,MASSAGE_THERAPY,48,between,100000,300000,3000,false
+Phòng khám ở Q3 giá 300k cách 2 cây số,TRADITIONAL_MEDICINE,770,between,255000,345000,2000,false
+Yoga ở Hà Nội giá 200k xung quanh đây,FITNESS,01,between,170000,230000,10000,true
+Spa ở Tân Bình chi phí 2tr trong bán kính 2km,SPA_BEAUTY,766,between,1700000,2300000,2000,false
+Gym ở Bình Thạnh giá 1.5tr cách 1 cây số,FITNESS,765,between,1275000,1725000,1000,false
+Hiệu thuốc ở Q10 dưới 300k lân cận,PHARMACY,771,lte,300000,,10000,true
+Phòng khám đông y ở Thủ Đức khoảng 1 triệu trong vòng 10km,TRADITIONAL_MEDICINE,762,between,850000,1150000,10000,false
+Nha sĩ ở Q.1 trên 1 triệu gần nhà,DENTAL,760,gte,1000000,,10000,true
+Massage trị liệu ở HCM giá 600k trong vòng 5km,MASSAGE_REHABILITATION,79,between,510000,690000,5000,false
+Phòng khám da liễu ở TPHCM giá 500 nghìn gần đây,DERMATOLOGY,79,between,425000,575000,10000,true
+Spa thư giãn ở quận một khoảng 400k lân cận,SPA_BEAUTY,760,between,340000,460000,10000,true
+Trung tâm yoga ở Q7 giá 250k trong vòng 2km,FITNESS,778,between,212500,287500,2000,false
+Tiệm làm đẹp ở Đà Nẵng giá 350k xung quanh,SPA_BEAUTY,48,between,297500,402500,10000,true
+Phòng khám đa khoa ở Hà Nội trên 800k trong bán kính 3km,TRADITIONAL_MEDICINE,01,gte,800000,,3000,false
+Gym ở Q3 từ 200k đến 400k cách 3km,FITNESS,770,between,200000,400000,3000,false
+Massage ở Q10 giá 2tr gần đây,MASSAGE_THERAPY,771,between,1700000,2300000,10000,true
+Nha khoa ở Thủ Đức giá 1.5 triệu trong vòng 5km,DENTAL,762,between,1275000,1725000,5000,false
+Hiệu thuốc ở Hà Nội dưới 200k gần đây,PHARMACY,01,lte,200000,,10000,true
+Yoga ở Q5 khoảng 300k trong vòng 2km,FITNESS,774,between,255000,345000,2000,false
+Spa ở Hồ Chí Minh từ 300k đến 600k xung quanh,SPA_BEAUTY,79,between,300000,600000,10000,true
+Phòng khám đông y ở Q7 trên 2 triệu cách 5km,TRADITIONAL_MEDICINE,778,gte,2000000,,5000,false
+Massage trị liệu ở Tân Bình giá 800k lân cận,MASSAGE_REHABILITATION,766,between,680000,920000,10000,true
+Ở Q3,,770,,,,,
+Dưới 500k,,,lte,500000,,,
+Khoảng 1 triệu,,,between,850000,1150000,,
+Dịch vụ y tế,,,,,,,
+Chăm sóc sức khỏe,,,,,,,
+Dịch vụ cao cấp,,,,,,,
+Ở Q1 giá 500k,,760,between,425000,575000,,
+Quận 3 dưới 1 triệu,,770,lte,1000000,,,
+Gần đây giá rẻ,,,lte,300000,,10000,true
+Tìm ở đây,,,,,,,
+Gần tôi,,,,,,10000,true

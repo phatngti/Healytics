@@ -26,7 +26,10 @@ export class DistanceMatrixResponseDto {
   @ApiProperty({ type: [String], example: ['Ho Chi Minh City, Vietnam'] })
   originAddresses: string[];
 
-  @ApiProperty({ type: [String], example: ['District 7, Ho Chi Minh City, Vietnam'] })
+  @ApiProperty({
+    type: [String],
+    example: ['District 7, Ho Chi Minh City, Vietnam'],
+  })
   destinationAddresses: string[];
 
   @ApiProperty({ type: [DistanceMatrixRowDto] })

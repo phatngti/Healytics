@@ -56,7 +56,7 @@ void main() {
       // TODO
     });
 
-    // Object description
+    // String description
     test('to test the property `description`', () async {
       // TODO
     });
@@ -98,6 +98,11 @@ void main() {
 
     // List<PartnerRecommendedServiceDto> recommendedServices (default value: const [])
     test('to test the property `recommendedServices`', () async {
+      // TODO
+    });
+
+    // PartnerDetailServiceManualDto serviceManual
+    test('to test the property `serviceManual`', () async {
       // TODO
     });
 

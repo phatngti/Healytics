@@ -15,6 +15,7 @@ import {
 import { EmployeeRole } from '@/employees/enum/employee-role.enum';
 import { EmployeeStatus } from '@/employees/enum/employee-status.enum';
 import { Gender } from '@/employees/enum/gender.enum';
+import { Account } from './account.entity';
 import { DoctorProfile } from './doctor-profile.entity';
 import { TherapistProfile } from './therapist-profile.entity';
 import { Partner } from './partner.entity';
@@ -23,9 +24,6 @@ import { Partner } from './partner.entity';
 export class Employee {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column({ name: 'auth_id', nullable: true, unique: true, length: 255 })
-  authId: string;
 
   @Index()
   @Column({ name: 'employee_code', unique: true, length: 50 })
@@ -39,9 +37,6 @@ export class Employee {
 
   @Column({ name: 'full_name', length: 100 })
   fullName: string;
-
-  @Column({ name: 'display_name', length: 50, nullable: true })
-  displayName: string;
 
   @Index()
   @Column({ unique: true, length: 100 })
@@ -69,17 +64,28 @@ export class Employee {
   @Column({ name: 'emergency_contact_phone', length: 20, nullable: true })
   emergencyContactPhone: string;
 
-  @Column({ name: 'id_card_url', type: 'text', nullable: true })
-  idCardUrl: string;
+  @Column({ name: 'verification_documents', type: 'jsonb', nullable: true })
+  verificationDocuments: {
+    fieldKey: string;
+    name?: string;
+    url?: string;
+    updatedTime?: string;
+    documents?: { name: string; url: string; updatedTime?: string }[];
+  }[];
 
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ length: 255, nullable: true })
-  password: string;
-
   @Column({ type: 'jsonb', nullable: true })
   schedule: { day: string; start: string; end: string; isWorking: boolean }[];
+
+  @Column({ name: 'work_history', type: 'jsonb', nullable: true })
+  workHistory: {
+    facility: string;
+    position: string;
+    period: string;
+    isCurrent: boolean;
+  }[];
 
   @Column({ type: 'date', nullable: true })
   dob: Date;
@@ -97,23 +103,31 @@ export class Employee {
   })
   status: EmployeeStatus;
 
+  // Denormalized cache maintained from specialist_reviews by the review module.
   @Column({ type: 'decimal', precision: 3, scale: 2, default: 0 })
   rating: number;
 
+  // Denormalized cache maintained from specialist_reviews by the review module.
   @Column({ name: 'review_count', type: 'int', default: 0 })
   reviewCount: number;
-
-  @Index()
-  @Column({ name: 'branch_id', type: 'uuid', nullable: true })
-  branchId: string;
 
   @Index()
   @Column({ name: 'partner_id', type: 'uuid', nullable: true })
   partnerId: string | null;
 
-  @ManyToOne(() => Partner, (partner) => partner.employees, { onDelete: 'SET NULL' })
+  @ManyToOne(() => Partner, (partner) => partner.employees, {
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'partner_id' })
   partner: Partner | null;
+
+  @Index()
+  @Column({ name: 'account_id', type: 'uuid', nullable: true, unique: true })
+  accountId: string | null;
+
+  @OneToOne(() => Account, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'account_id' })
+  account: Account | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

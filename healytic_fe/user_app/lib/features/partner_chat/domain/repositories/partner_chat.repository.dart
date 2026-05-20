@@ -1,0 +1,37 @@
+import 'package:user_app/features/partner_chat/data/datasources/remote/partner_chat_remote_datasource.dart';
+import 'package:user_app/features/partner_chat/domain/entities/partner_conversation.entity.dart';
+
+/// Repository interface for P2P partner chat.
+///
+/// Provides REST-based operations for conversation
+/// management and message history. Real-time messaging
+/// is handled separately via the socket service.
+abstract class PartnerChatRepository {
+  /// Get or create a conversation with the specified
+  /// partner.
+  ///
+  /// If an active conversation already exists between
+  /// the current user and [partnerAccountId], returns
+  /// the existing one. Otherwise creates a new one.
+  Future<PartnerConversation> getOrCreateConversation({
+    required String partnerAccountId,
+    String? initialMessage,
+  });
+
+  /// Fetch paginated message history for a
+  /// conversation.
+  ///
+  /// Returns a [PaginatedMessages] with messages in
+  /// chronological order (ASC) and pagination metadata.
+  Future<PaginatedMessages> getMessages(
+    String conversationId, {
+    String? beforeId,
+    int limit = 20,
+  });
+
+  /// Fetch all conversations for the current user.
+  Future<List<PartnerConversation>> getConversations();
+
+  /// Mark all messages in a conversation as read.
+  Future<void> markAsRead(String conversationId);
+}

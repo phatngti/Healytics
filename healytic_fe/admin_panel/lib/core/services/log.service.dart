@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:admin_panel/core/utils/console_logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:admin_panel/core/models/log.model.dart';
@@ -7,9 +8,10 @@ import 'package:admin_panel/core/models/log.model.dart';
 class LogService {
   final List<LogMessage> _msgBuffer = [];
 
-  /// Whether to buffer logs in memory before writing to the database.
-  /// This is useful when logging in quick succession, as it increases performance
-  /// and reduces NAND wear. However, it may cause the logs to be lost in case of a crash / in isolates.
+  /// Whether to buffer logs in memory before writing
+  /// to the database. Increases performance and
+  /// reduces NAND wear when logging in quick
+  /// succession. May cause log loss on crash.
   final bool _shouldBuffer;
 
   Timer? _flushTimer;
@@ -42,11 +44,20 @@ class LogService {
 
   void _handleLogRecord(LogRecord r) {
     if (kDebugMode) {
-      debugPrint(
-        '[${r.level.name}] [${r.time}] [${r.loggerName}] ${r.message}'
-        '${r.error == null ? '' : '\nError: ${r.error}'}'
-        '${r.stackTrace == null ? '' : '\nStack: ${r.stackTrace}'}',
-      );
+      final formatted =
+          '[${r.level.name}] [${r.time}] '
+          '[${r.loggerName}] ${r.message}'
+          '${r.error == null ? '' : '\nError: ${r.error}'}'
+          '${r.stackTrace == null ? '' : '\nStack: ${r.stackTrace}'}';
+
+      debugPrint(formatted);
+
+      // Route WARNING+ logs to browser console.error
+      // so they appear in the DevTools "Errors" tab
+      // with red highlighting. No-op on non-web.
+      if (r.level >= Level.WARNING) {
+        logErrorToConsole(formatted);
+      }
     }
 
     final record = LogMessage(

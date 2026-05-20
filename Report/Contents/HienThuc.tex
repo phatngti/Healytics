@@ -1,21 +1,17 @@
-\chapter{Hiện thực}
+﻿\chapter{Hiện thực}
 \section{Các công nghệ liên quan}
 
 \subsection{Mobile App Development (iOS/Android, Flutter)}
 \begin{itemize}
-    \item \textbf{Lý do chọn Flutter:} Là một framework đa nền tảng, cho phép phát triển ứng dụng cho cả iOS và Android từ một bộ mã nguồn duy nhất. Điều này giúp \textbf{tiết kiệm thời gian, chi phí} phát triển và bảo trì, đồng thời đảm bảo trải nghiệm người dùng nhất quán trên cả hai hệ điều hành. Hiệu năng của Flutter gần như tương đương với ứng dụng native.
+    \item \textbf{Lý do chọn Flutter:} Framework đa nền tảng cho iOS/Android với một codebase, giúp giảm chi phí phát triển - bảo trì và giữ trải nghiệm nhất quán.
     \item \textbf{Kiến trúc:} Áp dụng kiến trúc Clean Architecture hoặc Riverpod Architecture để tách biệt rõ ràng các tầng logic (Data, Domain, Presentation), giúp mã nguồn dễ kiểm thử và bảo trì.
     \item \textbf{Tính năng nổi bật}:
     \begin{itemize}
-        \item \textbf{Impeller Rendering Engine}: Flutter biên dịch shader tùy chỉnh tại thời điểm build để đạt độ mượt 120Hz và không có JS bridge; React Native với New Architecture (Fabric + Skia) vẫn dùng cầu nối JS-to-native, bị giật khi animation nặng; Native (Metal/Vulkan) truy cập GPU trực tiếp nhưng cần tinh chỉnh riêng cho từng nền tảng.
-        \item \textbf{Hot Reload Speed}: Flutter giữ trạng thái trong $<$100ms nhờ Dart AOT; React Native với Metro bundler reload trong $\sim$1s nhưng mất trạng thái ở module native phức tạp; Native không có hot reload thật sự—rebuild toàn bộ mất 10s+ trong Xcode/Android Studio.
-        \item \textbf{Widget/Component System}: Mô hình ``mọi thứ là widget'' của Flutter cho phép kết hợp vô hạn và UI chính xác đến từng pixel chỉ trong một ngôn ngữ (Dart); React Native dùng JSX cần thư viện bên thứ ba cho style nâng cao, dễ bất đồng bộ; Native (SwiftUI/Compose) kiểm soát hoàn toàn nhưng phải viết lại code cho iOS/Android.
-        \item \textbf{Startup Time \& App Size}: Flutter khởi động lạnh $<$50ms nhờ AOT nhưng bundle engine $\sim$50MB; React Native khởi động $\sim$100ms với JS bundle, kích thước cơ bản nhỏ hơn ($\sim$30MB); Native khởi động nhanh nhất ($<$30ms) không có runtime nhúng.
-        \item \textbf{Platform Channel/Bridge}: Kênh đồng bộ/bất đồng bộ của Flutter tích hợp API native (camera, BLE) với Dart an toàn kiểu; TurboModules của React Native giảm overhead cầu nối nhưng vẫn chỉ bất đồng bộ, khó debug; Native truy cập phần cứng trực tiếp qua SDK, độ trễ bằng 0.
-        \item \textbf{Multi-Platform Code Reuse}: Flutter biên dịch thành binary native cho iOS, Android, web, desktop và nhúng với tỷ lệ tái sử dụng 90\%+; React Native mạnh trên mobile, cần React Native Web/Electron cho các nền khác ($\sim$70\% tái sử dụng); Native yêu cầu codebase Swift/Kotlin riêng, tái sử dụng $<$30\%.
-        \item \textbf{Animation Performance}: Impeller + canvas 120Hz của Flutter cho 0 khung hình bị bỏ trong chuyển cảnh phức tạp; React Native ổn định $\sim$60fps nhưng giật khi JS thread nặng; Native đảm bảo 120Hz với Core Animation/Compose, tốt nhất cho game.
-        \item \textbf{OTA Updates}: Flutter dùng Shorebird/CodeMagic để vá lỗi tức thì không qua store; React Native dùng CodePush đẩy cập nhật JS trực tiếp; Native phải qua App Store/Google Play, chờ duyệt 1--7 ngày.
-        \item \textbf{Ecosystem \& Third-Party Libs}: pub.dev của Flutter phát triển nhanh nhưng thiếu plugin niche, thường cần viết channel tùy chỉnh; React Native tận dụng npm với 2M+ package, hệ sinh thái phong phú nhất; Native dùng CocoaPods/Gradle chính thức, ổn định nhất nhưng bị khóa nền tảng.
+        \item \textbf{Hiệu năng hiển thị:} Impeller giúp chuyển động mượt và ổn định cho UI phức tạp.
+        \item \textbf{Phát triển nhanh:} Hot reload nhanh, giữ trạng thái tốt khi chỉnh giao diện và logic.
+        \item \textbf{Khả năng tái sử dụng:} Chia sẻ code cao giữa mobile và có thể mở rộng web/desktop khi cần.
+        \item \textbf{Tích hợp native:} Platform channel hỗ trợ kết nối các API thiết bị như camera, BLE.
+        \item \textbf{Vận hành sản phẩm:} Hỗ trợ cập nhật và bảo trì thuận lợi, hệ sinh thái thư viện đủ lớn cho nhu cầu dự án.
     \end{itemize}
 \end{itemize}
 
@@ -24,28 +20,14 @@
 % -----------------------------------------------------------------
 \subsection{Web/Portal Development (Partner Portal, Admin Dashboard)}
 \begin{itemize}
-    \item \textbf{Lý do chọn Flutter (Web \& Desktop):} Cho phép tái sử dụng tới 100\% business logic và UI từ ứng dụng mobile (Customer/Technician App) để xây dựng Admin Dashboard. Với sự hỗ trợ của WebAssembly (Wasm), Flutter Web mang lại trải nghiệm Single Page Application (SPA) mượt mà, đồng nhất trên mọi trình duyệt mà không cần lo lắng về sự sai lệch CSS hay DOM như các framework web truyền thống.
+    \item \textbf{Lý do chọn Flutter (Web \& Desktop):} Tận dụng lại phần lớn business logic từ mobile, đảm bảo giao diện đồng nhất giữa các nền tảng và giảm chi phí bảo trì.
     \item \textbf{Tính năng nổi bật}:
     \begin{itemize}
-        \item \textbf{WebAssembly (Wasm) Rendering}: Flutter biên dịch sang Wasm (GC) thay vì chỉ JS thuần, giúp hiệu năng thực thi gần như Native trên trình duyệt hiện đại; React/Next.js dựa hoàn toàn vào JavaScript và DOM manipulation, dễ bị chậm khi xử lý bảng dữ liệu lớn (thousands of rows); Angular có hiệu năng tốt nhưng vẫn chịu giới hạn của JS thread; Vue/Nuxt nhẹ nhưng khó xử lý các tác vụ tính toán nặng phía client.
-        
-        \item \textbf{Unified Business Logic}: Chia sẻ hoàn toàn các model, repository, và service (Authentication, API handling) với Mobile App; React Web và React Native tuy cùng hệ sinh thái nhưng không thể chia sẻ code UI và thường phải viết lại logic điều hướng; Angular/Vue là web-only, hoàn toàn tách biệt với logic mobile; Việc dùng chung codebase giúp giảm 50\% công sức bảo trì và fix bug cho cả 3 nền tảng (Web, iOS, Android).
-        
-        \item \textbf{Pixel-Perfect UI Consistency}: Flutter vẽ UI trên một canvas (Skia/Impeller), đảm bảo Admin Dashboard hiển thị giống hệt nhau trên Chrome, Safari, hay Desktop App (Windows/macOS); Next.js/React phụ thuộc vào trình duyệt render HTML/CSS, thường gặp lỗi hiển thị khác nhau giữa các trình duyệt; CSS của Angular/Vue có thể bị conflict hoặc vỡ layout khi thay đổi độ phân giải màn hình.
-        
-        \item \textbf{Declarative Routing (GoRouter)}: Hỗ trợ deep linking, path parameters và redirection mạnh mẽ cho web, đồng thời quản lý navigation stack phức tạp của admin panel; React Router cần cấu hình thủ công nhiều; Angular Routing mạnh nhưng boilerplate code rất dài; Flutter Routing đồng bộ trạng thái URL với state của ứng dụng một cách tự nhiên.
-        
-        \item \textbf{Advanced Data Visualization}: Flutter tích hợp cực tốt với các thư viện vẽ biểu đồ (Charts) hiệu năng cao (fl\_charts, syncfusion) render trực tiếp trên canvas 60fps; Các thư viện Chart của React/Vue (D3.js, Chart.js) thao tác trên DOM/SVG, thường bị lag khi render lượng dữ liệu realtime lớn; Khả năng tùy biến visual của Flutter vượt trội hơn nhờ quyền kiểm soát từng pixel.
-        
-        \item \textbf{State Management (BLoC/Riverpod)}: Quản lý trạng thái phức tạp của Admin (đa ngôn ngữ, theme, user permissions) thống nhất, reactive và dễ test; React Context API thường gây re-render không cần thiết nếu không tối ưu (useMemo); Angular dùng RxJS mạnh nhưng đường cong học tập (learning curve) rất cao; Vuex/Pinia của Vue đơn giản nhưng khó scale cho các enterprise admin lớn.
-        
-        \item \textbf{Dart Sound Null Safety}: Hệ thống type an toàn tuyệt đối giúp ngăn chặn lỗi runtime (null reference) thường gặp khi xử lý dữ liệu API thiếu trường trong Admin Dashboard; TypeScript trong React/Next.js chỉ là lớp kiểm tra tĩnh (compile-time), vẫn có thể lỗi runtime; JavaScript thuần trong các framework cũ hoàn toàn không có bảo vệ này.
-        
-        \item \textbf{Desktop Support (Windows/macOS)}: Flutter cho phép build ra file .exe/.app native từ cùng source code web admin để nhân viên cài đặt, tận dụng phím tắt, notification hệ thống và làm việc offline; Next.js/React cần bọc trong Electron (rất nặng nề, tốn RAM); Angular/Vue không có giải pháp native chính thống, chỉ chạy trên trình duyệt.
-        
-        \item \textbf{Development Experience (DX)}: Stateful Hot Reload hoạt động trên cả Web, giúp sửa UI bảng biểu/form tức thì mà không mất dữ liệu đang nhập; HMR của Webpack (React/Vue) nhanh nhưng thường reload lại trang khi sửa logic sâu; Angular rebuild khá lâu với các dự án lớn; Công cụ Flutter DevTools giúp debug layout và network request trực quan hơn console log của trình duyệt.
-        
-        \item \textbf{Security}: Code logic được biên dịch thành main.dart.js (hoặc Wasm) minified và obfuscated mặc định, khó bị đọc trộm logic nghiệp vụ hơn so với code JS rõ ràng của React/Next.js (có thể xem qua Source tab trình duyệt); Đây là điểm cộng lớn cho các Admin Portal chứa logic tính toán doanh thu/hoa hồng nhạy cảm.
+        \item \textbf{Hiệu năng trình duyệt:} Flutter Web đáp ứng tốt các màn hình quản trị có nhiều thành phần dữ liệu.
+        \item \textbf{Code dùng chung:} Tái sử dụng model/service giữa mobile và web để giảm công sức phát triển.
+        \item \textbf{UI nhất quán:} Kiểm soát hiển thị tốt trên nhiều trình duyệt và độ phân giải.
+        \item \textbf{Routing và state management:} GoRouter kết hợp BLoC/Riverpod giúp luồng điều hướng rõ ràng, dễ kiểm thử.
+        \item \textbf{Mở rộng desktop:} Có thể phát hành bản desktop khi cần cho vận hành nội bộ.
     \end{itemize}
 \end{itemize}
 
@@ -119,7 +101,7 @@ Phần Backend đóng vai trò cốt lõi trong việc xử lý nghiệp vụ, l
 
 \subsubsection{Caching \& In-Memory Store (Redis)}
 \begin{itemize}
-    \item \textbf{Lý do chọn Redis:} Là kho lưu trữ dữ liệu trong bộ nhớ (In-memory) với hiệu năng siêu tốc ($<$1ms). Redis được sử dụng để Cache dữ liệu hay truy xuất (danh sách dịch vụ, banner), lưu trữ Session người dùng và quản lý các dữ liệu tạm thời (như giỏ hàng chưa thanh toán).
+    \item \textbf{Lý do chọn Redis:} Kho lưu trữ trong bộ nhớ với hiệu năng rất cao, dùng cho cache, session và dữ liệu tạm thời.
     \item \textbf{Tính năng nổi bật}:
     \begin{itemize}
         \item \textbf{Rich Data Structures}: Redis hỗ trợ Hash, List, Set, Sorted Set (dùng cho Leaderboard/Ranking), Bitmap; Memcached chỉ hỗ trợ Key-Value chuỗi đơn giản, không thao tác được trên cấu trúc dữ liệu; Cơ sở dữ liệu truyền thống (Postgres/MySQL) lưu trên đĩa cứng, tốc độ chậm hơn hàng nghìn lần so với RAM của Redis.
@@ -134,407 +116,83 @@ Phần Backend đóng vai trò cốt lõi trong việc xử lý nghiệp vụ, l
     \end{itemize}
 \end{itemize}
 
+% -----------------------------------------------------------------
+% PHẦN 4: CÔNG NGHỆ AI/ML
+% -----------------------------------------------------------------
+\subsection{Hạ tầng Trí tuệ Nhân tạo (AI/ML Infrastructure)}
 
+Hệ thống AI được triển khai như một cụm microservices độc lập, giao tiếp với Backend chính thông qua REST API. Toàn bộ được xây dựng bằng Python, tận dụng hệ sinh thái phong phú về Machine Learning và xử lý ngôn ngữ tự nhiên.
 
-
-\subsection{Hiện thực hệ thống RAG Chatbot}
-
-Phần hiện thực tập trung mô tả chi tiết quá trình xây dựng và triển khai hệ thống Chatbot tích hợp Retrieval-Augmented Generation (RAG). Khác với phần thiết kế đã trình bày ở mục trước, nội dung dưới đây mô tả trực tiếp cách các thành phần được cài đặt, cách chúng vận hành trong môi trường thực tế, cùng các cơ chế xử lý dữ liệu, truy xuất và sinh câu trả lời dựa trên mã nguồn Python của hệ thống.
-
-\subsubsection{Tổ chức mã nguồn}
-
-Hệ thống được triển khai dưới dạng một ứng dụng Python theo cấu trúc module hoá. Các thành phần được tách riêng thành nhiều file nhằm đảm bảo tính bảo trì, dễ kiểm thử và dễ mở rộng. Cấu trúc thư mục chính bao gồm:
-
+\subsubsection{Application Framework (FastAPI)}
 \begin{itemize}
-    \item \texttt{loaders/}: Các bộ tải tài liệu (PDF, text).
-    \item \texttt{processors/}: Bộ chia nhỏ văn bản và bộ làm sạch dữ liệu.
-    \item \texttt{embeddings/}: Mã thực thi mô hình embedding.
-    \item \texttt{vectorstore/}: Triển khai FAISS cho lưu trữ và truy vấn vector.
-    \item \texttt{retrieval/}: Bộ truy xuất top-k đoạn liên quan.
-    \item \texttt{prompt/}: Xây dựng format prompt hoàn chỉnh.
-    \item \texttt{chatbot/}: Pipeline chính kết nối truy xuất và mô hình sinh.
-\end{itemize}
-
-Việc tách thành module giúp các chức năng hoạt động độc lập và giảm rủi ro trùng lặp logic.
-
-\subsubsection{Hiện thực xử lý tài liệu}
-
-\paragraph{Tải và làm sạch tài liệu}
-
-Thành phần tải tài liệu được lập trình để quét nhiều định dạng.  
-Đối với PDF, hệ thống sử dụng bộ giải mã dựa trên PyMuPDF nhằm trích xuất nội dung văn bản theo từng trang. Sau khi tải xong, dữ liệu thô được chuyển qua lớp xử lý để loại bỏ:
-
-\begin{itemize}
-    \item ký tự thừa, ký tự xuống dòng không cần thiết;
-    \item khoảng trắng dư thừa;
-    \item các ký tự không hỗ trợ mã hoá UTF-8.
-\end{itemize}
-
-Kết quả trả về là một chuỗi văn bản sạch có thể đưa vào bước chia đoạn.
-
-\paragraph{Chia nhỏ văn bản}
-
-Khối chia nhỏ văn bản được hiện thực bằng một lớp chuyên dụng. Mã nguồn thực thi thuật toán chia theo độ dài token cố định (thường 300–400 token). Các đoạn sinh ra overlapped một phần để tránh mất ngữ nghĩa.
-
-Trong mã, bộ đếm token được thực hiện bằng tokenizer của mô hình embedding, đảm bảo số token đo được hoàn toàn trùng khớp với môi trường truy xuất và embedding.  
-Kết quả được lưu dưới dạng danh sách JSON gồm nội dung đoạn và metadata đi kèm như tên file, trang số và chỉ số đoạn.
-
-\subsubsection{Hiện thực mô hình embedding}
-
-Hệ thống sử dụng mô hình Sentence Transformers được tải từ HuggingFace. Lớp embedding thực thi các bước:
-
-    \begin{enumerate}
-        \item Tải mô hình vào CPU hoặc GPU tùy theo khả năng phần cứng.
-        \item Mã hóa văn bản thành vector có kích thước cố định.
-        \item Chuẩn hóa vector về đơn vị (L2 normalize) trước khi lưu vào FAISS.
-    \end{enumerate}
-
-
-Cơ chế xử lý hàng loạt (batch encoding) được tích hợp nhằm tăng hiệu năng khi embedding số lượng lớn đoạn.
-
-\subsubsection{Cơ sở dữ liệu vector FAISS}
-
-Vector sau khi được tạo sẽ được lưu vào chỉ mục FAISS dạng \texttt{IndexFlatIP}, tức sử dụng inner-product để tìm kiếm. Do các vector đã được chuẩn hóa, inner-product tương đương với cosine similarity.
-
-Quá trình xây dựng chỉ mục bao gồm:
-
-\begin{itemize}
-    \item khởi tạo chỉ mục rỗng;
-    \item chèn toàn bộ vector vào chỉ mục;
-    \item lưu thêm metadata tương ứng trong một bảng ánh xạ riêng.
-\end{itemize}
-
-Chỉ mục được ghi xuống đĩa để tái sử dụng ở các lần chạy sau, giảm thời gian khởi động hệ thống.
-
-\subsubsection{Hiện thực bộ truy xuất}
-
-Tại thời điểm nhận câu hỏi từ người dùng, pipeline thực hiện:
-
-\begin{enumerate}
-    \item embedding câu hỏi thành vector cùng kích thước với vector tài liệu;
-    \item gửi vector vào chỉ mục FAISS để truy vấn top-k (thường k = 5);
-    \item truy xuất lại nội dung các đoạn thông qua metadata;
-    \item xây dựng chuỗi ngữ cảnh bằng cách ghép các đoạn theo thứ tự giảm dần mức độ liên quan.
-\end{enumerate}
-
-Để tăng mức chính xác, mã nguồn có thêm bước lọc theo ngưỡng tương đồng. Nếu độ tương đồng thấp hơn mức tối thiểu, hệ thống trả về nhắc nhở rằng không tìm thấy thông tin phù hợp.
-
-\subsubsection{Xây dựng prompt đầu vào}
-
-Thành phần xây dựng prompt hiện thực đầy đủ 4 phần:
-
-\begin{itemize}
-    \item vai trò hệ thống (system role);
-    \item ngữ cảnh lấy từ RAG;
-    \item câu hỏi gốc;
-    \item hướng dẫn ràng buộc.
-\end{itemize}
-
-Mã nguồn chủ động tối ưu để tránh vượt quá giới hạn token của mô hình bằng cách:
-
-\begin{itemize}
-    \item cắt bỏ các đoạn quá dài,
-    \item ưu tiên giữ các đoạn có độ tương đồng cao nhất,
-    \item chuẩn hóa định dạng ngữ cảnh dưới dạng bullet hoặc paragraph ngắn.
-\end{itemize}
-
-\subsubsection{Tích hợp mô hình ngôn ngữ}
-
-Mô hình ngôn ngữ lớn được load trong chế độ suy luận lượng tử 4-bit, tận dụng thư viện HuggingFace Transformers kết hợp với accelerate và bitsandbytes. Thành phần hiện thực cung cấp:
-
-\begin{itemize}
-    \item cơ chế sinh văn bản theo chế độ greedy hoặc sampling;
-    \item kiểm soát tối đa token đầu ra nhằm tránh sinh tràn;
-    \item dừng sinh khi gặp các token kết thúc hoặc mẫu định dạng không hợp lệ.
-\end{itemize}
-
-Toàn bộ quá trình sinh được đóng gói thành một hàm duy nhất để dễ dàng gọi trong pipeline chatbot.
-
-\subsubsection{Xử lý phản hồi và hậu xử lý}
-
-Sau khi mô hình trả lời, hệ thống áp dụng chuỗi hậu xử lý:
-
-\begin{itemize}
-    \item loại bỏ token đặc biệt của mô hình;
-    \item chuẩn hóa xuống dòng, dấu câu;
-    \item cắt bỏ các phần nằm ngoài định dạng yêu cầu;
-    \item kiểm tra câu trả lời có bám sát ngữ cảnh hay không.
-\end{itemize}
-
-Nếu mô hình sinh câu trả lời không liên quan đến ngữ cảnh truy xuất, hệ thống tự động trả về thông báo trung tính để tránh rủi ro ảo giác.
-
-\subsubsection{Pipeline tổng hợp của Chatbot}
-
-Pipeline cuối cùng được hiện thực trong module \texttt{chatbot/service.py}. Tại đây toàn bộ các bước được kết nối theo trình tự:
-
-\begin{enumerate}
-    \item nhận câu hỏi từ người dùng;
-    \item embedding câu hỏi;
-    \item truy xuất đoạn liên quan từ FAISS;
-    \item xây dựng prompt hoàn chỉnh;
-    \item gửi prompt vào mô hình sinh;
-    \item trả về câu trả lời sau khi hậu xử lý.
-\end{enumerate}
-
-Mỗi bước đều có logging chi tiết giúp theo dõi hoạt động chatbot và hỗ trợ gỡ lỗi trong môi trường triển khai thực tế.
-
-
-
-
-\subsection{Triển khai hệ thống gợi ý}
-
-\subsubsection{Cấu trúc dữ liệu}
-
-Hệ thống được triển khai với cấu trúc dữ liệu rõ ràng, bao gồm:
-
-\begin{itemize}
-    \item \textbf{Services Database}: File JSON chứa các dịch vụ mẫu về sức khỏe
-    \item \textbf{Vector Database}: ChromaDB persistent storage tại \texttt{data/processed/vectordb/}
-    \item \textbf{Embedding Model}: \texttt{sentence-transformers/paraphrase-multilingual-mpnet-base-v2}
-\end{itemize}
-
-Mỗi service trong database chứa các trường:
-\begin{itemize}
-    \item \texttt{id}: Unique identifier (VD: SV001, SV002)
-    \item \texttt{name}: Tên dịch vụ
-    \item \texttt{description}: Mô tả chi tiết (100-200 từ)
-    \item \texttt{category}: Phân loại (y\_te, dinh\_duong, the\_thao, tam\_ly, phuc\_hoi)
-    \item \texttt{tags}: Danh sách từ khóa (4-6 tags)
-    \item \texttt{type}: Loại dịch vụ (consultation, exercise, nutrition, etc.)
-\end{itemize}
-
-\subsubsection{Offline Processing}
-
-\paragraph{Document Construction}
-Mỗi service được chuyển đổi thành một document text có cấu trúc:
-
-\begin{quote}
-\texttt{Tên dịch vụ: [name]} \\
-\texttt{Mô tả: [description]} \\
-\texttt{Danh mục: [category]} \\
-\texttt{Từ khóa: [tag1, tag2, tag3, ...]}
-\end{quote}
-
-\paragraph{Vector Database Building} 
-Quá trình build vector database bao gồm:
-\begin{enumerate}
-    \item Load các services từ \texttt{data/raw/services.json}
-    \item Tạo số lượng các documents tương ứng
-    \item Embedding các documents thành các vectors (768 chiều mỗi vector)
-    \item Index vào ChromaDB với cosine similarity metric
-    \item Lưu persistent tại \texttt{data/processed/vectordb/}
-\end{enumerate}
-
-Kích thước vector database (ví dụ với 10 services): $10 \times 768 = 7,680$ dimensions tổng cộng.
-
-\subsubsection{Online Processing}
-
-\paragraph{Home Recommender}  
-
-\textbf{Input Format:}
-\begin{itemize}
-    \item \texttt{user\_profile} (dict, optional):
+    \item \textbf{Lý do chọn FastAPI:} Framework Python async-native, tự sinh tài liệu OpenAPI và phù hợp cho AI service nhiều I/O.
+    \item \textbf{Tính năng nổi bật}:
     \begin{itemize}
-        \item \texttt{health\_conditions}: List[str] - VD: ["tim mạch", "đái tháo đường"]
-        \item \texttt{interests}: List[str] - VD: ["yoga", "dinh dưỡng"]
-        \item \texttt{goals}: List[str] - VD: ["giảm cân", "kiểm soát đường huyết"]
+        \item \textbf{Async-Native}: Hỗ trợ \texttt{async def} cho mọi endpoint, cho phép xử lý đồng thời hàng nghìn request mà không tạo thread; Flask/Django truyền thống dùng mô hình đồng bộ, cần Gunicorn workers để scale; Express (Node) cũng async nhưng không có type safety mạnh bằng Pydantic của FastAPI.
+
+        \item \textbf{Streaming Response (SSE)}: Hỗ trợ \texttt{StreamingResponse} native, cho phép gửi dữ liệu theo luồng (Server-Sent Events) — cốt lõi cho tính năng chatbot streaming; Flask cần extension bên ngoài cho SSE; Django không hỗ trợ streaming ở mức framework.
+
+        \item \textbf{Pydantic Validation}: Tự động validate request/response với type hints và Pydantic models, phát hiện lỗi dữ liệu trước khi vào logic AI; Flask/Django dùng Marshmallow hoặc serializers thủ công, dài dòng hơn.
+
+        \item \textbf{Performance}: Benchmark đạt 15k--20k req/s nhờ Uvicorn (ASGI), nhanh gấp 3--5 lần Flask (WSGI), và tương đương Express (Node); Kết hợp \texttt{uvloop} tăng thêm 20--30\% throughput.
     \end{itemize}
-    \item \texttt{selected\_services} (List[str], optional): ["SV001", "SV003"]
-    \item \texttt{top\_k} (int): Số lượng gợi ý mong muốn (default: 5)
 \end{itemize}
 
-\textbf{Processing Pipeline:}
-\begin{enumerate}
-    \item \textbf{Query Building}: Nối tất cả elements từ health\_conditions, interests, goals, và tags từ selected\_services thành một string
-    \item \textbf{Embedding}: Query string → 768-dim vector
-    \item \textbf{Vector Search}: ChromaDB query với cosine similarity
-    \item \textbf{Filtering}: Loại bỏ services trong selected\_services, filter theo threshold (0.2)
-    \item \textbf{Ranking}: Sắp xếp theo similarity score giảm dần
-    \item \textbf{Explanation}: Generate lý do dựa trên matching tags và profile
-\end{enumerate}
-
-\textbf{Output Format:}
+\subsubsection{Orchestration Framework (LangChain)}
 \begin{itemize}
-    \item \texttt{recommendations}: List[Dict] - Danh sách services được gợi ý
+    \item \textbf{Lý do chọn LangChain:} Nối LLM, vector store, retriever và prompt template thành pipeline hoàn chỉnh.
+    \item \textbf{Tính năng nổi bật}:
     \begin{itemize}
-        \item \texttt{service\_id}: str - VD: "SV002"
-        \item \texttt{name}: str - Tên dịch vụ
-        \item \texttt{description}: str - Mô tả đầy đủ
-        \item \texttt{category}: str - Danh mục
-        \item \texttt{tags}: List[str] - Tags
-        \item \texttt{type}: str - Loại dịch vụ
-        \item \texttt{similarity\_score}: float - Score trong [0, 1]
-        \item \texttt{reason}: str - Lý do gợi ý
+        \item \textbf{Runnable Interface}: Chain các bước xử lý (retrieval $\rightarrow$ prompt $\rightarrow$ LLM $\rightarrow$ parser) theo dạng pipeline khai báo, dễ debug từng bước; LlamaIndex cũng hỗ trợ RAG nhưng thiên về indexing, thiếu linh hoạt về chain composition; Tự build pipeline thủ công cần nhiều boilerplate code.
+
+        \item \textbf{Multi-Provider Support}: Tích hợp sẵn với HuggingFace (\texttt{langchain-huggingface}), ChromaDB (\texttt{langchain-chroma}), OpenAI, và nhiều provider khác chỉ qua config; Semantic Kernel (Microsoft) hỗ trợ ít provider hơn; Haystack (deepset) mạnh nhưng hệ sinh thái nhỏ hơn.
+
+        \item \textbf{Text Splitters}: \texttt{RecursiveCharacterTextSplitter} tách tài liệu thông minh theo ngữ nghĩa (ưu tiên tách ở dấu chấm, xuống dòng) thay vì cắt cứng; Hỗ trợ tùy chỉnh \texttt{chunk\_size} và \texttt{chunk\_overlap} phù hợp với từng embedding model.
+
+        \item \textbf{LangGraph}: Mở rộng LangChain thành đồ thị trạng thái (state graph) cho các agent phức tạp, hỗ trợ checkpoint và phân nhánh; AutoGen (Microsoft) cũng hỗ trợ multi-agent nhưng thiên về conversation, không mạnh về RAG pipeline.
     \end{itemize}
-    \item \texttt{total}: int - Tổng số gợi ý
 \end{itemize}
 
-\paragraph{Chatbot Recommender}  
-
-\textbf{Input Format:}
+\subsubsection{Mô hình ngôn ngữ lớn (Large Language Models)}
 \begin{itemize}
-    \item \texttt{query} (str): Câu hỏi tự nhiên từ người dùng
+    \item \textbf{Các mô hình sử dụng:}
     \begin{itemize}
-        \item VD: "Tôi bị stress và lo âu, cần tìm dịch vụ giúp giảm căng thẳng"
-        \item VD: "Có khóa học yoga nào phù hợp với người đau lưng không?"
+        \item \textbf{Meta Llama 3.1 8B Instruct}: Mô hình chính cho RAG Chatbot, lượng tử hóa 4-bit.
+        \item \textbf{Google Gemini (2.5 Flash)}: Dùng cho NER Service với structured output.
     \end{itemize}
-    \item \texttt{top\_k} (int): Số lượng gợi ý (default: 5)
+
+    \item \textbf{Tối ưu suy luận:}
+    \begin{itemize}
+        \item \textbf{BitsAndBytes (4-bit)}: NF4 quantization, giảm 75\% bộ nhớ, chỉ giảm <3\% chất lượng.
+    \end{itemize}
 \end{itemize}
 
-\textbf{Processing Pipeline:}
-\begin{enumerate}
-    \item \textbf{Query Embedding}: Câu query tự nhiên → 768-dim vector (không cần preprocessing)
-    \item \textbf{Vector Search}: Tìm kiếm trong ChromaDB
-    \item \textbf{Filtering}: Áp dụng similarity threshold (0.2)
-    \item \textbf{Ranking}: Sắp xếp theo similarity score
-    \item \textbf{Explanation}: Match tags trong query với tags của service
-\end{enumerate}
-
-\textbf{Output Format:}
+\subsubsection{Embedding và Vector Database}
 \begin{itemize}
-    \item \texttt{query}: str - Query gốc của người dùng
-    \item \texttt{recommendations}: List[Dict] - Giống format Home Recommender
-    \item \texttt{total}: int - Tổng số gợi ý
+    \item \textbf{Sentence Transformers}: Embedding đa ngôn ngữ cho tiếng Việt.
+    \item \textbf{ChromaDB}: Vector database persistent, tích hợp LangChain.
+    \item \textbf{FAISS}: Dùng cho tìm kiếm vector hiệu năng cao khi đánh giá/offline.
 \end{itemize}
 
-\subsubsection{Ví dụ minh họa}
-
-\paragraph{Ví dụ 1: Chatbot Recommender} 
-\textbf{Input:}
-\begin{verbatim}
-{
-  "query": "Tôi bị đau lưng mãn tính, cần tìm dịch vụ phục hồi",
-  "top_k": 3
-}
-\end{verbatim}
-
-\textbf{Query Processing:}
+\subsubsection{Xử lý Ngôn ngữ Tự nhiên tiếng Việt (Vietnamese NLP)}
 \begin{itemize}
-    \item Query embedding: 768-dim vector
-    \item Vector search: Tất cả services được scan
-    \item Top-3 services có highest cosine similarity
+    \item \textbf{Underthesea}: Word segmentation, POS tagging cho tiếng Việt.
+    \item \textbf{RapidFuzz}: Fuzzy string matching dựa trên khoảng cách Levenshtein, dùng để ánh xạ text thô (có lỗi chính tả) sang ID hệ thống trong bước Entity Linking.
+    \item \textbf{Aho-Corasick}: Khớp chuỗi đa mẫu, $\mathcal{O}(n + m + z)$, nhanh với địa danh Việt Nam.
 \end{itemize}
 
-\textbf{Output:}
-\begin{verbatim}
-{
-  "query": "Tôi bị đau lưng mãn tính, cần tìm dịch vụ phục hồi",
-  "recommendations": [
-    {
-      "service_id": "SV002",
-      "name": "Chương trình Yoga trị liệu",
-      "similarity_score": 0.782,
-      "reason": "Dịch vụ phù hợp vì liên quan đến: đau lưng, 
-                 phục hồi chức năng",
-      "category": "the_thao",
-      "tags": ["yoga", "phục hồi chức năng", "đau lưng", 
-               "cột sống", "trị liệu"]
-    },
-    {
-      "service_id": "SV009",
-      "name": "Massage trị liệu phục hồi",
-      "similarity_score": 0.718,
-      "reason": "Dịch vụ phù hợp vì liên quan đến: phục hồi 
-                 chức năng, đau lưng",
-      "category": "phuc_hoi",
-      "tags": ["massage", "phục hồi chức năng", "chấn thương", 
-               "vật lý trị liệu", "giảm đau"]
-    }
-  ],
-  "total": 2
-}
-\end{verbatim}
+\subsubsection{Kiến trúc Microservices AI}
 
-\paragraph{Ví dụ 2: Home Recommender}  
-
-\textbf{Input:}
-\begin{verbatim}
-{
-  "user_profile": {
-    "health_conditions": ["tim mạch", "huyết áp cao"],
-    "interests": ["dinh dưỡng"],
-    "goals": ["giảm cholesterol", "ăn uống lành mạnh"]
-  },
-  "selected_services": ["SV001"],
-  "top_k": 3
-}
-\end{verbatim}
-
-\textbf{Query Construction:}
-\begin{itemize}
-    \item Query string: "tim mạch huyết áp cao dinh dưỡng giảm cholesterol ăn uống lành mạnh"
-    \item Query embedding: 768-dim vector
-    \item Services to filter: SV001 (already used)
-\end{itemize}
-
-\textbf{Output:}
-\begin{verbatim}
-{
-  "recommendations": [
-    {
-      "service_id": "SV003",
-      "name": "Tư vấn dinh dưỡng cá nhân hóa",
-      "similarity_score": 0.814,
-      "reason": "Gợi ý vì dịch vụ này phù hợp với sở thích 
-                 (dinh dưỡng)",
-      "category": "dinh_duong",
-      "tags": ["dinh dưỡng", "giảm cân", "tăng cân", 
-               "cá nhân hóa", "chuyên gia"]
-    },
-    {
-      "service_id": "SV005",
-      "name": "Khám sức khỏe tổng quát",
-      "similarity_score": 0.692,
-      "reason": "Gợi ý vì dịch vụ này phù hợp với tình trạng 
-                 sức khỏe (tim mạch)",
-      "category": "y_te",
-      "tags": ["khám tổng quát", "xét nghiệm", "phòng ngừa", 
-               "sức khỏe", "định kỳ"]
-    }
-  ],
-  "total": 2
-}
-\end{verbatim}
-
-\subsubsection{Đánh giá hiệu năng}
-
-\paragraph{Độ phức tạp tính toán}  
+Hệ thống AI gồm 4 microservices độc lập, mỗi service đảm nhận một chức năng riêng:
 
 \begin{itemize}
-    \item \textbf{Embedding}: $O(L)$ với $L$ là độ dài query (thời gian constant cho mô hình BERT)
-    \item \textbf{Vector Search}: $O(\log N)$ với HNSW index, $N$ = 10 services (ví dụ với 10 service)
-    \item \textbf{Total latency}: < 100ms trên GPU, < 500ms trên CPU
-\end{itemize}
+    \item \textbf{Gateway Service}: Điểm vào duy nhất cho Backend gọi các AI service, chịu trách nhiệm orchestrate luồng xử lý (intent classification $\rightarrow$ NER $\rightarrow$ pre-filter $\rightarrow$ recommendation/chatbot), quản lý lịch sử hội thoại và wrap response thành SSE stream.
 
-\paragraph{Memory Requirements} 
+    \item \textbf{NER Service}: Trích xuất thực thể từ truy vấn tự nhiên (loại dịch vụ, địa điểm, giá, khoảng cách), sử dụng kiến trúc Hybrid kết hợp Gemini LLM, regex, và underthesea.
 
-\begin{itemize}
-    \item \textbf{Embedding Model}: ~420MB (model weights)
-    \item \textbf{Vector Database}: ~80KB (10 services × 768 dims × 4 bytes)
-    \item \textbf{Runtime Memory}: ~600MB total
-\end{itemize}
+    \item \textbf{RAG Chatbot Service}: Sinh câu trả lời dựa trên kiến thức y tế (PDF) kết hợp thông tin dịch vụ thực tế, sử dụng LangChain pipeline với Llama 3.1.
 
-\paragraph{Scalability} 
-
-Hệ thống có thể scale hiệu quả:
-\begin{itemize}
-    \item \textbf{1,000 services}: Latency < 100ms, Memory ~8MB cho vectors
-    \item \textbf{10,000 services}: Latency < 150ms, Memory ~80MB cho vectors
-    \item \textbf{100,000 services}: Latency < 200ms, Memory ~800MB cho vectors
-\end{itemize}
-
-HNSW index đảm bảo độ phức tạp $O(\log N)$ cho search, phù hợp với database lớn.
-
-\subsubsection{Khả năng mở rộng}
-
-Hệ thống được thiết kế để dễ dàng mở rộng theo các hướng:
-
-\begin{itemize}
-    \item \textbf{Incremental Updates}: Thêm services mới vào vector database mà không cần rebuild toàn bộ
-    \item \textbf{Multi-language Support}: Mô hình embedding hiện tại đã hỗ trợ 50+ ngôn ngữ
-    \item \textbf{Personalization}: Có thể thêm user embedding để cá nhân hóa sâu hơn
-    \item \textbf{Hybrid Ranking}: Kết hợp semantic search với collaborative filtering hoặc popularity scores
-    \item \textbf{Real-time Feedback}: Tích hợp user feedback để cải thiện ranking theo thời gian
+    \item \textbf{Recommender Service}: Gợi ý dịch vụ phù hợp dựa trên hồ sơ người dùng hoặc ngữ cảnh hội thoại, sử dụng ChromaDB để tìm kiếm tương đồng ngữ nghĩa.
 \end{itemize}
 
 
@@ -601,8 +259,8 @@ Hệ thống được thiết kế dựa trên mô hình Microservices hiện đ
 Tầng này lưu trữ và quản lý luồng dữ liệu, cụ thể hóa các khối database trừu tượng:
 
 \begin{itemize}
-    \item \textbf{Relational Database (SQL):} Sử dụng \textbf{PostgreSQL}. Dùng để lưu trữ dữ liệu có cấu trúc (thông tin user, đơn hàng, lịch hẹn).
-    \item \textbf{Vector Database:} Sử dụng \textbf{FAISS} (Facebook AI Similarity Search). Dùng để lưu trữ vector embeddings phục vụ cho AI Service (tìm kiếm ngữ nghĩa, gợi ý).
+    \item \textbf{Relational Database (SQL):} Sử dụng \textbf{PostgreSQL} kèm extension \textbf{PostGIS} cho truy vấn không gian (spatial queries). Dùng để lưu trữ dữ liệu có cấu trúc (thông tin user, đơn hàng, lịch hẹn) và hỗ trợ tìm kiếm dịch vụ theo khoảng cách địa lý.
+    \item \textbf{Vector Database:} Sử dụng \textbf{ChromaDB} ở chế độ persistent. Dùng để lưu trữ vector embeddings phục vụ cho AI Service (tìm kiếm ngữ nghĩa, gợi ý). \textbf{FAISS} được sử dụng bổ sung cho đánh giá batch offline.
     \item \textbf{Cache:} Sử dụng \textbf{Redis}. Giúp tăng tốc độ truy xuất dữ liệu thường xuyên sử dụng và giảm tải cho Database chính.
     \item \textbf{Message Queue:} Sử dụng \textbf{RabbitMQ}. Đảm bảo giao tiếp bất đồng bộ (asynchronous) giữa các microservices (ví dụ: Core Service gửi sự kiện đến Notification Service mà không cần chờ đợi).
     \item \textbf{Object Storage:} Sử dụng \textbf{MinIO}. Giải pháp lưu trữ đối tượng (tương thích S3) dùng để lưu trữ file tĩnh, hình ảnh, tài liệu y tế (thay thế cho khối Cloud Storage trừu tượng).
@@ -620,44 +278,64 @@ Kết nối với các dịch vụ bên ngoài để mở rộng tính năng.
     \end{itemize}
 \end{itemize}
 
-\vspace{1cm} % Khoảng cách một chút trước phần nhận xét
-
 \subsection*{Nhận xét tổng quan}
-Kiến trúc này rất hiện đại và phù hợp với quy mô dự án nền tảng Health/Beauty. Việc tách biệt rõ ràng giữa PostgreSQL (nghiệp vụ) và FAISS (AI) cho thấy sự đầu tư kỹ lưỡng vào hiệu năng xử lý dữ liệu thông minh. Sử dụng MinIO cũng là một giải pháp hay để tự chủ (self-hosted) việc lưu trữ dữ liệu thay vì phụ thuộc hoàn toàn vào cloud public storage đắt đỏ.
+Kiến trúc này rất hiện đại và phù hợp với quy mô dự án nền tảng Health/Beauty. Việc tách biệt rõ ràng giữa PostgreSQL kèm PostGIS (nghiệp vụ và không gian) và ChromaDB (AI vector search) cho thấy sự đầu tư kỹ lưỡng vào hiệu năng xử lý dữ liệu thông minh. Sử dụng MinIO cũng là một giải pháp hay để tự chủ (self-hosted) việc lưu trữ dữ liệu thay vì phụ thuộc hoàn toàn vào cloud public storage đắt đỏ.
 \section{Phần Software – Triển khai ứng dụng}
-% \subsection{User Mobile App}
-% \subsection{Partner Portal (Web/App)}
-% \subsection{Admin Dashboard (Web)}
-% \subsection{Tích hợp AI với hệ thống ứng dụng}
-% \subsection{Bảo mật và quản lý dữ liệu}
-Hệ thống Backend được xây dựng dựa trên \textbf{NestJS Framework}, tuân theo kiến trúc module hóa để đảm bảo tính mở rộng và bảo mật. Dưới đây là các chi tiết hiện thực cụ thể dựa trên mã nguồn thực tế.
 
-\subsection{Cấu hình và Khởi tạo hệ thống (Bootstrap \& Configuration)}
+Hệ thống Backend được xây dựng dựa trên \textbf{NestJS Framework}, tuân theo kiến trúc module hóa để đảm bảo tính mở rộng và bảo mật. Phần hiện thực được tổ chức theo bốn phân hệ chính dựa trên góc nhìn người dùng: (1)~Hạ tầng nền tảng dùng chung, (2)~Ứng dụng Người bệnh, (3)~Cổng Đối tác, và (4)~Trang Quản trị --- khớp với phân nhóm Use Case đã phân tích ở chương trước và kịch bản demo End-to-End trước Hội đồng.
+
+
+% ===========================================================================
+% 6.3.1  HẠ TẦNG NỀN TẢNG VÀ DỊCH VỤ CHUNG (CORE)
+% ===========================================================================
+\subsection{Hiện thực Hạ tầng nền tảng và Dịch vụ chung}
+
+Trước khi đi vào chi tiết từng phân hệ người dùng, phần này trình bày các thành phần hạ tầng kỹ thuật dùng chung cho toàn bộ hệ thống. Đây là ``móng nhà'' mà cả ba cổng (User App, Partner Portal, Admin Portal) đều dựa trên: từ cơ chế xác thực JWT, chuẩn hóa dữ liệu DTO, quản lý tệp tin, đến hệ thống thông báo đa kênh và cầu nối với cụm AI microservices.
+
+\subsubsection{Cấu hình và Khởi tạo hệ thống (Bootstrap \& Configuration)}
 
 Điểm khởi chạy của ứng dụng nằm tại \texttt{src/main.ts}, nơi thiết lập các cấu hình toàn cục quan trọng cho bảo mật và tài liệu hóa API:
 
 \begin{itemize}
     \item \textbf{Bảo mật HTTP:} Tích hợp thư viện \texttt{helmet} để thiết lập các HTTP headers an toàn và kích hoạt \texttt{enableCors()} cho phép các ứng dụng Client (Mobile/Web) truy cập tài nguyên.
     
-    \item \textbf{Kiểm soát dữ liệu đầu vào:} Sử dụng \texttt{ValidationPipe} ở mức toàn cục (\texttt{globalPipes}) với tùy chọn \texttt{whitelist: true}. Điều này giúp tự động loại bỏ các trường dữ liệu thừa không được định nghĩa trong DTO, đảm bảo tính sạch sẽ của dữ liệu trước khi vào Controller.
+    \item \textbf{Kiểm soát dữ liệu đầu vào:} Sử dụng \texttt{ValidationPipe} ở mức toàn cục (\texttt{globalPipes}) với tùy chọn \texttt{whitelist: true}. Điều này giúp tự động loại bỏ các trường dữ liệu thừa không được định nghĩa trong DTO.
     
-    \item \textbf{Tài liệu hóa API (Swagger):} Hệ thống tự động sinh tài liệu API chuẩn OpenAPI. \texttt{DocumentBuilder} được cấu hình để tạo giao diện Swagger UI tại đường dẫn \texttt{/api/docs}, hỗ trợ đội ngũ phát triển Mobile và Web tích hợp nhanh chóng.
-    
-    \item \textbf{Kết nối Cơ sở dữ liệu:} Cấu hình Database được tách biệt trong \texttt{src/config/database.config.ts}, sử dụng các biến môi trường (\texttt{process.env}) để kết nối tới PostgreSQL, đảm bảo không lộ thông tin nhạy cảm (credentials) trong mã nguồn.
+    \item \textbf{Xác thực Webhook (Stripe):} Bật tùy chọn \texttt{rawBody: true} để xác thực chữ ký webhook Stripe. Khởi tạo \texttt{RedisIoAdapter} cho WebSocket scale ngang và kết nối RabbitMQ consumer với queue \texttt{checkout\_queue}.
 \end{itemize}
 
-\subsection{Module Xác thực và Bảo mật (Authentication \& Security)}
+\subsubsection{Module Thanh toán (Payment Gateway Module)}
+
+\texttt{PaymentGatewayModule} hỗ trợ song parallel hai cổng thanh toán chính: MoMo (nội địa Việt Nam) và Stripe (quốc tế). Cấu trúc API như sau:
+
+\begin{itemize}
+    \item \textbf{Phía người dùng:} Các endpoint \texttt{POST /v1/user/payments/momo/*} và \texttt{POST /v1/user/payments/stripe/*} cho phép tạo đơn thanh toán, hoàn tiền, và kiểm tra trạng thái.
+    
+    \item \textbf{Phía callback:} Các endpoint công khai \texttt{POST /v1/public/momo/ipn} (Immediate Payment Notification) và \texttt{POST /v1/public/stripe/webhook} để xử lý các sự kiện từ phía gateway, theo mô hình server-to-server.
+\end{itemize}
+
+\subsubsection{Module Tích hợp AI (AI Service Integration)}
+
+\texttt{AiServiceController} cung cấp endpoint nội bộ:
+
+\begin{itemize}
+    \item \texttt{POST /v1/ai/recommendations} - Trả về danh sách dịch vụ được gợi ý kèm thông tin đầy đủ (tên, mô tả, giá, hình ảnh, vị trí).
+    
+    \item Bảo vệ bằng API key header \texttt{X-AI-API-Key} để chỉ cho phép gọi machine-to-machine từ cụm AI Gateway.
+\end{itemize}
+
+\subsubsection{Module Xác thực và Phân quyền (AuthModule)}
 
 Module \texttt{AuthModule} đóng vai trò trung tâm trong việc quản lý định danh, sử dụng kết hợp \textbf{Passport} và \textbf{JWT}.
 
-\subsubsection{Quy trình Đăng ký \& Đăng nhập}
+\paragraph{Quy trình Đăng ký \& Đăng nhập}
 \begin{itemize}
     \item \textbf{Đăng ký (\texttt{register}):} \texttt{AuthService} tiếp nhận DTO đăng ký, thực hiện băm mật khẩu (hashing) bằng thuật toán \texttt{bcrypt} trước khi lưu vào cơ sở dữ liệu. Nếu có thông tin \texttt{profile}, hệ thống sẽ khởi tạo đồng thời \texttt{Account} và \texttt{UserProfile} nhờ cơ chế \texttt{cascade: true} của TypeORM.
     
     \item \textbf{Đăng nhập (\texttt{login}):} Sử dụng \texttt{LocalStrategy} để xác thực email/password. Sau khi thành công, hệ thống cấp phát cặp token gồm \texttt{access\_token} (ngắn hạn) và \texttt{refresh\_token} (dài hạn).
 \end{itemize}
 
-\subsubsection{Cơ chế Bảo mật Token (JWT Strategy)}
+\paragraph{Cơ chế Bảo mật Token (JWT Strategy)}
 \begin{itemize}
     \item \textbf{Access Token:} Được ký (sign) bằng \texttt{jwtConstants.secret}. Các request đến API được bảo vệ bởi \texttt{JwtAuthGuard}, sử dụng \texttt{JwtStrategy} để trích xuất và xác thực token từ Header (\texttt{Bearer Token}).
     
@@ -666,22 +344,9 @@ Module \texttt{AuthModule} đóng vai trò trung tâm trong việc quản lý đ
     \item \textbf{Logout an toàn:} API \texttt{/auth/logout} thực hiện xóa \texttt{refreshTokenHash} trong DB, đảm bảo token cũ mất hiệu lực ngay lập tức.
 \end{itemize}
 
-\subsection{Quản lý Tài khoản và Dữ liệu Người dùng (Account Management)}
+% TODO: Hình sơ đồ luồng JWT (login → sign → refresh rotation → hash DB → logout)
 
-Module \texttt{AccountModule} chịu trách nhiệm quản lý thông tin người dùng và các dữ liệu sức khỏe liên quan.
-
-\begin{itemize}
-    \item \textbf{Mô hình dữ liệu (Entities):}
-    \begin{itemize}
-        \item \textbf{Account:} Là thực thể lõi, chứa thông tin đăng nhập (\texttt{email}, \texttt{passwordHash}) và vai trò (\texttt{role}). Cấu trúc hỗ trợ lưu trữ dữ liệu khảo sát linh hoạt thông qua cột \texttt{survey} kiểu \texttt{jsonb}, cho phép lưu trữ các câu trả lời khảo sát sức khỏe phức tạp mà không cần thay đổi schema cứng.
-        \item \textbf{UserProfile:} Chứa thông tin cá nhân (tên, ngày sinh, bio) và liên kết 1-1 với Account. Entity này cũng hỗ trợ quan hệ với \texttt{Address} để lưu địa chỉ chi tiết.
-    \end{itemize}
-    
-    \item \textbf{Xử lý Khảo sát (Survey Feature):}
-    \texttt{AccountController} cung cấp các endpoints \texttt{GET/POST /account/survey} để Client gửi và lấy dữ liệu khảo sát. Dữ liệu này được \texttt{AccountService} lưu trực tiếp vào cột \texttt{jsonb} của user, phục vụ cho đầu vào của hệ thống AI gợi ý sau này.
-\end{itemize}
-
-\subsection{Kiến trúc DTO và Validation}
+\subsubsection{Kiến trúc DTO và Validation}
 
 Hệ thống áp dụng chặt chẽ mô hình \textbf{Data Transfer Object (DTO)} để kiểm soát dữ liệu giao tiếp:
 
@@ -691,99 +356,1551 @@ Hệ thống áp dụng chặt chẽ mô hình \textbf{Data Transfer Object (DTO
     \item \textbf{Nested Validation:} Hỗ trợ validate dữ liệu lồng nhau (ví dụ: object \texttt{profile} bên trong \texttt{register} request) thông qua \texttt{@ValidateNested} và \texttt{Type(() => RegisterProfileDto)}.
 \end{itemize}
 
-\subsection{Quy trình Đăng ký \& Xác minh Đối tác (Partner Registration \& Verification)}
+\subsubsection{Quản lý Tệp tin và Lưu trữ (S3 File Management)}
 
-Module \texttt{PartnersModule} quản lý toàn bộ quy trình từ lúc đối tác đăng ký tài khoản, nộp hồ sơ kinh doanh, cho đến khi được quản trị viên phê duyệt hoặc yêu cầu bổ sung. Toàn bộ quy trình được vận hành theo mô hình máy trạng thái (State Machine) gồm 5 trạng thái.
-
-\subsubsection{Các trạng thái xác minh đối tác}
-
-Mỗi đối tác luôn ở một trong 5 trạng thái sau, được định nghĩa trong enum \texttt{PartnerVerificationStatus}:
+Module \texttt{S3Module} tích hợp với dịch vụ lưu trữ đối tượng tương thích S3 (MinIO) để quản lý tệp tin:
 
 \begin{itemize}
-    \item \texttt{ONBOARDING}: Đối tác vừa tạo tài khoản, đang trong quá trình bổ sung thông tin và tải lên giấy tờ.
-    \item \texttt{PENDING}: Hồ sơ đã được nộp đầy đủ, đang chờ quản trị viên xem xét.
-    \item \texttt{APPROVED}: Hồ sơ đã được chấp thuận, đối tác có thể bắt đầu cung cấp dịch vụ trên nền tảng.
-    \item \texttt{REJECTED}: Hồ sơ bị từ chối vĩnh viễn, không thể nộp lại.
-    \item \texttt{REQUIRED\_RESUBMIT}: Hồ sơ cần chỉnh sửa hoặc bổ sung thêm tài liệu trước khi nộp lại.
+    \item \textbf{Upload:} Tạo Pre-signed URL cho phép Client upload trực tiếp đến storage mà không qua Backend, giảm tải cho server.
+    \item \textbf{Download:} Sinh Pre-signed URL có thời hạn để truy cập tệp tin (tài liệu doanh nghiệp, hình ảnh sản phẩm).
+    \item \textbf{Quản lý tài liệu đối tác:} Thực thể \texttt{PartnerDocument} lưu metadata (loại tài liệu, URL, trạng thái) trong PostgreSQL, trong khi nội dung tệp thực tế nằm trên Object Storage.
 \end{itemize}
 
-Sơ đồ chuyển đổi trạng thái:
+\subsubsection{Hệ thống Thông báo đa kênh (Notification)}
 
-\begin{center}
-\begin{tabular}{@{}r@{\;}c@{\;}l@{}}
-\texttt{ONBOARDING} $\rightarrow$ \texttt{PENDING} & $\rightarrow$ & \texttt{APPROVED} \\
-& $\searrow$ & \texttt{REJECTED} \\
-& $\searrow$ & \texttt{REQUIRED\_RESUBMIT} $\rightarrow$ \texttt{PENDING} $\rightarrow$ \ldots \\
-\end{tabular}
-\end{center}
-
-\subsubsection{Đăng ký đối tác}
-
-Khi đối tác đăng ký, hệ thống thực hiện các bước sau trong cùng một giao dịch (transaction) để đảm bảo tính toàn vẹn dữ liệu:
-
-\begin{enumerate}
-    \item \textbf{Kiểm tra trùng lặp:} Đảm bảo email và mã số thuế chưa có trong hệ thống.
-    \item \textbf{Kiểm tra địa chỉ:} Xác nhận thông tin tỉnh/huyện/xã hợp lệ thông qua \texttt{LocationsService}.
-    \item \textbf{Khởi tạo dữ liệu:} Khởi tạo thông tin tài khoản, thông tin doanh nghiệp, người đại diện pháp lý, và các giấy tờ KYC ban đầu.
-    \item \textbf{Cấp quyền truy cập:} Tạo token truy cập để đối tác có thể đăng nhập ngay.
-\end{enumerate}
-
-Sau khi đăng ký thành công, đối tác được gán trạng thái \texttt{PENDING} và tự động vào hàng đợi chờ xét duyệt.
-
-\subsubsection{Cập nhật hồ sơ thông minh }
-
-Khi đối tác chỉnh sửa hồ sơ (đặc biệt sau khi bị yêu cầu bổ sung), hệ thống áp dụng cơ chế cập nhật thông minh (Smart Update) gồm 3 bước:
+Module \texttt{NotificationModule} cung cấp hệ thống thông báo đa kênh phục vụ cả ba portal, với ba controller phân quyền rõ ràng:
 
 \begin{itemize}
-    \item \textbf{Nhận diện thay đổi:} Mỗi trường gửi lên đều kèm theo \texttt{fieldKey}, giúp hệ thống biết chính xác trường nào đã được sửa mà không cần so sánh toàn bộ dữ liệu.
-    \item \textbf{Phân loại mức độ quan trọng:} Hệ thống phân biệt rõ giữa thay đổi nhạy cảm (mã số thuế, địa chỉ, thông tin người đại diện) và thay đổi thông thường (số điện thoại, tên thương hiệu).
-    \item \textbf{Tự động chuyển trạng thái:}
-    \begin{itemize}
-        \item Nếu đối tác đang ở trạng thái \texttt{REQUIRED\_RESUBMIT} hoặc \texttt{ONBOARDING} và đã sửa hết các lỗi $\rightarrow$ tự động chuyển sang \texttt{PENDING} để chờ xét duyệt lại.
-        \item Nếu đối tác đã được \texttt{APPROVED} nhưng sửa thông tin nhạy cảm $\rightarrow$ thu hồi phê duyệt và chuyển về \texttt{REQUIRED\_RESUBMIT} để quản trị viên xem xét lại.
-    \end{itemize}
+    \item \textbf{WebSocket:} \texttt{NotificationGateway} đẩy thông báo tức thì (đặt lịch, tin nhắn mới, nhắc hẹn).
+    \item \textbf{Push Notification (FCM):} \texttt{PushNotificationService} tích hợp Firebase Cloud Messaging qua thư viện \texttt{firebase-admin}. \texttt{UserDeviceController} quản lý đăng ký/hủy đăng ký device token.
+    \item \textbf{Quản lý:} \texttt{UserNotificationController} (xem, đánh dấu đã đọc), \texttt{AdminNotificationController} (broadcast hệ thống).
+    \item \textbf{Bất đồng bộ:} Sự kiện thông báo phát qua RabbitMQ từ các module nghiệp vụ (\texttt{BookingModule}, \texttt{ChatModule}), không làm chậm luồng xử lý chính.
 \end{itemize}
 
-\subsubsection{Hiển thị phản hồi từ quản trị viên}
+% TODO: Hình kiến trúc Notification đa kênh (3 source → RabbitMQ → NotificationService → WS + FCM + DB)
 
-Khi đối tác mở xem hồ sơ của mình, hệ thống sẽ:
+\subsubsection{Module Tích hợp AI (\texttt{AiServiceModule})}
 
-\begin{enumerate}
-    \item Lấy bản đánh giá gần nhất từ bảng \texttt{PartnerReviewLog}.
-    \item Tổng hợp phản hồi thành 2 danh sách: phản hồi theo từng trường thông tin (\texttt{fieldFeedbackMap}) và phản hồi theo từng tài liệu (\texttt{documentFeedbackMap}).
-    \item Trả về kèm theo hồ sơ, giúp ứng dụng đánh dấu trực quan những mục cần sửa và hiển thị lý do cụ thể từ quản trị viên.
-\end{enumerate}
-
-\subsection{Module Quản trị và Nhật ký Kiểm toán (Admin Management \& Audit Trail)}
-
-\subsubsection{Xét duyệt đối tác (\texttt{reviewPartner})}
-
-Các API quản trị nằm trong \texttt{AdminModule}, chỉ cho phép truy cập bởi người dùng có vai trò \texttt{ADMIN} (được bảo vệ bằng \texttt{JwtAuthGuard} và \texttt{RolesGuard}).
-
-Khi quản trị viên xét duyệt một hồ sơ đối tác, hệ thống xử lý theo các bước:
+Cầu nối giữa Backend NestJS và cụm microservices AI (Python/FastAPI). Luồng hoạt động:
 
 \begin{enumerate}
-    \item \textbf{Kiểm tra điều kiện:} Chỉ cho phép xét duyệt khi đối tác đang ở trạng thái \texttt{PENDING}. Nếu không, hệ thống trả về lỗi.
-
-    \item \textbf{Phân loại đánh giá:} Quản trị viên gửi danh sách các mục cần đánh giá, mỗi mục gồm \texttt{fieldKey} và \texttt{feedback}. Hệ thống tự động phân loại:
-    \begin{itemize}
-        \item Nếu \texttt{fieldKey} nằm trong danh sách trường thông tin đã biết $\rightarrow$ đánh giá trường hồ sơ.
-        \item Nếu không $\rightarrow$ đánh giá tài liệu (khớp theo mã tài liệu).
-    \end{itemize}
-
-    \item \textbf{Lưu ảnh chụp dữ liệu:} Với mỗi mục được đánh giá, hệ thống lưu lại giá trị hiện tại (snapshot) kèm kết quả hợp lệ hay không và phản hồi chi tiết. Điều này giúp truy vết lại chính xác dữ liệu tại thời điểm xét duyệt.
-
-    \item \textbf{Xác định kết quả cuối cùng:} Hệ thống áp dụng quy tắc ưu tiên:
-    \begin{itemize}
-        \item Nếu quản trị viên chọn từ chối $\rightarrow$ \texttt{REJECTED} (ưu tiên cao nhất, không thể đảo ngược).
-        \item Nếu có bất kỳ mục nào bị đánh dấu lỗi $\rightarrow$ \texttt{REQUIRED\_RESUBMIT} (yêu cầu sửa lại).
-        \item Nếu tất cả hợp lệ và đủ tài liệu bắt buộc $\rightarrow$ \texttt{APPROVED}.
-    \end{itemize}
-
-    \item \textbf{Ghi nhận lịch sử:} Toàn bộ kết quả xét duyệt được lưu vào bảng \texttt{PartnerReviewLog} dưới dạng bản ghi không thể sửa đổi, bao gồm: kết quả, người duyệt, nhận xét chung, và chi tiết đánh giá từng trường/tài liệu.
+    \item AI Gateway gọi endpoint \texttt{/ai/recommendations} kèm danh sách \texttt{service\_id} cần làm giàu thông tin.
+    \item \texttt{AiServiceService} truy vấn bảng \texttt{products} kèm quan hệ (category, media, employees) từ PostgreSQL.
+    \item Kết quả ánh xạ thành \texttt{AiRecommendationsResponseDto} chứa đầy đủ thông tin (tên, mô tả, giá, hình ảnh, vị trí) để hiển thị trên ứng dụng.
 \end{enumerate}
 
-\subsubsection{Nhật ký kiểm toán (Audit Logging)}
+Endpoint bảo vệ bằng \texttt{AiApiKeyGuard}, chỉ service nội bộ được phép truy cập.
+
+\subsubsection{Hạ tầng Liên kết và Cross-cutting Concerns}
+
+\paragraph{Module RabbitMQ}
+
+Cấu hình kết nối RabbitMQ cho giao tiếp bất đồng bộ giữa các module. Module đăng ký \texttt{ClientsModule} với giao thức AMQP, hỗ trợ TLS và virtual host riêng biệt. Sử dụng chính bởi \texttt{NotificationModule} (sự kiện thông báo) và \texttt{HealthServiceModule} (đồng bộ dữ liệu với AI Recommender).
+
+\paragraph{Module Redis}
+
+Cung cấp kết nối Redis cho toàn bộ ứng dụng qua \texttt{RedisService}:
+
+\begin{itemize}
+    \item \textbf{Caching:} Dữ liệu tra cứu thường xuyên (dịch vụ, banner).
+    \item \textbf{Pub/Sub:} Phát sự kiện \texttt{service:created}, \texttt{service:updated}, \texttt{service:deleted} để AI Recommender đồng bộ vector store.
+    \item \textbf{Distributed Locking:} Khóa phân tán cho slot đặt lịch, ngăn double-booking.
+    \item \textbf{Session/TTL:} Checkout ticket, OTP, dữ liệu tạm thời.
+\end{itemize}
+
+% TODO: Hình sơ đồ Redis multi-purpose (4 blocks: Cache, Distributed Lock, Pub/Sub, Session/TTL)
+
+\paragraph{Middleware, Interceptor và Guard}
+
+Các cơ chế xuyên suốt (cross-cutting concerns):
+
+\begin{itemize}
+    \item \textbf{LoggingMiddleware:} Ghi method, URL, thời gian phản hồi, status code trên mọi route.
+    \item \textbf{ResponseInterceptor:} Chuẩn hóa response về format \texttt{\{statusCode, message, data\}}.
+    \item \textbf{PublicThrottlerGuard:} Rate limiting 100 request/60 giây cho route công khai.
+    \item \textbf{WsContractBootstrapService:} Tự động đăng ký WebSocket event contracts khi khởi động.
+\end{itemize}
+
+
+% ===========================================================================
+% 6.3.2  PHÂN HỆ ỨNG DỤNG NGƯỜI BỆNH (USER APP)
+% ===========================================================================
+\subsection{Hiện thực Phân hệ Ứng dụng Người bệnh (User App)}
+
+Phân hệ này hiện thực toàn bộ trải nghiệm của người bệnh trên ứng dụng di động, từ lúc tạo tài khoản đến khi hoàn thành dịch vụ và gửi đánh giá. Nội dung được trình bày theo trục hành trình sử dụng thực tế: xác thực tài khoản $\rightarrow$ truy cập màn hình Home $\rightarrow$ khám phá phòng khám và dịch vụ $\rightarrow$ xem chi tiết dịch vụ $\rightarrow$ nhận hỗ trợ từ trợ lý AI $\rightarrow$ đặt lịch với cơ chế khóa slot phân tán $\rightarrow$ thanh toán $\rightarrow$ theo dõi lịch hẹn $\rightarrow$ đánh giá chuyên gia và dịch vụ.
+
+\begin{enumerate}
+    \item \textbf{Xác thực và khởi tạo hồ sơ:} đăng nhập, đăng ký, xác thực OTP và hoàn thiện thông tin cá nhân.
+    \item \textbf{Khám phá và ra quyết định:} Home, tìm kiếm dịch vụ, trang chi tiết phòng khám, chi tiết dịch vụ và trợ lý AI.
+    \item \textbf{Giao dịch dịch vụ:} đặt lịch, giữ slot bằng Redis Redlock, checkout và thanh toán qua các cổng tích hợp.
+    \item \textbf{Theo dõi sau đặt lịch:} quản lý lịch hẹn, xem hướng dẫn dịch vụ, chat với cơ sở và đánh giá sau khi hoàn thành.
+\end{enumerate}
+
+\subsubsection{Đăng nhập và Đăng ký Tài khoản}
+
+Luồng khởi tạo tài khoản của ứng dụng người bệnh được tổ chức theo mô hình tách riêng \textbf{đăng nhập} và \textbf{đăng ký}, giúp người dùng quay lại đăng nhập nhanh, đồng thời buộc người dùng mới hoàn thiện đủ thông tin định danh trước khi sử dụng các chức năng đặt lịch và thanh toán.
+
+\begin{enumerate}
+    \item \textbf{Màn hình vào cổng xác thực:} Người dùng chọn giữa hai nhánh thao tác chính là \texttt{Sign In} hoặc \texttt{Create an account}. Cách tổ chức này giảm nhầm lẫn giữa người dùng mới và người dùng đã có tài khoản.
+
+    \item \textbf{Đăng nhập tài khoản hiện có:} Người dùng nhập email và mật khẩu, có thể sử dụng liên kết \texttt{Forgot Password?} khi quên mật khẩu. Giao diện đồng thời hỗ trợ đăng nhập nhanh bằng Google và Facebook cho các trường hợp không muốn dùng mật khẩu cục bộ.
+
+    \item \textbf{Khởi tạo đăng ký bằng email:} Với người dùng mới, hệ thống yêu cầu nhập email trước, đồng thời hiển thị điều khoản sử dụng và chính sách riêng tư ngay ở bước đầu để ràng buộc sự đồng thuận trước khi tạo tài khoản.
+
+    \item \textbf{Xác thực email bằng OTP:} Sau bước nhập email, người dùng nhập mã xác thực được gửi qua email để chứng minh quyền sở hữu địa chỉ đăng ký và giảm nguy cơ tạo tài khoản giả mạo.
+
+    \item \textbf{Hoàn thiện hồ sơ đăng ký:} Sau khi xác thực OTP, người dùng tiếp tục nhập họ tên pháp lý, ngày sinh, mật khẩu, xác nhận mật khẩu và địa chỉ liên hệ. Đây là tập dữ liệu nền để tạo \texttt{Account} và \texttt{UserProfile} ban đầu.
+
+    \item \textbf{Xác nhận và kích hoạt:} Khi người dùng nhấn \texttt{Agree \& Continue}, backend thực hiện kiểm tra hợp lệ dữ liệu, băm mật khẩu bằng \texttt{bcrypt}, lưu hồ sơ và cấp token truy cập để người dùng đi tiếp sang các bước cá nhân hóa tiếp theo.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_entry.png}
+    \caption{Chọn \texttt{Sign In} hoặc \texttt{Create an account}}
+    \label{fig:user_auth_entry}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_signin.png}
+    \caption{Đăng nhập bằng email, mật khẩu hoặc social login}
+    \label{fig:user_auth_signin}
+\end{subfigure}
+\par\medskip
+\caption{Luồng Sign In của người dùng trên ứng dụng di động}
+\label{fig:user_auth_signin_flow}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_email.png}
+    \caption{Nhập email đăng ký}
+    \label{fig:user_auth_email}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_otp.png}
+    \caption{Xác thực email bằng mã OTP}
+    \label{fig:user_auth_otp}
+\end{subfigure}
+\par\medskip
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_signup_profile.png}
+    \caption{Điền thông tin cá nhân và ngày sinh}
+    \label{fig:user_auth_signup_profile}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/sign_in_sign_up/fig_user_auth_signup_address.png}
+    \caption{Địa chỉ, điều khoản và xác nhận đăng ký}
+    \label{fig:user_auth_signup_address}
+\end{subfigure}
+\par\medskip
+\caption{Luồng Sign Up của người dùng trên ứng dụng di động}
+\label{fig:user_auth_signup_flow}
+\end{figure}
+
+\paragraph{Mô tả dữ liệu và ràng buộc giao diện}
+
+\begin{itemize}
+    \item \textbf{Email:} Là định danh đăng nhập chính, được thu thập ngay từ đầu để kiểm tra định dạng và tránh trùng lặp tài khoản.
+    \item \textbf{Mật khẩu:} Giao diện yêu cầu tối thiểu 8 ký tự và có trường \texttt{Confirm Password} để giảm lỗi nhập sai trước khi gửi request lên server.
+    \item \textbf{Ngày sinh:} Hệ thống hiển thị ràng buộc độ tuổi tối thiểu 16 tuổi, phù hợp với yêu cầu sử dụng dịch vụ và xác minh danh tính cơ bản.
+    \item \textbf{Họ tên pháp lý và địa chỉ:} Bao gồm tên thật, địa chỉ đường, phường/xã, quận/huyện, tỉnh/thành và quốc gia; đây là nhóm dữ liệu cần thiết cho nhận diện hồ sơ người dùng và các tác vụ điều hướng, đặt lịch, thanh toán.
+    \item \textbf{Điều khoản sử dụng:} Trước khi hoàn tất đăng ký, người dùng phải đồng ý với \texttt{Terms of Service}, \texttt{Payment Terms of Service} và \texttt{Privacy Policy}, tạo cơ sở pháp lý cho toàn bộ giao dịch phát sinh sau đó.
+\end{itemize}
+
+\subsubsection{Màn hình chính (Home)}
+
+Màn hình chính là điểm khởi đầu sau khi người dùng đăng nhập, được thiết kế theo cấu trúc module hóa với nhiều phân vùng độc lập giúp người dùng truy cập nhanh các chức năng thường dùng và khám phá dịch vụ phù hợp.
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/home/fig_home_1.png}
+    \caption{Header và thao tác nhanh (Quick Actions)}
+    \label{fig:user_home_1}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/home/fig_home_2.png}
+    \caption{Banner nổi bật và Dịch vụ đề xuất}
+    \label{fig:user_home_2}
+\end{subfigure}
+\par\medskip
+\caption{Giao diện Home -- Phân vùng chức năng chính}
+\label{fig:user_home_part1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/home/fig_home_3.png}
+    \caption{Khám phá danh mục dịch vụ}
+    \label{fig:user_home_3}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/home/fig_home_4.png}
+    \caption{Dịch vụ cao cấp (Premium Treatments)}
+    \label{fig:user_home_4}
+\end{subfigure}
+\par\medskip
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/home/fig_home_5.png}
+    \caption{Hoạt động gần đây (Recent Activity)}
+    \label{fig:user_home_5}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    % Trống để cân đối grid
+\end{subfigure}
+\par\medskip
+\caption{Giao diện Home -- Khám phá và Trạng thái}
+\label{fig:user_home_part2}
+\end{figure}
+
+\textbf{Thành phần chính của màn hình Home:}
+
+\begin{itemize}
+    \item \textbf{User Profile Header \& Quick Actions:} Hiển thị định danh người dùng và các lối tắt quan trọng như đặt lịch (Book Appointment) và trợ lý AI.
+    \item \textbf{Feature Banner \& Recommend For You:} Băng rôn quảng bá dịch vụ và danh sách dịch vụ đề xuất sử dụng thanh cuộn ngang (\texttt{ListView} horizontal).
+    \item \textbf{Explore Services \& Premium Treatments:} Lưới danh mục dịch vụ được điều khiển động qua API và các gói điều trị nổi bật.
+    \item \textbf{Recent Activity:} Danh sách các hoạt động hoặc lịch hẹn gần đây với huy hiệu trạng thái (badges) phân màu rõ ràng.
+\end{itemize}
+
+\textbf{Tính năng kỹ thuật:}
+
+\begin{itemize}
+    \item \textbf{State Management:} Áp dụng \textbf{Riverpod 3.0} với cơ chế lazy loading và caching để tăng tốc độ tải trang.
+    \item \textbf{Theme-Aware Styling:} Toàn bộ màu sắc thiết kế được chuyển đổi sang chuẩn Material 3 \texttt{ColorScheme} và \texttt{SemanticColors} để hỗ trợ chế độ tối/sáng nhất quán.
+    \item \textbf{Dynamic Category Mapping:} Biểu tượng và màu sắc của danh mục (như Wellness, Medical, Spa) được phân giải động ở tầng Datasource dựa trên category slug thay vì gán cứng trên giao diện.
+\end{itemize}
+
+\subsubsection{Dịch vụ Gợi ý (Recommend For You)}
+
+Tính năng Recommend For You hiển thị danh sách các dịch vụ sức khỏe được hệ thống đề xuất dựa trên hồ sơ người dùng và lịch sử sử dụng. Trên màn hình Home, khu vực này xuất hiện dưới dạng danh sách cuộn ngang với các thẻ dịch vụ kèm ảnh đại diện, tên dịch vụ, vị trí phòng khám và giá. Người dùng có thể nhấn \textbf{View all} để mở trang danh sách đầy đủ, nơi các dịch vụ được sắp xếp theo thứ tự ưu tiên cá nhân hóa.
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.38\textheight,keepaspectratio]{Images/Hiện thực/user_app/recommend/fig_recommend_home.png}
+    \caption{Khu vực Recommend For You trên Home}
+    \label{fig:recommend_home}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.38\textheight,keepaspectratio]{Images/Hiện thực/user_app/recommend/fig_recommend_list.png}
+    \caption{Trang danh sách Recommendations đầy đủ}
+    \label{fig:recommend_list}
+\end{subfigure}
+\par\medskip
+\caption{Tính năng Dịch vụ Gợi ý (Recommend For You) trên ứng dụng người bệnh}
+\label{fig:user_recommend_flow}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Hiển thị trên Home:} Mỗi thẻ dịch vụ hiển thị ảnh đại diện, tên, địa chỉ phòng khám, điểm đánh giá và giá. Nút ``+'' cho phép thêm dịch vụ vào giỏ đặt lịch nhanh.
+    \item \textbf{Trang danh sách đầy đủ:} Người dùng xem toàn bộ dịch vụ được đề xuất, bao gồm các gói từ nhiều phòng khám khác nhau như Professional Teeth Whitening, Neck \& Shoulder Therapy, Basic Facial Care Package và Dental Checkup \& Cleaning.
+    \item \textbf{Recent Activity:} Phần bên dưới Home hiển thị các lịch hẹn gần đây với badge phân màu trạng thái (Pending Payment, Scheduled, Canceled).
+\end{itemize}
+
+\subsubsection{Khám phá Dịch vụ và Phòng khám}
+
+Chức năng khám phá cho phép người dùng tìm kiếm và xem chi tiết dịch vụ sức khỏe cũng như thông tin phòng khám trước khi đưa ra quyết định đặt lịch. Luồng tương tác bao gồm hai bước chính: tìm kiếm/lọc dịch vụ theo nhu cầu và xem trang chi tiết phòng khám cung cấp dịch vụ đó.
+
+\paragraph{Tìm kiếm và Lọc Dịch vụ}
+
+Người dùng có thể tìm dịch vụ qua nhiều chiều lọc kết hợp: từ khóa tên dịch vụ, danh mục sức khỏe (Dental, Spa, Fitness, v.v.), khoảng giá, tags đặc trưng, và khoảng cách địa lý từ vị trí hiện tại. Kết quả được sắp xếp linh hoạt theo mức độ phổ biến, đánh giá trung bình, số lượt đặt, hoặc giá. Mỗi thẻ dịch vụ trong danh sách hiển thị hình ảnh đại diện, tên dịch vụ, thời lượng, giá gốc, giá khuyến mãi và tên phòng khám cung cấp.
+
+\textbf{Tính năng kỹ thuật:}
+
+\begin{itemize}
+    \item \textbf{\texttt{HealthServiceModule}:} \texttt{UserHealthServiceController} hỗ trợ lọc theo \texttt{categoryId}, tags, khoảng giá, khoảng cách địa lý, phân trang và sắp xếp theo giá, đánh giá, lượt đặt hoặc khoảng cách.
+    \item \textbf{\texttt{CategoriesModule} và \texttt{ServiceTagsModule}:} Cung cấp cây danh mục và hệ thống tags many-to-many với \texttt{Product}, phục vụ bộ lọc đa chiều trên ứng dụng.
+    \item \textbf{\texttt{LocationsModule} và \texttt{MapboxModule}:} Chuẩn hóa địa chỉ hành chính Việt Nam, hỗ trợ geocoding, tìm kiếm theo bán kính và tính khoảng cách giữa người dùng với phòng khám.
+\end{itemize}
+
+\paragraph{Trang Chi tiết Phòng khám}
+
+Khi người dùng chọn một phòng khám, giao diện hiển thị trang thông tin đầy đủ tổ chức theo 3 tab:
+
+\begin{itemize}
+    \item \textbf{Tab ``Cửa hàng'':} Thông tin tổng quan gồm tên, ảnh bìa, logo, gallery cơ sở vật chất, chỉ số tin cậy (rating trung bình, năm kinh nghiệm, tổng số khách hàng), danh sách chứng chỉ hành nghề, và top 5 chuyên gia kèm chuyên ngành.
+
+    \item \textbf{Tab ``Dịch vụ'':} Danh mục các gói dịch vụ của phòng khám có phân trang và tìm kiếm theo tên. Mỗi dịch vụ hiển thị giá gốc, giá khuyến mãi, thời lượng thực hiện và số lượt đặt.
+
+    \item \textbf{Tab ``Đánh giá'':} Tổng hợp nhận xét từ người dùng đã sử dụng dịch vụ, hỗ trợ lọc theo số sao hoặc chỉ hiển thị đánh giá kèm ảnh thực tế.
+\end{itemize}
+
+Dữ liệu ba tab được tách qua \texttt{UserClinicController}: \texttt{GET /clinics/:id/info} cho thông tin tổng quan, \texttt{GET /clinics/:id/products} cho danh sách dịch vụ có phân trang, và \texttt{GET /clinics/:id/reviews} cho đánh giá có lọc theo số sao hoặc ảnh đính kèm.
+
+Hình~\ref{fig:user_clinic_detail} minh họa giao diện trang chi tiết phòng khám. Hai ảnh đầu (Hình~\ref{fig:clinic_info_overview}--\ref{fig:clinic_info_facility}) thể hiện tab ``Cửa hàng'' với phần tổng quan và gallery cơ sở vật chất. Hai ảnh sau (Hình~\ref{fig:clinic_info_services}--\ref{fig:clinic_info_reviews}) lần lượt là tab ``Dịch vụ'' liệt kê các gói điều trị và tab ``Đánh giá'' tổng hợp phản hồi người dùng.
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.38\textheight,keepaspectratio]{Images/Hiện thực/user_app/clinic_info/fig_clinic_info_1.png}
+    \caption{Tab Cửa hàng -- phần tổng quan}
+    \label{fig:clinic_info_overview}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.38\textheight,keepaspectratio]{Images/Hiện thực/user_app/clinic_info/fig_clinic_info_2.png}
+    \caption{Tab Cửa hàng -- cơ sở vật chất}
+    \label{fig:clinic_info_facility}
+\end{subfigure}
+\par\medskip
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.38\textheight,keepaspectratio]{Images/Hiện thực/user_app/clinic_info/fig_clinic_info_3.png}
+    \caption{Tab Dịch vụ -- danh sách dịch vụ}
+    \label{fig:clinic_info_services}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.38\textheight,keepaspectratio]{Images/Hiện thực/user_app/clinic_info/fig_clinic_info_4.png}
+    \caption{Tab Đánh giá}
+    \label{fig:clinic_info_reviews}
+\end{subfigure}
+\par\medskip
+\caption{Trang chi tiết phòng khám với 3 tab: Cửa hàng, Dịch vụ, Đánh giá}
+\label{fig:user_clinic_detail}
+\end{figure}
+
+\subsubsection{Chi tiết Dịch vụ (Service Detail)}
+
+Màn hình chi tiết dịch vụ cung cấp đầy đủ thông tin để người dùng ra quyết định và có thể đặt lịch ngay trên cùng một giao diện. Dữ liệu hiển thị được tổng hợp từ hồ sơ dịch vụ, hình ảnh truyền thông, chuyên gia đủ điều kiện, tags đặc trưng, đánh giá người dùng và các slot khả dụng.
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/service_details/Simulator Screenshot - iPhone 16 - 2026-05-07 at 23.55.30.png}
+    \caption{Tổng quan dịch vụ}
+    \label{fig:service_detail_overview}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/service_details/Simulator Screenshot - iPhone 16 - 2026-05-07 at 23.55.38.png}
+    \caption{Phần đánh giá và nhận xét}
+    \label{fig:service_detail_reviews}
+\end{subfigure}
+\par\medskip
+\caption{Luồng Service Detail trên ứng dụng người dùng}
+\label{fig:user_service_detail_flow}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.31\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/service_details/Simulator Screenshot - iPhone 16 - 2026-05-07 at 23.56.00.png}
+    \caption{Bảng xếp hạng chi tiết}
+    \label{fig:service_detail_ratings}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.31\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/service_details/Simulator Screenshot - iPhone 16 - 2026-05-07 at 23.56.18.png}
+    \caption{Chọn chuyên gia và khung giờ}
+    \label{fig:service_detail_select_specialist}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.31\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/service_details/Simulator Screenshot - iPhone 16 - 2026-05-07 at 23.56.31.png}
+    \caption{Xác nhận đặt lịch}
+    \label{fig:service_detail_confirm}
+\end{subfigure}
+\par\medskip
+\caption{Luồng đặt lịch dịch vụ trên ứng dụng người dùng}
+\label{fig:user_service_booking_flow}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Thao tác xem thông tin:} Người dùng xem ảnh bìa, nhãn dịch vụ, giá, mô tả ngắn, điểm đánh giá và nhận xét để đánh giá nhanh chất lượng dịch vụ.
+    \item \textbf{Thao tác đặt lịch:} Người dùng chọn chuyên gia, chọn ngày giờ phù hợp và chuyển sang màn hình xác nhận đặt lịch.
+    \item \textbf{Ràng buộc dữ liệu:} Chỉ các chuyên gia thỏa \texttt{ProductEmployeeEligibility} và slot còn khả dụng mới được hiển thị để tránh chọn lịch không hợp lệ.
+\end{itemize}
+
+\subsubsection{Trò chuyện với Trợ lý AI (Chat with Dr. AI)}
+
+Trợ lý AI (Dr. AI Assistant) được tích hợp như một kênh tư vấn sức khỏe thông minh, hỗ trợ người dùng mô tả triệu chứng, nhận hướng dẫn chăm sóc tại nhà và khám phá dịch vụ phù hợp. Người dùng truy cập tính năng này qua Quick Action trên Home hoặc tab Chat ở thanh điều hướng chính.
+
+Luồng sử dụng diễn ra theo ba giai đoạn chính:
+
+\begin{enumerate}
+    \item \textbf{Giai đoạn khởi động:} Màn hình chào giới thiệu các lĩnh vực hỗ trợ gồm Symptom Checker, Health Tips, Medication Info và Wellness Plans. Người dùng nhấn ``Start a Conversation'' để bắt đầu phiên tư vấn mới.
+    \item \textbf{Giai đoạn tư vấn:} Người dùng nhập câu hỏi hoặc mô tả triệu chứng; Dr. AI trả lời theo từng đoạn qua SSE streaming. Cuộc hội thoại được trình bày theo kiểu chat bong bóng (tin nhắn người dùng màu xanh, phản hồi AI màu trắng/xám). Thanh hành động nhanh bên dưới cung cấp các lối tắt Symptom Check và Book Appointment.
+    \item \textbf{Giai đoạn gợi ý dịch vụ:} Khi AI xác định nhu cầu cụ thể, hệ thống tự động nhúng thẻ ``Recommended Services'' trực tiếp vào luồng hội thoại, hiển thị các dịch vụ phù hợp (tên, danh mục, thời lượng, giá, tên phòng khám) kèm nút ``View'' để chuyển sang trang chi tiết.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.31\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.32\textheight,keepaspectratio]{Images/Hiện thực/user_app/chat_with_ai/fig_chat_ai_home_quick_action.png}
+    \caption{Quick Action trên Home}
+    \label{fig:chat_ai_home_quick_action}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.31\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.32\textheight,keepaspectratio]{Images/Hiện thực/user_app/chat_with_ai/fig_chat_ai_welcome.png}
+    \caption{Màn hình chào AI Health Assistant}
+    \label{fig:chat_ai_welcome}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.31\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.32\textheight,keepaspectratio]{Images/Hiện thực/user_app/chat_with_ai/fig_chat_ai_conversation_1.png}
+    \caption{Hội thoại -- AI trả lời tư vấn}
+    \label{fig:chat_ai_conv1}
+\end{subfigure}
+\par\medskip
+\caption{Giai đoạn khởi động và tư vấn của Dr. AI Assistant}
+\label{fig:user_chat_ai_phase1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.31\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.32\textheight,keepaspectratio]{Images/Hiện thực/user_app/chat_with_ai/fig_chat_ai_conversation_2.png}
+    \caption{AI gợi ý dịch vụ trong hội thoại}
+    \label{fig:chat_ai_conv2}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.31\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.32\textheight,keepaspectratio]{Images/Hiện thực/user_app/chat_with_ai/fig_chat_ai_service_recommend.png}
+    \caption{Thẻ Recommended Services trong chat}
+    \label{fig:chat_ai_service_recommend}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.31\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.32\textheight,keepaspectratio]{Images/Hiện thực/user_app/chat_with_ai/fig_chat_ai_history.png}
+    \caption{Lịch sử phiên tư vấn AI}
+    \label{fig:chat_ai_history}
+\end{subfigure}
+\par\medskip
+\caption{Giai đoạn gợi ý dịch vụ và quản lý lịch sử hội thoại}
+\label{fig:user_chat_ai_phase2}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Quick Actions:} Trên màn hình Home, nút ``AI Health Assistant'' dẫn thẳng vào trang chào Dr. AI, cùng với ``Book Appointment'' là hai lối tắt chính.
+    \item \textbf{Tư vấn triệu chứng:} Người dùng mô tả vấn đề sức khỏe bằng ngôn ngữ tự nhiên; AI phân tích và đề xuất hướng chăm sóc chi tiết theo từng bước.
+    \item \textbf{Gợi ý dịch vụ nội tuyến:} Khi xác định dịch vụ phù hợp, AI nhúng thẻ Recommended Services vào cuộc trò chuyện với đầy đủ thông tin danh mục, thời lượng và giá.
+    \item \textbf{Lịch sử phiên tư vấn:} Tab ``AI Session'' trong Chat History liệt kê tất cả phiên đã tư vấn, phân nhóm theo ngày và có thể tìm kiếm lại.
+\end{itemize}
+
+\textbf{Tính năng kỹ thuật:}
+
+\begin{itemize}
+    \item \textbf{LLM Integration:} Chat AI đi qua Gateway Service, tích hợp với mô hình ngôn ngữ lớn (GPT/Llama) và pipeline RAG để trả lời chính xác trong lĩnh vực y tế.
+    \item \textbf{Streaming Response (SSE):} Phản hồi được stream từng chunk qua Server-Sent Events, giảm thời gian chờ cảm nhận và tạo trải nghiệm hội thoại tự nhiên.
+    \item \textbf{Context Preservation:} Lịch sử hội thoại được lưu phía server, người dùng có thể mở lại phiên bất kỳ và tiếp tục trong cùng ngữ cảnh.
+    \item \textbf{Service Recommendation Injection:} Khi AI xác định entity dịch vụ từ cuộc trò chuyện, hệ thống truy vấn Recommender Service và nhúng kết quả trực tiếp vào stream phản hồi.
+\end{itemize}
+
+\subsubsection{Luồng Đặt lịch và Thanh toán}
+
+Quy trình đặt lịch được tổ chức theo mô hình wizard 3 bước, mỗi bước hiển thị thanh tiến trình giúp người dùng nắm rõ vị trí hiện tại trong luồng. Về phía backend, lịch hẹn đi qua máy trạng thái \texttt{PENDING\_PAYMENT} $\rightarrow$ \texttt{CONFIRMED} $\rightarrow$ \texttt{IN\_PROGRESS} $\rightarrow$ \texttt{COMPLETED} hoặc \texttt{CANCELLED}; mỗi chuyển trạng thái được ghi vào \texttt{BookingStatusLog}.
+
+\begin{enumerate}
+    \item \textbf{Bước 1 -- Chọn danh mục và dịch vụ:} Người dùng tìm kiếm hoặc chọn danh mục sức khỏe (Dental Care, Dermatology, Fitness \& Yoga, v.v.) từ lưới biểu tượng. Sau khi chọn danh mục, danh sách dịch vụ thuộc danh mục đó hiển thị bên dưới kèm thông tin hình ảnh, thời lượng, giá và phòng khám cung cấp. Người dùng đánh dấu dịch vụ mong muốn rồi nhấn \textit{Continue}.
+
+    \item \textbf{Bước 2 -- Chọn chuyên gia và lịch hẹn:} Hệ thống hiển thị danh sách chuyên gia đủ điều kiện (ảnh, tên, chuyên ngành). Người dùng chọn chuyên gia, sau đó chọn ngày từ dải lịch ngang và khung giờ khả dụng (Morning, Afternoon) được tải từ API slot. Các slot đã bị khóa phân tán (Redis Redlock) sẽ không xuất hiện.
+
+    \item \textbf{Bước 3 -- Xác nhận đặt lịch:} Màn hình tổng hợp hiển thị thông tin chuyên gia, ngày giờ, danh mục và dịch vụ, địa chỉ phòng khám, cùng bảng chi phí (Subtotal, Discount, Total Amount). Người dùng nhấn \textit{Confirm \& Pay} để chuyển sang bước thanh toán.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_step1_category.png}
+    \caption{Chọn danh mục dịch vụ}
+    \label{fig:booking_step1_category}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_step1_service.png}
+    \caption{Chọn dịch vụ sau khi lọc danh mục}
+    \label{fig:booking_step1_service}
+\end{subfigure}
+\par\medskip
+\caption{Bước 1 -- Chọn danh mục và dịch vụ trong luồng Book Appointment}
+\label{fig:booking_step1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_step2_schedule.png}
+    \caption{Chọn chuyên gia, ngày và khung giờ}
+    \label{fig:booking_step2_schedule}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_step3_confirm.png}
+    \caption{Xác nhận thông tin và bảng giá}
+    \label{fig:booking_step3_confirm}
+\end{subfigure}
+\par\medskip
+\caption{Bước 2 \& 3 -- Chọn lịch hẹn và xác nhận đặt lịch}
+\label{fig:booking_step2_step3}
+\end{figure}
+
+\paragraph{Thanh toán (Checkout \& Payment)}
+
+Sau khi xác nhận đặt lịch, người dùng được chuyển sang màn hình Checkout hiển thị tóm tắt đơn hàng (phòng khám, dịch vụ, chuyên gia, giá) kèm tùy chọn quy đổi xu (Redeem Coins). Hệ thống hỗ trợ ba phương thức thanh toán:
+
+\begin{itemize}
+    \item \textbf{Credit/Debit Card:} Thanh toán quốc tế qua cổng Stripe.
+    \item \textbf{E-Wallet (MoMo/ZaloPay):} Thanh toán nội địa qua ví điện tử MoMo. Khi chọn phương thức này, ứng dụng mở WebView đến cổng \texttt{test-payment.momo.vn}, hiển thị mã đơn hàng và số tiền để người dùng xác nhận bằng ví MoMo.
+    \item \textbf{Pay Later:} Cho phép đặt lịch trước, thanh toán sau tại phòng khám.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_checkout.png}
+    \caption{Chọn phương thức thanh toán}
+    \label{fig:booking_checkout}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{Images/Hiện thực/user_app/booking/fig_booking_momo_payment.png}
+    \caption{Cổng thanh toán MoMo}
+    \label{fig:booking_momo_payment}
+\end{subfigure}
+\par\medskip
+\caption{Luồng Checkout và thanh toán qua ví điện tử MoMo}
+\label{fig:booking_checkout_flow}
+\end{figure}
+
+\textbf{Tính năng kỹ thuật:}
+
+\begin{itemize}
+    \item \textbf{Payment Gateway Integration:} Stripe (quốc tế) và MoMo (nội địa), với luồng IPN/Webhook server-to-server xác nhận giao dịch.
+    \item \textbf{Redeem Coins:} Người dùng có thể quy đổi xu tích lũy để giảm giá trực tiếp trên tổng đơn hàng.
+    \item \textbf{Idempotency:} Sử dụng mã đơn hàng duy nhất (\texttt{BK-*}) để ngăn double charge khi retry.
+    \item \textbf{Distributed Lock:} Redis Redlock khóa slot trong 10 phút (TTL) từ lúc tạo draft order đến khi thanh toán hoàn tất hoặc hết hạn.
+\end{itemize}
+
+Chi tiết API và luồng tích hợp MoMo xem tại \textbf{Phụ lục~\ref{appendix:momo_api}}.
+
+\subsubsection{Quản lý Lịch hẹn (Appointments)}
+
+Màn hình Appointments cho phép người dùng theo dõi toàn bộ lịch sử hẹn được phân loại thành bốn tab: Pending (chờ thanh toán), Upcoming (sắp tới), Completed (hoàn thành), và Canceled (đã hủy). Mỗi lịch hẹn được hiển thị dưới dạng card chứa thông tin dịch vụ, cơ sở y tế, chuyên gia, thời gian check-in, và trạng thái thanh toán. Người dùng có thể nhấn nút \textit{Details} để xem chi tiết đầy đủ hoặc thực hiện các hành động bổ sung.
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appointment/fig_appointment_pending.png}
+    \caption{Tab Pending -- chờ thanh toán}
+    \label{fig:appointment_pending}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appointment/fig_appointment_upcoming.png}
+    \caption{Tab Upcoming -- lịch hẹn sắp tới}
+    \label{fig:appointment_upcoming}
+\end{subfigure}
+\par\medskip
+\caption{Quản lý lịch hẹn -- danh sách hẹn theo trạng thái}
+\label{fig:appointments_list}
+\end{figure}
+
+\textbf{Tính năng kỹ thuật:}
+
+\begin{itemize}
+    \item \textbf{Phân loại theo trạng thái:} Bốn tab (Pending, Upcoming, Completed, Canceled) với lazy loading 10 item/batch.
+    \item \textbf{Real-time Status Sync:} WebSocket cập nhật trạng thái lịch hẹn khi có thay đổi từ phía partner.
+    \item \textbf{Push Notification:} Nhắc nhở 1 giờ trước lịch hẹn qua FCM.
+\end{itemize}
+
+\paragraph{Chi tiết lịch hẹn và Hướng dẫn dịch vụ (Service Manual)}
+
+Khi người dùng nhấn nút \textit{Details} từ danh sách hẹn, màn hình Appointment Details hiển thị thông tin đầy đủ về lịch hẹn: hình ảnh dịch vụ, tên dịch vụ, cơ sở y tế, chuyên gia phụ trách, thời gian check-in/check-out, và các tùy chọn liên quan (xem hướng dẫn dịch vụ, nhắn tin với cơ sở). Người dùng có thể nhấn \textit{Service manual} để truy cập hướng dẫn chi tiết về dịch vụ, bao gồm: guidelines trước dịch vụ (Pre-Service Guidelines), các bước thực hiện dịch vụ, hình ảnh cơ sở vật chất (Facilities), và lịch sử đánh giá về dịch vụ đó. Tính năng này giúp người dùng chuẩn bị tốt trước cuộc hẹn và giao tiếp trực tiếp với nhân viên qua chat.
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=6pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appointment/fig_appointment_details.png}
+    \caption{Chi tiết lịch hẹn}
+    \label{fig:appointment_details}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appointment/fig_appointment_manual_1.png}
+    \caption{Hướng dẫn dịch vụ -- phần 1}
+    \label{fig:appointment_manual_part1}
+\end{subfigure}
+\par\medskip
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appointment/fig_appointment_manual_2.png}
+    \caption{Hướng dẫn dịch vụ -- phần 2}
+    \label{fig:appointment_manual_part2}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{Images/Hiện thực/user_app/appointment/fig_appointment_chat.png}
+    \caption{Chat với cơ sở y tế}
+    \label{fig:appointment_chat}
+\end{subfigure}
+\par\medskip
+\caption{Chi tiết lịch hẹn, hướng dẫn dịch vụ, và liên hệ với cơ sở}
+\label{fig:appointment_details_flow}
+\end{figure}
+
+\textbf{Thành phần chính của Service Manual:}
+
+\begin{itemize}
+    \item \textbf{Pre-Service Guidelines:} Hướng dẫn chuẩn bị trước dịch vụ (ví dụ: chải răng trước khi tẩy trắng, tránh cà phê 24 giờ trước).
+    \item \textbf{Service Rules:} Quy tắc thực hiện dịch vụ từng bước (bao gồm numbered steps, icons minh họa).
+    \item \textbf{Facilities:} Hình ảnh gallery các cơ sở vật chất, thiết bị sử dụng.
+    \item \textbf{Review:} Tổng hợp đánh giá (số sao trung bình, danh sách feedback từ khách hàng trước).
+\end{itemize}
+
+\subsubsection{Đánh giá Dịch vụ}
+
+Sau khi lịch hẹn chuyển sang trạng thái hoàn thành, người dùng được dẫn vào luồng đánh giá theo từng bước nhằm tối ưu tỷ lệ hoàn thành khảo sát. Hệ thống thu thập hai nhóm dữ liệu chính: \texttt{SpecialistReview} cho đánh giá chuyên gia về chuyên môn và thái độ, và \texttt{TreatmentReview} cho trải nghiệm dịch vụ, không gian, kết quả và ảnh thực tế.
+
+\begin{enumerate}
+    \item \textbf{Đánh giá dịch vụ:} Người dùng chấm điểm mức độ hài lòng về dịch vụ tổng thể.
+    \item \textbf{Đánh giá chuyên gia \& cơ sở:} Hệ thống yêu cầu đánh giá chi tiết cho chuyên gia phụ trách và cơ sở vật chất.
+    \item \textbf{Nhận xét và hình ảnh:} Người dùng nhập bình luận và có thể tải lên hình ảnh đính kèm (ảnh sau điều trị, hóa đơn).
+    \item \textbf{Hoàn tất:} Sau khi gửi, hệ thống ghi nhận đánh giá, cập nhật điểm trung bình và hiển thị màn hình thông báo thành công.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\captionsetup[subfigure]{font=small,justification=centering}
+\captionsetup{skip=8pt}
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/reviews/fig_review_step1.png}
+    \caption{Bắt đầu đánh giá dịch vụ}
+    \label{fig:review_step1}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/reviews/fig_review_step2.png}
+    \caption{Đánh giá chuyên gia}
+    \label{fig:review_step2}
+\end{subfigure}
+\par\medskip
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/reviews/fig_review_step3.png}
+    \caption{Nhận xét chi tiết và đính kèm ảnh}
+    \label{fig:review_step3}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{Images/Hiện thực/user_app/reviews/fig_review_step4.png}
+    \caption{Hoàn tất đánh giá}
+    \label{fig:review_step4}
+\end{subfigure}
+\par\medskip
+\caption{Luồng Đánh giá dịch vụ (Service Review) trên ứng dụng người bệnh}
+\label{fig:user_review_flow}
+\end{figure}
+
+% ===========================================================================
+% 6.3.3  PHÂN HỆ CỔNG ĐỐI TÁC (PARTNER PORTAL)
+% ===========================================================================
+\subsection{Hiện thực Phân hệ Cổng Đối tác (Partner Portal)}
+
+Phân hệ Partner Portal (Flutter Web) hỗ trợ toàn bộ vòng đời vận hành của cơ sở: đăng ký KYC, hoàn thiện hồ sơ công khai, quản trị dịch vụ/nhân sự/tài chính và giao tiếp với khách hàng. Menu chính gồm Dashboard, Services, Employee, Service Tags, Finance, Messages.
+
+% ---------------------------------------------------------------------------
+% 6.3.3.1  ĐĂNG KÝ VÀ XÁC MINH HỒ SƠ
+% ---------------------------------------------------------------------------
+\subsubsection{Đăng ký và Xác minh Hồ sơ Đối tác}
+
+Luồng đăng ký gồm 4 bước: nộp hồ sơ trực tuyến, chuyển \texttt{PENDING} để admin xét duyệt, chỉnh sửa khi bị yêu cầu \texttt{REQUIRED\_RESUBMIT}, và hoàn thiện hồ sơ công khai sau khi \texttt{APPROVED}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_register_1.png}
+    \vspace{0.5em}
+    \caption{Form đăng ký đối tác -- Bước 1: Thông tin tài khoản và doanh nghiệp}
+    \label{fig:partner_reg1}
+\end{figure}
+
+Hình~\ref{fig:partner_reg1} hiển thị màn hình Partner Registration:
+\begin{itemize}
+    \item \textbf{Account Information:} Email và mật khẩu đăng nhập.
+    \item \textbf{Business \& Partner Information} (Thông tin doanh nghiệp): Brand Name (Tên thương hiệu), Legal Company Name (Tên công ty pháp lý), Tax Code (Mã số thuế), Business Types (Loại hình kinh doanh, đa chọn), địa chỉ cơ sở (dropdown 3 cấp tỉnh--huyện--xã).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_register_2.png}
+    \vspace{0.5em}
+    \caption{Form đăng ký đối tác -- Bước 2: Thông tin người đại diện pháp lý và CCCD}
+    \label{fig:partner_reg2}
+\end{figure}
+
+Hình~\ref{fig:partner_reg2} hiển thị bước khai báo đại diện pháp lý:
+\begin{itemize}
+    \item \textbf{Legal Representative:} Họ tên, chức danh, số điện thoại, loại và số giấy tờ định danh, ngày cấp.
+    \item \textbf{Identity Verification Images:} Tải ảnh mặt trước và mặt sau CCCD; hệ thống hiển thị preview và gắn badge ``Verified'' khi đạt chất lượng.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_register_3.png}
+    \vspace{0.5em}
+    \caption{Form đăng ký đối tác -- Bước 3: Tải lên Giấy phép bắt buộc}
+    \label{fig:partner_reg3}
+\end{figure}
+
+Hình~\ref{fig:partner_reg3} hiển thị bước tải tài liệu cuối:
+\begin{itemize}
+    \item \textbf{Document Verification:} Tải bản scan các giấy phép bắt buộc, bao gồm Giấy phép kinh doanh (PDF/ảnh, tối đa 10MB),...
+    \item Sau khi tải thành công, hệ thống hiển thị tên tệp, kích thước và badge ``Uploaded successfully''.
+    \item Nút \textbf{Complete Registration} được kích hoạt sau khi hoàn tất bước này.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_register_done.png}
+    \vspace{0.5em}
+    \caption{Màn hình xác nhận đăng ký thành công -- hồ sơ chuyển trạng thái PENDING}
+    \label{fig:partner_reg_done}
+\end{figure}
+
+Hình~\ref{fig:partner_reg_done} xác nhận đăng ký hoàn tất:
+\begin{itemize}
+    \item Hệ thống gán Application ID và chuyển hồ sơ sang trạng thái \texttt{PENDING}.
+    \item Email xác nhận gửi tự động; nút \textbf{Back to Login} đưa đối tác về màn hình chờ duyệt.
+\end{itemize}
+
+\paragraph{Luồng chỉnh sửa hồ sơ theo yêu cầu của Admin (Application Revision)}
+
+Khi admin đánh giá hồ sơ có lỗi và chuyển trạng thái thành \texttt{REQUIRED\_RESUBMIT}, hệ thống gửi thông báo và đối tác thấy trang Application Revision với danh sách các mục cần cập nhật. Luồng diễn ra theo 3 bước: xem tóm tắt $\rightarrow$ mở rộng trường cần sửa $\rightarrow$ cập nhật và nộp lại.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_revision_info.png}
+    \vspace{0.5em}
+    \caption{Application Revision -- tổng quan các mục cần chỉnh sửa và mục đã chấp thuận}
+    \label{fig:partner_revision_info}
+\end{figure}
+
+Hình~\ref{fig:partner_revision_info} hiển thị trang Application Revision sau khi đối tác nhận thông báo:
+\begin{itemize}
+    \item \textbf{ACTION REQUIRED} (cam): Business Entity, Legal Representative -- cần chỉnh sửa.
+    \item \textbf{Approved} (tick xanh): Location Details, Documents -- không cần sửa.
+    \item Thanh trạng thái: \textit{``Awaiting Revision''} và nút \textbf{Resubmit Application}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_revision_required_update_fields.png}
+    \vspace{0.5em}
+    \caption{Application Revision -- mục Business Entity mở rộng với các trường cần sửa}
+    \label{fig:partner_revision_fields}
+\end{figure}
+
+Hình~\ref{fig:partner_revision_fields} cho thấy mục Business Entity sau khi mở rộng:
+\begin{itemize}
+    \item Trường lỗi (Tax Code, Phone Number): viền đỏ, badge \textbf{UPDATE} cam kèm lý do admin.
+    \item Trường hợp lệ (Brand Name, Business Types): tick xanh, read-only.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_revision_updated_field.png}
+    \vspace{0.5em}
+    \caption{Application Revision -- badge EDITED (xanh) xác nhận trường đã được cập nhật}
+    \label{fig:partner_revision_updated}
+\end{figure}
+
+Hình~\ref{fig:partner_revision_updated} hiển thị trạng thái sau khi nhập lại:
+\begin{itemize}
+    \item Badge \textbf{UPDATE} (cam) chuyển sang \textbf{EDITED} (xanh) -- thay đổi được ghi nhận cục bộ.
+    \item Nhấn \textbf{Resubmit Application} để gửi hồ sơ cập nhật về Admin Portal xét duyệt lại.
+\end{itemize}
+
+\paragraph{Hoàn thiện hồ sơ công khai phòng khám (Complete Clinic Profile)}
+
+Sau khi hồ sơ được Admin phê duyệt (\texttt{APPROVED}), đối tác được chuyển sang trang \textbf{Complete Clinic Profile} để điền thông tin hiển thị công khai. Phải hoàn tất 4 mục bắt buộc mới mở khóa Partner Dashboard.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_complete_profile_1.png}
+    \vspace{0.5em}
+    \caption{Complete Clinic Profile -- trạng thái ban đầu (0\% hoàn thành), 4 mục bắt buộc chưa điền}
+    \label{fig:partner_profile1}
+\end{figure}
+
+Hình~\ref{fig:partner_profile1} là màn hình đầu tiên sau phê duyệt:
+\begin{itemize}
+    \item Thanh tiến độ: \textit{``Profile 0\% complete''} với 4 mục cần điền: Cover Image (Ảnh bìa), Logo Image (Logo), Description (Mô tả), Gallery (Bộ ảnh phòng khám).
+    \item \textbf{Verified clinic identity} hiển thị read-only thông tin đã xác minh từ hồ sơ KYC.
+    % \item Cảnh báo: \textit{``Complete the required fields to unlock the dashboard.''}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_complete_profile_2.png}
+    \vspace{0.5em}
+    \caption{Complete Clinic Profile -- Clinic Branding đã tải ảnh bìa và logo}
+    \label{fig:partner_profile2}
+\end{figure}
+
+Hình~\ref{fig:partner_profile2} nhấn nút Upload để tải ảnh lên, sau khi đối tác tải ảnh lên:
+\begin{itemize}
+    \item \textbf{Cover Image} (Ảnh bìa, tỷ lệ 16:9): xem preview trực tiếp.
+    \item \textbf{Logo Image} (Logo thương hiệu): nút Change (Thay ảnh)/Delete (Xóa) để thay thế.
+    \item \textbf{About Clinic} (Giới thiệu phòng khám): nhập mô tả qua nút \textbf{Edit Description} (Chỉnh sửa mô tả).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_register/fig_partner_complete_profile_3.png}
+    \vspace{0.5em}
+    \caption{Complete Clinic Profile -- hoàn thiện 4/4 mục}
+    \label{fig:partner_profile3}
+\end{figure}
+
+Hình~\ref{fig:partner_profile3} là trạng thái hoàn tất:
+\begin{itemize}
+    \item Nhấn nút upload để tải lên từ 3-8 ảnh ở mục gallery, nhằm mô tả cơ sở vật chất của doanh nghiệp.
+    \item Trust badge là huy hiệu chứng nhận giúp tăng ưu tín của doanh nghiệp, hiện tại là optional.
+    \item Thanh tiến độ cập nhật thành \textit{``Profile 100\% complete''} với tất cả mục bắt buộc đã hoàn thiện.
+    \item Nhấn \textbf{Complete profile} để công khai hồ sơ và mở khóa Partner Dashboard.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.3.2  DASHBOARD ĐỐI TÁC
+% ---------------------------------------------------------------------------
+\subsubsection{Dashboard Đối tác}
+
+Dashboard là trang chủ của Partner Portal, hiển thị tổng quan kinh doanh theo kỳ (Today / This Week / This Month / This Quarter / This Year) và các Quick Actions để truy cập nhanh các chức năng thường dùng.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/dashboard/fig_partner_dashboard_1.png}
+    \vspace{0.5em}
+    \caption{Partner Dashboard -- KPI tổng hợp, Revenue Overview, Quick Actions và biểu đồ phân tích}
+    \label{fig:partner_dash1}
+\end{figure}
+
+Hình~\ref{fig:partner_dash1} hiển thị màn hình Dashboard chính:
+\begin{itemize}
+    \item \textbf{KPI:} Doanh thu, số lịch hẹn, dịch vụ đang hoạt động và đánh giá trung bình theo kỳ.
+    \item \textbf{Revenue Overview} (Tổng quan doanh thu): Biểu đồ doanh thu hàng ngày; 
+    \item \textbf{Thao tác nhanh (Quick Actions):} Thêm dịch vụ (Add Service), Thêm nhân viên (Add Employee), Quản lý dịch vụ (Manage Services), Tin nhắn (Messages).
+    \item \textbf{Hiệu suất Dịch vụ (Service Performance):} Biểu đồ cột (bar chart) lượt đặt theo dịch vụ; 
+    \item \textbf{Employee Overview} (Tổng quan nhân viên): Biểu đồ vành khuyên phân bổ vai trò nhân sự.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/dashboard/fig_partner_dashboard_2.png}
+    \vspace{0.5em}
+    \caption{Partner Dashboard -- chế độ Services: KPI dịch vụ và biểu đồ Booking and revenue trend}
+    \label{fig:partner_dash2}
+\end{figure}
+
+Hình~\ref{fig:partner_dash2} hiển thị chế độ \textbf{Services} trong Dashboard:
+\begin{itemize}
+    \item \textbf{KPI:} Số dịch vụ đang hoạt động, tổng lượt đặt, doanh thu và đánh giá trung bình theo kỳ (dữ liệu minh hoạ).
+    \item \textbf{Booking and revenue trend:} Hai đường booking và doanh thu trên cùng trục thời gian.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/dashboard/fig_partner_dashboard_3.png}
+    \vspace{0.5em}
+    \caption{Partner Dashboard -- Category/service leaders và tổng quan Booking operations}
+    \label{fig:partner_dash3}
+\end{figure}
+
+Hình~\ref{fig:partner_dash3} hiển thị hai widget phân tích:
+\begin{itemize}
+    \item \textbf{Category \& service leaders:} Top dịch vụ và danh mục dẫn đầu theo doanh thu (dữ liệu minh hoạ).
+    \item \textbf{Booking operations:} Tổng số booking và phân bố theo mức độ khẩn cấp (trễ, chờ xác nhận, hoàn thành).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/dashboard/fig_partner_dashboar_4.png}
+    \vspace{0.5em}
+    \caption{Partner Dashboard -- chi tiết Booking operations: phân bố trạng thái và cảnh báo}
+    \label{fig:partner_dash4}
+\end{figure}
+
+Hình~\ref{fig:partner_dash4} phóng to phần \textbf{Booking operations}:
+\begin{itemize}
+    \item \textbf{Trạng thái:} Phân bố booking theo từng trạng thái vận hành (dữ liệu minh hoạ).
+    \item \textbf{Cảnh báo:} Xử lý booking trễ, xác nhận booking đang chờ và rà soát quy trình nhắc nhở.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.3.3  QUẢN LÝ DỊCH VỤ
+% ---------------------------------------------------------------------------
+
+\subsubsection{Quản lý Dịch vụ (Services)}
+
+Module Services cho phép đối tác quản lý toàn bộ danh mục dịch vụ (Product) và theo dõi hiệu suất kinh doanh theo dịch vụ. Giao diện gồm hai phần chính: trang Services Dashboard (KPI tổng hợp, xu hướng, xếp hạng, vận hành đặt lịch) và trang quản lý sản phẩm chi tiết.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_partner_service_dashboard_1.png}
+    \vspace{0.5em}
+    \caption{Services Dashboard -- KPI tổng hợp và biểu đồ xu hướng doanh thu theo tuần}
+    \label{fig:partner_svc_dash1}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_dash1} hiển thị phần đầu của Services Dashboard:
+\begin{itemize}
+    \item \textbf{KPI:} Số dịch vụ đang hoạt động, tổng lượt đặt, doanh thu và đánh giá trung bình theo kỳ.
+    \item \textbf{Booking and revenue trend:} Biểu đồ đường booking và doanh thu song song theo tuần.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_partner_service_dashboard_2.png}
+    \vspace{0.5em}
+    \caption{Services Dashboard -- top dịch vụ/danh mục theo doanh thu và tổng quan Booking operations}
+    \label{fig:partner_svc_dash2}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_dash2} hiển thị phần giữa của Dashboard:
+\begin{itemize}
+    \item \textbf{Category and service leaders:} Top dịch vụ và danh mục dẫn đầu theo doanh thu (dữ liệu minh hoạ).
+    \item \textbf{Booking operations:} Tổng số booking và phân bố theo mức độ khẩn cấp (trễ, chờ xác nhận, hoàn thành).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_partner_service_dashboard_3.png}
+    \vspace{0.5em}
+    \caption{Services Dashboard -- chi tiết Booking operations: phân bố trạng thái và cảnh báo vận hành}
+    \label{fig:partner_svc_dash3}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_dash3} là Booking operations:
+\begin{itemize}
+    \item \textbf{Phân bố trạng thái (Status):} Confirmed (Đã xác nhận), Cancelled (Đã hủy), No-show (Khách vắng), Rescheduled (Đổi lịch) với số lượng minh hoạ tương ứng.
+    \item \textbf{Cảnh báo:} Xử lý booking trễ, xác nhận booking chờ, rà soát quy trình nhắc nhở.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_partner_service_dashboard_4.png}
+    \vspace{0.5em}
+    \caption{Services Dashboard -- bảng Product Management: danh sách dịch vụ với tên, giá và thao tác}
+    \label{fig:partner_svc_dash4}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_dash4} hiển thị bảng \textbf{Product Management}:
+\begin{itemize}
+    \item Mỗi hàng: ID, thumbnail, danh mục, tên dịch vụ, giá, 3 nút thao tác (xem/sửa/xóa).
+    \item Thanh công cụ: Search (Tìm kiếm), Sort (Sắp xếp), Filter (Lọc), nút \textbf{Add Product} (Thêm sản phẩm) và \textbf{Delete All} (Xóa tất cả).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_partner_service_dashboard_5.png}
+    \vspace{0.5em}
+    \caption{Services Dashboard -- chế độ Website Layout: xem trước giao diện dịch vụ phía khách hàng}
+    \label{fig:partner_svc_dash5}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_dash5} hiển thị chế độ \textbf{Website Layout}:
+\begin{itemize}
+    \item Chuyển đổi giữa chế độ bảng (quản lý) và lưới (xem trước giao diện khách hàng).
+\end{itemize}
+
+\paragraph{Tạo dịch vụ mới (Create Product)}
+
+Luồng tạo dịch vụ mới gồm 3 phần chính điền trên cùng một form dài: thông tin cơ bản, hướng dẫn dịch vụ (Service Manual), và đa phương tiện (Media Gallery).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_partner_create_service_1.png}
+    \vspace{0.5em}
+    \caption{Create Product -- General Information: tên, mô tả, phân loại và cài đặt lịch đặt}
+    \label{fig:partner_create_svc1}
+\end{figure}
+
+Hình~\ref{fig:partner_create_svc1} hiển thị mục \textbf{General Information}:
+\begin{itemize}
+    \item \textbf{Thông tin chính (trái):} Tên sản phẩm (Product Name), Mô tả (Description, rich text), Hướng dẫn dịch vụ (Service Manual).
+    \item \textbf{Thanh bên (phải):} Hiển thị (Visibility), Bật/tắt cửa hàng trực tuyến (Online Store toggle), Danh mục (Category), Thẻ nhãn (Tags), Phân công nhân viên (Staff Assignment), Thời lượng/Thời gian đệm (Duration/Buffer), Sức chứa (Capacity), Quy tắc đặt lịch (Booking Rules).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_parter_create_service_2.png}
+    \vspace{0.5em}
+    \caption{Create Product -- Service Manual: Pre-Service Guidelines, Service Rules và Procedure Steps}
+    \label{fig:partner_create_svc2}
+\end{figure}
+
+Hình~\ref{fig:partner_create_svc2} hiển thị mục \textbf{Service Manual}:
+\begin{itemize}
+    \item \textbf{Pre-Service Guidelines:} Hướng dẫn chuẩn bị trước khi đến.
+    \item \textbf{Service Rules:} Mỗi quy tắc gồm icon slug, tiêu đề và mô tả.
+    \item \textbf{Procedure Steps:} Các bước quy trình tuần tự (Step 1, 2, ...).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_partner_create_service_3.png}
+    \vspace{0.5em}
+    \caption{Create Product -- Service Pricing và Media Gallery}
+    \label{fig:partner_create_svc3}
+\end{figure}
+
+Hình~\ref{fig:partner_create_svc3} hiển thị phần cuối của form:
+\begin{itemize}
+    \item \textbf{Service Pricing:} Base Price và Sale Price.
+    \item \textbf{Media Gallery:} Product Images và Facility Images (tải ảnh hoặc thêm từ URL).
+    \item Nút \textbf{Save \& Publish} lưu và công khai dịch vụ.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.3.4  QUẢN LÝ NHÂN VIÊN
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Nhân viên (Employee)}
+
+Module Employee cho phép đối tác quản lý hồ sơ nhân sự (Therapist, Doctor\ldots), theo dõi hiệu suất đội ngũ và tạo mới nhân viên với thông tin chuyên môn đầy đủ.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_1.png}
+    \vspace{0.5em}
+    \caption{Employee Dashboard -- tổng quan nhân sự: Team Performance, Role Distribution và Workload Efficiency}
+    \label{fig:partner_emp1}
+\end{figure}
+
+Hình~\ref{fig:partner_emp1} hiển thị trang tổng quan Employee Dashboard:
+\begin{itemize}
+    \item \textbf{Team Performance:} Tổng nhân sự (Total Staff), tỷ lệ Active/On Leave, Utilization (tỷ lệ lấp đầy lịch làm) và Quality Signal (điểm đánh giá trung bình).
+    \item \textbf{Role Distribution:} Biểu đồ tròn phân bổ theo loại nhân viên (Doctor, Spa Therapist, Massage Therapist).
+    \item \textbf{Workload Efficiency:} Biểu đồ cột thể hiện số buổi, doanh thu và năng suất theo tháng.
+\end{itemize}
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_2.png}
+    \vspace{0.5em}
+    \caption{Employee Dashboard -- Top Performers và Compliance Posture}
+    \label{fig:partner_emp2}
+\end{figure}
+
+Hình~\ref{fig:partner_emp2} hiển thị phần dưới của Dashboard:
+\begin{itemize}
+    \item \textbf{Top Performers:} Xếp hạng nhân viên theo Utilization (tỷ lệ lấp lịch), Rating (đánh giá) và Contribution (doanh thu đóng góp).
+    \item \textbf{Compliance Posture:} Trạng thái tuân thủ -- Verification Coverage (hồ sơ cần tải tài liệu xác minh) và Emergency Readiness (thông tin liên hệ khẩn cấp đầy đủ).
+\end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_employee_3.png}
+    \vspace{0.5em}
+    \caption{Employee Management -- danh sách nhân viên dạng bảng với ID, vị trí, đánh giá và trạng thái}
+    \label{fig:partner_emp3}
+\end{figure}
+
+Hình~\ref{fig:partner_emp3} hiển thị bảng quản lý nhân viên:
+\begin{itemize}
+    \item Cột: ID, Avatar, Full Name (Họ tên), Position (Vị trí: Senior Doctor/Spa Therapist/Massage Therapist), Rating (Đánh giá), Review Count (Số lượt đánh giá), Status (Trạng thái), Actions (Xem/Sửa/Xóa).
+    \item Nút \textbf{Add Employee} (thêm nhân viên mới) và \textbf{Delete All} (xóa toàn bộ); hỗ trợ tìm kiếm, lọc và sắp xếp.
+\end{itemize}
+\paragraph{Tạo nhân viên mới}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_1.png}
+    \vspace{0.5em}
+    \caption{Tạo nhân viên -- Contact \& Basic Info và Professional Role}
+    \label{fig:partner_create_emp1}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp1} hiển thị bước đầu của form tạo nhân viên:
+\begin{itemize}
+    \item \textbf{Contact \& Basic Info:} First Name (Tên), Last Name (Họ), Email, Phone (Số điện thoại), Date of Birth (Ngày sinh), Gender (Giới tính), Emergency Contact (Liên hệ khẩn cấp).
+    \item \textbf{Professional Role:} Chọn loại (\textbf{Therapist} hoặc \textbf{Doctor}), Job Title (Chức danh), Employee ID (tự sinh -- Auto-Generate), Employment Type (Full-Time/Part-Time), Start Date (Ngày bắt đầu) và Description (Mô tả công việc, hỗ trợ rich text).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_2_a.png}
+    \vspace{0.5em}
+    \caption{Tạo Doctor -- Education \& Qualifications và Experience \& Qualifications}
+    \label{fig:partner_create_emp2}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp2} hiển thị các mục thông tin chuyên môn dành cho Doctor:
+\begin{itemize}
+    \item \textbf{Education \& Qualifications:} Medical Title (Chức danh y tế), Medical License ID (Mã chứng chỉ hành nghề -- bắt buộc), Education (Bằng cấp -- đa chọn), Certifications (Chứng chỉ chuyên môn).
+    \item \textbf{Experience \& Qualifications:} Years of Experience (Số năm kinh nghiệm), Consultation Fee (Phí tư vấn \%), Specializations (Chuyên khoa -- đa chọn).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_2_b.png}
+    \vspace{0.5em}
+    \caption{Tạo Therapist -- Skills \& Services: loại trị liệu, cấp bậc và kỹ năng chuyên môn}
+    \label{fig:partner_create_emp2b}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp2b} hiển thị mục \textbf{Skills \& Services} dành cho Therapist:
+\begin{itemize}
+    \item \textbf{Therapist Type:} Spa Therapist (General wellness) hoặc Massage Therapist (Deep tissue).
+    \item \textbf{Therapist Level} (Cấp bậc) và \textbf{Commission Rate} (Tỷ lệ hoa hồng \%).
+    \item \textbf{Massage Strength:} Mức lực massage -- Soft / Medium / Strong (chỉ hiện khi chọn Massage Therapist).
+    \item \textbf{Last Health Check} (Ngày kiểm tra sức khoẻ gần nhất) và \textbf{Skill Set} (Kỹ năng chuyên môn -- đa chọn).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_3.png}
+    \vspace{0.5em}
+    \caption{Tạo nhân viên -- Work History và Documents \& Certifications}
+    \label{fig:partner_create_emp3}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp3} hiển thị phần tài liệu và lịch sử công tác:
+\begin{itemize}
+    \item \textbf{Work History:} Thêm nhiều mục lịch sử công tác qua nút \textbf{Add Work History}.
+    \item \textbf{Documents \& Certifications -- Required:} Giấy phép hành nghề (License/Permit) và Chứng minh nhân thân (Identity Card) -- bắt buộc; hỗ trợ xem (View) và thay thế (Replace).
+    \item \textbf{Other Documents:} Khu vực tải lên tự do (PDF, JPG, PNG -- tối đa 10MB).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_4.png}
+    \vspace{0.5em}
+    \caption{Tạo nhân viên -- Work Schedule: ca làm việc theo từng ngày trong tuần}
+    \label{fig:partner_create_emp4}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp4} hiển thị phần \textbf{Work Schedule}:
+\begin{itemize}
+    \item Cấu hình ca theo từng ngày (Mon--Sun): toggle bật/tắt và giờ bắt đầu/kết thúc (Shift Hours).
+    \item Nút \textbf{Apply Preset} áp dụng mẫu ca mặc định (Full-Time Morning: Mon--Fri 09:00--17:00).
+    \item Nhấn \textbf{Create Employee/Doctor} để lưu; hệ thống tự sinh Employee ID.
+\end{itemize}
+
+% 6.3.3.5  SERVICE TAGS
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Service Tags}
+
+Service Tags là nhãn phân loại do đối tác tự định nghĩa, dùng để tổ chức và lọc dịch vụ trong nội bộ phòng khám.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service_tag/fig_service_tags_dashboard.png}
+    \vspace{0.5em}
+    \caption{Service Tags Management -- danh sách nhãn dịch vụ với tên, màu, lượng sử dụng và trạng thái}
+    \label{fig:partner_svc_tags_dash}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_tags_dash} hiển thị danh sách Service Tags:
+\begin{itemize}
+    \item Mỗi tag: tên, mô tả, nhãn màu, số dịch vụ sử dụng (Usage) và trạng thái Active/Inactive.
+    \item Nút \textbf{Add New Tag} mở modal tạo mới; \textbf{Delete All} xóa toàn bộ.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service_tag/fig_service_tags_create_new_service_tag.png}
+    \vspace{0.5em}
+    \caption{Modal Create New Tag -- nhập tên, mô tả, chọn màu, thứ tự và trạng thái}
+    \label{fig:partner_svc_tags_create}
+\end{figure}
+
+Hình~\ref{fig:partner_svc_tags_create} tạo tag mới:
+\begin{itemize}
+    \item Nhập Name (Tên), Description (Mô tả), chọn Color (Màu sắc, 10 màu preset), Sort Order (Thứ tự sắp xếp) và toggle Active (Đang hoạt động).
+    \item Nút \textbf{Create} để lưu và đóng; tag mới xuất hiện ngay trong danh sách.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.3.6  TÀI CHÍNH ĐỐI TÁC
+% ---------------------------------------------------------------------------
+\subsubsection{Tài chính Đối tác (Finance)}
+
+Module Finance cung cấp cho đối tác bức tranh tài chính từ góc nhìn phòng khám: doanh thu, giao dịch thành công, và trạng thái thanh toán theo kỳ.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_finance/fig_partner_finance_1.png}
+    \vspace{0.5em}
+    \caption{Finance -- KPI tài chính và biểu đồ xu hướng doanh thu}
+    \label{fig:partner_finance1}
+\end{figure}
+
+Hình~\ref{fig:partner_finance1} hiển thị tổng quan tài chính đối tác:
+\begin{itemize}
+    \item \textbf{KPI:} Doanh thu gộp, số giao dịch thành công, tỷ lệ hoàn tiền.
+    \item \textbf{Biểu đồ:} Xu hướng doanh thu theo ngày/tuần -- xác định cao điểm, thấp điểm.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/partner_finance/fig_partner_finance_2.png}
+    \vspace{0.5em}
+    \caption{Finance -- bảng chi tiết giao dịch theo mã booking, số tiền và trạng thái}
+    \label{fig:partner_finance2}
+\end{figure}
+
+Hình~\ref{fig:partner_finance2} hiển thị bảng giao dịch chi tiết:
+\begin{itemize}
+    \item Mỗi dòng: mã booking, dịch vụ, khách hàng, số tiền, trạng thái (Paid/Pending/Refunded).
+    \item Hỗ trợ lọc theo thời gian và xuất dữ liệu đối soát nội bộ.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.3.7  NHẮN TIN
+% ---------------------------------------------------------------------------
+\subsubsection{Nhắn tin với Khách hàng (Messages)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/message/fig_partner_user_message.png}
+    \vspace{0.5em}
+    \caption{Messages -- giao diện chat thời gian thực giữa đối tác và khách hàng}
+    \label{fig:partner_message}
+\end{figure}
+
+Hình~\ref{fig:partner_message} hiển thị module Messages:
+\begin{itemize}
+    \item \textbf{Cột trái:} Danh sách hội thoại (avatar, tên, tin nhắn gần nhất, thời gian).
+    \item \textbf{Cột phải:} Khung chat với lịch sử, ô nhập và nút tải tệp đính kèm.
+    \item Truyền tin qua WebSocket (\texttt{PartnerChatGateway}); tự động đẩy thông báo khi ngoài màn hình.
+\end{itemize}
+
+% ===========================================================================
+% 6.3.4  PHÂN HỆ TRANG QUẢN TRỊ (ADMIN PORTAL)
+% ===========================================================================
+\subsection{Hiện thực Phân hệ Trang Quản trị (Admin Portal)}
+
+Admin Portal (Flutter Web) cung cấp công cụ giám sát và kiểm duyệt toàn hệ thống qua 5 module chính: Dashboard, Finance, Category, Provider và Notifications.
+
+% ---------------------------------------------------------------------------
+% 6.3.4.1  PROVIDER MANAGEMENT
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Hồ sơ Đối tác (Provider Management)}
+
+Module Provider là trung tâm xét duyệt hồ sơ đối tác: xem hàng đợi, kiểm tra chi tiết hồ sơ, ghi Revision Note theo trường và ra quyết định \texttt{Approve}/\texttt{Request Revision}/\texttt{Reject}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/provider_management/fig_admin_provider_dashboard.png}
+    \vspace{0.5em}
+    \caption{Provider Requests -- hàng đợi xét duyệt và bảng danh sách đối tác}
+    \label{fig:admin_provider_dash}
+\end{figure}
+
+Hình~\ref{fig:admin_provider_dash} hiển thị màn hình chính module Provider:
+\begin{itemize}
+    \item \textbf{KPI:} Số hồ sơ chờ duyệt, ưu tiên cao, đang hoạt động và thời gian chờ trung bình (dữ liệu minh hoạ).
+    \item \textbf{Bảng danh sách:} Tên/ID đối tác, ngày nộp, badge trạng thái (Pending/Active), nút thao tác.
+    \item Hai tab: \textbf{Verification Queue} và \textbf{All Providers}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/provider_management/fig_admin_provider_revisions.png}
+    \vspace{0.5em}
+    \caption{Chi tiết xét duyệt đối tác -- Business Overview, KYC Documents và panel hành động}
+    \label{fig:admin_provider_revisions}
+\end{figure}
+
+Hình~\ref{fig:admin_provider_revisions} hiển thị trang chi tiết xét duyệt:
+\begin{itemize}
+    \item \textbf{Business Overview (trái):} Brand Name, Tax Code, Business Types, địa chỉ và bản đồ; mỗi trường có tick xanh/bút cam.
+    \item \textbf{KYC Documents (phải):} CCCD mặt trước/sau (phóng to), giấy phép kinh doanh PDF (tải về).
+    \item \textbf{Hành động:} Approve Provider (xanh), Request Revision (cam), Reject Application (đỏ).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/provider_management/fig_admin_provider_request_revision_by_field.png}
+    \vspace{0.5em}
+    \caption{Chi tiết xét duyệt -- popover Revision Note cho từng trường bị lỗi}
+    \label{fig:admin_provider_request_revision}
+\end{figure}
+
+Hình~\ref{fig:admin_provider_request_revision} minh họa ghi Revision Note theo từng trường:
+\begin{itemize}
+    \item Nhấn bút cam trên trường Tax Code $\rightarrow$ popover nhập Revision Note và nút \textbf{Save Feedback}.
+    \item Có thể đánh dấu nhiều trường lỗi liên tiếp mà không mất dữ liệu đang xem.
+    \item Panel phải cập nhật tức thì số trường đã được đánh dấu để chỉnh sửa.
+    \item Sau khi admin nhấn nút \textbf{Request Revision} thì trạng thái hồ sơ chuyển thành \texttt{REQUIRED\_RESUBMIT}.
+    \item Trường lỗi (Tax Code, Phone Number): viền đỏ, badge UPDATE cam kèm lý do từ admin.
+    \item Vòng lặp: Đối tác sửa $\rightarrow$ Resubmit $\rightarrow$ Admin xét duyệt lại.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.4.2  DASHBOARD ADMIN
+% ---------------------------------------------------------------------------
+\subsubsection{Dashboard Quản trị (Admin Dashboard)}
+
+Admin Dashboard tổng hợp toàn bộ chỉ số vận hành nền tảng trong một không gian làm việc duy nhất, với bộ lọc thời gian 7D / 30D / 90D (7 ngày / 30 ngày / 90 ngày) và nút Refresh hiển thị timestamp cập nhật lần cuối.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/dashboard/fig_admin_dashboard_1.png}
+    \vspace{0.5em}
+    \caption{Admin Dashboard -- phần 1: 8 KPI nền tảng và biểu đồ Finance Trend 30 ngày}
+    \label{fig:admin_dash1}
+\end{figure}
+
+Hình~\ref{fig:admin_dash1} hiển thị phần đầu Admin Dashboard:
+\begin{itemize}
+    \item \textbf{KPI hàng trên (quy mô):} Gross Revenue, tổng giao dịch, số đối tác và tỷ lệ thành công (dữ liệu minh hoạ).
+    \item \textbf{KPI hàng dưới (rủi ro):} Tỷ lệ thất bại, hủy, giá trị booking trung bình và số thông báo chờ xử lý.
+    \item \textbf{Finance Trend:} Ba đường Gross/Net Revenue và Refund Pressure theo ngày.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/dashboard/fig_admin_dashboard_2.png}
+    \vspace{0.5em}
+    \caption{Admin Dashboard -- phần 2: Booking Outcomes, Transaction Health và top doanh thu}
+    \label{fig:admin_dash2}
+\end{figure}
+
+Hình~\ref{fig:admin_dash2} hiển thị phần giữa Dashboard:
+\begin{itemize}
+    \item \textbf{Booking Outcomes:} Phân bố tỷ lệ thành công, thất bại và hủy theo kỳ (dữ liệu minh hoạ).
+    \item \textbf{Transaction Health:} Phân bố giao dịch theo trạng thái Paid/Pending/Refunded/Failed.
+    \item \textbf{Top Revenue Partners \& Services:} Danh sách đối tác và dịch vụ dẫn đầu theo doanh thu.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/dashboard/fig_admin_dashboard_3.png}
+    \vspace{0.5em}
+    \caption{Admin Dashboard -- phần 3: Notifications Summary và Category Health}
+    \label{fig:admin_dash3}
+\end{figure}
+
+Hình~\ref{fig:admin_dash3} hiển thị phần cuối Dashboard:
+\begin{itemize}
+    \item \textbf{Notifications Summary:} Tóm tắt cảnh báo theo mức độ Critical/High/Medium cần xử lý (dữ liệu minh hoạ).
+    \item \textbf{Category Health:} Phân bố danh mục Active/Inactive/Empty và top danh mục theo số lượng dịch vụ.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.4.3  FINANCE MANAGER
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Tài chính (Finance Manager)}
+
+Module Finance cho phép quản trị viên giám sát toàn bộ dòng tiền của nền tảng qua nhiều tab chuyên biệt: Overview, Ledger, Payouts, Refunds, Reconciliation, Partner Exposure, Exports.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/finance/fig_admin_finance_1.png}
+    \vspace{0.5em}
+    \caption{Finance Manager -- Tab Overview: bộ lọc đa chiều, 8 KPI tài chính và Revenue Trend}
+    \label{fig:admin_finance1}
+\end{figure}
+
+Hình~\ref{fig:admin_finance1} hiển thị tab Overview của Finance Manager:
+\begin{itemize}
+    \item \textbf{Bộ lọc:} Khoảng thời gian (7D/30D/90D/Custom), đối tác, trạng thái, Flagged, SLA Breached.
+    \item \textbf{KPI:} Gross/Net Revenue, Platform Fees, Refund, Failed, Pending Payouts, Held và Unreconciled theo kỳ lọc (dữ liệu minh hoạ).
+    \item \textbf{Revenue Trend Table:} Chi tiết từng ngày theo Gross/Net/Refunds/Payouts.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/finance/fig_admin_finance_2.png}
+    \vspace{0.5em}
+    \caption{Finance Manager -- Finance Alerts và bảng Partner Exposure với chỉ số rủi ro}
+    \label{fig:admin_finance2}
+\end{figure}
+
+Hình~\ref{fig:admin_finance2} hiển thị hai phần phía dưới tab Overview:
+\begin{itemize}
+    \item \textbf{Finance Alerts:} Cảnh báo refund cao, payouts bị giữ, reconciliation exceptions tăng và trạng thái platform fee (dữ liệu minh hoạ).
+    \item \textbf{Partner Exposure:} Danh sách đối tác với Volume/Pending/Refunds/Failed/Held và mức độ rủi ro (Risk) tương ứng.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.4.4  CATEGORY MANAGEMENT
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Danh mục (Category Management)}
+
+Module Category cho phép quản trị viên duy trì cây phân loại dịch vụ trên toàn nền tảng. Danh mục này được đối tác sử dụng khi tạo dịch vụ mới và là tiêu chí phân loại khi xét duyệt Business Type của hồ sơ đăng ký.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/category/fig_admin_category_dashboard.png}
+    \vspace{0.5em}
+    \caption{Category Management -- danh sách danh mục với tên, số dịch vụ, trạng thái và thao tác}
+    \label{fig:admin_category_dash}
+\end{figure}
+
+Hình~\ref{fig:admin_category_dash} hiển thị danh sách danh mục:
+\begin{itemize}
+    \item Mỗi hàng: icon màu, tên, mô tả, Total Services, trạng thái Visible/Hidden, nút sửa/xóa.
+    \item Checkbox cho thao tác hàng loạt; thanh công cụ: Sort, Filter, \textbf{Add Category}, \textbf{Delete All}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/category/fig_admin_create_new_category.png}
+    \vspace{0.5em}
+    \caption{Form tạo danh mục mới -- thông tin, cài đặt và nút Create Category}
+    \label{fig:admin_create_category}
+\end{figure}
+
+Hình~\ref{fig:admin_create_category} hiển thị form tạo danh mục:
+\begin{itemize}
+    \item \textbf{Category Information:} Name (bắt buộc), Description (textarea).
+    \item \textbf{Category Settings:} Status Active/Inactive, Sort Order, Icon Name, Color Hex.
+    \item Nút \textbf{Create Category} lưu; \textbf{Cancel} bỏ qua.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+% 6.3.4.5  NOTIFICATION MANAGEMENT
+% ---------------------------------------------------------------------------
+\subsubsection{Quản lý Thông báo (Notification Management)}
+
+Module Notifications cho phép quản trị viên tạo và quản lý chiến dịch thông báo đến các nhóm đối tượng khác nhau (đối tác, khách hàng, admin).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_dashboard_1.png}
+    \vspace{0.5em}
+    \caption{Notification Control Center -- KPI chiến dịch và bộ lọc Campaign Activity}
+    \label{fig:admin_notif_dash1}
+\end{figure}
+
+Hình~\ref{fig:admin_notif_dash1} hiển thị Notification Control Center:
+\begin{itemize}
+    \item \textbf{KPI:} Sent Today, Scheduled, Drafts, Active Segments.
+    \item \textbf{Bộ lọc:} Tab All/Draft/Scheduled/Sent/Failed và 6 bộ lọc (nội dung, kênh, đối tượng, người tạo, thời gian).
+    \item Nút \textbf{Create Campaign} mở wizard tạo chiến dịch mới.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_dashboard_2.png}
+    \vspace{0.5em}
+    \caption{Notification Control Center -- bảng Campaign Activity: danh sách chiến dịch và trạng thái}
+    \label{fig:admin_notif_dash2}
+\end{figure}
+
+Hình~\ref{fig:admin_notif_dash2} hiển thị bảng Campaign Activity:
+\begin{itemize}
+    \item Mỗi hàng: Campaign, Channel, Audience, Status badge (Scheduled/Sent/Draft/Failed), thời gian, menu Actions.
+    \item Phân trang 10 hàng/trang.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_detail.png}
+    \vspace{0.5em}
+    \caption{Chi tiết chiến dịch thông báo -- nội dung, đối tượng, trạng thái và lịch gửi}
+    \label{fig:admin_notif_detail}
+\end{figure}
+
+Hình~\ref{fig:admin_notif_detail} hiển thị chi tiết chiến dịch:
+\begin{itemize}
+    \item Nội dung đầy đủ: tiêu đề, thông điệp, kênh gửi (In-App/Push/Email).
+    \item Đối tượng, trạng thái và thời gian đặt lịch.
+    \item Chỉnh sửa chiến dịch Draft/Scheduled hoặc clone chiến dịch đã gửi.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_create_new_campain.png}
+    \vspace{0.5em}
+    \caption{Tạo chiến dịch thông báo -- wizard soạn nội dung, chọn kênh, đối tượng và lịch gửi}
+    \label{fig:admin_create_campaign}
+\end{figure}
+
+Hình~\ref{fig:admin_create_campaign} hiển thị wizard tạo chiến dịch:
+\begin{itemize}
+    \item \textbf{Nội dung:} Campaign Name, Title, Message body.
+    \item \textbf{Kênh gửi:} In-App, Push Notification, Email (chọn một hoặc nhiều).
+    \item \textbf{Đối tượng:} Verified Partners, Active Customers, All Users, Admin Operations.
+    \item \textbf{Lịch gửi:} Send Now hoặc Schedule (picker ngày giờ).
+\end{itemize}
+
+\subsubsection{Nhật ký Kiểm toán (Audit Logging)}
 
 Ngoài lịch sử xét duyệt, hệ thống còn ghi lại mọi thao tác quan trọng của quản trị viên thông qua module \texttt{AuditModule}:
 
@@ -795,12 +1912,816 @@ Ngoài lịch sử xét duyệt, hệ thống còn ghi lại mọi thao tác qua
 
 Nhờ kết hợp giữa \texttt{PartnerReviewLog} và \texttt{AuditLog}, hệ thống đảm bảo khả năng truy vết toàn diện: ai đã duyệt hồ sơ nào, vào lúc nào, và dữ liệu lúc đó trông ra sao.
 
-\subsection{Quản lý Tệp tin và Lưu trữ (S3 File Management)}
 
-Module \texttt{S3Module} tích hợp với dịch vụ lưu trữ đối tượng tương thích S3 (MinIO) để quản lý tệp tin:
+
+\section{Hiện thực và Tích hợp các dịch vụ Trí tuệ Nhân tạo (AI Services)}
+\subsection{Hiện thực dịch vụ nhận dạng thực thể (NER Service)}
+
+
+\subsubsection{Kiến trúc Hybrid NER và quyết định thiết kế}
+
+Hệ thống dùng kiến trúc \textbf{Hybrid NER}, kết hợp ba lớp xử lý bổ trợ nhau:
+\begin{itemize}
+    \item \textbf{LLM extraction (Gemini):} xử lý các thực thể ngữ nghĩa trong \texttt{gemini\_ner.py}, với model mặc định \texttt{gemini-2.5-flash}.
+    \item \textbf{Rule-based extraction (Regex):} xử lý các mẫu định lượng và làm lớp dự phòng trong \texttt{extractor.py} và \texttt{distance\_extractor.py}.
+    \item \textbf{Fallback nội bộ:} kết hợp \texttt{underthesea}, keyword scan và bộ so khớp địa danh (Aho-Corasick hoặc n-gram fallback) trong \texttt{extractor.py}.
+\end{itemize}
+
+Các tham số cấu hình chính nằm trong \texttt{config.py}:
+\begin{itemize}
+    \item \texttt{QUERY\_CACHE\_MAXSIZE = 1000}.
+    \item \texttt{LOCATION\_CACHE\_TTL = 3600} giây.
+    \item \texttt{GEMINI\_TIMEOUT\_MS = 1500}, \texttt{GEMINI\_MAX\_RETRIES = 1}, \texttt{GEMINI\_COOLDOWN\_SECONDS = 5}.
+    \item \texttt{NER\_MIN\_CONFIDENCE = 0.8} cho lọc \texttt{BUSINESS\_TYPE}.
+    \item \texttt{DEFAULT\_PROXIMITY\_RADIUS\_M = 10000}, \texttt{MAX\_PROXIMITY\_RADIUS\_M = 50000}.
+\end{itemize}
+
+
+\subsubsection{Pipeline xử lý truy vấn}
+
+Khi nhận truy vấn tự nhiên, NER Service xử lý theo pipeline tuần tự:
+\begin{enumerate}
+    \item \textbf{Hybrid extraction} (\texttt{extractor.py}): nhận thực thể từ Gemini rồi bổ sung bằng underthesea, keyword và location fallback.
+    \item \textbf{Numeric policy} (\texttt{extractor.py}): \texttt{PRICE} và \texttt{DISTANCE} dùng hướng \textit{Gemini-first}; khi Gemini không trả kết quả thì mới rơi về parser cục bộ.
+    \item \textbf{Entity normalization} (\texttt{normalizer.py}): quy đổi về schema chuẩn gồm \texttt{business\_type}, \texttt{location\_code}, \texttt{operator}, \texttt{amount}.
+    \item \textbf{Spatial resolution} (\texttt{spatial\_context.py}): xử lý ngữ cảnh khoảng cách và tọa độ người dùng.
+    \item \textbf{Pre-filter query} (\texttt{query\_builder.py}, \texttt{db\_fetcher.py}): dựng điều kiện truy vấn và lấy ứng viên từ DB/PostGIS.
+\end{enumerate}
+
+Đầu ra endpoint:
+\begin{itemize}
+    \item \texttt{/ner/extract}: trả \texttt{NerResponse} (entities + \texttt{extraction\_source}) trong \texttt{ner\_routes.py}.
+    \item \texttt{/prefilter/search}: trả \textbf{List[String]} (danh sách \texttt{service\_id}) trong \texttt{prefilter\_routes.py}.
+\end{itemize}
+
+\subsubsection{Tối ưu hiệu năng và độ bền vận hành}
+
+NER Service có một số cơ chế tối ưu quan trọng để giữ độ trễ ổn định trong môi trường thời gian thực:
+\begin{itemize}
+    \item \textbf{LRU query cache:} giữ tối đa 1000 truy vấn (\texttt{QUERY\_CACHE\_MAXSIZE}) trong \texttt{extractor.py}.
+    \item \textbf{Aho-Corasick location matching:} bật/tắt bằng \texttt{LOCATION\_MATCHER\_USE\_AHO}; nếu không khả dụng thì chuyển sang n-gram fallback trong \texttt{extractor.py}.
+    \item \textbf{Stale-while-revalidate cho cache địa lý:} TTL 3600 giây trong \texttt{cache.py}.
+    \item \textbf{Confidence gating:} ngưỡng \texttt{NER\_MIN\_CONFIDENCE = 0.8} cho \texttt{BUSINESS\_TYPE} trong \texttt{gemini\_ner.py}.
+\end{itemize}
+
+\subsubsection{Schema giao tiếp và tính xác định đầu ra}
+
+Dữ liệu trao đổi giữa Gateway và NER Service được chuẩn hóa bằng Pydantic models. Ngoài bộ trường \texttt{type/value/confidence}, mỗi thực thể còn mang thêm thông tin ngữ nghĩa để phục vụ bước dựng truy vấn:
+\begin{itemize}
+    \item \texttt{business\_type} cho thực thể loại hình dịch vụ.
+    \item \texttt{location\_code}, \texttt{location\_level} cho thực thể địa điểm.
+    \item \texttt{operator}, \texttt{amount}, \texttt{amount\_max} cho thực thể định lượng.
+\end{itemize}
+
+Trong mã hiện thực, schema entity được định nghĩa ở \texttt{ner\_schema.py}. Một ví dụ điển hình là entity \texttt{DISTANCE}:
+\begin{itemize}
+    \item \texttt{type}: \texttt{"DISTANCE"}
+    \item \texttt{value}: chuỗi gốc trong câu hỏi (ví dụ \texttt{"trong bán kính 5km"})
+    \item \texttt{confidence}: điểm tin cậy trong đoạn $[0,1]$
+    \item \texttt{operator}: \texttt{lte/gte/between}
+    \item \texttt{amount}, \texttt{amount\_max}: giá trị số đã chuẩn hóa
+    \item \texttt{radius\_meters}: bán kính theo mét để đưa xuống truy vấn không gian
+    \item \texttt{distance\_unit}: đơn vị người dùng nhập (\texttt{km}, \texttt{m}, ...)
+    \item \texttt{proximity\_intent}: cờ thể hiện ý định tìm gần (tường minh hoặc ngầm định)
+\end{itemize}
+
+Các loại entity trong NER Service (theo \texttt{extractor.py}, \texttt{normalizer.py}, \texttt{ner\_schema.py}) gồm:
+\begin{itemize}
+    \item \texttt{BUSINESS\_TYPE}: loại hình dịch vụ (spa, gym, nha khoa, ...).
+    \item \texttt{LOCATION}: địa điểm hành chính (tỉnh/huyện/xã) sau bước chuẩn hóa code.
+    \item \texttt{PRICE}: ràng buộc giá, mang \texttt{operator/amount/amount\_max}.
+    \item \texttt{DISTANCE}: ràng buộc khoảng cách, mang thêm \texttt{radius\_meters} và \texttt{distance\_unit}.
+\end{itemize}
+
+Thiết kế schema như vậy giúp việc chuyển từ ngôn ngữ tự nhiên sang điều kiện SQL/PostGIS rõ ràng hơn, dễ kiểm thử hơn và cũng thuận lợi cho truy vết lỗi trong thực nghiệm.
+
+
+\subsection{Hiện thực hệ thống RAG Chatbot}
+
+Phần hiện thực mô tả chi tiết cách hệ thống RAG Chatbot được triển khai dựa trên mã nguồn Python mới nhất. Hệ thống được xây dựng theo kiến trúc LangChain pipeline kết hợp FastAPI, hỗ trợ streaming response và tích hợp chặt chẽ với Gateway thông qua cơ chế bất đồng bộ.
+
+\subsubsection{Tiền xử lý, chỉ mục và truy xuất}
+
+Hệ thống được tổ chức theo dạng module hoá rõ ràng, bám sát kiến trúc thiết kế:
 
 \begin{itemize}
-    \item \textbf{Upload:} Tạo Pre-signed URL cho phép Client upload trực tiếp đến storage mà không qua Backend, giảm tải cho server.
-    \item \textbf{Download:} Sinh Pre-signed URL có thời hạn để truy cập tệp tin (tài liệu doanh nghiệp, hình ảnh sản phẩm).
-    \item \textbf{Quản lý tài liệu đối tác:} Thực thể \texttt{PartnerDocument} lưu metadata (loại tài liệu, URL, trạng thái) trong PostgreSQL, trong khi nội dung tệp thực tế nằm trên Object Storage.
+    \item \texttt{src/base/llm\_model.py}: Khởi tạo và cấu hình mô hình LLM (quantization 4-bit).
+    \item \texttt{src/rag/file\_loader.py}: Load PDF + tiền xử lý + chia đoạn.
+    \item \texttt{src/rag/vectorstore.py}: Xây dựng vector database (ChromaDB).
+    \item \texttt{src/rag/offline\_rag.py}: Xây dựng pipeline RAG bằng LangChain Runnable.
+    \item \texttt{src/rag/main.py}: Kết nối các thành phần thành RAG chain hoàn chỉnh.
+    \item \texttt{app.py}: FastAPI app + streaming endpoint.
 \end{itemize}
+
+Hệ thống hiện tại ưu tiên sử dụng \textbf{ChromaDB} để đơn giản hóa lưu trữ local và tích hợp trực tiếp với LangChain.
+
+\subsubsection{Hiện thực mô hình ngôn ngữ (LLM)}
+
+Mô hình được load thông qua HuggingFace Transformers với cấu hình lượng tử hoá 4-bit:
+
+\begin{itemize}
+    \item Model: \texttt{meta-llama/Llama-3.1-8B-Instruct}
+    \item Quantization:
+    \begin{itemize}
+        \item \texttt{load\_in\_4bit=True}
+        \item \texttt{bnb\_4bit\_quant\_type=NF4}
+        \item \texttt{double quantization}
+        \item compute dtype: float16
+    \end{itemize}
+    \item max\_new\_tokens: 512
+\end{itemize}
+
+Việc sử dụng 4-bit giúp giảm yêu cầu VRAM từ $\sim 24GB \rightarrow 8GB$ mà vẫn giữ chất lượng suy luận chấp nhận được.
+
+LLM được wrap lại bằng \texttt{HuggingFacePipeline} để tích hợp trực tiếp vào LangChain chain.
+\subsubsection{Hiện thực xử lý tài liệu và xây dựng vector store}
+
+\paragraph{Load và làm sạch dữ liệu}
+
+Hệ thống sử dụng \texttt{PyPDFLoader} để đọc tài liệu PDF theo từng trang. Sau đó áp dụng hàm:
+
+\begin{itemize}
+    \item loại bỏ ký tự không thuộc ASCII (\texttt{ord(char) < 128})
+\end{itemize}
+
+Việc này giúp tránh lỗi encoding khi embedding.
+
+\paragraph{Chia đoạn (chunking)}
+
+Sử dụng:
+\begin{itemize}
+    \item \texttt{RecursiveCharacterTextSplitter}
+    \item chunk\_size = 300
+    \item chunk\_overlap = 0
+\end{itemize}
+
+Khác với thiết kế ban đầu (có overlap), phiên bản hiện tại tối ưu tốc độ và giảm redundancy nên không dùng overlap.
+
+\paragraph{Xây dựng vector store}
+
+Vector DB được khởi tạo thông qua:
+
+\begin{verbatim}
+Chroma.from_documents(documents, embedding)
+\end{verbatim}
+
+Embedding sử dụng:
+\begin{itemize}
+    \item \texttt{HuggingFaceEmbeddings}
+    \item device ưu tiên CUDA
+\end{itemize}
+
+Retriever được tạo bằng:
+
+\begin{verbatim}
+retriever = db.as_retriever(
+    search_type="similarity",
+    search_kwargs={"k": 10}
+)
+\end{verbatim}
+
+\subsubsection{Hiện thực pipeline RAG bằng LangChain Runnable}
+
+Pipeline RAG được xây dựng theo dạng chain:
+
+\begin{verbatim}
+input_data
+| prompt
+| llm
+| output_parser
+\end{verbatim}
+
+Trong đó:
+
+\paragraph{Input mapping}
+
+\begin{itemize}
+    \item context: question $\rightarrow$ retriever $\rightarrow$ format docs
+    \item history: lấy trực tiếp từ request
+    \item services: lấy trực tiếp từ Gateway
+    \item question: câu hỏi user
+\end{itemize}
+
+Cụ thể:
+
+\begin{verbatim}
+"context": question → retriever → format_docs
+\end{verbatim}
+
+\paragraph{Prompt template (quan trọng)}
+
+Prompt thực tế được thiết kế rất chi tiết với:
+
+\begin{itemize}
+    \item phân cấp nguồn tri thức (history → KB → services → LLM)
+    \item rule rõ ràng về:
+    \begin{itemize}
+        \item ngôn ngữ
+        \item tone
+        \item safety y tế
+        \item cách dùng knowledge base
+        \item cách dùng services
+    \end{itemize}
+\end{itemize}
+
+Ví dụ cấu trúc prompt:
+
+\begin{verbatim}
+[MEDICAL KNOWLEDGE BASE]
+{context}
+
+[CONVERSATION HISTORY]
+{history}
+
+[RELEVANT SERVICES]
+{services}
+
+[USER QUESTION]
+{question}
+\end{verbatim}
+
+Điểm quan trọng:
+\begin{itemize}
+    \item Không ép dùng context nếu không liên quan
+    \item Không được hallucinate
+    \item Không được chẩn đoán y khoa
+\end{itemize}
+
+\paragraph{Output parser}
+
+Custom parser:
+
+\begin{itemize}
+    \item loại bỏ prefix như ``Answer:''
+    \item chuẩn hoá output về text thuần
+\end{itemize}
+
+\subsubsection{Hiện thực Streaming và cơ chế SSE}
+
+\paragraph{Bản chất SSE trong hệ thống}
+
+\textbf{Server-Sent Events (SSE)} là cơ chế cho phép server gửi dữ liệu liên tục về client qua HTTP connection.
+
+\paragraph{Cách hiện thực streaming}
+
+Cụ thể, quá trình được thực hiện theo các bước:
+
+\begin{enumerate}
+    \item Mô hình LLM sinh ra từng token một theo câu trả lời.
+    \item Nối 3 token liên tiếp thành một chunk.
+    \item Các chunk này được phát tuần tự thông qua một \texttt{async generator}, tạo thành luồng dữ liệu liên tục gửi về client.
+\end{enumerate}
+
+Cách tiếp cận này đảm bảo:
+
+\begin{itemize}
+    \item Trải nghiệm người dùng tương tự streaming token (hiển thị dần nội dung).
+    \item Câu trả lời xuất hiện nhanh chóng và liên tục.
+    \item Tương thích hoàn toàn với \texttt{StreamingResponse} của FastAPI.
+\end{itemize}
+
+Về mặt hiện thực, hệ thống sử dụng cơ chế chia nhỏ văn bản theo cửa sổ trượt. Cơ chế này đóng vai trò là lớp trung gian giữa kết quả sinh hoàn chỉnh của LLM và hệ thống SSE tại Gateway, giúp duy trì trải nghiệm hội thoại thời gian thực mà không làm thay đổi pipeline RAG lõi.
+
+
+\paragraph{Flow tổng thể SSE}
+
+\begin{enumerate}
+    \item Client gửi request
+    \item Gateway gọi chatbot service
+    \item Chatbot:
+    \begin{itemize}
+        \item build enriched\_question
+        \item gọi RAG chain
+        \item Streaming chunk text
+    \end{itemize}
+    \item Gateway:
+    \begin{itemize}
+        \item nhận chunk
+        \item wrap thành:
+        \begin{itemize}
+            \item TOKEN
+            \item DONE
+        \end{itemize}
+        \item gửi SSE về client
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Hiện thực endpoint và tích hợp Gateway}
+
+Payload từ Gateway:
+
+\begin{verbatim}
+{
+    "history": "...",
+    "services": "...",
+    "question": "..."
+}
+\end{verbatim}
+
+Chatbot không xử lý intent hay recommendation, mà chỉ:
+
+\begin{itemize}
+    \item nhận context đã enrich
+    \item sinh câu trả lời
+\end{itemize}
+
+Điều này đảm bảo:
+\begin{itemize}
+    \item tách biệt responsibility
+    \item dễ scale microservice
+\end{itemize}
+
+\subsubsection{Pipeline tổng hợp cuối cùng}
+
+Pipeline runtime:
+
+\begin{enumerate}
+    \item Nhận request từ Gateway
+    \item Build enriched input (history + services + question)
+    \item Retriever truy xuất context từ Chroma
+    \item Build prompt hoàn chỉnh
+    \item LLM generate answer
+    \item Streaming từng chunk
+    \item Gateway convert → SSE → client
+\end{enumerate}
+
+Toàn bộ pipeline được thiết kế theo hướng:
+\begin{itemize}
+    \item tách biệt rõ retrieval vs generation
+    \item async-friendly
+    \item dễ mở rộng (có thể thay streaming thật sau này)
+\end{itemize}
+
+
+
+\subsection{Triển khai hệ thống gợi ý}
+
+\subsubsection{Cấu trúc dữ liệu}
+
+Hệ thống được triển khai theo kiến trúc production-ready, trong đó dữ liệu dịch vụ không còn phụ thuộc vào file JSON tĩnh mà được lấy trực tiếp từ cơ sở dữ liệu PostgreSQL. Cụ thể:
+
+\begin{itemize}
+    \item \textbf{Services Database}: Bảng \texttt{products} trong PostgreSQL (chỉ lấy các dịch vụ active và hiển thị online)
+    \item \textbf{Vector Database}: ChromaDB persistent storage tại \texttt{data/processed/vectordb/}
+    \item \textbf{Embedding Model}: \texttt{sentence-transformers/paraphrase-multilingual-mpnet-base-v2}
+\end{itemize}
+
+Mỗi service được chuẩn hoá về dạng:
+
+\begin{itemize}
+    \item \texttt{service\_id}: định danh duy nhất (ưu tiên \texttt{service\_id}, fallback \texttt{id})
+    \item \texttt{name}: tên dịch vụ
+    \item \texttt{description}: mô tả
+    \item \texttt{category}: phân loại (từ bảng categories)
+\end{itemize}
+
+Khác với version ban đầu, các trường như \texttt{tags}, \texttt{type} không còn bắt buộc mà được đơn giản hóa để phù hợp với dữ liệu production.
+
+\subsubsection{Offline Processing}
+
+\paragraph{Document Construction}
+
+Mỗi service được biểu diễn dưới dạng:
+
+\begin{verbatim}
+[name] + " " + [description]
+\end{verbatim}
+
+Thiết kế này giúp embedding tập trung vào ngữ nghĩa chính thay vì format cứng như trước.
+
+\paragraph{Vector Database Building} 
+
+Quá trình build vector database được thực hiện từ PostgreSQL:
+
+\begin{enumerate}
+    \item Query dữ liệu từ bảng \texttt{products} (join với \texttt{categories})
+    \item Lọc các service hợp lệ
+    \item Tạo document text từ name + description
+    \item Embedding thành vector 768 chiều
+    \item Upsert vào ChromaDB
+\end{enumerate}
+
+Hệ thống hỗ trợ chế độ:
+
+\begin{itemize}
+    \item \textbf{clean build}: xoá toàn bộ vector DB và build lại
+    \item \textbf{incremental build}: chỉ insert/update các service mới
+\end{itemize}
+
+\subsubsection{Đồng bộ dữ liệu thời gian thực}
+
+Hệ thống production triển khai cơ chế \textbf{real-time synchronization} thông qua Redis Pub/Sub.
+
+\paragraph{Cơ chế hoạt động}
+
+\begin{enumerate}
+    \item Backend publish event khi có thay đổi dữ liệu:
+    \begin{itemize}
+        \item \texttt{new\_service\_created}
+        \item \texttt{service:updated}
+        \item \texttt{service:deleted}
+    \end{itemize}
+    \item Recommender Service subscribe các channel Redis
+    \item Khi nhận event:
+    \begin{itemize}
+        \item Query lại dữ liệu mới nhất từ PostgreSQL
+        \item Re-embedding service
+        \item Upsert hoặc delete trong ChromaDB
+    \end{itemize}
+\end{enumerate}
+
+Cơ chế này đảm bảo:
+\begin{itemize}
+    \item Không cần rebuild toàn bộ vector DB
+    \item Dữ liệu luôn đồng bộ với hệ thống nghiệp vụ
+    \item Giảm độ trễ cập nhật xuống gần real-time
+\end{itemize}
+
+\subsubsection{Online Processing}
+
+\paragraph{Home Recommender}   
+
+\textbf{Input Format:}
+\begin{itemize}
+    \item \texttt{user\_id}: Gateway gửi lên, recommender tự truy vấn profile
+    \item \texttt{top\_k}: số lượng gợi ý
+\end{itemize}
+
+\textbf{Processing Pipeline:}
+
+\begin{enumerate}
+    \item \textbf{Fetch User Profile}: lấy health conditions, interests, goals từ database
+    \item \textbf{Fetch Service History}: truy vấn các dịch vụ đã sử dụng
+    \item \textbf{Query Construction}:
+    \begin{itemize}
+        \item nối health conditions + interests + goals
+        \item bổ sung nội dung dịch vụ đã dùng trước đó
+    \end{itemize}
+    \item \textbf{Embedding}: chuyển query thành vector
+    \item \textbf{Vector Search}: tìm top-k trong ChromaDB
+\end{enumerate}
+
+Điểm cải tiến:
+\begin{itemize}
+    \item Sử dụng trực tiếp document của service history thay vì chỉ ID
+    \item Tăng khả năng cá nhân hoá ngữ nghĩa
+\end{itemize}
+
+\paragraph{Chatbot Recommender}  
+
+\textbf{Input Format:}
+\begin{itemize}
+    \item \texttt{query}: câu hỏi tự nhiên
+    \item \texttt{conversation\_id}
+    \item \texttt{top\_k}
+    \item \texttt{filtered\_ids} (optional): danh sách service từ NER
+\end{itemize}
+
+\textbf{Processing Pipeline:}
+
+\begin{enumerate}
+    \item \textbf{Query Embedding}: chuyển query thành vector
+    \item \textbf{Vector Search}:
+    \begin{itemize}
+        \item Nếu có \texttt{filtered\_ids}:
+        \begin{itemize}
+            \item áp dụng filter metadata trong ChromaDB
+        \end{itemize}
+        \item Nếu không:
+        \begin{itemize}
+            \item search toàn bộ vector space
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Ranking}: sắp xếp theo cosine similarity
+\end{enumerate}
+
+Điểm quan trọng:
+\begin{itemize}
+    \item Filter được push xuống vector DB (không filter sau khi search)
+    \item Giảm search space $\rightarrow$ tăng precision
+\end{itemize}
+
+\subsubsection{Tích hợp với Gateway và SSE}
+
+Recommender không trả dữ liệu trực tiếp cho UI mà thông qua Gateway.
+
+\paragraph{Chatbot Flow}
+
+\begin{enumerate}
+    \item Gateway nhận message từ user
+    \item Gọi song song:
+    \begin{itemize}
+        \item NER Service
+        \item Recommender Service
+        \item LLM Service (streaming)
+    \end{itemize}
+    \item Recommender trả:
+    \begin{verbatim}
+{
+  "service_ids": [...],
+  "scores": [...]
+}
+    \end{verbatim}
+    \item Gateway:
+    \begin{itemize}
+        \item enrich thông tin service từ DB
+        \item gửi SSE event:
+        \begin{itemize}
+            \item \texttt{RECOMMENDATION}
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+\paragraph{Home Flow}
+
+\begin{itemize}
+    \item UI gọi trực tiếp endpoint \texttt{/recommender/home}
+    \item Recommender trả danh sách service ID + score
+    \item Backend enrich trước khi trả về UI
+\end{itemize}
+
+\subsubsection{Đánh giá hiệu năng}
+
+\paragraph{Độ phức tạp}
+
+\begin{itemize}
+    \item Embedding: $O(L)$
+    \item Vector search: $O(\log N)$ (Chroma internal index)
+\end{itemize}
+
+\paragraph{Latency thực tế}
+
+\begin{itemize}
+    \item Chatbot recommender: 50–150ms
+    \item Home recommender: 80–200ms (do thêm bước fetch profile)
+\end{itemize}
+
+\paragraph{Tối ưu}
+
+\begin{itemize}
+    \item Upsert thay vì rebuild
+    \item Filter ngay tại vector DB
+    \item Async processing tại Gateway
+\end{itemize}
+
+\subsubsection{Khả năng mở rộng}
+
+Hệ thống được thiết kế theo hướng production:
+
+\begin{itemize}
+    \item \textbf{Incremental update}: hỗ trợ upsert từng service
+    \item \textbf{Real-time sync}: Redis Pub/Sub
+    \item \textbf{Microservice-ready}: tách biệt hoàn toàn với chatbot
+    \item \textbf{Hybrid extension}: có thể bổ sung ranking layer phía sau
+\end{itemize}
+
+\subsection{Triển khai Intent Classification Model}
+
+\subsubsection{Kiến trúc triển khai}
+
+Trong hệ thống thực tế, Intent Classification được triển khai như một thành phần nhẹ (lightweight component) nằm trực tiếp trong Gateway Service, thay vì tách thành một microservice độc lập. Quyết định này nhằm giảm latency và tránh overhead network call cho một bài toán có độ phức tạp thấp.
+
+Pipeline suy luận bao gồm hai bước tuần tự:
+
+\begin{enumerate}
+    \item Mã hoá câu input thành vector embedding
+    \item Dự đoán xác suất nhãn bằng mô hình logistic regression
+\end{enumerate}
+
+Toàn bộ quá trình xử lý diễn ra đồng bộ (synchronous) và có thời gian thực thi rất nhỏ ($<10ms$), đảm bảo không ảnh hưởng đến luồng xử lý chính của chatbot.
+
+\subsubsection{Quản lý mô hình và khởi tạo}
+
+Mô hình được load theo cơ chế \textbf{singleton} trong vòng đời của ứng dụng:
+
+\begin{itemize}
+    \item Encoder (\texttt{SentenceTransformer}) được load một lần khi service khởi động
+    \item Classifier (logistic regression) được load từ file pickle
+\end{itemize}
+
+Việc sử dụng singleton giúp:
+
+\begin{itemize}
+    \item Tránh overhead load model nhiều lần
+    \item Giảm độ trễ khi xử lý request
+    \item Đảm bảo consistency giữa các lần dự đoán
+\end{itemize}
+
+\subsubsection{Tiền xử lý đầu vào}
+
+Câu input từ người dùng được giữ gần như nguyên bản, chỉ thực hiện các bước tối thiểu:
+
+\begin{itemize}
+    \item loại bỏ khoảng trắng dư thừa
+    \item chuẩn hoá encoding
+\end{itemize}
+
+Không áp dụng các kỹ thuật preprocessing phức tạp (stemming, stopword removal) để tránh làm mất thông tin ngữ nghĩa quan trọng cho embedding model.
+
+\subsubsection{Chiến lược dự đoán và ngưỡng quyết định}
+
+Thay vì sử dụng trực tiếp output nhị phân (0/1), hệ thống sử dụng xác suất dự đoán từ logistic regression:
+
+\begin{verbatim}
+p = model.predict_proba(embedding)[1]
+\end{verbatim}
+
+Sau đó áp dụng một ngưỡng:
+
+\begin{itemize}
+    \item $p \geq \theta \rightarrow$ cần gợi ý dịch vụ
+    \item $p < \theta \rightarrow$ không cần gợi ý
+\end{itemize}
+
+Trong triển khai hiện tại, ngưỡng $\theta$ được tinh chỉnh thực nghiệm (thường trong khoảng 0.5–0.7) để cân bằng giữa:
+
+\begin{itemize}
+    \item \textbf{Precision}: tránh gợi ý sai (false positive)
+    \item \textbf{Recall}: không bỏ sót nhu cầu thực (false negative)
+\end{itemize}
+
+\subsubsection{Tích hợp vào pipeline Gateway}
+
+Intent Classification là bước đầu tiên trong pipeline xử lý hội thoại:
+
+\begin{enumerate}
+    \item Nhận message từ user
+    \item Phân loại intent
+    \item Nếu positive:
+    \begin{itemize}
+        \item gọi NER Service
+        \item gọi Recommender Service
+    \end{itemize}
+    \item Gọi RAG Chatbot với context đã enrich
+\end{enumerate}
+
+Điểm quan trọng:
+
+\begin{itemize}
+    \item Intent Classification chạy \textbf{trước tất cả các service khác}
+    \item Quyết định trực tiếp việc có kích hoạt recommender hay không
+    \item Giúp giảm chi phí compute (không gọi embedding + vector search khi không cần)
+\end{itemize}
+
+\subsubsection{Xử lý song song và tối ưu hiệu năng}
+
+Trong trường hợp intent = positive, Gateway triển khai gọi các service theo cơ chế bất đồng bộ:
+
+\begin{itemize}
+    \item NER Service
+    \item Recommender Service
+\end{itemize}
+
+Hai service này được chạy song song (async tasks), sau đó kết quả được tổng hợp trước khi gửi vào RAG.
+
+Intent Classification đóng vai trò như một \textbf{routing gate}, giúp:
+
+\begin{itemize}
+    \item giảm số lượng request không cần thiết
+    \item tối ưu latency tổng thể của hệ thống
+\end{itemize}
+
+
+\subsubsection{Khả năng mở rộng}
+
+Thiết kế hiện tại cho phép mở rộng dễ dàng:
+
+\begin{itemize}
+    \item Thay thế classifier bằng mô hình deep learning nếu cần
+    \item Mở rộng từ binary classification → multi-intent classification
+    \item Kết hợp thêm rule-based layer cho các intent đặc biệt
+\end{itemize}
+
+Ngoài ra, do component này độc lập với RAG và Recommender, có thể tách thành microservice riêng nếu hệ thống scale lớn hơn.
+
+
+\section{Triển khai hệ thống (Deployment)}
+
+Toàn bộ hạ tầng hệ thống được container hóa và triển khai tự động thông qua quy trình CI/CD (Continuous Integration / Continuous Deployment) với Jenkins, Docker và Image Registry. Hệ thống được vận hành trên hai môi trường riêng biệt: server CPU (cho Backend và hạ tầng dữ liệu) và server GPU cloud (cho các mô hình AI).
+
+\subsection{Quy trình CI/CD với Jenkins}
+
+Quy trình CI/CD được tự động hóa từ lúc đẩy mã nguồn lên GitHub đến khi cập nhật production, với hai thành phần: \textbf{Jenkins Agent} (build/test) và \textbf{Jenkins Controller} (deploy).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/Deploy_arch.jpg}
+    \vspace{10pt}
+    \caption{Kiến trúc triển khai CI/CD của hệ thống}
+    \label{fig:deploy_arch}
+\end{figure}
+
+\subsubsection{Giai đoạn Build và Test (Jenkins Agent)}
+
+\textbf{Jenkins Agent} phụ trách build và kiểm thử trước khi phát hành:
+
+\begin{enumerate}
+    \item \textbf{Clone mã nguồn mới nhất:} Khi Maintainer kích hoạt quy trình CI/CD, Jenkins Agent tự động clone phiên bản mã nguồn mới nhất từ GitHub repository.
+    
+    \item \textbf{Build Docker Image:} Agent thực hiện build Docker image cho từng service (Backend Service, AI Service, Admin Web Portal, và các service phụ trợ khác) dựa trên Dockerfile tương ứng trong mã nguồn.
+    
+    \item \textbf{Chạy kiểm thử (Test Running):} Sau khi build thành công, hệ thống tự động chạy bộ test (unit test, integration test) trên Docker image vừa tạo. Chỉ khi toàn bộ test suite pass, quy trình mới tiếp tục sang bước tiếp theo.
+    
+    \item \textbf{Đẩy Image lên Registry:} Khi test hoàn tất thành công, Jenkins Agent đẩy (push) Docker image đã được kiểm chứng lên \textbf{Image Registry} (Docker Hub hoặc private registry). Mỗi image được gắn tag version tương ứng với commit hash hoặc release version để đảm bảo khả năng truy vết và rollback.
+\end{enumerate}
+
+\subsubsection{Giai đoạn Deploy (Jenkins Controller)}
+
+\textbf{Jenkins Controller} điều phối cập nhật production:
+
+\begin{enumerate}
+    \item \textbf{Nhận thông báo từ GitHub:} Khi có mã nguồn mới được đẩy lên GitHub (pushed code), Jenkins Controller nhận webhook trigger và bắt đầu quy trình deploy.
+    
+    \item \textbf{Thực thi Deploy Script:} Jenkins Controller chạy deploy service script (\texttt{.sh}) thông qua lệnh SSH đến Compute Instance. Script này thực hiện:
+    \begin{itemize}
+        \item Kéo (pull) các Docker image mới nhất từ Image Registry.
+        \item Cập nhật cấu hình Docker Compose nếu cần thiết.
+        \item Khởi động lại các service bằng \texttt{docker-compose up -d} với image mới.
+    \end{itemize}
+    
+    \item \textbf{Cập nhật dịch vụ:} Docker Compose trên server production kéo các image mới từ Registry và khởi động lại các container tương ứng, bao gồm:
+    \begin{itemize}
+        \item \textbf{Backend Service:} NestJS API server.
+        \item \textbf{AI Service:} Cụm microservices AI (Gateway, NER, Chatbot, Recommender).
+        \item \textbf{Admin Web Portal:} Trang quản trị hệ thống.
+        \item \textbf{Other Services:} Các dịch vụ hỗ trợ khác (Kong Gateway, monitoring, v.v.).
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Ưu điểm của kiến trúc CI/CD}
+
+Thiết kế CI/CD hai tầng (Agent--Controller) mang lại nhiều lợi ích:
+
+\begin{itemize}
+    \item Tách biệt build và deploy để giảm tải production.
+    \item Bắt buộc test trước phát hành để giảm rủi ro lỗi.
+    \item Dễ rollback nhờ version tag của image.
+    \item Triển khai ổn định và tự động hóa end-to-end.
+\end{itemize}
+
+\subsection{Container hóa với Docker Compose}
+
+File \texttt{docker-compose.yml} tại thư mục \texttt{dockers/} định nghĩa toàn bộ hạ tầng hệ thống, đảm bảo nhất quán giữa môi trường phát triển và production.
+
+\subsubsection{PostgreSQL với PostGIS}
+
+\begin{itemize}
+    \item \textbf{Image:} \texttt{postgis/postgis:17-3.5} — PostgreSQL 17 tích hợp PostGIS 3.5 cho truy vấn không gian (tìm dịch vụ gần vị trí người dùng).
+    \item \textbf{Khởi tạo:} Script \texttt{init-databases.sh} tự động tạo các database bổ sung cho Kong Gateway và các service phụ.
+    \item \textbf{Healthcheck:} \texttt{pg\_isready} kiểm tra trạng thái sẵn sàng trước khi các service phụ thuộc khởi động.
+    \item \textbf{Persistence:} Volume \texttt{pgdata} gắn vào \texttt{/var/lib/postgresql/data} giữ dữ liệu khi container restart.
+\end{itemize}
+
+\subsubsection{Redis}
+
+\begin{itemize}
+    \item \textbf{Image:} \texttt{redis:7-alpine} — phiên bản nhẹ, tối ưu cho container.
+    \item \textbf{Persistence:} AOF (Append Only File) kết hợp RDB snapshot (\texttt{--save 20 1}).
+    \item \textbf{Bảo mật:} Yêu cầu mật khẩu qua \texttt{--requirepass}, cấu hình từ biến môi trường.
+\end{itemize}
+
+\subsubsection{RabbitMQ Cluster (3 nodes + HAProxy)}
+
+Hệ thống triển khai RabbitMQ dạng cluster 3 node đảm bảo tính sẵn sàng cao (High Availability):
+
+\begin{itemize}
+    \item \textbf{3 node:} \texttt{rabbitmq1} (primary), \texttt{rabbitmq2}, \texttt{rabbitmq3} tự động join cluster khi khởi động thông qua script \texttt{cluster-entrypoint.sh}.
+    \item \textbf{TLS/SSL:} Certificate sinh tự động bởi container \texttt{rabbitmq-cert-gen}, mã hóa giao tiếp giữa các node và client.
+    \item \textbf{HAProxy:} Container \texttt{rabbitmq-haproxy} cân bằng tải kết nối AMQP giữa 3 node, đảm bảo failover tự động.
+    \item \textbf{Khởi tạo:} Container \texttt{rabbitmq-init} tạo user, vhost và phân quyền cho backend application.
+\end{itemize}
+
+\subsection{Kong API Gateway}
+
+Kong đóng vai trò cổng vào duy nhất cho toàn bộ hệ thống, được triển khai gồm 3 thành phần Docker:
+
+\begin{enumerate}
+    \item \textbf{Kong Bootstrap (\texttt{kong-bootstrap}):} Container chạy một lần duy nhất để khởi tạo schema database cho Kong trên PostgreSQL.
+    \item \textbf{Kong Control Plane (\texttt{kong-cp}):} Instance chính xử lý request. Proxy endpoint tại port 8000, Admin API tại port 8001, Manager UI tại port 8002 cho quản trị trực quan.
+    \item \textbf{Kong Configurator (decK):} Sử dụng công cụ \texttt{decK} để đồng bộ cấu hình route, service, plugin từ file \texttt{kong.yml} vào Kong, đảm bảo cấu hình được version control và có thể tái tạo.
+\end{enumerate}
+
+Cấu hình route trong \texttt{kong.yml} định tuyến request đến các upstream service tương ứng (NestJS Backend, AI Gateway), đồng thời áp dụng các plugin bảo mật (rate limiting, authentication).
+
+\subsection{Triển khai AI trên RunPod GPU Cloud}
+
+Các mô hình AI yêu cầu GPU mạnh (đặc biệt Llama 3.1 8B với quantization 4-bit) được triển khai trên RunPod — nền tảng GPU cloud theo nhu cầu (on-demand):
+
+\begin{itemize}
+    \item \textbf{\texttt{deploy\_runpod.py}:} Script tự động hóa toàn bộ quy trình triển khai: tạo pod GPU trên RunPod, cài đặt môi trường Python và dependencies, tải mô hình từ HuggingFace, và khởi động các AI service (RAG Chatbot, Recommender, NER, Gateway).
+    \item \textbf{\texttt{teardown\_runpod.py}:} Script gỡ bỏ pod và giải phóng tài nguyên GPU khi không cần thiết, tiết kiệm chi phí vận hành.
+    \item \textbf{Yêu cầu phần cứng:} GPU NVIDIA với tối thiểu 16GB VRAM cho inference Llama 3.1 8B (quantized 4-bit NF4).
+\end{itemize}
+
+\subsection{Kiến trúc triển khai tổng thể}
+
+Kiến trúc triển khai tách biệt thành hai cụm độc lập giao tiếp qua REST API:
+
+\begin{itemize}
+    \item \textbf{Cụm Backend (Server CPU):} Docker Compose chạy PostgreSQL, Redis, RabbitMQ, Kong và NestJS Backend. Triển khai trên Compute Instance và được cập nhật tự động qua Jenkins Controller.
+    \item \textbf{Cụm AI (RunPod GPU):} Các microservices Python (Gateway, NER, Chatbot, Recommender) chạy trên pod GPU cloud. Có thể scale lên/xuống theo nhu cầu thực tế.
+    \item \textbf{CI/CD Pipeline:} Jenkins Agent (máy cục bộ) đảm nhận build và test, đẩy image lên Registry. Jenkins Controller (server production) kéo image và triển khai tự động khi có code mới trên GitHub.
+    \item \textbf{Kết nối:} Cloudflare Tunnel đảm bảo kết nối an toàn giữa hai cụm và với client bên ngoài.
+\end{itemize}
+
+Thiết kế này cho phép scale từng phần linh hoạt: tăng GPU khi lượng truy vấn AI tăng mà không ảnh hưởng đến Backend, hoặc mở rộng Backend khi lượng booking tăng mà không tốn thêm chi phí GPU. Đồng thời, quy trình CI/CD tự động hóa hoàn toàn đảm bảo mọi thay đổi được kiểm thử kỹ lưỡng trước khi lên production, giảm thiểu rủi ro và tăng tốc chu kỳ phát triển.

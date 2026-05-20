@@ -1,4 +1,4 @@
-import 'dart:developer' as developer;
+import 'package:logging/logging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
@@ -8,11 +8,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'app_router.g.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+final _log = Logger('AppRouter');
 
 @riverpod
 GoRouter router(Ref ref) {
   final notifier = ref.watch(routerListenableProvider.notifier);
-  String initialLocation = '/'; // Rõ ràng và an toàn hơn
+  String initialLocation = '/';
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
@@ -46,6 +47,12 @@ class RouterListenable extends _$RouterListenable implements Listenable {
         (LottieSplashRoute.isPublic && path == LottieSplashRoute.pathPattern) ||
         (OnboardingRoute.isPublic && path == OnboardingRoute.pathPattern) ||
         (SignInRoute.isPublic && path == SignInRoute.pathPattern) ||
+        (ForgotPasswordRoute.isPublic &&
+            path == ForgotPasswordRoute.pathPattern) ||
+        (PasswordResetCodeRoute.isPublic &&
+            path == PasswordResetCodeRoute.pathPattern) ||
+        (ResetPasswordRoute.isPublic &&
+            path == ResetPasswordRoute.pathPattern) ||
         (EmailFormRoute.isPublic && path == EmailFormRoute.pathPattern) ||
         (EmailCodeConfirmationRoute.isPublic &&
             path == EmailCodeConfirmationRoute.pathPattern) ||
@@ -61,14 +68,12 @@ class RouterListenable extends _$RouterListenable implements Listenable {
             path == HealthSafetyStepRoute.pathPattern);
 
     if (isLoggedIn) {
-      developer.log('[ROUTER] Logged In Route requested: $path', name: 'AppRouter');
-      // Logged-in user hitting a public route → send to home
+      _log.info('Logged In Route requested: $path');
       if (isPublicRoute) {
         return '/home';
       }
     } else {
-      developer.log('[ROUTER] Public Route requested: $path', name: 'AppRouter');
-      // Not logged in and trying to access a protected route
+      _log.info('Public Route requested: $path');
       if (!isPublicRoute) {
         return '/signin';
       }

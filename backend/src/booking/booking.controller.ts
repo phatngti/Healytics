@@ -37,7 +37,9 @@ export class BookingController {
    */
   @Post('async-checkout')
   @HttpCode(HttpStatus.ACCEPTED)
-  @ApiOperation({ summary: 'Start async checkout (returns 202 with ticket ID)' })
+  @ApiOperation({
+    summary: 'Start async checkout (returns 202 with ticket ID)',
+  })
   @ApiAcceptedResponse({ type: AsyncCheckoutResponseDto })
   async asyncCheckout(
     @Body() dto: AsyncCheckoutDto,
@@ -81,8 +83,9 @@ export class BookingController {
   @ApiOkResponse({ type: BookingResponseDto })
   @ApiNotFoundResponse({ description: 'Booking not found' })
   async getBooking(
+    @CurrentUser('id') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<BookingResponseDto> {
-    return this.bookingService.getBooking(id);
+    return this.bookingService.getBooking(userId, id);
   }
 }

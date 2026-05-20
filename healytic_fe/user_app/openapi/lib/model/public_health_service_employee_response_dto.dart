@@ -14,6 +14,7 @@ class PublicHealthServiceEmployeeResponseDto {
   /// Returns a new [PublicHealthServiceEmployeeResponseDto] instance.
   PublicHealthServiceEmployeeResponseDto({
     required this.id,
+    required this.eligibilityId,
     required this.name,
     required this.role,
     this.imageUrl,
@@ -27,69 +28,39 @@ class PublicHealthServiceEmployeeResponseDto {
     this.daySchedules = const [],
   });
 
+
+  /// Employee (specialist) ID
   String id;
+
+  /// product_employee_eligibility surrogate PK for this employee–service pair
+  String eligibilityId;
 
   String name;
 
   String role;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? imageUrl;
+  String? imageUrl;
 
   bool isSelected;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? quote;
+  String? quote;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? degrees;
+  String? degrees;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? languages;
+  String? languages;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? experience;
+  String? experience;
 
   List<String> specializations;
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? bio;
+  String? bio;
 
   List<PublicHealthServiceEmployeeDayScheduleDto> daySchedules;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is PublicHealthServiceEmployeeResponseDto &&
     other.id == id &&
+    other.eligibilityId == eligibilityId &&
     other.name == name &&
     other.role == role &&
     other.imageUrl == imageUrl &&
@@ -106,6 +77,7 @@ class PublicHealthServiceEmployeeResponseDto {
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
+    (eligibilityId.hashCode) +
     (name.hashCode) +
     (role.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
@@ -119,11 +91,12 @@ class PublicHealthServiceEmployeeResponseDto {
     (daySchedules.hashCode);
 
   @override
-  String toString() => 'PublicHealthServiceEmployeeResponseDto[id=$id, name=$name, role=$role, imageUrl=$imageUrl, isSelected=$isSelected, quote=$quote, degrees=$degrees, languages=$languages, experience=$experience, specializations=$specializations, bio=$bio, daySchedules=$daySchedules]';
+  String toString() => 'PublicHealthServiceEmployeeResponseDto[id=$id, eligibilityId=$eligibilityId, name=$name, role=$role, imageUrl=$imageUrl, isSelected=$isSelected, quote=$quote, degrees=$degrees, languages=$languages, experience=$experience, specializations=$specializations, bio=$bio, daySchedules=$daySchedules]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
+      json[r'eligibilityId'] = this.eligibilityId;
       json[r'name'] = this.name;
       json[r'role'] = this.role;
     if (this.imageUrl != null) {
@@ -182,18 +155,19 @@ class PublicHealthServiceEmployeeResponseDto {
 
       return PublicHealthServiceEmployeeResponseDto(
         id: mapValueOfType<String>(json, r'id')!,
+        eligibilityId: mapValueOfType<String>(json, r'eligibilityId')!,
         name: mapValueOfType<String>(json, r'name')!,
         role: mapValueOfType<String>(json, r'role')!,
-        imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
+        imageUrl: mapValueOfType<String>(json, r'imageUrl'),
         isSelected: mapValueOfType<bool>(json, r'isSelected')!,
-        quote: mapValueOfType<Object>(json, r'quote'),
-        degrees: mapValueOfType<Object>(json, r'degrees'),
-        languages: mapValueOfType<Object>(json, r'languages'),
-        experience: mapValueOfType<Object>(json, r'experience'),
+        quote: mapValueOfType<String>(json, r'quote'),
+        degrees: mapValueOfType<String>(json, r'degrees'),
+        languages: mapValueOfType<String>(json, r'languages'),
+        experience: mapValueOfType<String>(json, r'experience'),
         specializations: json[r'specializations'] is Iterable
             ? (json[r'specializations'] as Iterable).cast<String>().toList(growable: false)
             : const [],
-        bio: mapValueOfType<Object>(json, r'bio'),
+        bio: mapValueOfType<String>(json, r'bio'),
         daySchedules: PublicHealthServiceEmployeeDayScheduleDto.listFromJson(json[r'daySchedules']),
       );
     }
@@ -243,6 +217,7 @@ class PublicHealthServiceEmployeeResponseDto {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'id',
+    'eligibilityId',
     'name',
     'role',
     'isSelected',

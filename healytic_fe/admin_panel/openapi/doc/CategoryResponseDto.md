@@ -11,9 +11,10 @@ Name | Type | Description | Notes
 **id** | **String** | Unique category identifier | 
 **name** | **String** | Category name | 
 **slug** | **String** | URL-friendly slug | 
-**description** | [**Object**](.md) | Category description | [optional] 
-**imageUrl** | [**Object**](.md) | Category image URL | [optional] 
+**description** | **String** | Category description | [optional] 
+**imageUrl** | **String** | Category image URL | [optional] 
 **isActive** | **bool** | Whether category is active | 
+**categoryType** | **String** | Category type for UI grouping | [optional] [default to 'primary']
 **createdAt** | [**DateTime**](DateTime.md) | Creation timestamp | 
 **updatedAt** | [**DateTime**](DateTime.md) | Last update timestamp | 
 **parent** | [**CategorySummaryDto**](CategorySummaryDto.md) | Parent category | [optional] 

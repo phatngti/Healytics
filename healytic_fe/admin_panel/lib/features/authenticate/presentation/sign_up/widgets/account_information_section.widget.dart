@@ -35,16 +35,6 @@ class AccountInformationSection extends HookWidget {
                   Expanded(
                     child: FormFieldBuilders.buildTextField(
                       context,
-                      fieldKey: 'username',
-                      label: 'Username',
-                      hintText: 'Enter username',
-                      isRequired: true,
-                    ),
-                  ),
-                  AppDimens.horizontalMedium,
-                  Expanded(
-                    child: FormFieldBuilders.buildTextField(
-                      context,
                       fieldKey: 'email',
                       label: 'Email Address',
                       hintText: 'email@domain.com',
@@ -59,13 +49,6 @@ class AccountInformationSection extends HookWidget {
 
             return Column(
               children: [
-                FormFieldBuilders.buildTextField(
-                  context,
-                  fieldKey: 'username',
-                  label: 'Username',
-                  hintText: 'Enter username',
-                  isRequired: true,
-                ),
                 AppDimens.verticalMedium,
                 FormFieldBuilders.buildTextField(
                   context,

@@ -1,4 +1,7 @@
-import 'package:admin_openapi/api.dart' hide PartnerVerificationStatus;
+import 'dart:developer' as developer;
+
+import 'package:admin_openapi/api.dart'
+    hide PartnerVerificationStatus, PartnerPriority;
 import 'package:admin_openapi/api.dart' as openapi;
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
@@ -9,42 +12,65 @@ import 'package:admin_panel/features/admin/partner_manager/domain/partner_verifi
 import 'package:admin_panel/features/admin/partner_manager/domain/partner_verification_stats.entity.dart';
 import 'package:admin_panel/features/admin/partner_manager/datasource/data/partner_verification_mock_data.dart';
 import 'package:admin_panel/features/admin/partner_manager/datasource/data/partner_verification_detail_mock_data.dart';
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'partner_verification_remote.datasource.g.dart';
 
-// ============================================================================
+// ============================================================
 // 1. ABSTRACT INTERFACE
-// ============================================================================
+// ============================================================
 
-/// Abstract interface for partner verification data operations
+/// Abstract interface for partner verification data
+/// operations.
 abstract class PartnerVerificationRemoteDataSource {
+  /// Get paginated list of partner verifications
+  /// filtered by scope, search, status, and sort.
   Future<List<PartnerVerificationEntity>> getPartnerVerifications({
     required int startingAt,
     required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   });
 
-  Future<int> getTotalRows({PartnerVerificationStatus? statusFilter});
+  /// Get one paginated page plus the filtered total
+  /// returned by the same list endpoint.
+  Future<PartnerVerificationPageEntity> getPartnerVerificationPage({
+    required int startingAt,
+    required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    String? sortedBy,
+    bool? sortedAsc,
+    PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
+  });
 
-  /// Get detailed partner verification information for review page
+  /// Get total count matching current filters.
+  Future<int> getTotalRows({
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
+  });
+
+  /// Get detailed partner verification information
+  /// for review page.
   Future<PartnerVerificationDetailEntity> getPartnerDetailById(
     PartnerVerificationId id,
   );
 
+  /// Approve a partner verification request.
   Future<void> approvePartner(PartnerVerificationId id);
 
+  /// Reject a partner verification request.
   Future<void> rejectPartner(PartnerVerificationId id, {String? reason});
 
-  /// Submit a review decision for a partner with optional field-level feedback.
-  ///
-  /// [id] - The partner ID to review.
-  /// [decision] - The review decision: 'APPROVED', 'CHANGES_REQUIRED', or 'REJECTED'.
-  /// [generalComment] - Optional general comment/note for the review.
-  /// [fieldFeedback] - Map of fieldKey to feedback note for fields requiring revision.
+  /// Submit a review decision for a partner with
+  /// optional field-level feedback.
   Future<void> reviewPartner(
     PartnerVerificationId id, {
     required String decision,
@@ -52,14 +78,19 @@ abstract class PartnerVerificationRemoteDataSource {
     Map<String, String?>? fieldFeedback,
   });
 
-  Future<PartnerVerificationStats> getStats();
+  /// Get dashboard statistics.
+  Future<PartnerVerificationStats> getStats({
+    PartnerManagerScope scope,
+    String? searchQuery,
+  });
 }
 
-// ============================================================================
+// ============================================================
 // 2. IMPLEMENTATION (Real API)
-// ============================================================================
+// ============================================================
 
-/// Real implementation using API service
+/// Real implementation using the generated
+/// AdminPartnersApi.
 class PartnerVerificationRemoteDataSourceImpl
     implements PartnerVerificationRemoteDataSource {
   final ApiService apiService;
@@ -70,49 +101,168 @@ class PartnerVerificationRemoteDataSourceImpl
   Future<List<PartnerVerificationEntity>> getPartnerVerifications({
     required int startingAt,
     required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) async {
-    // Calculate page number from offset (1-indexed)
+    final page = await getPartnerVerificationPage(
+      startingAt: startingAt,
+      count: count,
+      scope: scope,
+      searchQuery: searchQuery,
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+      statusFilter: statusFilter,
+      quickFilter: quickFilter,
+    );
+    return page.items;
+  }
+
+  @override
+  Future<PartnerVerificationPageEntity> getPartnerVerificationPage({
+    required int startingAt,
+    required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    String? sortedBy,
+    bool? sortedAsc,
+    PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
+  }) async {
+    if (quickFilter == PartnerManagerQuickFilter.highPriority) {
+      return _getHighPriorityPartnerVerificationPage(
+        startingAt: startingAt,
+        count: count,
+        scope: scope,
+        searchQuery: searchQuery,
+        sortedBy: sortedBy,
+        sortedAsc: sortedAsc,
+        statusFilter: statusFilter,
+      );
+    }
+
     final page = (startingAt ~/ count) + 1;
+    final effectiveScope =
+        quickFilter == PartnerManagerQuickFilter.pendingReview
+        ? PartnerManagerScope.verificationQueue
+        : scope;
 
     final response = await apiService.adminPartnersApi
         .adminPartnersControllerGetPartners(
           page: page,
           limit: count,
+          scope: _mapScope(effectiveScope),
+          search: searchQuery,
           verificationStatus: _mapStatusToQueryParam(statusFilter),
+          sortBy: _mapSortBy(sortedBy),
+          sortDirection: _mapSortDirection(sortedAsc),
         );
+
     if (response == null) {
-      return [];
+      return const PartnerVerificationPageEntity(items: [], total: 0);
     }
 
-    return response.data.map((dto) => _mapPartnerItemToEntity(dto)).toList();
+    return PartnerVerificationPageEntity(
+      items: response.data.map(_mapPartnerItemToEntity).toList(),
+      total: response.total.toInt(),
+    );
   }
 
   @override
-  Future<int> getTotalRows({PartnerVerificationStatus? statusFilter}) async {
-    final response = await apiService.adminPartnersApi
-        .adminPartnersControllerGetTotalPartners();
-    if (response == null) {
-      return 0;
+  Future<int> getTotalRows({
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
+  }) async {
+    if (quickFilter != null) {
+      final page = await getPartnerVerificationPage(
+        startingAt: 0,
+        count: 1,
+        scope: scope,
+        searchQuery: searchQuery,
+        statusFilter: statusFilter,
+        quickFilter: quickFilter,
+      );
+      return page.total;
     }
+
+    final response = await apiService.adminPartnersApi
+        .adminPartnersControllerGetTotalPartners(
+          scope: _mapScope(scope),
+          search: searchQuery,
+          verificationStatus: _mapStatusToQueryParam(statusFilter),
+        );
+    if (response == null) return 0;
     return response.total.toInt();
+  }
+
+  Future<PartnerVerificationPageEntity>
+  _getHighPriorityPartnerVerificationPage({
+    required int startingAt,
+    required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    String? sortedBy,
+    bool? sortedAsc,
+    PartnerVerificationStatus? statusFilter,
+  }) async {
+    const pageSize = 100;
+    var page = 1;
+    var fetched = 0;
+    var total = 0;
+    final highPriority = <PartnerVerificationEntity>[];
+
+    do {
+      final response = await apiService.adminPartnersApi
+          .adminPartnersControllerGetPartners(
+            page: page,
+            limit: pageSize,
+            scope: _mapScope(PartnerManagerScope.verificationQueue),
+            search: searchQuery,
+            verificationStatus: _mapStatusToQueryParam(statusFilter),
+            sortBy: _mapSortBy(sortedBy),
+            sortDirection: _mapSortDirection(sortedAsc),
+          );
+
+      if (response == null) {
+        break;
+      }
+
+      total = response.total.toInt();
+      final items = response.data.map(_mapPartnerItemToEntity).toList();
+      fetched += items.length;
+      highPriority.addAll(
+        items.where((item) => item.priority == PartnerPriority.high),
+      );
+
+      if (items.isEmpty) {
+        break;
+      }
+      page += 1;
+    } while (fetched < total);
+
+    final start = startingAt.clamp(0, highPriority.length).toInt();
+    final end = (startingAt + count).clamp(0, highPriority.length).toInt();
+
+    return PartnerVerificationPageEntity(
+      items: highPriority.sublist(start, end),
+      total: highPriority.length,
+    );
   }
 
   @override
   Future<PartnerVerificationDetailEntity> getPartnerDetailById(
     PartnerVerificationId id,
   ) async {
-    debugPrint(
-      'PartnerVerificationRemoteDataSourceImpl: Fetching id=${id.value}',
-    );
     final dto = await apiService.adminPartnersApi
         .adminPartnersControllerGetPartnerDetail(id.value);
     if (dto == null) {
       throw Exception('Partner detail not found: $id');
     }
-    debugPrint('PartnerVerificationRemoteDataSourceImpl: Received dto=$dto');
     return _mapToPartnerVerificationDetailEntity(dto);
   }
 
@@ -146,7 +296,6 @@ class PartnerVerificationRemoteDataSourceImpl
     String? generalComment,
     Map<String, String?>? fieldFeedback,
   }) async {
-    // Map decision string to enum
     final decisionEnum = switch (decision) {
       'APPROVED' => ReviewPartnerProfileDtoDecisionEnum.APPROVED,
       'CHANGES_REQUIRED' =>
@@ -155,7 +304,6 @@ class PartnerVerificationRemoteDataSourceImpl
       _ => throw ArgumentError('Invalid decision: $decision'),
     };
 
-    // Build review items from field feedback
     final items = <ReviewItemDto>[];
     if (fieldFeedback != null) {
       for (final entry in fieldFeedback.entries) {
@@ -169,11 +317,6 @@ class PartnerVerificationRemoteDataSourceImpl
       items: items,
     );
 
-    debugPrint(
-      'ReviewPartner: id=${id.value}, decision=$decision, '
-      'comment=$generalComment, items=${items.length}',
-    );
-
     await apiService.adminPartnersApi.adminPartnersControllerReviewPartner(
       id.value,
       reviewDto,
@@ -181,20 +324,175 @@ class PartnerVerificationRemoteDataSourceImpl
   }
 
   @override
-  Future<PartnerVerificationStats> getStats() async {
-    // No dedicated stats endpoint - return defaults
-    debugPrint(
-      'PartnerVerificationRemoteDataSourceImpl.getStats called'
-      ' - No stats endpoint available',
-    );
-    return const PartnerVerificationStats();
+  Future<PartnerVerificationStats> getStats({
+    PartnerManagerScope scope = PartnerManagerScope.verificationQueue,
+    String? searchQuery,
+  }) async {
+    try {
+      final response = await apiService.adminPartnersApi
+          .adminPartnersControllerGetPartnerStats(
+            scope: _mapScope(scope),
+            search: searchQuery,
+          );
+      if (response == null) {
+        return const PartnerVerificationStats();
+      }
+      return PartnerVerificationStats(
+        pendingReview: response.pendingReview.toInt(),
+        highPriority: response.highPriority.toInt(),
+        activeToday: response.activeToday.toInt(),
+        avgWaitSeconds: response.avgWaitSeconds.toInt(),
+        avgWaitTime: response.avgWaitTime,
+        totalProviders: response.totalProviders.toInt(),
+        requiredResubmit: response.requiredResubmit.toInt(),
+        approved: response.approved.toInt(),
+        rejected: response.rejected.toInt(),
+      );
+    } catch (e, st) {
+      developer.log(
+        'Failed to fetch partner stats',
+        name: 'PartnerVerificationDataSource',
+        error: e,
+        stackTrace: st,
+      );
+      return const PartnerVerificationStats();
+    }
   }
 
-  // ===========================================================================
-  // MAPPING FUNCTIONS
-  // ===========================================================================
+  // ========================================================
+  // MAPPING: List Item
+  // ========================================================
 
-  /// Maps [AdminPartnerDetailResponseDto] to [PartnerVerificationDetailEntity]
+  PartnerVerificationEntity _mapPartnerItemToEntity(AdminPartnerItemDto dto) {
+    final displayName = _getDisplayName(dto);
+
+    return PartnerVerificationEntity(
+      id: PartnerVerificationId(dto.id),
+      name: displayName,
+      initials: _getInitials(displayName),
+      serviceTypes: dto.businessType.map(_formatBusinessType).toList(),
+      submittedAt: dto.createdAt,
+      priority: _mapPriority(dto.priority),
+      status: _mapItemVerificationStatus(dto.verificationStatus),
+      isAccountActive: dto.isAccountActive,
+      providerId: dto.id,
+    );
+  }
+
+  String _getDisplayName(AdminPartnerItemDto dto) {
+    final brandName = dto.brandName.trim();
+    if (brandName.isNotEmpty) return brandName;
+
+    final legalName = dto.legalName.trim();
+    if (legalName.isNotEmpty) return legalName;
+
+    final email = dto.email.trim();
+    if (email.isNotEmpty) return email;
+
+    return dto.id;
+  }
+
+  /// Formats backend BusinessType enum value into
+  /// a UI-friendly label.
+  static String _formatBusinessType(openapi.BusinessType type) {
+    return switch (type) {
+      openapi.BusinessType.MASSAGE_THERAPY => 'Massage Therapy',
+      openapi.BusinessType.MASSAGE_REHABILITATION => 'Rehabilitation',
+      openapi.BusinessType.SPA_BEAUTY => 'Spa & Beauty',
+      openapi.BusinessType.FITNESS => 'Fitness',
+      openapi.BusinessType.PHARMACY => 'Pharmacy',
+      openapi.BusinessType.DENTAL => 'Dental',
+      openapi.BusinessType.TRADITIONAL_MEDICINE => 'Traditional Medicine',
+      openapi.BusinessType.PSYCHOLOGY => 'Psychology',
+      openapi.BusinessType.DERMATOLOGY => 'Dermatology',
+      openapi.BusinessType.NUTRITION => 'Nutrition',
+      openapi.BusinessType.PSYCHIATRY => 'Psychiatry',
+      _ => type.value,
+    };
+  }
+
+  // ========================================================
+  // MAPPING: Status & Priority
+  // ========================================================
+
+  PartnerVerificationStatus _mapVerificationStatus(
+    openapi.PartnerVerificationStatus status,
+  ) {
+    return switch (status) {
+      openapi.PartnerVerificationStatus.APPROVED =>
+        PartnerVerificationStatus.approved,
+      openapi.PartnerVerificationStatus.REJECTED =>
+        PartnerVerificationStatus.rejected,
+      openapi.PartnerVerificationStatus.REQUIRED_RESUBMIT =>
+        PartnerVerificationStatus.requiredResubmit,
+      _ => PartnerVerificationStatus.pending,
+    };
+  }
+
+  PartnerVerificationStatus _mapItemVerificationStatus(
+    openapi.PartnerVerificationStatus status,
+  ) {
+    return _mapVerificationStatus(status);
+  }
+
+  PartnerPriority _mapPriority(openapi.PartnerPriority p) {
+    if (p == openapi.PartnerPriority.high ||
+        p == openapi.PartnerPriority.urgent) {
+      return PartnerPriority.high;
+    }
+    return PartnerPriority.normal;
+  }
+
+  // ========================================================
+  // MAPPING: Query Params
+  // ========================================================
+
+  AdminPartnerScope? _mapScope(PartnerManagerScope scope) {
+    return switch (scope) {
+      PartnerManagerScope.verificationQueue =>
+        AdminPartnerScope.VERIFICATION_QUEUE,
+      PartnerManagerScope.allProviders => AdminPartnerScope.ALL_PROVIDERS,
+    };
+  }
+
+  openapi.PartnerVerificationStatus? _mapStatusToQueryParam(
+    PartnerVerificationStatus? status,
+  ) {
+    if (status == null) return null;
+    return switch (status) {
+      PartnerVerificationStatus.pending =>
+        openapi.PartnerVerificationStatus.PENDING,
+      PartnerVerificationStatus.requiredResubmit =>
+        openapi.PartnerVerificationStatus.REQUIRED_RESUBMIT,
+      PartnerVerificationStatus.approved =>
+        openapi.PartnerVerificationStatus.APPROVED,
+      PartnerVerificationStatus.rejected =>
+        openapi.PartnerVerificationStatus.REJECTED,
+    };
+  }
+
+  AdminPartnerSortBy? _mapSortBy(String? sortedBy) {
+    if (sortedBy == null) return null;
+    return switch (sortedBy) {
+      'name' => AdminPartnerSortBy.brandName,
+      'submittedAt' => AdminPartnerSortBy.createdAt,
+      'priority' => AdminPartnerSortBy.priority,
+      'status' => AdminPartnerSortBy.verificationStatus,
+      _ => AdminPartnerSortBy.createdAt,
+    };
+  }
+
+  AdminPartnerSortDirection? _mapSortDirection(bool? sortedAsc) {
+    if (sortedAsc == null) return null;
+    return sortedAsc
+        ? AdminPartnerSortDirection.ASC
+        : AdminPartnerSortDirection.DESC;
+  }
+
+  // ========================================================
+  // MAPPING: Detail
+  // ========================================================
+
   PartnerVerificationDetailEntity _mapToPartnerVerificationDetailEntity(
     AdminPartnerDetailResponseDto dto,
   ) {
@@ -207,7 +505,7 @@ class PartnerVerificationRemoteDataSourceImpl
               businessInfo.taxRegistrationCode!,
             )
           : null,
-      isTaxCodeValid: false, // TODO: Add isTaxCodeValid to DTO if available
+      isTaxCodeValid: false,
       address: _mapAddress(businessInfo.address),
       email: businessInfo.email != null
           ? _mapVerifiedFieldNullable<String?>(businessInfo.email!)
@@ -226,8 +524,6 @@ class PartnerVerificationRemoteDataSourceImpl
     );
   }
 
-  /// Maps [VerifiedField] DTO to [VerifiedFieldEntity<T>]
-  /// Handles non-nullable value conversion.
   VerifiedFieldEntity<T> _mapVerifiedField<T>(VerifiedField dto) {
     return VerifiedFieldEntity<T>(
       fieldKey: dto.fieldKey,
@@ -237,7 +533,6 @@ class PartnerVerificationRemoteDataSourceImpl
     );
   }
 
-  /// Maps [VerifiedField] DTO to [VerifiedFieldEntity<T?>] for nullable values.
   VerifiedFieldEntity<T?> _mapVerifiedFieldNullable<T>(VerifiedField dto) {
     return VerifiedFieldEntity<T?>(
       fieldKey: dto.fieldKey,
@@ -247,7 +542,6 @@ class PartnerVerificationRemoteDataSourceImpl
     );
   }
 
-  /// Converts a dynamic value to the specified type [T].
   T _convertValue<T>(Object? value) {
     if (T == String) {
       return (value?.toString() ?? '') as T;
@@ -255,16 +549,12 @@ class PartnerVerificationRemoteDataSourceImpl
     return value as T;
   }
 
-  /// Converts a dynamic value to nullable type [T?].
   T? _convertValueNullable<T>(Object? value) {
     if (value == null) return null;
-    if (T == String) {
-      return value.toString() as T;
-    }
+    if (T == String) return value.toString() as T;
     return value as T?;
   }
 
-  /// Maps [VerifiedField] DTO to [VerifiedFieldEntity<List<String>>]
   VerifiedFieldEntity<List<String>> _mapVerifiedFieldList(VerifiedField dto) {
     final value = dto.value;
     final List<String> listValue;
@@ -283,82 +573,6 @@ class PartnerVerificationRemoteDataSourceImpl
     );
   }
 
-  /// Maps verification status enum
-  PartnerVerificationStatus _mapVerificationStatus(
-    AdminPartnerDetailResponseDtoStatusEnum status,
-  ) {
-    return switch (status) {
-      AdminPartnerDetailResponseDtoStatusEnum.PENDING ||
-      AdminPartnerDetailResponseDtoStatusEnum.REQUIRED_RESUBMIT =>
-        PartnerVerificationStatus.pending,
-      AdminPartnerDetailResponseDtoStatusEnum.APPROVED =>
-        PartnerVerificationStatus.approved,
-      AdminPartnerDetailResponseDtoStatusEnum.REJECTED =>
-        PartnerVerificationStatus.rejected,
-      _ => PartnerVerificationStatus.pending,
-    };
-  }
-
-  /// Maps priority enum - maps API values to domain values
-  /// Note: Domain only has 'normal' and 'high', so 'low' maps to 'normal'
-  /// and 'urgent' maps to 'high'
-  PartnerPriority _mapPriority(AdminPartnerDetailResponseDtoPriorityEnum p) {
-    return switch (p) {
-      AdminPartnerDetailResponseDtoPriorityEnum.low ||
-      AdminPartnerDetailResponseDtoPriorityEnum.normal =>
-        PartnerPriority.normal,
-      AdminPartnerDetailResponseDtoPriorityEnum.high ||
-      AdminPartnerDetailResponseDtoPriorityEnum.urgent => PartnerPriority.high,
-      _ => PartnerPriority.normal,
-    };
-  }
-
-  /// Maps [PartnerItemDto] to [PartnerVerificationEntity] for list responses
-  PartnerVerificationEntity _mapPartnerItemToEntity(PartnerItemDto dto) {
-    return PartnerVerificationEntity(
-      id: PartnerVerificationId(dto.id),
-      name: dto.brandName,
-      initials: _getInitials(dto.brandName),
-      // serviceTypes: [dto.businessType.value],
-      submittedAt: dto.createdAt,
-      priority: PartnerPriority.normal,
-      status: _mapItemVerificationStatus(dto.verificationStatus),
-      isEmailVerified: true,
-      providerId: dto.id,
-    );
-  }
-
-  /// Maps verification status enum from list DTO
-  PartnerVerificationStatus _mapItemVerificationStatus(
-    openapi.PartnerVerificationStatus status,
-  ) {
-    return switch (status) {
-      openapi.PartnerVerificationStatus.PENDING ||
-      openapi.PartnerVerificationStatus.REQUIRED_RESUBMIT =>
-        PartnerVerificationStatus.pending,
-      openapi.PartnerVerificationStatus.APPROVED =>
-        PartnerVerificationStatus.approved,
-      openapi.PartnerVerificationStatus.REJECTED =>
-        PartnerVerificationStatus.rejected,
-      _ => PartnerVerificationStatus.pending,
-    };
-  }
-
-  /// Converts domain status enum to API query parameter string
-  String? _mapStatusToQueryParam(PartnerVerificationStatus? status) {
-    if (status == null) return null;
-    switch (status) {
-      case PartnerVerificationStatus.pending:
-        return 'PENDING';
-      case PartnerVerificationStatus.approved:
-        return 'APPROVED';
-      case PartnerVerificationStatus.rejected:
-        return 'REJECTED';
-    }
-  }
-
-  /// Maps address DTO to domain entity.
-  /// Now handles `VerifiedField` for streetAddress, ward, district, city.
   AddressInfo? _mapAddress(AddressInfoDto? dto) {
     if (dto == null) return null;
     return AddressInfo(
@@ -398,7 +612,6 @@ class PartnerVerificationRemoteDataSourceImpl
     );
   }
 
-  /// Parses location value from DTO which can be a Map or String
   AddressLocation _parseLocationValue(Object? value) {
     if (value is Map<String, dynamic>) {
       return AddressLocation(
@@ -406,12 +619,9 @@ class PartnerVerificationRemoteDataSourceImpl
         name: value['name']?.toString() ?? '',
       );
     }
-    // Fallback: treat as string name with empty id
     return AddressLocation(id: '', name: value?.toString() ?? '');
   }
 
-  /// Maps legal representative DTO to domain entity.
-  /// Now handles `VerifiedField` for all fields.
   LegalRepresentative? _mapLegalRepresentative(LegalRepresentativeDto? dto) {
     if (dto == null) return null;
     return LegalRepresentative(
@@ -456,20 +666,15 @@ class PartnerVerificationRemoteDataSourceImpl
     );
   }
 
-  /// Maps KYC document DTOs to domain entities.
-  /// Now handles `List<VerifiedField>` instead of `List<KycDocumentDto>`.
-  /// Each VerifiedField contains a document object with id, fileName, etc.
   List<VerifiedFieldEntity<KycDocument>> _mapKycDocuments(
     List<VerifiedField> documents,
   ) {
     if (documents.isEmpty) return [];
-    debugPrint('Mapping ${documents.length} KYC documents');
 
     return documents.map((verifiedField) {
       final value = verifiedField.value;
       KycDocument document;
 
-      // The value is typically a Map containing document details
       if (value is Map<String, dynamic>) {
         document = KycDocument(
           id: value['id']?.toString() ?? verifiedField.fieldKey,
@@ -483,7 +688,6 @@ class PartnerVerificationRemoteDataSourceImpl
               : null,
         );
       } else if (value is String) {
-        // Fallback: if value is a string (URL), use it as fileUrl
         document = KycDocument(
           id: verifiedField.fieldKey,
           documentKey: verifiedField.fieldKey,
@@ -492,7 +696,6 @@ class PartnerVerificationRemoteDataSourceImpl
           fileUrl: value.isNotEmpty ? value : null,
         );
       } else {
-        // Default fallback
         document = KycDocument(
           id: verifiedField.fieldKey,
           documentKey: verifiedField.fieldKey,
@@ -510,33 +713,38 @@ class PartnerVerificationRemoteDataSourceImpl
     }).toList();
   }
 
-  /// Extracts file type from URL or path
   String _extractFileType(String url) {
     if (url.isEmpty) return '';
-    final extension = url.split('.').lastOrNull?.toLowerCase() ?? '';
-    return extension;
+    return url.split('.').lastOrNull?.toLowerCase() ?? '';
   }
 
-  /// Extracts file name from URL or path
   String _extractFileName(String url) {
     if (url.isEmpty) return '';
     return url.split('/').lastOrNull ?? '';
   }
 
-  /// Gets initials from a name
   String _getInitials(String name) {
-    final words = name.trim().split(RegExp(r'\s+'));
-    if (words.isEmpty) return '';
-    if (words.length == 1) return words.first.substring(0, 2).toUpperCase();
+    final words = name
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((word) => word.isNotEmpty)
+        .toList();
+    if (words.isEmpty) return '?';
+    if (words.length == 1) {
+      final word = words.first;
+      final end = word.length >= 2 ? 2 : word.length;
+      return word.substring(0, end).toUpperCase();
+    }
     return '${words.first[0]}${words.last[0]}'.toUpperCase();
   }
 }
 
-// ============================================================================
+// ============================================================
 // 3. MOCK IMPLEMENTATION
-// ============================================================================
+// ============================================================
 
-/// Mock implementation with rich static data for UI testing
+/// Mock implementation with rich static data for
+/// UI testing.
 class PartnerVerificationRemoteDataSourceMock
     implements PartnerVerificationRemoteDataSource {
   final List<PartnerVerificationEntity> _mockData = partnerVerificationMockData;
@@ -545,56 +753,71 @@ class PartnerVerificationRemoteDataSourceMock
   Future<List<PartnerVerificationEntity>> getPartnerVerifications({
     required int startingAt,
     required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
     String? sortedBy,
     bool? sortedAsc,
     PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
   }) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    var filtered = _mockData.toList();
-
-    // Apply status filter if provided
-    if (statusFilter != null) {
-      filtered = filtered.where((p) => p.status == statusFilter).toList();
-    }
-
-    // Apply sorting
-    if (sortedBy != null) {
-      switch (sortedBy) {
-        case 'name':
-          filtered.sort(
-            (a, b) => sortedAsc == true
-                ? a.name.compareTo(b.name)
-                : b.name.compareTo(a.name),
-          );
-        case 'priority':
-          filtered.sort((a, b) {
-            final comparison = a.priority.index.compareTo(b.priority.index);
-            return sortedAsc == true ? comparison : -comparison;
-          });
-        case 'submittedAt':
-        default:
-          filtered.sort(
-            (a, b) => sortedAsc == true
-                ? a.submittedAt.compareTo(b.submittedAt)
-                : b.submittedAt.compareTo(a.submittedAt),
-          );
-      }
-    }
-
-    final endIndex = (startingAt + count).clamp(0, filtered.length);
-    return filtered.sublist(startingAt.clamp(0, filtered.length), endIndex);
+    final page = await getPartnerVerificationPage(
+      startingAt: startingAt,
+      count: count,
+      scope: scope,
+      searchQuery: searchQuery,
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+      statusFilter: statusFilter,
+      quickFilter: quickFilter,
+    );
+    return page.items;
   }
 
   @override
-  Future<int> getTotalRows({PartnerVerificationStatus? statusFilter}) async {
-    await Future.delayed(const Duration(milliseconds: 300));
+  Future<PartnerVerificationPageEntity> getPartnerVerificationPage({
+    required int startingAt,
+    required int count,
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    String? sortedBy,
+    bool? sortedAsc,
+    PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 500));
 
-    if (statusFilter != null) {
-      return _mockData.where((p) => p.status == statusFilter).length;
-    }
-    return _mockData.length;
+    final filtered = _applyMockFilters(
+      scope: scope,
+      searchQuery: searchQuery,
+      statusFilter: statusFilter,
+      quickFilter: quickFilter,
+    );
+
+    _applyMockSort(filtered, sortedBy, sortedAsc);
+
+    final start = startingAt.clamp(0, filtered.length).toInt();
+    final end = (startingAt + count).clamp(0, filtered.length).toInt();
+
+    return PartnerVerificationPageEntity(
+      items: filtered.sublist(start, end),
+      total: filtered.length,
+    );
+  }
+
+  @override
+  Future<int> getTotalRows({
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    return _applyMockFilters(
+      scope: scope,
+      searchQuery: searchQuery,
+      statusFilter: statusFilter,
+      quickFilter: quickFilter,
+    ).length;
   }
 
   @override
@@ -612,13 +835,19 @@ class PartnerVerificationRemoteDataSourceMock
   @override
   Future<void> approvePartner(PartnerVerificationId id) async {
     await Future.delayed(const Duration(seconds: 1));
-    debugPrint('Mock: Approved partner $id');
+    developer.log(
+      'Mock: Approved partner $id',
+      name: 'PartnerVerificationMock',
+    );
   }
 
   @override
   Future<void> rejectPartner(PartnerVerificationId id, {String? reason}) async {
     await Future.delayed(const Duration(seconds: 1));
-    debugPrint('Mock: Rejected partner $id with reason: $reason');
+    developer.log(
+      'Mock: Rejected partner $id reason=$reason',
+      name: 'PartnerVerificationMock',
+    );
   }
 
   @override
@@ -629,38 +858,134 @@ class PartnerVerificationRemoteDataSourceMock
     Map<String, String?>? fieldFeedback,
   }) async {
     await Future.delayed(const Duration(seconds: 1));
-    debugPrint(
-      'Mock: Reviewed partner $id with decision: $decision, '
-      'comment: $generalComment, feedback items: ${fieldFeedback?.length ?? 0}',
+    developer.log(
+      'Mock: Reviewed partner $id '
+      'decision=$decision '
+      'items=${fieldFeedback?.length ?? 0}',
+      name: 'PartnerVerificationMock',
     );
   }
 
   @override
-  Future<PartnerVerificationStats> getStats() async {
+  Future<PartnerVerificationStats> getStats({
+    PartnerManagerScope scope = PartnerManagerScope.verificationQueue,
+    String? searchQuery,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
     final pending = _mockData
         .where((p) => p.status == PartnerVerificationStatus.pending)
         .length;
+    final resubmit = _mockData
+        .where((p) => p.status == PartnerVerificationStatus.requiredResubmit)
+        .length;
     final highPriority = _mockData
         .where((p) => p.priority == PartnerPriority.high)
         .length;
-    final activeToday = _mockData
+    final approved = _mockData
         .where((p) => p.status == PartnerVerificationStatus.approved)
+        .length;
+    final rejected = _mockData
+        .where((p) => p.status == PartnerVerificationStatus.rejected)
         .length;
 
     return PartnerVerificationStats(
-      pendingReview: pending,
+      pendingReview: pending + resubmit,
       highPriority: highPriority,
-      activeToday: activeToday,
+      activeToday: approved,
+      avgWaitSeconds: 15120,
       avgWaitTime: '4h 12m',
+      totalProviders: _mockData.length,
+      requiredResubmit: resubmit,
+      approved: approved,
+      rejected: rejected,
     );
+  }
+
+  // ─── Mock filter helpers ──────────────────────────
+
+  List<PartnerVerificationEntity> _applyMockFilters({
+    required PartnerManagerScope scope,
+    String? searchQuery,
+    PartnerVerificationStatus? statusFilter,
+    PartnerManagerQuickFilter? quickFilter,
+  }) {
+    var filtered = _mockData.toList();
+    final effectiveScope =
+        quickFilter == PartnerManagerQuickFilter.pendingReview
+        ? PartnerManagerScope.verificationQueue
+        : scope;
+
+    // Apply scope
+    if (effectiveScope == PartnerManagerScope.verificationQueue) {
+      filtered = filtered
+          .where(
+            (p) =>
+                p.status == PartnerVerificationStatus.pending ||
+                p.status == PartnerVerificationStatus.requiredResubmit,
+          )
+          .toList();
+    }
+
+    // Apply status filter
+    if (statusFilter != null) {
+      filtered = filtered.where((p) => p.status == statusFilter).toList();
+    }
+
+    if (quickFilter == PartnerManagerQuickFilter.highPriority) {
+      filtered = filtered
+          .where((p) => p.priority == PartnerPriority.high)
+          .toList();
+    }
+
+    // Apply search
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      final query = searchQuery.toLowerCase();
+      filtered = filtered
+          .where(
+            (p) =>
+                p.name.toLowerCase().contains(query) ||
+                (p.providerId?.toLowerCase().contains(query) ?? false),
+          )
+          .toList();
+    }
+
+    return filtered;
+  }
+
+  void _applyMockSort(
+    List<PartnerVerificationEntity> filtered,
+    String? sortedBy,
+    bool? sortedAsc,
+  ) {
+    if (sortedBy == null) return;
+
+    switch (sortedBy) {
+      case 'name':
+        filtered.sort(
+          (a, b) => sortedAsc == true
+              ? a.name.compareTo(b.name)
+              : b.name.compareTo(a.name),
+        );
+      case 'priority':
+        filtered.sort((a, b) {
+          final cmp = a.priority.index.compareTo(b.priority.index);
+          return sortedAsc == true ? cmp : -cmp;
+        });
+      case 'submittedAt':
+      default:
+        filtered.sort(
+          (a, b) => sortedAsc == true
+              ? a.submittedAt.compareTo(b.submittedAt)
+              : b.submittedAt.compareTo(a.submittedAt),
+        );
+    }
   }
 }
 
-// ============================================================================
+// ============================================================
 // 4. PROVIDER WITH MOCK SWITCHING
-// ============================================================================
+// ============================================================
 
 @riverpod
 PartnerVerificationRemoteDataSource partnerVerificationRemoteDataSource(

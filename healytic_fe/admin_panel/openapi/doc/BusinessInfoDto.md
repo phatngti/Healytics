@@ -9,6 +9,7 @@ import 'package:admin_openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **brandName** | [**VerifiedField**](VerifiedField.md) |  | 
+**legalName** | [**VerifiedField**](VerifiedField.md) |  | [optional] 
 **taxRegistrationCode** | [**VerifiedField**](VerifiedField.md) |  | [optional] 
 **businessType** | [**VerifiedField**](VerifiedField.md) |  | 
 **address** | [**AddressInfoDto**](AddressInfoDto.md) |  | [optional] 

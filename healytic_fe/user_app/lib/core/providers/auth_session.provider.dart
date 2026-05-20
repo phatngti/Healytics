@@ -1,8 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/entities/store.entity.dart';
 import 'package:user_app/core/models/store.model.dart';
+
+part 'auth_session.provider.g.dart';
 
 class AuthSessionStore {
   bool get isMockMode => AppEnvironment.current.useMock;
@@ -39,6 +42,19 @@ class AuthSessionStore {
     return null;
   }
 
+  /// Returns the current user's UUID from the JWT
+  /// `sub` claim, or `null` if unavailable.
+  String? get currentUserId {
+    final token = Store.tryGet(StoreKey.accessToken);
+    if (token == null || token.isEmpty) return null;
+    try {
+      final claims = JwtDecoder.decode(token);
+      return claims['sub'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Validates the stored access token exists and has
   /// not expired.
   bool _isTokenValid() {
@@ -54,13 +70,25 @@ class AuthSessionStore {
 
   void _clearSession() {
     Store.delete(StoreKey.accessToken);
+    Store.delete(StoreKey.refreshToken);
   }
+
+  /// Clears all tokens and forces the user back to
+  /// the login screen via the router guard.
+  void forceLogout() => _clearSession();
 }
 
-final authSessionStoreProvider = Provider<AuthSessionStore>((ref) {
+@Riverpod(keepAlive: true)
+AuthSessionStore authSessionStore(Ref ref) {
   return AuthSessionStore();
-});
+}
 
 final currentUserDisplayNameProvider = Provider<String?>((ref) {
   return ref.watch(authSessionStoreProvider).currentUserDisplayName;
+});
+
+/// Provides the current user's UUID extracted from
+/// the JWT `sub` claim.
+final currentUserIdProvider = Provider<String?>((ref) {
+  return ref.watch(authSessionStoreProvider).currentUserId;
 });

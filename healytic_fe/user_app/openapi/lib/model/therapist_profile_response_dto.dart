@@ -21,61 +21,25 @@ class TherapistProfileResponseDto {
     this.healthCheckDate,
     this.skills = const [],
     this.deviceProficiency = const [],
-    this.licenseUrl,
   });
 
+
   /// Employee ID (primary key)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   String? employeeId;
 
   /// Therapist level (junior, senior, etc.)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   String? level;
 
   /// Therapist type
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   String? type;
 
   /// Strength level
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   String? strengthLevel;
 
   /// Commission rate (percentage)
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   num? commissionRate;
 
   /// Health check date
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   DateTime? healthCheckDate;
 
   /// List of skills
@@ -83,15 +47,6 @@ class TherapistProfileResponseDto {
 
   /// Device proficiency list
   List<String> deviceProficiency;
-
-  /// License URL
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? licenseUrl;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is TherapistProfileResponseDto &&
@@ -102,8 +57,7 @@ class TherapistProfileResponseDto {
     other.commissionRate == commissionRate &&
     other.healthCheckDate == healthCheckDate &&
     _deepEquality.equals(other.skills, skills) &&
-    _deepEquality.equals(other.deviceProficiency, deviceProficiency) &&
-    other.licenseUrl == licenseUrl;
+    _deepEquality.equals(other.deviceProficiency, deviceProficiency);
 
   @override
   int get hashCode =>
@@ -115,11 +69,10 @@ class TherapistProfileResponseDto {
     (commissionRate == null ? 0 : commissionRate!.hashCode) +
     (healthCheckDate == null ? 0 : healthCheckDate!.hashCode) +
     (skills.hashCode) +
-    (deviceProficiency.hashCode) +
-    (licenseUrl == null ? 0 : licenseUrl!.hashCode);
+    (deviceProficiency.hashCode);
 
   @override
-  String toString() => 'TherapistProfileResponseDto[employeeId=$employeeId, level=$level, type=$type, strengthLevel=$strengthLevel, commissionRate=$commissionRate, healthCheckDate=$healthCheckDate, skills=$skills, deviceProficiency=$deviceProficiency, licenseUrl=$licenseUrl]';
+  String toString() => 'TherapistProfileResponseDto[employeeId=$employeeId, level=$level, type=$type, strengthLevel=$strengthLevel, commissionRate=$commissionRate, healthCheckDate=$healthCheckDate, skills=$skills, deviceProficiency=$deviceProficiency]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -155,11 +108,6 @@ class TherapistProfileResponseDto {
     }
       json[r'skills'] = this.skills;
       json[r'deviceProficiency'] = this.deviceProficiency;
-    if (this.licenseUrl != null) {
-      json[r'licenseUrl'] = this.licenseUrl;
-    } else {
-      json[r'licenseUrl'] = null;
-    }
     return json;
   }
 
@@ -186,7 +134,9 @@ class TherapistProfileResponseDto {
         level: mapValueOfType<String>(json, r'level'),
         type: mapValueOfType<String>(json, r'type'),
         strengthLevel: mapValueOfType<String>(json, r'strengthLevel'),
-        commissionRate: num.parse('${json[r'commissionRate']}'),
+        commissionRate: json[r'commissionRate'] == null
+            ? null
+            : num.parse('${json[r'commissionRate']}'),
         healthCheckDate: mapDateTime(json, r'healthCheckDate', r''),
         skills: json[r'skills'] is Iterable
             ? (json[r'skills'] as Iterable).cast<String>().toList(growable: false)
@@ -194,7 +144,6 @@ class TherapistProfileResponseDto {
         deviceProficiency: json[r'deviceProficiency'] is Iterable
             ? (json[r'deviceProficiency'] as Iterable).cast<String>().toList(growable: false)
             : const [],
-        licenseUrl: mapValueOfType<String>(json, r'licenseUrl'),
       );
     }
     return null;

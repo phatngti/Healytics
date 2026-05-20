@@ -56,7 +56,12 @@ void main() {
       // TODO
     });
 
-    // Object description
+    // bool isWishlisted
+    test('to test the property `isWishlisted`', () async {
+      // TODO
+    });
+
+    // String description
     test('to test the property `description`', () async {
       // TODO
     });

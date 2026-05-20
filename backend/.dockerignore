@@ -1,0 +1,36 @@
+# Dependencies & build output (rebuilt in Docker)
+node_modules
+dist
+
+# Environment & secrets
+.env*
+
+# Version control
+.git
+.gitignore
+
+# IDE & tooling config
+.vscode
+.agent
+.prettierrc
+eslint.config.mjs
+
+# Documentation & non-runtime assets
+docs
+todos
+openapi
+*.md
+!README.md
+
+# Test infrastructure & coverage (not needed in Docker)
+test
+jest-html-reporters-attach
+coverage
+
+# Scripts (not needed for runtime build)
+scripts
+performace
+
+# Misc caches
+.yarn
+.cache

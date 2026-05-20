@@ -49,20 +49,19 @@ export class RegisterPartnerHandler {
   ) {}
 
   async execute(dto: RegisterPartnerDto): Promise<RegisterPartnerResponseDto> {
-    this.logger.log(`Registering partner with email: ${dto.account.email}`);
+    const email = dto.account.email.trim().toLowerCase();
+    this.logger.log(`Registering partner with email: ${email}`);
 
     // 1. Pre-transaction invariant checks (read-only, no lock needed)
     const accountRepo = this.dataSource.getRepository(Account);
     const partnerRepo = this.dataSource.getRepository(Partner);
 
     const existingAccount = await accountRepo.findOne({
-      where: [{ email: dto.account.email }],
+      where: { email },
     });
 
     if (existingAccount) {
-      throw new ConflictException(
-        'An account with this email already exists',
-      );
+      throw new ConflictException('An account with this email already exists');
     }
 
     const existingPartner = await partnerRepo.findOne({
@@ -82,9 +81,7 @@ export class RegisterPartnerHandler {
         dto.partner.wardId,
       );
     } catch (error) {
-      throw new BadRequestException(
-        `Invalid address: ${error.message}`,
-      );
+      throw new BadRequestException(`Invalid address: ${error.message}`);
     }
 
     // 2. Geocode facility address (non-blocking — failure does NOT stop registration)
@@ -107,9 +104,7 @@ export class RegisterPartnerHandler {
         this.logger.warn(`Geocoding returned no results for: ${fullAddress}`);
       }
     } catch (error) {
-      this.logger.warn(
-        `Geocoding failed (non-blocking): ${error.message}`,
-      );
+      this.logger.warn(`Geocoding failed (non-blocking): ${error.message}`);
       // Continue registration without geo — coordinates will be null
     }
 
@@ -122,7 +117,7 @@ export class RegisterPartnerHandler {
       // Create Account
       const passwordHash = await bcrypt.hash(dto.account.password, 10);
       const account = queryRunner.manager.create(Account, {
-        email: dto.account.email,
+        email,
         passwordHash,
         role: Role.HEALTH_PARTNER,
         isActive: true,
@@ -134,7 +129,7 @@ export class RegisterPartnerHandler {
         taxCode: dto.partner.taxCode,
         legalName: dto.partner.legalName,
         brandName: dto.partner.brandName,
-        businessType: dto.partner.businessType as BusinessType[],
+        businessType: dto.partner.businessType,
         provinceId: dto.partner.provinceId,
         districtId: dto.partner.districtId,
         wardId: dto.partner.wardId,

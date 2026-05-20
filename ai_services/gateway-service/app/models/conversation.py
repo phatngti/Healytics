@@ -4,21 +4,20 @@ app/models/conversation.py
 ORM model mirroring the `conversations` table created by the NestJS migration.
 This service does NOT manage the schema — read/write only.
 
-Table schema (from NestJS migration):
+Table schema (production PostgreSQL / NestJS):
     id           UUID  PRIMARY KEY  DEFAULT uuid_generate_v4()
-    user_id      VARCHAR  NULLABLE
+    user_id      VARCHAR  NULLABLE  (UUID-formatted account id)
     title        VARCHAR(255)
     created_at   TIMESTAMPTZ  DEFAULT now()
     updated_at   TIMESTAMPTZ  DEFAULT now()
 """
 
+from datetime import datetime, timezone
 import uuid
-from datetime import datetime
 
 from sqlalchemy import DateTime, String, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
-from datetime import datetime, timezone
 
 from app.core.database import Base
 
@@ -31,6 +30,7 @@ class Conversation(Base):
         primary_key=True,
         server_default=text("uuid_generate_v4()"),
     )
+    # Production stores account ids as varchar even though values are UUID-formatted.
     user_id: Mapped[str | None] = mapped_column(
         String,
         nullable=True,

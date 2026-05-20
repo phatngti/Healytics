@@ -51,7 +51,13 @@ class Settings(BaseSettings):
     GEMINI_TIMEOUT_MS: int = 1500
     GEMINI_MAX_RETRIES: int = 1
     GEMINI_RETRY_BACKOFF_MS: int = 400
-    GEMINI_COOLDOWN_SECONDS: int = 30
+    GEMINI_COOLDOWN_SECONDS: int = 5  # Paid tier can retry faster
+    
+    # NER confidence filtering (based on evaluation analysis)
+    # Threshold 0.80: Rejects all 27 FP, loses 11/108 TP → Precision 100%, Recall 89.9%
+    # Threshold 0.85: Same result as 0.80, more conservative margin
+    # Threshold 0.90: Same result, strictest (safest for production)
+    NER_MIN_CONFIDENCE: float = 0.8  # Reject entities below this threshold
 
 
 settings = Settings()

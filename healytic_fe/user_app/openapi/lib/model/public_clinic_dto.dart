@@ -13,31 +13,54 @@ part of openapi.api;
 class PublicClinicDto {
   /// Returns a new [PublicClinicDto] instance.
   PublicClinicDto({
+    required this.id,
     required this.name,
+    this.avatarUrl,
     required this.address,
   });
 
+
+  String id;
+
   String name;
+
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? avatarUrl;
 
   String address;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is PublicClinicDto &&
+    other.id == id &&
     other.name == name &&
+    other.avatarUrl == avatarUrl &&
     other.address == address;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
+    (id.hashCode) +
     (name.hashCode) +
+    (avatarUrl == null ? 0 : avatarUrl!.hashCode) +
     (address.hashCode);
 
   @override
-  String toString() => 'PublicClinicDto[name=$name, address=$address]';
+  String toString() => 'PublicClinicDto[id=$id, name=$name, avatarUrl=$avatarUrl, address=$address]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+      json[r'id'] = this.id;
       json[r'name'] = this.name;
+    if (this.avatarUrl != null) {
+      json[r'avatarUrl'] = this.avatarUrl;
+    } else {
+      json[r'avatarUrl'] = null;
+    }
       json[r'address'] = this.address;
     return json;
   }
@@ -61,7 +84,9 @@ class PublicClinicDto {
       }());
 
       return PublicClinicDto(
+        id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
+        avatarUrl: mapValueOfType<String>(json, r'avatarUrl'),
         address: mapValueOfType<String>(json, r'address')!,
       );
     }
@@ -110,6 +135,7 @@ class PublicClinicDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'id',
     'name',
     'address',
   };

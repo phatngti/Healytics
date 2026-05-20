@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:common/widgets/images/avatar.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
+import 'package:user_app/core/providers/location.provider.dart';
+import 'package:user_app/features/cart/presentation/providers/cart.provider.dart';
+import 'package:user_app/router/routes.dart';
 
-class HomeHeader extends StatelessWidget {
+class HomeHeader extends ConsumerWidget {
   final String userName;
+  final String? avatarUrl;
 
-  const HomeHeader({super.key, required this.userName});
+  const HomeHeader({super.key, required this.userName, this.avatarUrl});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cartCount = ref.watch(cartBadgeCountProvider);
+    final locationAsync = ref.watch(currentLocationAddressProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -22,7 +31,6 @@ class HomeHeader extends StatelessWidget {
         top: hPadding,
         bottom: contentPad,
       ),
-      color: colorScheme.surface.withValues(alpha: 0.8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -30,8 +38,6 @@ class HomeHeader extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  height: AppDimens.avatarMd,
-                  width: AppDimens.avatarMd,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -39,16 +45,10 @@ class HomeHeader extends StatelessWidget {
                       width: AppDimens.borderWidthThick,
                     ),
                   ),
-                  child: ClipOval(
-                    child: Image.network(
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuAHFOX7h9F48tcGwMIcEIfkFIO_BCb-TwyhCGYTSYlivBYYPeitHy4W3oeX4l3dEEfJb_yZupssfa2sclSZPLyXfEG5q3pl2sx39c1coakQeOePB7aFA1dAPE3Ra0lpxaiQawpTpkWJktpcY7JCrjO_VPaGyAgzVQM37ZX_Y0pjSESxXa_IpilQ3wPqplOIkK3Rv_S_u-cz9aZh75qv45DoVVZ9RQ3Jl9ta2otLB3h_v3CdJg2ZGgoU5oVyRGojV_h0ciQfIgAJaK6I',
-                      fit: BoxFit.cover,
-                      semanticLabel: 'User avatar',
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        Icons.person,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
+                  child: AvatarImage(
+                    name: userName,
+                    imageUrl: avatarUrl,
+                    radius: AppDimens.avatarMd / 2,
                   ),
                 ),
                 SizedBox(width: AppDimens.spaceMd),
@@ -67,13 +67,14 @@ class HomeHeader extends StatelessWidget {
                       ),
                       Text(
                         userName,
-                        style: textTheme.titleLarge?.copyWith(
+                        style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           height: 1.0,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      _LocationAddress(locationAsync: locationAsync),
                     ],
                   ),
                 ),
@@ -82,16 +83,21 @@ class HomeHeader extends StatelessWidget {
           ),
           Row(
             children: [
-              _HeaderIconButton(
-                icon: Symbols.shopping_cart,
-                tooltip: 'Shopping cart',
-                onTap: () {},
-              ),
-              SizedBox(width: AppDimens.spaceMd),
-              _HeaderIconButton(
-                icon: Symbols.settings,
-                tooltip: 'Settings',
-                onTap: () {},
+              Badge(
+                isLabelVisible: cartCount > 0,
+                label: Text(
+                  '$cartCount',
+                  style: textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onError,
+                  ),
+                ),
+                backgroundColor: colorScheme.error,
+                child: _HeaderIconButton(
+                  key: keys.homePage.cartButton,
+                  icon: Symbols.shopping_cart,
+                  tooltip: 'Shopping cart',
+                  onTap: () => const CartRoute().push(context),
+                ),
               ),
             ],
           ),
@@ -107,6 +113,7 @@ class _HeaderIconButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const _HeaderIconButton({
+    super.key,
     required this.icon,
     required this.tooltip,
     required this.onTap,
@@ -132,17 +139,83 @@ class _HeaderIconButton extends StatelessWidget {
               BoxShadow(
                 color: colorScheme.shadow.withValues(alpha: 0.05),
                 blurRadius: AppDimens.spaceXxs,
-                offset: const Offset(0, 1),
+                offset: Offset(0, AppDimens.spaceXxs),
               ),
             ],
           ),
           child: Icon(
             icon,
-            size: AppDimens.iconLg,
+            size: AppDimens.iconMd,
             color: colorScheme.onSurface,
           ),
         ),
       ),
+    );
+  }
+}
+
+class _LocationAddress extends StatelessWidget {
+  final AsyncValue<String?> locationAsync;
+
+  const _LocationAddress({required this.locationAsync});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return locationAsync.when(
+      data: (address) {
+        if (address == null || address.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return Padding(
+          padding: EdgeInsets.only(top: AppDimens.spaceXxs),
+          child: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  address + ' ',
+                  style: textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Icon(
+                Icons.location_on_outlined,
+                size: AppDimens.iconSm,
+                color: colorScheme.primary,
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => Padding(
+        padding: EdgeInsets.only(top: AppDimens.spaceXxs),
+        child: Row(
+          children: [
+            Icon(
+              Icons.location_on_outlined,
+              size: AppDimens.iconSm,
+              color: colorScheme.outline,
+            ),
+            SizedBox(width: AppDimens.spaceXxs),
+            SizedBox(
+              width: 80,
+              height: 10,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: AppDimens.radiusMd,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

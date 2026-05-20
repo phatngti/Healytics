@@ -13,14 +13,18 @@ part of openapi.api;
 class PublicHealthServiceReviewResponseDto {
   /// Returns a new [PublicHealthServiceReviewResponseDto] instance.
   PublicHealthServiceReviewResponseDto({
+    required this.id,
     required this.reviewerName,
     this.avatarUrl,
     required this.rating,
-    required this.status,
-    required this.date,
-    required this.text,
-    this.imageUrls = const [],
+    this.comment,
+    this.tags = const [],
+    this.photoUrls = const [],
+    required this.createdAt,
   });
+
+
+  String id;
 
   String reviewerName;
 
@@ -34,40 +38,49 @@ class PublicHealthServiceReviewResponseDto {
 
   num rating;
 
-  String status;
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  Object? comment;
 
-  String date;
+  List<String> tags;
 
-  String text;
+  List<String> photoUrls;
 
-  List<String> imageUrls;
+  String createdAt;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is PublicHealthServiceReviewResponseDto &&
+    other.id == id &&
     other.reviewerName == reviewerName &&
     other.avatarUrl == avatarUrl &&
     other.rating == rating &&
-    other.status == status &&
-    other.date == date &&
-    other.text == text &&
-    _deepEquality.equals(other.imageUrls, imageUrls);
+    other.comment == comment &&
+    _deepEquality.equals(other.tags, tags) &&
+    _deepEquality.equals(other.photoUrls, photoUrls) &&
+    other.createdAt == createdAt;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
+    (id.hashCode) +
     (reviewerName.hashCode) +
     (avatarUrl == null ? 0 : avatarUrl!.hashCode) +
     (rating.hashCode) +
-    (status.hashCode) +
-    (date.hashCode) +
-    (text.hashCode) +
-    (imageUrls.hashCode);
+    (comment == null ? 0 : comment!.hashCode) +
+    (tags.hashCode) +
+    (photoUrls.hashCode) +
+    (createdAt.hashCode);
 
   @override
-  String toString() => 'PublicHealthServiceReviewResponseDto[reviewerName=$reviewerName, avatarUrl=$avatarUrl, rating=$rating, status=$status, date=$date, text=$text, imageUrls=$imageUrls]';
+  String toString() => 'PublicHealthServiceReviewResponseDto[id=$id, reviewerName=$reviewerName, avatarUrl=$avatarUrl, rating=$rating, comment=$comment, tags=$tags, photoUrls=$photoUrls, createdAt=$createdAt]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+      json[r'id'] = this.id;
       json[r'reviewerName'] = this.reviewerName;
     if (this.avatarUrl != null) {
       json[r'avatarUrl'] = this.avatarUrl;
@@ -75,10 +88,14 @@ class PublicHealthServiceReviewResponseDto {
       json[r'avatarUrl'] = null;
     }
       json[r'rating'] = this.rating;
-      json[r'status'] = this.status;
-      json[r'date'] = this.date;
-      json[r'text'] = this.text;
-      json[r'imageUrls'] = this.imageUrls;
+    if (this.comment != null) {
+      json[r'comment'] = this.comment;
+    } else {
+      json[r'comment'] = null;
+    }
+      json[r'tags'] = this.tags;
+      json[r'photoUrls'] = this.photoUrls;
+      json[r'createdAt'] = this.createdAt;
     return json;
   }
 
@@ -101,15 +118,18 @@ class PublicHealthServiceReviewResponseDto {
       }());
 
       return PublicHealthServiceReviewResponseDto(
+        id: mapValueOfType<String>(json, r'id')!,
         reviewerName: mapValueOfType<String>(json, r'reviewerName')!,
         avatarUrl: mapValueOfType<Object>(json, r'avatarUrl'),
         rating: num.parse('${json[r'rating']}'),
-        status: mapValueOfType<String>(json, r'status')!,
-        date: mapValueOfType<String>(json, r'date')!,
-        text: mapValueOfType<String>(json, r'text')!,
-        imageUrls: json[r'imageUrls'] is Iterable
-            ? (json[r'imageUrls'] as Iterable).cast<String>().toList(growable: false)
+        comment: mapValueOfType<Object>(json, r'comment'),
+        tags: json[r'tags'] is Iterable
+            ? (json[r'tags'] as Iterable).cast<String>().toList(growable: false)
             : const [],
+        photoUrls: json[r'photoUrls'] is Iterable
+            ? (json[r'photoUrls'] as Iterable).cast<String>().toList(growable: false)
+            : const [],
+        createdAt: mapValueOfType<String>(json, r'createdAt')!,
       );
     }
     return null;
@@ -157,12 +177,12 @@ class PublicHealthServiceReviewResponseDto {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'id',
     'reviewerName',
     'rating',
-    'status',
-    'date',
-    'text',
-    'imageUrls',
+    'tags',
+    'photoUrls',
+    'createdAt',
   };
 }
 

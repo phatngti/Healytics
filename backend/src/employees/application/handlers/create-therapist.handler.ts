@@ -2,12 +2,17 @@ import {
   Injectable,
   Logger,
   InternalServerErrorException,
+  Optional,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { CreateSpaTherapistDto, CreateMassageTherapistDto } from '../../dto/create-therapist.dto';
+import {
+  CreateSpaTherapistDto,
+  CreateMassageTherapistDto,
+} from '../../dto/create-therapist.dto';
 import { Employee } from '@/common/entities/employee.entity';
 import { TherapistProfile } from '@/common/entities/therapist-profile.entity';
 import { EmployeeRole } from '../../enum/employee-role.enum';
+import { SearchIndexOutboxService } from '@/search/services/search-index-outbox.service';
 
 type CreateTherapistCommand = CreateSpaTherapistDto | CreateMassageTherapistDto;
 
@@ -20,7 +25,11 @@ type CreateTherapistCommand = CreateSpaTherapistDto | CreateMassageTherapistDto;
 export class CreateTherapistHandler {
   private readonly logger = new Logger(CreateTherapistHandler.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @Optional()
+    private readonly searchIndexOutboxService?: SearchIndexOutboxService,
+  ) {}
 
   /**
    * Executes the create therapist command within a transaction.
@@ -54,11 +63,10 @@ export class CreateTherapistHandler {
         employmentType: command.employmentType,
         startDate: command.startDate ? new Date(command.startDate) : undefined,
         schedule: command.schedule,
+        workHistory: command.workHistory,
         avatarUrl: command.avatar,
-        idCardUrl: command.idCardUrl,
+        verificationDocuments: command.verificationDocuments,
         status: command.status,
-        branchId: command.branch || undefined,
-        password: command.password,
         description: command.description,
         jobTitle: command.jobTitle,
         partnerId: command.partnerId,
@@ -76,17 +84,16 @@ export class CreateTherapistHandler {
           ? new Date(command.healthCheckDate)
           : undefined,
         skills: command.skills,
-        licenseUrl: command.licenseUrl,
       };
 
       // SPA-specific: deviceProficiency
       if (therapistType === 'SPA' && 'deviceProficiency' in command) {
-        profileData.deviceProficiency = (command as CreateSpaTherapistDto).deviceProficiency;
+        profileData.deviceProficiency = command.deviceProficiency;
       }
 
       // MASSAGE-specific: strengthLevel
       if (therapistType === 'MASSAGE' && 'strengthLevel' in command) {
-        profileData.strengthLevel = (command as CreateMassageTherapistDto).strengthLevel;
+        profileData.strengthLevel = command.strengthLevel;
       }
 
       const therapistProfile = queryRunner.manager.create(
@@ -94,6 +101,11 @@ export class CreateTherapistHandler {
         profileData,
       );
       await queryRunner.manager.save(TherapistProfile, therapistProfile);
+
+      await this.searchIndexOutboxService?.enqueueEmployee(
+        queryRunner.manager,
+        savedEmployee.id,
+      );
 
       // 3. Commit transaction
       await queryRunner.commitTransaction();

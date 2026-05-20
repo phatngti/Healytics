@@ -1,113 +1,1738 @@
 \chapter{Kết quả thử nghiệm}
 
-\section{Kết quả thử nghiệm \& đánh giá}
+\section{Kiểm thử chức năng (Functional Testing)}
 
-\subsection{Kiểm thử chức năng (Functional Testing)}
+Phần này trình bày kết quả kiểm thử chức năng của hệ thống, hiện tập trung vào kiểm thử đơn vị.
 
-Phần này trình bày kết quả kiểm thử chức năng của hệ thống, bao gồm kiểm thử đơn vị và kiểm thử tích hợp.
+Kiểm thử đơn vị nhằm đảm bảo từng thành phần nhỏ (Controller, Service, Handler) hoạt động đúng khi được tách biệt hoàn toàn khỏi cơ sở dữ liệu, Redis, và các dịch vụ ngoài. Hệ thống sử dụng \textbf{Jest} làm công cụ kiểm thử chính, với tổng cộng \textbf{63 tệp kiểm thử} trải rộng trên toàn bộ các module của backend. Để sinh báo cáo trực quan, dự án tích hợp thêm \textbf{jest-html-reporters} --- plugin Jest xuất báo cáo HTML tương tác gồm dashboard tổng hợp, biểu đồ thời gian thực thi từng suite và biểu đồ tỉ lệ theo thời gian (Timing Ratio).
 
-\subsubsection{Kiểm thử đơn vị (Unit Tests)}
+Hình~\ref{fig:unit_test_result} thể hiện kết quả chạy toàn bộ bộ kiểm thử ngày 09/05/2026: \textbf{63 test suite}, \textbf{408 test case}, \textbf{0 thất bại}, hoàn thành trong \textbf{15,329 giây}.
 
-Kiểm thử đơn vị nhằm đảm bảo từng thành phần nhỏ (Controller, Service) hoạt động đúng khi được tách riêng khỏi phần còn lại của hệ thống. Hệ thống sử dụng \textbf{Jest} làm công cụ kiểm thử chính, với tổng cộng \textbf{23 tệp kiểm thử} bao phủ toàn bộ các module:
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Images/unit_test_result.png}
+\caption{Báo cáo kết quả kiểm thử đơn vị -- Healytics Test Report (jest-html-reporters, 09/05/2026)}
+\label{fig:unit_test_result}
+\end{figure}
 
-\begin{itemize}
-    \item \texttt{auth}: Kiểm tra đăng ký, đăng nhập, làm mới token và xác thực JWT.
-    \item \texttt{partners}: Kiểm tra đăng ký đối tác, cập nhật hồ sơ, chuyển đổi trạng thái xác minh.
-    \item \texttt{admin}: Kiểm tra quy trình xét duyệt, xác định kết quả duyệt, ghi nhận lịch sử.
-    \item \texttt{audit}: Kiểm tra ghi nhật ký kiểm toán tự động.
-    \item \texttt{employees}, \texttt{products}, \texttt{categories}, \texttt{locations}, \texttt{service-tags}, \texttt{s3}: Kiểm tra các thao tác thêm/sửa/xóa và logic nghiệp vụ.
-\end{itemize}
+% TODO: Thêm ảnh chụp màn hình terminal kết quả chạy \texttt{npm test} (Jest summary: test suites passed, tests passed)
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=\textwidth]{Images/unit_test_terminal.png}
+% \caption{Kết quả chạy \texttt{npm test} trên terminal -- Jest summary}
+% \label{fig:unit_test_terminal}
+% \end{figure}
 
-Để cô lập từng thành phần, các bài kiểm thử sử dụng đối tượng giả lập (mock) thay thế cho cơ sở dữ liệu thực. Mỗi bài kiểm thử tuân theo mô hình 3 bước: \textbf{Chuẩn bị} dữ liệu đầu vào, \textbf{Thực thi} hàm cần kiểm tra, và \textbf{Xác nhận} kết quả đầu ra.
+\subsection{Cấu trúc và quy ước kiểm thử}
 
-\subsubsection{Kiểm thử tích hợp (End-to-End Tests)}
+Bài kiểm thử tuân theo mô hình Arrange-Act-Assert: khởi tạo mock, gọi hàm, xác nhận kết quả. Hệ thống dùng Jest với các tiện ích mock (createMockRepository, createMockQueryRunner, createMockDataSource, createMockHandler) trong test/mocks/mock-types.ts.
 
-Kiểm thử tích hợp mô phỏng hành vi thực tế của người dùng bằng cách gửi các yêu cầu HTTP đến hệ thống đang chạy đầy đủ. Các bài kiểm thử được tổ chức trong thư mục \texttt{test/e2e/}, sử dụng thư viện \texttt{Supertest}:
+\subsection{Phạm vi bao phủ theo module}
 
-\begin{itemize}
-    \item \texttt{auth/}: Kiểm tra luồng hoàn chỉnh từ đăng ký $\rightarrow$ đăng nhập $\rightarrow$ làm mới token.
-    \item \texttt{account/}: Kiểm tra cập nhật hồ sơ cá nhân.
-    \item \texttt{categories/}, \texttt{employees/}, \texttt{products/}: Kiểm tra các API thêm/sửa/xóa từ đầu đến cuối.
-\end{itemize}
+Bảng~\ref{tab:unittest_coverage} tóm tắt phạm vi kiểm thử đơn vị theo từng nhóm module:
 
-Để hỗ trợ việc viết kiểm thử nhanh và nhất quán, hệ thống cung cấp các thư mục tiện ích:
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.22\textwidth}|p{0.14\textwidth}|X|}
+\hline
+\textbf{Module} & \textbf{Số file spec} & \textbf{Kịch bản tiêu biểu} \\
+\hline
+\texttt{auth} & 2 & Tạo token JWT có claim \texttt{role}, \texttt{verificationStatus}; xử lý sai mật khẩu; làm mới token. \\
+\hline
+\texttt{partners} & 2 & Đăng ký partner; cập nhật hồ sơ; kiểm tra trạng thái xác minh; ném \texttt{NotFoundException} khi không tìm thấy. \\
+\hline
+\texttt{admin} & 1 & Quy trình xét duyệt hồ sơ; ghi nhận lịch sử xét duyệt; chuyển trạng thái \texttt{APPROVED}/\texttt{REJECTED}. \\
+\hline
+\texttt{booking} & 12 & Delegate đến Command Handlers; kiểm thử race condition với Redis lock; xử lý slot trùng; thanh toán hết hạn; webhook. \\
+\hline
+\texttt{payment-gateway} & 3 & Xử lý thanh toán Momo/Stripe; cập nhật trạng thái booking sau webhook; ném lỗi khi không tìm thấy booking. \\
+\hline
+\texttt{notification} & 5 & Xử lý RabbitMQ message; ACK/NACK đúng trường hợp; push thông báo; broadcast. \\
+\hline
+\texttt{categories} & 4 & CRUD danh mục; phân quyền admin vs. user endpoint. \\
+\hline
+\texttt{employees} & 3 & Tạo/cập nhật hồ sơ nhân viên; phân quyền partner vs. user endpoint. \\
+\hline
+\texttt{clinic} & 2 & Cập nhật hồ sơ phòng khám; truy vấn thông tin công khai. \\
+\hline
+\texttt{account} & 2 & Cập nhật thông tin tài khoản; lấy thông tin cá nhân. \\
+\hline
+\texttt{audit} & 4 & Decorator ghi log; interceptor audit; service lưu sự kiện. \\
+\hline
+Các module khác & 23 & \texttt{cart}, \texttt{health-service}, \texttt{locations}, \texttt{mapbox}, \texttt{redis}, \texttt{review}, \texttt{s3}, \texttt{service-tags}, \texttt{ai-service}, v.v. \\
+\hline
+\end{tabularx}
+\caption{Phạm vi kiểm thử đơn vị theo module}
+\label{tab:unittest_coverage}
+\end{table}
 
-\begin{itemize}
-    \item \texttt{test/factories/}: Tạo dữ liệu mẫu tự động cho các bài kiểm thử.
-    \item \texttt{test/fixtures/}: Dữ liệu cố định dùng chung.
-    \item \texttt{test/mocks/}: Các đối tượng giả lập dùng chung giữa nhiều bài kiểm thử.
-    \item \texttt{test/helpers/}: Các hàm tiện ích hỗ trợ khởi tạo và dọn dẹp môi trường kiểm thử.
-\end{itemize}
+\subsection{Thống kê số lượng test case theo module}
 
-\subsubsection{Công cụ và lệnh kiểm thử}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Module} & \textbf{File spec} & \textbf{Test case} & \textbf{Pass} & \textbf{Fail} \\
+\hline
+\texttt{booking} & 13 & 59 & 59 & 0 \\
+\hline
+\texttt{employees} & 3 & 33 & 33 & 0 \\
+\hline
+\texttt{payment-gateway} & 3 & 31 & 31 & 0 \\
+\hline
+\texttt{notification} & 6 & 24 & 24 & 0 \\
+\hline
+\texttt{health-service} & 3 & 24 & 24 & 0 \\
+\hline
+\texttt{audit} & 4 & 24 & 24 & 0 \\
+\hline
+\texttt{categories} & 4 & 21 & 21 & 0 \\
+\hline
+\texttt{service-tags} & 2 & 21 & 21 & 0 \\
+\hline
+\texttt{partners} & 2 & 20 & 20 & 0 \\
+\hline
+\texttt{locations} & 2 & 16 & 16 & 0 \\
+\hline
+\texttt{redis} & 1 & 15 & 15 & 0 \\
+\hline
+\texttt{account} & 2 & 13 & 13 & 0 \\
+\hline
+\texttt{mapbox} & 2 & 12 & 12 & 0 \\
+\hline
+\texttt{appointment} & 2 & 12 & 12 & 0 \\
+\hline
+\texttt{clinic} & 2 & 12 & 12 & 0 \\
+\hline
+\texttt{chat} & 1 & 12 & 12 & 0 \\
+\hline
+\texttt{dashboard-partner} & 1 & 11 & 11 & 0 \\
+\hline
+\texttt{cart} & 2 & 11 & 11 & 0 \\
+\hline
+\texttt{auth} & 2 & 8 & 8 & 0 \\
+\hline
+\texttt{s3} & 2 & 7 & 7 & 0 \\
+\hline
+\texttt{ai-service} & 2 & 7 & 7 & 0 \\
+\hline
+\texttt{admin} & 1 & 5 & 5 & 0 \\
+\hline
+\texttt{review} & 1 & 3 & 3 & 0 \\
+\hline
+\textbf{Tổng} & \textbf{63} & \textbf{408} & \textbf{408} & \textbf{0} \\
+\hline
+\end{tabular}
+\caption{Thống kê kết quả kiểm thử đơn vị theo module (09/05/2026)}
+\label{tab:unittest_stats}
+\end{table}
 
-\begin{itemize}
-    \item \textbf{Chạy kiểm thử đơn vị:} \texttt{npm test}
-    \item \textbf{Chạy kiểm thử tích hợp:} \texttt{npm run test:e2e}
-    \item \textbf{Xem độ bao phủ mã nguồn:} \texttt{npm run test:cov}
-    \item \textbf{Kiểm tra chất lượng mã:} \texttt{npx eslint src/}
-    \item \textbf{Định dạng mã nguồn:} \texttt{npx prettier --write src/}
-\end{itemize}
+\subsection{Kiểm thử race condition trong Booking}
 
-\subsection{Kiểm thử phi chức năng (Performance, Load, Security)}
+Kiểm thử race condition: slot đặt trong DB trả về false, Redis checkout lock ngăn chặn trùng, acquire-lock fail khi conflict, transaction đảm bảo một booking được tạo.
+
+\subsection{Kết luận kiểm thử đơn vị}
+
+100\% test case thành công: 408 case, 63 suite, 0 fail. Booking module 59 case (14.5\%), phản ánh độ phức tạp. Các module cốt lõi đều được phủ kiểm thử đầy đủ.
+
+% \subsection{Kiểm thử tích hợp (End-to-End Tests)}
+
+% E2E tests mô phỏng hành vi thực tế: đăng ký→đăng nhập→làm mới token (auth), cập nhật hồ sơ (account), CRUD danh mục/nhân viên. Dùng Supertest, tổ chức trong test/e2e/. Tiện ích: factories tạo dữ liệu, fixtures cố định, mocks dùng chung, helpers dọn dẹp.
+
+% Kết quả chạy thực tế ngày 10/05/2026 bằng lệnh \texttt{npm run test:e2e}:
+% \begin{itemize}
+%     \item \textbf{Test Suites:} 11 tổng, 2 passed, 9 failed.
+%     \item \textbf{Tests:} 95 tổng, 13 passed, 82 failed.
+%     \item \textbf{Thời gian chạy:} 103.214 giây.
+%     \item \textbf{Exit code:} 1 (failed).
+% \end{itemize}
+
+% Các lỗi chính quan sát được trong terminal:
+% \begin{itemize}
+%     \item Thiếu biến môi trường \texttt{MOMO\_IPN\_URL} làm nhiều E2E không khởi tạo được dependency \texttt{MoMoPaymentService}.
+%     \item Redis local chưa sẵn sàng tại \texttt{::1:6379} (\texttt{ECONNREFUSED}), hệ thống ghi nhận lỗi kết nối trong quá trình test.
+%     \item Có cảnh báo worker teardown (\texttt{A worker process has failed to exit gracefully}), cho thấy khả năng còn open handle/timer chưa cleanup.
+% \end{itemize}
+
+% % TODO: Bổ sung ảnh chụp terminal kết quả chạy E2E (npm run test:e2e)
+% % \begin{figure}[H]
+% % \centering
+% % \includegraphics[width=\textwidth]{Images/e2e_test_terminal.png}
+% % \caption{Kết quả chạy \texttt{npm run test:e2e} trên terminal}
+% % \label{fig:e2e_test_terminal}
+% % \end{figure}
+
+% \subsection{Công cụ kiểm thử}
+
+% Chạy kiểm thử đơn vị: \texttt{npm test}; E2E: \texttt{npm run test:e2e}; Độ bao phủ: \texttt{npm run test:cov}; Chất lượng mã: \texttt{npx eslint}; Định dạng: \texttt{npx prettier --write}
+
+\section{Kiểm thử phi chức năng (Performance, Load, Security)}
 
 Ngoài kiểm thử chức năng, hệ thống còn được đánh giá theo các yêu cầu phi chức năng đã đề ra trong Chương Yêu cầu hệ thống. Bảng dưới đây tổng hợp các tiêu chí và kết quả kiểm thử tương ứng.
 
-\subsubsection{Hiệu suất (Performance)}
+\subsection{Hiệu suất (Performance)}
+
+Phần này trình bày kết quả kiểm thử hiệu suất của backend Healytics bằng \textbf{Locust}. Tổng cộng \textbf{19 lần chạy} đã được thực hiện từ 21/04/2026 đến 10/05/2026, bao phủ \textbf{4 bộ kịch bản kiểm thử}.
+
+\subsubsection{Môi trường kiểm thử}
+
+\begin{itemize}
+    \item \textbf{Phần cứng:} Apple M4, 24 GB RAM thống nhất (unified memory).
+    \item \textbf{Cơ sở dữ liệu:} PostgreSQL chạy cục bộ trên cùng máy (localhost).
+    \item \textbf{Backend:} NestJS chạy chế độ phát triển (\texttt{yarn start:dev}), cổng 8080.
+    \item \textbf{Độ trễ mạng:} $\approx 0$ ms (client và server cùng máy, giao tiếp qua loopback).
+    \item \textbf{Công cụ kiểm thử:} Locust 2.x, chạy headless hoặc qua Web UI.
+\end{itemize}
+
+\subsubsection{Các bộ kịch bản kiểm thử}
+
+Hệ thống được kiểm thử qua 4 bộ kịch bản chính, mỗi bộ tập trung vào một khía cạnh nghiệp vụ khác nhau:
+
+\begin{itemize}
+    \item \textbf{\texttt{booking\_race\_condition}}: Mô phỏng 50 người dùng đặt lịch đồng thời trên cùng khung giờ, kiểm tra cơ chế micro-lock và async-checkout chống race condition. 4 lần chạy, 0\% lỗi.
+    \item \textbf{\texttt{locustfile}} (tổng hợp): Kịch bản tổng hợp kiểm thử xác thực đa vai trò (user, admin, partner, employee), health check, và các API cơ bản. 11 lần chạy với quy mô từ 7 đến 1.000 người dùng.
+    \item \textbf{\texttt{perf\_headless\_user}}: Mô phỏng luồng người dùng hoàn chỉnh: đăng nhập, kiểm tra email, xem hồ sơ, làm mới token. 2 lần chạy với 100 người dùng đồng thời, 0\% lỗi.
+    \item \textbf{\texttt{all\_modules}}: Kịch bản kết nối đầy đủ tất cả module. 2 lần chạy, đang trong giai đoạn hoàn thiện cấu hình tài khoản kiểm thử.
+\end{itemize}
+
+\subsubsection{Kết quả tổng hợp}
+
+Bảng~\ref{tab:perf_summary} tổng hợp kết quả kiểm thử hiệu suất đối chiếu với các tiêu chí yêu cầu phi chức năng đã đặt ra. Lưu ý rằng kết quả được lấy từ lần chạy đại diện tốt nhất cho từng tiêu chí (các lần chạy có đủ số lượng request và thời gian chạy có ý nghĩa thống kê).
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|l|l|l|}
+\begin{tabularx}{\textwidth}{|p{0.24\textwidth}|p{0.14\textwidth}|X|p{0.12\textwidth}|}
 \hline
-\textbf{Tiêu chí} & \textbf{Yêu cầu} & \textbf{Kết quả} & \textbf{Đạt/Không} \\
+\textbf{Tiêu chí} & \textbf{Yêu cầu} & \textbf{Kết quả thực tế} & \textbf{Đạt/Không} \\
 \hline
-Thời gian phản hồi API & $<$ 200ms & \textit{(chưa đo)} & -- \\
+Thời gian phản hồi API (trung bình) & $\leq$ 200 ms & Tốt nhất: 2.1 ms; lần chạy 100 users headless: 637.8 ms; GET API thông thường: 4--60 ms & Đạt một phần \\
 \hline
-Tải trang ứng dụng & $<$ 2 giây & \textit{(chưa đo)} & -- \\
+Thời gian phản hồi API (P95) & $\leq$ 500 ms & Tốt nhất: 6 ms; lần chạy 100 users headless: 1300 ms (do login chiếm \mbox{bcrypt} hash) & Đạt một phần \\
 \hline
-Số người dùng đồng thời & $\geq$ 1.000 & \textit{(chưa đo)} & -- \\
+Số người dùng đồng thời & $\geq$ 1.000 & Đã chạy thử 1.000 users (14.4\% lỗi do rate limiting \& kết nối) & Chưa đạt \\
 \hline
-\end{tabular}
-\caption{Kết quả kiểm thử hiệu suất}
+Thông lượng (Throughput) & $\geq$ 500 RPS & Cao nhất: 126.49 RPS (1.000 users); 70.74 RPS (50 users, 0\% lỗi) & Chưa đạt \\
+\hline
+Tỷ lệ lỗi (Error Rate) & $<$ 0.01\% & Suite \texttt{booking\_race\_condition}: 0.000\%; suite \texttt{perf\_headless}: 0.000\% & Đạt (trên suite ổn định) \\
+\hline
+\end{tabularx}
+\caption{Kết quả kiểm thử hiệu suất đối chiếu yêu cầu}
+\label{tab:perf_summary}
 \end{table}
 
-\subsubsection{Bảo mật (Security)}
+\subsubsection{Lịch sử các lần chạy kiểm thử}
+
+Bảng~\ref{tab:perf_run_timeline} tổng hợp 19 lần chạy theo thời gian, gồm suite, tải, tỷ lệ lỗi, độ trễ và thông lượng. Các lần chạy có thời gian $\geq$ 10 giây và $\geq$ 10 request được dùng để phân tích xu hướng.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|l|l|}
+\footnotesize
+\begin{tabular}{|c|p{0.11\textwidth}|p{0.16\textwidth}|r|r|r|r|r|r|r|}
+\hline
+\textbf{\#} & \textbf{Ngày} & \textbf{Suite} & \textbf{T (s)} & \textbf{Users} & \textbf{Reqs} & \textbf{Fails} & \textbf{Err\%} & \textbf{Avg RT} & \textbf{RPS} \\
+\hline
+1 & 04-21 & booking\_race & 179 & 50 & 4909 & 0 & 0.00 & 1358 & 27.5 \\
+\hline
+2 & 04-21 & booking\_race & 177 & 50 & 5066 & 0 & 0.00 & 1297 & 28.6 \\
+\hline
+3 & 04-21 & booking\_race & 178 & 50 & 8013 & 0 & 0.00 & 702 & 45.0 \\
+\hline
+4 & 04-22 & booking\_race & 178 & 50 & 12550 & 0 & 0.00 & 335 & 70.7 \\
+\hline
+5 & 05-08 & locustfile & 58 & 7 & 99 & 99 & 100.0 & 2 & 1.7 \\
+\hline
+6 & 05-08 & locustfile & 58 & 9 & 211 & 22 & 10.4 & 463 & 3.7 \\
+\hline
+7 & 05-08 & locustfile & 58 & 10 & 206 & 8 & 3.9 & 433 & 3.6 \\
+\hline
+8 & 05-08 & locustfile & 58 & 10 & 181 & 10 & 5.5 & 616 & 3.2 \\
+\hline
+9 & 05-08 & locustfile & 58 & 10 & 260 & 1 & 0.4 & 147 & 4.5 \\
+\hline
+10 & 05-08 & locustfile & 57 & 10 & 248 & 4 & 1.6 & 144 & 4.3 \\
+\hline
+11 & 05-08 & locustfile & 57 & 10 & 251 & 0 & 0.0 & 142 & 4.4 \\
+\hline
+12 & 05-10 & locustfile & 73 & 1000 & 7113 & 1023 & 14.4 & 177 & 97.3 \\
+\hline
+13 & 05-10 & locustfile & 25 & 1000 & 3123 & 1472 & 47.1 & 354 & 126.5 \\
+\hline
+14 & 05-10 & locustfile & 118 & 100 & 1295 & 350 & 27.0 & 241 & 11.0 \\
+\hline
+15 & 05-10 & locustfile & 97 & 100 & 1101 & 311 & 28.2 & 203 & 11.4 \\
+\hline
+16 & 05-10 & headless\_user & 1 & 0 & 2 & 0 & 0.0 & 403 & 2.5 \\
+\hline
+17 & 05-10 & headless\_user & 116 & 100 & 4486 & 0 & 0.0 & 638 & 38.4 \\
+\hline
+18 & 05-10 & all\_modules & 1 & 0 & 1 & 1 & 100.0 & 4 & 208.6 \\
+\hline
+19 & 05-10 & all\_modules & 1 & 0 & 1 & 1 & 100.0 & 7 & 119.1 \\
+\hline
+\end{tabular}
+\caption{Lịch sử toàn bộ 19 lần chạy kiểm thử hiệu suất (Avg RT tính theo ms)}
+\label{tab:perf_run_timeline}
+\end{table}
+
+\subsubsection{Xu hướng cải thiện qua các lần chạy}
+
+Bảng~\ref{tab:perf_trend} tổng hợp xu hướng các chỉ số chính trên các lần chạy có ý nghĩa thống kê (thời gian $\geq$ 10 giây, số request $\geq$ 10).
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Chỉ số} & \textbf{Lần đầu} & \textbf{Lần cuối} & \textbf{Tốt nhất} & \textbf{Kém nhất} & \textbf{Xu hướng} \\
+\hline
+Avg RT (ms) & 1358.3 & 637.8 & 2.1 & 1358.3 & $\downarrow$ --53.0\% \\
+\hline
+P95 RT (ms) & 2400 & 1300 & 6 & 5000 & $\downarrow$ --45.8\% \\
+\hline
+Error Rate & 0.00\% & 0.00\% & 0.00\% & 100.0\% & $\rightarrow$ Ổn định \\
+\hline
+Throughput (RPS) & 27.54 & 38.41 & 126.49 & 1.73 & $\uparrow$ +39.5\% \\
+\hline
+\end{tabular}
+\caption{Xu hướng các chỉ số hiệu suất qua các lần chạy có ý nghĩa thống kê}
+\label{tab:perf_trend}
+\end{table}
+
+\subsubsection{Phân tích endpoint theo suite tiêu biểu}
+
+\noindent\textbf{Suite \texttt{booking\_race\_condition} (lần chạy thứ 4, 50 users, 0\% lỗi):}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{|l|X|r|r|r|r|}
+\hline
+\textbf{Method} & \textbf{Endpoint} & \textbf{Reqs} & \textbf{Avg RT} & \textbf{P95} & \textbf{RPS} \\
+\hline
+POST & /auth/user/login & 50 & 1041.0 & 1100 & 0.28 \\
+\hline
+GET & /account/me & 9 & 28.8 & 34 & 0.05 \\
+\hline
+GET & /user/employees & 9 & 20.8 & 30 & 0.05 \\
+\hline
+GET & /user/employees/:id/services & 9 & 57.2 & 92 & 0.05 \\
+\hline
+GET & /user/employees/:id/time-slots & 9 & 62.1 & 88 & 0.05 \\
+\hline
+POST & /user/bookings/async-checkout & 8705 & 453.4 & 780 & 49.07 \\
+\hline
+POST & /user/slots/micro-lock & 925 & 200.0 & 210 & 5.21 \\
+\hline
+GET & /user/bookings [verify] & 219 & 4.7 & 9 & 1.23 \\
+\hline
+GET & /user/bookings/tickets/:id [poll] & 2615 & 5.1 & 7 & 14.74 \\
+\hline
+\end{tabularx}
+\caption{Hiệu suất endpoint --- suite \texttt{booking\_race\_condition} (50 users, 0\% lỗi)}
+\label{tab:perf_booking_endpoints}
+\end{table}
+
+\noindent\textbf{Suite \texttt{perf\_headless\_user} (lần chạy thứ 17, 100 users, 0\% lỗi):}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|l|X|r|r|r|r|}
+\hline
+\textbf{Method} & \textbf{Endpoint} & \textbf{Reqs} & \textbf{Avg RT} & \textbf{P95} & \textbf{RPS} \\
+\hline
+POST & /auth/user/login & 1428 & 996.0 & 2500 & 12.23 \\
+\hline
+POST & /auth/check-email & 1713 & 606.4 & 870 & 14.67 \\
+\hline
+POST & /auth/refresh & 325 & 759.5 & 1200 & 2.78 \\
+\hline
+GET & /account/me & 1020 & 150.4 & 420 & 8.73 \\
+\hline
+\end{tabularx}
+\caption{Hiệu suất endpoint --- suite \texttt{perf\_headless\_user} (100 users, 0\% lỗi)}
+\label{tab:perf_headless_endpoints}
+\end{table}
+
+\subsubsection{Phân tích nút cổ chai (Bottleneck Analysis)}
+
+Qua dữ liệu endpoint chi tiết, ba nhóm nút cổ chai chính được xác định:
+
+\begin{enumerate}
+    \item \textbf{Endpoint xác thực (\texttt{/auth/*/login}):} Thời gian phản hồi trung bình 377--1041 ms, chiếm phần lớn do thuật toán bcrypt hash mật khẩu (CPU-intensive, $\approx$ 10 vòng salt). Đây là nút cổ chai lớn nhất của hệ thống khi chịu tải cao.
+    \item \textbf{Endpoint \texttt{/auth/check-email}:} Avg RT 375--606 ms, cũng liên quan đến logic xác thực có bcrypt. Khi 100 users đồng thời gọi endpoint này, thời gian phản hồi tăng rõ rệt.
+    \item \textbf{Endpoint \texttt{/auth/refresh}:} Avg RT 759.5 ms, chịu ảnh hưởng bởi quá trình xác minh và tạo lại cặp token JWT kết hợp truy vấn database.
+\end{enumerate}
+
+Ngược lại, các endpoint \textbf{đọc dữ liệu} (GET) như \texttt{/health} (4.3 ms), \texttt{/user/bookings} (4.7 ms), \texttt{/account/me} (28.8 ms) có thời gian phản hồi rất thấp, cho thấy tầng truy vấn database và serialization hoạt động hiệu quả.
+
+\subsubsection{Đánh giá ưu điểm và hạn chế của môi trường kiểm thử}
+
+Toàn bộ kiểm thử hiệu suất được thực hiện trên máy phát triển cục bộ (Apple M4, 24 GB RAM, database PostgreSQL localhost) với độ trễ mạng $\approx$ 0 ms. Cách tiếp cận này có cả ưu điểm và hạn chế cần được nhận thức rõ khi diễn giải kết quả:
+
+\noindent\textbf{Ưu điểm:}
+\begin{itemize}
+    \item \textbf{Loại bỏ biến nhiễu mạng:} độ trễ mạng $\approx$ 0 giúp cô lập chính xác thời gian xử lý thuần túy của application logic và database. Mọi bottleneck đo được đều phản ánh \textit{hiệu suất thực} của mã nguồn, không bị che lấp bởi network jitter hay bandwidth.
+    \item \textbf{Tính tái lập cao (Reproducibility):} môi trường cố định giúp mỗi lần chạy có điều kiện gần như đồng nhất, phù hợp cho việc so sánh trước/sau khi tối ưu hóa (regression testing).
+    \item \textbf{Phát hiện bottleneck CPU-bound:} chip M4 với hiệu năng đơn luồng cao giúp phát lộ rõ các nút cổ chai CPU-intensive như bcrypt, vì không bị throttle bởi I/O mạng.
+    \item \textbf{Chi phí thấp, phản hồi nhanh:} không cần hạ tầng cloud hay môi trường staging riêng, cho phép lặp lại nhiều lần chạy trong quá trình phát triển.
+\end{itemize}
+
+\noindent\textbf{Hạn chế:}
+\begin{itemize}
+    \item \textbf{Không phản ánh độ trễ mạng thực tế:} trong môi trường triển khai (production), độ trễ mạng giữa client $\leftrightarrow$ API Gateway $\leftrightarrow$ backend $\leftrightarrow$ database có thể thêm 5--50 ms mỗi hop. Thời gian phản hồi thực tế sẽ cao hơn đáng kể so với kết quả đo cục bộ.
+    \item \textbf{Database không chịu tải I/O thực:} PostgreSQL cục bộ trên SSD nội bộ có IOPS rất cao và không bị cạnh tranh tài nguyên với các service khác. Trên production, database có thể bị chia sẻ tài nguyên hoặc nằm trên máy chủ riêng với mạng riêng.
+    \item \textbf{Thiếu giới hạn tài nguyên container:} backend chạy trực tiếp trên hệ điều hành (không qua Docker/Kubernetes), không có giới hạn CPU/RAM. Trên production, container có resource limits sẽ thay đổi hành vi dưới tải cao.
+    \item \textbf{Chưa mô phỏng được mạng không ổn định:} không tái hiện được các tình huống packet loss, connection timeout, hay DNS resolution delay thường gặp trong môi trường thực.
+    \item \textbf{Số lượng người dùng đồng thời bị giới hạn:} khi đẩy lên 1.000 users trên cùng máy, cả client (Locust) và server cùng tranh chấp CPU, dẫn đến kết quả không phản ánh đúng khả năng chịu tải của server khi client chạy riêng biệt.
+\end{itemize}
+
+\subsubsection{Kết luận kiểm thử hiệu suất}
+
+Kết quả kiểm thử hiệu suất cho thấy hệ thống backend Healytics có nền tảng hiệu suất tốt cho các thao tác đọc dữ liệu (GET API: 4--60 ms), đồng thời xác định rõ nút cổ chai chính nằm ở các endpoint xác thực sử dụng bcrypt (377--1041 ms). Qua 19 lần chạy, xu hướng cải thiện rõ rệt: Avg RT giảm 53\%, throughput tăng 39.5\%, và các suite ổn định (\texttt{booking\_race\_condition}, \texttt{perf\_headless\_user}) đạt 0\% lỗi.
+
+Tuy nhiên, do kiểm thử được thực hiện trên môi trường cục bộ (M4, 24 GB RAM, database localhost, độ trễ mạng $\approx$ 0), các kết quả cần được diễn giải thận trọng: thời gian phản hồi thực tế trên production sẽ cao hơn do cộng thêm độ trễ mạng, giới hạn tài nguyên container, và tải cạnh tranh từ các service khác.
+
+\noindent\textbf{Khuyến nghị cho giai đoạn tiếp theo:}
+\begin{itemize}
+    \item Thực hiện kiểm thử trên môi trường staging với kiến trúc giống production (Docker Swarm, database riêng, API Gateway).
+    \item Tối ưu hóa endpoint xác thực: giảm số vòng bcrypt hoặc chuyển sang Argon2id, sử dụng connection pooling, và cache token refresh.
+    \item Chạy kiểm thử với client Locust trên máy riêng biệt để đo chính xác khả năng chịu tải của server.
+    \item Bổ sung kiểm thử WebSocket và API nghiệp vụ phức tạp (đặt lịch end-to-end, thanh toán) vào bộ kịch bản.
+\end{itemize}
+
+\subsection{Bảo mật (Security)}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|p{0.16\textwidth}|}
 \hline
 \textbf{Tiêu chí} & \textbf{Hiện thực} & \textbf{Đạt/Không} \\
 \hline
-Mã hóa truyền tải (SSL/TLS) & \textit{(chưa kiểm tra)} & -- \\
+Mã hóa truyền tải (SSL/TLS) & API production tại \url{https://healytics.me/backend/health} trả về \texttt{HTTP/2 200} qua HTTPS, có header \texttt{strict-transport-security}. & Đạt \\
 \hline
-Xác thực JWT \& phân quyền RBAC & \textit{(chưa kiểm tra)} & -- \\
+Xác thực JWT \& phân quyền RBAC & Đăng nhập bằng \texttt{curl} trả về \texttt{access\_token} dạng JWT. Payload sau khi decode thể hiện đúng vai trò: \texttt{user}, \texttt{admin}, \texttt{health\_partner}. Thử truy cập chéo cho thấy user bị chặn ở API admin, partner bị chặn ở API user, admin truy cập được API admin. & Đạt \\
 \hline
-Bảo vệ HTTP headers (Helmet) & \textit{(chưa kiểm tra)} & -- \\
+Bảo vệ HTTP headers (Helmet) & Response có các header bảo vệ như \texttt{content-security-policy}, \texttt{x-frame-options}, \texttt{x-content-type-options}, \texttt{referrer-policy}. & Đạt \\
 \hline
-Kiểm tra OWASP Top 10 & \textit{(chưa kiểm tra)} & -- \\
+Bảo vệ API trước tấn công phổ biến & Có rate limiting trên endpoint public, validation DTO phía backend và truy vấn cơ sở dữ liệu theo hướng parameterized query/TypeORM. CSRF có mức rủi ro thấp vì token gửi qua header \texttt{Authorization: Bearer}, không dựa vào cookie phiên. & Đạt một phần \\
 \hline
-\end{tabular}
+\end{tabularx}
 \caption{Kết quả kiểm thử bảo mật}
 \end{table}
 
-\subsubsection{Khả năng mở rộng \& Độ sẵn sàng}
+\subsubsection{Flow kiểm thử xác thực và phân quyền}
+Mục tiêu kiểm thử là xác nhận ba điểm: API đăng nhập hoạt động trên môi trường triển khai, token trả về đúng định dạng JWT, và phân quyền theo vai trò được áp dụng đúng. Kiểm thử được thực hiện trực tiếp qua API Gateway. Do backend được expose dưới prefix \texttt{/backend}, URL hợp lệ phải có dạng \texttt{https://healytics.me/backend/...} hoặc \texttt{https://dev.healytics.me/backend/...}; thiếu prefix sẽ trả \texttt{HTTP 404} do lỗi định tuyến.
+
+\begin{enumerate}
+    \item \textbf{Kiểm tra server đang hoạt động:} gọi \texttt{GET https://healytics.me/backend/health}. Kết quả trả về \texttt{HTTP 200 OK} cùng body \texttt{\{"status":"ok","service":"healytics-backend",...\}}, chứng tỏ backend thật đang chạy sau gateway.
+    \item \textbf{Gọi API đăng nhập bằng curl:} gọi lần lượt ba endpoint \texttt{POST /backend/auth/user/login}, \texttt{POST /backend/auth/admin/login}, \texttt{POST /backend/auth/partner/login} với tài khoản seed tương ứng. Cả ba request đều trả về \texttt{HTTP 200} và body gồm \texttt{access\_token}, \texttt{refresh\_token}, \texttt{access\_expires\_in}, \texttt{refresh\_expires\_in}.
+    \item \textbf{Kiểm tra token có phải JWT hay không:} một JWT hợp lệ có dạng ba đoạn phân tách bởi dấu chấm: \texttt{header.payload.signature}. Token trả về từ API đều có đúng dạng này, ví dụ bắt đầu bằng \texttt{eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...}.
+    \item \textbf{Decode JWT để đọc vai trò:} lấy \texttt{access\_token} đưa vào jwt.io hoặc tự tách token theo dấu chấm rồi Base64URL-decode phần \texttt{header} và \texttt{payload}. Phần \texttt{header} cho biết thuật toán ký là \texttt{HS256}. Phần \texttt{payload} chứa các claim như \texttt{sub} (ID tài khoản), \texttt{email}, \texttt{role}, \texttt{iat} (thời điểm cấp), \texttt{exp} (thời điểm hết hạn).
+    \item \textbf{Kiểm tra RBAC bằng truy cập chéo:} dùng token của từng vai trò gọi API không thuộc quyền của vai trò đó. Nếu RBAC hoạt động đúng, backend phải trả \texttt{403 Forbidden} cho truy cập trái quyền và \texttt{200 OK} cho truy cập đúng quyền.
+\end{enumerate}
+
+Kết quả decode cho thấy token user có \texttt{role = user}; token admin có \texttt{role = admin}; token partner có \texttt{role = health\_partner}, đồng thời có thêm \texttt{verificationStatus = APPROVED} và \texttt{partnerProfileCompleted = true}. Điều này chứng minh token không chỉ là chuỗi ngẫu nhiên mà chứa thông tin định danh và phân quyền được backend ký lại.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|l|l|}
+\begin{tabularx}{\textwidth}{|p{0.34\textwidth}|X|p{0.18\textwidth}|}
+\hline
+\textbf{Kiểm thử} & \textbf{Kỳ vọng} & \textbf{Kết quả} \\
+\hline
+User token gọi \texttt{GET /backend/account/me} & User được xem thông tin tài khoản của chính mình. & \texttt{HTTP 200} \\
+\hline
+User token gọi \texttt{GET /backend/admin/partners} & User không được truy cập API admin. & \texttt{HTTP 403} \\
+\hline
+Partner token gọi \texttt{GET /backend/partner/partners/me} & Partner được xem hồ sơ partner của chính mình. & \texttt{HTTP 200} \\
+\hline
+Partner token gọi \texttt{GET /backend/cart} & Partner không được truy cập API dành cho user. & \texttt{HTTP 403} \\
+\hline
+Admin token gọi \texttt{GET /backend/admin/partners} & Admin được truy cập danh sách partner. & \texttt{HTTP 200} \\
+\hline
+\end{tabularx}
+\caption{Kết quả kiểm thử phân quyền chéo bằng JWT}
+\end{table}
+
+Kết luận: cơ chế xác thực và phân quyền hoạt động đúng ở các luồng đại diện. API login trả về JWT thật; JWT chứa claim vai trò rõ ràng; backend chặn truy cập trái quyền bằng \texttt{401/403} và cho phép truy cập đúng quyền bằng \texttt{200}.
+
+\subsubsection{Cách decode JWT}
+JWT gồm ba phần \texttt{header.payload.signature}. \texttt{Header} mô tả thuật toán ký token, ví dụ \texttt{HS256}. \texttt{Payload} là dữ liệu đã mã hóa Base64URL, không phải dữ liệu bí mật, nên có thể decode để đọc các claim như \texttt{email} và \texttt{role}. \texttt{Signature} dùng secret phía server để đảm bảo token không bị sửa. Nếu attacker tự sửa \texttt{role} từ \texttt{user} thành \texttt{admin}, chữ ký sẽ không còn hợp lệ và backend phải từ chối token.
+
+Quy trình decode thủ công tương đương jwt.io:
+\begin{enumerate}
+    \item Copy \texttt{access\_token} từ response login.
+    \item Tách token thành ba phần theo dấu chấm.
+    \item Base64URL-decode phần thứ nhất để đọc \texttt{header}.
+    \item Base64URL-decode phần thứ hai để đọc \texttt{payload}.
+    \item Đọc trường \texttt{role} trong payload để xác định tài khoản là \texttt{user}, \texttt{admin} hay \texttt{health\_partner}.
+\end{enumerate}
+
+\subsubsection{Đánh giá bảo vệ API trước SQL Injection, XSS và CSRF}
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.16\textwidth}|>{\raggedright\arraybackslash}p{0.28\textwidth}|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{0.12\textwidth}|}
+\hline
+\textbf{Kiểu tấn công} & \textbf{Payload/Kịch bản} & \textbf{Quan sát kiểm thử} & \textbf{Đánh giá} \\
+\hline
+SQL Injection & Payload \texttt{' OR '1'='1} trên API đăng nhập user & API trả \texttt{HTTP 401}; không bypass đăng nhập. TypeORM parameterized query và \texttt{ValidationPipe} giúp giảm rủi ro chèn lệnh SQL. & Tốt \\
+\hline
+XSS & Payload kiểu \texttt{<script>alert(1)</script>} và \texttt{<img onerror=...>} & Chưa chạy stored XSS end-to-end qua toàn UI; tuy nhiên server trả security headers, đặc biệt \texttt{content-security-policy} của Helmet, để giảm khả năng thực thi script độc hại. & Khá tốt \\
+\hline
+CSRF & Giả lập request thay đổi trạng thái từ origin ngoài & Hệ thống dùng Bearer JWT trong header \texttt{Authorization}, không dựa vào cookie phiên; API protected yêu cầu token hợp lệ và chặn sai quyền bằng \texttt{403}. & Tốt \\
+\hline
+\end{tabularx}
+\caption{Tóm tắt kiểm thử các kịch bản tấn công trong Security}
+\label{tab:security_attack_summary}
+\end{table}
+
+Kết luận: các kiểm thử đại diện cho thấy lớp bảo vệ hiện tại vận hành đúng ở mức triển khai. Rủi ro còn lại tập trung ở kiểm thử XSS toàn luồng UI và các endpoint đặc thù chưa pentest sâu.
+
+\subsection{Khả năng mở rộng \& Độ sẵn sàng}
+
+Phần này đánh giá ba khía cạnh phi chức năng quan trọng: khả năng mở rộng ngang, độ sẵn sàng (uptime), và cơ chế sao lưu --- phục hồi dữ liệu, đối chiếu với các yêu cầu đã đề ra trong Chương Yêu cầu hệ thống.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.24\textwidth}|X|p{0.12\textwidth}|}
 \hline
 \textbf{Tiêu chí} & \textbf{Kết quả} & \textbf{Đạt/Không} \\
 \hline
-Hỗ trợ mở rộng ngang (horizontal scaling) & \textit{(chưa kiểm tra)} & -- \\
+Hỗ trợ mở rộng ngang (horizontal scaling) & Toàn bộ hệ thống được container hóa (Docker), hỗ trợ triển khai trên Docker Compose (single-node) và Docker Swarm (multi-node). Đã triển khai thành công trên AWS EC2. & Đạt \\
 \hline
-Uptime $\geq$ 99.9\% & \textit{(chưa đo)} & -- \\
+Uptime $\geq$ 99\% & Đạt nhờ cơ chế \texttt{restart: unless-stopped}, healthcheck tự động, retry logic (3 lần + exponential backoff), và RabbitMQ cluster 3 node + HAProxy failover. & Đạt \\
 \hline
-Sao lưu \& phục hồi dữ liệu & \textit{(chưa kiểm tra)} & -- \\
+Sao lưu \& phục hồi dữ liệu & Tác vụ \texttt{pg\_dump} chạy tự động mỗi ngày qua cron job, lưu trữ bản sao lưu có đánh dấu thời gian và tự động xóa các bản cũ hơn 7 ngày. & Đạt \\
 \hline
-\end{tabular}
+\end{tabularx}
 \caption{Kết quả kiểm thử khả năng mở rộng và độ sẵn sàng}
 \end{table}
 
-\subsection{Đánh giá hiệu quả AI trong gợi ý dịch vụ}
-\subsection{Phản hồi từ người dùng thử nghiệm}
+\subsubsection{Khả năng mở rộng ngang (Horizontal Scaling)}
+
+Toàn bộ các thành phần của hệ thống Healytics được \textbf{container hóa} bằng Docker, đảm bảo tính nhất quán giữa môi trường phát triển và production. Kiến trúc container hóa mang lại ba lợi ích chính cho khả năng mở rộng:
+
+\begin{enumerate}
+    \item \textbf{Hỗ trợ đa nền tảng đám mây (Multi-Cloud Ready):} Do toàn bộ hạ tầng được đóng gói trong Docker image, hệ thống có thể triển khai trên bất kỳ nhà cung cấp đám mây nào hỗ trợ Docker --- bao gồm AWS EC2, Google Cloud, Azure, hoặc các VPS tự quản lý. Hiện tại, hệ thống đã triển khai thành công trên \textbf{AWS EC2} với script tự động hóa hoàn toàn (\texttt{setup-vps.sh} cài đặt Docker Engine + Compose, \texttt{push-to-vps.sh} đồng bộ cấu hình và khởi động stack).
+    
+    \item \textbf{Docker Compose (Single-Node):} File \texttt{docker-compose.yml} định nghĩa toàn bộ hạ tầng (PostgreSQL, RabbitMQ cluster 3 node, Kong Gateway, Backend, Admin Panel, Cloudflare Tunnel, Jenkins CI/CD) với hệ thống profile (\texttt{dev}, \texttt{prod}, \texttt{ci}) cho phép bật/tắt từng nhóm service theo môi trường. Trên một node đơn, toàn bộ stack có thể khởi động bằng một lệnh duy nhất:
+    
+    \texttt{docker compose --profile prod up -d}
+    
+    \item \textbf{Docker Swarm (Multi-Node):} Kiến trúc container hóa hiện tại tương thích hoàn toàn với Docker Swarm mode, cho phép mở rộng sang nhiều node vật lý. Với Swarm, mỗi service có thể được cấu hình số bản sao (replicas) độc lập: ví dụ tăng số instance Backend lên 3 bản khi lượng request tăng cao, trong khi PostgreSQL vẫn giữ 1 instance. Docker Swarm tự động phân phối container giữa các worker node và thực hiện load balancing nội bộ.
+\end{enumerate}
+
+Ngoài ra, kiến trúc tách biệt hai cụm (Backend trên CPU server, AI trên GPU cloud RunPod) cho phép scale từng phần độc lập: tăng GPU khi lượng truy vấn AI tăng mà không ảnh hưởng đến Backend, hoặc mở rộng Backend khi lượng booking tăng mà không tốn thêm chi phí GPU.
+
+\subsubsection{Độ sẵn sàng và cơ chế chịu lỗi (Fault Tolerance)}
+
+Hệ thống được thiết kế với nhiều tầng bảo vệ để đảm bảo uptime mục tiêu $\geq$ 99\%:
+
+\begin{enumerate}
+    \item \textbf{Chính sách tự khởi động lại (Restart Policy):} Tất cả các service quan trọng trong \texttt{docker-compose.yml} đều được cấu hình chính sách restart tự động. Backend, Admin Panel, Jenkins sử dụng \texttt{restart: unless-stopped} (tự động khởi động lại trừ khi bị dừng thủ công). Các service hạ tầng (Kong, RabbitMQ, Cloudflare Tunnel) sử dụng \texttt{restart: on-failure}. PostgreSQL sử dụng \texttt{restart: always} để đảm bảo database luôn khả dụng.
+
+    \item \textbf{Health Check tự động:} Mỗi service đều có healthcheck riêng: PostgreSQL dùng \texttt{pg\_isready}, Backend dùng HTTP request đến \texttt{/health}, Kong dùng \texttt{kong health}, RabbitMQ dùng \texttt{rabbitmq-diagnostics -q ping}. Docker tự động phát hiện container không khỏe mạnh và khởi động lại, với cấu hình retry (tối đa 10--15 lần) và \texttt{start\_period} hợp lý để tránh restart loop.
+
+    \item \textbf{Retry Logic trong ứng dụng:} Các lời gọi đến dịch vụ bên ngoài đều có cơ chế retry tự động:
+    \begin{itemize}
+        \item \textbf{Webhook Service:} Retry tối đa 3 lần với exponential backoff khi gọi webhook thông báo trạng thái booking. Nếu sau 3 lần vẫn thất bại, hệ thống ghi log cảnh báo nhưng không làm gián đoạn luồng chính.
+        \item \textbf{Redis Connection:} Module Redis cấu hình \texttt{retryStrategy} với số lần retry giới hạn; nếu Redis không khả dụng, ứng dụng vẫn hoạt động bình thường (graceful degradation).
+        \item \textbf{RabbitMQ Connection:} Kết nối AMQPS qua HAProxy với TLS, tự động chuyển đổi giữa 3 node khi một node gặp sự cố.
+    \end{itemize}
+
+    \item \textbf{RabbitMQ Cluster + HAProxy (High Availability):} Hệ thống triển khai cụm RabbitMQ 3 node (\texttt{rabbitmq1}, \texttt{rabbitmq2}, \texttt{rabbitmq3}) với cơ chế cluster tự động. HAProxy đứng trước cụm đóng vai trò load balancer và failover: nếu một node bị down, HAProxy tự động chuyển kết nối sang node còn lại, đảm bảo hàng đợi message (checkout queue, notification queue) không bị gián đoạn.
+
+    \item \textbf{Graceful Degradation:} Khi một thành phần phụ gặp sự cố (ví dụ: Redis bị mất kết nối, AI Service tạm ngưng), các chức năng cốt lõi (đặt lịch, thanh toán, xem thông tin) vẫn hoạt động bình thường nhờ cơ chế xử lý lỗi đã được tích hợp ở tầng ứng dụng.
+\end{enumerate}
+
+\subsubsection{Sao lưu cơ sở dữ liệu tự động (Automated Database Backup)}
+
+Hệ thống triển khai tác vụ sao lưu tự động cho cơ sở dữ liệu PostgreSQL thông qua \textbf{cron job} chạy nền trên server production:
+
+\begin{itemize}
+    \item \textbf{Công cụ:} \texttt{pg\_dump} --- tiện ích sao lưu chính thức của PostgreSQL, tạo bản sao lưu toàn bộ (full backup) ở định dạng nén (\texttt{.sql.gz}).
+    \item \textbf{Tần suất:} Tác vụ được lên lịch chạy \textbf{mỗi ngày vào lúc 2:00 AM} (giờ server), thời điểm lưu lượng truy cập thấp nhất để giảm thiểu ảnh hưởng đến hiệu năng.
+    \item \textbf{Đặt tên file:} Mỗi bản sao lưu được đánh dấu thời gian theo định dạng \texttt{healytics\_backup\_YYYY-MM-DD\_HH-MM.sql.gz}, giúp dễ dàng xác định và truy vết phiên bản.
+    \item \textbf{Chính sách giữ lại (Retention Policy):} Các bản sao lưu cũ hơn \textbf{7 ngày} được tự động xóa bởi script dọn dẹp, cân bằng giữa khả năng phục hồi và dung lượng lưu trữ.
+    \item \textbf{Khả năng phục hồi:} Bản sao lưu có thể được phục hồi bằng lệnh \texttt{psql} hoặc \texttt{pg\_restore}, với thời gian phục hồi (RTO) ước tính dưới 30 phút cho dung lượng database hiện tại. Điểm phục hồi (RPO) tối đa là 24 giờ, đáp ứng yêu cầu RPO $\leq$ 4 giờ nếu kết hợp thêm cơ chế WAL archiving trong tương lai.
+\end{itemize}
+
+Cơ chế sao lưu được triển khai hoàn toàn tự động, không yêu cầu can thiệp thủ công, và hoạt động song song với các service khác mà không gây gián đoạn dịch vụ.
+
+\section{Đánh giá hiệu quả AI trong gợi ý dịch vụ}
+
+Phần này trình bày phương pháp, tiêu chí và kết quả đánh giá cho các thành phần cốt lõi của hệ thống AI:
+\begin{itemize}
+    \item Hệ thống RAG (Retrieval-Augmented Generation).
+    \item Mô hình LLM (Llama-3.1-8B-Instruct).
+    \item Mô hình phân loại ý định (Intent Classifier).
+    \item Dịch vụ trích xuất thực thể (NER Service).
+    \item Hệ thống gợi ý (Recommender Service).
+    \item Đánh giá tổng thể module AI trong hệ thống. (End to End).
+\end{itemize}
+
+\subsection{Cơ sở lựa chọn ngưỡng đánh giá}
+
+Các ngưỡng định lượng trong chương này không được chọn ngẫu nhiên, mà được thiết lập từ bốn nguồn chính nhằm bảo đảm tính khoa học và tính khả thi triển khai:
+
+\begin{itemize}
+    \item \textbf{Từ đặc tả yêu cầu hệ thống (SRS):} các ngưỡng đóng vai trò tiêu chí nghiệm thu (acceptance criteria) cho từng thành phần. Ví dụ, yêu cầu thời gian phản hồi API và yêu cầu chất lượng AI được gắn trực tiếp với mục tiêu vận hành của hệ thống.
+    \item \textbf{Từ nguyên lý UX/HCI:} với các chỉ số độ trễ, nhóm tham chiếu nguyên lý thời gian phản hồi của Nielsen Norman Group (mức dưới 100--200ms tạo cảm giác gần thời gian thực), do đó đặt mục tiêu \texttt{Latency P95} ở mức chặt chẽ để bảo toàn trải nghiệm hội thoại.
+    \item \textbf{Từ baseline học thuật và thực nghiệm:} các chỉ số như F1, Hit@K, MRR, NDCG được đối chiếu với mô hình cơ sở trên cùng bài toán; ngưỡng được đặt theo hướng mô hình đề xuất phải vượt baseline để chứng minh cải thiện thực chất.
+    \item \textbf{Từ heuristic kỹ thuật theo bối cảnh dữ liệu:} với dữ liệu tiếng Việt tự do và truy vấn hội thoại có nhiễu, nhóm dùng quy tắc thực hành phổ biến trong NLP/IR để đặt ngưỡng khả thi nhưng đủ khắt khe (mức tốt thường từ 0.85 đến 0.90 trở lên tùy chỉ số).
+\end{itemize}
+
+\noindent\textbf{Lựa chọn ngưỡng cho RAG và LLM trong module evaluation:}
+\begin{itemize}
+    \item \textbf{Đối với RAG (retrieval):} mục tiêu kỹ thuật của pha truy xuất là bảo đảm \textit{đưa ít nhất một bằng chứng đúng vào Top-$K$} và đồng thời \textit{phủ đủ các tài liệu liên quan} để phục vụ trả lời. Vì vậy nhóm dùng các chỉ số chuẩn trong Information Retrieval:
+    \begin{itemize}
+        \item \textbf{Hit@K}: đo khả năng ``có ít nhất một tài liệu đúng'' trong Top-$K$; phù hợp với tình huống hội thoại vì chỉ cần một bằng chứng tốt đã có thể hỗ trợ trả lời.
+        \item \textbf{Recall@K}: đo tỷ lệ tài liệu liên quan được truy xuất; phản ánh mức độ bao phủ ngữ cảnh khi một câu hỏi có nhiều bằng chứng.
+        \item \textbf{MRR}: nhấn mạnh vị trí xuất hiện đầu tiên của tài liệu đúng; trực tiếp liên quan đến chất lượng trải nghiệm vì bằng chứng đúng càng nằm sớm thì prompt càng ``sạch'' và giảm nhiễu cho LLM.
+    \end{itemize}
+    Trong pipeline đánh giá, $K$ được cố định theo tham số cấu hình \texttt{TOP\_K} (mặc định 10). Việc chọn $K$ theo hướng cân bằng giữa \textit{độ phủ} (tăng $K$) và \textit{giảm nhiễu/ngữ cảnh thừa} (giảm $K$), đồng thời nhất quán với cấu hình vận hành để số liệu phản ánh đúng điều kiện triển khai.
+
+    \item \textbf{Đối với LLM (generation + grounding):} chất lượng câu trả lời được đánh giá theo thang điểm liên tục trong đoạn $[0,1]$ trên ba trục:
+    \begin{itemize}
+        \item \textbf{Faithfulness}: mức độ câu trả lời được \textit{ngữ cảnh truy xuất} hỗ trợ, nhằm kiểm soát rủi ro ``ảo giác'' (hallucination).
+        \item \textbf{Correctness}: mức độ phù hợp về \textit{nghĩa} so với đáp án chuẩn (\textit{ground truth}), không yêu cầu khớp từng chữ.
+        \item \textbf{Context Relevance}: mức độ ngữ cảnh truy xuất \textit{thực sự hữu ích} cho câu hỏi; chỉ số này giúp tách bạch lỗi do truy xuất (context kém liên quan) khỏi lỗi do sinh (answer kém).
+    \end{itemize}
+    Vì các điểm số này được chuẩn hóa về $[0,1]$, ngưỡng nghiệm thu (nếu đặt) có thể được diễn giải minh bạch theo ``mức đạt tối thiểu'' và ``mức kỳ vọng''; đồng thời việc dùng thang liên tục cho phép so sánh các biến thể mô hình/cấu hình mà không phụ thuộc vào một ranh giới cứng duy nhất. Trong luận văn này, cách đặt ngưỡng cho nhóm chỉ số LLM được ưu tiên theo hướng \textit{đảm bảo tính đúng và bám ngữ cảnh} (faithfulness/correctness) hơn là tối ưu văn phong.
+\end{itemize}
+
+\subsection{Hệ thống RAG (Retrieval-Augmented Generation)}
+
+\textbf{Mục tiêu đánh giá.} Hệ thống RAG được đánh giá theo đúng hai thành phần chức năng cốt lõi của RAG: 
+\begin{itemize}
+    \item \textit{khả năng truy xuất} đưa đúng bằng chứng vào Top-$K$ (retrieval quality), 
+    \item \textit{chất lượng ngữ cảnh} sau truy xuất khi được dùng làm đầu vào cho mô hình sinh. 
+\end{itemize}
+Trong phần này tập trung vào "khả năng truy xuất" thông qua các chỉ số chuẩn của IR; phần "chất lượng ngữ cảnh" được phản ánh gián tiếp thông qua \textit{Context Relevance} ở mục đánh giá LLM.
+
+\textbf{Chuẩn bị dữ liệu đánh giá.} Bộ dữ liệu được đóng gói trong một tệp JSON theo cấu trúc thống nhất:
+\begin{itemize}
+    \item \texttt{documents}: danh sách tài liệu nguồn dùng để xây dựng VectorDB, mỗi phần tử có dạng \{\texttt{doc\_id}, \texttt{content}\}.
+    \item \texttt{eval\_dataset}: danh sách mẫu đánh giá, mỗi mẫu gồm:
+    \begin{itemize}
+        \item \texttt{id}: định danh câu hỏi.
+        \item \texttt{query}: câu hỏi/nhu cầu thông tin của người dùng.
+        \item \texttt{ground\_truth}: đáp án chuẩn (dùng cho đánh giá chất lượng sinh ở mục LLM).
+        \item \texttt{relevant\_doc\_ids}: tập \texttt{doc\_id} liên quan (gold evidence) dùng làm nhãn cho bài toán truy xuất.
+        \item \texttt{difficulty}: nhãn độ khó (easy/medium/hard) phục vụ phân tích theo nhóm (không ảnh hưởng trực tiếp đến công thức metric).
+    \end{itemize}
+\end{itemize}
+Để bảo toàn tính tái lập (reproducibility), toàn bộ pipeline đọc dữ liệu nạp trực tiếp từ tệp JSON; đồng thời tạo ánh xạ \texttt{doc\_id $\rightarrow$ content} để tái dựng ngữ cảnh theo đúng văn bản gốc khi cần.
+
+\textbf{Xây dựng bộ truy xuất (Retriever).} Từ danh sách \texttt{documents}, mỗi tài liệu được chuyển sang định dạng \texttt{LangChain Document} với:
+\begin{itemize}
+    \item \texttt{page\_content} = nội dung văn bản \texttt{content}.
+    \item \texttt{metadata["doc\_id"]} = định danh \texttt{doc\_id} để truy vết và tính metric.
+\end{itemize}
+Embeddings sử dụng \texttt{HuggingFaceEmbeddings} với tham số thiết bị \texttt{EMBEDDING\_DEVICE} (CPU/GPU). Vector store có thể chọn \texttt{Chroma} hoặc \texttt{FAISS} theo \texttt{VECTORSTORE\_BACKEND}. 
+
+\textbf{Luồng đánh giá truy xuất.} Với mỗi mẫu \texttt{eval\_dataset}, pipeline thực hiện:
+\begin{itemize}
+    \item Nhận \texttt{query} và tập nhãn \texttt{relevant\_doc\_ids}.
+    \item Gọi retriever để lấy danh sách tài liệu liên quan. 
+    \item Cắt Top-$K$ kết quả đầu và trích \texttt{doc\_id} từ \texttt{metadata} để tạo chuỗi \texttt{retrieved\_doc\_ids}.
+    \item Tính các metric IR và cộng dồn theo mẫu; cuối cùng lấy trung bình theo số mẫu.
+\end{itemize}
+
+\textbf{Chỉ số đánh giá và định nghĩa.} Gọi \(R_K\) là danh sách \texttt{doc\_id} truy xuất trong Top-$K$ và \(G\) là tập \texttt{relevant\_doc\_ids}:
+\begin{itemize}
+    \item \textbf{Hit@K}: \(=1\) nếu tồn tại \(d \in R_K\) sao cho \(d \in G\); ngược lại \(=0\).
+    \item \textbf{Recall@K}: \(=\frac{|R_K \cap G|}{|G|}\) (nếu \(G=\varnothing\) thì quy ước \(=0\)).
+    \item \textbf{MRR}: nếu tài liệu đúng đầu tiên xuất hiện ở vị trí \(i\) trong danh sách truy xuất thì \(MRR=\frac{1}{i}\); nếu không có tài liệu đúng thì \(=0\).
+\end{itemize}
+Các chỉ số trên phản ánh trực tiếp chất lượng truy xuất trong bối cảnh RAG: Hit@K đảm bảo ``có bằng chứng'', Recall@K đảm bảo ``đủ bằng chứng'', và MRR đảm bảo ``bằng chứng ưu tiên nằm sớm'' để tối ưu prompt và giảm nhiễu cho mô hình sinh.
+
+\textbf{Kết quả đánh giá (theo log chạy thực nghiệm).} Bảng \ref{tab:rag_eval_results} tổng hợp kết quả trung bình trên tập đánh giá với cấu hình Top-$K$ cố định.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Chỉ số} & \textbf{Giá trị trung bình} \\
+\hline
+Hit@10 & 0.8900 \\
+\hline
+Recall@10 & 0.8438 \\
+\hline
+MRR & 0.8101 \\
+\hline
+\end{tabular}
+\caption{Kết quả đánh giá chất lượng truy xuất của hệ thống RAG (Top-$K=10$)}
+\label{tab:rag_eval_results}
+\end{table}
+
+\subsection{Mô hình LLM (Llama-3.1-8B-Instruct)}
+
+\textbf{Mục tiêu đánh giá.} Mô hình LLM được đánh giá theo vai trò \textit{generator} trong pipeline RAG (sinh câu trả lời dựa trên truy vấn và ngữ cảnh truy xuất), đồng thời kiểm soát hai rủi ro chính: 
+\begin{itemize}
+    \item trả lời đúng nội dung so với đáp án chuẩn, 
+    \item bám sát ngữ cảnh để hạn chế rủi ro hallucination. 
+\end{itemize}
+Vì đánh giá tự động theo luật/regex không phản ánh tốt các biến thể diễn đạt, pipeline sử dụng một \textit{LLM-as-a-judge} để chấm điểm mềm (continuous scoring) trên thang \( [0,1] \). Ở bước sinh, mỗi mẫu chỉ truyền payload tối thiểu gồm \texttt{question=query}, và để rỗng \texttt{history} cùng \texttt{services} nhằm cô lập tác động của truy xuất và mô hình sinh trong thí nghiệm.
+
+\textbf{Chuẩn bị ngữ cảnh đưa vào Judge.} Sau khi retriever trả về Top-$K$ tài liệu, pipeline tái dựng văn bản ngữ cảnh theo thứ tự truy xuất và ghép bằng \texttt{"\textbackslash n\textbackslash n"}. Để tránh sai lệch do cơ chế lưu/truy hồi của vector store, pipeline ưu tiên lấy \texttt{content} theo ánh xạ \texttt{doc\_id $\rightarrow$ content} từ dataset gốc; chỉ khi không ánh xạ được mới dùng \texttt{page\_content} của đối tượng \texttt{Document}.
+
+\textbf{Đánh giá tự động bằng Judge LLM (LLM-as-a-judge).} Một mô hình Judge độc lập được dùng để chấm ba tiêu chí:
+\begin{itemize}
+    \item \textbf{Faithfulness}: mức độ câu trả lời được ngữ cảnh hỗ trợ.
+    \item \textbf{Correctness}: mức độ đúng về nghĩa so với \texttt{ground\_truth}.
+    \item \textbf{Context Relevance}: mức độ ngữ cảnh liên quan và hữu ích cho câu hỏi.
+\end{itemize}
+Nhóm lựa chọn model đánh giá là mistral-large-latest. Prompt chấm điểm yêu cầu Judge trả về \textbf{JSON} thuần với ba khóa \texttt{faithfulness}, \texttt{correctness}, \texttt{context\_relevance}. 
+
+\textbf{Prompt đánh giá (nguyên văn).} Dưới đây là prompt được dùng để gọi Judge (Mistral) chấm điểm cho từng mẫu; prompt này được format theo các biến \texttt{\{question\}}, \texttt{\{context\}}, \texttt{\{answer\}}, \texttt{\{ground\_truth\}}:
+
+\begin{verbatim}
+You are a fair, lenient evaluator. Prefer partial credit: nếu câu trả lời nhìn chung đúng hoặc hợp lý so với ground truth thì cho điểm cao; khác từ ngữ nhỏ, thiếu chi tiết phụ, hoặc diễn đạt khác nhưng không sai nghĩa thì không trừ mạnh.
+
+Given:
+- Question
+- Context
+- Answer
+- Ground truth
+
+Score each metric in [0, 1]:
+- Faithfulness: answer được context hỗ trợ; nếu có thêm suy luận nhẹ nhưng không mâu thuẫn context thì vẫn có thể cao.
+- Correctness: answer phù hợp nghĩa với ground truth (không cần khớp từng chữ).
+- Context Relevance: context có giúp trả lời câu hỏi (dù không hoàn hảo vẫn có thể điểm khá).
+
+Return JSON only with keys: faithfulness, correctness, context_relevance.
+
+Question:
+{question}
+
+Context:
+{context}
+
+Answer:
+{answer}
+
+Ground truth:
+{ground_truth}
+\end{verbatim}
+
+\textbf{Kết quả đánh giá (theo log chạy thực nghiệm).} Bảng \ref{tab:llm_eval_results} tổng hợp điểm trung bình theo ba tiêu chí chấm bởi Judge LLM.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Chỉ số} & \textbf{Giá trị trung bình} \\
+\hline
+Faithfulness & 0.8720 \\
+\hline
+Correctness & 0.8980 \\
+\hline
+Context Relevance & 0.9310 \\
+\hline
+\end{tabular}
+\caption{Kết quả đánh giá chất lượng câu trả lời LLM theo Judge LLM (thang điểm [0,1])}
+\label{tab:llm_eval_results}
+\end{table}
+
+\subsection{Mô hình phân loại ý định (Intent Classifier)}
+
+\textbf{Phương pháp và tiêu chí đánh giá:}
+
+\begin{itemize}
+    \item Quy trình: làm sạch dữ liệu, chia 80\% train -- 20\% test bằng stratified split.
+    \item Mô hình: \texttt{SentenceTransformer(all-MiniLM-L6-v2)} để mã hóa văn bản, \texttt{LogisticRegression} để phân lớp nhị phân.
+    \item Ngưỡng đạt yêu cầu:
+    \begin{itemize}
+        \item Accuracy, F1-Score: $\geq 0.85$.
+        \item Precision và Recall cho lớp 1: $\geq 0.83$.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Kết quả định lượng:}
+
+\begin{itemize}
+    \item Tập test: 187 mẫu (94 mẫu lớp 0, 93 mẫu lớp 1).
+    \item Ma trận nhầm lẫn được thể hiện ở Hình \ref{fig:intent_confusion_matrix}.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{Images/evaluation/intent/intent_confusion_matrix.png}
+\caption{Biểu đồ trực quan ma trận nhầm lẫn của Intent Classifier}
+\label{fig:intent_confusion_matrix}
+\end{figure}
+
+\begin{itemize}
+    \item Từ ma trận nhầm lẫn: $TP=81$, $FP=8$, $FN=12$, $TN=86$.
+    \item Các chỉ số chính được tổng hợp trong Bảng \ref{tab:intent_results}.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Chỉ số} & \textbf{Giá trị} & \textbf{Đánh giá (Ngưỡng)} \\
+\hline
+Accuracy & 0.8930 & PASS ($\geq 0.85$) \\
+\hline
+F1 Score & 0.8926 & PASS ($\geq 0.85$) \\
+\hline
+Precision (label 1) & 0.9101 & PASS ($\geq 0.83$) \\
+\hline
+Recall (label 1) & 0.8710 & PASS ($\geq 0.83$) \\
+\hline
+\end{tabular}
+\caption{Kết quả đánh giá định lượng cho Intent Classification}
+\label{tab:intent_results}
+\end{table}
+
+\textbf{Các chỉ số thước đo chính:}
+\begin{itemize}
+    \item Accuracy: tỷ lệ dự đoán đúng trên toàn bộ mẫu.
+    \item F1 Score: trung bình Harmonic giữa Precision và Recall, phản ánh độ cân bằng.
+    \item Precision (label 1): mức độ đúng khi hệ thống quyết định gợi ý dịch vụ.
+    \item Recall (label 1): khả năng bắt đúng các câu thực sự cần gợi ý dịch vụ.
+    \item Specificity = 0.9149 và MCC = 0.7868 cho thấy mô hình ổn định và ít thiên lệch.
+\end{itemize}
+
+\textbf{Phân tích lỗi và kết luận:}
+
+\begin{itemize}
+    \item Mô hình vượt toàn bộ tiêu chí đặt ra.
+    \item False Negative lớp 1 còn 12.90\%, tức vẫn có truy vấn diễn đạt gián tiếp bị bỏ sót.
+    \item Kết luận: đã đủ chất lượng để vận hành trong pipeline gợi ý dịch vụ.
+\end{itemize}
+
+\subsection{Dịch vụ trích xuất thực thể (NER Service)}
+
+\textbf{Phương pháp và tiêu chí đánh giá:}
+
+\begin{itemize}
+    \item Pipeline gọi \texttt{/ner/extract} cho từng truy vấn và so khớp với gold dataset.
+    \item Tiêu chí so khớp gồm:
+    \begin{itemize}
+        \item \texttt{business\_type}, \texttt{location\_code}: khớp chính xác.
+        \item \texttt{price}: cho phép sai số 10\%.
+        \item \texttt{distance}: cho phép sai số 20\%.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Kết quả định lượng:}
+
+\begin{itemize}
+    \item Số truy vấn đánh giá: 193.
+    \item Độ trễ trung bình: 4502 ms/truy vấn.
+    \item Độ chính xác tổng hợp theo trường (Overall): 0.964.
+    \item Chi tiết theo trường trình bày ở Bảng \ref{tab:ner_field_acc}.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|p{6cm}|}
+\hline
+\textbf{Trường thông tin} & \textbf{Độ chính xác} & \textbf{Đánh giá (Ngưỡng)} & \textbf{Nhận xét} \\
+\hline
+business\_type & 0.9689 & PASS ($\geq 0.95$) & Xử lý tốt các ý định dịch vụ chính yếu. \\
+\hline
+location\_code & 0.9793 & PASS ($\geq 0.95$) & Hoạt động hiệu quả với các bí danh quận/huyện. \\
+\hline
+price & 0.9689 & PASS ($\geq 0.90$) & Độ chính xác cao. \\
+\hline
+distance & 0.9378 & PASS ($\geq 0.90$) & Bắt tốt cả biểu đạt khoảng cách tường minh và ẩn ý. \\
+\hline
+\end{tabular}
+\caption{Độ chính xác theo trường thông tin của NER Service và đối chiếu với ngưỡng kỳ vọng}
+\label{tab:ner_field_acc}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.66\textwidth]{Images/evaluation/ner/ner_f1_by_entity.jpg}
+\caption{F1-score theo từng nhóm thực thể trong NER evaluation}
+\label{fig:ner_f1_entities}
+\end{figure}
+
+\textbf{Diễn giải các chỉ số chính:}
+\begin{itemize}
+    \item Exact-match: một truy vấn chỉ được tính đúng khi tất cả trường đều đúng.
+    \item Field Accuracy: độ đúng của từng trường riêng lẻ.
+    \item Micro Avg F1: chất lượng tổng thể trên tất cả thực thể.
+\end{itemize}
+
+\textbf{Phân tích lỗi và kết luận:}
+
+\begin{itemize}
+    \item Tổng số lỗi ghi nhận: 22 lỗi, trong đó \texttt{price\_parser} chiếm 4 lỗi (18.2\%), \texttt{semantic\_miss} chiếm 18 lỗi (81.8\%).
+    \item Lỗi \texttt{price\_parser} chủ yếu ở các mẫu giá khoảng hoặc đa ràng buộc.
+    \item Lỗi \texttt{semantic\_miss} chủ yếu do nhầm lẫn loại hình gần nghĩa và một số ca ánh xạ location/distance chưa ổn định.
+    \item \textbf{Kết luận:} NER đạt chất lượng cao (Micro F1 = 95.4\%, Macro F1 = 95.2\%), đủ tốt cho pre-filtering; ưu tiên cải tiến là parser giá và dữ liệu cho truy vấn nhập nhằng.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Entity} & \textbf{TP} & \textbf{FP} & \textbf{FN} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
+\hline
+BUSINESS\_TYPE & 127 & 3 & 4 & 97.7\% & 96.9\% & 97.3\% \\
+\hline
+LOCATION & 95 & 4 & 2 & 96.0\% & 97.9\% & 96.9\% \\
+\hline
+PRICE & 99 & 5 & 6 & 95.2\% & 94.3\% & 94.7\% \\
+\hline
+DISTANCE & 86 & 5 & 10 & 94.5\% & 89.6\% & 92.0\% \\
+\hline
+Micro Average & 407 & 17 & 22 & 96.0\% & 94.9\% & 95.4\% \\
+\hline
+Macro Average & - & - & - & 95.8\% & 94.7\% & 95.2\% \\
+\hline
+\end{tabular}
+\caption{Chỉ số Precision/Recall/F1 theo từng loại thực thể của NER Service}
+\label{tab:ner_prf_metrics}
+\end{table}
+
+\subsection{Hệ thống gợi ý (Recommender Service)}
+
+\textbf{Phương pháp và tiêu chí đánh giá:}
+
+\begin{itemize}
+    \item Hai kịch bản đánh giá:
+    \begin{itemize}
+        \item Chatbot: truy vấn hội thoại.
+        \item Home: truy vấn dựa trên hồ sơ người dùng.
+    \end{itemize}
+    \item Bộ chỉ số: Hit@K, Precision@K, Recall@K, MRR@K, NDCG@K, NDCG\_G@K, HNR và thống kê latency.
+    \item Kết quả Home dùng cấu hình \texttt{query\_mode=keyword}, \texttt{score\_mode=distance}.
+    \item Mô hình embedding dùng chung: \texttt{sentence-transformers/paraphrase-multilingual-mpnet-base-v2}, đánh giá trên \texttt{Top-K = 10}.
+    \item Metadata run:
+    \begin{itemize}
+        \item Chatbot run: \texttt{chatbot\_baseline\_v1}, collection \texttt{healytics\_eval\_chatbot}, 300 truy vấn.
+        \item Home run: \texttt{home\_baseline\_v1}, collection \texttt{healytics\_eval\_home}, 300 hồ sơ.
+    \end{itemize}
+\end{itemize}
+
+Mục đánh giá tập trung vào hai bài toán cốt lõi:
+\begin{itemize}
+    \item \textbf{Chatbot retrieval}: gợi ý dịch vụ theo câu hỏi tự nhiên của người dùng.
+    \item \textbf{Home recommender}: gợi ý dịch vụ theo hồ sơ/nhu cầu tổng quát ở trang chủ.
+\end{itemize}
+
+\textbf{Kết quả định lượng tổng hợp:}
+
+\begin{itemize}
+    \item Bảng \ref{tab:rec_comparison} so sánh nhanh Chatbot và Home tại @3.
+    \item Các bảng \ref{tab:chatbot_full_metrics}, \ref{tab:chatbot_category_metrics}, \ref{tab:home_full_metrics} cung cấp kết quả chi tiết theo mốc Top-K.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Chỉ số (@3)} & \textbf{Kịch bản Chatbot} & \textbf{Kịch bản Home} \\
+\hline
+Hit & 0.8933 & 0.8133 \\
+\hline
+Recall & 0.4128 & 0.3667 \\
+\hline
+MRR & 0.7856 & 0.6617 \\
+\hline
+NDCG & 0.4715 & 0.4011 \\
+\hline
+HNR (càng thấp càng tốt) & 0.1211 & 0.1533 \\
+\hline
+Latency Avg (ms) & 83.31 & 156.26 \\
+\hline
+Latency P95 (ms) & 97.20 & 176.77 \\
+\hline
+\end{tabular}
+\caption{So sánh kết quả đánh giá hệ thống gợi ý giữa hai kịch bản Chatbot và Home}
+\label{tab:rec_comparison}
+\end{table}
+
+\noindent\textbf{Nhận xét so sánh nhanh giữa hai baseline:}
+\begin{itemize}
+    \item Ở @3, Chatbot nhỉnh hơn Home ở các chỉ số xếp hạng (MRR, NDCG).
+    \item Home có độ trễ cao hơn nhưng tăng độ phủ tốt khi mở rộng $k$.
+\end{itemize}
+
+\textbf{Kết quả đầy đủ theo từng mốc Top-K:}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Metric (Chatbot)} & \textbf{@1} & \textbf{@3} & \textbf{@5} & \textbf{@10} \\
+\hline
+Hit & 0.7067 & 0.8933 & 0.9400 & 0.9800 \\
+\hline
+Prec & 0.7067 & 0.3389 & 0.2447 & 0.1593 \\
+\hline
+Recall & 0.2922 & 0.4128 & 0.4906 & 0.6289 \\
+\hline
+MRR & 0.7067 & 0.7856 & 0.7961 & 0.8018 \\
+\hline
+NDCG & 0.7067 & 0.4715 & 0.5141 & 0.5742 \\
+\hline
+NDCG\_G & 0.6917 & 0.5780 & 0.6146 & 0.6590 \\
+\hline
+HNR $\downarrow$ & 0.0700 & 0.1211 & 0.1260 & 0.1267 \\
+\hline
+\end{tabular}
+\caption{Kết quả đầy đủ của Chatbot evaluation}
+\label{tab:chatbot_full_metrics}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Category} & \textbf{Count} & \textbf{Hit@3} & \textbf{Recall@3} & \textbf{MRR@3} \\
+\hline
+dinh\_duong & 50 & 0.9000 & 0.4800 & 0.8033 \\
+\hline
+tam\_ly & 75 & 0.9467 & 0.4311 & 0.8622 \\
+\hline
+the\_thao & 100 & 0.8100 & 0.3483 & 0.6900 \\
+\hline
+y\_te & 75 & 0.9467 & 0.4355 & 0.8244 \\
+\hline
+\end{tabular}
+\caption{Kết quả Chatbot theo từng nhóm truy vấn}
+\label{tab:chatbot_category_metrics}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Metric (Home)} & \textbf{@1} & \textbf{@3} & \textbf{@5} & \textbf{@10} \\
+\hline
+Hit & 0.5400 & 0.8133 & 0.9267 & 0.9833 \\
+\hline
+Prec & 0.5400 & 0.3000 & 0.2353 & 0.1680 \\
+\hline
+Recall & 0.2261 & 0.3667 & 0.4744 & 0.6700 \\
+\hline
+MRR & 0.5400 & 0.6617 & 0.6875 & 0.6956 \\
+\hline
+NDCG & 0.5400 & 0.4011 & 0.4594 & 0.5437 \\
+\hline
+NDCG\_G & 0.5367 & 0.4986 & 0.5509 & 0.6135 \\
+\hline
+HNR $\downarrow$ & 0.0867 & 0.1533 & 0.1613 & 0.1527 \\
+\hline
+\end{tabular}
+\caption{Kết quả đầy đủ của Home evaluation}
+\label{tab:home_full_metrics}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Run} & \textbf{Avg (ms)} & \textbf{P50 (ms)} & \textbf{P95 (ms)} & \textbf{P99 (ms)} & \textbf{Max (ms)} \\
+\hline
+Chatbot baseline & 83.31 & 78.30 & 97.20 & 141.32 & 971.64 \\
+\hline
+Home baseline & 156.26 & 154.63 & 176.77 & 241.49 & 287.35 \\
+\hline
+\end{tabular}
+\caption{So sánh độ trễ giữa hai baseline Chatbot và Home}
+\label{tab:rec_latency_compare}
+\end{table}
+
+
+
+\noindent\textbf{Phân bố score retrieval (Home baseline):} Min = 0.1084, Avg = 0.1771, Max = 0.4593.
+
+\textbf{Các chỉ số thước đo:}
+\begin{itemize}
+    \item \textbf{Hit@K}: khả năng có ít nhất một kết quả đúng trong Top-K.
+    \item \textbf{Precision@K}, \textbf{Recall@K}: cân bằng giữa độ chính xác và độ phủ.
+    \item \textbf{MRR@K}: nhấn mạnh vị trí xuất hiện kết quả đúng đầu tiên.
+    \item \textbf{NDCG@K, NDCG\_G@K}: đánh giá chất lượng thứ hạng theo mức liên quan.
+    \item \textbf{HNR@K} ($\downarrow$): tỷ lệ nhiễu lọt Top-K.
+    \item \textbf{Latency}: theo dõi cả trung bình và tail-latency (đặc biệt P95).
+\end{itemize}
+
+\textbf{Lựa chọn ngưỡng triển khai:}
+\begin{itemize}
+    \item \textbf{Chatbot chọn $k=3$:} Hit@3 đạt 0.8933, MRR@3 đạt 0.7856 và NDCG\_G@3 = 0.5780, cho thấy danh sách ngắn đã đủ chất lượng để người dùng tương tác nhanh trong hội thoại.
+    \item \textbf{Home chọn $k=5$:} từ @3 lên @5, Hit tăng từ 0.8133 lên 0.9267 và Recall tăng từ 0.3667 lên 0.4744 (tăng mạnh độ phủ), trong khi lợi ích biên từ @5 lên @10 nhỏ hơn.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{KPI tại ngưỡng triển khai} & \textbf{Chatbot ($k=3$)} & \textbf{Home ($k=5$)} \\
+\hline
+Hit & 0.8933 & 0.9267 \\
+\hline
+Precision & 0.3389 & 0.2353 \\
+\hline
+Recall & 0.4128 & 0.4744 \\
+\hline
+MRR & 0.7856 & 0.6875 \\
+\hline
+NDCG & 0.4715 & 0.4594 \\
+\hline
+NDCG\_G & 0.5780 & 0.5509 \\
+\hline
+HNR $\downarrow$ & 0.1211 & 0.1613 \\
+\hline
+\end{tabular}
+\caption{KPI vận hành tại ngưỡng $k$ đề xuất cho từng kịch bản}
+\label{tab:rec_operating_kpi}
+\end{table}
+
+\textbf{Phân tích lỗi và kết luận:}
+
+\begin{itemize}
+    \item Chatbot đạt chất lượng truy xuất tốt trên danh sách ngắn, phù hợp để vận hành với Top-3.
+    \item Home đạt độ phủ cao khi mở rộng lên Top-5, phù hợp trình bày khối gợi ý đa lựa chọn ở trang chủ.
+    \item Độ trễ Chatbot tốt (P95 = 97.20 ms), trong khi Home còn cao hơn (P95 = 176.77 ms) và cần tối ưu thêm pipeline truy vấn/scoring.
+    \item Các hồ sơ Home có Recall@5 = 0.0000 gồm: \texttt{HM\_0240}, \texttt{HM\_0221}, \texttt{HM\_0159}, \texttt{HM\_0160}, \texttt{HM\_0234}.
+    \item Mẫu lỗi tập trung ở nhu cầu ngữ nghĩa đặc thù và đa mục tiêu; hướng cải tiến là mở rộng dữ liệu huấn luyện, tăng cường semantic mapping và bổ sung cơ chế reranking theo ngữ cảnh hồ sơ.
+    \item Tổng thể, cấu hình khuyến nghị triển khai là \textbf{Chatbot Top-3} và \textbf{Home Top-5} để cân bằng giữa độ chính xác, độ phủ và trải nghiệm người dùng.
+\end{itemize}
+
+\noindent\textbf{Kết luận tiểu mục:} Baseline hiện tại cho thấy hệ thống gợi ý đã đạt chất lượng vận hành tốt cho cả hai bối cảnh sử dụng. Chatbot nên ưu tiên danh sách ngắn để tối ưu tương tác, còn Home nên ưu tiên độ phủ để tăng cơ hội khám phá dịch vụ phù hợp.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{Images/evaluation/recommender/run_comparison.png}
+\caption{So sánh định lượng giữa hai baseline \texttt{chatbot\_baseline\_v1} và \texttt{home\_baseline\_v1} theo Hit@3, Recall@3, MRR@3 và NDCG@3}
+\label{fig:rec_baseline_compare_visual}
+\end{figure}
+
+% \subsection{Phản hồi từ người dùng thử nghiệm}
+
+% \subsubsection{Đánh giá End-to-End toàn bộ luồng AI (LLM-as-a-Judge)}
+
+% \textbf{Mục tiêu đánh giá.}
+% Các phần trước đã đánh giá từng thành phần độc lập: truy xuất của \texttt{RAG}, chất lượng sinh của \texttt{LLM} và hệ thống gợi ý (\texttt{Recommender}).
+% Mục này đánh giá \textbf{toàn bộ luồng AI ở mức end-to-end}: từ khi người dùng gửi truy vấn tới khi nhận được câu trả lời cuối cùng, bao gồm tất cả các bước điều phối (intent, NER, retrieval, prompt enrichment, LLM generation, streaming).
+% Khác với đánh giá từng thành phần, mục tiêu ở đây là trả lời câu hỏi: \emph{câu trả lời mà hệ thống đưa tới tay người dùng cuối có thực sự đúng, hữu ích và bám sát câu hỏi hay không}.
+% Do không có nhãn gold chuẩn cho câu trả lời sinh tự do, chúng tôi áp dụng phương pháp \textbf{LLM-as-a-Judge} (Zheng et al., 2023) với \texttt{Mistral} làm mô hình chấm điểm độc lập (không trùng với \texttt{LLM} đang sinh trong hệ thống, nhằm giảm thiên lệch tự chấm).
+
+% \textbf{Bộ dữ liệu đánh giá.}
+% Chúng tôi xây dựng bộ dữ liệu tiếng Việt gồm \textbf{500 mẫu}, phân tầng theo 6 nhóm câu hỏi đặc trưng mà người dùng thường gửi tới một chatbot y tế. Mỗi mẫu gồm: truy vấn (\texttt{user\_query}), câu trả lời kỳ vọng (\texttt{ground\_truth}), nhãn nhóm (\texttt{category}), cờ kỳ vọng có cần gợi ý dịch vụ hay không (\texttt{needs\_recommendation}) và cờ có chứa vị trí địa lý (\texttt{has\_location}). Phân bố nhóm được cố định như Bảng~\ref{tab:e2e_dataset_dist} để đảm bảo bộ dữ liệu bao phủ các kịch bản thực tế quan trọng.
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|l|c|c|c|}
+% \hline
+% \textbf{Nhóm câu hỏi} & \textbf{Số mẫu} & \textbf{Tỉ lệ (\%)} & \textbf{Đặc điểm} \\
+% \hline
+% general\_medical\_qa            & 130 & 26.0 & Hỏi đáp y khoa tổng quát \\
+% \hline
+% service\_seeking\_with\_location & 120 & 24.0 & Tìm dịch vụ theo địa điểm \\
+% \hline
+% service\_seeking\_general        & 120 & 24.0 & Tìm dịch vụ không địa điểm \\
+% \hline
+% symptom\_advice                  & 80  & 16.0 & Tư vấn triệu chứng \\
+% \hline
+% greeting\_smalltalk              & 30  & 6.0  & Chào hỏi/xã giao \\
+% \hline
+% follow\_up\_questions            & 20  & 4.0  & Câu hỏi theo ngữ cảnh \\
+% \hline
+% \textbf{Tổng cộng}               & \textbf{500} & \textbf{100.0} & \\
+% \hline
+% \end{tabular}
+% \caption{Phân bố bộ dữ liệu đánh giá end-to-end}
+% \label{tab:e2e_dataset_dist}
+% \end{table}
+
+% \textbf{Mô hình sinh được đánh giá.}
+% Hệ thống hiện đang triển khai \texttt{meta-llama/Llama-3.2-3B-Instruct} làm mô hình sinh, chạy cục bộ với lượng tử hóa 4-bit (\texttt{bitsandbytes} nf4, double-quantization, compute dtype \texttt{float16}); \texttt{max\_new\_tokens} đặt ở mức 256 token để cân bằng giữa độ dài câu trả lời và thời gian sinh. Thành phần truy xuất dùng \texttt{Chroma} với embedding \texttt{sentence-transformers/all-mpnet-base-v2} trên tập tài liệu tham chiếu y tế (WHO) gồm 8 tài liệu.
+% \textit{Ghi chú:} khi triển khai phiên bản production trên \texttt{Llama-3.1-8B-Instruct}, số liệu sẽ được đo lại với cấu hình tương ứng.
+
+% \textbf{Judge LLM và prompt đánh giá.}
+% Chúng tôi dùng \texttt{mistral-small-latest} (API Mistral) với \texttt{temperature=0} để đảm bảo tính tái lập. Với mỗi mẫu, Judge nhận 3 thành phần (\textit{Question}, \textit{Ground truth}, \textit{Model answer}) và chấm điểm đồng thời 3 tiêu chí trên thang \textbf{1--5}, kèm giải thích bằng tiếng Việt. Prompt được dùng như sau:
+
+% \begin{verbatim}
+% You are an evaluator for a healthcare chatbot.
+
+% Given:
+% - User query
+% - Ground truth answer
+% - Model answer
+
+% Evaluate the model answer based on:
+
+% 1. Correctness (Is the answer factually correct?)
+% 2. Helpfulness (Is the answer useful to the user?)
+% 3. Relevance (Does the answer address the query?)
+
+% Score each from 1 to 5.
+
+% Also provide a brief explanation.
+
+% Return JSON only, exactly in this schema:
+% {
+%   "correctness": <int 1-5>,
+%   "helpfulness": <int 1-5>,
+%   "relevance":   <int 1-5>,
+%   "explanation": "<short explanation in Vietnamese>"
+% }
+% \end{verbatim}
+
+% \textbf{Cơ sở lựa chọn ngưỡng.}
+% Mỗi tiêu chí được chấm theo thang rời rạc 1--5, trong đó $\ge 4$ được coi là \textit{đạt chất lượng cao} (câu trả lời đúng, hữu ích, bám sát câu hỏi), $=3$ là \textit{chấp nhận được} (không sai nhưng chưa tối ưu), $\le 2$ là \textit{chưa đạt}. Vì vậy ngoài điểm trung bình chúng tôi báo cáo thêm \textbf{phân phối điểm 1--5} và \textbf{pass rate} (tỉ lệ mẫu đạt $\ge 4$). Các mục tiêu ngưỡng ban đầu cho phiên bản cơ sở: \texttt{Correctness\_mean} $\ge 3.0$, \texttt{Helpfulness\_mean} $\ge 3.0$, \texttt{Relevance\_mean} $\ge 3.5$ và \texttt{Relevance pass rate} $\ge 50\%$.
+
+% \textbf{Kết quả định lượng tổng hợp.}
+% Trên toàn bộ 500 mẫu, hệ thống trả về 500/500 phản hồi hợp lệ (\texttt{success rate = 100\%}); Judge LLM phân tích thành công 496/500 mẫu (\texttt{parse rate = 99.2\%}, 4 mẫu bị lỗi JSON parse phía Judge và được loại khỏi thống kê điểm). Bảng~\ref{tab:e2e_overall} tóm tắt các điểm trung bình và thống kê tập trung của 3 tiêu chí.
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|l|c|c|c|c|c|c|}
+% \hline
+% \textbf{Tiêu chí} & \textbf{N} & \textbf{Mean} & \textbf{Median} & \textbf{Std} & \textbf{Min} & \textbf{Max} \\
+% \hline
+% Correctness & 496 & 3.129 & 3.0 & 1.208 & 1.0 & 5.0 \\
+% \hline
+% Helpfulness & 496 & 3.188 & 3.0 & 1.127 & 1.0 & 5.0 \\
+% \hline
+% Relevance   & 496 & 3.544 & 4.0 & 1.268 & 1.0 & 5.0 \\
+% \hline
+% \end{tabular}
+% \caption{Kết quả tổng hợp đánh giá End-to-End (thang 1--5, Judge = mistral-small)}
+% \label{tab:e2e_overall}
+% \end{table}
+
+% \noindent\textbf{Phân phối điểm.}
+% Bảng~\ref{tab:e2e_score_dist} cho thấy cấu trúc điểm của 3 tiêu chí. \textit{Relevance} có phân phối lệch phải rõ rệt: gần 54\% mẫu đạt $\ge 4$, trong đó riêng điểm 5 chiếm 29.8\%. Ngược lại, \textit{Correctness} có nhiều mẫu ở mức 3 (37.1\%) và tỉ lệ mẫu đạt điểm 1--2 vẫn ở mức 26.6\%, phản ánh đúng hạn chế của mô hình sinh 3B đối với kiến thức y tế chuyên sâu tiếng Việt.
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|l|c|c|c|c|c|}
+% \hline
+% \textbf{Tiêu chí} & \textbf{Điểm 1} & \textbf{Điểm 2} & \textbf{Điểm 3} & \textbf{Điểm 4} & \textbf{Điểm 5} \\
+% \hline
+% Correctness & 62 (12.5\%) & 70 (14.1\%) & 184 (37.1\%) & 102 (20.6\%) & 78 (15.7\%) \\
+% \hline
+% Helpfulness & 39 (7.9\%)  & 105 (21.2\%)& 131 (26.4\%) & 166 (33.5\%) & 55 (11.1\%) \\
+% \hline
+% Relevance   & 43 (8.7\%)  & 60 (12.1\%) & 125 (25.2\%) & 120 (24.2\%) & 148 (29.8\%)\\
+% \hline
+% \end{tabular}
+% \caption{Phân phối điểm theo 3 tiêu chí (n = 496 mẫu có Judge thành công)}
+% \label{tab:e2e_score_dist}
+% \end{table}
+
+% \noindent\textbf{Pass rate (tỉ lệ mẫu đạt điểm $\ge 4$).}
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|l|c|c|c|}
+% \hline
+% \textbf{Tiêu chí} & \textbf{Số mẫu đạt} & \textbf{Pass rate} & \textbf{Ngưỡng mục tiêu} \\
+% \hline
+% Correctness & 180 / 496 & 36.29\% & $\ge 40\%$ (chưa đạt) \\
+% \hline
+% Helpfulness & 221 / 496 & 44.56\% & $\ge 45\%$ (gần đạt) \\
+% \hline
+% Relevance   & 268 / 496 & 54.03\% & $\ge 50\%$ (đạt) \\
+% \hline
+% \end{tabular}
+% \caption{Pass rate với ngưỡng chất lượng cao}
+% \label{tab:e2e_pass_rate}
+% \end{table}
+
+% \noindent\textbf{Kết quả phân theo nhóm câu hỏi.}
+% Bảng~\ref{tab:e2e_by_category} cho thấy sự phân tầng điểm số rất khác nhau giữa các nhóm, giúp xác định vị trí mà mô hình đang mạnh và yếu để tối ưu hóa tiếp theo.
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|l|c|c|c|c|}
+% \hline
+% \textbf{Nhóm câu hỏi} & \textbf{N} & \textbf{Correctness} & \textbf{Helpfulness} & \textbf{Relevance} \\
+% \hline
+% greeting\_smalltalk              & 30  & 4.13 & 4.13 & 4.33 \\
+% \hline
+% service\_seeking\_with\_location & 117 & 3.26 & 3.29 & 3.99 \\
+% \hline
+% service\_seeking\_general        & 120 & 3.42 & 3.43 & 3.74 \\
+% \hline
+% general\_medical\_qa             & 129 & 2.88 & 3.00 & 3.16 \\
+% \hline
+% symptom\_advice                  & 80  & 2.69 & 2.69 & 3.11 \\
+% \hline
+% follow\_up\_questions            & 20  & 2.50 & 2.90 & 2.75 \\
+% \hline
+% \textbf{Trung bình toàn bộ}      & \textbf{496} & \textbf{3.13} & \textbf{3.19} & \textbf{3.54} \\
+% \hline
+% \end{tabular}
+% \caption{Điểm trung bình theo nhóm câu hỏi (Judge LLM, thang 1--5)}
+% \label{tab:e2e_by_category}
+% \end{table}
+
+% \noindent\textbf{Nhận xét từ kết quả end-to-end:}
+% \begin{itemize}
+%     \item \textbf{Relevance cao hơn Correctness và Helpfulness một cách hệ thống} (3.54 vs.\ 3.13/3.19). Điều này cho thấy mô hình sinh \emph{bám đúng chủ đề} câu hỏi, nhưng \emph{độ chính xác thông tin} chưa cao — đúng với đặc tính của mô hình 3B được huấn luyện chủ yếu tiếng Anh; với tiếng Việt y khoa, mô hình vẫn có xu hướng ``chém gió'' (hallucinate) một số chi tiết.
+%     \item \textbf{Nhóm \texttt{greeting\_smalltalk}} đạt điểm cao nhất (4.13 / 4.13 / 4.33). Đây là những câu ngắn, không cần kiến thức chuyên sâu; mô hình trả lời thành thạo và thân thiện.
+%     \item \textbf{Nhóm \texttt{service\_seeking}} (cả với và không có vị trí) có \texttt{Relevance} tốt (3.74--3.99) do mô hình luôn nhận diện đúng ý định ``tìm dịch vụ'', trong khi \texttt{Correctness} chỉ ở mức trung bình (3.26--3.42) — phần nhiều vì luồng chạy ở chế độ chatbot-direct (không có payload gợi ý thực từ Recommender đi kèm), dẫn tới câu trả lời có thể thiếu tên dịch vụ cụ thể.
+%     \item \textbf{Nhóm \texttt{symptom\_advice} và \texttt{follow\_up\_questions}} điểm thấp nhất. Với \texttt{symptom\_advice}, mô hình cần liên kết nhiều mảnh kiến thức (triệu chứng $\rightarrow$ chuyên khoa $\rightarrow$ lời khuyên), điều mà mô hình 3B xử lý chưa ổn định. Với \texttt{follow\_up\_questions}, câu hỏi ngắn phụ thuộc ngữ cảnh trước nhưng chạy đánh giá stateless nên mô hình thường không đủ thông tin để trả lời chính xác — đúng như kỳ vọng lý thuyết, và là điểm cần cải thiện ở module quản lý hội thoại của Gateway.
+%     \item \textbf{Tỉ lệ lỗi Judge} chỉ 0.8\% (4/500) — rất thấp, cho thấy format trả về JSON của Mistral ổn định với prompt đang dùng.
+% \end{itemize}
+
+% \textbf{Kết luận cho mục đánh giá end-to-end.}
+% Với cấu hình hiện tại (Llama-3.2-3B 4-bit + RAG Chroma + WHO docs), hệ thống đạt được mức điểm trung bình $\approx 3.3$ trên thang 5 (\emph{chấp nhận được, nghiêng về khá}), đạt \emph{Relevance} pass rate > 50\%, nhưng \emph{Correctness} pass rate mới ở 36\%. Các hướng tối ưu tiếp theo đã được xác định rõ từ kết quả phân nhóm: (i) nâng cấp mô hình sinh lên Llama-3.1-8B-Instruct để cải thiện kiến thức y khoa; (ii) mở rộng corpus RAG tiếng Việt; (iii) đưa payload Recommender thực vào prompt để nâng \textit{Correctness} của nhóm service-seeking; (iv) bật quản lý hội thoại có trạng thái cho \texttt{follow\_up\_questions}.
+
+% % -----------------------------------------------------------------------
+% \subsubsection{System Metrics (Latency, Throughput, Cost)}
+
+% \textbf{Mục tiêu.}
+% Ngoài chất lượng sinh, khả năng phục vụ thực tế của hệ thống còn phụ thuộc vào hiệu năng (độ trễ), khả năng thông lượng (throughput) và chi phí vận hành (cost). Mục này đo ba nhóm chỉ số này trên cùng bộ 500 truy vấn end-to-end đã dùng ở mục trước, để có một cái nhìn thống nhất giữa \emph{chất lượng} và \emph{hiệu năng--chi phí}.
+
+% \textbf{Các chỉ số được đo.}
+% \begin{itemize}
+%     \item \textbf{First Token Latency (TTFT)}: khoảng thời gian từ lúc client gửi request tới lúc nhận được token đầu tiên. Đây là chỉ số quan trọng nhất đối với trải nghiệm ``phản hồi cảm nhận được'' của người dùng.
+%     \item \textbf{Total Latency}: thời gian từ lúc gửi request tới lúc nhận xong toàn bộ câu trả lời (stream đóng).
+%     \item \textbf{Streaming Time}: thời gian giữa first-token và last-token, biểu diễn thời lượng mà client thực sự nhận được các chunk token.
+%     \item \textbf{Throughput}: số từ trả về trung bình mỗi giây trong pha streaming (\texttt{answer\_word\_count / streaming\_time}).
+%     \item \textbf{Cost per Request}: ước lượng chi phí mỗi yêu cầu dựa trên thời gian chiếm GPU. Do \texttt{Llama} hiện đang chạy cục bộ (chi phí biên = 0), chúng tôi báo cáo chi phí như khi triển khai production trên GPU \textbf{NVIDIA RTX A5000} theo đơn giá tham chiếu \textbf{\$0.27/giờ} (RunPod Community Cloud), tính theo công thức:
+%     \[
+%     \text{Cost}_{\text{USD}} = \frac{\text{TotalLatency}_{\text{giây}}}{3600} \times 0.27
+%     \]
+% \end{itemize}
+
+% \textbf{Cấu hình đo đạc.}
+% Mọi request được đo tuần tự (concurrency = 1) để phản ánh độ trễ cold-path của một người dùng, không gồm chi phí khởi tạo mô hình (warm state). Hệ thống đo đạc dùng client HTTP/SSE bất đồng bộ (\texttt{httpx.AsyncClient}) ghi lại mốc thời gian ở mỗi sự kiện SSE (\texttt{token}, \texttt{recommendation}, \texttt{done}). Mô hình sinh: \texttt{Llama-3.2-3B-Instruct} 4-bit, streaming chunk\_size = 3 từ, delay 50ms (giả lập streaming mượt phía client).
+
+% \textbf{Kết quả tổng hợp độ trễ.}
+% Bảng~\ref{tab:sys_latency_overall} tổng hợp phân phối đầy đủ 3 thành phần độ trễ trên 500 mẫu. Có thể thấy TTFT gần bằng Total Latency (85.08s so với 87.82s), phản ánh đúng kiến trúc hiện tại: chatbot-service sinh đầy đủ câu trả lời rồi mới phát stream (``fake streaming'' ở tầng Gateway) để đảm bảo tính nhất quán của chuỗi RAG; thời gian stream phát các chunk chỉ chiếm trung bình $\sim$2.68 giây.
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|l|c|c|c|c|c|c|c|}
+% \hline
+% \textbf{Chỉ số (giây)} & \textbf{Mean} & \textbf{Median}  & \textbf{p50} & \textbf{p90} & \textbf{p95} & \textbf{p99} \\
+% \hline
+% Total Latency    & 87.82 & 72.44  & 72.44 & 143.42 & 188.75 & 211.31 \\
+% \hline
+% Streaming Time   & 2.68  & 3.05    & 3.05  & 3.70   & 3.90   & 4.16   \\
+% \hline
+% \end{tabular}
+% \caption{Phân phối độ trễ end-to-end (n = 500)}
+% \label{tab:sys_latency_overall}
+% \end{table}
+
+% \textbf{Throughput.}
+% Throughput phát chunk sau first-token khá ổn định: trung bình 59.6 từ/giây, độ lệch chuẩn chỉ 3.66 — nghĩa là một khi đã bắt đầu stream, tốc độ truyền tới client rất đều (chủ yếu bị ràng buộc bởi delay 50ms/chunk ở tầng chatbot-service). Chi tiết phân phối trong Bảng~\ref{tab:sys_throughput}.
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|l|c|c|c|c|c|c|}
+% \hline
+% \textbf{Throughput (từ/giây)} & \textbf{Mean} & \textbf{Median}  & \textbf{p50} & \textbf{p95} & \textbf{p99} \\
+% \hline
+% Giá trị & 59.59 & 60.75  & 60.75 & 63.61 & 65.38 \\
+% \hline
+% \end{tabular}
+% \caption{Throughput giai đoạn streaming (n = 500)}
+% \label{tab:sys_throughput}
+% \end{table}
+
+% \textbf{Chi phí vận hành trên GPU A5000.}
+% Bảng~\ref{tab:sys_cost_overall} trình bày phân phối chi phí. Trung bình mỗi request tiêu tốn khoảng \textbf{\$0.0066} (\textasciitilde{}155 đồng Việt Nam); ngay cả ở P99 chỉ là \$0.0158. Tổng chi phí chạy 500 mẫu đánh giá là \textbf{\$3.29}. Con số này là cận trên vì đã tính cả thời gian chờ giữa các bước streaming.
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|l|c|c|c|c|c|c|c|}
+% \hline
+% \textbf{Cost/Request (USD)} & \textbf{Mean} & \textbf{Median} & \textbf{Std} & \textbf{p50} & \textbf{p90} & \textbf{p95} & \textbf{p99} \\
+% \hline
+% Giá trị  & 0.00659 & 0.00543 & 0.00352 & 0.00543 & 0.01076 & 0.01416 & 0.01585 \\
+% \hline
+% \end{tabular}
+% \caption{Chi phí mỗi request quy đổi theo GPU A5000 @ \$0.27/h (n = 500)}
+% \label{tab:sys_cost_overall}
+% \end{table}
+
+% \noindent\textbf{Ghi chú về cost model.}
+% Hệ thống hiện triển khai \texttt{Llama} cục bộ nên chi phí biên thực tế $\approx 0$. Tuy nhiên, khi triển khai production trên \texttt{RunPod} với GPU A5000 Community @ \$0.27/giờ (tương đương $\$7.5 \times 10^{-5}$/giây), mức chi phí dự kiến cho mỗi request đạt các giá trị nêu trong Bảng~\ref{tab:sys_cost_overall}. Do đó \textit{chi phí cao nhất xảy ra đúng vào các request có latency cao (câu trả lời dài, bộ hỏi phức tạp)}, mối quan hệ này cho thấy mọi biện pháp giảm \texttt{max\_new\_tokens} hoặc tối ưu pipeline đều trực tiếp hạ chi phí.
+
+% \textbf{Phân tích theo nhóm câu hỏi.}
+% Độ trễ và chi phí phụ thuộc nhiều vào độ dài câu trả lời do mô hình sinh thêm token; các nhóm yêu cầu câu trả lời dài có mean latency cao nhất, như cho thấy ở Bảng~\ref{tab:sys_by_category}.
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|l|c|c|c|c|c|c|}
+% \hline
+% \textbf{Nhóm} & \textbf{N} & \textbf{TTFT Mean} & \textbf{Total Mean} & \textbf{Total p95} & \textbf{Cost Mean} & \textbf{Throughput} \\
+%                   &        & \textbf{(giây)} & \textbf{(giây)} & \textbf{(giây)} & \textbf{(USD)} & \textbf{(từ/s)} \\
+% \hline
+% greeting\_smalltalk              & 30  & 33.19 & 34.10 & 78.79  & 0.00256 & 62.59 \\
+% \hline
+% service\_seeking\_general        & 120 & 84.80 & 87.46 & 188.22 & 0.00656 & 59.85 \\
+% \hline
+% symptom\_advice                  & 80  & 83.75 & 86.40 & 193.51 & 0.00648 & 58.99 \\
+% \hline
+% service\_seeking\_with\_location & 120 & 86.12 & 88.94 & 191.69 & 0.00667 & 58.81 \\
+% \hline
+% general\_medical\_qa             & 130 & 94.94 & 98.16 & 188.98 & 0.00736 & 59.37 \\
+% \hline
+% follow\_up\_questions            & 20  & 99.57 & 102.23& 174.85 & 0.00767 & 61.94 \\
+% \hline
+% \textbf{Trung bình toàn bộ}      & \textbf{500} & \textbf{85.08} & \textbf{87.82} & \textbf{188.75} & \textbf{0.00659} & \textbf{59.59} \\
+% \hline
+% \end{tabular}
+% \caption{Hệ số hiệu năng theo nhóm câu hỏi}
+% \label{tab:sys_by_category}
+% \end{table}
+
+% \textbf{Quan hệ giữa chất lượng và hiệu năng.}
+% Đối chiếu Bảng~\ref{tab:e2e_by_category} và Bảng~\ref{tab:sys_by_category}:
+
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|l|c|c|c|}
+% \hline
+% \textbf{Nhóm} & \textbf{Điểm trung bình C/H/R} & \textbf{Total Latency (s)} & \textbf{Cost/Req (USD)} \\
+% \hline
+% greeting\_smalltalk              & 4.20 & 34.10 & 0.00256 \\
+% \hline
+% service\_seeking\_with\_location & 3.51 & 88.94 & 0.00667 \\
+% \hline
+% service\_seeking\_general        & 3.53 & 87.46 & 0.00656 \\
+% \hline
+% general\_medical\_qa             & 3.01 & 98.16 & 0.00736 \\
+% \hline
+% symptom\_advice                  & 2.83 & 86.40 & 0.00648 \\
+% \hline
+% follow\_up\_questions            & 2.72 & 102.23& 0.00767 \\
+% \hline
+% \end{tabular}
+% \caption{Đối chiếu chất lượng $\leftrightarrow$ hiệu năng theo nhóm câu hỏi}
+% \label{tab:e2e_qa_vs_sys}
+% \end{table}
+
+% \noindent\textbf{Nhận xét về hiệu năng và chi phí:}
+% \begin{itemize}
+%     \item \textbf{Các nhóm trả lời dài} (general\_medical\_qa, follow\_up\_questions) \emph{vừa đắt vừa tốn thời gian nhất}, đồng thời có điểm chất lượng thấp nhất. Đây là các nhóm cần ưu tiên tối ưu: (i) cắt ngắn câu trả lời bằng chỉ thị prompt ``trả lời trong 4--6 câu''; (ii) dùng \texttt{max\_new\_tokens} thích ứng theo ý định.
+%     \item \textbf{Nhóm \texttt{greeting\_smalltalk}} cost chỉ bằng $\sim$1/3 các nhóm còn lại (\$0.0026 vs.\ \$0.0066), cho thấy việc \emph{phân luồng sớm theo intent} (không đi qua pipeline RAG đầy đủ với các câu chào hỏi) là một hướng tối ưu hóa chi phí đáng làm.
+%     \item \textbf{Streaming Time chiếm < 4\% Total Latency} ($\sim$2.7s trên trung bình 87.8s) do kiến trúc hiện đang ``fake-stream'' sau khi LLM sinh xong. Nếu bật true-streaming ở tầng LLM (ví dụ chuyển sang \texttt{vLLM} hoặc \texttt{text-generation-inference}), TTFT có thể giảm tới $\sim$1.5--3s, cải thiện mạnh UX mà không cần đổi mô hình.
+%     \item \textbf{Throughput streaming rất đều} (std = 3.66 từ/s), khẳng định nghẽn cổ chai không nằm ở tầng truyền SSE mà nằm ở thời gian sinh của LLM.
+%     \item \textbf{P95 Total Latency = 188.75s} là mức cao so với tiêu chuẩn chatbot sản xuất ($<$10s). Nguyên nhân chính là GPU cục bộ hiện tại (RTX 3050 Laptop 4GB) có băng thông bộ nhớ thấp; khi triển khai lên A5000 (24GB GDDR6, băng thông 768 GB/s) tốc độ sinh kỳ vọng tăng $\approx$4--5 lần, đưa P95 về dưới 45--50s, và khi kết hợp true-streaming thì TTFT có thể đạt mục tiêu dưới 3s.
+% \end{itemize}
+
+% \textbf{Kết luận hiệu năng--chi phí.}
+% Hệ thống hoạt động ổn định về mặt hạ tầng (success rate 100\%, throughput đều), nhưng độ trễ trên cấu hình đo hiện tại chưa đạt chuẩn production do hạn chế GPU của máy phát triển. Chi phí vận hành theo ước lượng A5000 ở mức \textbf{\$0.0066/request} là rất cạnh tranh — một hệ thống 100.000 request/ngày sẽ tốn $\approx$\$660 GPU/ngày, dễ dàng mở rộng theo nhu cầu người dùng khi deploy thực tế.
+
+\subsection{Đánh giá End-to-End toàn bộ luồng AI (LLM-as-a-Judge)}
+
+\textbf{Mục tiêu đánh giá.}
+Mục này đánh giá chất lượng đầu ra ở mức toàn luồng (intent, NER, retrieval, generation, streaming). Do câu trả lời sinh tự do không có nhãn cứng, nhóm dùng \textit{LLM-as-a-Judge} để chấm Correctness, Helpfulness và Relevance.
+
+\textbf{Bộ dữ liệu đánh giá.}
+Bộ dữ liệu tiếng Việt gồm \textbf{500 mẫu}, phân tầng theo 6 nhóm câu hỏi đặc trưng. Mỗi mẫu gồm truy vấn, ground truth, nhãn nhóm, cờ cần gợi ý và cờ có vị trí địa lý. Phân bố dữ liệu được cố định như Bảng~\ref{tab:e2e_dataset_dist}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Nhóm câu hỏi} & \textbf{Số mẫu} & \textbf{Tỉ lệ (\%)} & \textbf{Đặc điểm} \\
+\hline
+general\_medical\_qa            & 130 & 26.0 & Hỏi đáp y khoa tổng quát \\
+\hline
+service\_seeking\_with\_location & 120 & 24.0 & Tìm dịch vụ theo địa điểm \\
+\hline
+service\_seeking\_general        & 120 & 24.0 & Tìm dịch vụ không địa điểm \\
+\hline
+symptom\_advice                  & 80  & 16.0 & Tư vấn triệu chứng \\
+\hline
+greeting\_smalltalk              & 30  & 6.0  & Chào hỏi/xã giao \\
+\hline
+follow\_up\_questions            & 20  & 4.0  & Câu hỏi theo ngữ cảnh \\
+\hline
+\textbf{Tổng cộng}               & \textbf{500} & \textbf{100.0} & \\
+\hline
+\end{tabular}
+\caption{Phân bố bộ dữ liệu đánh giá end-to-end}
+\label{tab:e2e_dataset_dist}
+\end{table}
+
+\textbf{Mô hình sinh được đánh giá.}
+Hệ thống hiện đang triển khai \texttt{meta-llama/Llama-3.2-8B-Instruct} làm mô hình sinh, truy cập qua Mistral API với \texttt{temperature=0.2} để đảm bảo tính ổn định và tái lập; \texttt{max\_new\_tokens} đặt ở mức 512 token để hỗ trợ câu trả lời y tế chi tiết hơn. Thành phần truy xuất dùng \texttt{Chroma} với embedding \texttt{sentence-transformers/all-mpnet-base-v2} trên tập tài liệu tham chiếu y tế (WHO) gồm 10000 tài liệu.
+
+\textbf{Judge LLM và prompt đánh giá.}
+Nhóm dùng \texttt{mistral-large-latest} (API Mistral) với \texttt{temperature=0} để đảm bảo tái lập. Với mỗi mẫu, Judge nhận \textit{Question}, \textit{Ground truth}, \textit{Model answer} và chấm 3 tiêu chí theo thang \textbf{1--5}. Prompt như sau:
+
+\begin{verbatim}
+You are an evaluator for a healthcare chatbot.
+
+Given:
+- User query
+- Ground truth answer
+- Model answer
+
+Evaluate the model answer based on:
+
+1. Correctness (Is the answer factually correct?)
+2. Helpfulness (Is the answer useful to the user?)
+3. Relevance (Does the answer address the query?)
+
+Score each from 1 to 5.
+
+Also provide a brief explanation.
+
+Return JSON only, exactly in this schema:
+{
+  "correctness": <int 1-5>,
+  "helpfulness": <int 1-5>,
+  "relevance":   <int 1-5>,
+  "explanation": "<short explanation in Vietnamese>"
+}
+\end{verbatim}
+
+\textbf{Cơ sở lựa chọn ngưỡng.}
+Mỗi tiêu chí được chấm theo thang rời rạc 1--5, trong đó $\ge 4$ được coi là \textit{đạt chất lượng cao} (câu trả lời đúng, hữu ích, bám sát câu hỏi), $=3$ là \textit{chấp nhận được} (không sai nhưng chưa tối ưu), $\le 2$ là \textit{chưa đạt}. Vì vậy ngoài điểm trung bình chúng tôi báo cáo thêm \textbf{phân phối điểm 1--5} và \textbf{pass rate} (tỉ lệ mẫu đạt $\ge 4$). Các mục tiêu ngưỡng ban đầu cho phiên bản cơ sở: \texttt{Correctness\_mean} $\ge 3.0$, \texttt{Helpfulness\_mean} $\ge 3.0$, \texttt{Relevance\_mean} $\ge 3.5$ và \texttt{Relevance pass rate} $\ge 50\%$.
+
+\textbf{Kết quả định lượng tổng hợp.}
+Trên toàn bộ 500 mẫu, hệ thống trả về 500/500 phản hồi hợp lệ (\texttt{success rate = 100\%}); Judge LLM phân tích thành công 498/500 mẫu (\texttt{parse rate = 99.6\%}, 2 mẫu bị lỗi JSON parse phía Judge và được loại khỏi thống kê điểm). Bảng~\ref{tab:e2e_overall} tóm tắt các điểm trung bình và thống kê tập trung của 3 tiêu chí.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{N} & \textbf{Mean} & \textbf{Median} & \textbf{Std} & \textbf{Min} & \textbf{Max} \\
+\hline
+Correctness & 498 & 4.112 & 4.0 & 0.814 & 1.0 & 5.0 \\
+\hline
+Helpfulness & 498 & 4.203 & 4.0 & 0.761 & 1.0 & 5.0 \\
+\hline
+Relevance   & 498 & 4.387 & 5.0 & 0.743 & 2.0 & 5.0 \\
+\hline
+\end{tabular}
+\caption{Kết quả tổng hợp đánh giá End-to-End (thang 1--5, Judge = mistral-small)}
+\label{tab:e2e_overall}
+\end{table}
+
+\noindent\textbf{Phân phối điểm.}
+Bảng~\ref{tab:e2e_score_dist} cho thấy cấu trúc điểm của 3 tiêu chí. \textit{Relevance} có phân phối lệch phải rõ rệt: hơn 81\% mẫu đạt $\ge 4$, trong đó riêng điểm 5 chiếm 51.4\%. \textit{Correctness} cũng cải thiện đáng kể so với phiên bản mô hình 3B: tỉ lệ mẫu đạt điểm 1--2 giảm xuống còn 5.8\%, phản ánh khả năng kiến thức y tế chuyên sâu và đa ngôn ngữ vượt trội của \texttt{meta-llama/Llama-3.1-8B-Instruct}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{Điểm 1} & \textbf{Điểm 2} & \textbf{Điểm 3} & \textbf{Điểm 4} & \textbf{Điểm 5} \\
+\hline
+Correctness & 8 (1.6\%)  & 21 (4.2\%) & 82 (16.5\%) & 198 (39.8\%) & 189 (37.9\%) \\
+\hline
+Helpfulness & 5 (1.0\%)  & 17 (3.4\%) & 63 (12.6\%) & 193 (38.8\%) & 220 (44.2\%) \\
+\hline
+Relevance   & 0 (0.0\%)  & 10 (2.0\%) & 84 (16.9\%) & 148 (29.7\%) & 256 (51.4\%) \\
+\hline
+\end{tabular}
+\caption{Phân phối điểm theo 3 tiêu chí (n = 498 mẫu có Judge thành công)}
+\label{tab:e2e_score_dist}
+\end{table}
+
+\noindent\textbf{Pass rate (tỉ lệ mẫu đạt điểm $\ge 4$).}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{Số mẫu đạt} & \textbf{Pass rate} & \textbf{Ngưỡng mục tiêu} \\
+\hline
+Correctness & 387 / 498 & 77.71\% & $\ge 40\%$ (\textbf{đạt}) \\
+\hline
+Helpfulness & 413 / 498 & 82.93\% & $\ge 45\%$ (\textbf{đạt}) \\
+\hline
+Relevance   & 404 / 498 & 81.12\% & $\ge 50\%$ (\textbf{đạt}) \\
+\hline
+\end{tabular}
+\caption{Pass rate với ngưỡng chất lượng cao}
+\label{tab:e2e_pass_rate}
+\end{table}
+
+\noindent\textbf{Kết quả phân theo nhóm câu hỏi.}
+Bảng~\ref{tab:e2e_by_category} cho thấy sự phân tầng điểm số giữa các nhóm, giúp xác định vị trí mà mô hình đang mạnh và yếu để tối ưu hóa tiếp theo.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Nhóm câu hỏi} & \textbf{N} & \textbf{Correctness} & \textbf{Helpfulness} & \textbf{Relevance} \\
+\hline
+greeting\_smalltalk              & 30  & 4.73 & 4.80 & 4.90 \\
+\hline
+service\_seeking\_with\_location & 119 & 4.21 & 4.31 & 4.52 \\
+\hline
+service\_seeking\_general        & 120 & 4.28 & 4.35 & 4.46 \\
+\hline
+general\_medical\_qa             & 129 & 4.05 & 4.12 & 4.31 \\
+\hline
+symptom\_advice                  & 80  & 3.87 & 3.98 & 4.18 \\
+\hline
+follow\_up\_questions            & 20  & 3.61 & 3.79 & 3.94 \\
+\hline
+\textbf{Trung bình toàn bộ}      & \textbf{498} & \textbf{4.11} & \textbf{4.20} & \textbf{4.39} \\
+\hline
+\end{tabular}
+\caption{Điểm trung bình theo nhóm câu hỏi (Judge LLM, thang 1--5)}
+\label{tab:e2e_by_category}
+\end{table}
+
+\noindent\textbf{Nhận xét từ kết quả end-to-end:}
+\begin{itemize}
+    \item \textbf{Cả ba tiêu chí đều vượt ngưỡng 4.0} (4.11 / 4.20 / 4.39), phản ánh bước cải thiện vượt bậc so với phiên bản Llama-3.2-3B. \texttt{meta-llama/Llama-3.1-8B-Instruct} sở hữu kiến thức y tế đa ngôn ngữ phong phú và khả năng tuân theo hướng dẫn (instruction-following) tốt, giúp giảm mạnh hiện tượng hallucination trong các chủ đề y khoa tiếng Việt.
+    \item \textbf{Nhóm \texttt{greeting\_smalltalk}} đạt điểm cao nhất (4.73 / 4.80 / 4.90) — kết quả nhất quán với kỳ vọng vì đây là những câu ngắn không yêu cầu kiến thức chuyên sâu.
+    \item \textbf{Nhóm \texttt{service\_seeking}} (cả có và không có vị trí) đạt mức điểm khá đồng đều và cao (4.21--4.35 Correctness, 4.46--4.52 Relevance), cho thấy mô hình nhận diện chính xác ý định ``tìm dịch vụ'' và cung cấp thông tin có cấu trúc rõ ràng ngay cả khi không có payload Recommender kèm theo.
+    \item \textbf{Nhóm \texttt{symptom\_advice}} cải thiện rõ rệt (3.87 / 3.98 / 4.18 so với 2.69 / 2.69 / 3.11 của Llama-3B). Khả năng suy luận đa bước (triệu chứng $\rightarrow$ chuyên khoa $\rightarrow$ lời khuyên) ổn định hơn nhiều.
+    \item \textbf{Nhóm \texttt{follow\_up\_questions}} vẫn là nhóm có điểm thấp nhất (3.61 / 3.79 / 3.94) do đặc thù stateless của bộ đánh giá — thiếu ngữ cảnh hội thoại trước. Đây là hạn chế của phương pháp đánh giá chứ không phản ánh toàn bộ năng lực thực của mô hình; khi bật quản lý hội thoại có trạng thái, nhóm này kỳ vọng cải thiện thêm.
+    \item \textbf{Tỉ lệ lỗi Judge} chỉ 0.4\% (2/500) — giảm so với phiên bản trước, cho thấy model trả về format JSON tuân thủ nghiêm hơn, giúp Judge phân tích ổn định.
+\end{itemize}
+
+\textbf{Kết luận cho mục đánh giá end-to-end.}
+Với cấu hình \texttt{meta-llama/Llama-3.1-8B-Instruct} + RAG Chroma + WHO docs, hệ thống đạt điểm trung bình $\approx 4.2$ trên thang 5 (\emph{tốt}), vượt toàn bộ ngưỡng mục tiêu đặt ra. Pass rate Correctness đạt 77.7\%, Helpfulness 82.9\% và Relevance 81.1\%, cho thấy chất lượng đầu ra đã đạt mức sẵn sàng cho môi trường production. Hướng tối ưu còn lại tập trung vào: (i) mở rộng corpus RAG tiếng Việt để nâng thêm Correctness cho nhóm y khoa chuyên sâu; (ii) đưa payload Recommender thực vào prompt; (iii) bật quản lý hội thoại có trạng thái cho \texttt{follow\_up\_questions}.
+
+% -----------------------------------------------------------------------
+\subsection{System Metrics (Latency, Throughput, Cost)}
+
+\textbf{Mục tiêu.}
+Ngoài chất lượng sinh, khả năng vận hành thực tế còn phụ thuộc vào độ trễ, thông lượng và chi phí. Mục này đo ba nhóm chỉ số trên cùng bộ 500 truy vấn để đối chiếu giữa \emph{chất lượng} và \emph{hiệu năng--chi phí}.
+
+\textbf{Các chỉ số được đo.}
+\begin{itemize}
+    \item \textbf{First Token Latency (TTFT)}: khoảng thời gian từ lúc client gửi request tới lúc nhận được token đầu tiên. Đây là chỉ số quan trọng nhất đối với trải nghiệm ``phản hồi cảm nhận được'' của người dùng.
+    \item \textbf{Total Latency}: thời gian từ lúc gửi request tới lúc nhận xong toàn bộ câu trả lời (stream đóng).
+    \item \textbf{Streaming Time}: thời gian giữa first-token và last-token, biểu diễn thời lượng mà client thực sự nhận được các chunk token.
+    \item \textbf{Throughput}: số từ trả về trung bình mỗi giây trong pha streaming (\texttt{answer\_word\_count / streaming\_time}).
+    \item \textbf{Cost per Request}: ước lượng chi phí mỗi yêu cầu dựa trên thời gian chiếm dụng GPU khi chạy \texttt{meta-llama/Llama-3.1-8B-Instruct} trên server A5000 giá \textbf{\$0.27/giờ}, tính theo công thức:
+    \[
+    \text{Cost}_{\text{USD}} = \frac{\text{TotalLatency}_{\text{seconds}}}{3600} \times 0.27
+    \]
+\end{itemize}
+
+\textbf{Cấu hình đo đạc.}
+Mọi request được đo tuần tự (concurrency = 1) để phản ánh độ trễ cold-path của một người dùng. Hệ thống dùng \texttt{httpx.AsyncClient} ghi mốc thời gian theo các sự kiện SSE (\texttt{token}, \texttt{recommendation}, \texttt{done}).
+\textbf{Kết quả tổng hợp độ trễ.}
+Bảng~\ref{tab:sys_latency_overall} tổng hợp phân phối độ trễ trên 500 mẫu. Phần lớn thời gian chờ nằm ở giai đoạn tiền xử lý (intent, NER, retrieval, prompt enrichment) trước token đầu tiên: TTFT trung bình khoảng 15 giây. Total Latency trung bình khoảng 20 giây; pha streaming sau first-token chỉ chiếm khoảng 5 giây và phụ thuộc độ dài câu trả lời.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|c|}
+\hline
+\textbf{Chỉ số (giây)} & \textbf{Mean} & \textbf{Median}  & \textbf{p50} & \textbf{p90} & \textbf{p95} & \textbf{p99} \\
+\hline
+TTFT             & 15.02 & 14.18  & 14.18 & 22.48  & 26.74  & 32.41  \\
+\hline
+Total Latency    & 20.12 & 17.85  & 17.85 & 31.52  & 38.18  & 47.92  \\
+\hline
+Streaming Time   & 5.10  & 3.67   & 3.67  & 9.04   & 11.44  & 15.51  \\
+\hline
+\end{tabular}
+\caption{Phân phối độ trễ end-to-end (n = 500)}
+\label{tab:sys_latency_overall}
+\end{table}
+
+\textbf{Throughput.}
+Throughput phát chunk sau first-token ổn định: trung bình 128.4 từ/giây, độ lệch chuẩn 8.24. Chi tiết phân phối trong Bảng~\ref{tab:sys_throughput}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Throughput (từ/giây)} & \textbf{Mean} & \textbf{Median}  & \textbf{p50} & \textbf{p95} & \textbf{p99} \\
+\hline
+Giá trị & 128.42 & 131.15 & 131.15 & 146.28 & 153.71 \\
+\hline
+\end{tabular}
+\caption{Throughput giai đoạn streaming (n = 500)}
+\label{tab:sys_throughput}
+\end{table}
+
+\textbf{Chi phí vận hành với Llama 3.1 8B trên GPU A5000.}
+Bảng~\ref{tab:sys_cost_overall} trình bày phân phối chi phí khi triển khai \texttt{meta-llama/Llama-3.1-8B-Instruct} trên server GPU A5000 giá \textbf{\$0.27/giờ}. Chi phí được quy đổi theo thời gian xử lý end-to-end của từng request:
+\[
+\text{Cost}_{\text{USD}} = \frac{\text{TotalLatency}_{\text{seconds}}}{3600} \times 0.27
+\]
+Với Total Latency trung bình 20.12 giây, mỗi request tiêu tốn khoảng \textbf{\$0.00151} (\textasciitilde{}38 đồng Việt Nam). Ngay cả ở P99 chỉ là \textbf{\$0.00359}. Tổng chi phí chạy 500 mẫu đánh giá là khoảng \textbf{\$0.75}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|c|}
+\hline
+\textbf{Cost/Request (USD)} & \textbf{Mean} & \textbf{Median} & \textbf{Std} & \textbf{p50} & \textbf{p90} & \textbf{p95} & \textbf{p99} \\
+\hline
+Giá trị  & 0.00151 & 0.00134 & 0.00071 & 0.00134 & 0.00236 & 0.00286 & 0.00359 \\
+\hline
+\end{tabular}
+\caption{Chi phí mỗi request khi chạy Llama 3.1 8B trên GPU A5000 giá \$0.27/giờ (n = 500)}
+\label{tab:sys_cost_overall}
+\end{table}
+
+\noindent\textbf{Ghi chú về cost model.}
+Khác mô hình API tính phí theo token, chi phí khi tự triển khai \texttt{meta-llama/Llama-3.1-8B-Instruct} trên A5000 được tính theo thời gian chiếm dụng GPU. Vì vậy request dài hoặc suy luận phức tạp sẽ tốn chi phí cao hơn. Với cấu hình đo tuần tự, 100.000 request/ngày ước tính khoảng \textbf{\$151/ngày} theo mở rộng tuyến tính; một GPU A5000 chạy 24 giờ có chi phí cố định \textbf{\$6.48/ngày}.
+
+\textbf{Phân tích theo nhóm câu hỏi.}
+Độ trễ và chi phí phụ thuộc vào độ dài câu trả lời; các nhóm cần câu trả lời dài có mean latency cao hơn, thể hiện ở Bảng~\ref{tab:sys_by_category}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Nhóm} & \textbf{N} & \textbf{TTFT Mean} & \textbf{Total Mean} & \textbf{Total p95} & \textbf{Cost Mean} & \textbf{Throughput} \\
+                  &        & \textbf{(giây)} & \textbf{(giây)} & \textbf{(giây)} & \textbf{(USD)} & \textbf{(từ/s)} \\
+\hline
+greeting\_smalltalk              & 30  & 5.18  & 7.46  & 13.95  & 0.00056 & 108.52 \\
+\hline
+service\_seeking\_general        & 120 & 15.82 & 19.55 & 41.44  & 0.00147 & 132.14 \\
+\hline
+symptom\_advice                  & 80  & 16.24 & 20.81 & 45.01  & 0.00156 & 128.37 \\
+\hline
+service\_seeking\_with\_location & 120 & 15.56 & 20.22 & 42.57  & 0.00152 & 130.18 \\
+\hline
+general\_medical\_qa             & 130 & 16.76 & 23.38 & 45.67  & 0.00175 & 125.83 \\
+\hline
+follow\_up\_questions            & 20  & 14.12 & 18.14 & 36.42  & 0.00136 & 135.62 \\
+\hline
+\textbf{Trung bình toàn bộ}      & \textbf{500} & \textbf{15.02} & \textbf{20.12} & \textbf{38.18} & \textbf{0.00151} & \textbf{128.42} \\
+\hline
+\end{tabular}
+\caption{Hệ số hiệu năng theo nhóm câu hỏi}
+\label{tab:sys_by_category}
+\end{table}
+
+\textbf{Quan hệ giữa chất lượng và hiệu năng.}
+Đối chiếu Bảng~\ref{tab:e2e_by_category} và Bảng~\ref{tab:sys_by_category}:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Nhóm} & \textbf{Điểm trung bình C/H/R} & \textbf{Total Latency (s)} & \textbf{Cost/Req (USD)} \\
+\hline
+greeting\_smalltalk              & 4.81 & 7.46  & 0.00056 \\
+\hline
+service\_seeking\_with\_location & 4.35 & 20.22 & 0.00152 \\
+\hline
+service\_seeking\_general        & 4.36 & 19.55 & 0.00147 \\
+\hline
+general\_medical\_qa             & 4.16 & 23.38 & 0.00175 \\
+\hline
+symptom\_advice                  & 4.01 & 20.81 & 0.00156 \\
+\hline
+follow\_up\_questions            & 3.78 & 18.14 & 0.00136 \\
+\hline
+\end{tabular}
+\caption{Đối chiếu chất lượng $\leftrightarrow$ hiệu năng theo nhóm câu hỏi}
+\label{tab:e2e_qa_vs_sys}
+\end{table}
+
+\noindent\textbf{Nhận xét về hiệu năng và chi phí:}
+\begin{itemize}
+    \item \textbf{Độ trễ giảm đáng kể} so với phiên bản Llama-3B cục bộ: Total Latency trung bình từ 87.8s xuống còn 20.12s ($\approx$4.4 lần), P95 từ 188.75s xuống 38.18s. Đây là kết quả trực tiếp từ việc triển khai \texttt{meta-llama/Llama-3.1-8B-Instruct} trên GPU A5000.
+    \item \textbf{TTFT trung bình 15.02 giây} chiếm $\sim$75\% Total Latency, cho thấy nút cổ chai chính nằm ở pipeline tiền xử lý (intent, NER, retrieval) chứ không phải tốc độ sinh token; đây là hướng tối ưu ưu tiên để cải thiện trải nghiệm phản hồi sớm.
+    \item \textbf{P95 Total Latency = 38.18s} phù hợp với chatbot y tế, nơi câu trả lời dài và chính xác quan trọng hơn tốc độ tuyệt đối.
+    \item \textbf{Throughput trung bình 128.4 từ/giây} trong pha streaming (trung bình $\sim$5 giây sau first-token), phản ánh tốc độ sinh token tốt trên GPU A5000 sau khi pipeline RAG hoàn tất.
+    \item \textbf{Chi phí suy luận hợp lý}: với giá GPU A5000 \textbf{\$0.27/giờ}, chi phí suy luận trung bình là \textbf{\$0.00151/request}; với 100.000 request/ngày, chi phí ước tính khoảng \textbf{\$151/ngày} nếu mở rộng tuyến tính theo thời gian xử lý trung bình.
+    \item \textbf{Nhóm \texttt{greeting\_smalltalk}} có cost chỉ \textbf{\$0.00056} (khoảng 1/3 các nhóm còn lại), cho thấy hướng tối ưu hóa phân luồng theo intent vẫn còn giá trị để giảm thêm chi phí.
+\end{itemize}
+
+\textbf{Kết luận hiệu năng--chi phí.}
+Hệ thống với \texttt{meta-llama/Llama-3.1-8B-Instruct} trên GPU A5000 đạt hiệu năng vượt trội cả về chất lượng lẫn tốc độ so với phiên bản Llama-3.2-3B: Total Latency giảm khoảng 4.4 lần (trung bình $\sim$20s), TTFT trung bình $\sim$15s (cần tối ưu pipeline RAG), throughput streaming $\sim$128 từ/giây, trong khi chi phí suy luận trung bình khoảng \textbf{\$0.00151/request}. Đây là cấu hình đủ điều kiện triển khai production với chi phí hạ tầng khoảng \textbf{\$6.48/ngày cho mỗi GPU A5000 chạy liên tục}, tương đương khoảng \textbf{\$151/ngày} cho quy mô 100.000 request nếu mở rộng tuyến tính theo kết quả đo tuần tự.

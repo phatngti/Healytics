@@ -28,15 +28,9 @@ void main() {
       // TODO
     });
 
-    // Medical titles
-    // List<String> medicalTitles (default value: const [])
-    test('to test the property `medicalTitles`', () async {
-      // TODO
-    });
-
-    // Medical license numbers
-    // List<String> medicalLicenses (default value: const [])
-    test('to test the property `medicalLicenses`', () async {
+    // Medical credentials (titles + licenses)
+    // List<MedicalCredentialResponseDto> medicalCredentials (default value: const [])
+    test('to test the property `medicalCredentials`', () async {
       // TODO
     });
 

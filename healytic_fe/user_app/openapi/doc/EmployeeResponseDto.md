@@ -10,28 +10,28 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** | Unique employee identifier | 
 **employeeCode** | **String** | Employee code | 
-**firstName** | [**Object**](.md) | First name | [optional] 
-**lastName** | [**Object**](.md) | Last name | [optional] 
+**firstName** | **String** | First name | [optional] 
+**lastName** | **String** | Last name | [optional] 
 **fullName** | **String** | Full name | 
-**displayName** | [**Object**](.md) | Display name | [optional] 
 **email** | **String** | Email address | 
-**phone** | [**Object**](.md) | Phone number | [optional] 
-**avatarUrl** | [**Object**](.md) | Avatar URL | [optional] 
-**jobTitle** | [**Object**](.md) | Job title | [optional] 
-**startDate** | [**Object**](.md) | Start date | [optional] 
-**employmentType** | [**Object**](.md) | Employment type | [optional] 
-**description** | [**Object**](.md) | Description/bio | [optional] 
-**emergencyContactName** | [**Object**](.md) | Emergency contact name | [optional] 
-**emergencyContactPhone** | [**Object**](.md) | Emergency contact phone | [optional] 
-**idCardUrl** | [**Object**](.md) | ID card URL | [optional] 
+**phone** | **String** | Phone number | [optional] 
+**avatarUrl** | **String** | Avatar URL | [optional] 
+**jobTitle** | **String** | Job title | [optional] 
+**startDate** | [**DateTime**](DateTime.md) | Start date | [optional] 
+**employmentType** | **String** | Employment type | [optional] 
+**description** | **String** | Description/bio | [optional] 
+**emergencyContactName** | **String** | Emergency contact name | [optional] 
+**emergencyContactPhone** | **String** | Emergency contact phone | [optional] 
+**verificationDocuments** | [**List<VerificationDocumentEntryDto>**](VerificationDocumentEntryDto.md) | Verification documents | [optional] [default to const []]
 **schedule** | [**List<WorkScheduleEntryDto>**](WorkScheduleEntryDto.md) | Work schedule | [optional] [default to const []]
-**dob** | [**Object**](.md) | Date of birth | [optional] 
-**gender** | **String** | Gender | [optional] 
-**role** | **String** | Employee role | 
-**status** | **String** | Employee status | 
+**workHistory** | [**List<WorkHistoryEntryDto>**](WorkHistoryEntryDto.md) | Work history | [optional] [default to const []]
+**dob** | [**DateTime**](DateTime.md) | Date of birth | [optional] 
+**gender** | [**Gender**](Gender.md) |  | [optional] 
+**role** | [**EmployeeRole**](EmployeeRole.md) |  | 
+**status** | [**EmployeeStatus**](EmployeeStatus.md) |  | 
 **rating** | **num** | Rating (0-5) | 
 **reviewCount** | **num** | Number of reviews | 
-**partnerId** | [**Object**](.md) | Partner ID the employee belongs to | [optional] 
+**partnerId** | **String** | Partner ID the employee belongs to | [optional] 
 **createdAt** | [**DateTime**](DateTime.md) | Creation timestamp | 
 **updatedAt** | [**DateTime**](DateTime.md) | Last update timestamp | 
 **doctorProfile** | [**DoctorProfileResponseDto**](DoctorProfileResponseDto.md) | Doctor profile | [optional] 

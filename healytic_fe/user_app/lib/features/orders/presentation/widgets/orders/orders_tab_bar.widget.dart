@@ -1,50 +1,67 @@
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/features/orders/presentation/providers/appointment.provider.dart';
 
 /// Horizontal tab bar for switching between
-/// Upcoming / Completed / Canceled appointment lists.
+/// Pending / Upcoming / Processing / Completed /
+/// Canceled appointment lists.
 class OrdersTabBar extends HookConsumerWidget {
   const OrdersTabBar({super.key});
 
-  static const _tabs = ['Upcoming', 'Completed', 'Canceled'];
+  static const _tabs = [
+    'Pending',
+    'Upcoming',
+    'Processing',
+    'Completed',
+    'Canceled',
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedTabProvider);
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DecoratedBox(
+      padding: AppDimens.paddingHorizontalMedium,
+      child: Container(
+        padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: colors.outlineVariant)),
+          color: cs.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: List.generate(_tabs.length, (i) {
             final isActive = selected == i;
             return Expanded(
-              child: InkWell(
+              child: GestureDetector(
                 onTap: () => ref.read(selectedTabProvider.notifier).select(i),
-                child: Container(
-                  padding: const EdgeInsets.only(bottom: 12),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 0),
+                  curve: Curves.easeInOut,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        width: 2,
-                        color: isActive ? colors.primary : Colors.transparent,
-                      ),
-                    ),
+                    color: isActive ? cs.surface : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: isActive
+                        ? [
+                            BoxShadow(
+                              color: cs.shadow.withValues(alpha: 0.08),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ]
+                        : null,
                   ),
-                  child: Text(
-                    _tabs[i],
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                      color: isActive
-                          ? colors.primary
-                          : colors.onSurfaceVariant,
+                  child: Center(
+                    child: Text(
+                      _tabs[i],
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        fontWeight: isActive
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        color: isActive ? cs.primary : cs.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ),

@@ -16,8 +16,18 @@ void main() {
   // final instance = PublicClinicDto();
 
   group('test PublicClinicDto', () {
+    // String id
+    test('to test the property `id`', () async {
+      // TODO
+    });
+
     // String name
     test('to test the property `name`', () async {
+      // TODO
+    });
+
+    // String avatarUrl
+    test('to test the property `avatarUrl`', () async {
       // TODO
     });
 

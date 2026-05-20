@@ -12,6 +12,12 @@ abstract class CategoryRepository {
     bool? sortedAsc,
   });
 
+  /// Get all categories for client-side filtering/sorting.
+  Future<List<CategoryEntity>> getAllCategories({
+    String? sortedBy,
+    bool? sortedAsc,
+  });
+
   /// Get total count of categories
   Future<int> getTotalRows();
 

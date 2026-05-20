@@ -1,8 +1,7 @@
 import 'dart:convert';
 
 import 'package:admin_openapi/api.dart';
-import 'package:admin_panel/core/entities/store.entity.dart';
-import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/config/autofill_config.dart';
 import 'package:admin_panel/features/authenticate/domain/authenticate.entity.dart';
 import 'package:admin_panel/features/authenticate/presentation/providers/sign_up.provider.dart';
 import 'package:admin_panel/features/authenticate/presentation/sign_up/autofill/sign_up_form.autofill.dart';
@@ -18,7 +17,6 @@ import 'package:admin_panel/features/authenticate/presentation/sign_up/widgets/s
 import 'package:common/widgets/toast.dart';
 import 'package:admin_panel/router/admin_routes.dart';
 import 'package:common/utils/demensions.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart' hide Store;
@@ -35,18 +33,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 /// - Legal Representative (Section 3)
 /// - Document Verification (Section 4)
 class SignUpFormScreen extends HookConsumerWidget {
-  const SignUpFormScreen({
-    super.key,
-    this.autofill = false,
-  });
+  const SignUpFormScreen({super.key, this.autofill = false});
 
-  /// When `true` (debug builds only), pre-fills all
+  /// When `true` in UAT, pre-fills all
   /// registration fields. Activate via
   /// `?autofill=true` or the `autoFill` store flag.
   final bool autofill;
 
   /// Extracts business types from form value and
-  /// converts to List<String>.
+  /// converts to `List<String>`.
   List<String> _extractBusinessTypes(dynamic value) {
     if (value == null) return [];
     if (value is String) return [value];
@@ -54,6 +49,17 @@ class SignUpFormScreen extends HookConsumerWidget {
       return value.whereType<String>().toList();
     }
     return [];
+  }
+
+  /// Maps UI ID type label to backend `IdType` enum
+  /// value.
+  String _mapIdTypeToApiValue(String uiLabel) {
+    return switch (uiLabel) {
+      'ID Card' => 'CITIZEN_ID',
+      'Citizen Identity Card' => 'CITIZEN_ID',
+      'Passport' => 'PASSPORT',
+      _ => 'CITIZEN_ID',
+    };
   }
 
   /// Extracts user-friendly error message from API
@@ -66,8 +72,7 @@ class SignUpFormScreen extends HookConsumerWidget {
         if (json is Map<String, dynamic>) {
           final message = json['message'];
           if (message is Map<String, dynamic>) {
-            return message['message'] as String? ??
-                error.message!;
+            return message['message'] as String? ?? error.message!;
           } else if (message is String) {
             return message;
           }
@@ -80,26 +85,47 @@ class SignUpFormScreen extends HookConsumerWidget {
     return error.toString();
   }
 
+  /// Required field keys that must all be non-empty
+  /// before the submit button is enabled.
+  static const _requiredFieldKeys = [
+    'email',
+    'password',
+    'confirm_password',
+    'brand_name',
+    'legal_name',
+    'tax_code',
+    'business_types',
+    'province',
+    'street_address',
+    'clinic_phone',
+    'representative_name',
+    'representative_position',
+    'representative_phone',
+    'id_type',
+    'id_number',
+    'id_issue_date',
+    'documents.identity_front',
+    'documents.identity_back',
+    'documents.business_license',
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = useMemoized(
-      () => GlobalKey<FormBuilderState>(),
-    );
+    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final scrollController = useScrollController();
+    final isFormComplete = useState(false);
 
     final colorScheme = Theme.of(context).colorScheme;
     final state = ref.watch(signUpProviderProvider);
 
-    // Resolve autofill: URL param OR store config flag,
-    // gated behind kDebugMode.
-    final shouldAutofill = kDebugMode &&
-        (autofill ||
-            (Store.tryGet(StoreKey.autoFill) ?? false));
+    // Resolve autofill for UAT only: URL param
+    // OR UAT store config flag.
+    final shouldAutofill = AutofillConfig.isUatAutofillEnabled(
+      routeAutofill: autofill,
+    );
 
     final initialValue = useMemoized(
-      () => shouldAutofill
-          ? _buildAutofillValues()
-          : const <String, dynamic>{},
+      () => shouldAutofill ? _buildAutofillValues() : const <String, dynamic>{},
     );
 
     // Listen for state changes
@@ -112,25 +138,15 @@ class SignUpFormScreen extends HookConsumerWidget {
         data: (data) {
           // Only redirect on successful registration
           if (data.registrationSuccess) {
-            ref
-                .read(signUpProviderProvider.notifier)
-                .reset();
-            context.go(
-              const SuccessRegistrationRoute().location,
-            );
+            ref.read(signUpProviderProvider.notifier).reset();
+            context.go(const SuccessRegistrationRoute().location);
           }
         },
         error: (error, stackTrace) {
           final message = _extractErrorMessage(error);
-          ToastContext.showToast(
-            context,
-            ToastType.error,
-            message,
-          );
+          ToastContext.showToast(context, ToastType.error, message);
           // Reset loading state after error
-          ref
-              .read(signUpProviderProvider.notifier)
-              .reset();
+          ref.read(signUpProviderProvider.notifier).reset();
         },
       );
     });
@@ -141,7 +157,6 @@ class SignUpFormScreen extends HookConsumerWidget {
 
         // Build nested entities
         final accountRequest = AccountRequestEntity(
-          username: values['username'] ?? '',
           email: values['email'] ?? '',
           password: values['password'] ?? '',
         );
@@ -150,22 +165,18 @@ class SignUpFormScreen extends HookConsumerWidget {
           taxCode: values['tax_code'] ?? '',
           legalName: values['legal_name'] ?? '',
           brandName: values['brand_name'] ?? '',
-          businessType: _extractBusinessTypes(
-            values['business_types'],
-          ),
+          businessType: _extractBusinessTypes(values['business_types']),
           provinceId: values['province'] ?? '',
           districtId: values['district'] ?? '',
           wardId: values['ward'] ?? '',
           streetAddress: values['street_address'] ?? '',
-          phoneNumber: values['representative_phone'],
+          phoneNumber: values['clinic_phone'] ?? values['representative_phone'],
         );
 
         // Build documents list
-        final documents =
-            <PartnerDocumentVerificationEntity>[];
+        final documents = <PartnerDocumentVerificationEntity>[];
         for (final entry in values.entries) {
-          if (entry.key.startsWith('documents.') &&
-              entry.value != null) {
+          if (entry.key.startsWith('documents.') && entry.value != null) {
             final value = entry.value;
             if (value is DocumentUploadType) {
               documents.add(
@@ -176,22 +187,15 @@ class SignUpFormScreen extends HookConsumerWidget {
                   urls: [value.url],
                 ),
               );
-            } else if (value
-                    is List<DocumentUploadType> &&
-                value.isNotEmpty) {
-              final docKey = entry.key.replaceFirst(
-                'documents.',
-                '',
-              );
+            } else if (value is List<DocumentUploadType> && value.isNotEmpty) {
+              final docKey = entry.key.replaceFirst('documents.', '');
               documents.addAll(
                 value.indexed
                     .map(
-                      (indexed) =>
-                          PartnerDocumentVerificationEntity(
+                      (indexed) => PartnerDocumentVerificationEntity(
                         fileType: indexed.$2.fileType,
                         type: docKey.toUpperCase(),
-                        documentKey:
-                            '${docKey}_${indexed.$1 + 1}',
+                        documentKey: '${docKey}_${indexed.$1 + 1}',
                         urls: [indexed.$2.url],
                       ),
                     )
@@ -200,32 +204,24 @@ class SignUpFormScreen extends HookConsumerWidget {
             }
           }
         }
-        final legalRepresentativeRequest =
-            LegalRepresentativeEntity(
-          fullName:
-              values['representative_name'] ?? '',
-          position:
-              values['representative_position'],
-          phoneNumber:
-              values['representative_phone'],
-          idType: values['id_type'] ?? 'ID Card',
+        final legalRepresentativeRequest = LegalRepresentativeEntity(
+          fullName: values['representative_name'] ?? '',
+          position: values['representative_position'],
+          phoneNumber: values['representative_phone'],
+          idType: _mapIdTypeToApiValue(
+            values['id_type'] ?? 'Citizen Identity Card',
+          ),
           idNumber: values['id_number'] ?? '',
-          idIssueDate: values['id_issue_date']
-                  ?.toString()
-                  .split(' ')
-                  .first ??
-              DateTime.now()
-                  .toIso8601String()
-                  .split('T')
-                  .first,
+          idIssueDate:
+              values['id_issue_date']?.toString().split(' ').first ??
+              DateTime.now().toIso8601String().split('T').first,
           documents: documents,
         );
 
         final request = RegisterPartnerRequestEntity(
           account: accountRequest,
           partner: partnerRequest,
-          legalRepresentative:
-              legalRepresentativeRequest,
+          legalRepresentative: legalRepresentativeRequest,
         );
 
         await ref
@@ -245,21 +241,17 @@ class SignUpFormScreen extends HookConsumerWidget {
           Expanded(
             child: SingleChildScrollView(
               controller: scrollController,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 40,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: 800,
-                  ),
+                  constraints: const BoxConstraints(maxWidth: 800),
                   child: FormBuilder(
                     key: formKey,
                     initialValue: initialValue,
+                    onChanged: () =>
+                        _checkFormCompleteness(formKey, isFormComplete),
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Title section
                         const RegistrationTitleSection(),
@@ -268,33 +260,27 @@ class SignUpFormScreen extends HookConsumerWidget {
                         // Section 1: Account Information
                         FormSectionCard(
                           sectionNumber: '1',
-                          title: 'Account Information',
-                          child:
-                              const AccountInformationSection(),
+                          title: 'ACCOUNT INFORMATION'.toUpperCase(),
+                          child: const AccountInformationSection(),
                         ),
                         AppDimens.verticalLarge,
 
                         // Section 2: Business & Partner
                         FormSectionCard(
                           sectionNumber: '2',
-                          title:
-                              'Business & Partner Information',
+                          title: 'Business & Partner Information'.toUpperCase(),
                           child: Column(
                             children: [
                               BusinessPartnerSection(
-                                initialServiceTags:
-                                    shouldAutofill
-                                        ? SignUpFormAutofill
-                                            .businessTypes
-                                        : null,
+                                initialServiceTags: shouldAutofill
+                                    ? SignUpFormAutofill.businessTypes
+                                    : null,
                               ),
                               AppDimens.verticalMedium,
                               BusinessLocationSection(
-                                initialStreetAddress:
-                                    shouldAutofill
-                                        ? SignUpFormAutofill
-                                            .streetAddress
-                                        : null,
+                                initialStreetAddress: shouldAutofill
+                                    ? SignUpFormAutofill.streetAddress
+                                    : null,
                               ),
                             ],
                           ),
@@ -304,20 +290,27 @@ class SignUpFormScreen extends HookConsumerWidget {
                         // Section 3: Legal Representative
                         FormSectionCard(
                           sectionNumber: '3',
-                          title: 'Legal Representative',
-                          child:
-                              LegalRepresentativeSectionV2(),
+                          title: 'Legal Representative'.toUpperCase(),
+                          child: LegalRepresentativeSectionV2(),
                         ),
                         AppDimens.verticalLarge,
 
                         // Section 4: Document Verification
-                        FormSectionCard(
-                          sectionNumber: '4',
-                          title: 'Document Verification',
-                          child:
-                              const DocumentVerificationSection(
-                            scope: 'SPA_BEAUTY',
-                          ),
+                        Builder(
+                          builder: (context) {
+                            final formState = FormBuilder.of(context);
+                            final types =
+                                formState?.fields['business_types']?.value
+                                    as List<dynamic>?;
+                            final scope = (types != null && types.isNotEmpty)
+                                ? types.first.toString()
+                                : 'SPA_BEAUTY';
+                            return FormSectionCard(
+                              sectionNumber: '4',
+                              title: 'Document Verification'.toUpperCase(),
+                              child: DocumentVerificationSection(scope: scope),
+                            );
+                          },
                         ),
                         AppDimens.verticalLarge,
 
@@ -325,6 +318,7 @@ class SignUpFormScreen extends HookConsumerWidget {
                         RegistrationSubmitSection(
                           onSubmit: submit,
                           isLoading: state.isLoading,
+                          isEnabled: isFormComplete.value,
                         ),
                         AppDimens.verticalExtraLarge,
                       ],
@@ -339,31 +333,75 @@ class SignUpFormScreen extends HookConsumerWidget {
     );
   }
 
+  /// Checks whether all [_requiredFieldKeys] have
+  /// non-empty values and updates [isFormComplete].
+  ///
+  /// Also reads underlying [TextEditingController]
+  /// text to catch programmatic/autofill values
+  /// that may not yet be synced to FormBuilder.
+  void _checkFormCompleteness(
+    GlobalKey<FormBuilderState> formKey,
+    ValueNotifier<bool> isFormComplete,
+  ) {
+    // Schedule after the current frame so
+    // FormBuilder has committed field values.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final fields = formKey.currentState?.fields;
+      if (fields == null) {
+        isFormComplete.value = false;
+        return;
+      }
+
+      for (final key in _requiredFieldKeys) {
+        if (!_isFieldFilled(fields, key)) {
+          isFormComplete.value = false;
+          return;
+        }
+      }
+      isFormComplete.value = true;
+    });
+  }
+
+  /// Returns `true` when the field identified by
+  /// [key] has a non-empty value.
+  ///
+  /// Checks both the FormBuilder field value and
+  /// the controller text (if available) to handle
+  /// edge cases where controllers are updated
+  /// programmatically.
+  bool _isFieldFilled(Map<String, dynamic> fields, String key) {
+    final field = fields[key];
+    if (field == null) return false;
+
+    final value = field.value;
+
+    // Check FormBuilder field value
+    if (value == null) return false;
+    if (value is String && value.isEmpty) return false;
+    if (value is List && value.isEmpty) return false;
+
+    return true;
+  }
+
   /// Autofill map for all simple `FormBuilder` fields.
   /// Only used when [shouldAutofill] is active.
   static Map<String, dynamic> _buildAutofillValues() => {
-        // Section 1
-        'username': SignUpFormAutofill.username,
-        'email': SignUpFormAutofill.email,
-        'password': SignUpFormAutofill.password,
-        'confirm_password':
-            SignUpFormAutofill.confirmPassword,
-        // Section 2
-        'brand_name': SignUpFormAutofill.brandName,
-        'legal_name': SignUpFormAutofill.legalName,
-        'tax_code': SignUpFormAutofill.taxCode,
-        'street_address':
-            SignUpFormAutofill.streetAddress,
-        // Section 3
-        'representative_name':
-            SignUpFormAutofill.representativeName,
-        'representative_position':
-            SignUpFormAutofill.representativePosition,
-        'representative_phone':
-            SignUpFormAutofill.representativePhone,
-        'id_type': SignUpFormAutofill.idType,
-        'id_number': SignUpFormAutofill.idNumber,
-        'id_issue_date':
-            SignUpFormAutofill.idIssueDate,
-      };
+    // Section 1
+    'username': SignUpFormAutofill.username,
+    'email': SignUpFormAutofill.email,
+    'password': SignUpFormAutofill.password,
+    'confirm_password': SignUpFormAutofill.confirmPassword,
+    // Section 2
+    'brand_name': SignUpFormAutofill.brandName,
+    'legal_name': SignUpFormAutofill.legalName,
+    'tax_code': SignUpFormAutofill.taxCode,
+    'street_address': SignUpFormAutofill.streetAddress,
+    // Section 3
+    'representative_name': SignUpFormAutofill.representativeName,
+    'representative_position': SignUpFormAutofill.representativePosition,
+    'representative_phone': SignUpFormAutofill.representativePhone,
+    'id_type': SignUpFormAutofill.idType,
+    'id_number': SignUpFormAutofill.idNumber,
+    'id_issue_date': SignUpFormAutofill.idIssueDate,
+  };
 }

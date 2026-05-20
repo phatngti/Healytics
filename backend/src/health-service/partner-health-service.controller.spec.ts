@@ -9,6 +9,7 @@ import { HealthServiceType } from './enums/health-service-type.enum';
 describe('PartnerHealthServiceController', () => {
   let controller: PartnerHealthServiceController;
   let healthServiceService: MockType<HealthServiceService>;
+  const mockAccountId = 'account-uuid';
 
   beforeEach(async () => {
     // Arrange - Create typed mock for HealthServiceService
@@ -28,7 +29,9 @@ describe('PartnerHealthServiceController', () => {
       ],
     }).compile();
 
-    controller = module.get<PartnerHealthServiceController>(PartnerHealthServiceController);
+    controller = module.get<PartnerHealthServiceController>(
+      PartnerHealthServiceController,
+    );
     healthServiceService = module.get(HealthServiceService);
   });
 
@@ -48,11 +51,14 @@ describe('PartnerHealthServiceController', () => {
       healthServiceService.create!.mockResolvedValue(expectedProduct);
 
       // Act
-      const result = await controller.create(createDto);
+      const result = await controller.create(mockAccountId, createDto);
 
       // Assert
       expect(result).toEqual(expectedProduct);
-      expect(healthServiceService.create).toHaveBeenCalledWith(createDto);
+      expect(healthServiceService.create).toHaveBeenCalledWith(
+        mockAccountId,
+        createDto,
+      );
       expect(healthServiceService.create).toHaveBeenCalledTimes(1);
     });
   });
@@ -61,16 +67,22 @@ describe('PartnerHealthServiceController', () => {
     it('should call service.update with ID and DTO and return the updated product', async () => {
       // Arrange
       const id = 'uuid-1';
-      const updateDto: UpdatePartnerHealthServiceDto = { name: 'Updated Massage' };
+      const updateDto: UpdatePartnerHealthServiceDto = {
+        name: 'Updated Massage',
+      };
       const expectedProduct = { id, name: 'Updated Massage' };
       healthServiceService.update!.mockResolvedValue(expectedProduct);
 
       // Act
-      const result = await controller.update(id, updateDto);
+      const result = await controller.update(mockAccountId, id, updateDto);
 
       // Assert
       expect(result).toEqual(expectedProduct);
-      expect(healthServiceService.update).toHaveBeenCalledWith(id, updateDto);
+      expect(healthServiceService.update).toHaveBeenCalledWith(
+        mockAccountId,
+        id,
+        updateDto,
+      );
       expect(healthServiceService.update).toHaveBeenCalledTimes(1);
     });
   });

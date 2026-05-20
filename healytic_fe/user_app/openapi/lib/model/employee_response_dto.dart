@@ -18,7 +18,6 @@ class EmployeeResponseDto {
     this.firstName,
     this.lastName,
     required this.fullName,
-    this.displayName,
     required this.email,
     this.phone,
     this.avatarUrl,
@@ -28,8 +27,9 @@ class EmployeeResponseDto {
     this.description,
     this.emergencyContactName,
     this.emergencyContactPhone,
-    this.idCardUrl,
+    this.verificationDocuments = const [],
     this.schedule = const [],
+    this.workHistory = const [],
     this.dob,
     this.gender,
     required this.role,
@@ -43,6 +43,7 @@ class EmployeeResponseDto {
     this.therapistProfile,
   });
 
+
   /// Unique employee identifier
   String id;
 
@@ -50,139 +51,64 @@ class EmployeeResponseDto {
   String employeeCode;
 
   /// First name
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? firstName;
+  String? firstName;
 
   /// Last name
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? lastName;
+  String? lastName;
 
   /// Full name
   String fullName;
-
-  /// Display name
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? displayName;
 
   /// Email address
   String email;
 
   /// Phone number
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? phone;
+  String? phone;
 
   /// Avatar URL
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? avatarUrl;
+  String? avatarUrl;
 
   /// Job title
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? jobTitle;
+  String? jobTitle;
 
   /// Start date
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? startDate;
+  DateTime? startDate;
 
   /// Employment type
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? employmentType;
+  String? employmentType;
 
   /// Description/bio
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? description;
+  String? description;
 
   /// Emergency contact name
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? emergencyContactName;
+  String? emergencyContactName;
 
   /// Emergency contact phone
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? emergencyContactPhone;
+  String? emergencyContactPhone;
 
-  /// ID card URL
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? idCardUrl;
+  /// Verification documents
+  List<VerificationDocumentEntryDto> verificationDocuments;
 
   /// Work schedule
   List<WorkScheduleEntryDto> schedule;
 
+  /// Work history
+  List<WorkHistoryEntryDto> workHistory;
+
   /// Date of birth
+  DateTime? dob;
+
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  Object? dob;
+  Gender? gender;
 
-  /// Gender
-  EmployeeResponseDtoGenderEnum? gender;
+  EmployeeRole role;
 
-  /// Employee role
-  EmployeeResponseDtoRoleEnum role;
-
-  /// Employee status
-  EmployeeResponseDtoStatusEnum status;
+  EmployeeStatus status;
 
   /// Rating (0-5)
   num rating;
@@ -191,13 +117,7 @@ class EmployeeResponseDto {
   num reviewCount;
 
   /// Partner ID the employee belongs to
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? partnerId;
+  String? partnerId;
 
   /// Creation timestamp
   DateTime createdAt;
@@ -206,21 +126,9 @@ class EmployeeResponseDto {
   DateTime updatedAt;
 
   /// Doctor profile
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   DoctorProfileResponseDto? doctorProfile;
 
   /// Therapist profile
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   TherapistProfileResponseDto? therapistProfile;
 
   @override
@@ -230,7 +138,6 @@ class EmployeeResponseDto {
     other.firstName == firstName &&
     other.lastName == lastName &&
     other.fullName == fullName &&
-    other.displayName == displayName &&
     other.email == email &&
     other.phone == phone &&
     other.avatarUrl == avatarUrl &&
@@ -240,8 +147,9 @@ class EmployeeResponseDto {
     other.description == description &&
     other.emergencyContactName == emergencyContactName &&
     other.emergencyContactPhone == emergencyContactPhone &&
-    other.idCardUrl == idCardUrl &&
+    _deepEquality.equals(other.verificationDocuments, verificationDocuments) &&
     _deepEquality.equals(other.schedule, schedule) &&
+    _deepEquality.equals(other.workHistory, workHistory) &&
     other.dob == dob &&
     other.gender == gender &&
     other.role == role &&
@@ -262,7 +170,6 @@ class EmployeeResponseDto {
     (firstName == null ? 0 : firstName!.hashCode) +
     (lastName == null ? 0 : lastName!.hashCode) +
     (fullName.hashCode) +
-    (displayName == null ? 0 : displayName!.hashCode) +
     (email.hashCode) +
     (phone == null ? 0 : phone!.hashCode) +
     (avatarUrl == null ? 0 : avatarUrl!.hashCode) +
@@ -272,8 +179,9 @@ class EmployeeResponseDto {
     (description == null ? 0 : description!.hashCode) +
     (emergencyContactName == null ? 0 : emergencyContactName!.hashCode) +
     (emergencyContactPhone == null ? 0 : emergencyContactPhone!.hashCode) +
-    (idCardUrl == null ? 0 : idCardUrl!.hashCode) +
+    (verificationDocuments.hashCode) +
     (schedule.hashCode) +
+    (workHistory.hashCode) +
     (dob == null ? 0 : dob!.hashCode) +
     (gender == null ? 0 : gender!.hashCode) +
     (role.hashCode) +
@@ -287,7 +195,7 @@ class EmployeeResponseDto {
     (therapistProfile == null ? 0 : therapistProfile!.hashCode);
 
   @override
-  String toString() => 'EmployeeResponseDto[id=$id, employeeCode=$employeeCode, firstName=$firstName, lastName=$lastName, fullName=$fullName, displayName=$displayName, email=$email, phone=$phone, avatarUrl=$avatarUrl, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, description=$description, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, idCardUrl=$idCardUrl, schedule=$schedule, dob=$dob, gender=$gender, role=$role, status=$status, rating=$rating, reviewCount=$reviewCount, partnerId=$partnerId, createdAt=$createdAt, updatedAt=$updatedAt, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
+  String toString() => 'EmployeeResponseDto[id=$id, employeeCode=$employeeCode, firstName=$firstName, lastName=$lastName, fullName=$fullName, email=$email, phone=$phone, avatarUrl=$avatarUrl, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, description=$description, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, verificationDocuments=$verificationDocuments, schedule=$schedule, workHistory=$workHistory, dob=$dob, gender=$gender, role=$role, status=$status, rating=$rating, reviewCount=$reviewCount, partnerId=$partnerId, createdAt=$createdAt, updatedAt=$updatedAt, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -304,11 +212,6 @@ class EmployeeResponseDto {
       json[r'lastName'] = null;
     }
       json[r'fullName'] = this.fullName;
-    if (this.displayName != null) {
-      json[r'displayName'] = this.displayName;
-    } else {
-      json[r'displayName'] = null;
-    }
       json[r'email'] = this.email;
     if (this.phone != null) {
       json[r'phone'] = this.phone;
@@ -326,7 +229,7 @@ class EmployeeResponseDto {
       json[r'jobTitle'] = null;
     }
     if (this.startDate != null) {
-      json[r'startDate'] = this.startDate;
+      json[r'startDate'] = this.startDate!.toUtc().toIso8601String();
     } else {
       json[r'startDate'] = null;
     }
@@ -350,14 +253,11 @@ class EmployeeResponseDto {
     } else {
       json[r'emergencyContactPhone'] = null;
     }
-    if (this.idCardUrl != null) {
-      json[r'idCardUrl'] = this.idCardUrl;
-    } else {
-      json[r'idCardUrl'] = null;
-    }
+      json[r'verificationDocuments'] = this.verificationDocuments;
       json[r'schedule'] = this.schedule;
+      json[r'workHistory'] = this.workHistory;
     if (this.dob != null) {
-      json[r'dob'] = this.dob;
+      json[r'dob'] = this.dob!.toUtc().toIso8601String();
     } else {
       json[r'dob'] = null;
     }
@@ -411,28 +311,28 @@ class EmployeeResponseDto {
       return EmployeeResponseDto(
         id: mapValueOfType<String>(json, r'id')!,
         employeeCode: mapValueOfType<String>(json, r'employeeCode')!,
-        firstName: mapValueOfType<Object>(json, r'firstName'),
-        lastName: mapValueOfType<Object>(json, r'lastName'),
+        firstName: mapValueOfType<String>(json, r'firstName'),
+        lastName: mapValueOfType<String>(json, r'lastName'),
         fullName: mapValueOfType<String>(json, r'fullName')!,
-        displayName: mapValueOfType<Object>(json, r'displayName'),
         email: mapValueOfType<String>(json, r'email')!,
-        phone: mapValueOfType<Object>(json, r'phone'),
-        avatarUrl: mapValueOfType<Object>(json, r'avatarUrl'),
-        jobTitle: mapValueOfType<Object>(json, r'jobTitle'),
-        startDate: mapValueOfType<Object>(json, r'startDate'),
-        employmentType: mapValueOfType<Object>(json, r'employmentType'),
-        description: mapValueOfType<Object>(json, r'description'),
-        emergencyContactName: mapValueOfType<Object>(json, r'emergencyContactName'),
-        emergencyContactPhone: mapValueOfType<Object>(json, r'emergencyContactPhone'),
-        idCardUrl: mapValueOfType<Object>(json, r'idCardUrl'),
+        phone: mapValueOfType<String>(json, r'phone'),
+        avatarUrl: mapValueOfType<String>(json, r'avatarUrl'),
+        jobTitle: mapValueOfType<String>(json, r'jobTitle'),
+        startDate: mapDateTime(json, r'startDate', r''),
+        employmentType: mapValueOfType<String>(json, r'employmentType'),
+        description: mapValueOfType<String>(json, r'description'),
+        emergencyContactName: mapValueOfType<String>(json, r'emergencyContactName'),
+        emergencyContactPhone: mapValueOfType<String>(json, r'emergencyContactPhone'),
+        verificationDocuments: VerificationDocumentEntryDto.listFromJson(json[r'verificationDocuments']),
         schedule: WorkScheduleEntryDto.listFromJson(json[r'schedule']),
-        dob: mapValueOfType<Object>(json, r'dob'),
-        gender: EmployeeResponseDtoGenderEnum.fromJson(json[r'gender']),
-        role: EmployeeResponseDtoRoleEnum.fromJson(json[r'role'])!,
-        status: EmployeeResponseDtoStatusEnum.fromJson(json[r'status'])!,
+        workHistory: WorkHistoryEntryDto.listFromJson(json[r'workHistory']),
+        dob: mapDateTime(json, r'dob', r''),
+        gender: Gender.fromJson(json[r'gender']),
+        role: EmployeeRole.fromJson(json[r'role'])!,
+        status: EmployeeStatus.fromJson(json[r'status'])!,
         rating: num.parse('${json[r'rating']}'),
         reviewCount: num.parse('${json[r'reviewCount']}'),
-        partnerId: mapValueOfType<Object>(json, r'partnerId'),
+        partnerId: mapValueOfType<String>(json, r'partnerId'),
         createdAt: mapDateTime(json, r'createdAt', r'')!,
         updatedAt: mapDateTime(json, r'updatedAt', r'')!,
         doctorProfile: DoctorProfileResponseDto.fromJson(json[r'doctorProfile']),
@@ -496,238 +396,4 @@ class EmployeeResponseDto {
     'updatedAt',
   };
 }
-
-/// Gender
-class EmployeeResponseDtoGenderEnum {
-  /// Instantiate a new enum with the provided [value].
-  const EmployeeResponseDtoGenderEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const MALE = EmployeeResponseDtoGenderEnum._(r'MALE');
-  static const FEMALE = EmployeeResponseDtoGenderEnum._(r'FEMALE');
-  static const OTHER = EmployeeResponseDtoGenderEnum._(r'OTHER');
-
-  /// List of all possible values in this [enum][EmployeeResponseDtoGenderEnum].
-  static const values = <EmployeeResponseDtoGenderEnum>[
-    MALE,
-    FEMALE,
-    OTHER,
-  ];
-
-  static EmployeeResponseDtoGenderEnum? fromJson(dynamic value) => EmployeeResponseDtoGenderEnumTypeTransformer().decode(value);
-
-  static List<EmployeeResponseDtoGenderEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <EmployeeResponseDtoGenderEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = EmployeeResponseDtoGenderEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [EmployeeResponseDtoGenderEnum] to String,
-/// and [decode] dynamic data back to [EmployeeResponseDtoGenderEnum].
-class EmployeeResponseDtoGenderEnumTypeTransformer {
-  factory EmployeeResponseDtoGenderEnumTypeTransformer() => _instance ??= const EmployeeResponseDtoGenderEnumTypeTransformer._();
-
-  const EmployeeResponseDtoGenderEnumTypeTransformer._();
-
-  String encode(EmployeeResponseDtoGenderEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a EmployeeResponseDtoGenderEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  EmployeeResponseDtoGenderEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'MALE': return EmployeeResponseDtoGenderEnum.MALE;
-        case r'FEMALE': return EmployeeResponseDtoGenderEnum.FEMALE;
-        case r'OTHER': return EmployeeResponseDtoGenderEnum.OTHER;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [EmployeeResponseDtoGenderEnumTypeTransformer] instance.
-  static EmployeeResponseDtoGenderEnumTypeTransformer? _instance;
-}
-
-
-/// Employee role
-class EmployeeResponseDtoRoleEnum {
-  /// Instantiate a new enum with the provided [value].
-  const EmployeeResponseDtoRoleEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const DOCTOR = EmployeeResponseDtoRoleEnum._(r'DOCTOR');
-  static const THERAPIST = EmployeeResponseDtoRoleEnum._(r'THERAPIST');
-  static const RECEPTIONIST = EmployeeResponseDtoRoleEnum._(r'RECEPTIONIST');
-  static const MANAGER = EmployeeResponseDtoRoleEnum._(r'MANAGER');
-
-  /// List of all possible values in this [enum][EmployeeResponseDtoRoleEnum].
-  static const values = <EmployeeResponseDtoRoleEnum>[
-    DOCTOR,
-    THERAPIST,
-    RECEPTIONIST,
-    MANAGER,
-  ];
-
-  static EmployeeResponseDtoRoleEnum? fromJson(dynamic value) => EmployeeResponseDtoRoleEnumTypeTransformer().decode(value);
-
-  static List<EmployeeResponseDtoRoleEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <EmployeeResponseDtoRoleEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = EmployeeResponseDtoRoleEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [EmployeeResponseDtoRoleEnum] to String,
-/// and [decode] dynamic data back to [EmployeeResponseDtoRoleEnum].
-class EmployeeResponseDtoRoleEnumTypeTransformer {
-  factory EmployeeResponseDtoRoleEnumTypeTransformer() => _instance ??= const EmployeeResponseDtoRoleEnumTypeTransformer._();
-
-  const EmployeeResponseDtoRoleEnumTypeTransformer._();
-
-  String encode(EmployeeResponseDtoRoleEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a EmployeeResponseDtoRoleEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  EmployeeResponseDtoRoleEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'DOCTOR': return EmployeeResponseDtoRoleEnum.DOCTOR;
-        case r'THERAPIST': return EmployeeResponseDtoRoleEnum.THERAPIST;
-        case r'RECEPTIONIST': return EmployeeResponseDtoRoleEnum.RECEPTIONIST;
-        case r'MANAGER': return EmployeeResponseDtoRoleEnum.MANAGER;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [EmployeeResponseDtoRoleEnumTypeTransformer] instance.
-  static EmployeeResponseDtoRoleEnumTypeTransformer? _instance;
-}
-
-
-/// Employee status
-class EmployeeResponseDtoStatusEnum {
-  /// Instantiate a new enum with the provided [value].
-  const EmployeeResponseDtoStatusEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const ACTIVE = EmployeeResponseDtoStatusEnum._(r'ACTIVE');
-  static const INACTIVE = EmployeeResponseDtoStatusEnum._(r'INACTIVE');
-  static const ON_LEAVE = EmployeeResponseDtoStatusEnum._(r'ON_LEAVE');
-
-  /// List of all possible values in this [enum][EmployeeResponseDtoStatusEnum].
-  static const values = <EmployeeResponseDtoStatusEnum>[
-    ACTIVE,
-    INACTIVE,
-    ON_LEAVE,
-  ];
-
-  static EmployeeResponseDtoStatusEnum? fromJson(dynamic value) => EmployeeResponseDtoStatusEnumTypeTransformer().decode(value);
-
-  static List<EmployeeResponseDtoStatusEnum> listFromJson(dynamic json, {bool growable = false,}) {
-    final result = <EmployeeResponseDtoStatusEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = EmployeeResponseDtoStatusEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [EmployeeResponseDtoStatusEnum] to String,
-/// and [decode] dynamic data back to [EmployeeResponseDtoStatusEnum].
-class EmployeeResponseDtoStatusEnumTypeTransformer {
-  factory EmployeeResponseDtoStatusEnumTypeTransformer() => _instance ??= const EmployeeResponseDtoStatusEnumTypeTransformer._();
-
-  const EmployeeResponseDtoStatusEnumTypeTransformer._();
-
-  String encode(EmployeeResponseDtoStatusEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a EmployeeResponseDtoStatusEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  EmployeeResponseDtoStatusEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'ACTIVE': return EmployeeResponseDtoStatusEnum.ACTIVE;
-        case r'INACTIVE': return EmployeeResponseDtoStatusEnum.INACTIVE;
-        case r'ON_LEAVE': return EmployeeResponseDtoStatusEnum.ON_LEAVE;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [EmployeeResponseDtoStatusEnumTypeTransformer] instance.
-  static EmployeeResponseDtoStatusEnumTypeTransformer? _instance;
-}
-
 

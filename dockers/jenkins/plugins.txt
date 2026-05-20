@@ -1,0 +1,50 @@
+# ===========================================================================
+# Jenkins Suggested Plugins (from setup wizard) + project-specific extras
+# Installed at build time via: jenkins-plugin-cli --plugin-file plugins.txt
+# ===========================================================================
+
+# --- Organization & Administration ---
+cloudbees-folder
+antisamy-markup-formatter
+configuration-as-code
+
+# --- Build Features ---
+build-timeout
+credentials-binding
+ssh-agent
+timestamper
+ws-cleanup
+
+# --- Build Tools ---
+ant
+gradle
+
+# --- Pipelines & Continuous Delivery ---
+workflow-aggregator
+job-dsl
+pipeline-github-lib
+pipeline-graph-view
+pipeline-utility-steps
+
+# --- Source Code Management ---
+git
+github
+
+# --- Webhook Trigger (credential-free CI) ---
+# Receives GitHub push webhooks and extracts branch/ref from the payload.
+# Replaces github-branch-source (which required a PAT for branch discovery).
+generic-webhook-trigger
+
+# --- Distributed Builds ---
+ssh-slaves
+
+# --- User Management & Security ---
+matrix-auth
+ldap
+
+# --- Notifications & Publishing ---
+email-ext
+mailer
+
+# --- Project-specific extras ---
+docker-workflow

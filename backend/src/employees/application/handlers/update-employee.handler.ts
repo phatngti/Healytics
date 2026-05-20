@@ -3,6 +3,7 @@ import {
   Logger,
   NotFoundException,
   InternalServerErrorException,
+  Optional,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { UpdateEmployeeDto } from '../../dto/update-employee.dto';
@@ -10,6 +11,7 @@ import { Employee } from '@/common/entities/employee.entity';
 import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
 import { TherapistProfile } from '@/common/entities/therapist-profile.entity';
 import { EmployeeRole } from '../../enum/employee-role.enum';
+import { SearchIndexOutboxService } from '@/search/services/search-index-outbox.service';
 
 /**
  * Handler for updating employees with transactional boundaries.
@@ -19,7 +21,11 @@ import { EmployeeRole } from '../../enum/employee-role.enum';
 export class UpdateEmployeeHandler {
   private readonly logger = new Logger(UpdateEmployeeHandler.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @Optional()
+    private readonly searchIndexOutboxService?: SearchIndexOutboxService,
+  ) {}
 
   /**
    * Executes the update employee command within a transaction.
@@ -46,8 +52,18 @@ export class UpdateEmployeeHandler {
 
       const { doctorProfile, therapistProfile, ...employeeData } = command;
 
+      // Strip null/undefined values so we never overwrite non-nullable DB columns
+      // (e.g. employeeCode, fullName, email, role, status) with null.
+      const sanitizedData = Object.fromEntries(
+        Object.entries(employeeData).filter(
+          ([, v]) => v !== null && v !== undefined,
+        ),
+      );
+
       // 2. Domain Action: Update Employee entity
-      Object.assign(employee, employeeData);
+      if (Object.keys(sanitizedData).length > 0) {
+        Object.assign(employee, sanitizedData);
+      }
       await queryRunner.manager.save(Employee, employee);
 
       // 3. Domain Action: Update Doctor Profile if applicable
@@ -81,6 +97,11 @@ export class UpdateEmployeeHandler {
         }
         await queryRunner.manager.save(TherapistProfile, profile);
       }
+
+      await this.searchIndexOutboxService?.enqueueEmployee(
+        queryRunner.manager,
+        id,
+      );
 
       // 5. Commit transaction
       await queryRunner.commitTransaction();

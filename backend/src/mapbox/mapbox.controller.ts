@@ -1,18 +1,14 @@
-import {
-  Get,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiOperation,
-  ApiOkResponse,
-} from '@nestjs/swagger';
+import { Get, Query } from '@nestjs/common';
+import { ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { PublicApi } from '@/common/decorators/api/public-api.decorator';
 import { MapboxService } from './mapbox.service';
 import { GeocodeQueryDto } from './dto/geocode-query.dto';
 import { ReverseGeocodeQueryDto } from './dto/reverse-geocode-query.dto';
 import { DistanceMatrixQueryDto } from './dto/distance-matrix-query.dto';
+import { DirectionsQueryDto } from './dto/directions-query.dto';
 import { GeocodeResponseDto } from './dto/geocode-response.dto';
 import { DistanceMatrixResponseDto } from './dto/distance-matrix-response.dto';
+import { DirectionsResponseDto } from './dto/directions-response.dto';
 import { ClientKeyResponseDto } from './dto/client-key-response.dto';
 
 /**
@@ -34,15 +30,28 @@ export class MapboxController {
   @Get('reverse-geocode')
   @ApiOperation({ summary: 'Reverse geocode lat/lng to address' })
   @ApiOkResponse({ type: GeocodeResponseDto })
-  reverseGeocode(@Query() query: ReverseGeocodeQueryDto): Promise<GeocodeResponseDto> {
+  reverseGeocode(
+    @Query() query: ReverseGeocodeQueryDto,
+  ): Promise<GeocodeResponseDto> {
     return this.mapboxService.reverseGeocode(query.lat, query.lng);
   }
 
   @Get('distance-matrix')
   @ApiOperation({ summary: 'Get travel distance and duration' })
   @ApiOkResponse({ type: DistanceMatrixResponseDto })
-  distanceMatrix(@Query() query: DistanceMatrixQueryDto): Promise<DistanceMatrixResponseDto> {
+  distanceMatrix(
+    @Query() query: DistanceMatrixQueryDto,
+  ): Promise<DistanceMatrixResponseDto> {
     return this.mapboxService.distanceMatrix(query.origins, query.destinations);
+  }
+
+  @Get('directions')
+  @ApiOperation({ summary: 'Get driving directions route geometry' })
+  @ApiOkResponse({ type: DirectionsResponseDto })
+  directions(
+    @Query() query: DirectionsQueryDto,
+  ): Promise<DirectionsResponseDto> {
+    return this.mapboxService.directions(query.origin, query.destination);
   }
 
   @Get('client-key')

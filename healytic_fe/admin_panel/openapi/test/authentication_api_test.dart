@@ -17,10 +17,35 @@ void main() {
   // final instance = AuthenticationApi();
 
   group('tests for AuthenticationApi', () {
+    // Check if email is already registered
+    //
+    // Public endpoint for pre-registration email uniqueness validation.
+    //
+    //Future<CheckEmailResponseDto> authControllerCheckEmail(CheckEmailDto checkEmailDto) async
+    test('test authControllerCheckEmail', () async {
+      // TODO
+    });
+
+    // Request a user password reset code
+    //
+    // Returns a generic success response to avoid exposing whether an email is registered.
+    //
+    //Future<PasswordResetResponseDto> authControllerForgotUserPassword(ForgotPasswordDto forgotPasswordDto) async
+    test('test authControllerForgotUserPassword', () async {
+      // TODO
+    });
+
     // Login as admin
     //
     //Future<AuthTokensDto> authControllerLoginAdmin(AdminLoginDto adminLoginDto) async
     test('test authControllerLoginAdmin', () async {
+      // TODO
+    });
+
+    // Login as an employee
+    //
+    //Future<AuthTokensDto> authControllerLoginEmployee(EmployeeLoginDto employeeLoginDto) async
+    test('test authControllerLoginEmployee', () async {
       // TODO
     });
 
@@ -52,6 +77,13 @@ void main() {
       // TODO
     });
 
+    // Refresh employee tokens
+    //
+    //Future<AuthTokensDto> authControllerRefreshEmployee(RefreshTokenRequestDto refreshTokenRequestDto) async
+    test('test authControllerRefreshEmployee', () async {
+      // TODO
+    });
+
     // Refresh partner tokens with verification info
     //
     //Future<AuthTokensDto> authControllerRefreshPartner(RefreshTokenRequestDto refreshTokenRequestDto) async
@@ -72,6 +104,20 @@ void main() {
     //
     //Future<AuthTokensDto> authControllerRegisterUser(RegisterDto registerDto) async
     test('test authControllerRegisterUser', () async {
+      // TODO
+    });
+
+    // Reset a user password with validated reset token
+    //
+    //Future<PasswordResetResponseDto> authControllerResetUserPassword(ResetPasswordDto resetPasswordDto) async
+    test('test authControllerResetUserPassword', () async {
+      // TODO
+    });
+
+    // Validate a user password reset code
+    //
+    //Future<ValidatePasswordResetCodeResponseDto> authControllerValidateUserPasswordResetCode(ValidatePasswordResetCodeDto validatePasswordResetCodeDto) async
+    test('test authControllerValidateUserPasswordResetCode', () async {
       // TODO
     });
 

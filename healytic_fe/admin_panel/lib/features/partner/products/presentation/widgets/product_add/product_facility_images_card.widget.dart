@@ -1,4 +1,6 @@
 import 'package:admin_panel/core/providers/s3.provider.dart';
+import 'package:admin_panel/features/partner/products/domain/facility_image_key.dart';
+import 'package:admin_panel/features/partner/products/domain/product_form_field.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -20,29 +22,64 @@ class ProductFacilityImagesCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return FormBuilderField<List<Map<String, String>>>(
-      name: 'facility_images',
+      name: ProductFormField.facilityImages.key,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'At least one facility image is required';
+        }
+        final hasUploaded = value.any(
+          (m) =>
+              (m[FacilityImageKey.imageUrl]?.isNotEmpty
+                  ?? false),
+        );
+        if (!hasUploaded) {
+          return 'Upload at least one facility image';
+        }
+        return null;
+      },
       builder: (field) {
         final images = field.value ?? <Map<String, String>>[];
+        final hasError = field.errorText != null;
 
         return Card(
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: colorScheme.outlineVariant),
+            side: BorderSide(
+              color: hasError
+                  ? colorScheme.error
+                  : colorScheme.outlineVariant,
+            ),
           ),
           child: Padding(
             padding: AppDimens.paddingAllLarge,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(context, textTheme, colorScheme),
+                _buildHeader(
+                  context, textTheme, colorScheme,
+                ),
                 AppDimens.verticalMedium,
                 if (images.isEmpty)
-                  _buildEmptyState(context, colorScheme, textTheme)
+                  _buildEmptyState(
+                    context, colorScheme, textTheme,
+                  )
                 else
                   _buildImageGrid(context, images, field),
                 AppDimens.verticalSmall,
-                _buildAddButton(context, colorScheme, field, images),
+                _buildAddButton(
+                  context, colorScheme, field, images,
+                ),
+                if (hasError)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      field.errorText!,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.error,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -58,11 +95,30 @@ class ProductFacilityImagesCard extends StatelessWidget {
   ) {
     return Row(
       children: [
-        Icon(Icons.business_outlined, color: colorScheme.primary, size: 20),
+        Icon(
+          Icons.business_outlined,
+          color: colorScheme.primary,
+          size: 20,
+        ),
         AppDimens.horizontalSmall,
-        Text(
-          'Facility Images',
-          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+        Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: 'Facility Images',
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const TextSpan(
+                text: ' *',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -99,7 +155,8 @@ class ProductFacilityImagesCard extends StatelessWidget {
             ),
           ),
           Text(
-            'Add images of your clinic or facility',
+            'Upload at least one image of your'
+            ' clinic or facility',
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -157,7 +214,7 @@ class ProductFacilityImagesCard extends StatelessWidget {
       child: OutlinedButton.icon(
         onPressed: () {
           final list = List<Map<String, String>>.from(images);
-          list.add({'imageUrl': '', 'label': ''});
+          list.add({FacilityImageKey.imageUrl: '', FacilityImageKey.label: ''});
           field.didChange(list);
         },
         icon: const Icon(Icons.add, size: 18),
@@ -206,7 +263,7 @@ class _FacilityImageRowState extends ConsumerState<_FacilityImageRow> {
   @override
   void initState() {
     super.initState();
-    _labelController.text = widget.data['label'] ?? '';
+    _labelController.text = widget.data[FacilityImageKey.label] ?? '';
   }
 
   @override
@@ -244,7 +301,7 @@ class _FacilityImageRowState extends ConsumerState<_FacilityImageRow> {
         setState(() => _isUploading = false);
 
         if (url != null) {
-          widget.onUpdate({...widget.data, 'imageUrl': url});
+          widget.onUpdate({...widget.data, FacilityImageKey.imageUrl: url});
         }
       } else {
         _showError('Upload failed – could not get storage key.');
@@ -271,9 +328,10 @@ class _FacilityImageRowState extends ConsumerState<_FacilityImageRow> {
   // ── Helpers ──────────────────────────────────────────────────────
 
   bool get _hasImage =>
-      _selectedFile != null || (widget.data['imageUrl']?.isNotEmpty ?? false);
+      _selectedFile != null ||
+      (widget.data[FacilityImageKey.imageUrl]?.isNotEmpty ?? false);
 
-  String get _imageUrl => widget.data['imageUrl'] ?? '';
+  String get _imageUrl => widget.data[FacilityImageKey.imageUrl] ?? '';
 
   ImageProvider? get _previewImage {
     if (_selectedFile != null) {
@@ -350,7 +408,8 @@ class _FacilityImageRowState extends ConsumerState<_FacilityImageRow> {
         contentPadding: AppDimens.paddingAllSmall,
       ),
       style: textTheme.bodyMedium,
-      onChanged: (value) => widget.onUpdate({...widget.data, 'label': value}),
+      onChanged: (value) =>
+          widget.onUpdate({...widget.data, FacilityImageKey.label: value}),
     );
   }
 

@@ -1,0 +1,9 @@
+# Ignore all generated report files
+*.html
+*.csv
+*.json
+*.md
+
+# But keep the directory itself
+!.gitkeep
+!.gitignore

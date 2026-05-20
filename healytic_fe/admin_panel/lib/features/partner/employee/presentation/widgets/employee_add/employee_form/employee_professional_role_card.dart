@@ -1,4 +1,5 @@
 import 'package:admin_panel/features/partner/employee/domain/employment_type.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_form_field.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
 import 'package:admin_panel/theme/app_theme.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
@@ -10,16 +11,18 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:uuid/uuid.dart';
 
 class EmployeeProfessionalRoleCard extends StatefulWidget {
-  final ValueChanged<EmployeeRole>? onRoleChanged;
-  final EmployeeRole initialRole;
+  final ValueChanged<EmployeeRoleType>? onRoleChanged;
+  final EmployeeRoleType initialRole;
   final bool readOnly;
+  final bool roleReadOnly;
   final EmployeeEntity? employee;
 
   const EmployeeProfessionalRoleCard({
     super.key,
     this.onRoleChanged,
-    this.initialRole = EmployeeRole.therapist,
+    this.initialRole = EmployeeRoleType.therapist,
     this.readOnly = false,
+    this.roleReadOnly = false,
     this.employee,
   });
 
@@ -33,13 +36,15 @@ class _EmployeeProfessionalRoleCardState
   late final TextEditingController _employeeIdController;
 
   bool _isExpanded = true;
-  late EmployeeRole _selectedRole;
+  late EmployeeRoleType _selectedRole;
 
   @override
   void initState() {
     super.initState();
     _employeeIdController = TextEditingController(
-      text: const Uuid().v4().substring(0, 8).toUpperCase(),
+      text:
+          widget.employee?.employeeCode ??
+          const Uuid().v4().substring(0, 8).toUpperCase(),
     );
 
     _selectedRole = widget.initialRole;
@@ -55,6 +60,10 @@ class _EmployeeProfessionalRoleCardState
         });
       }
     }
+    if (widget.employee?.employeeCode != oldWidget.employee?.employeeCode &&
+        widget.employee?.employeeCode != null) {
+      _employeeIdController.text = widget.employee!.employeeCode;
+    }
   }
 
   @override
@@ -63,7 +72,7 @@ class _EmployeeProfessionalRoleCardState
     super.dispose();
   }
 
-  void _handleRoleChanged(EmployeeRole role) {
+  void _handleRoleChanged(EmployeeRoleType role) {
     setState(() {
       _selectedRole = role;
     });
@@ -75,6 +84,7 @@ class _EmployeeProfessionalRoleCardState
     final colorScheme = Theme.of(context).colorScheme;
     final formEnabled = FormBuilder.of(context)?.enabled ?? true;
     final isReadOnly = widget.readOnly || !formEnabled;
+    final isRoleReadOnly = widget.roleReadOnly || isReadOnly;
 
     return Container(
       decoration: BoxDecoration(
@@ -147,7 +157,7 @@ class _EmployeeProfessionalRoleCardState
           ),
           // Content
           AnimatedCrossFade(
-            firstChild: _buildContent(context, isReadOnly),
+            firstChild: _buildContent(context, isReadOnly, isRoleReadOnly),
             secondChild: const SizedBox.shrink(),
             crossFadeState: _isExpanded
                 ? CrossFadeState.showFirst
@@ -159,7 +169,11 @@ class _EmployeeProfessionalRoleCardState
     );
   }
 
-  Widget _buildContent(BuildContext context, bool isReadOnly) {
+  Widget _buildContent(
+    BuildContext context,
+    bool isReadOnly,
+    bool isRoleReadOnly,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(24),
@@ -171,18 +185,21 @@ class _EmployeeProfessionalRoleCardState
         children: [
           // Role Toggle Selector
           Text(
-            'Select Role Type',
+            'Select Role Type'.toUpperCase(),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
-          IgnorePointer(
-            ignoring: isReadOnly,
-            child: RoleToggleSelector(
-              selectedRole: _selectedRole,
-              onRoleChanged: _handleRoleChanged,
+          Opacity(
+            opacity: isRoleReadOnly ? 0.7 : 1,
+            child: IgnorePointer(
+              ignoring: isRoleReadOnly,
+              child: RoleToggleSelector(
+                selectedRole: _selectedRole,
+                onRoleChanged: _handleRoleChanged,
+              ),
             ),
           ),
           // Hidden field to store role in form
@@ -209,7 +226,7 @@ class _EmployeeProfessionalRoleCardState
                 child: _buildTextField(
                   context,
                   label: 'Job Title',
-                  placeholder: _selectedRole == EmployeeRole.doctor
+                  placeholder: _selectedRole == EmployeeRoleType.doctor
                       ? 'e.g. Senior Dermatologist'
                       : 'e.g. Senior Massage Therapist',
                   isRequired: true,
@@ -220,7 +237,9 @@ class _EmployeeProfessionalRoleCardState
                 child: FormFieldBuilders.buildAutoGenerateTextField(
                   context,
                   label: 'Employee ID',
+                  fieldKey: EmployeeFormField.employeeId.key,
                   controller: _employeeIdController,
+                  enabled: !isReadOnly,
                   onGenerate: () {
                     // Prevent generation in read only mode
                     if (isReadOnly) return;
@@ -231,6 +250,7 @@ class _EmployeeProfessionalRoleCardState
                           .toUpperCase();
                     });
                   },
+                  isRequired: true,
                 ),
               ),
             ],
@@ -245,7 +265,8 @@ class _EmployeeProfessionalRoleCardState
                   items: EmploymentType.values
                       .map((e) => e.displayName)
                       .toList(),
-                  initialValue: EmploymentType.fullTime.displayName,
+                  initialValue: _initialEmploymentType,
+                  isRequired: true,
                 ),
               ),
               AppDimens.horizontalLarge,
@@ -255,6 +276,7 @@ class _EmployeeProfessionalRoleCardState
                   fieldKey: 'start_date',
                   label: 'Start Date',
                   hintText: 'Select Start Date',
+                  isRequired: true,
                 ),
               ),
             ],
@@ -267,10 +289,20 @@ class _EmployeeProfessionalRoleCardState
             fieldKey: 'description',
             readOnly: isReadOnly,
             initialValue: widget.employee?.description,
+            isRequired: true,
           ),
         ],
       ),
     );
+  }
+
+  String get _initialEmploymentType {
+    final employmentType = widget.employee?.employmentType;
+    if (employmentType == null || employmentType.isEmpty) {
+      return EmploymentType.fullTime.displayName;
+    }
+    return EmploymentType.fromApiValue(employmentType)?.displayName ??
+        employmentType;
   }
 
   Widget _buildTextField(

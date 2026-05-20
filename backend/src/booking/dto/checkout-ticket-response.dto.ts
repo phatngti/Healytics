@@ -3,34 +3,66 @@ import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
 import { CheckoutTicketStatus } from '@/booking/enums/checkout-ticket-status.enum';
 
 export class CheckoutTicketResponseDto {
-  @ApiProperty({ description: 'Ticket ID (same as ticket_id in webhook)', example: 'TICKET_ABCD123' })
+  @ApiProperty({
+    type: String,
+    description: 'Ticket ID (same as ticket_id in webhook)',
+    example: 'TICKET_ABCD123',
+  })
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    example: 'USER_ID_123',
+  })
   userId: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    example: 'STAFF_ID_123',
+  })
   staffId: string;
 
-  @ApiProperty({ example: '2023-10-25T14:00:00Z' })
+  @ApiProperty({
+    type: Date,
+    example: '2023-10-25T14:00:00Z',
+  })
   startTime: Date;
 
-  @ApiProperty({ enum: CheckoutTicketStatus, example: CheckoutTicketStatus.QUEUED })
+  @ApiProperty({
+    type: String,
+    enum: CheckoutTicketStatus,
+    example: CheckoutTicketStatus.QUEUED,
+  })
   status: CheckoutTicketStatus;
 
-  @ApiProperty({ example: 'ai_chat_session_888_msg_12' })
+  @ApiProperty({
+    type: String,
+    example: 'ai_chat_session_888_msg_12',
+  })
   idempotencyKey: string;
 
-  @ApiPropertyOptional({ description: 'Booking ID when checkout succeeds' })
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Booking ID when checkout succeeds',
+  })
   bookingId: string | null;
 
-  @ApiPropertyOptional({ description: 'Error message when checkout fails' })
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Error message when checkout fails',
+  })
   errorMessage: string | null;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Date,
+    example: '2023-10-25T14:00:00Z',
+  })
   createdAt: Date;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Date,
+    example: '2023-10-25T14:00:00Z',
+  })
   updatedAt: Date;
 
   static fromEntity(ticket: CheckoutTicket): CheckoutTicketResponseDto {

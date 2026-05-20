@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:user_app/features/orders/domain/entities/service_manual.entity.dart';
 import 'package:user_app/features/orders/presentation/widgets/service_manual/manual_section_card.widget.dart';
+import 'package:user_app/features/orders/presentation/widgets/service_manual/service_rule_icon_data.dart';
 
-/// Displays the "Quy định dịch vụ" section with
-/// icon-labelled rule cards.
+/// Displays the "Service Rules" section with
+/// purple icon badges and rule descriptions.
 class ServiceRules extends StatelessWidget {
-  const ServiceRules({super.key, required this.rules});
+  const ServiceRules({
+    super.key,
+    required this.rules,
+  });
 
   /// List of service rule entries.
   final List<ServiceRuleEntity> rules;
@@ -15,22 +19,14 @@ class ServiceRules extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ManualSectionCard(
-      icon: Symbols.policy,
-      title: 'Quy định dịch vụ',
+      title: 'Service Rules',
       child: Column(
-        children: rules.map((rule) => _RuleRow(rule: rule)).toList(),
+        children: rules
+            .map((rule) => _RuleRow(rule: rule))
+            .toList(),
       ),
     );
   }
-}
-
-/// Maps an icon slug string to an [IconData].
-IconData _resolveIcon(String slug) {
-  return switch (slug) {
-    'volume_off' => Symbols.volume_off,
-    'event_busy' => Symbols.event_busy,
-    _ => Symbols.info,
-  };
 }
 
 class _RuleRow extends StatelessWidget {
@@ -43,39 +39,46 @@ class _RuleRow extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    return Container(
-      margin: EdgeInsets.only(bottom: AppDimens.spaceMd),
-      padding: AppDimens.paddingAllMediumSmall,
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: AppDimens.radiusMediumSmall,
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.4)),
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: AppDimens.spaceLg,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            _resolveIcon(rule.iconSlug),
-            size: AppDimens.iconMd,
-            color: colors.primary,
+          Container(
+            width: AppDimens.ctaButtonMd,
+            height: AppDimens.ctaButtonMd,
+            decoration: BoxDecoration(
+              color: colors.primary,
+              borderRadius: AppDimens.radiusSmall,
+            ),
+            child: Icon(
+              serviceRuleIconData(rule.iconSlug) ??
+                  Symbols.tune,
+              size: AppDimens.iconMd,
+              color: colors.onPrimary,
+            ),
           ),
-          AppDimens.horizontalMediumSmall,
+          AppDimens.horizontalMedium,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   rule.title,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w500,
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(
+                    fontWeight: FontWeight.bold,
                     color: colors.onSurface,
                   ),
                 ),
                 AppDimens.verticalExtraSmall,
                 Text(
                   rule.description,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: colors.outline,
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(
+                    color: colors.onSurfaceVariant,
                   ),
                 ),
               ],

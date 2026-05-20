@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  Logger,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Inject, Logger, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 import { randomUUID } from 'crypto';
 
@@ -46,9 +41,7 @@ export class RedisService implements OnModuleDestroy {
     `;
     const result = await this.redis.eval(script, 1, key, token);
     const released = result === 1;
-    this.logger.debug(
-      `Lock release ${released ? 'OK' : 'SKIPPED'}: ${key}`,
-    );
+    this.logger.debug(`Lock release ${released ? 'OK' : 'SKIPPED'}: ${key}`);
     return released;
   }
 
@@ -57,6 +50,19 @@ export class RedisService implements OnModuleDestroy {
    */
   async getLockTTL(key: string): Promise<number> {
     return this.redis.ttl(key);
+  }
+
+  /**
+   * Validate that a lock is still held with the expected token.
+   * Returns true if the key exists and its value matches the given token.
+   */
+  async validateLock(key: string, expectedToken: string): Promise<boolean> {
+    const currentValue = await this.redis.get(key);
+    const valid = currentValue === expectedToken;
+    this.logger.debug(
+      `Lock validation ${valid ? 'OK' : 'FAILED'}: ${key} (expected=${expectedToken}, actual=${currentValue ?? 'null'})`,
+    );
+    return valid;
   }
 
   // ── Generic Redis operations ────────────────────────────────
@@ -75,6 +81,95 @@ export class RedisService implements OnModuleDestroy {
 
   async del(key: string): Promise<number> {
     return this.redis.del(key);
+  }
+
+  async delMany(keys: string[]): Promise<number> {
+    if (keys.length === 0) {
+      return 0;
+    }
+    return this.redis.del(...keys);
+  }
+
+  async getJson<T>(key: string): Promise<T | null> {
+    const value = await this.redis.get(key);
+    if (!value) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(value) as T;
+    } catch (error) {
+      this.logger.warn(
+        `Invalid Redis JSON at key "${key}", deleting: ${(error as Error).message}`,
+      );
+      await this.redis.del(key).catch(() => undefined);
+      return null;
+    }
+  }
+
+  async setJson(
+    key: string,
+    value: unknown,
+    ttlSeconds?: number,
+  ): Promise<void> {
+    await this.set(key, JSON.stringify(value), ttlSeconds);
+  }
+
+  /**
+   * Atomically replace a JSON document only when its `hash` field matches.
+   * Used for refresh-token rotation so two parallel refreshes cannot both win.
+   */
+  async compareJsonHashAndSet(
+    key: string,
+    expectedHash: string,
+    nextValue: unknown,
+    ttlSeconds: number,
+  ): Promise<'ok' | 'missing' | 'mismatch'> {
+    const script = `
+      local current = redis.call("GET", KEYS[1])
+      if not current then
+        return -1
+      end
+
+      local ok, decoded = pcall(cjson.decode, current)
+      if not ok or decoded["hash"] ~= ARGV[1] then
+        return 0
+      end
+
+      redis.call("SET", KEYS[1], ARGV[2], "EX", ARGV[3])
+      return 1
+    `;
+
+    const result = await this.redis.eval(
+      script,
+      1,
+      key,
+      expectedHash,
+      JSON.stringify(nextValue),
+      ttlSeconds,
+    );
+
+    if (result === 1) {
+      return 'ok';
+    }
+    if (result === -1) {
+      return 'missing';
+    }
+    return 'mismatch';
+  }
+
+  // ── Pub/Sub helpers ─────────────────────────────────────────
+
+  /**
+   * Publish a message to a Redis channel (Pub/Sub).
+   * Returns the number of subscribers that received the message.
+   */
+  async publish(channel: string, message: string): Promise<number> {
+    const receivers = await this.redis.publish(channel, message);
+    this.logger.debug(
+      `Published to "${channel}" (${receivers} receiver(s)): ${message}`,
+    );
+    return receivers;
   }
 
   async onModuleDestroy() {

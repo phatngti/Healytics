@@ -16,6 +16,8 @@ import { Gender } from '@/employees/enum/gender.enum';
 import { TherapistLevel } from '@/employees/enum/therapist-level.enum';
 import { StrengthLevel } from '@/employees/enum/strength-level.enum';
 import { WorkScheduleEntryDto } from './work-schedule-entry.dto';
+import { WorkHistoryEntryDto } from './work-history-entry.dto';
+import { VerificationDocumentEntryDto } from './verification-document-entry.dto';
 
 // ═══════════════════════════════════════════════════════════════
 // Shared base fields for all therapist types
@@ -37,7 +39,10 @@ export class CreateSpaTherapistDto {
   @IsNotEmpty()
   lastName: string;
 
-  @ApiProperty({ example: 'spa.therapist.c@healytics.com', description: 'Email address' })
+  @ApiProperty({
+    example: 'spa.therapist.c@healytics.com',
+    description: 'Email address',
+  })
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -52,22 +57,32 @@ export class CreateSpaTherapistDto {
   @IsOptional()
   dateOfBirth?: string;
 
-  @ApiPropertyOptional({ enum: Gender, example: Gender.FEMALE, description: 'Gender' })
+  @ApiPropertyOptional({
+    enum: Gender,
+    example: Gender.FEMALE,
+    description: 'Gender',
+  })
   @IsEnum(Gender)
   @IsOptional()
   gender?: Gender;
 
-  @ApiPropertyOptional({ example: 'Pham Van D', description: 'Emergency contact name' })
+  @ApiProperty({ example: 'Pham Van D', description: 'Emergency contact name' })
   @IsString()
-  @IsOptional()
-  emergencyContactName?: string;
+  @IsNotEmpty()
+  emergencyContactName: string;
 
-  @ApiPropertyOptional({ example: '0934567890', description: 'Emergency contact phone' })
+  @ApiProperty({
+    example: '0934567890',
+    description: 'Emergency contact phone',
+  })
   @IsString()
-  @IsOptional()
-  emergencyContactPhone?: string;
+  @IsNotEmpty()
+  emergencyContactPhone: string;
 
-  @ApiProperty({ example: 'SPA-001', description: 'Unique employee identifier code' })
+  @ApiProperty({
+    example: 'SPA-001',
+    description: 'Unique employee identifier code',
+  })
   @IsString()
   @IsNotEmpty()
   employeeId: string;
@@ -77,12 +92,12 @@ export class CreateSpaTherapistDto {
   @IsOptional()
   employmentType?: string;
 
-  @ApiPropertyOptional({ example: '2026-03-08', description: 'Start date' })
+  @ApiProperty({ example: '2026-03-08', description: 'Start date' })
   @IsDateString()
-  @IsOptional()
-  startDate?: string;
+  @IsNotEmpty()
+  startDate: string;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: [WorkScheduleEntryDto],
     description: 'Weekly work schedule',
     example: [
@@ -93,77 +108,135 @@ export class CreateSpaTherapistDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => WorkScheduleEntryDto)
-  @IsOptional()
-  schedule?: WorkScheduleEntryDto[];
+  @IsNotEmpty()
+  schedule: WorkScheduleEntryDto[];
 
-  @ApiPropertyOptional({ example: 'https://i.pravatar.cc/150?u=spa@healytics.com', description: 'Avatar URL' })
+  @ApiPropertyOptional({
+    type: [WorkHistoryEntryDto],
+    description: 'Work history entries',
+    example: [
+      {
+        facility: 'Glow Saigon Spa Retreat',
+        position: 'Senior Spa Therapist',
+        period: '2021–Present',
+        isCurrent: true,
+      },
+    ],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => WorkHistoryEntryDto)
+  @IsOptional()
+  workHistory?: WorkHistoryEntryDto[];
+
+  @ApiPropertyOptional({
+    example: 'https://i.pravatar.cc/150?u=spa@healytics.com',
+    description: 'Avatar URL',
+  })
   @IsString()
   @IsOptional()
   avatar?: string;
 
-  @ApiPropertyOptional({ description: 'ID card URL' })
-  @IsString()
+  @ApiPropertyOptional({
+    type: [VerificationDocumentEntryDto],
+    description: 'Verification documents (ID card, licenses, etc.)',
+    example: [
+      {
+        fieldKey: 'id_card',
+        documents: [
+          {
+            name: 'ID Card',
+            url: 'https://storage.example.com/id-card.jpg',
+            updatedTime: '2026-03-21T14:00:00.000Z',
+          },
+        ],
+      },
+      {
+        fieldKey: 'other_documents',
+        documents: [
+          {
+            name: 'Health Certificate',
+            url: 'https://storage.example.com/health-cert.pdf',
+            updatedTime: '2026-03-21T14:00:00.000Z',
+          },
+        ],
+      },
+    ],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => VerificationDocumentEntryDto)
   @IsOptional()
-  idCardUrl?: string;
+  verificationDocuments?: VerificationDocumentEntryDto[];
 
-  @ApiPropertyOptional({ enum: EmployeeStatus, example: EmployeeStatus.ACTIVE, description: 'Employee status' })
+  @ApiPropertyOptional({
+    enum: EmployeeStatus,
+    example: EmployeeStatus.ACTIVE,
+    description: 'Employee status',
+  })
   @IsEnum(EmployeeStatus)
   @IsOptional()
   status?: EmployeeStatus;
 
-  @ApiPropertyOptional({ example: '', description: 'Branch ID or name' })
+  @ApiProperty({ description: 'Bio / description' })
   @IsString()
-  @IsOptional()
-  branch?: string;
+  @IsNotEmpty()
+  description: string;
 
-  @ApiPropertyOptional({ example: 'password123', description: 'Account password' })
-  @IsString()
-  @IsOptional()
-  password?: string;
-
-  @ApiPropertyOptional({ description: 'Bio / description' })
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @ApiPropertyOptional({ example: 'Senior Spa Therapist', description: 'Job title' })
+  @ApiPropertyOptional({
+    example: 'Senior Spa Therapist',
+    description: 'Job title',
+  })
   @IsString()
   @IsOptional()
   jobTitle?: string;
 
   // ── Spa Therapist-specific fields ──────────────────────────
 
-  @ApiPropertyOptional({ enum: TherapistLevel, example: TherapistLevel.SENIOR, description: 'Therapist level' })
+  @ApiPropertyOptional({
+    enum: TherapistLevel,
+    example: TherapistLevel.SENIOR,
+    description: 'Therapist level',
+  })
   @IsEnum(TherapistLevel)
   @IsOptional()
   therapistLevel?: TherapistLevel;
 
-  @ApiPropertyOptional({ example: 15.0, description: 'Commission rate percentage' })
+  @ApiPropertyOptional({
+    example: 15.0,
+    description: 'Commission rate percentage',
+  })
   @IsNumber()
   @IsOptional()
   commissionRate?: number;
 
-  @ApiPropertyOptional({ example: '2026-01-15', description: 'Last health check date' })
+  @ApiPropertyOptional({
+    example: '2026-01-15',
+    description: 'Last health check date',
+  })
   @IsDateString()
   @IsOptional()
   healthCheckDate?: string;
 
-  @ApiPropertyOptional({ type: [String], example: ['Facial Treatment', 'Body Scrub'], description: 'Skills' })
+  @ApiPropertyOptional({
+    type: [String],
+    example: ['Facial Treatment', 'Body Scrub'],
+    description: 'Skills',
+  })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
   skills?: string[];
 
-  @ApiPropertyOptional({ type: [String], example: ['LED Light Therapy', 'Microdermabrasion'], description: 'Device proficiency' })
+  @ApiPropertyOptional({
+    type: [String],
+    example: ['LED Light Therapy', 'Microdermabrasion'],
+    description: 'Device proficiency',
+  })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
   deviceProficiency?: string[];
-
-  @ApiPropertyOptional({ example: 'https://example.com/license/spa-001.pdf', description: 'License URL' })
-  @IsString()
-  @IsOptional()
-  licenseUrl?: string;
 
   // ── Internal (injected by controller) ──────────────────────
 
@@ -189,7 +262,10 @@ export class CreateMassageTherapistDto {
   @IsNotEmpty()
   lastName: string;
 
-  @ApiProperty({ example: 'massage.therapist.e@healytics.com', description: 'Email address' })
+  @ApiProperty({
+    example: 'massage.therapist.e@healytics.com',
+    description: 'Email address',
+  })
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -204,22 +280,35 @@ export class CreateMassageTherapistDto {
   @IsOptional()
   dateOfBirth?: string;
 
-  @ApiPropertyOptional({ enum: Gender, example: Gender.MALE, description: 'Gender' })
+  @ApiPropertyOptional({
+    enum: Gender,
+    example: Gender.MALE,
+    description: 'Gender',
+  })
   @IsEnum(Gender)
   @IsOptional()
   gender?: Gender;
 
-  @ApiPropertyOptional({ example: 'Nguyen Thi F', description: 'Emergency contact name' })
+  @ApiProperty({
+    example: 'Nguyen Thi F',
+    description: 'Emergency contact name',
+  })
   @IsString()
-  @IsOptional()
-  emergencyContactName?: string;
+  @IsNotEmpty()
+  emergencyContactName: string;
 
-  @ApiPropertyOptional({ example: '0956789012', description: 'Emergency contact phone' })
+  @ApiProperty({
+    example: '0956789012',
+    description: 'Emergency contact phone',
+  })
   @IsString()
-  @IsOptional()
-  emergencyContactPhone?: string;
+  @IsNotEmpty()
+  emergencyContactPhone: string;
 
-  @ApiProperty({ example: 'MSG-001', description: 'Unique employee identifier code' })
+  @ApiProperty({
+    example: 'MSG-001',
+    description: 'Unique employee identifier code',
+  })
   @IsString()
   @IsNotEmpty()
   employeeId: string;
@@ -229,12 +318,12 @@ export class CreateMassageTherapistDto {
   @IsOptional()
   employmentType?: string;
 
-  @ApiPropertyOptional({ example: '2026-03-08', description: 'Start date' })
+  @ApiProperty({ example: '2026-03-08', description: 'Start date' })
   @IsDateString()
-  @IsOptional()
-  startDate?: string;
+  @IsNotEmpty()
+  startDate: string;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     type: [WorkScheduleEntryDto],
     description: 'Weekly work schedule',
     example: [
@@ -245,76 +334,134 @@ export class CreateMassageTherapistDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => WorkScheduleEntryDto)
-  @IsOptional()
-  schedule?: WorkScheduleEntryDto[];
+  @IsNotEmpty()
+  schedule: WorkScheduleEntryDto[];
 
-  @ApiPropertyOptional({ example: 'https://i.pravatar.cc/150?u=massage@healytics.com', description: 'Avatar URL' })
+  @ApiPropertyOptional({
+    type: [WorkHistoryEntryDto],
+    description: 'Work history entries',
+    example: [
+      {
+        facility: 'Healing Hands Massage Center',
+        position: 'Lead Massage Therapist',
+        period: '2020–Present',
+        isCurrent: true,
+      },
+    ],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => WorkHistoryEntryDto)
+  @IsOptional()
+  workHistory?: WorkHistoryEntryDto[];
+
+  @ApiPropertyOptional({
+    example: 'https://i.pravatar.cc/150?u=massage@healytics.com',
+    description: 'Avatar URL',
+  })
   @IsString()
   @IsOptional()
   avatar?: string;
 
-  @ApiPropertyOptional({ description: 'ID card URL' })
-  @IsString()
+  @ApiPropertyOptional({
+    type: [VerificationDocumentEntryDto],
+    description: 'Verification documents (ID card, licenses, etc.)',
+    example: [
+      {
+        fieldKey: 'id_card',
+        documents: [
+          {
+            name: 'ID Card',
+            url: 'https://storage.example.com/id-card.jpg',
+            updatedTime: '2026-03-21T14:00:00.000Z',
+          },
+        ],
+      },
+      {
+        fieldKey: 'other_documents',
+        documents: [
+          {
+            name: 'Health Certificate',
+            url: 'https://storage.example.com/health-cert.pdf',
+            updatedTime: '2026-03-21T14:00:00.000Z',
+          },
+        ],
+      },
+    ],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => VerificationDocumentEntryDto)
   @IsOptional()
-  idCardUrl?: string;
+  verificationDocuments?: VerificationDocumentEntryDto[];
 
-  @ApiPropertyOptional({ enum: EmployeeStatus, example: EmployeeStatus.ACTIVE, description: 'Employee status' })
+  @ApiPropertyOptional({
+    enum: EmployeeStatus,
+    example: EmployeeStatus.ACTIVE,
+    description: 'Employee status',
+  })
   @IsEnum(EmployeeStatus)
   @IsOptional()
   status?: EmployeeStatus;
 
-  @ApiPropertyOptional({ example: '', description: 'Branch ID or name' })
+  @ApiProperty({ description: 'Bio / description' })
   @IsString()
-  @IsOptional()
-  branch?: string;
+  @IsNotEmpty()
+  description: string;
 
-  @ApiPropertyOptional({ example: 'password123', description: 'Account password' })
-  @IsString()
-  @IsOptional()
-  password?: string;
-
-  @ApiPropertyOptional({ description: 'Bio / description' })
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @ApiPropertyOptional({ example: 'Master Massage Therapist', description: 'Job title' })
+  @ApiPropertyOptional({
+    example: 'Master Massage Therapist',
+    description: 'Job title',
+  })
   @IsString()
   @IsOptional()
   jobTitle?: string;
 
   // ── Massage Therapist-specific fields ──────────────────────
 
-  @ApiPropertyOptional({ enum: TherapistLevel, example: TherapistLevel.MASTER, description: 'Therapist level' })
+  @ApiPropertyOptional({
+    enum: TherapistLevel,
+    example: TherapistLevel.MASTER,
+    description: 'Therapist level',
+  })
   @IsEnum(TherapistLevel)
   @IsOptional()
   therapistLevel?: TherapistLevel;
 
-  @ApiPropertyOptional({ enum: StrengthLevel, example: StrengthLevel.STRONG, description: 'Strength level' })
+  @ApiPropertyOptional({
+    enum: StrengthLevel,
+    example: StrengthLevel.STRONG,
+    description: 'Strength level',
+  })
   @IsEnum(StrengthLevel)
   @IsOptional()
   strengthLevel?: StrengthLevel;
 
-  @ApiPropertyOptional({ example: 20.0, description: 'Commission rate percentage' })
+  @ApiPropertyOptional({
+    example: 20.0,
+    description: 'Commission rate percentage',
+  })
   @IsNumber()
   @IsOptional()
   commissionRate?: number;
 
-  @ApiPropertyOptional({ example: '2026-02-01', description: 'Last health check date' })
+  @ApiPropertyOptional({
+    example: '2026-02-01',
+    description: 'Last health check date',
+  })
   @IsDateString()
   @IsOptional()
   healthCheckDate?: string;
 
-  @ApiPropertyOptional({ type: [String], example: ['Deep Tissue', 'Swedish Massage'], description: 'Skills' })
+  @ApiPropertyOptional({
+    type: [String],
+    example: ['Deep Tissue', 'Swedish Massage'],
+    description: 'Skills',
+  })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
   skills?: string[];
-
-  @ApiPropertyOptional({ example: 'https://example.com/license/msg-001.pdf', description: 'License URL' })
-  @IsString()
-  @IsOptional()
-  licenseUrl?: string;
 
   // ── Internal (injected by controller) ──────────────────────
 

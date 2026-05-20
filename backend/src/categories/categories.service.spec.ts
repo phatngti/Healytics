@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CategoriesService } from './categories.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Category } from '@/common/entities/category.entity';
+import { Product } from '@/common/entities/product.entity';
+import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { NotFoundException } from '@nestjs/common';
+import { PartnersService } from '@/partners/partners.service';
 import { CreateCategoryHandler } from './application/handlers/create-category.handler';
 import { UpdateCategoryHandler } from './application/handlers/update-category.handler';
 import { RemoveCategoryHandler } from './application/handlers/remove-category.handler';
@@ -34,6 +37,26 @@ describe('CategoriesService', () => {
     execute: jest.fn(),
   };
 
+  const mockEligibilityRepository = {
+    find: jest.fn(),
+    createQueryBuilder: jest.fn().mockReturnValue({
+      innerJoinAndSelect: jest.fn().mockReturnThis(),
+      innerJoin: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([]),
+    }),
+  };
+
+  const mockProductRepository = {
+    find: jest.fn(),
+    findOne: jest.fn(),
+  };
+
+  const mockPartnersService = {
+    getFirstHealthPartner: jest.fn().mockResolvedValue(null),
+  };
+
   // Full mock entity for realistic DTO mapping
   const mockCategoryEntity: Partial<Category> = {
     id: 'uuid-1',
@@ -55,6 +78,18 @@ describe('CategoriesService', () => {
         {
           provide: getRepositoryToken(Category),
           useValue: mockCategoryRepository,
+        },
+        {
+          provide: getRepositoryToken(Product),
+          useValue: mockProductRepository,
+        },
+        {
+          provide: getRepositoryToken(ProductEmployeeEligibility),
+          useValue: mockEligibilityRepository,
+        },
+        {
+          provide: PartnersService,
+          useValue: mockPartnersService,
         },
         {
           provide: CreateCategoryHandler,
@@ -138,7 +173,9 @@ describe('CategoriesService', () => {
       mockCategoryRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.findOne('missing-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('missing-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -160,7 +197,9 @@ describe('CategoriesService', () => {
       mockCategoryRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.findBySlug('missing-slug')).rejects.toThrow(NotFoundException);
+      await expect(service.findBySlug('missing-slug')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -177,7 +216,10 @@ describe('CategoriesService', () => {
       // Assert
       expect(result.id).toBe('uuid-1');
       expect(result.name).toBe('New Name');
-      expect(mockUpdateCategoryHandler.execute).toHaveBeenCalledWith('uuid-1', updateDto);
+      expect(mockUpdateCategoryHandler.execute).toHaveBeenCalledWith(
+        'uuid-1',
+        updateDto,
+      );
     });
   });
 

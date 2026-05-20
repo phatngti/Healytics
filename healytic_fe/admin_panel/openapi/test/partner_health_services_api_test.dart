@@ -38,10 +38,24 @@ void main() {
       // TODO
     });
 
+    // Get per-service detail analytics
+    //
+    //Future<HealthServiceDetailAnalyticsResponseDto> partnerHealthServiceControllerGetDetailAnalytics(String productId, { String period }) async
+    test('test partnerHealthServiceControllerGetDetailAnalytics', () async {
+      // TODO
+    });
+
     // Get full health service details by slug
     //
     //Future<PartnerHealthServiceDetailResponseDto> partnerHealthServiceControllerGetDetails(String slug) async
     test('test partnerHealthServiceControllerGetDetails', () async {
+      // TODO
+    });
+
+    // Get health service overview analytics
+    //
+    //Future<HealthServiceOverviewAnalyticsResponseDto> partnerHealthServiceControllerGetOverviewAnalytics({ String period }) async
+    test('test partnerHealthServiceControllerGetOverviewAnalytics', () async {
       // TODO
     });
 

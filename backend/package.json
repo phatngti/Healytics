@@ -10,26 +10,34 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "start:e2e": "NODE_ENV=test nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "test": "node scripts/run-jest-report.js",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "test:cov": "node scripts/run-jest-report.js --coverage",
+    "test:report": "node scripts/run-jest-report.js",
+    "test:report:cov": "node scripts/run-jest-report.js --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e": "node scripts/run-jest-report.js --config ./test/jest-e2e.json",
     "migration:create": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli migration:create ./migrations/scripts/$npm_config_name",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
     "migration:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli migration:run -d ./migrations/typeorm.config.ts",
+    "migration:run:e2e": "NODE_ENV=test npm run migration:run",
     "migration:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli migration:revert -d ./migrations/typeorm.config.ts",
     "migration:revert:all": "while true; do output=$(npm run migration:revert 2>&1); echo \"$output\"; if echo \"$output\" | grep -q 'Nothing to revert'; then echo 'All migrations reverted.'; break; fi; echo 'Reverted one migration, continuing...'; done",
     "migration:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli migration:generate -d ./migrations/typeorm.config.ts ./migrations/scripts/$npm_config_name",
     "seed": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts",
-    "seed:clear": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts --clear"
+    "seed:prod": "node dist/src/database/seeds/seed.js",
+    "seed:clear": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts --clear",
+    "seed:clear-all": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts --clear-all",
+    "generate:ws-contract": "ts-node -r tsconfig-paths/register scripts/generate-ws-contract.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.971.0",
     "@aws-sdk/s3-request-presigner": "^3.971.0",
+    "@elastic/elasticsearch": "8.17.0",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^10.4.22",
     "@nestjs/config": "^3.3.0",
@@ -38,14 +46,17 @@
     "@nestjs/microservices": "^10.4.22",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.4.22",
+    "@nestjs/platform-socket.io": "^10.4.22",
+    "@nestjs/schedule": "^6.1.1",
+    "@nestjs/swagger": "^7.4.2",
     "@nestjs/throttler": "^6.5.0",
     "@nestjs/typeorm": "^10.0.2",
-    "@types/bcrypt": "^6.0.0",
+    "@nestjs/websockets": "^10.4.22",
+    "@socket.io/redis-adapter": "^8.3.0",
     "amqp-connection-manager": "^5.0.0",
     "amqplib": "^0.10.9",
     "axios": "^1.13.6",
     "bcrypt": "^6.0.0",
-    "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "dotenv": "^17.2.3",
@@ -59,6 +70,8 @@
     "pg": "^8.11.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "socket.io": "^4.8.3",
+    "stripe": "^22.0.2",
     "typeorm": "^0.3.23"
   },
   "devDependencies": {
@@ -66,12 +79,13 @@
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^10.4.9",
     "@nestjs/schematics": "^10.2.3",
-    "@nestjs/swagger": "^7.4.2",
     "@nestjs/testing": "^10.4.22",
     "@types/amqplib": "^0.10.8",
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.0",
     "@types/express-session": "^1.17.6",
     "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^22.10.7",
     "@types/passport-jwt": "^4.0.1",
@@ -83,6 +97,7 @@
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^16.0.0",
     "jest": "^30.0.0",
+    "jest-html-reporters": "^3.0.11",
     "prettier": "^3.4.2",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
@@ -112,6 +127,30 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageReporters": [
+      "json",
+      "json-summary",
+      "text",
+      "lcov",
+      "clover"
+    ],
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/test-setup.ts"
+    ],
+    "reporters": [
+      "default",
+      [
+        "jest-html-reporters",
+        {
+          "publicPath": "./test-report",
+          "filename": "index.html",
+          "pageTitle": "Healytics Test Report",
+          "expand": true,
+          "openReport": false,
+          "enableMergeData": true
+        }
+      ]
+    ]
   }
 }

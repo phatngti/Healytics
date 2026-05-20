@@ -17,10 +17,10 @@ class BusinessInfo {
     this.taxRegistrationCode,
     this.serviceTags,
     this.address,
-    this.username,
     this.email,
     this.phoneNumber,
   });
+
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -60,14 +60,6 @@ class BusinessInfo {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  Object? username;
-
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   Object? email;
 
   ///
@@ -84,7 +76,6 @@ class BusinessInfo {
     other.taxRegistrationCode == taxRegistrationCode &&
     other.serviceTags == serviceTags &&
     other.address == address &&
-    other.username == username &&
     other.email == email &&
     other.phoneNumber == phoneNumber;
 
@@ -95,12 +86,11 @@ class BusinessInfo {
     (taxRegistrationCode == null ? 0 : taxRegistrationCode!.hashCode) +
     (serviceTags == null ? 0 : serviceTags!.hashCode) +
     (address == null ? 0 : address!.hashCode) +
-    (username == null ? 0 : username!.hashCode) +
     (email == null ? 0 : email!.hashCode) +
     (phoneNumber == null ? 0 : phoneNumber!.hashCode);
 
   @override
-  String toString() => 'BusinessInfo[brandName=$brandName, taxRegistrationCode=$taxRegistrationCode, serviceTags=$serviceTags, address=$address, username=$username, email=$email, phoneNumber=$phoneNumber]';
+  String toString() => 'BusinessInfo[brandName=$brandName, taxRegistrationCode=$taxRegistrationCode, serviceTags=$serviceTags, address=$address, email=$email, phoneNumber=$phoneNumber]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -123,11 +113,6 @@ class BusinessInfo {
       json[r'address'] = this.address;
     } else {
       json[r'address'] = null;
-    }
-    if (this.username != null) {
-      json[r'username'] = this.username;
-    } else {
-      json[r'username'] = null;
     }
     if (this.email != null) {
       json[r'email'] = this.email;
@@ -165,7 +150,6 @@ class BusinessInfo {
         taxRegistrationCode: mapValueOfType<Object>(json, r'taxRegistrationCode'),
         serviceTags: mapValueOfType<Object>(json, r'serviceTags'),
         address: AddressDto.fromJson(json[r'address']),
-        username: mapValueOfType<Object>(json, r'username'),
         email: mapValueOfType<Object>(json, r'email'),
         phoneNumber: mapValueOfType<Object>(json, r'phoneNumber'),
       );

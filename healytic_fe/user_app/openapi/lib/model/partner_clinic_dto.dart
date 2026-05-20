@@ -18,6 +18,7 @@ class PartnerClinicDto {
     this.isVerified,
   });
 
+
   String name;
 
   String address;

@@ -24,6 +24,12 @@ class EmployeeStatsActionsSection extends StatelessWidget {
   /// Callback when Edit button is pressed.
   final VoidCallback? onEdit;
 
+  /// Callback when Deactivate button is pressed.
+  final VoidCallback? onDeactivate;
+
+  /// Whether the Deactivate action is currently submitting.
+  final bool isDeactivating;
+
   const EmployeeStatsActionsSection({
     super.key,
     required this.rating,
@@ -32,6 +38,8 @@ class EmployeeStatsActionsSection extends StatelessWidget {
     this.dateOfBirth,
     this.isEditing = false,
     this.onEdit,
+    this.onDeactivate,
+    this.isDeactivating = false,
   });
 
   @override
@@ -50,25 +58,19 @@ class EmployeeStatsActionsSection extends StatelessWidget {
               children: [
                 Text(
                   'RATING',
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                      ),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
                 ),
                 Row(
                   children: [
                     Text(
                       rating.toStringAsFixed(1),
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     AppDimens.horizontalExtraSmall,
                     _StarRow(rating: rating),
@@ -79,9 +81,7 @@ class EmployeeStatsActionsSection extends StatelessWidget {
             Container(
               width: 1,
               height: 40,
-              margin: const EdgeInsets.symmetric(
-                horizontal: 24,
-              ),
+              margin: const EdgeInsets.symmetric(horizontal: 24),
               color: colorScheme.outlineVariant,
             ),
             // Personal
@@ -90,23 +90,17 @@ class EmployeeStatsActionsSection extends StatelessWidget {
               children: [
                 Text(
                   'PERSONAL',
-                  style: Theme.of(context)
-                      .textTheme
-                      .labelSmall
-                      ?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                      ),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
                 ),
                 Text(
                   _personalLabel,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -123,21 +117,20 @@ class EmployeeStatsActionsSection extends StatelessWidget {
             ),
             AppDimens.horizontalMediumSmall,
             AppButton(
-              onPressed: () {},
+              onPressed: isDeactivating ? null : onDeactivate,
               buttonType: ButtonType.elevated,
+              isLoading: isDeactivating,
               customStyle: OutlinedButton.styleFrom(
-                backgroundColor: Theme.of(context)
-                    .extension<SemanticColors>()!
-                    .error!
-                    .withAlpha(25),
-                foregroundColor: Theme.of(context)
-                    .extension<SemanticColors>()!
-                    .error,
+                backgroundColor: Theme.of(
+                  context,
+                ).extension<SemanticColors>()!.error!.withAlpha(25),
+                foregroundColor: Theme.of(
+                  context,
+                ).extension<SemanticColors>()!.error,
                 side: BorderSide(
-                  color: Theme.of(context)
-                      .extension<SemanticColors>()!
-                      .error!
-                      .withAlpha(50),
+                  color: Theme.of(
+                    context,
+                  ).extension<SemanticColors>()!.error!.withAlpha(50),
                 ),
               ),
               child: const Text('Deactivate'),
@@ -194,9 +187,7 @@ class _StarRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final warningColor = Theme.of(context)
-        .extension<SemanticColors>()!
-        .warning;
+    final warningColor = Theme.of(context).extension<SemanticColors>()!.warning;
 
     return Row(
       children: List.generate(5, (index) {

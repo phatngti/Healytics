@@ -14,25 +14,19 @@ class EmployeeEducationCard extends StatelessWidget {
   /// The doctor entity to display data for.
   final DoctorEntity doctor;
 
-  const EmployeeEducationCard({
-    super.key,
-    required this.doctor,
-  });
+  const EmployeeEducationCard({super.key, required this.doctor});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>()!;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: AppDimens.radiusMedium,
-        border: Border.all(
-          color: colorScheme.outlineVariant,
-        ),
+        border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withAlpha(10),
@@ -54,29 +48,19 @@ class EmployeeEducationCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: _EducationList(
-                    items: doctor.education,
-                  ),
-                ),
+                Expanded(child: _EducationList(items: doctor.education)),
                 Container(
                   width: 1,
                   height: 150,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                  ),
+                  margin: const EdgeInsets.symmetric(horizontal: 32),
                   decoration: BoxDecoration(
                     border: Border(
-                      left: BorderSide(
-                        color: colorScheme.outlineVariant,
-                      ),
+                      left: BorderSide(color: colorScheme.outlineVariant),
                     ),
                   ),
                 ),
                 Expanded(
-                  child: _CertificationList(
-                    items: doctor.certifications,
-                  ),
+                  child: _CertificationList(items: doctor.certifications),
                 ),
               ],
             ),
@@ -92,36 +76,23 @@ class EmployeeEducationCard extends StatelessWidget {
     required SemanticColors semanticColors,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: 16,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            colorScheme.surfaceContainerHighest
-                .withAlpha(100),
+            colorScheme.surfaceContainerHighest.withAlpha(100),
             colorScheme.surface,
           ],
         ),
-        border: Border(
-          bottom: BorderSide(
-            color: colorScheme.outlineVariant,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.school,
-            color: semanticColors.info,
-          ),
+          Icon(Icons.school, color: semanticColors.info),
           AppDimens.horizontalSmall,
           Text(
             'Education & Certifications',
-            style: textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -159,9 +130,7 @@ class _EducationList extends StatelessWidget {
             ),
           )
         else
-          ...items.map(
-            (item) => _EducationItem(label: item),
-          ),
+          ...items.map((item) => _EducationItem(label: item)),
       ],
     );
   }
@@ -242,29 +211,20 @@ class _CertificationList extends StatelessWidget {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.tertiaryContainer
-                      .withAlpha(50),
+                  color: colorScheme.tertiaryContainer.withAlpha(50),
                   borderRadius: AppDimens.radiusLarge,
-                  border: Border.all(
-                    color: colorScheme.tertiary
-                        .withAlpha(75),
-                  ),
+                  border: Border.all(color: colorScheme.tertiary.withAlpha(75)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.verified,
-                      size: 14,
-                      color: colorScheme.tertiary,
-                    ),
+                    Icon(Icons.verified, size: 14, color: colorScheme.tertiary),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(
                         cert,
                         overflow: TextOverflow.ellipsis,
-                        style:
-                            textTheme.labelMedium?.copyWith(
+                        style: textTheme.labelMedium?.copyWith(
                           color: colorScheme.tertiary,
                           fontWeight: FontWeight.w600,
                         ),

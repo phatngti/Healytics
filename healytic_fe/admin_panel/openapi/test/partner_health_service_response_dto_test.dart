@@ -35,13 +35,12 @@ void main() {
     });
 
     // Description
-    // Object description
+    // String description
     test('to test the property `description`', () async {
       // TODO
     });
 
-    // Type
-    // String type
+    // HealthServiceType type
     test('to test the property `type`', () async {
       // TODO
     });
@@ -53,7 +52,7 @@ void main() {
     });
 
     // Sale price if on discount
-    // Object salePrice
+    // num salePrice
     test('to test the property `salePrice`', () async {
       // TODO
     });
@@ -64,8 +63,7 @@ void main() {
       // TODO
     });
 
-    // Status
-    // String status
+    // HealthServiceStatus status
     test('to test the property `status`', () async {
       // TODO
     });
@@ -77,7 +75,7 @@ void main() {
     });
 
     // Vendor name
-    // Object vendorName
+    // String vendorName
     test('to test the property `vendorName`', () async {
       // TODO
     });
@@ -115,6 +113,24 @@ void main() {
     // Eligible employees for service
     // List<PartnerHealthServiceEmployeeEligibilityDto> productEmployeeEligibilities (default value: const [])
     test('to test the property `productEmployeeEligibilities`', () async {
+      // TODO
+    });
+
+    // Service manual (guidelines, rules, procedure steps)
+    // PartnerServiceManualDto serviceManual
+    test('to test the property `serviceManual`', () async {
+      // TODO
+    });
+
+    // Feature tags associated with this service
+    // List<PartnerProductTagDto> productTags (default value: const [])
+    test('to test the property `productTags`', () async {
+      // TODO
+    });
+
+    // Tag IDs associated with this service
+    // List<String> tagIds (default value: const [])
+    test('to test the property `tagIds`', () async {
       // TODO
     });
 

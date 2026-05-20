@@ -1,0 +1,5722 @@
+[
+  {
+    "query": "Làm sao để không còn la mắng hay bạo lực với người nhà khi tức giận?",
+    "relevant_ids": [
+      "SV022",
+      "SV023"
+    ],
+    "hard_negative_ids": [
+      "SV029",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV022": 2,
+      "SV023": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0107"
+  },
+  {
+    "query": "Tôi muốn tập luyện tại nhà trong không gian nhỏ, có phương pháp nào hiệu quả không?",
+    "relevant_ids": [
+      "SV048",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV036",
+      "SV032",
+      "SV047",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV048": 2,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0240"
+  },
+  {
+    "query": "Làm sao để hết chứng khó tiêu và táo bón kéo dài?",
+    "relevant_ids": [
+      "SV008",
+      "SV015"
+    ],
+    "hard_negative_ids": [
+      "SV007",
+      "SV001",
+      "SV004",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV008": 2,
+      "SV015": 1
+    },
+    "category": "y_te",
+    "id": "CB_0038"
+  },
+  {
+    "query": "Làm sao để các thành viên trong nhà gần gũi và hiểu nhau hơn?",
+    "relevant_ids": [
+      "SV018",
+      "SV020",
+      "SV017"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV018": 2,
+      "SV020": 1,
+      "SV017": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0090"
+  },
+  {
+    "query": "Làm sao để biết da mình đang gặp vấn đề gì và cần chăm sóc thế nào?",
+    "relevant_ids": [
+      "SV007",
+      "SV014"
+    ],
+    "hard_negative_ids": [
+      "SV012",
+      "SV004",
+      "SV006"
+    ],
+    "relevance_grades": {
+      "SV007": 2,
+      "SV014": 1
+    },
+    "category": "y_te",
+    "id": "CB_0033"
+  },
+  {
+    "query": "Tôi muốn giảm cân nhưng không biết bắt đầu từ đâu, có ai giúp tôi lên thực đơn riêng được không?",
+    "relevant_ids": [
+      "SV051",
+      "SV058"
+    ],
+    "hard_negative_ids": [
+      "SV059",
+      "SV052",
+      "SV053"
+    ],
+    "relevance_grades": {
+      "SV051": 2,
+      "SV058": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0251"
+  },
+  {
+    "query": "Có gợi ý nào cho các hoạt động vận động ngoài trời để gần gũi thiên nhiên không?",
+    "relevant_ids": [
+      "SV039",
+      "SV043",
+      "SV047"
+    ],
+    "hard_negative_ids": [
+      "SV035",
+      "SV036",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV039": 2,
+      "SV043": 1,
+      "SV047": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0193"
+  },
+  {
+    "query": "Tôi cứ bị ám ảnh mãi chuyện tai nạn năm ngoái, không ngủ được.",
+    "relevant_ids": [
+      "SV025",
+      "SV028",
+      "SV020"
+    ],
+    "hard_negative_ids": [
+      "SV022",
+      "SV016",
+      "SV021"
+    ],
+    "relevance_grades": {
+      "SV025": 2,
+      "SV028": 1,
+      "SV020": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0121"
+  },
+  {
+    "query": "Chế độ ăn nào tốt cho người bị cao huyết áp?",
+    "relevant_ids": [
+      "SV004",
+      "SV015",
+      "SV005"
+    ],
+    "hard_negative_ids": [
+      "SV001",
+      "SV013",
+      "SV003",
+      "SV006"
+    ],
+    "relevance_grades": {
+      "SV004": 2,
+      "SV015": 1,
+      "SV005": 1
+    },
+    "category": "y_te",
+    "id": "CB_0020"
+  },
+  {
+    "query": "Tôi muốn tìm lớp học cách tự bảo vệ bản thân.",
+    "relevant_ids": [
+      "SV046",
+      "SV033",
+      "SV043"
+    ],
+    "hard_negative_ids": [
+      "SV041",
+      "SV038",
+      "SV049",
+      "SV036"
+    ],
+    "relevance_grades": {
+      "SV046": 2,
+      "SV033": 1,
+      "SV043": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0226"
+  },
+  {
+    "query": "Tìm bác sĩ nữ khám riêng tư và thân thiện.",
+    "relevant_ids": [
+      "SV005",
+      "SV013",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV006",
+      "SV015",
+      "SV007"
+    ],
+    "relevance_grades": {
+      "SV005": 2,
+      "SV013": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0025"
+  },
+  {
+    "query": "Tôi muốn tìm hiểu về chế độ ăn uống giúp sống thọ và tốt cho tim mạch.",
+    "relevant_ids": [
+      "SV060",
+      "SV053"
+    ],
+    "hard_negative_ids": [
+      "SV054",
+      "SV056",
+      "SV051",
+      "SV057"
+    ],
+    "relevance_grades": {
+      "SV060": 2,
+      "SV053": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0296"
+  },
+  {
+    "query": "Làm sao để biết mình có bị trầm cảm không và cần làm gì?",
+    "relevant_ids": [
+      "SV021",
+      "SV023",
+      "SV027"
+    ],
+    "hard_negative_ids": [
+      "SV030",
+      "SV022"
+    ],
+    "relevance_grades": {
+      "SV021": 2,
+      "SV023": 1,
+      "SV027": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0104"
+  },
+  {
+    "query": "Cuối tuần này có hoạt động gì ngoài trời để hòa mình vào thiên nhiên không?",
+    "relevant_ids": [
+      "SV045",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV046"
+    ],
+    "relevance_grades": {
+      "SV045": 2,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0221"
+  },
+  {
+    "query": "Có lớp dạy bơi cho người lớn chưa biết gì không?",
+    "relevant_ids": [
+      "SV042",
+      "SV033",
+      "SV046"
+    ],
+    "hard_negative_ids": [
+      "SV038",
+      "SV036",
+      "SV037",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV042": 2,
+      "SV033": 1,
+      "SV046": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0206"
+  },
+  {
+    "query": "Chế độ ăn nào giúp giảm nguy cơ mắc bệnh tiểu đường và tốt cho sức khỏe tổng thể?",
+    "relevant_ids": [
+      "SV060",
+      "SV053"
+    ],
+    "hard_negative_ids": [
+      "SV054",
+      "SV056",
+      "SV051",
+      "SV057"
+    ],
+    "relevance_grades": {
+      "SV060": 2,
+      "SV053": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0298"
+  },
+  {
+    "query": "Vận động viên cần thực đơn ăn uống thế nào để đạt đỉnh phong độ trước giải đấu?",
+    "relevant_ids": [
+      "SV059",
+      "SV053",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV059": 2,
+      "SV053": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0292"
+  },
+  {
+    "query": "Tôi muốn tìm bác sĩ chuyên về bệnh dạ dày ruột.",
+    "relevant_ids": [
+      "SV008",
+      "SV015"
+    ],
+    "hard_negative_ids": [
+      "SV007",
+      "SV001",
+      "SV004",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV008": 2,
+      "SV015": 1
+    },
+    "category": "y_te",
+    "id": "CB_0039"
+  },
+  {
+    "query": "Có dịch vụ nào đánh giá thể lực rồi thiết kế lịch tập dài hạn không?",
+    "relevant_ids": [
+      "SV032",
+      "SV044",
+      "SV033"
+    ],
+    "hard_negative_ids": [
+      "SV035",
+      "SV045"
+    ],
+    "relevance_grades": {
+      "SV032": 2,
+      "SV044": 1,
+      "SV033": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0159"
+  },
+  {
+    "query": "Tôi bị đau lưng mãn tính, có hoạt động nào hỗ trợ giảm đau và tăng sự linh hoạt mà không làm nặng thêm tình trạng không?",
+    "relevant_ids": [
+      "SV035",
+      "SV033",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV050",
+      "SV042",
+      "SV049"
+    ],
+    "relevance_grades": {
+      "SV035": 2,
+      "SV033": 1,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0174"
+  },
+  {
+    "query": "Cách nào để giảm mỡ toàn thân nhanh và hiệu quả nhất?",
+    "relevant_ids": [
+      "SV050",
+      "SV045",
+      "SV042"
+    ],
+    "hard_negative_ids": [
+      "SV043",
+      "SV044",
+      "SV049",
+      "SV041"
+    ],
+    "relevance_grades": {
+      "SV050": 2,
+      "SV045": 1,
+      "SV042": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0246"
+  },
+  {
+    "query": "Làm sao để có chế độ ăn uống lành mạnh phòng ngừa bệnh tim? Có ai tư vấn riêng được không?",
+    "relevant_ids": [
+      "SV001",
+      "SV005"
+    ],
+    "hard_negative_ids": [
+      "SV004",
+      "SV012",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV001": 2,
+      "SV005": 1
+    },
+    "category": "y_te",
+    "id": "CB_0002"
+  },
+  {
+    "query": "Mình muốn đi bộ đường dài thử thách bản thân ở những nơi cảnh đẹp.",
+    "relevant_ids": [
+      "SV045",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV046"
+    ],
+    "relevance_grades": {
+      "SV045": 2,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0225"
+  },
+  {
+    "query": "Làm sao để có một chế độ ăn uống lành mạnh phù hợp với mình nhỉ? Tôi cần người tư vấn.",
+    "relevant_ids": [
+      "SV051",
+      "SV058"
+    ],
+    "hard_negative_ids": [
+      "SV059",
+      "SV052",
+      "SV053"
+    ],
+    "relevance_grades": {
+      "SV051": 2,
+      "SV058": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0252"
+  },
+  {
+    "query": "Tôi cần kế hoạch để thay đổi công việc trong 5 năm tới.",
+    "relevant_ids": [
+      "SV029",
+      "SV025",
+      "SV016"
+    ],
+    "hard_negative_ids": [
+      "SV027",
+      "SV021",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV029": 2,
+      "SV025": 1,
+      "SV016": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0145"
+  },
+  {
+    "query": "Có cộng đồng nào giúp mình học hỏi kinh nghiệm để cải thiện sức khỏe tinh thần không?",
+    "relevant_ids": [
+      "SV027",
+      "SV030"
+    ],
+    "hard_negative_ids": [
+      "SV020",
+      "SV016",
+      "SV021"
+    ],
+    "relevance_grades": {
+      "SV027": 2,
+      "SV030": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0134"
+  },
+  {
+    "query": "Tôi bận lắm, có bài tập nào giảm cân mà chỉ cần 30 phút mỗi ngày không?",
+    "relevant_ids": [
+      "SV050",
+      "SV045",
+      "SV042"
+    ],
+    "hard_negative_ids": [
+      "SV043",
+      "SV044",
+      "SV049",
+      "SV041"
+    ],
+    "relevance_grades": {
+      "SV050": 2,
+      "SV045": 1,
+      "SV042": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0247"
+  },
+  {
+    "query": "Làm sao để hết sợ nước và học bơi?",
+    "relevant_ids": [
+      "SV042",
+      "SV033",
+      "SV046"
+    ],
+    "hard_negative_ids": [
+      "SV038",
+      "SV036",
+      "SV037",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV042": 2,
+      "SV033": 1,
+      "SV046": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0207"
+  },
+  {
+    "query": "Con tôi ở tuổi dậy thì rất khó bảo, có chuyên gia nào giúp tôi cách nuôi dạy không?",
+    "relevant_ids": [
+      "SV018",
+      "SV020",
+      "SV017"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV018": 2,
+      "SV020": 1,
+      "SV017": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0087"
+  },
+  {
+    "query": "Tôi muốn kiểm tra sức khỏe định kỳ thì đăng ký thế nào?",
+    "relevant_ids": [
+      "SV002",
+      "SV013",
+      "SV010"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV011"
+    ],
+    "relevance_grades": {
+      "SV002": 2,
+      "SV013": 1,
+      "SV010": 1
+    },
+    "category": "y_te",
+    "id": "CB_0006"
+  },
+  {
+    "query": "Có thực đơn nào ăn uống lành mạnh để kiểm soát mức cholesterol không?",
+    "relevant_ids": [
+      "SV057",
+      "SV056"
+    ],
+    "hard_negative_ids": [
+      "SV051",
+      "SV059",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV057": 2,
+      "SV056": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0284"
+  },
+  {
+    "query": "Có chỗ nào hỗ trợ tâm lý cho người mất người thân không?",
+    "relevant_ids": [
+      "SV025",
+      "SV028",
+      "SV020"
+    ],
+    "hard_negative_ids": [
+      "SV022",
+      "SV016",
+      "SV021"
+    ],
+    "relevance_grades": {
+      "SV025": 2,
+      "SV028": 1,
+      "SV020": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0124"
+  },
+  {
+    "query": "Có hoạt động thể thao nào giúp tăng cường tim mạch và đốt mỡ không?",
+    "relevant_ids": [
+      "SV039",
+      "SV043",
+      "SV047"
+    ],
+    "hard_negative_ids": [
+      "SV035",
+      "SV036",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV039": 2,
+      "SV043": 1,
+      "SV047": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0191"
+  },
+  {
+    "query": "Tôi muốn tìm một chỗ có thể soi da và tư vấn liệu trình chăm sóc chuyên sâu.",
+    "relevant_ids": [
+      "SV007",
+      "SV014"
+    ],
+    "hard_negative_ids": [
+      "SV012",
+      "SV004",
+      "SV006"
+    ],
+    "relevance_grades": {
+      "SV007": 2,
+      "SV014": 1
+    },
+    "category": "y_te",
+    "id": "CB_0035"
+  },
+  {
+    "query": "Sau khi tập gym về tôi muốn tìm một lớp để thả lỏng và giãn cơ bắp.",
+    "relevant_ids": [
+      "SV047",
+      "SV032",
+      "SV040"
+    ],
+    "hard_negative_ids": [
+      "SV048",
+      "SV043"
+    ],
+    "relevance_grades": {
+      "SV047": 2,
+      "SV032": 1,
+      "SV040": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0232"
+  },
+  {
+    "query": "Có lớp thể dục online nào có giáo viên hướng dẫn trực tiếp vào buổi sáng không?",
+    "relevant_ids": [
+      "SV037",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV039",
+      "SV040"
+    ],
+    "relevance_grades": {
+      "SV037": 2,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0182"
+  },
+  {
+    "query": "Mình muốn tăng cân và xây dựng cơ bắp, có chương trình nào theo dõi sát sao và lên kế hoạch ăn uống không?",
+    "relevant_ids": [
+      "SV051",
+      "SV058"
+    ],
+    "hard_negative_ids": [
+      "SV059",
+      "SV052",
+      "SV053"
+    ],
+    "relevance_grades": {
+      "SV051": 2,
+      "SV058": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0253"
+  },
+  {
+    "query": "Có chuyên gia tâm lý nào giúp tôi kiềm chế cảm xúc tiêu cực không?",
+    "relevant_ids": [
+      "SV022",
+      "SV023"
+    ],
+    "hard_negative_ids": [
+      "SV029",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV022": 2,
+      "SV023": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0108"
+  },
+  {
+    "query": "Chúng em sắp cưới, cần chuẩn bị gì để hôn nhân hạnh phúc?",
+    "relevant_ids": [
+      "SV024",
+      "SV022"
+    ],
+    "hard_negative_ids": [
+      "SV026",
+      "SV028",
+      "SV016"
+    ],
+    "relevance_grades": {
+      "SV024": 2,
+      "SV022": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0116"
+  },
+  {
+    "query": "Bỏ thuốc lá có cải thiện sức khỏe phổi và giảm nguy cơ ung thư không?",
+    "relevant_ids": [
+      "SV010",
+      "SV011"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV002",
+      "SV001"
+    ],
+    "relevance_grades": {
+      "SV010": 2,
+      "SV011": 1
+    },
+    "category": "y_te",
+    "id": "CB_0049"
+  },
+  {
+    "query": "Tôi muốn phân tích thành phần cơ thể để biết nên ăn uống thế nào cho đúng.",
+    "relevant_ids": [
+      "SV051",
+      "SV058"
+    ],
+    "hard_negative_ids": [
+      "SV059",
+      "SV052",
+      "SV053"
+    ],
+    "relevance_grades": {
+      "SV051": 2,
+      "SV058": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0254"
+  },
+  {
+    "query": "Mẹ tôi hay bị đau khớp, có chương trình vận động nào nhẹ nhàng giúp bà linh hoạt hơn không?",
+    "relevant_ids": [
+      "SV049",
+      "SV045",
+      "SV037"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV039"
+    ],
+    "relevance_grades": {
+      "SV049": 2,
+      "SV045": 1,
+      "SV037": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0243"
+  },
+  {
+    "query": "Em hay bị táo bón khi mang bầu, có thực đơn nào giúp cải thiện không?",
+    "relevant_ids": [
+      "SV056",
+      "SV054"
+    ],
+    "hard_negative_ids": [
+      "SV059",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV056": 2,
+      "SV054": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0277"
+  },
+  {
+    "query": "Bác sĩ nào giỏi về các vấn đề tuyến tiền liệt?",
+    "relevant_ids": [
+      "SV015",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV003",
+      "SV012",
+      "SV002",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV015": 2,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0074"
+  },
+  {
+    "query": "Chế độ ăn uống nào tốt nhất để vừa tăng cơ vừa giữ dáng cho người tập gym?",
+    "relevant_ids": [
+      "SV054",
+      "SV058",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV060",
+      "SV052",
+      "SV055",
+      "SV051"
+    ],
+    "relevance_grades": {
+      "SV054": 2,
+      "SV058": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0269"
+  },
+  {
+    "query": "Dạo này tôi thấy chán nản, mệt mỏi quá, không muốn làm gì cả. Có chỗ nào giúp tôi không?",
+    "relevant_ids": [
+      "SV021",
+      "SV023",
+      "SV027"
+    ],
+    "hard_negative_ids": [
+      "SV030",
+      "SV022"
+    ],
+    "relevance_grades": {
+      "SV021": 2,
+      "SV023": 1,
+      "SV027": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0101"
+  },
+  {
+    "query": "Làm sao để có đủ protein và vitamin B12 khi ăn thuần chay?",
+    "relevant_ids": [
+      "SV053",
+      "SV052",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV060",
+      "SV054"
+    ],
+    "relevance_grades": {
+      "SV053": 2,
+      "SV052": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0262"
+  },
+  {
+    "query": "Mình muốn cải thiện vóc dáng, có chương trình tập luyện nào phù hợp không?",
+    "relevant_ids": [
+      "SV032",
+      "SV044",
+      "SV033"
+    ],
+    "hard_negative_ids": [
+      "SV035",
+      "SV045"
+    ],
+    "relevance_grades": {
+      "SV032": 2,
+      "SV044": 1,
+      "SV033": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0160"
+  },
+  {
+    "query": "Có khóa học nào dạy kỹ năng sinh tồn dưới nước không?",
+    "relevant_ids": [
+      "SV042",
+      "SV033",
+      "SV046"
+    ],
+    "hard_negative_ids": [
+      "SV038",
+      "SV036",
+      "SV037",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV042": 2,
+      "SV033": 1,
+      "SV046": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0209"
+  },
+  {
+    "query": "Tôi bị đau đầu gối mấy hôm nay, không biết có phải bị gì không?",
+    "relevant_ids": [
+      "SV012",
+      "SV002",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV015",
+      "SV010",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV012": 2,
+      "SV002": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0056"
+  },
+  {
+    "query": "Có gói khám nào giúp phát hiện sớm bệnh tim mạch, tiểu đường không?",
+    "relevant_ids": [
+      "SV002",
+      "SV013",
+      "SV010"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV011"
+    ],
+    "relevance_grades": {
+      "SV002": 2,
+      "SV013": 1,
+      "SV010": 1
+    },
+    "category": "y_te",
+    "id": "CB_0007"
+  },
+  {
+    "query": "Thời điểm ăn các bữa chính và phụ quan trọng thế nào khi muốn cơ bắp to hơn?",
+    "relevant_ids": [
+      "SV054",
+      "SV058",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV060",
+      "SV052",
+      "SV055",
+      "SV051"
+    ],
+    "relevance_grades": {
+      "SV054": 2,
+      "SV058": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0270"
+  },
+  {
+    "query": "Con em bị sốt cao kèm ho thì phải làm sao?",
+    "relevant_ids": [
+      "SV006",
+      "SV008"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV001",
+      "SV004",
+      "SV012"
+    ],
+    "relevance_grades": {
+      "SV006": 2,
+      "SV008": 1
+    },
+    "category": "y_te",
+    "id": "CB_0027"
+  },
+  {
+    "query": "Tôi đang tìm một hoạt động thể chất nhẹ nhàng, giúp thư giãn tinh thần và giảm căng thẳng.",
+    "relevant_ids": [
+      "SV047",
+      "SV032",
+      "SV040"
+    ],
+    "hard_negative_ids": [
+      "SV048",
+      "SV043"
+    ],
+    "relevance_grades": {
+      "SV047": 2,
+      "SV032": 1,
+      "SV040": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0234"
+  },
+  {
+    "query": "Làm sao để biết mình có bị nghiện mạng xã hội hay không và cách quản lý thời gian dùng điện thoại?",
+    "relevant_ids": [
+      "SV023",
+      "SV018"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV029"
+    ],
+    "relevance_grades": {
+      "SV023": 2,
+      "SV018": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0114"
+  },
+  {
+    "query": "Mình muốn xây dựng một kế hoạch hành động cụ thể để cải thiện bản thân và cuộc sống.",
+    "relevant_ids": [
+      "SV028",
+      "SV022",
+      "SV019"
+    ],
+    "hard_negative_ids": [
+      "SV029",
+      "SV030",
+      "SV016",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV028": 2,
+      "SV022": 1,
+      "SV019": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0140"
+  },
+  {
+    "query": "Tìm lớp tập an toàn cho người có vấn đề xương khớp, đặc biệt là lưng.",
+    "relevant_ids": [
+      "SV031",
+      "SV035",
+      "SV049"
+    ],
+    "hard_negative_ids": [
+      "SV046",
+      "SV047"
+    ],
+    "relevance_grades": {
+      "SV031": 2,
+      "SV035": 1,
+      "SV049": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0154"
+  },
+  {
+    "query": "Tôi dễ nổi nóng và thường không kiểm soát được lời nói của mình.",
+    "relevant_ids": [
+      "SV022",
+      "SV023"
+    ],
+    "hard_negative_ids": [
+      "SV029",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV022": 2,
+      "SV023": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0106"
+  },
+  {
+    "query": "Tôi cần kiêng ăn những gì để giảm nguy cơ bệnh tim mạch và cholesterol?",
+    "relevant_ids": [
+      "SV057",
+      "SV056"
+    ],
+    "hard_negative_ids": [
+      "SV051",
+      "SV059",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV057": 2,
+      "SV056": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0285"
+  },
+  {
+    "query": "Tập sao cho cơ thể khỏe mạnh, linh hoạt hơn để làm việc hàng ngày tốt hơn?",
+    "relevant_ids": [
+      "SV038",
+      "SV035",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV049",
+      "SV031"
+    ],
+    "relevance_grades": {
+      "SV038": 2,
+      "SV035": 1,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0190"
+  },
+  {
+    "query": "Cơ thể tôi dạo này khá cứng nhắc, muốn tìm cách để cải thiện độ linh hoạt và dẻo dai.",
+    "relevant_ids": [
+      "SV047",
+      "SV032",
+      "SV040"
+    ],
+    "hard_negative_ids": [
+      "SV048",
+      "SV043"
+    ],
+    "relevance_grades": {
+      "SV047": 2,
+      "SV032": 1,
+      "SV040": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0233"
+  },
+  {
+    "query": "Chương trình nào giúp người già vận động tốt hơn, duy trì cuộc sống độc lập?",
+    "relevant_ids": [
+      "SV049",
+      "SV045",
+      "SV037"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV039"
+    ],
+    "relevance_grades": {
+      "SV049": 2,
+      "SV045": 1,
+      "SV037": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0244"
+  },
+  {
+    "query": "Tôi nghiện thuốc lá nặng, có cách nào giúp tôi vượt qua cơn thèm không?",
+    "relevant_ids": [
+      "SV010",
+      "SV011"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV002",
+      "SV001"
+    ],
+    "relevance_grades": {
+      "SV010": 2,
+      "SV011": 1
+    },
+    "category": "y_te",
+    "id": "CB_0047"
+  },
+  {
+    "query": "Tôi muốn có một thực đơn ăn uống khoa học để giảm cân trong một tháng.",
+    "relevant_ids": [
+      "SV052",
+      "SV057",
+      "SV055"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV059",
+      "SV060",
+      "SV056"
+    ],
+    "relevance_grades": {
+      "SV052": 2,
+      "SV057": 1,
+      "SV055": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0257"
+  },
+  {
+    "query": "Tôi đang tìm một môn thể thao giúp rèn luyện sức khỏe và khả năng phòng thân.",
+    "relevant_ids": [
+      "SV046",
+      "SV033",
+      "SV043"
+    ],
+    "hard_negative_ids": [
+      "SV041",
+      "SV038",
+      "SV049",
+      "SV036"
+    ],
+    "relevance_grades": {
+      "SV046": 2,
+      "SV033": 1,
+      "SV043": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0229"
+  },
+  {
+    "query": "Có môn thể thao nào vận động mạnh, đốt nhiều calo mà người mới bắt đầu cũng theo được không?",
+    "relevant_ids": [
+      "SV044",
+      "SV042"
+    ],
+    "hard_negative_ids": [
+      "SV045",
+      "SV047",
+      "SV038",
+      "SV043"
+    ],
+    "relevance_grades": {
+      "SV044": 2,
+      "SV042": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0218"
+  },
+  {
+    "query": "Có bài tập nào hiệu quả mà ít gây áp lực lên khớp không ạ?",
+    "relevant_ids": [
+      "SV048",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV036",
+      "SV032",
+      "SV047",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV048": 2,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0237"
+  },
+  {
+    "query": "Mình vừa mất người thân, muốn tìm một chỗ để chia sẻ và nhận được sự động viên.",
+    "relevant_ids": [
+      "SV027",
+      "SV030"
+    ],
+    "hard_negative_ids": [
+      "SV020",
+      "SV016",
+      "SV021"
+    ],
+    "relevance_grades": {
+      "SV027": 2,
+      "SV030": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0133"
+  },
+  {
+    "query": "Tôi hay bị đau tức hạ sườn phải, đi tiểu vàng, có cần khám gan không?",
+    "relevant_ids": [
+      "SV014",
+      "SV008",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV014": 2,
+      "SV008": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0066"
+  },
+  {
+    "query": "Tôi muốn đăng ký học bơi cho người lớn.",
+    "relevant_ids": [
+      "SV042",
+      "SV033",
+      "SV046"
+    ],
+    "hard_negative_ids": [
+      "SV038",
+      "SV036",
+      "SV037",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV042": 2,
+      "SV033": 1,
+      "SV046": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0208"
+  },
+  {
+    "query": "Tôi muốn đo mắt để làm kính mới.",
+    "relevant_ids": [
+      "SV009",
+      "SV015",
+      "SV007"
+    ],
+    "hard_negative_ids": [
+      "SV003",
+      "SV005",
+      "SV011",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV009": 2,
+      "SV015": 1,
+      "SV007": 1
+    },
+    "category": "y_te",
+    "id": "CB_0043"
+  },
+  {
+    "query": "Làm sao để mình đối phó với lo âu tốt hơn? Có ai cũng gặp vấn đề giống mình không?",
+    "relevant_ids": [
+      "SV027",
+      "SV030"
+    ],
+    "hard_negative_ids": [
+      "SV020",
+      "SV016",
+      "SV021"
+    ],
+    "relevance_grades": {
+      "SV027": 2,
+      "SV030": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0132"
+  },
+  {
+    "query": "bị tiểu đường thì nên ăn gì để tốt cho sức khỏe?",
+    "relevant_ids": [
+      "SV055",
+      "SV053"
+    ],
+    "hard_negative_ids": [
+      "SV052",
+      "SV060",
+      "SV051"
+    ],
+    "relevance_grades": {
+      "SV055": 2,
+      "SV053": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0271"
+  },
+  {
+    "query": "gợi ý các bữa ăn giúp ổn định đường huyết hàng ngày",
+    "relevant_ids": [
+      "SV055",
+      "SV053"
+    ],
+    "hard_negative_ids": [
+      "SV052",
+      "SV060",
+      "SV051"
+    ],
+    "relevance_grades": {
+      "SV055": 2,
+      "SV053": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0272"
+  },
+  {
+    "query": "Làm sao để các chị em phụ nữ có thể học vài chiêu tự vệ cơ bản?",
+    "relevant_ids": [
+      "SV046",
+      "SV033",
+      "SV043"
+    ],
+    "hard_negative_ids": [
+      "SV041",
+      "SV038",
+      "SV049",
+      "SV036"
+    ],
+    "relevance_grades": {
+      "SV046": 2,
+      "SV033": 1,
+      "SV043": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0228"
+  },
+  {
+    "query": "Muốn phòng ngừa bệnh tật và kiểm tra sức khỏe hàng năm thì nên làm gì?",
+    "relevant_ids": [
+      "SV002",
+      "SV013",
+      "SV010"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV011"
+    ],
+    "relevance_grades": {
+      "SV002": 2,
+      "SV013": 1,
+      "SV010": 1
+    },
+    "category": "y_te",
+    "id": "CB_0010"
+  },
+  {
+    "query": "Tôi muốn tìm một nơi có chuyên gia hướng dẫn để chia sẻ những khó khăn về tâm lý cùng với những người khác.",
+    "relevant_ids": [
+      "SV027",
+      "SV030"
+    ],
+    "hard_negative_ids": [
+      "SV020",
+      "SV016",
+      "SV021"
+    ],
+    "relevance_grades": {
+      "SV027": 2,
+      "SV030": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0135"
+  },
+  {
+    "query": "Em muốn cải thiện kỹ năng giao tiếp và bớt nhút nhát khi ở chỗ đông người",
+    "relevant_ids": [
+      "SV020",
+      "SV019"
+    ],
+    "hard_negative_ids": [
+      "SV024",
+      "SV027",
+      "SV017"
+    ],
+    "relevance_grades": {
+      "SV020": 2,
+      "SV019": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0100"
+  },
+  {
+    "query": "Ăn gì để tốt cho thai nhi và mẹ bầu?",
+    "relevant_ids": [
+      "SV056",
+      "SV054"
+    ],
+    "hard_negative_ids": [
+      "SV059",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV056": 2,
+      "SV054": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0276"
+  },
+  {
+    "query": "Làm sao để giảm mỡ và có người hướng dẫn tập luyện bài bản?",
+    "relevant_ids": [
+      "SV032",
+      "SV044",
+      "SV033"
+    ],
+    "hard_negative_ids": [
+      "SV035",
+      "SV045"
+    ],
+    "relevance_grades": {
+      "SV032": 2,
+      "SV044": 1,
+      "SV033": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0157"
+  },
+  {
+    "query": "Cần bao nhiêu protein và tinh bột mỗi ngày để xây dựng cơ bắp hiệu quả?",
+    "relevant_ids": [
+      "SV054",
+      "SV058",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV060",
+      "SV052",
+      "SV055",
+      "SV051"
+    ],
+    "relevance_grades": {
+      "SV054": 2,
+      "SV058": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0267"
+  },
+  {
+    "query": "Chị mình bị thoái hóa cột sống, có bài tập nào hỗ trợ phục hồi chức năng không?",
+    "relevant_ids": [
+      "SV031",
+      "SV035",
+      "SV049"
+    ],
+    "hard_negative_ids": [
+      "SV046",
+      "SV047"
+    ],
+    "relevance_grades": {
+      "SV031": 2,
+      "SV035": 1,
+      "SV049": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0152"
+  },
+  {
+    "query": "Mình cần tìm huấn luyện viên cá nhân để theo dõi và lên lịch tập gym 12 tuần.",
+    "relevant_ids": [
+      "SV032",
+      "SV044",
+      "SV033"
+    ],
+    "hard_negative_ids": [
+      "SV035",
+      "SV045"
+    ],
+    "relevance_grades": {
+      "SV032": 2,
+      "SV044": 1,
+      "SV033": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0158"
+  },
+  {
+    "query": "Có nhóm nào tổ chức đi khám phá các đỉnh núi đẹp không?",
+    "relevant_ids": [
+      "SV045",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV046"
+    ],
+    "relevance_grades": {
+      "SV045": 2,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0223"
+  },
+  {
+    "query": "Có cách nào để thiết lập ranh giới rõ ràng giữa công việc và cuộc sống riêng không?",
+    "relevant_ids": [
+      "SV030",
+      "SV021"
+    ],
+    "hard_negative_ids": [
+      "SV022",
+      "SV023",
+      "SV016",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV030": 2,
+      "SV021": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0149"
+  },
+  {
+    "query": "Có lớp nào cho bé 5 tuổi để vận động và phát triển thể chất không?",
+    "relevant_ids": [
+      "SV043",
+      "SV032"
+    ],
+    "hard_negative_ids": [
+      "SV046",
+      "SV048",
+      "SV034",
+      "SV031"
+    ],
+    "relevance_grades": {
+      "SV043": 2,
+      "SV032": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0211"
+  },
+  {
+    "query": "Da mặt tôi hay bị dị ứng, nổi mẩn đỏ, có chuyên gia nào giúp không?",
+    "relevant_ids": [
+      "SV007",
+      "SV014"
+    ],
+    "hard_negative_ids": [
+      "SV012",
+      "SV004",
+      "SV006"
+    ],
+    "relevance_grades": {
+      "SV007": 2,
+      "SV014": 1
+    },
+    "category": "y_te",
+    "id": "CB_0032"
+  },
+  {
+    "query": "Em đang muốn thử phương pháp ăn uống 16/8, cần tư vấn cụ thể để không bị sai cách.",
+    "relevant_ids": [
+      "SV058",
+      "SV053",
+      "SV060"
+    ],
+    "hard_negative_ids": [
+      "SV057",
+      "SV059",
+      "SV055"
+    ],
+    "relevance_grades": {
+      "SV058": 2,
+      "SV053": 1,
+      "SV060": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0289"
+  },
+  {
+    "query": "Có chế độ ăn nào được coi là lành mạnh nhất thế giới không?",
+    "relevant_ids": [
+      "SV060",
+      "SV053"
+    ],
+    "hard_negative_ids": [
+      "SV054",
+      "SV056",
+      "SV051",
+      "SV057"
+    ],
+    "relevance_grades": {
+      "SV060": 2,
+      "SV053": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0300"
+  },
+  {
+    "query": "Bác sĩ vừa chẩn đoán tôi bị gan nhiễm mỡ, cần ăn uống kiêng khem thế nào?",
+    "relevant_ids": [
+      "SV014",
+      "SV008",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV014": 2,
+      "SV008": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0067"
+  },
+  {
+    "query": "Có môn nào vừa học cách tự vệ vừa giúp rèn luyện cơ thể không?",
+    "relevant_ids": [
+      "SV036",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV047",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV036": 2,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0178"
+  },
+  {
+    "query": "Có thực đơn meal prep nào giúp dân tập tạ lên cơ không?",
+    "relevant_ids": [
+      "SV054",
+      "SV058",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV060",
+      "SV052",
+      "SV055",
+      "SV051"
+    ],
+    "relevance_grades": {
+      "SV054": 2,
+      "SV058": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0268"
+  },
+  {
+    "query": "Tìm lớp dạy bơi cho người mới bắt đầu, đặc biệt là người lớn.",
+    "relevant_ids": [
+      "SV042",
+      "SV033",
+      "SV046"
+    ],
+    "hard_negative_ids": [
+      "SV038",
+      "SV036",
+      "SV037",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV042": 2,
+      "SV033": 1,
+      "SV046": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0210"
+  },
+  {
+    "query": "Vợ chồng tôi thường xuyên cãi vã, làm sao để cải thiện tình hình?",
+    "relevant_ids": [
+      "SV018",
+      "SV020",
+      "SV017"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV018": 2,
+      "SV020": 1,
+      "SV017": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0086"
+  },
+  {
+    "query": "Lâu rồi chưa đi kiểm tra răng, không biết có bị sâu hay viêm lợi không?",
+    "relevant_ids": [
+      "SV011",
+      "SV008",
+      "SV006"
+    ],
+    "hard_negative_ids": [
+      "SV014",
+      "SV007",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV011": 2,
+      "SV008": 1,
+      "SV006": 1
+    },
+    "category": "y_te",
+    "id": "CB_0052"
+  },
+  {
+    "query": "Tôi muốn nâng cao kỹ năng lãnh đạo và quản lý đội nhóm hiệu quả hơn.",
+    "relevant_ids": [
+      "SV028",
+      "SV022",
+      "SV019"
+    ],
+    "hard_negative_ids": [
+      "SV029",
+      "SV030",
+      "SV016",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV028": 2,
+      "SV022": 1,
+      "SV019": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0139"
+  },
+  {
+    "query": "Bé nhà em học kém, khó tập trung, liệu có cần tư vấn gì không ạ?",
+    "relevant_ids": [
+      "SV019",
+      "SV025"
+    ],
+    "hard_negative_ids": [
+      "SV017",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV019": 2,
+      "SV025": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0092"
+  },
+  {
+    "query": "Có bài tập nào phù hợp cho người lớn tuổi để giữ gìn sức khỏe không?",
+    "relevant_ids": [
+      "SV049",
+      "SV045",
+      "SV037"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV039"
+    ],
+    "relevance_grades": {
+      "SV049": 2,
+      "SV045": 1,
+      "SV037": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0242"
+  },
+  {
+    "query": "Tôi cảm thấy bế tắc trong mối quan hệ hôn nhân, không biết phải làm gì nữa.",
+    "relevant_ids": [
+      "SV018",
+      "SV020",
+      "SV017"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV018": 2,
+      "SV020": 1,
+      "SV017": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0089"
+  },
+  {
+    "query": "Làm sao để sửa dáng lưng gù và đứng thẳng hơn?",
+    "relevant_ids": [
+      "SV033",
+      "SV035",
+      "SV048"
+    ],
+    "hard_negative_ids": [
+      "SV049",
+      "SV038",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV033": 2,
+      "SV035": 1,
+      "SV048": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0162"
+  },
+  {
+    "query": "Làm sao để tự tin hơn khi đi phỏng vấn hay gặp gỡ đối tác?",
+    "relevant_ids": [
+      "SV020",
+      "SV019"
+    ],
+    "hard_negative_ids": [
+      "SV024",
+      "SV027",
+      "SV017"
+    ],
+    "relevance_grades": {
+      "SV020": 2,
+      "SV019": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0097"
+  },
+  {
+    "query": "Có bài tập nào giúp giảm cân mà không cần đến phòng gym nhàm chán không?",
+    "relevant_ids": [
+      "SV044",
+      "SV042"
+    ],
+    "hard_negative_ids": [
+      "SV045",
+      "SV047",
+      "SV038",
+      "SV043"
+    ],
+    "relevance_grades": {
+      "SV044": 2,
+      "SV042": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0216"
+  },
+  {
+    "query": "Con tôi 8 tuổi, tìm hoạt động giúp bé cân bằng tốt hơn và tự tin hơn.",
+    "relevant_ids": [
+      "SV043",
+      "SV032"
+    ],
+    "hard_negative_ids": [
+      "SV046",
+      "SV048",
+      "SV034",
+      "SV031"
+    ],
+    "relevance_grades": {
+      "SV043": 2,
+      "SV032": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0213"
+  },
+  {
+    "query": "Em bị đau lưng lắm lúc mang bầu, có cách nào tập luyện cho đỡ hơn không ạ?",
+    "relevant_ids": [
+      "SV040",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV034",
+      "SV042"
+    ],
+    "relevance_grades": {
+      "SV040": 2,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0196"
+  },
+  {
+    "query": "Có chỗ nào tư vấn về kỹ thuật CBT hoặc mindfulness để vượt qua căng thẳng không?",
+    "relevant_ids": [
+      "SV016",
+      "SV024",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV030",
+      "SV027",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV016": 2,
+      "SV024": 1,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0078"
+  },
+  {
+    "query": "Làm sao để tránh bị kiệt sức vì áp lực công việc?",
+    "relevant_ids": [
+      "SV030",
+      "SV021"
+    ],
+    "hard_negative_ids": [
+      "SV022",
+      "SV023",
+      "SV016",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV030": 2,
+      "SV021": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0147"
+  },
+  {
+    "query": "Nấm da hoặc vảy nến thì khám ở đâu tốt?",
+    "relevant_ids": [
+      "SV007",
+      "SV014"
+    ],
+    "hard_negative_ids": [
+      "SV012",
+      "SV004",
+      "SV006"
+    ],
+    "relevance_grades": {
+      "SV007": 2,
+      "SV014": 1
+    },
+    "category": "y_te",
+    "id": "CB_0034"
+  },
+  {
+    "query": "Em muốn kiểm tra sức khỏe tổng thể của phụ nữ thì cần khám những gì?",
+    "relevant_ids": [
+      "SV005",
+      "SV013",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV006",
+      "SV015",
+      "SV007"
+    ],
+    "relevance_grades": {
+      "SV005": 2,
+      "SV013": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0022"
+  },
+  {
+    "query": "Tôi bị đau buốt khi đi tiểu và tiểu rắt, cần đi khám ở đâu?",
+    "relevant_ids": [
+      "SV015",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV003",
+      "SV012",
+      "SV002",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV015": 2,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0071"
+  },
+  {
+    "query": "Tôi bị chảy nước mũi và đau đầu liên tục, có phải bị viêm xoang không?",
+    "relevant_ids": [
+      "SV013",
+      "SV004"
+    ],
+    "hard_negative_ids": [
+      "SV012",
+      "SV015",
+      "SV002",
+      "SV010"
+    ],
+    "relevance_grades": {
+      "SV013": 2,
+      "SV004": 1
+    },
+    "category": "y_te",
+    "id": "CB_0061"
+  },
+  {
+    "query": "Tôi muốn tìm hiểu về các bài tập giúp giảm lo âu và sống tích cực hơn.",
+    "relevant_ids": [
+      "SV017",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV024",
+      "SV020"
+    ],
+    "relevance_grades": {
+      "SV017": 2,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0085"
+  },
+  {
+    "query": "Tôi muốn tìm cách vượt qua cảm giác sợ hãi và lo lắng kéo dài sau sự cố.",
+    "relevant_ids": [
+      "SV025",
+      "SV028",
+      "SV020"
+    ],
+    "hard_negative_ids": [
+      "SV022",
+      "SV016",
+      "SV021"
+    ],
+    "relevance_grades": {
+      "SV025": 2,
+      "SV028": 1,
+      "SV020": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0125"
+  },
+  {
+    "query": "Có khóa học nào giúp phụ nữ tăng cường sự tự tin và an toàn không?",
+    "relevant_ids": [
+      "SV046",
+      "SV033",
+      "SV043"
+    ],
+    "hard_negative_ids": [
+      "SV041",
+      "SV038",
+      "SV049",
+      "SV036"
+    ],
+    "relevance_grades": {
+      "SV046": 2,
+      "SV033": 1,
+      "SV043": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0227"
+  },
+  {
+    "query": "Tôi muốn tìm một nhóm hoạt động cuối tuần để giao lưu và rèn luyện sức khỏe.",
+    "relevant_ids": [
+      "SV039",
+      "SV043",
+      "SV047"
+    ],
+    "hard_negative_ids": [
+      "SV035",
+      "SV036",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV039": 2,
+      "SV043": 1,
+      "SV047": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0192"
+  },
+  {
+    "query": "Làm sao để hết đau lưng mà không cần dùng thuốc, có phương pháp trị liệu nào hiệu quả không?",
+    "relevant_ids": [
+      "SV031",
+      "SV035",
+      "SV049"
+    ],
+    "hard_negative_ids": [
+      "SV046",
+      "SV047"
+    ],
+    "relevance_grades": {
+      "SV031": 2,
+      "SV035": 1,
+      "SV049": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0155"
+  },
+  {
+    "query": "Tôi mới đi khám, bác sĩ bảo cholesterol cao. Giờ nên ăn gì để giảm xuống?",
+    "relevant_ids": [
+      "SV057",
+      "SV056"
+    ],
+    "hard_negative_ids": [
+      "SV051",
+      "SV059",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV057": 2,
+      "SV056": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0281"
+  },
+  {
+    "query": "Tìm lớp vận động theo nhạc, sôi động để giải tỏa căng thẳng.",
+    "relevant_ids": [
+      "SV041",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV040",
+      "SV043",
+      "SV035"
+    ],
+    "relevance_grades": {
+      "SV041": 2,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0205"
+  },
+  {
+    "query": "Tôi cần hỗ trợ cảm xúc khẩn cấp, có ai giúp tôi được không?",
+    "relevant_ids": [
+      "SV021",
+      "SV023",
+      "SV027"
+    ],
+    "hard_negative_ids": [
+      "SV030",
+      "SV022"
+    ],
+    "relevance_grades": {
+      "SV021": 2,
+      "SV023": 1,
+      "SV027": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0105"
+  },
+  {
+    "query": "Mình không có kinh nghiệm nhảy nhưng muốn tìm lớp nào đó để cải thiện sự dẻo dai và làm quen với nhịp điệu cơ thể.",
+    "relevant_ids": [
+      "SV044",
+      "SV042"
+    ],
+    "hard_negative_ids": [
+      "SV045",
+      "SV047",
+      "SV038",
+      "SV043"
+    ],
+    "relevance_grades": {
+      "SV044": 2,
+      "SV042": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0220"
+  },
+  {
+    "query": "Tôi mới ăn chay, cần thực đơn nào để không bị thiếu chất?",
+    "relevant_ids": [
+      "SV053",
+      "SV052",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV060",
+      "SV054"
+    ],
+    "relevance_grades": {
+      "SV053": 2,
+      "SV052": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0261"
+  },
+  {
+    "query": "EMDR có thật sự giúp ích cho người bị sốc tâm lý không?",
+    "relevant_ids": [
+      "SV025",
+      "SV028",
+      "SV020"
+    ],
+    "hard_negative_ids": [
+      "SV022",
+      "SV016",
+      "SV021"
+    ],
+    "relevance_grades": {
+      "SV025": 2,
+      "SV028": 1,
+      "SV020": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0123"
+  },
+  {
+    "query": "Tôi mới phát hiện đường huyết cao, cần làm gì bây giờ?",
+    "relevant_ids": [
+      "SV003",
+      "SV012",
+      "SV011"
+    ],
+    "hard_negative_ids": [
+      "SV005",
+      "SV002",
+      "SV004"
+    ],
+    "relevance_grades": {
+      "SV003": 2,
+      "SV012": 1,
+      "SV011": 1
+    },
+    "category": "y_te",
+    "id": "CB_0011"
+  },
+  {
+    "query": "Làm sao để quên đi những ký ức tồi tệ sau vụ bạo lực?",
+    "relevant_ids": [
+      "SV025",
+      "SV028",
+      "SV020"
+    ],
+    "hard_negative_ids": [
+      "SV022",
+      "SV016",
+      "SV021"
+    ],
+    "relevance_grades": {
+      "SV025": 2,
+      "SV028": 1,
+      "SV020": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0122"
+  },
+  {
+    "query": "Tôi muốn kiểm tra xem có bị sỏi thận không.",
+    "relevant_ids": [
+      "SV015",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV003",
+      "SV012",
+      "SV002",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV015": 2,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0073"
+  },
+  {
+    "query": "Làm sao để có chế độ ăn tốt cho tim mạch, phòng tránh mỡ máu cao?",
+    "relevant_ids": [
+      "SV057",
+      "SV056"
+    ],
+    "hard_negative_ids": [
+      "SV051",
+      "SV059",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV057": 2,
+      "SV056": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0282"
+  },
+  {
+    "query": "Tôi bị mụn trứng cá mãi không khỏi, cần tìm nơi điều trị.",
+    "relevant_ids": [
+      "SV007",
+      "SV014"
+    ],
+    "hard_negative_ids": [
+      "SV012",
+      "SV004",
+      "SV006"
+    ],
+    "relevance_grades": {
+      "SV007": 2,
+      "SV014": 1
+    },
+    "category": "y_te",
+    "id": "CB_0031"
+  },
+  {
+    "query": "Làm sao để biết tình trạng sức khỏe tổng thể của mình bây giờ?",
+    "relevant_ids": [
+      "SV002",
+      "SV013",
+      "SV010"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV011"
+    ],
+    "relevance_grades": {
+      "SV002": 2,
+      "SV013": 1,
+      "SV010": 1
+    },
+    "category": "y_te",
+    "id": "CB_0008"
+  },
+  {
+    "query": "Ở đây có dịch vụ dùng máy móc hiện đại để soi họng không?",
+    "relevant_ids": [
+      "SV013",
+      "SV004"
+    ],
+    "hard_negative_ids": [
+      "SV012",
+      "SV015",
+      "SV002",
+      "SV010"
+    ],
+    "relevance_grades": {
+      "SV013": 2,
+      "SV004": 1
+    },
+    "category": "y_te",
+    "id": "CB_0062"
+  },
+  {
+    "query": "Tôi muốn tìm một nơi tư vấn tâm lý riêng tư và đảm bảo bí mật.",
+    "relevant_ids": [
+      "SV016",
+      "SV024",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV030",
+      "SV027",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV016": 2,
+      "SV024": 1,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0079"
+  },
+  {
+    "query": "Mình muốn tìm một hình thức tập luyện cường độ cao để xả hết năng lượng tiêu cực.",
+    "relevant_ids": [
+      "SV036",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV047",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV036": 2,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0179"
+  },
+  {
+    "query": "Tìm hoạt động phiêu lưu nào đó có hướng dẫn viên chuyên nghiệp và đầy đủ thiết bị an toàn.",
+    "relevant_ids": [
+      "SV045",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV046"
+    ],
+    "relevance_grades": {
+      "SV045": 2,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0224"
+  },
+  {
+    "query": "Có bác sĩ tim mạch nào tư vấn qua video call không?",
+    "relevant_ids": [
+      "SV001",
+      "SV005"
+    ],
+    "hard_negative_ids": [
+      "SV004",
+      "SV012",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV001": 2,
+      "SV005": 1
+    },
+    "category": "y_te",
+    "id": "CB_0005"
+  },
+  {
+    "query": "Gợi ý thực đơn ăn uống lành mạnh với nhiều rau, cá, và dầu ô liu.",
+    "relevant_ids": [
+      "SV060",
+      "SV053"
+    ],
+    "hard_negative_ids": [
+      "SV054",
+      "SV056",
+      "SV051",
+      "SV057"
+    ],
+    "relevance_grades": {
+      "SV060": 2,
+      "SV053": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0297"
+  },
+  {
+    "query": "Mình muốn tìm một phương pháp giúp tăng khả năng tập trung khi làm việc.",
+    "relevant_ids": [
+      "SV017",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV024",
+      "SV020"
+    ],
+    "relevance_grades": {
+      "SV017": 2,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0083"
+  },
+  {
+    "query": "Em ăn uống thất thường quá, muốn nhờ chuyên gia dinh dưỡng giúp điều chỉnh lại lối sống và thực đơn.",
+    "relevant_ids": [
+      "SV051",
+      "SV058"
+    ],
+    "hard_negative_ids": [
+      "SV059",
+      "SV052",
+      "SV053"
+    ],
+    "relevance_grades": {
+      "SV051": 2,
+      "SV058": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0255"
+  },
+  {
+    "query": "Tôi muốn tìm một phương pháp tập luyện cường độ cao để đốt nhiều calo trong thời gian ngắn.",
+    "relevant_ids": [
+      "SV050",
+      "SV045",
+      "SV042"
+    ],
+    "hard_negative_ids": [
+      "SV043",
+      "SV044",
+      "SV049",
+      "SV041"
+    ],
+    "relevance_grades": {
+      "SV050": 2,
+      "SV045": 1,
+      "SV042": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0250"
+  },
+  {
+    "query": "Tôi muốn tập thể dục nhẹ nhàng để cơ thể dẻo dai hơn và không lo bị vấp ngã.",
+    "relevant_ids": [
+      "SV049",
+      "SV045",
+      "SV037"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV039"
+    ],
+    "relevance_grades": {
+      "SV049": 2,
+      "SV045": 1,
+      "SV037": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0245"
+  },
+  {
+    "query": "Em hay bị run khi nói chuyện với người lạ, không biết có cách nào khắc phục không?",
+    "relevant_ids": [
+      "SV020",
+      "SV019"
+    ],
+    "hard_negative_ids": [
+      "SV024",
+      "SV027",
+      "SV017"
+    ],
+    "relevance_grades": {
+      "SV020": 2,
+      "SV019": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0096"
+  },
+  {
+    "query": "Mình mới phẫu thuật đầu gối, có môn thể thao nào giúp phục hồi mà không ảnh hưởng khớp không?",
+    "relevant_ids": [
+      "SV035",
+      "SV033",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV050",
+      "SV042",
+      "SV049"
+    ],
+    "relevance_grades": {
+      "SV035": 2,
+      "SV033": 1,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0171"
+  },
+  {
+    "query": "Tôi muốn lấy cao răng và đánh bóng răng.",
+    "relevant_ids": [
+      "SV011",
+      "SV008",
+      "SV006"
+    ],
+    "hard_negative_ids": [
+      "SV014",
+      "SV007",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV011": 2,
+      "SV008": 1,
+      "SV006": 1
+    },
+    "category": "y_te",
+    "id": "CB_0051"
+  },
+  {
+    "query": "Tôi nghe nói về chế độ ăn kiêng ít tinh bột giúp giảm cân, có thể tìm hiểu ở đâu?",
+    "relevant_ids": [
+      "SV052",
+      "SV057",
+      "SV055"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV059",
+      "SV060",
+      "SV056"
+    ],
+    "relevance_grades": {
+      "SV052": 2,
+      "SV057": 1,
+      "SV055": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0256"
+  },
+  {
+    "query": "Dạo này tôi hay lo lắng và thấy buồn bã không lý do, có cần đi gặp chuyên gia không?",
+    "relevant_ids": [
+      "SV016",
+      "SV024",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV030",
+      "SV027",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV016": 2,
+      "SV024": 1,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0077"
+  },
+  {
+    "query": "Lịch tiêm vắc xin cho bé dưới 1 tuổi gồm những mũi nào?",
+    "relevant_ids": [
+      "SV006",
+      "SV008"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV001",
+      "SV004",
+      "SV012"
+    ],
+    "relevance_grades": {
+      "SV006": 2,
+      "SV008": 1
+    },
+    "category": "y_te",
+    "id": "CB_0028"
+  },
+  {
+    "query": "Có ai giúp được tôi vụ cứ ăn quá nhiều rồi lại thấy hối hận không?",
+    "relevant_ids": [
+      "SV026",
+      "SV027",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV025",
+      "SV019",
+      "SV024",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV026": 2,
+      "SV027": 1,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0130"
+  },
+  {
+    "query": "Làm sao để bỏ thuốc lá hiệu quả và không bị tái nghiện?",
+    "relevant_ids": [
+      "SV010",
+      "SV011"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV002",
+      "SV001"
+    ],
+    "relevance_grades": {
+      "SV010": 2,
+      "SV011": 1
+    },
+    "category": "y_te",
+    "id": "CB_0046"
+  },
+  {
+    "query": "Tôi muốn tìm chuyên gia giúp mình có mối quan hệ lành mạnh hơn với đồ ăn.",
+    "relevant_ids": [
+      "SV026",
+      "SV027",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV025",
+      "SV019",
+      "SV024",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV026": 2,
+      "SV027": 1,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0129"
+  },
+  {
+    "query": "Làm thế nào để tăng cường trao đổi chất và giảm mỡ mà không mất cơ?",
+    "relevant_ids": [
+      "SV050",
+      "SV045",
+      "SV042"
+    ],
+    "hard_negative_ids": [
+      "SV043",
+      "SV044",
+      "SV049",
+      "SV041"
+    ],
+    "relevance_grades": {
+      "SV050": 2,
+      "SV045": 1,
+      "SV042": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0248"
+  },
+  {
+    "query": "Tôi muốn hỏi bác sĩ chuyên khoa tim mạch về sức khỏe của mình nhưng không có thời gian đến phòng khám.",
+    "relevant_ids": [
+      "SV001",
+      "SV005"
+    ],
+    "hard_negative_ids": [
+      "SV004",
+      "SV012",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV001": 2,
+      "SV005": 1
+    },
+    "category": "y_te",
+    "id": "CB_0001"
+  },
+  {
+    "query": "Tập thể dục bằng hệ thống dây treo có những lợi ích gì?",
+    "relevant_ids": [
+      "SV048",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV036",
+      "SV032",
+      "SV047",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV048": 2,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0239"
+  },
+  {
+    "query": "Có ai lên lịch tập chạy bộ cá nhân hóa cho mình không?",
+    "relevant_ids": [
+      "SV034",
+      "SV045",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV042",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV034": 2,
+      "SV045": 1,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0169"
+  },
+  {
+    "query": "Làm sao để kiểm soát cơn đói khi đang cố gắng giảm cân?",
+    "relevant_ids": [
+      "SV058",
+      "SV053",
+      "SV060"
+    ],
+    "hard_negative_ids": [
+      "SV057",
+      "SV059",
+      "SV055"
+    ],
+    "relevance_grades": {
+      "SV058": 2,
+      "SV053": 1,
+      "SV060": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0287"
+  },
+  {
+    "query": "Tôi đang rất mệt mỏi và áp lực, muốn tìm cách giải tỏa.",
+    "relevant_ids": [
+      "SV016",
+      "SV024",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV030",
+      "SV027",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV016": 2,
+      "SV024": 1,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0076"
+  },
+  {
+    "query": "Tôi ngồi nhiều ở văn phòng nên hay bị đau mỏi vai gáy và lưng, có bài tập nào giúp kéo giãn cơ thể không?",
+    "relevant_ids": [
+      "SV047",
+      "SV032",
+      "SV040"
+    ],
+    "hard_negative_ids": [
+      "SV048",
+      "SV043"
+    ],
+    "relevance_grades": {
+      "SV047": 2,
+      "SV032": 1,
+      "SV040": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0231"
+  },
+  {
+    "query": "Gia đình tôi đang có nhiều căng thẳng và mâu thuẫn, muốn tìm người hỗ trợ để hòa giải.",
+    "relevant_ids": [
+      "SV018",
+      "SV020",
+      "SV017"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV018": 2,
+      "SV020": 1,
+      "SV017": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0088"
+  },
+  {
+    "query": "Có bài tập nào giúp đốt nhiều calo mà lại vui không?",
+    "relevant_ids": [
+      "SV041",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV040",
+      "SV043",
+      "SV035"
+    ],
+    "relevance_grades": {
+      "SV041": 2,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0202"
+  },
+  {
+    "query": "Có hoạt động thể chất online nào phù hợp cho người bận rộn muốn tập buổi sáng không?",
+    "relevant_ids": [
+      "SV037",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV039",
+      "SV040"
+    ],
+    "relevance_grades": {
+      "SV037": 2,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0185"
+  },
+  {
+    "query": "Tôi muốn được tư vấn từ bác sĩ chuyên khoa nhi cho con tôi.",
+    "relevant_ids": [
+      "SV006",
+      "SV008"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV001",
+      "SV004",
+      "SV012"
+    ],
+    "relevance_grades": {
+      "SV006": 2,
+      "SV008": 1
+    },
+    "category": "y_te",
+    "id": "CB_0030"
+  },
+  {
+    "query": "Tôi bị cao huyết áp, muốn tìm hiểu cách tập thể dục an toàn tại nhà.",
+    "relevant_ids": [
+      "SV001",
+      "SV005"
+    ],
+    "hard_negative_ids": [
+      "SV004",
+      "SV012",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV001": 2,
+      "SV005": 1
+    },
+    "category": "y_te",
+    "id": "CB_0003"
+  },
+  {
+    "query": "Tôi muốn tìm một công việc khác nhưng không biết bắt đầu từ đâu.",
+    "relevant_ids": [
+      "SV029",
+      "SV025",
+      "SV016"
+    ],
+    "hard_negative_ids": [
+      "SV027",
+      "SV021",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV029": 2,
+      "SV025": 1,
+      "SV016": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0142"
+  },
+  {
+    "query": "Làm sao để hạn chế polyp mũi tái phát và chăm sóc mũi đúng cách?",
+    "relevant_ids": [
+      "SV013",
+      "SV004"
+    ],
+    "hard_negative_ids": [
+      "SV012",
+      "SV015",
+      "SV002",
+      "SV010"
+    ],
+    "relevance_grades": {
+      "SV013": 2,
+      "SV004": 1
+    },
+    "category": "y_te",
+    "id": "CB_0065"
+  },
+  {
+    "query": "Tôi muốn thực đơn chay đơn giản, dễ làm mà vẫn đảm bảo dinh dưỡng.",
+    "relevant_ids": [
+      "SV053",
+      "SV052",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV060",
+      "SV054"
+    ],
+    "relevance_grades": {
+      "SV053": 2,
+      "SV052": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0263"
+  },
+  {
+    "query": "Tôi muốn tìm hiểu về phương pháp nhịn ăn để giảm cân, có ai hướng dẫn không?",
+    "relevant_ids": [
+      "SV058",
+      "SV053",
+      "SV060"
+    ],
+    "hard_negative_ids": [
+      "SV057",
+      "SV059",
+      "SV055"
+    ],
+    "relevance_grades": {
+      "SV058": 2,
+      "SV053": 1,
+      "SV060": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0286"
+  },
+  {
+    "query": "Làm sao để tập luyện cho một giải chạy marathon?",
+    "relevant_ids": [
+      "SV034",
+      "SV045",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV042",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV034": 2,
+      "SV045": 1,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0167"
+  },
+  {
+    "query": "tôi cần một kế hoạch ăn uống khoa học cho người bệnh tiểu đường type 2",
+    "relevant_ids": [
+      "SV055",
+      "SV053"
+    ],
+    "hard_negative_ids": [
+      "SV052",
+      "SV060",
+      "SV051"
+    ],
+    "relevance_grades": {
+      "SV055": 2,
+      "SV053": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0275"
+  },
+  {
+    "query": "Có cách nào bớt sợ nói trước đám đông không, mỗi lần nghĩ đến là tim đập nhanh?",
+    "relevant_ids": [
+      "SV020",
+      "SV019"
+    ],
+    "hard_negative_ids": [
+      "SV024",
+      "SV027",
+      "SV017"
+    ],
+    "relevance_grades": {
+      "SV020": 2,
+      "SV019": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0099"
+  },
+  {
+    "query": "Mình muốn tìm lớp tập thể dục để giảm cân hiệu quả.",
+    "relevant_ids": [
+      "SV041",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV040",
+      "SV043",
+      "SV035"
+    ],
+    "relevance_grades": {
+      "SV041": 2,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0201"
+  },
+  {
+    "query": "Tập yoga có giúp cải thiện tư thế và giảm đau lưng không?",
+    "relevant_ids": [
+      "SV031",
+      "SV035",
+      "SV049"
+    ],
+    "hard_negative_ids": [
+      "SV046",
+      "SV047"
+    ],
+    "relevance_grades": {
+      "SV031": 2,
+      "SV035": 1,
+      "SV049": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0153"
+  },
+  {
+    "query": "Tôi muốn học cách nhận biết và xử lý các nguyên nhân gây ra sự tức giận.",
+    "relevant_ids": [
+      "SV022",
+      "SV023"
+    ],
+    "hard_negative_ids": [
+      "SV029",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV022": 2,
+      "SV023": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0109"
+  },
+  {
+    "query": "Làm thế nào để cải thiện sức khỏe chuyển hóa và giảm mỡ thừa an toàn?",
+    "relevant_ids": [
+      "SV052",
+      "SV057",
+      "SV055"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV059",
+      "SV060",
+      "SV056"
+    ],
+    "relevance_grades": {
+      "SV052": 2,
+      "SV057": 1,
+      "SV055": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0258"
+  },
+  {
+    "query": "Mình hay bị đau vai gáy do ngồi máy tính cả ngày, có bài tập nào hỗ trợ không?",
+    "relevant_ids": [
+      "SV033",
+      "SV035",
+      "SV048"
+    ],
+    "hard_negative_ids": [
+      "SV049",
+      "SV038",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV033": 2,
+      "SV035": 1,
+      "SV048": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0161"
+  },
+  {
+    "query": "Chế độ ăn nào tốt cho người bị trào ngược dạ dày thực quản?",
+    "relevant_ids": [
+      "SV008",
+      "SV015"
+    ],
+    "hard_negative_ids": [
+      "SV007",
+      "SV001",
+      "SV004",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV008": 2,
+      "SV015": 1
+    },
+    "category": "y_te",
+    "id": "CB_0040"
+  },
+  {
+    "query": "Làm sao để bé ăn dặm đủ chất mà không biếng ăn?",
+    "relevant_ids": [
+      "SV006",
+      "SV008"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV001",
+      "SV004",
+      "SV012"
+    ],
+    "relevance_grades": {
+      "SV006": 2,
+      "SV008": 1
+    },
+    "category": "y_te",
+    "id": "CB_0029"
+  },
+  {
+    "query": "Làm sao để có thực đơn ăn uống tốt cho sức khỏe mà dễ chuẩn bị?",
+    "relevant_ids": [
+      "SV060",
+      "SV053"
+    ],
+    "hard_negative_ids": [
+      "SV054",
+      "SV056",
+      "SV051",
+      "SV057"
+    ],
+    "relevance_grades": {
+      "SV060": 2,
+      "SV053": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0299"
+  },
+  {
+    "query": "Đã lâu rồi tôi chưa đi khám phụ khoa, giờ muốn đi kiểm tra lại.",
+    "relevant_ids": [
+      "SV005",
+      "SV013",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV006",
+      "SV015",
+      "SV007"
+    ],
+    "relevance_grades": {
+      "SV005": 2,
+      "SV013": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0024"
+  },
+  {
+    "query": "Làm sao để không còn tự ti về ngoại hình và chấp nhận cơ thể mình?",
+    "relevant_ids": [
+      "SV026",
+      "SV027",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV025",
+      "SV019",
+      "SV024",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV026": 2,
+      "SV027": 1,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0127"
+  },
+  {
+    "query": "Tôi đang cảm thấy khá tệ và muốn tìm một nơi để tâm sự về chuyện trầm cảm.",
+    "relevant_ids": [
+      "SV027",
+      "SV030"
+    ],
+    "hard_negative_ids": [
+      "SV020",
+      "SV016",
+      "SV021"
+    ],
+    "relevance_grades": {
+      "SV027": 2,
+      "SV030": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0131"
+  },
+  {
+    "query": "Tôi chưa từng tập gym bao giờ, có chỗ nào hướng dẫn chi tiết cho người chưa quen không?",
+    "relevant_ids": [
+      "SV038",
+      "SV035",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV049",
+      "SV031"
+    ],
+    "relevance_grades": {
+      "SV038": 2,
+      "SV035": 1,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0188"
+  },
+  {
+    "query": "Môn nào giúp trẻ em tăng độ dẻo dai và sức mạnh cơ bắp?",
+    "relevant_ids": [
+      "SV043",
+      "SV032"
+    ],
+    "hard_negative_ids": [
+      "SV046",
+      "SV048",
+      "SV034",
+      "SV031"
+    ],
+    "relevance_grades": {
+      "SV043": 2,
+      "SV032": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0212"
+  },
+  {
+    "query": "Tôi muốn tìm chỗ khám cho bé có dấu hiệu tự kỷ.",
+    "relevant_ids": [
+      "SV019",
+      "SV025"
+    ],
+    "hard_negative_ids": [
+      "SV017",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV019": 2,
+      "SV025": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0093"
+  },
+  {
+    "query": "Tôi muốn cải thiện sức khỏe tim mạch và sự dẻo dai thì nên tập gì?",
+    "relevant_ids": [
+      "SV041",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV040",
+      "SV043",
+      "SV035"
+    ],
+    "relevance_grades": {
+      "SV041": 2,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0203"
+  },
+  {
+    "query": "Mình cần tìm bài tập giúp kéo giãn cơ thể, thư giãn đầu óc mỗi sáng.",
+    "relevant_ids": [
+      "SV037",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV039",
+      "SV040"
+    ],
+    "relevance_grades": {
+      "SV037": 2,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0183"
+  },
+  {
+    "query": "Tôi hay cãi vã vì tính nóng nảy, muốn cải thiện cách giao tiếp.",
+    "relevant_ids": [
+      "SV022",
+      "SV023"
+    ],
+    "hard_negative_ids": [
+      "SV029",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV022": 2,
+      "SV023": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0110"
+  },
+  {
+    "query": "Dạo này tôi cứ bị stress vì công việc hoài, có chuyên gia nào tư vấn giúp không?",
+    "relevant_ids": [
+      "SV030",
+      "SV021"
+    ],
+    "hard_negative_ids": [
+      "SV022",
+      "SV023",
+      "SV016",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV030": 2,
+      "SV021": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0150"
+  },
+  {
+    "query": "Mình muốn tìm một lớp tập cường độ cao, nhiều động tác khác nhau để cải thiện thể lực.",
+    "relevant_ids": [
+      "SV038",
+      "SV035",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV049",
+      "SV031"
+    ],
+    "relevance_grades": {
+      "SV038": 2,
+      "SV035": 1,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0189"
+  },
+  {
+    "query": "Mình đang gặp rào cản tâm lý, muốn có người chỉ dẫn để vượt qua và phát triển kỹ năng mới.",
+    "relevant_ids": [
+      "SV028",
+      "SV022",
+      "SV019"
+    ],
+    "hard_negative_ids": [
+      "SV029",
+      "SV030",
+      "SV016",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV028": 2,
+      "SV022": 1,
+      "SV019": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0138"
+  },
+  {
+    "query": "Tôi nên làm nghề gì thì hợp với tính cách và sở thích của mình?",
+    "relevant_ids": [
+      "SV029",
+      "SV025",
+      "SV016"
+    ],
+    "hard_negative_ids": [
+      "SV027",
+      "SV021",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV029": 2,
+      "SV025": 1,
+      "SV016": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0144"
+  },
+  {
+    "query": "Có chương trình ăn uống nào giúp cơ thể đốt mỡ hiệu quả mà vẫn đủ chất không?",
+    "relevant_ids": [
+      "SV052",
+      "SV057",
+      "SV055"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV059",
+      "SV060",
+      "SV056"
+    ],
+    "relevance_grades": {
+      "SV052": 2,
+      "SV057": 1,
+      "SV055": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0260"
+  },
+  {
+    "query": "Dạo này tôi hay bị ợ nóng với đau bụng, không biết khám ở đâu?",
+    "relevant_ids": [
+      "SV008",
+      "SV015"
+    ],
+    "hard_negative_ids": [
+      "SV007",
+      "SV001",
+      "SV004",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV008": 2,
+      "SV015": 1
+    },
+    "category": "y_te",
+    "id": "CB_0036"
+  },
+  {
+    "query": "Làm thế nào để giữ cho lá gan luôn khỏe mạnh và phòng tránh bệnh tật?",
+    "relevant_ids": [
+      "SV014",
+      "SV008",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV014": 2,
+      "SV008": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0068"
+  },
+  {
+    "query": "Tôi bị hội chứng ruột kích thích thì nên ăn gì để giảm triệu chứng?",
+    "relevant_ids": [
+      "SV008",
+      "SV015"
+    ],
+    "hard_negative_ids": [
+      "SV007",
+      "SV001",
+      "SV004",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV008": 2,
+      "SV015": 1
+    },
+    "category": "y_te",
+    "id": "CB_0037"
+  },
+  {
+    "query": "Trước khi cưới, có cần học cách quản lý tiền bạc gia đình hay không?",
+    "relevant_ids": [
+      "SV024",
+      "SV022"
+    ],
+    "hard_negative_ids": [
+      "SV026",
+      "SV028",
+      "SV016"
+    ],
+    "relevance_grades": {
+      "SV024": 2,
+      "SV022": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0118"
+  },
+  {
+    "query": "Tập gì để tăng độ linh hoạt của cột sống và làm khỏe vùng core?",
+    "relevant_ids": [
+      "SV033",
+      "SV035",
+      "SV048"
+    ],
+    "hard_negative_ids": [
+      "SV049",
+      "SV038",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV033": 2,
+      "SV035": 1,
+      "SV048": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0165"
+  },
+  {
+    "query": "Các món ăn nào giàu chất xơ và omega-3 giúp hạ cholesterol?",
+    "relevant_ids": [
+      "SV057",
+      "SV056"
+    ],
+    "hard_negative_ids": [
+      "SV051",
+      "SV059",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV057": 2,
+      "SV056": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0283"
+  },
+  {
+    "query": "Bạn tôi dạo này cứ nhịn ăn, người gầy rộc mà vẫn kêu mình béo, phải làm sao?",
+    "relevant_ids": [
+      "SV026",
+      "SV027",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV025",
+      "SV019",
+      "SV024",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV026": 2,
+      "SV027": 1,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0128"
+  },
+  {
+    "query": "Mình muốn học kỹ thuật chạy bộ đúng để không bị chấn thương.",
+    "relevant_ids": [
+      "SV034",
+      "SV045",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV042",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV034": 2,
+      "SV045": 1,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0168"
+  },
+  {
+    "query": "Có khóa thể thao nào dành riêng cho các mẹ bầu không?",
+    "relevant_ids": [
+      "SV040",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV034",
+      "SV042"
+    ],
+    "relevance_grades": {
+      "SV040": 2,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0200"
+  },
+  {
+    "query": "Người mới bắt đầu tập thể dục có tham gia được lớp nào không, mình không có kinh nghiệm?",
+    "relevant_ids": [
+      "SV041",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV040",
+      "SV043",
+      "SV035"
+    ],
+    "relevance_grades": {
+      "SV041": 2,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0204"
+  },
+  {
+    "query": "Kế hoạch ăn chay lâu dài làm sao để đảm bảo đầy đủ sắt và canxi?",
+    "relevant_ids": [
+      "SV053",
+      "SV052",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV060",
+      "SV054"
+    ],
+    "relevance_grades": {
+      "SV053": 2,
+      "SV052": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0265"
+  },
+  {
+    "query": "Tôi cảm thấy quá tải với công việc, không có thời gian cho bản thân, làm sao để cải thiện?",
+    "relevant_ids": [
+      "SV030",
+      "SV021"
+    ],
+    "hard_negative_ids": [
+      "SV022",
+      "SV023",
+      "SV016",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV030": 2,
+      "SV021": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0146"
+  },
+  {
+    "query": "Bao lâu thì mình nên đi vệ sinh răng miệng một lần?",
+    "relevant_ids": [
+      "SV011",
+      "SV008",
+      "SV006"
+    ],
+    "hard_negative_ids": [
+      "SV014",
+      "SV007",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV011": 2,
+      "SV008": 1,
+      "SV006": 1
+    },
+    "category": "y_te",
+    "id": "CB_0055"
+  },
+  {
+    "query": "Tôi cần người lên kế hoạch ăn uống và thời gian biểu để giảm cân an toàn.",
+    "relevant_ids": [
+      "SV058",
+      "SV053",
+      "SV060"
+    ],
+    "hard_negative_ids": [
+      "SV057",
+      "SV059",
+      "SV055"
+    ],
+    "relevance_grades": {
+      "SV058": 2,
+      "SV053": 1,
+      "SV060": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0290"
+  },
+  {
+    "query": "Thực đơn cho bà bầu 3 tháng đầu cần những gì?",
+    "relevant_ids": [
+      "SV056",
+      "SV054"
+    ],
+    "hard_negative_ids": [
+      "SV059",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV056": 2,
+      "SV054": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0279"
+  },
+  {
+    "query": "Nếu bị suy nhược tinh thần thì nên điều trị ở đâu?",
+    "relevant_ids": [
+      "SV021",
+      "SV023",
+      "SV027"
+    ],
+    "hard_negative_ids": [
+      "SV030",
+      "SV022"
+    ],
+    "relevance_grades": {
+      "SV021": 2,
+      "SV023": 1,
+      "SV027": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0103"
+  },
+  {
+    "query": "Tôi hay bị căng thẳng, có cách nào để thư giãn đầu óc không?",
+    "relevant_ids": [
+      "SV017",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV024",
+      "SV020"
+    ],
+    "relevance_grades": {
+      "SV017": 2,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0081"
+  },
+  {
+    "query": "Tôi muốn làm xét nghiệm máu, siêu âm và kiểm tra tổng quát.",
+    "relevant_ids": [
+      "SV002",
+      "SV013",
+      "SV010"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV011"
+    ],
+    "relevance_grades": {
+      "SV002": 2,
+      "SV013": 1,
+      "SV010": 1
+    },
+    "category": "y_te",
+    "id": "CB_0009"
+  },
+  {
+    "query": "Tập HIIT có thực sự hiệu quả để giảm mỡ nhanh không?",
+    "relevant_ids": [
+      "SV050",
+      "SV045",
+      "SV042"
+    ],
+    "hard_negative_ids": [
+      "SV043",
+      "SV044",
+      "SV049",
+      "SV041"
+    ],
+    "relevance_grades": {
+      "SV050": 2,
+      "SV045": 1,
+      "SV042": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0249"
+  },
+  {
+    "query": "Tôi muốn tìm hiểu về cách dùng thuốc và insulin cho người bị đường huyết.",
+    "relevant_ids": [
+      "SV003",
+      "SV012",
+      "SV011"
+    ],
+    "hard_negative_ids": [
+      "SV005",
+      "SV002",
+      "SV004"
+    ],
+    "relevance_grades": {
+      "SV003": 2,
+      "SV012": 1,
+      "SV011": 1
+    },
+    "category": "y_te",
+    "id": "CB_0015"
+  },
+  {
+    "query": "Làm sao để giảm căng thẳng và cải thiện hơi thở khi đang mang thai?",
+    "relevant_ids": [
+      "SV040",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV034",
+      "SV042"
+    ],
+    "relevance_grades": {
+      "SV040": 2,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0199"
+  },
+  {
+    "query": "Phụ nữ có thai thì nên vận động những bài tập nào để tốt cho cả mẹ và bé?",
+    "relevant_ids": [
+      "SV040",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV034",
+      "SV042"
+    ],
+    "relevance_grades": {
+      "SV040": 2,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0197"
+  },
+  {
+    "query": "Có khóa học nào về chánh niệm cho người mới bắt đầu không?",
+    "relevant_ids": [
+      "SV017",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV024",
+      "SV020"
+    ],
+    "relevance_grades": {
+      "SV017": 2,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0084"
+  },
+  {
+    "query": "Mình đang căng thẳng quá, có hoạt động nào giúp giải tỏa stress hiệu quả không?",
+    "relevant_ids": [
+      "SV036",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV047",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV036": 2,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0176"
+  },
+  {
+    "query": "Bệnh gout của tôi tái phát, cần tư vấn uống thuốc gì?",
+    "relevant_ids": [
+      "SV012",
+      "SV002",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV015",
+      "SV010",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV012": 2,
+      "SV002": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0057"
+  },
+  {
+    "query": "món ăn nào có chỉ số GI thấp phù hợp cho người đái tháo đường?",
+    "relevant_ids": [
+      "SV055",
+      "SV053"
+    ],
+    "hard_negative_ids": [
+      "SV052",
+      "SV060",
+      "SV051"
+    ],
+    "relevance_grades": {
+      "SV055": 2,
+      "SV053": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0273"
+  },
+  {
+    "query": "Gợi ý thực đơn các món ăn từ thực vật ngon miệng và cân bằng dinh dưỡng.",
+    "relevant_ids": [
+      "SV053",
+      "SV052",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV060",
+      "SV054"
+    ],
+    "relevance_grades": {
+      "SV053": 2,
+      "SV052": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0264"
+  },
+  {
+    "query": "Có lớp học nào giúp cải thiện tư thế ngồi làm việc và giảm đau lưng dưới không?",
+    "relevant_ids": [
+      "SV033",
+      "SV035",
+      "SV048"
+    ],
+    "hard_negative_ids": [
+      "SV049",
+      "SV038",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV033": 2,
+      "SV035": 1,
+      "SV048": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0164"
+  },
+  {
+    "query": "Tôi thường xuyên bị đầy bụng, khó tiêu sau khi ăn đồ dầu mỡ, có phải là triệu chứng của bệnh sỏi mật không?",
+    "relevant_ids": [
+      "SV014",
+      "SV008",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV014": 2,
+      "SV008": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0070"
+  },
+  {
+    "query": "Tôi muốn tìm lớp tập giúp ông bà giữ thăng bằng tốt hơn để không bị ngã.",
+    "relevant_ids": [
+      "SV049",
+      "SV045",
+      "SV037"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV039"
+    ],
+    "relevance_grades": {
+      "SV049": 2,
+      "SV045": 1,
+      "SV037": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0241"
+  },
+  {
+    "query": "Có dịch vụ nào giúp các cặp đôi hiểu nhau hơn trước khi về chung một nhà không?",
+    "relevant_ids": [
+      "SV024",
+      "SV022"
+    ],
+    "hard_negative_ids": [
+      "SV026",
+      "SV028",
+      "SV016"
+    ],
+    "relevance_grades": {
+      "SV024": 2,
+      "SV022": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0119"
+  },
+  {
+    "query": "Làm thế nào để phòng tránh chấn thương khi vận động và tăng phạm vi chuyển động của các khớp?",
+    "relevant_ids": [
+      "SV047",
+      "SV032",
+      "SV040"
+    ],
+    "hard_negative_ids": [
+      "SV048",
+      "SV043"
+    ],
+    "relevance_grades": {
+      "SV047": 2,
+      "SV032": 1,
+      "SV040": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0235"
+  },
+  {
+    "query": "Viêm amidan mãn tính thì chữa trị ở đâu tốt?",
+    "relevant_ids": [
+      "SV013",
+      "SV004"
+    ],
+    "hard_negative_ids": [
+      "SV012",
+      "SV015",
+      "SV002",
+      "SV010"
+    ],
+    "relevance_grades": {
+      "SV013": 2,
+      "SV004": 1
+    },
+    "category": "y_te",
+    "id": "CB_0063"
+  },
+  {
+    "query": "Có môn thể thao nào kết hợp cả sức mạnh, sức bền và sự dẻo dai không?",
+    "relevant_ids": [
+      "SV038",
+      "SV035",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV049",
+      "SV031"
+    ],
+    "relevance_grades": {
+      "SV038": 2,
+      "SV035": 1,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0187"
+  },
+  {
+    "query": "Mình muốn đặt ra mục tiêu sự nghiệp rõ ràng hơn và có người đồng hành để đạt được thì tìm ở đâu?",
+    "relevant_ids": [
+      "SV028",
+      "SV022",
+      "SV019"
+    ],
+    "hard_negative_ids": [
+      "SV029",
+      "SV030",
+      "SV016",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV028": 2,
+      "SV022": 1,
+      "SV019": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0137"
+  },
+  {
+    "query": "Mẹ tôi hay bị đau đầu và nhìn mờ, liệu có phải bị cườm nước không?",
+    "relevant_ids": [
+      "SV009",
+      "SV015",
+      "SV007"
+    ],
+    "hard_negative_ids": [
+      "SV003",
+      "SV005",
+      "SV011",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV009": 2,
+      "SV015": 1,
+      "SV007": 1
+    },
+    "category": "y_te",
+    "id": "CB_0044"
+  },
+  {
+    "query": "Làm sao để tập luyện cho cơ bụng và toàn thân khỏe hơn?",
+    "relevant_ids": [
+      "SV048",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV036",
+      "SV032",
+      "SV047",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV048": 2,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0238"
+  },
+  {
+    "query": "Tôi muốn có một kế hoạch tập gym riêng biệt để đạt mục tiêu tăng cơ.",
+    "relevant_ids": [
+      "SV032",
+      "SV044",
+      "SV033"
+    ],
+    "hard_negative_ids": [
+      "SV035",
+      "SV045"
+    ],
+    "relevance_grades": {
+      "SV032": 2,
+      "SV044": 1,
+      "SV033": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0156"
+  },
+  {
+    "query": "Tôi muốn được bác sĩ theo dõi huyết áp định kỳ qua ứng dụng thì tìm ở đâu?",
+    "relevant_ids": [
+      "SV004",
+      "SV015",
+      "SV005"
+    ],
+    "hard_negative_ids": [
+      "SV001",
+      "SV013",
+      "SV003",
+      "SV006"
+    ],
+    "relevance_grades": {
+      "SV004": 2,
+      "SV015": 1,
+      "SV005": 1
+    },
+    "category": "y_te",
+    "id": "CB_0019"
+  },
+  {
+    "query": "Mình muốn bắt đầu chạy bộ từ con số 0 thì nên làm gì?",
+    "relevant_ids": [
+      "SV034",
+      "SV045",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV042",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV034": 2,
+      "SV045": 1,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0166"
+  },
+  {
+    "query": "ăn uống thế nào để tránh biến chứng của bệnh tiểu đường?",
+    "relevant_ids": [
+      "SV055",
+      "SV053"
+    ],
+    "hard_negative_ids": [
+      "SV052",
+      "SV060",
+      "SV051"
+    ],
+    "relevance_grades": {
+      "SV055": 2,
+      "SV053": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0274"
+  },
+  {
+    "query": "Có lớp cardio nào giúp cải thiện sức khỏe tim mạch và tinh thần không?",
+    "relevant_ids": [
+      "SV036",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV047",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV036": 2,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0180"
+  },
+  {
+    "query": "Ông tôi bị viêm gan B mạn tính, có phương pháp điều trị nào hiệu quả không?",
+    "relevant_ids": [
+      "SV014",
+      "SV008",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV014": 2,
+      "SV008": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0069"
+  },
+  {
+    "query": "Ông bà mình hay bị đau khớp gối, có hoạt động nào vừa sức lại tốt cho xương khớp không?",
+    "relevant_ids": [
+      "SV035",
+      "SV033",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV050",
+      "SV042",
+      "SV049"
+    ],
+    "relevance_grades": {
+      "SV035": 2,
+      "SV033": 1,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0172"
+  },
+  {
+    "query": "Có dịch vụ nào kiểm tra sức khỏe răng miệng toàn diện không?",
+    "relevant_ids": [
+      "SV011",
+      "SV008",
+      "SV006"
+    ],
+    "hard_negative_ids": [
+      "SV014",
+      "SV007",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV011": 2,
+      "SV008": 1,
+      "SV006": 1
+    },
+    "category": "y_te",
+    "id": "CB_0054"
+  },
+  {
+    "query": "Con tôi tự nhiên bướng bỉnh, hay cáu gắt lắm, có chỗ nào giúp được không?",
+    "relevant_ids": [
+      "SV019",
+      "SV025"
+    ],
+    "hard_negative_ids": [
+      "SV017",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV019": 2,
+      "SV025": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0091"
+  },
+  {
+    "query": "Cháu nhà tôi đang tuổi teen, có vẻ đang gặp vấn đề tâm lý, cần tìm ai giúp đỡ.",
+    "relevant_ids": [
+      "SV019",
+      "SV025"
+    ],
+    "hard_negative_ids": [
+      "SV017",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV019": 2,
+      "SV025": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0095"
+  },
+  {
+    "query": "Tôi muốn khám tổng quát xem mắt có vấn đề gì không?",
+    "relevant_ids": [
+      "SV009",
+      "SV015",
+      "SV007"
+    ],
+    "hard_negative_ids": [
+      "SV003",
+      "SV005",
+      "SV011",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV009": 2,
+      "SV015": 1,
+      "SV007": 1
+    },
+    "category": "y_te",
+    "id": "CB_0042"
+  },
+  {
+    "query": "Con tôi rất tự ti, không hòa đồng với các bạn, có ai giúp bé được không?",
+    "relevant_ids": [
+      "SV019",
+      "SV025"
+    ],
+    "hard_negative_ids": [
+      "SV017",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV019": 2,
+      "SV025": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0094"
+  },
+  {
+    "query": "Có khóa học thể thao nào tốt cho trẻ nhỏ từ 4 đến 12 tuổi không?",
+    "relevant_ids": [
+      "SV043",
+      "SV032"
+    ],
+    "hard_negative_ids": [
+      "SV046",
+      "SV048",
+      "SV034",
+      "SV031"
+    ],
+    "relevance_grades": {
+      "SV043": 2,
+      "SV032": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0214"
+  },
+  {
+    "query": "Mình muốn tìm lớp tập tăng cường cơ bụng và làm cơ thể dẻo dai hơn.",
+    "relevant_ids": [
+      "SV033",
+      "SV035",
+      "SV048"
+    ],
+    "hard_negative_ids": [
+      "SV049",
+      "SV038",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV033": 2,
+      "SV035": 1,
+      "SV048": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0163"
+  },
+  {
+    "query": "Làm sao để vợ chồng sắp cưới không cãi nhau nhiều, biết cách nói chuyện với nhau?",
+    "relevant_ids": [
+      "SV024",
+      "SV022"
+    ],
+    "hard_negative_ids": [
+      "SV026",
+      "SV028",
+      "SV016"
+    ],
+    "relevance_grades": {
+      "SV024": 2,
+      "SV022": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0117"
+  },
+  {
+    "query": "Sau khi tập nặng thì nên ăn gì để cơ bắp phục hồi nhanh nhất?",
+    "relevant_ids": [
+      "SV059",
+      "SV053",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV059": 2,
+      "SV053": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0295"
+  },
+  {
+    "query": "Tôi muốn tìm hiểu về liệu pháp CBT cho mấy người hay ngại giao tiếp",
+    "relevant_ids": [
+      "SV020",
+      "SV019"
+    ],
+    "hard_negative_ids": [
+      "SV024",
+      "SV027",
+      "SV017"
+    ],
+    "relevance_grades": {
+      "SV020": 2,
+      "SV019": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0098"
+  },
+  {
+    "query": "Bé nhà em 6 tháng chưa biết lật có cần khám không ạ?",
+    "relevant_ids": [
+      "SV006",
+      "SV008"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV001",
+      "SV004",
+      "SV012"
+    ],
+    "relevance_grades": {
+      "SV006": 2,
+      "SV008": 1
+    },
+    "category": "y_te",
+    "id": "CB_0026"
+  },
+  {
+    "query": "Mình muốn tìm môn thể thao giúp tăng sức bền và rèn luyện sức mạnh chân.",
+    "relevant_ids": [
+      "SV045",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV046"
+    ],
+    "relevance_grades": {
+      "SV045": 2,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0222"
+  },
+  {
+    "query": "Tôi hay bị nhức mỏi các khớp ngón tay, có cần đi khám không?",
+    "relevant_ids": [
+      "SV012",
+      "SV002",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV015",
+      "SV010",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV012": 2,
+      "SV002": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0060"
+  },
+  {
+    "query": "Mình muốn tìm hoạt động nhóm nào đó sôi động, có nhạc vui vẻ để cải thiện tinh thần và rèn luyện sức khỏe.",
+    "relevant_ids": [
+      "SV044",
+      "SV042"
+    ],
+    "hard_negative_ids": [
+      "SV045",
+      "SV047",
+      "SV038",
+      "SV043"
+    ],
+    "relevance_grades": {
+      "SV044": 2,
+      "SV042": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0219"
+  },
+  {
+    "query": "Có gói khám nào để tầm soát ung thư phụ nữ không?",
+    "relevant_ids": [
+      "SV005",
+      "SV013",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV006",
+      "SV015",
+      "SV007"
+    ],
+    "relevance_grades": {
+      "SV005": 2,
+      "SV013": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0021"
+  },
+  {
+    "query": "Phòng khám nào tốt để tư vấn về nhiễm trùng đường tiểu?",
+    "relevant_ids": [
+      "SV015",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV003",
+      "SV012",
+      "SV002",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV015": 2,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0075"
+  },
+  {
+    "query": "Mình muốn tìm lớp học giúp chuẩn bị thể lực tốt cho quá trình sinh nở.",
+    "relevant_ids": [
+      "SV040",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV034",
+      "SV042"
+    ],
+    "relevance_grades": {
+      "SV040": 2,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0198"
+  },
+  {
+    "query": "Làm sao để biết mình có bị loãng xương không và cần làm gì?",
+    "relevant_ids": [
+      "SV012",
+      "SV002",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV015",
+      "SV010",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV012": 2,
+      "SV002": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0059"
+  },
+  {
+    "query": "Mình cần tìm một người hướng dẫn chuyên nghiệp để cải thiện sức bền khi chạy.",
+    "relevant_ids": [
+      "SV034",
+      "SV045",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV042",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV034": 2,
+      "SV045": 1,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0170"
+  },
+  {
+    "query": "Thực đơn ăn kiêng cho người bệnh tiểu đường nên có gì?",
+    "relevant_ids": [
+      "SV003",
+      "SV012",
+      "SV011"
+    ],
+    "hard_negative_ids": [
+      "SV005",
+      "SV002",
+      "SV004"
+    ],
+    "relevance_grades": {
+      "SV003": 2,
+      "SV012": 1,
+      "SV011": 1
+    },
+    "category": "y_te",
+    "id": "CB_0012"
+  },
+  {
+    "query": "Có cách nào ngăn ngừa đột quỵ do huyết áp cao không?",
+    "relevant_ids": [
+      "SV004",
+      "SV015",
+      "SV005"
+    ],
+    "hard_negative_ids": [
+      "SV001",
+      "SV013",
+      "SV003",
+      "SV006"
+    ],
+    "relevance_grades": {
+      "SV004": 2,
+      "SV015": 1,
+      "SV005": 1
+    },
+    "category": "y_te",
+    "id": "CB_0018"
+  },
+  {
+    "query": "Tôi muốn bắt đầu ngày mới tràn đầy năng lượng, có bài tập nhẹ nhàng nào làm tại nhà buổi sáng không?",
+    "relevant_ids": [
+      "SV037",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV039",
+      "SV040"
+    ],
+    "relevance_grades": {
+      "SV037": 2,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0181"
+  },
+  {
+    "query": "Mình đang tập gym mà muốn cơ bắp phát triển nhanh hơn thì ăn gì cho hợp lý?",
+    "relevant_ids": [
+      "SV054",
+      "SV058",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV060",
+      "SV052",
+      "SV055",
+      "SV051"
+    ],
+    "relevance_grades": {
+      "SV054": 2,
+      "SV058": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0266"
+  },
+  {
+    "query": "Tôi muốn học cách sắp xếp công việc và việc cá nhân hiệu quả hơn.",
+    "relevant_ids": [
+      "SV030",
+      "SV021"
+    ],
+    "hard_negative_ids": [
+      "SV022",
+      "SV023",
+      "SV016",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV030": 2,
+      "SV021": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0148"
+  },
+  {
+    "query": "Mình muốn tìm một chương trình tập luyện giúp tăng cường sức khỏe tổng thể cho người mới bắt đầu.",
+    "relevant_ids": [
+      "SV038",
+      "SV035",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV049",
+      "SV031"
+    ],
+    "relevance_grades": {
+      "SV038": 2,
+      "SV035": 1,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0186"
+  },
+  {
+    "query": "Tôi bị đau lưng kinh niên, có cách nào tập luyện để đỡ hơn không?",
+    "relevant_ids": [
+      "SV031",
+      "SV035",
+      "SV049"
+    ],
+    "hard_negative_ids": [
+      "SV046",
+      "SV047"
+    ],
+    "relevance_grades": {
+      "SV031": 2,
+      "SV035": 1,
+      "SV049": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0151"
+  },
+  {
+    "query": "Mắt tôi dạo này nhìn không rõ, cần đi kiểm tra ở đâu?",
+    "relevant_ids": [
+      "SV009",
+      "SV015",
+      "SV007"
+    ],
+    "hard_negative_ids": [
+      "SV003",
+      "SV005",
+      "SV011",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV009": 2,
+      "SV015": 1,
+      "SV007": 1
+    },
+    "category": "y_te",
+    "id": "CB_0041"
+  },
+  {
+    "query": "Tôi mới bắt đầu tập thể dục, có môn nào phù hợp cho người mới mà vẫn thú vị không?",
+    "relevant_ids": [
+      "SV039",
+      "SV043",
+      "SV047"
+    ],
+    "hard_negative_ids": [
+      "SV035",
+      "SV036",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV039": 2,
+      "SV043": 1,
+      "SV047": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0194"
+  },
+  {
+    "query": "Muốn khám tổng quát các bệnh về tai và họng thì đăng ký như thế nào?",
+    "relevant_ids": [
+      "SV013",
+      "SV004"
+    ],
+    "hard_negative_ids": [
+      "SV012",
+      "SV015",
+      "SV002",
+      "SV010"
+    ],
+    "relevance_grades": {
+      "SV013": 2,
+      "SV004": 1
+    },
+    "category": "y_te",
+    "id": "CB_0064"
+  },
+  {
+    "query": "Tôi muốn tìm một loại hình tập luyện giúp tăng cường sức mạnh toàn thân và giữ thăng bằng tốt hơn.",
+    "relevant_ids": [
+      "SV048",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV036",
+      "SV032",
+      "SV047",
+      "SV044"
+    ],
+    "relevance_grades": {
+      "SV048": 2,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0236"
+  },
+  {
+    "query": "Tôi muốn làm xét nghiệm PAP và siêu âm vú ở đâu?",
+    "relevant_ids": [
+      "SV005",
+      "SV013",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV006",
+      "SV015",
+      "SV007"
+    ],
+    "relevance_grades": {
+      "SV005": 2,
+      "SV013": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0023"
+  },
+  {
+    "query": "Mình muốn tìm một người giúp định hướng phát triển bản thân thì phải làm sao?",
+    "relevant_ids": [
+      "SV028",
+      "SV022",
+      "SV019"
+    ],
+    "hard_negative_ids": [
+      "SV029",
+      "SV030",
+      "SV016",
+      "SV024"
+    ],
+    "relevance_grades": {
+      "SV028": 2,
+      "SV022": 1,
+      "SV019": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0136"
+  },
+  {
+    "query": "Mình muốn tìm một lớp tập luyện vừa giúp giảm cân vừa tăng cường thể lực.",
+    "relevant_ids": [
+      "SV036",
+      "SV035"
+    ],
+    "hard_negative_ids": [
+      "SV032",
+      "SV047",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV036": 2,
+      "SV035": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0177"
+  },
+  {
+    "query": "Tôi hay bị uể oải buổi sáng, có cách nào để tỉnh táo và tập thể dục ở nhà không?",
+    "relevant_ids": [
+      "SV037",
+      "SV044"
+    ],
+    "hard_negative_ids": [
+      "SV039",
+      "SV040"
+    ],
+    "relevance_grades": {
+      "SV037": 2,
+      "SV044": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0184"
+  },
+  {
+    "query": "Tôi muốn tìm sự giúp đỡ từ bác sĩ hoặc chuyên gia để cai thuốc.",
+    "relevant_ids": [
+      "SV010",
+      "SV011"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV002",
+      "SV001"
+    ],
+    "relevance_grades": {
+      "SV010": 2,
+      "SV011": 1
+    },
+    "category": "y_te",
+    "id": "CB_0050"
+  },
+  {
+    "query": "Tôi muốn tham gia các chuyến đi xe đạp khám phá cảnh đẹp cuối tuần.",
+    "relevant_ids": [
+      "SV039",
+      "SV043",
+      "SV047"
+    ],
+    "hard_negative_ids": [
+      "SV035",
+      "SV036",
+      "SV048"
+    ],
+    "relevance_grades": {
+      "SV039": 2,
+      "SV043": 1,
+      "SV047": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0195"
+  },
+  {
+    "query": "Có phương pháp ăn uống nào giúp cải thiện trao đổi chất và tăng tuổi thọ không?",
+    "relevant_ids": [
+      "SV058",
+      "SV053",
+      "SV060"
+    ],
+    "hard_negative_ids": [
+      "SV057",
+      "SV059",
+      "SV055"
+    ],
+    "relevance_grades": {
+      "SV058": 2,
+      "SV053": 1,
+      "SV060": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0288"
+  },
+  {
+    "query": "Tôi mới bắt đầu chạy marathon, chế độ ăn uống cần lưu ý gì?",
+    "relevant_ids": [
+      "SV059",
+      "SV053",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV059": 2,
+      "SV053": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0294"
+  },
+  {
+    "query": "Mình muốn tìm lớp vận động giúp tăng cường cơ bắp và dễ thở hơn, nhưng không muốn tập nặng.",
+    "relevant_ids": [
+      "SV035",
+      "SV033",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV050",
+      "SV042",
+      "SV049"
+    ],
+    "relevance_grades": {
+      "SV035": 2,
+      "SV033": 1,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0173"
+  },
+  {
+    "query": "Con tôi cứ dán mắt vào điện thoại chơi game suốt ngày, có cách nào giúp cháu không?",
+    "relevant_ids": [
+      "SV023",
+      "SV018"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV029"
+    ],
+    "relevance_grades": {
+      "SV023": 2,
+      "SV018": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0111"
+  },
+  {
+    "query": "Làm sao để cải thiện sức khỏe tinh thần khi cảm thấy kiệt sức và mất động lực?",
+    "relevant_ids": [
+      "SV016",
+      "SV024",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV030",
+      "SV027",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV016": 2,
+      "SV024": 1,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0080"
+  },
+  {
+    "query": "Làm sao để kiểm soát cân nặng hợp lý trong thai kỳ?",
+    "relevant_ids": [
+      "SV056",
+      "SV054"
+    ],
+    "hard_negative_ids": [
+      "SV059",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV056": 2,
+      "SV054": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0278"
+  },
+  {
+    "query": "Mình muốn tìm một môn thể thao nhẹ nhàng, không gây sốc cho cơ thể, phù hợp để duy trì sức khỏe.",
+    "relevant_ids": [
+      "SV035",
+      "SV033",
+      "SV034"
+    ],
+    "hard_negative_ids": [
+      "SV050",
+      "SV042",
+      "SV049"
+    ],
+    "relevance_grades": {
+      "SV035": 2,
+      "SV033": 1,
+      "SV034": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0175"
+  },
+  {
+    "query": "Tôi tập gym thường xuyên muốn ăn uống sao cho khỏe hơn và nhanh hồi sức.",
+    "relevant_ids": [
+      "SV059",
+      "SV053",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV059": 2,
+      "SV053": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0291"
+  },
+  {
+    "query": "Làm sao để cải thiện chất lượng giấc ngủ và không còn trằn trọc nữa?",
+    "relevant_ids": [
+      "SV017",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV024",
+      "SV020"
+    ],
+    "relevance_grades": {
+      "SV017": 2,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0082"
+  },
+  {
+    "query": "Tôi muốn kiểm tra nguy cơ mắc bệnh tim mạch mà không cần đi lại nhiều.",
+    "relevant_ids": [
+      "SV001",
+      "SV005"
+    ],
+    "hard_negative_ids": [
+      "SV004",
+      "SV012",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV001": 2,
+      "SV005": 1
+    },
+    "category": "y_te",
+    "id": "CB_0004"
+  },
+  {
+    "query": "Làm sao để phát triển sự nghiệp của tôi lên một tầm cao mới?",
+    "relevant_ids": [
+      "SV029",
+      "SV025",
+      "SV016"
+    ],
+    "hard_negative_ids": [
+      "SV027",
+      "SV021",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV029": 2,
+      "SV025": 1,
+      "SV016": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0143"
+  },
+  {
+    "query": "Chỗ nào dạy kỹ năng an toàn cho nữ giới để không bị động trong các tình huống nguy hiểm?",
+    "relevant_ids": [
+      "SV046",
+      "SV033",
+      "SV043"
+    ],
+    "hard_negative_ids": [
+      "SV041",
+      "SV038",
+      "SV049",
+      "SV036"
+    ],
+    "relevance_grades": {
+      "SV046": 2,
+      "SV033": 1,
+      "SV043": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0230"
+  },
+  {
+    "query": "Chỗ mình có hỗ trợ những người dùng internet quá nhiều không?",
+    "relevant_ids": [
+      "SV023",
+      "SV018"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV029"
+    ],
+    "relevance_grades": {
+      "SV023": 2,
+      "SV018": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0113"
+  },
+  {
+    "query": "Lớp học nào giúp bé rèn luyện tính kỷ luật và tinh thần đồng đội?",
+    "relevant_ids": [
+      "SV043",
+      "SV032"
+    ],
+    "hard_negative_ids": [
+      "SV046",
+      "SV048",
+      "SV034",
+      "SV031"
+    ],
+    "relevance_grades": {
+      "SV043": 2,
+      "SV032": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0215"
+  },
+  {
+    "query": "Ăn gì để ít bị chấn thương khi chơi thể thao cường độ cao?",
+    "relevant_ids": [
+      "SV059",
+      "SV053",
+      "SV057"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV059": 2,
+      "SV053": 1,
+      "SV057": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0293"
+  },
+  {
+    "query": "Tôi muốn tìm một chuyên gia tâm lý để nói chuyện về vấn đề tinh thần của mình.",
+    "relevant_ids": [
+      "SV021",
+      "SV023",
+      "SV027"
+    ],
+    "hard_negative_ids": [
+      "SV030",
+      "SV022"
+    ],
+    "relevance_grades": {
+      "SV021": 2,
+      "SV023": 1,
+      "SV027": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0102"
+  },
+  {
+    "query": "Làm sao để phòng ngừa các biến chứng do bệnh tiểu đường gây ra?",
+    "relevant_ids": [
+      "SV003",
+      "SV012",
+      "SV011"
+    ],
+    "hard_negative_ids": [
+      "SV005",
+      "SV002",
+      "SV004"
+    ],
+    "relevance_grades": {
+      "SV003": 2,
+      "SV012": 1,
+      "SV011": 1
+    },
+    "category": "y_te",
+    "id": "CB_0014"
+  },
+  {
+    "query": "Tôi cần công thức nấu ăn và danh sách mua sắm cho người ăn kiêng.",
+    "relevant_ids": [
+      "SV052",
+      "SV057",
+      "SV055"
+    ],
+    "hard_negative_ids": [
+      "SV058",
+      "SV059",
+      "SV060",
+      "SV056"
+    ],
+    "relevance_grades": {
+      "SV052": 2,
+      "SV057": 1,
+      "SV055": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0259"
+  },
+  {
+    "query": "Em muốn tìm hiểu cách xây dựng mối quan hệ vợ chồng bền vững, tránh rạn nứt sau này.",
+    "relevant_ids": [
+      "SV024",
+      "SV022"
+    ],
+    "hard_negative_ids": [
+      "SV026",
+      "SV028",
+      "SV016"
+    ],
+    "relevance_grades": {
+      "SV024": 2,
+      "SV022": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0120"
+  },
+  {
+    "query": "Em thấy mình bị phụ thuộc vào Facebook quá, cứ phải lướt liên tục. Có giải pháp nào không ạ?",
+    "relevant_ids": [
+      "SV023",
+      "SV018"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV029"
+    ],
+    "relevance_grades": {
+      "SV023": 2,
+      "SV018": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0112"
+  },
+  {
+    "query": "Có chương trình hỗ trợ nào để ngừng hút thuốc lá không?",
+    "relevant_ids": [
+      "SV010",
+      "SV011"
+    ],
+    "hard_negative_ids": [
+      "SV009",
+      "SV002",
+      "SV001"
+    ],
+    "relevance_grades": {
+      "SV010": 2,
+      "SV011": 1
+    },
+    "category": "y_te",
+    "id": "CB_0048"
+  },
+  {
+    "query": "Tôi mới đo thấy huyết áp hơi cao, cần làm gì bây giờ?",
+    "relevant_ids": [
+      "SV004",
+      "SV015",
+      "SV005"
+    ],
+    "hard_negative_ids": [
+      "SV001",
+      "SV013",
+      "SV003",
+      "SV006"
+    ],
+    "relevance_grades": {
+      "SV004": 2,
+      "SV015": 1,
+      "SV005": 1
+    },
+    "category": "y_te",
+    "id": "CB_0016"
+  },
+  {
+    "query": "Làm sao để ổn định huyết áp mà không cần dùng nhiều thuốc?",
+    "relevant_ids": [
+      "SV004",
+      "SV015",
+      "SV005"
+    ],
+    "hard_negative_ids": [
+      "SV001",
+      "SV013",
+      "SV003",
+      "SV006"
+    ],
+    "relevance_grades": {
+      "SV004": 2,
+      "SV015": 1,
+      "SV005": 1
+    },
+    "category": "y_te",
+    "id": "CB_0017"
+  },
+  {
+    "query": "Mình muốn tìm lớp học nhảy vừa để tập thể dục vừa xả stress thì nên học gì?",
+    "relevant_ids": [
+      "SV044",
+      "SV042"
+    ],
+    "hard_negative_ids": [
+      "SV045",
+      "SV047",
+      "SV038",
+      "SV043"
+    ],
+    "relevance_grades": {
+      "SV044": 2,
+      "SV042": 1
+    },
+    "category": "the_thao",
+    "id": "CB_0217"
+  },
+  {
+    "query": "Tôi muốn tìm hiểu về các phương pháp điều trị tật khúc xạ, ví dụ như mổ mắt cận.",
+    "relevant_ids": [
+      "SV009",
+      "SV015",
+      "SV007"
+    ],
+    "hard_negative_ids": [
+      "SV003",
+      "SV005",
+      "SV011",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV009": 2,
+      "SV015": 1,
+      "SV007": 1
+    },
+    "category": "y_te",
+    "id": "CB_0045"
+  },
+  {
+    "query": "Chế độ ăn nào giúp mẹ bầu không bị thiếu máu và đủ chất?",
+    "relevant_ids": [
+      "SV056",
+      "SV054"
+    ],
+    "hard_negative_ids": [
+      "SV059",
+      "SV060"
+    ],
+    "relevance_grades": {
+      "SV056": 2,
+      "SV054": 1
+    },
+    "category": "dinh_duong",
+    "id": "CB_0280"
+  },
+  {
+    "query": "Muốn xem răng có vấn đề gì không, với cả cạo vôi răng luôn.",
+    "relevant_ids": [
+      "SV011",
+      "SV008",
+      "SV006"
+    ],
+    "hard_negative_ids": [
+      "SV014",
+      "SV007",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV011": 2,
+      "SV008": 1,
+      "SV006": 1
+    },
+    "category": "y_te",
+    "id": "CB_0053"
+  },
+  {
+    "query": "Ở đâu chuyên trị các bệnh về thận và bàng quang?",
+    "relevant_ids": [
+      "SV015",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV003",
+      "SV012",
+      "SV002",
+      "SV013"
+    ],
+    "relevance_grades": {
+      "SV015": 2,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0072"
+  },
+  {
+    "query": "Bạn em cứ chơi game online quên ăn quên ngủ, làm sao để khuyên bạn đi tư vấn được ạ?",
+    "relevant_ids": [
+      "SV023",
+      "SV018"
+    ],
+    "hard_negative_ids": [
+      "SV019",
+      "SV029"
+    ],
+    "relevance_grades": {
+      "SV023": 2,
+      "SV018": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0115"
+  },
+  {
+    "query": "Tôi ăn xong là lại thấy lo lắng, muốn nôn ra hoặc tìm cách tiêu hao ngay.",
+    "relevant_ids": [
+      "SV026",
+      "SV027",
+      "SV029"
+    ],
+    "hard_negative_ids": [
+      "SV025",
+      "SV019",
+      "SV024",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV026": 2,
+      "SV027": 1,
+      "SV029": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0126"
+  },
+  {
+    "query": "Em không biết nên chọn ngành nào học cho phù hợp với mình ạ?",
+    "relevant_ids": [
+      "SV029",
+      "SV025",
+      "SV016"
+    ],
+    "hard_negative_ids": [
+      "SV027",
+      "SV021",
+      "SV028"
+    ],
+    "relevance_grades": {
+      "SV029": 2,
+      "SV025": 1,
+      "SV016": 1
+    },
+    "category": "tam_ly",
+    "id": "CB_0141"
+  },
+  {
+    "query": "Có chương trình nào giúp tôi kiểm soát bệnh đường hiệu quả không?",
+    "relevant_ids": [
+      "SV003",
+      "SV012",
+      "SV011"
+    ],
+    "hard_negative_ids": [
+      "SV005",
+      "SV002",
+      "SV004"
+    ],
+    "relevance_grades": {
+      "SV003": 2,
+      "SV012": 1,
+      "SV011": 1
+    },
+    "category": "y_te",
+    "id": "CB_0013"
+  },
+  {
+    "query": "Mẹ tôi bị thoái hóa khớp gối, có bài tập hay chế độ ăn nào giúp cải thiện không?",
+    "relevant_ids": [
+      "SV012",
+      "SV002",
+      "SV001"
+    ],
+    "hard_negative_ids": [
+      "SV015",
+      "SV010",
+      "SV003"
+    ],
+    "relevance_grades": {
+      "SV012": 2,
+      "SV002": 1,
+      "SV001": 1
+    },
+    "category": "y_te",
+    "id": "CB_0058"
+  }
+]

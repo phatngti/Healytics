@@ -15,35 +15,26 @@ class DoctorExperienceCard extends StatefulWidget {
   /// Existing doctor entity for pre-fill in edit mode.
   final DoctorEntity? doctor;
 
-  const DoctorExperienceCard({
-    super.key,
-    this.isEditing = true,
-    this.doctor,
-  });
+  const DoctorExperienceCard({super.key, this.isEditing = true, this.doctor});
 
   @override
-  State<DoctorExperienceCard> createState() =>
-      _DoctorExperienceCardState();
+  State<DoctorExperienceCard> createState() => _DoctorExperienceCardState();
 }
 
-class _DoctorExperienceCardState
-    extends State<DoctorExperienceCard> {
+class _DoctorExperienceCardState extends State<DoctorExperienceCard> {
   bool _isExpanded = true;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>()!;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: AppDimens.radiusMedium,
-        border: Border.all(
-          color: colorScheme.outlineVariant,
-        ),
+        border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withAlpha(10),
@@ -55,11 +46,7 @@ class _DoctorExperienceCardState
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          _buildHeader(
-            colorScheme,
-            textTheme,
-            semanticColors,
-          ),
+          _buildHeader(colorScheme, textTheme, semanticColors),
           AnimatedCrossFade(
             firstChild: _buildContent(context),
             secondChild: const SizedBox.shrink(),
@@ -79,10 +66,7 @@ class _DoctorExperienceCardState
     SemanticColors semanticColors,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: 16,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: InkWell(
         onTap: () {
           setState(() {
@@ -95,12 +79,11 @@ class _DoctorExperienceCardState
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: semanticColors.success
-                    ?.withAlpha(25),
+                color: semanticColors.success?.withAlpha(25),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: semanticColors.success
-                          ?.withAlpha(75) ??
+                  color:
+                      semanticColors.success?.withAlpha(75) ??
                       colorScheme.outlineVariant,
                 ),
               ),
@@ -120,9 +103,7 @@ class _DoctorExperienceCardState
             const Spacer(),
             AnimatedRotation(
               turns: _isExpanded ? 0.5 : 0,
-              duration: const Duration(
-                milliseconds: 200,
-              ),
+              duration: const Duration(milliseconds: 200),
               child: Icon(
                 Icons.expand_more,
                 color: colorScheme.onSurfaceVariant,
@@ -140,11 +121,7 @@ class _DoctorExperienceCardState
     return Container(
       padding: AppDimens.paddingAllLarge,
       decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: colorScheme.outlineVariant,
-          ),
-        ),
+        border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,36 +129,29 @@ class _DoctorExperienceCardState
           Row(
             children: [
               Expanded(
-                child:
-                    FormFieldBuilders.buildTextField(
+                child: FormFieldBuilders.buildTextField(
                   context,
                   fieldKey: 'experience_years',
                   label: 'Years of Experience',
                   hintText: '0',
                   keyboardType: TextInputType.number,
                   enabled: widget.isEditing,
-                  initialValue: widget
-                      .doctor?.experienceYears
-                      ?.toString(),
+                  initialValue: widget.doctor?.experienceYears?.toString(),
+                  isRequired: true,
                 ),
               ),
               AppDimens.horizontalLarge,
               Expanded(
-                child:
-                    FormFieldBuilders.buildTextField(
+                child: FormFieldBuilders.buildTextField(
                   context,
                   fieldKey: 'consultation_fee',
                   label: 'Consultation Fee',
                   hintText: '00%',
                   keyboardType: TextInputType.number,
-                  suffixIcon: const Icon(
-                    Icons.percent,
-                    size: 20,
-                  ),
+                  suffixIcon: const Icon(Icons.percent, size: 20),
                   enabled: widget.isEditing,
-                  initialValue: widget
-                      .doctor?.consultationFee
-                      ?.toString(),
+                  initialValue: widget.doctor?.consultationFee?.toString(),
+                  isRequired: true,
                 ),
               ),
             ],
@@ -191,15 +161,13 @@ class _DoctorExperienceCardState
             context,
             fieldKey: 'specializations',
             label: 'Specializations',
-            availableOptions:
-                MedicalSpecialization.optionsMap,
-            searchHint:
-                'Search or add specialization...',
+            availableOptions: MedicalSpecialization.optionsMap,
+            searchHint: 'Search or add specialization...',
             allowCreate: true,
             width: double.infinity,
             enabled: widget.isEditing,
-            initialValue:
-                widget.doctor?.specializations,
+            initialValue: widget.doctor?.specializations,
+            isRequired: true,
           ),
         ],
       ),

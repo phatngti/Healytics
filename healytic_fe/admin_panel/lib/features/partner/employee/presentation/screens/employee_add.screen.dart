@@ -1,15 +1,19 @@
-import 'package:admin_panel/core/entities/store.entity.dart';
-import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/core/config/autofill_config.dart';
 import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_form_field.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_gender.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
+import 'package:admin_panel/features/partner/employee/domain/employment_type.dart';
+import 'package:admin_panel/features/partner/employee/domain/schedule_day.dart';
+import 'package:admin_panel/features/partner/employee/domain/schedule_entry_key.dart';
 import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
 import 'package:admin_panel/features/partner/employee/presentation/autofill/employee_add.autofill.dart';
 import 'package:admin_panel/features/partner/employee/presentation/layouts/employee_add_desktop.dart';
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee.provider.dart';
+import 'package:admin_panel/features/partner/employee/presentation/validation/employee_create_form_validation.dart';
 import 'package:admin_panel/router/partner_routes.dart';
 import 'package:admin_panel/theme/app_theme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -18,7 +22,8 @@ import 'package:uuid/uuid.dart';
 class EmployeeAddScreen extends ConsumerStatefulWidget {
   const EmployeeAddScreen({super.key, this.autofill = false});
 
-  /// Pre-fill all fields in debug builds when `?autofill=true` is in URL.
+  /// Pre-fill all fields in UAT when
+  /// `?autofill=true` is in URL.
   final bool autofill;
 
   @override
@@ -27,22 +32,47 @@ class EmployeeAddScreen extends ConsumerStatefulWidget {
 
 class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
   Future<void> _handleSubmit(Map<String, dynamic> values) async {
-    try {
-      final role =
-          values['employee_role']?.toString().toUpperCase() ??
-          EmployeeRole.therapist.apiValue;
+    final roleType = EmployeeCreateFormValidation.roleFromValues(values);
+    final therapistType = EmployeeCreateFormValidation.therapistTypeFromValues(
+      values,
+    );
+    final missingFields = EmployeeCreateFormValidation.missingRequiredFields(
+      values,
+      role: roleType,
+      therapistType: therapistType,
+    );
+    if (missingFields.isNotEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Please complete all required fields before creating employee',
+            ),
+            backgroundColor: Theme.of(
+              context,
+            ).extension<SemanticColors>()!.error,
+          ),
+        );
+      }
+      return;
+    }
 
-      if (role == EmployeeRole.doctor.apiValue) {
+    try {
+      final role = roleType.apiValue;
+
+      if (role == EmployeeRoleType.doctor.apiValue) {
         await _createDoctor(values);
       } else {
         await _createTherapist(values);
       }
 
       if (mounted) {
+        final roleEnum = EmployeeRoleType.fromApiValue(role);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '${role == EmployeeRole.doctor.apiValue ? 'Doctor' : 'Therapist'} created successfully',
+              '${roleEnum?.displayName ?? role}'
+              ' created successfully',
             ),
           ),
         );
@@ -63,93 +93,65 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
   }
 
   Future<void> _createDoctor(Map<String, dynamic> values) async {
-    final firstName =
-        values['first_name']?.toString().trim() ?? '';
-    final lastName =
-        values['last_name']?.toString().trim() ?? '';
+    final firstName = _str(values, EmployeeFormField.firstName);
+    final lastName = _str(values, EmployeeFormField.lastName);
 
-    // Collect indexed medical titles / licenses
     final medicalTitles = _collectIndexed(
       values,
-      'medical_title_',
+      EmployeeFormField.medicalTitlePrefix.key,
     );
     final medicalLicenses = _collectIndexed(
       values,
-      'medical_license_',
+      EmployeeFormField.medicalLicensePrefix.key,
     );
 
-    // Education & certifications come from
-    // multi-select popover as List<String>
-    final specializations =
-        _toStringList(values['specializations']);
-    final education =
-        _toStringList(values['education']);
-    final certifications =
-        _toStringList(values['certifications']);
+    final specializations = _toStringList(
+      values[EmployeeFormField.specializations.key],
+    );
+    final education = _toStringList(values[EmployeeFormField.education.key]);
+    final certifications = _toStringList(
+      values[EmployeeFormField.certifications.key],
+    );
 
     final request = CreateDoctorRequest(
       firstName: firstName,
       lastName: lastName,
-      employeeId:
-          values['employee_id']?.toString().trim() ??
-          const Uuid().v4().substring(0, 8).toUpperCase(),
-      email:
-          values['email_address']?.toString().trim() ??
-          '',
-      phone:
-          values['phone_number']?.toString().trim() ??
-          '',
-      avatar:
-          values['avatar_url']?.toString() ??
-          'https://i.pravatar.cc/150?u='
-              '${values['email_address']}',
-      dateOfBirth:
-          values['date_of_birth']?.toString() ?? '',
-      gender:
-          values['gender']?.toString().toUpperCase() ??
-          'OTHER',
-      emergencyContactName:
-          values['emergency_contact_name']
-              ?.toString() ??
-          'Unknown',
-      emergencyContactPhone:
-          values['emergency_contact_phone']
-              ?.toString() ??
-          'Unknown',
-      employmentType:
-          values['employment_type']?.toString() ??
-          'Full-Time',
-      startDate:
-          values['start_date']?.toString() ??
-          DateTime.now().toString(),
-      jobTitle:
-          values['job_title']?.toString().trim() ??
-          'Doctor',
+      employeeId: _employeeId(values),
+      email: _str(values, EmployeeFormField.emailAddress),
+      phone: _str(values, EmployeeFormField.phoneNumber),
+      avatar: _avatarUrl(values),
+      dateOfBirth: _strOrEmpty(values, EmployeeFormField.dateOfBirth),
+      gender: _gender(values),
+      emergencyContactName: _emergencyName(values),
+      emergencyContactPhone: _emergencyPhone(values),
+      employmentType: _employmentType(values),
+      startDate: _startDate(values),
+      schedule: _collectSchedule(values),
+      verificationDocuments: _collectVerificationDocs(values),
+      jobTitle: _str(values, EmployeeFormField.jobTitle).isNotEmpty
+          ? _str(values, EmployeeFormField.jobTitle)
+          : EmployeeRoleType.doctor.displayName,
       medicalTitles: medicalTitles,
       medicalLicenses: medicalLicenses,
       experienceYears: int.tryParse(
-        values['experience_years']?.toString() ?? '',
+        values[EmployeeFormField.experienceYears.key]?.toString() ?? '',
       ),
       consultationFee: double.tryParse(
-        values['consultation_fee']?.toString() ?? '',
+        values[EmployeeFormField.consultationFee.key]?.toString() ?? '',
       ),
       specializations: specializations,
       education: education,
       certifications: certifications,
-      description: values['description']?.toString(),
+      description: values[EmployeeFormField.description.key]?.toString(),
+      workHistory: _collectWorkHistory(values),
     );
 
-    await ref
-        .read(employeeProvider.notifier)
-        .createDoctor(request);
+    await ref.read(employeeProvider.notifier).createDoctor(request);
   }
 
   /// Collects indexed form values like `prefix_0`,
   /// `prefix_1`, … into a list of non-empty strings.
-  List<String> _collectIndexed(
-    Map<String, dynamic> values,
-    String prefix,
-  ) {
+  List<String> _collectIndexed(Map<String, dynamic> values, String prefix) {
     final result = <String>[];
     for (int i = 0; ; i++) {
       final v = values['$prefix$i']?.toString().trim();
@@ -162,10 +164,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
   /// Safely converts a value to `List<String>`.
   List<String> _toStringList(dynamic value) {
     if (value is List) {
-      return value
-          .map((e) => e.toString())
-          .where((e) => e.isNotEmpty)
-          .toList();
+      return value.map((e) => e.toString()).where((e) => e.isNotEmpty).toList();
     }
     if (value is String && value.isNotEmpty) {
       return _parseCommaSeparatedList(value);
@@ -174,60 +173,49 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
   }
 
   Future<void> _createTherapist(Map<String, dynamic> values) async {
-    // Parse name from first_name and last_name fields
-    final firstName = values['first_name']?.toString().trim() ?? '';
-    final lastName = values['last_name']?.toString().trim() ?? '';
+    final firstName = _str(values, EmployeeFormField.firstName);
+    final lastName = _str(values, EmployeeFormField.lastName);
 
-    // Determine therapist type
     final type =
-        values['therapist_type']?.toString() ?? TherapistType.massage.apiValue;
+        values[EmployeeFormField.therapistType.key]?.toString() ??
+        TherapistType.massage.apiValue;
 
-    // Map therapist level
-    String? level = values['therapist_level']?.toString();
+    String? level = values[EmployeeFormField.therapistLevel.key]?.toString();
     if (level != null) {
       level = level.toUpperCase();
     }
 
     final double commissionRate =
-        double.tryParse(values['commission_rate']?.toString() ?? '') ?? 0.0;
-    final String? healthCheckDate = values['health_check_date']?.toString();
-    final String? licenseUrl = values['license_url']?.toString();
+        double.tryParse(
+          values[EmployeeFormField.commissionRate.key]?.toString() ?? '',
+        ) ??
+        0.0;
+    final String? healthCheckDate =
+        values[EmployeeFormField.healthCheckDate.key]?.toString();
 
     // Common fields
-    final commonEmployeeId =
-        values['employee_id']?.toString().trim() ??
-        const Uuid().v4().substring(0, 8).toUpperCase();
-    final commonEmail = values['email_address']?.toString().trim() ?? '';
-    final commonPhone = values['phone_number']?.toString().trim() ?? '';
-    final commonAvatar =
-        values['avatar_url']?.toString() ??
-        'https://i.pravatar.cc/150?u=${values['email_address']}';
-    final commonDob = values['date_of_birth']?.toString() ?? '';
-    final commonGender = values['gender']?.toString().toUpperCase() ?? 'OTHER';
-    final commonEmergencyName =
-        values['emergency_contact_name']?.toString() ?? 'Unknown';
-    final commonEmergencyPhone =
-        values['emergency_contact_phone']?.toString() ?? 'Unknown';
-    final commonEmploymentType =
-        values['employment_type']?.toString() ?? 'Full-Time';
-    final commonStartDate =
-        values['start_date']?.toString() ?? DateTime.now().toString();
-    final commonJobTitle =
-        values['job_title']?.toString().trim() ?? 'Therapist';
-    final commonDescription = values['description']?.toString();
+    final commonEmployeeId = _employeeId(values);
+    final commonEmail = _str(values, EmployeeFormField.emailAddress);
+    final commonPhone = _str(values, EmployeeFormField.phoneNumber);
+    final commonAvatar = _avatarUrl(values);
+    final commonDob = _strOrEmpty(values, EmployeeFormField.dateOfBirth);
+    final commonGender = _gender(values);
+    final commonEmergencyName = _emergencyName(values);
+    final commonEmergencyPhone = _emergencyPhone(values);
+    final commonEmploymentType = _employmentType(values);
+    final commonStartDate = _startDate(values);
+    final jobTitle = _str(values, EmployeeFormField.jobTitle);
+    final commonJobTitle = jobTitle.isNotEmpty
+        ? jobTitle
+        : EmployeeRoleType.therapist.displayName;
+    final commonDescription = values[EmployeeFormField.description.key]
+        ?.toString();
 
     if (type == TherapistType.spa.apiValue) {
-      // Spa Therapist
-      List<String> skills = [];
-      final rawSkills = values['spa_skills'];
-      if (rawSkills is List) {
-        skills = rawSkills.map((e) => e.toString()).toList();
-      } else if (rawSkills is String) {
-        skills = _parseCommaSeparatedList(rawSkills);
-      }
+      final skills = _parseSkills(values[EmployeeFormField.spaSkills.key]);
 
       List<String> deviceProficiency = [];
-      final rawDevices = values['device_proficiency'];
+      final rawDevices = values[EmployeeFormField.deviceProficiency.key];
       if (rawDevices is List) {
         deviceProficiency = rawDevices.map((e) => e.toString()).toList();
       }
@@ -244,29 +232,25 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         emergencyContactPhone: commonEmergencyPhone,
         employmentType: commonEmploymentType,
         startDate: commonStartDate,
+        schedule: _collectSchedule(values),
         avatar: commonAvatar,
+        verificationDocuments: _collectVerificationDocs(values),
         jobTitle: commonJobTitle,
         therapistLevel: level,
         commissionRate: commissionRate,
         healthCheckDate: healthCheckDate,
         skills: skills,
         deviceProficiency: deviceProficiency,
-        licenseUrl: licenseUrl,
         description: commonDescription,
+        workHistory: _collectWorkHistory(values),
       );
 
       await ref.read(employeeProvider.notifier).createSpaTherapist(request);
     } else {
-      // Massage Therapist
-      List<String> skills = [];
-      final rawSkills = values['massage_skills'];
-      if (rawSkills is List) {
-        skills = rawSkills.map((e) => e.toString()).toList();
-      } else if (rawSkills is String) {
-        skills = _parseCommaSeparatedList(rawSkills);
-      }
+      final skills = _parseSkills(values[EmployeeFormField.massageSkills.key]);
 
-      final strengthLevel = values['strength_level']?.toString();
+      final strengthLevel = values[EmployeeFormField.strengthLevel.key]
+          ?.toString();
 
       final request = CreateMassageTherapistRequest(
         firstName: firstName,
@@ -280,19 +264,79 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         emergencyContactPhone: commonEmergencyPhone,
         employmentType: commonEmploymentType,
         startDate: commonStartDate,
+        schedule: _collectSchedule(values),
         avatar: commonAvatar,
+        verificationDocuments: _collectVerificationDocs(values),
         jobTitle: commonJobTitle,
         therapistLevel: level,
         strengthLevel: strengthLevel,
         commissionRate: commissionRate,
         healthCheckDate: healthCheckDate,
         skills: skills,
-        licenseUrl: licenseUrl,
         description: commonDescription,
+        workHistory: _collectWorkHistory(values),
       );
 
       await ref.read(employeeProvider.notifier).createMassageTherapist(request);
     }
+  }
+
+  // ── Helpers ──────────────────────────────────────
+
+  /// Reads a trimmed string from form [values].
+  String _str(Map<String, dynamic> values, EmployeeFormField field) =>
+      values[field.key]?.toString().trim() ?? '';
+
+  /// Reads a non-trimmed string, defaulting to `''`.
+  String _strOrEmpty(Map<String, dynamic> values, EmployeeFormField field) =>
+      values[field.key]?.toString() ?? '';
+
+  /// Returns the employee ID or generates one.
+  String _employeeId(Map<String, dynamic> values) {
+    final id = _str(values, EmployeeFormField.employeeId);
+    return id.isNotEmpty ? id : const Uuid().v4().substring(0, 8).toUpperCase();
+  }
+
+  /// Returns the avatar URL or a placeholder.
+  String _avatarUrl(Map<String, dynamic> values) =>
+      values[EmployeeFormField.avatarUrl.key]?.toString() ??
+      'https://i.pravatar.cc/150?u='
+          '${values[EmployeeFormField.emailAddress.key]}';
+
+  /// Returns the gender API value,
+  /// defaulting to `OTHER`.
+  String _gender(Map<String, dynamic> values) =>
+      values[EmployeeFormField.gender.key]?.toString().toUpperCase() ??
+      EmployeeGender.nonBinary.apiValue!;
+
+  /// Returns emergency contact name.
+  String _emergencyName(Map<String, dynamic> values) =>
+      values[EmployeeFormField.emergencyContactName.key]?.toString() ?? '';
+
+  /// Returns emergency contact phone.
+  String _emergencyPhone(Map<String, dynamic> values) =>
+      values[EmployeeFormField.emergencyContactPhone.key]?.toString() ?? '';
+
+  /// Returns employment type,
+  /// defaulting to full-time.
+  String _employmentType(Map<String, dynamic> values) =>
+      values[EmployeeFormField.employmentType.key]?.toString() ??
+      EmploymentType.fullTime.displayName;
+
+  /// Returns the start date string.
+  String _startDate(Map<String, dynamic> values) =>
+      values[EmployeeFormField.startDate.key]?.toString() ??
+      DateTime.now().toString();
+
+  /// Parses a raw skills value into a list.
+  List<String> _parseSkills(dynamic rawSkills) {
+    if (rawSkills is List) {
+      return rawSkills.map((e) => e.toString()).toList();
+    }
+    if (rawSkills is String) {
+      return _parseCommaSeparatedList(rawSkills);
+    }
+    return [];
   }
 
   List<String> _parseCommaSeparatedList(String? value) {
@@ -304,21 +348,70 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         .toList();
   }
 
+  /// Extracts work history entries from form values.
+  List<Map<String, dynamic>> _collectWorkHistory(Map<String, dynamic> values) {
+    final raw = values[EmployeeFormField.workHistory.key];
+    if (raw is List) {
+      return raw.whereType<Map<String, dynamic>>().toList();
+    }
+    return [];
+  }
+
+  /// Collects schedule entries from per-day form
+  /// fields into a list of maps matching
+  /// `WorkScheduleEntryDto` JSON shape.
+  List<Map<String, dynamic>> _collectSchedule(Map<String, dynamic> values) {
+    return ScheduleDay.values.map((day) {
+      final val = values[day.scheduleFieldKey];
+      if (val is List && val.length == 2) {
+        final start = val[0]?.toString() ?? '';
+        final end = val[1]?.toString() ?? '';
+        return {
+          ScheduleEntryKey.day: day.displayName,
+          ScheduleEntryKey.start: start,
+          ScheduleEntryKey.end: end,
+          ScheduleEntryKey.isWorking: true,
+        };
+      }
+      return {
+        ScheduleEntryKey.day: day.displayName,
+        ScheduleEntryKey.start: '',
+        ScheduleEntryKey.end: '',
+        ScheduleEntryKey.isWorking: false,
+      };
+    }).toList();
+  }
+
+  List<Map<String, dynamic>> _collectVerificationDocs(
+    Map<String, dynamic> values,
+  ) {
+    final raw = values[EmployeeFormField.verificationDocuments.key];
+    if (raw is List) {
+      return raw.whereType<Map<String, dynamic>>().toList();
+    }
+    return [];
+  }
+
   void _handleCancel() {
     context.goNamed(EmployeeHomeRoute.name);
   }
 
-  /// Sample data map for all [EmployeeAddDesktop] `FormBuilder`
-  /// fields. Delegates to [EmployeeAddAutofill.forRole].
+  /// Sample data map for all [EmployeeAddDesktop]
+  /// `FormBuilder` fields.
+  /// Delegates to [EmployeeAddAutofill.forRole].
   static Map<String, dynamic> _buildAutofillValues([
-    String role = 'THERAPIST',
-  ]) => EmployeeAddAutofill.forRole(role);
+    String? role,
+    String? therapistType,
+  ]) => EmployeeAddAutofill.forRole(
+    role ?? EmployeeRoleType.therapist.apiValue,
+    therapistType,
+  );
 
   @override
   Widget build(BuildContext context) {
-    final shouldAutofill =
-        kDebugMode &&
-        (widget.autofill || (Store.tryGet(StoreKey.autoFill) ?? false));
+    final shouldAutofill = AutofillConfig.isUatAutofillEnabled(
+      routeAutofill: widget.autofill,
+    );
     final initialValue = shouldAutofill
         ? _buildAutofillValues()
         : const <String, dynamic>{};

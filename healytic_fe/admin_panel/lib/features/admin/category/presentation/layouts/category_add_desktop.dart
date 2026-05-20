@@ -1,8 +1,11 @@
+import 'package:admin_panel/features/admin/category/domain/category_form_field.dart';
+import 'package:admin_panel/features/admin/category/domain/category_status.dart';
+import 'package:admin_panel/features/admin/category/presentation/widgets/category_icon_picker.widget.dart';
+import 'package:admin_panel/router/admin_routes.dart';
+import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/button/back_button.dart';
 import 'package:common/widgets/button/button.dart';
 import 'package:common/widgets/input/form_field_builders.dart';
-import 'package:admin_panel/router/admin_routes.dart';
-import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:go_router/go_router.dart';
@@ -25,13 +28,36 @@ class CategoryAddDesktop extends StatefulWidget {
 
 class _CategoryAddDesktopState extends State<CategoryAddDesktop> {
   final _formKey = GlobalKey<FormBuilderState>();
+  late final TextEditingController _iconController;
   bool _isLoading = false;
 
-  void _handleSubmit() async {
+  @override
+  void initState() {
+    super.initState();
+    _iconController = TextEditingController(
+      text:
+          widget.initialValue[CategoryFormField.iconName.key]
+              ?.toString() ??
+          '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _iconController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSubmit() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       setState(() => _isLoading = true);
       try {
-        widget.onSubmit?.call(_formKey.currentState!.value);
+        final values = {
+          ..._formKey.currentState!.value,
+          CategoryFormField.iconName.key:
+              _iconController.text.trim(),
+        };
+        widget.onSubmit?.call(values);
       } finally {
         if (mounted) {
           setState(() => _isLoading = false);
@@ -116,8 +142,10 @@ class _CategoryAddDesktopState extends State<CategoryAddDesktop> {
                         FormFieldBuilders.buildDropdownField(
                           context,
                           label: 'Status',
-                          items: const ['Active', 'Inactive'],
-                          initialValue: 'Active',
+                          items: CategoryStatus.values
+                              .map((s) => s.displayName)
+                              .toList(),
+                          initialValue: CategoryStatus.active.displayName,
                           hintText: 'Select status',
                         ),
                         AppDimens.verticalMedium,
@@ -140,20 +168,17 @@ class _CategoryAddDesktopState extends State<CategoryAddDesktop> {
                           },
                         ),
                         AppDimens.verticalMedium,
-                        // Icon Selection (Text field for icon name)
-                        FormFieldBuilders.buildTextField(
-                          context,
+                        // Icon Selection (Material icon picker)
+                        CategoryIconPicker(
+                          controller: _iconController,
                           label: 'Icon Name',
-                          hintText:
-                              'Enter Material icon name (e.g., spa, category)',
-                          prefixIcon: Icons.emoji_symbols_outlined,
                         ),
                         AppDimens.verticalMedium,
                         // Color Selection
                         FormFieldBuilders.buildTextField(
                           context,
                           label: 'Color (Hex)',
-                          fieldKey: 'color_hex',
+                          fieldKey: CategoryFormField.colorHex.key,
                           hintText: 'Enter hex color (e.g., #1A7B99)',
                           prefixIcon: Icons.color_lens_outlined,
                           validator: (value) {

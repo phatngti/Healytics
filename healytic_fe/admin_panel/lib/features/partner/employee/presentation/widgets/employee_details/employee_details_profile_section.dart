@@ -6,23 +6,22 @@ import 'package:flutter/material.dart';
 class EmployeeDetailsProfileSection extends StatelessWidget {
   final String? avatarUrl;
   final String? fullName;
+  final bool isEditing;
 
   const EmployeeDetailsProfileSection({
     super.key,
     this.avatarUrl,
     this.fullName,
+    this.isEditing = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        EmployeeProfileImageCard(
-          avatarUrl: avatarUrl,
-          fullName: fullName,
-        ),
+        EmployeeProfileImageCard(avatarUrl: avatarUrl, fullName: fullName),
         AppDimens.verticalLarge,
-        const EmployeeContactInfoCard(),
+        EmployeeContactInfoCard(enabled: isEditing),
       ],
     );
   }

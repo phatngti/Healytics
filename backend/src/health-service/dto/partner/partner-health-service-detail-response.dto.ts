@@ -4,50 +4,50 @@ import { Product } from '@/common/entities/product.entity';
 // ─── Nested DTOs ─────────────────────────────────────────────
 
 class PartnerFeatureTagDto {
-  @ApiProperty({ example: 'leaf' })
+  @ApiProperty({ type: String, example: 'leaf' })
   iconName: string;
 
-  @ApiProperty({ example: 'Pain Relief' })
+  @ApiProperty({ type: String, example: 'Pain Relief' })
   label: string;
 }
 
 class PartnerClinicDto {
-  @ApiProperty({ example: 'Healytics Wellness Center' })
+  @ApiProperty({ type: String, example: 'Healytics Wellness Center' })
   name: string;
 
-  @ApiProperty({ example: '123 Health Street, District 1, HCMC' })
+  @ApiProperty({ type: String, example: '123 Health Street, District 1, HCMC' })
   address: string;
 
-  @ApiPropertyOptional({ example: true })
+  @ApiPropertyOptional({ type: Boolean, example: true })
   isVerified?: boolean;
 }
 
 class PartnerSpecialistDto {
-  @ApiProperty() id: string;
-  @ApiProperty() name: string;
-  @ApiProperty() role: string;
-  @ApiPropertyOptional() imageUrl: string | null;
-  @ApiPropertyOptional() degrees: string | null;
-  @ApiPropertyOptional() experience: string | null;
+  @ApiProperty({ type: String }) id: string;
+  @ApiProperty({ type: String }) name: string;
+  @ApiProperty({ type: String }) role: string;
+  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) degrees: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) experience: string | null;
   @ApiPropertyOptional({ type: [String] }) specializations: string[];
-  @ApiPropertyOptional() bio: string | null;
-  @ApiPropertyOptional() quote: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) bio: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) quote: string | null;
   @ApiPropertyOptional({ type: [String] }) languages: string[];
 }
 
 class PartnerTimeSlotDto {
-  @ApiProperty({ example: '09:00' })
+  @ApiProperty({ type: String, example: '09:00' })
   time: string;
 
-  @ApiProperty({ example: true })
+  @ApiProperty({ type: Boolean, example: true })
   available: boolean;
 }
 
 class PartnerDayScheduleDto {
-  @ApiProperty({ example: 'Mon' })
+  @ApiProperty({ type: String, example: 'Mon' })
   day: string;
 
-  @ApiProperty({ example: '2025-05-12' })
+  @ApiProperty({ type: String, example: '2025-05-12' })
   date: string;
 
   @ApiProperty({ type: [PartnerTimeSlotDto] })
@@ -55,55 +55,87 @@ class PartnerDayScheduleDto {
 }
 
 class PartnerFacilityImageDto {
-  @ApiProperty() imageUrl: string;
-  @ApiProperty() label: string;
+  @ApiProperty({ type: String }) imageUrl: string;
+  @ApiProperty({ type: String }) label: string;
 }
 
 class PartnerReviewDto {
-  @ApiProperty() id: string;
-  @ApiProperty() reviewerName: string;
-  @ApiPropertyOptional() avatarUrl: string | null;
-  @ApiProperty() rating: number;
-  @ApiProperty() status: string;
-  @ApiProperty() date: string;
-  @ApiProperty() text: string;
+  @ApiProperty({ type: String }) id: string;
+  @ApiProperty({ type: String }) reviewerName: string;
+  @ApiPropertyOptional({ type: String, nullable: true }) avatarUrl: string | null;
+  @ApiProperty({ type: Number }) rating: number;
+  @ApiProperty({ type: String }) status: string;
+  @ApiProperty({ type: String }) date: string;
+  @ApiProperty({ type: String }) text: string;
   @ApiPropertyOptional({ type: [String] }) imageUrls: string[];
 }
 
 class PartnerRecommendedServiceDto {
-  @ApiProperty() id: string;
-  @ApiProperty() title: string;
-  @ApiPropertyOptional() imageUrl: string | null;
-  @ApiProperty() rating: number;
-  @ApiProperty() reviewCount: number;
-  @ApiProperty() price: string;
+  @ApiProperty({ type: String }) id: string;
+  @ApiProperty({ type: String }) title: string;
+  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl: string | null;
+  @ApiProperty({ type: Number }) rating: number;
+  @ApiProperty({ type: Number }) reviewCount: number;
+  @ApiProperty({ type: String }) price: string;
+}
+
+class PartnerDetailServiceRuleDto {
+  @ApiProperty({ type: String, example: 'no-eating' }) iconSlug: string;
+  @ApiProperty({ type: String, example: 'No Eating Before' }) title: string;
+  @ApiProperty({ type: String, example: 'Avoid eating 2 hours before the service' })
+  description: string;
+}
+
+class PartnerDetailProcedureStepDto {
+  @ApiProperty({ type: Number, example: 1 }) stepNumber: number;
+  @ApiProperty({ type: String, example: 'Check-in & Registration' }) title: string;
+  @ApiProperty({ type: String, example: 'Arrive at the reception and complete registration' })
+  description: string;
+}
+
+class PartnerDetailServiceManualDto {
+  @ApiPropertyOptional({ type: [String] }) preServiceGuidelines?: string[];
+  @ApiPropertyOptional({ type: [PartnerDetailServiceRuleDto] })
+  serviceRules?: PartnerDetailServiceRuleDto[];
+  @ApiPropertyOptional({ type: [PartnerDetailProcedureStepDto] })
+  procedureSteps?: PartnerDetailProcedureStepDto[];
 }
 
 // ─── Main DTO ────────────────────────────────────────────────
 
 export class PartnerHealthServiceDetailResponseDto {
-  @ApiProperty() id: string;
-  @ApiProperty() title: string;
-  @ApiProperty() categoryLabel: string;
+  @ApiProperty({ type: String }) id: string;
+  @ApiProperty({ type: String }) title: string;
+  @ApiProperty({ type: String }) categoryLabel: string;
   @ApiProperty({ type: [String] }) images: string[];
-  @ApiProperty() rating: number;
-  @ApiProperty() reviewCount: number;
-  @ApiProperty() price: string;
-  @ApiProperty() isVerified: boolean;
-  @ApiPropertyOptional() description: string | null;
-  @ApiProperty() duration: number;
-  @ApiProperty({ type: [PartnerFeatureTagDto] }) featureTags: PartnerFeatureTagDto[];
+  @ApiProperty({ type: Number }) rating: number;
+  @ApiProperty({ type: Number }) reviewCount: number;
+  @ApiProperty({ type: String }) price: string;
+  @ApiProperty({ type: Boolean }) isVerified: boolean;
+  @ApiPropertyOptional({ type: String, nullable: true }) description: string | null;
+  @ApiProperty({ type: Number }) duration: number;
+  @ApiProperty({ type: [PartnerFeatureTagDto] })
+  featureTags: PartnerFeatureTagDto[];
   @ApiProperty({ type: PartnerClinicDto }) clinic: PartnerClinicDto;
-  @ApiProperty({ type: [PartnerSpecialistDto] }) specialists: PartnerSpecialistDto[];
-  @ApiProperty({ type: [PartnerDayScheduleDto] }) daySchedules: PartnerDayScheduleDto[];
-  @ApiProperty({ type: [PartnerFacilityImageDto] }) facilityImages: PartnerFacilityImageDto[];
+  @ApiProperty({ type: [PartnerSpecialistDto] })
+  specialists: PartnerSpecialistDto[];
+  @ApiProperty({ type: [PartnerDayScheduleDto] })
+  daySchedules: PartnerDayScheduleDto[];
+  @ApiProperty({ type: [PartnerFacilityImageDto] })
+  facilityImages: PartnerFacilityImageDto[];
   @ApiProperty({ type: [PartnerReviewDto] }) reviews: PartnerReviewDto[];
-  @ApiProperty({ type: [PartnerRecommendedServiceDto] }) recommendedServices: PartnerRecommendedServiceDto[];
+  @ApiProperty({ type: [PartnerRecommendedServiceDto] })
+  recommendedServices: PartnerRecommendedServiceDto[];
+  @ApiPropertyOptional({ type: PartnerDetailServiceManualDto, nullable: true })
+  serviceManual: PartnerDetailServiceManualDto | null;
 
   /**
    * Maps a Product entity + recommended products into the detail response DTO.
    */
-  static fromEntity(product: Product, recommended: Product[]): PartnerHealthServiceDetailResponseDto {
+  static fromEntity(
+    product: Product,
+    recommended: Product[],
+  ): PartnerHealthServiceDetailResponseDto {
     const dto = new PartnerHealthServiceDetailResponseDto();
 
     dto.id = product.slug;
@@ -115,12 +147,9 @@ export class PartnerHealthServiceDetailResponseDto {
     dto.description = product.description;
     dto.duration = product.productDefinition?.durationMinutes ?? 0;
 
-    // Reviews & rating
-    const reviews = product.reviews ?? [];
-    dto.reviewCount = reviews.length;
-    dto.rating = reviews.length
-      ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10
-      : 0;
+    // Reviews & rating — product_reviews table dropped; fetched separately from product_treatment_reviews
+    dto.reviewCount = 0;
+    dto.rating = 0;
 
     // Price formatting
     const price = product.salePrice ?? product.basePrice;
@@ -143,22 +172,26 @@ export class PartnerHealthServiceDetailResponseDto {
     };
 
     // Specialists
-    dto.specialists = (product.productEmployeeEligibilities ?? []).map((elig) => {
-      const emp = elig.employee;
-      const doc = emp?.doctorProfile;
-      return {
-        id: emp?.id ?? '',
-        name: emp?.fullName ?? '',
-        role: emp?.jobTitle ?? emp?.role ?? '',
-        imageUrl: emp?.avatarUrl ?? null,
-        degrees: doc?.education?.join(', ') ?? null,
-        experience: doc?.experienceYears ? `${doc.experienceYears} years` : null,
-        specializations: doc?.specializations ?? [],
-        bio: emp?.description ?? null,
-        quote: emp?.description ?? null,
-        languages: ['Vietnamese', 'English'], // Mocked until entity supports it
-      };
-    });
+    dto.specialists = (product.productEmployeeEligibilities ?? []).map(
+      (elig) => {
+        const emp = elig.employee;
+        const doc = emp?.doctorProfile;
+        return {
+          id: emp?.id ?? '',
+          name: emp?.fullName ?? '',
+          role: emp?.jobTitle ?? emp?.role ?? '',
+          imageUrl: emp?.avatarUrl ?? null,
+          degrees: doc?.education?.join(', ') ?? null,
+          experience: doc?.experienceYears
+            ? `${doc.experienceYears} years`
+            : null,
+          specializations: doc?.specializations ?? [],
+          bio: emp?.description ?? null,
+          quote: emp?.description ?? null,
+          languages: ['Vietnamese', 'English'], // Mocked until entity supports it
+        };
+      },
+    );
 
     // Day schedules (mocked)
     dto.daySchedules = generateMockSchedules();
@@ -171,17 +204,8 @@ export class PartnerHealthServiceDetailResponseDto {
         label: fi.label,
       }));
 
-    // Reviews mapping
-    dto.reviews = reviews.map((r) => ({
-      id: r.id,
-      reviewerName: r.reviewerName,
-      avatarUrl: r.avatarUrl,
-      rating: r.rating,
-      status: r.status,
-      date: r.date instanceof Date ? r.date.toISOString().split('T')[0] : String(r.date),
-      text: r.text,
-      imageUrls: r.imageUrls ?? [],
-    }));
+    // Reviews — empty; use GET /reviews endpoint to fetch real TreatmentReview data
+    dto.reviews = [];
 
     // Recommended services
     dto.recommendedServices = recommended.map((p) => {
@@ -189,12 +213,16 @@ export class PartnerHealthServiceDetailResponseDto {
       return {
         id: p.slug,
         title: p.name,
-        imageUrl: p.media?.find((m) => m.isThumbnail)?.url ?? p.media?.[0]?.url ?? null,
+        imageUrl:
+          p.media?.find((m) => m.isThumbnail)?.url ?? p.media?.[0]?.url ?? null,
         rating: 0,
         reviewCount: 0,
         price: new Intl.NumberFormat('vi-VN').format(Number(rPrice)) + '₫',
       };
     });
+
+    // Service manual
+    dto.serviceManual = product.serviceManual ?? null;
 
     return dto;
   }
@@ -205,10 +233,10 @@ export class PartnerHealthServiceDetailResponseDto {
 function mapTagToIcon(tagName?: string): string {
   const iconMap: Record<string, string> = {
     'Pain Relief': 'healing',
-    'Relaxation': 'spa',
-    'Rehabilitation': 'fitness_center',
-    'Beauty': 'face',
-    'Skincare': 'dermatology',
+    Relaxation: 'spa',
+    Rehabilitation: 'fitness_center',
+    Beauty: 'face',
+    Skincare: 'dermatology',
   };
   return iconMap[tagName ?? ''] ?? 'local_offer';
 }
@@ -227,7 +255,14 @@ function generateMockSchedules(): PartnerDayScheduleDto[] {
     const dateStr = date.toISOString().split('T')[0];
 
     const morningSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'];
-    const afternoonSlots = ['14:00', '14:30', '15:00', '15:30', '16:00', '16:30'];
+    const afternoonSlots = [
+      '14:00',
+      '14:30',
+      '15:00',
+      '15:30',
+      '16:00',
+      '16:30',
+    ];
     const allSlots = [...morningSlots, ...afternoonSlots];
 
     return {

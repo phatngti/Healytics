@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   UseGuards,
   UseInterceptors,
@@ -9,7 +10,9 @@ import {
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { SurveyDto } from './dto/request/survey.dto';
+import { UpdateAvatarDto } from './dto/request/update-avatar.dto';
 import { SurveyResponseDto } from './dto/response/survey-response.dto';
+import { AccountMeResponseDto } from './dto/response/account-me-response.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/auth/roles.decorator';
@@ -42,12 +45,46 @@ export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
   /**
+   * Returns the current authenticated user's full account data including role.
+   */
+  @Get('me')
+  @ApiOperation({ summary: 'Get current user account details' })
+  @ApiOkResponse({
+    description: 'Current user account data with role.',
+    type: AccountMeResponseDto,
+  })
+  async getMe(
+    @CurrentUser('id') userId: string,
+  ): Promise<AccountMeResponseDto> {
+    return this.accountService.getMe(userId);
+  }
+
+  /**
+   * Updates the current user's avatar URL (S3 key).
+   */
+  @Patch('me/avatar')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @ApiOperation({ summary: 'Update current user avatar' })
+  @ApiOkResponse({
+    description: 'Avatar updated, returns refreshed account data.',
+    type: AccountMeResponseDto,
+  })
+  async updateAvatar(
+    @CurrentUser('id') userId: string,
+    @Body() dto: UpdateAvatarDto,
+  ): Promise<AccountMeResponseDto> {
+    return this.accountService.updateAvatar(userId, dto.avatarUrl);
+  }
+
+  /**
    * Gets the current user's survey data.
    */
   @Get('survey')
   @ApiOperation({ summary: 'Get current user survey' })
   @ApiOkResponse({ description: 'User survey data.', type: SurveyResponseDto })
-  async getSurvey(@CurrentUser('id') userId: string): Promise<SurveyResponseDto> {
+  async getSurvey(
+    @CurrentUser('id') userId: string,
+  ): Promise<SurveyResponseDto> {
     return this.accountService.getSurveyResponse(userId);
   }
 
@@ -58,7 +95,10 @@ export class AccountController {
   @Post('survey')
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Create one-shot survey for current user' })
-  @ApiCreatedResponse({ description: 'Survey created.', type: SurveyResponseDto })
+  @ApiCreatedResponse({
+    description: 'Survey created.',
+    type: SurveyResponseDto,
+  })
   @ApiConflictResponse({ description: 'Survey already exists.' })
   async postSurvey(
     @CurrentUser('id') userId: string,

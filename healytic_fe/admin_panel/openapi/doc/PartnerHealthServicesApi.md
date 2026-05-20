@@ -12,7 +12,9 @@ Method | HTTP request | Description
 [**partnerHealthServiceControllerCreate**](PartnerHealthServicesApi.md#partnerhealthservicecontrollercreate) | **POST** /partner/health-services | Create a new health service
 [**partnerHealthServiceControllerFindAll**](PartnerHealthServicesApi.md#partnerhealthservicecontrollerfindall) | **GET** /partner/health-services | Get all health services
 [**partnerHealthServiceControllerFindBySlug**](PartnerHealthServicesApi.md#partnerhealthservicecontrollerfindbyslug) | **GET** /partner/health-services/slug/{slug} | Get a health service by slug
+[**partnerHealthServiceControllerGetDetailAnalytics**](PartnerHealthServicesApi.md#partnerhealthservicecontrollergetdetailanalytics) | **GET** /partner/health-services/analytics/{productId} | Get per-service detail analytics
 [**partnerHealthServiceControllerGetDetails**](PartnerHealthServicesApi.md#partnerhealthservicecontrollergetdetails) | **GET** /partner/health-services/slug/{slug}/details | Get full health service details by slug
+[**partnerHealthServiceControllerGetOverviewAnalytics**](PartnerHealthServicesApi.md#partnerhealthservicecontrollergetoverviewanalytics) | **GET** /partner/health-services/analytics/overview | Get health service overview analytics
 [**partnerHealthServiceControllerRemove**](PartnerHealthServicesApi.md#partnerhealthservicecontrollerremove) | **DELETE** /partner/health-services/{id} | Delete a health service
 [**partnerHealthServiceControllerUpdate**](PartnerHealthServicesApi.md#partnerhealthservicecontrollerupdate) | **PATCH** /partner/health-services/{id} | Update a health service
 
@@ -154,6 +156,55 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **partnerHealthServiceControllerGetDetailAnalytics**
+> HealthServiceDetailAnalyticsResponseDto partnerHealthServiceControllerGetDetailAnalytics(productId, period)
+
+Get per-service detail analytics
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = PartnerHealthServicesApi();
+final productId = productId_example; // String | 
+final period = period_example; // String | Time period for analytics aggregation
+
+try {
+    final result = api_instance.partnerHealthServiceControllerGetDetailAnalytics(productId, period);
+    print(result);
+} catch (e) {
+    print('Exception when calling PartnerHealthServicesApi->partnerHealthServiceControllerGetDetailAnalytics: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **productId** | **String**|  | 
+ **period** | **String**| Time period for analytics aggregation | [optional] [default to 'this_month']
+
+### Return type
+
+[**HealthServiceDetailAnalyticsResponseDto**](HealthServiceDetailAnalyticsResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **partnerHealthServiceControllerGetDetails**
 > PartnerHealthServiceDetailResponseDto partnerHealthServiceControllerGetDetails(slug)
 
@@ -189,6 +240,53 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**PartnerHealthServiceDetailResponseDto**](PartnerHealthServiceDetailResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **partnerHealthServiceControllerGetOverviewAnalytics**
+> HealthServiceOverviewAnalyticsResponseDto partnerHealthServiceControllerGetOverviewAnalytics(period)
+
+Get health service overview analytics
+
+### Example
+```dart
+import 'package:admin_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = PartnerHealthServicesApi();
+final period = period_example; // String | Time period for analytics aggregation
+
+try {
+    final result = api_instance.partnerHealthServiceControllerGetOverviewAnalytics(period);
+    print(result);
+} catch (e) {
+    print('Exception when calling PartnerHealthServicesApi->partnerHealthServiceControllerGetOverviewAnalytics: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **period** | **String**| Time period for analytics aggregation | [optional] [default to 'this_month']
+
+### Return type
+
+[**HealthServiceOverviewAnalyticsResponseDto**](HealthServiceOverviewAnalyticsResponseDto.md)
 
 ### Authorization
 

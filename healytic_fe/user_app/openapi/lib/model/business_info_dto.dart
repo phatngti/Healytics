@@ -14,6 +14,7 @@ class BusinessInfoDto {
   /// Returns a new [BusinessInfoDto] instance.
   BusinessInfoDto({
     required this.brandName,
+    this.legalName,
     this.taxRegistrationCode,
     required this.businessType,
     this.address,
@@ -21,7 +22,16 @@ class BusinessInfoDto {
     this.phoneNumber,
   });
 
+
   VerifiedField brandName;
+
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  VerifiedField? legalName;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -60,6 +70,7 @@ class BusinessInfoDto {
   @override
   bool operator ==(Object other) => identical(this, other) || other is BusinessInfoDto &&
     other.brandName == brandName &&
+    other.legalName == legalName &&
     other.taxRegistrationCode == taxRegistrationCode &&
     other.businessType == businessType &&
     other.address == address &&
@@ -70,6 +81,7 @@ class BusinessInfoDto {
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (brandName.hashCode) +
+    (legalName == null ? 0 : legalName!.hashCode) +
     (taxRegistrationCode == null ? 0 : taxRegistrationCode!.hashCode) +
     (businessType.hashCode) +
     (address == null ? 0 : address!.hashCode) +
@@ -77,11 +89,16 @@ class BusinessInfoDto {
     (phoneNumber == null ? 0 : phoneNumber!.hashCode);
 
   @override
-  String toString() => 'BusinessInfoDto[brandName=$brandName, taxRegistrationCode=$taxRegistrationCode, businessType=$businessType, address=$address, email=$email, phoneNumber=$phoneNumber]';
+  String toString() => 'BusinessInfoDto[brandName=$brandName, legalName=$legalName, taxRegistrationCode=$taxRegistrationCode, businessType=$businessType, address=$address, email=$email, phoneNumber=$phoneNumber]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'brandName'] = this.brandName;
+    if (this.legalName != null) {
+      json[r'legalName'] = this.legalName;
+    } else {
+      json[r'legalName'] = null;
+    }
     if (this.taxRegistrationCode != null) {
       json[r'taxRegistrationCode'] = this.taxRegistrationCode;
     } else {
@@ -126,6 +143,7 @@ class BusinessInfoDto {
 
       return BusinessInfoDto(
         brandName: VerifiedField.fromJson(json[r'brandName'])!,
+        legalName: VerifiedField.fromJson(json[r'legalName']),
         taxRegistrationCode: VerifiedField.fromJson(json[r'taxRegistrationCode']),
         businessType: VerifiedField.fromJson(json[r'businessType'])!,
         address: AddressInfoDto.fromJson(json[r'address']),

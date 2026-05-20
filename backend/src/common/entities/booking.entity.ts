@@ -16,11 +16,13 @@ import { Account } from './account.entity';
 import { Employee } from './employee.entity';
 import { Product } from './product.entity';
 import { BookingStatusLog } from './booking-status-log.entity';
+import { Payment } from './payment.entity';
 
 @Entity('bookings')
 @Index('IDX_BOOKING_STAFF_START_TIME', ['staffId', 'startTime'], {
   unique: true,
-  where: '"deleted_at" IS NULL',
+  where:
+    '"deleted_at" IS NULL AND "status" IN (\'PENDING_PAYMENT\', \'CONFIRMED\')',
 })
 export class Booking {
   @PrimaryGeneratedColumn('uuid')
@@ -44,17 +46,28 @@ export class Booking {
   @Column({ name: 'end_time', type: 'timestamptz', nullable: true })
   endTime: Date | null;
 
-  @Column({ type: 'varchar', length: 30, default: BookingStatus.PENDING_PAYMENT })
+  @Column({
+    type: 'varchar',
+    length: 30,
+    default: BookingStatus.PENDING_PAYMENT,
+  })
   status: BookingStatus;
 
   @Column({ name: 'payment_url', type: 'text', nullable: true })
   paymentUrl: string | null;
+
+  /** Deep link to open MoMo app directly (mobile UX) */
+  @Column({ name: 'payment_deeplink', type: 'text', nullable: true })
+  paymentDeeplink: string | null;
 
   @Column({ name: 'payment_expires_at', type: 'timestamptz', nullable: true })
   paymentExpiresAt: Date | null;
 
   @Column({ type: 'text', nullable: true })
   notes: string | null;
+
+  @Column({ name: 'is_reviewed', type: 'boolean', default: false })
+  isReviewed: boolean;
 
   @VersionColumn({ default: 1 })
   version: number;
@@ -84,4 +97,7 @@ export class Booking {
 
   @OneToMany(() => BookingStatusLog, (log) => log.booking, { cascade: true })
   statusLogs: BookingStatusLog[];
+
+  @OneToMany(() => Payment, (payment) => payment.booking, { cascade: true })
+  payments: Payment[];
 }

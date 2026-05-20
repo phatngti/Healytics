@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
+import 'package:user_app/features/profile/presentation/providers/profile.provider.dart';
 import 'package:common/utils/demensions.dart';
 
-import '../widgets/explore_services_section.widget.dart';
+import '../widgets/specialists_section.widget.dart';
 import '../widgets/feature_banner.widget.dart';
 import '../widgets/home_header.widget.dart';
 import '../widgets/quick_actions_section.widget.dart';
@@ -17,6 +18,9 @@ class HomeUpdatePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userName = ref.watch(currentUserDisplayNameProvider);
+    final accountMe = ref.watch(accountMeProvider);
+    final displayName = accountMe.value?.displayName ?? userName ?? '';
+    final avatarUrl = accountMe.value?.avatarUrl;
 
     // Adaptive values from AppDimens — scales per MobileSize tier.
     final hPadding = AppDimens.horizontalPadding(context);
@@ -24,7 +28,6 @@ class HomeUpdatePage extends HookConsumerWidget {
     final sectionGap = AppDimens.sectionSpacing(context);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         // Clamp text scale to prevent layout breaks on extreme
         // system font sizes (0.8× – 1.3×).
@@ -39,7 +42,7 @@ class HomeUpdatePage extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                HomeHeader(userName: userName ?? ''),
+                HomeHeader(userName: displayName, avatarUrl: avatarUrl),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: hPadding),
                   child: Column(
@@ -54,7 +57,7 @@ class HomeUpdatePage extends HookConsumerWidget {
                       SizedBox(height: sectionGap),
                       const FeatureBanner(),
                       SizedBox(height: sectionGap),
-                      const ExploreServicesSection(),
+                      const SpecialistsSection(),
                       SizedBox(height: sectionGap),
                       const PremiumTreatmentsSection(),
                       SizedBox(height: sectionGap),

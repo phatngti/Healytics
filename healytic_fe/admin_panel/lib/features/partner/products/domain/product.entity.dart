@@ -1,4 +1,6 @@
 import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/facility_image.entity.dart';
+import 'package:admin_panel/features/partner/products/domain/service_manual.entity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'product.entity.freezed.dart';
@@ -52,6 +54,10 @@ abstract class Product with _$Product {
 
     // Media
     @Default([]) List<String> images,
+    @Default([]) List<FacilityImageEntity> facilityImages,
+
+    // Service Manual
+    ServiceManualEntity? serviceManual,
   }) = _Product;
 
   factory Product.fromJson(Map<String, dynamic> json) =>

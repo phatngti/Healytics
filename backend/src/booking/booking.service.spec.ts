@@ -1,18 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BookingService } from './booking.service';
 import { AcquireMicroLockHandler } from './application/handlers/acquire-micro-lock.handler';
+import { CheckDuplicateSlotHandler } from './application/handlers/check-duplicate-slot.handler';
 import { CreateCheckoutTicketHandler } from './application/handlers/create-checkout-ticket.handler';
 import { GetBookingHandler } from './application/handlers/get-booking.handler';
 import { GetCheckoutTicketHandler } from './application/handlers/get-checkout-ticket.handler';
 import { ListUserBookingsHandler } from './application/handlers/list-user-bookings.handler';
-import {
-  MockHandler,
-  createMockHandler,
-} from '../../test/mocks/mock-types';
+import { MockHandler, createMockHandler } from '../../test/mocks/mock-types';
 
 describe('BookingService', () => {
   let service: BookingService;
   let acquireMicroLockHandler: MockHandler;
+  let checkDuplicateSlotHandler: MockHandler;
   let createCheckoutTicketHandler: MockHandler;
   let getBookingHandler: MockHandler;
   let getCheckoutTicketHandler: MockHandler;
@@ -20,6 +19,7 @@ describe('BookingService', () => {
 
   beforeEach(async () => {
     acquireMicroLockHandler = createMockHandler();
+    checkDuplicateSlotHandler = createMockHandler();
     createCheckoutTicketHandler = createMockHandler();
     getBookingHandler = createMockHandler();
     getCheckoutTicketHandler = createMockHandler();
@@ -29,9 +29,19 @@ describe('BookingService', () => {
       providers: [
         BookingService,
         { provide: AcquireMicroLockHandler, useValue: acquireMicroLockHandler },
-        { provide: CreateCheckoutTicketHandler, useValue: createCheckoutTicketHandler },
+        {
+          provide: CheckDuplicateSlotHandler,
+          useValue: checkDuplicateSlotHandler,
+        },
+        {
+          provide: CreateCheckoutTicketHandler,
+          useValue: createCheckoutTicketHandler,
+        },
         { provide: GetBookingHandler, useValue: getBookingHandler },
-        { provide: GetCheckoutTicketHandler, useValue: getCheckoutTicketHandler },
+        {
+          provide: GetCheckoutTicketHandler,
+          useValue: getCheckoutTicketHandler,
+        },
         { provide: ListUserBookingsHandler, useValue: listUserBookingsHandler },
       ],
     }).compile();
@@ -60,7 +70,11 @@ describe('BookingService', () => {
   describe('asyncCheckout', () => {
     it('should delegate to CreateCheckoutTicketHandler', async () => {
       const dto = { userId: 'user-1', idempotencyKey: 'key-1' };
-      const expected = { ticketId: 'ticket-1', status: 'QUEUED', message: 'Processing...' };
+      const expected = {
+        ticketId: 'ticket-1',
+        status: 'QUEUED',
+        message: 'Processing...',
+      };
       createCheckoutTicketHandler.execute.mockResolvedValue(expected);
 
       const result = await service.asyncCheckout(dto as any);
@@ -91,10 +105,13 @@ describe('BookingService', () => {
       const expected = { id: bookingId, status: 'CONFIRMED' };
       getBookingHandler.execute.mockResolvedValue(expected);
 
-      const result = await service.getBooking(bookingId);
+      const result = await service.getBooking('user-1', bookingId);
 
       expect(result).toEqual(expected);
-      expect(getBookingHandler.execute).toHaveBeenCalledWith(bookingId);
+      expect(getBookingHandler.execute).toHaveBeenCalledWith(
+        'user-1',
+        bookingId,
+      );
       expect(getBookingHandler.execute).toHaveBeenCalledTimes(1);
     });
   });
@@ -110,7 +127,11 @@ describe('BookingService', () => {
       const result = await service.listMyBookings(userId, page, limit);
 
       expect(result).toEqual(expected);
-      expect(listUserBookingsHandler.execute).toHaveBeenCalledWith(userId, page, limit);
+      expect(listUserBookingsHandler.execute).toHaveBeenCalledWith(
+        userId,
+        page,
+        limit,
+      );
       expect(listUserBookingsHandler.execute).toHaveBeenCalledTimes(1);
     });
   });

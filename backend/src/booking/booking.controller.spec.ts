@@ -17,9 +17,7 @@ describe('BookingController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BookingController],
-      providers: [
-        { provide: BookingService, useValue: bookingService },
-      ],
+      providers: [{ provide: BookingService, useValue: bookingService }],
     }).compile();
 
     controller = module.get<BookingController>(BookingController);
@@ -31,8 +29,17 @@ describe('BookingController', () => {
 
   describe('asyncCheckout', () => {
     it('should call bookingService.asyncCheckout and return response', async () => {
-      const dto = { userId: 'user-1', staffId: 'staff-1', startTime: '2025-10-25T14:00:00Z', idempotencyKey: 'key-1' };
-      const expected = { ticketId: 'ticket-1', status: 'QUEUED', message: 'Processing...' };
+      const dto = {
+        userId: 'user-1',
+        staffId: 'staff-1',
+        startTime: '2025-10-25T14:00:00Z',
+        idempotencyKey: 'key-1',
+      };
+      const expected = {
+        ticketId: 'ticket-1',
+        status: 'QUEUED',
+        message: 'Processing...',
+      };
       bookingService.asyncCheckout.mockResolvedValue(expected);
 
       const result = await controller.asyncCheckout(dto as any);
@@ -63,7 +70,11 @@ describe('BookingController', () => {
       const result = await controller.listMyBookings('user-1', 1, 10);
 
       expect(result).toEqual(expected);
-      expect(bookingService.listMyBookings).toHaveBeenCalledWith('user-1', 1, 10);
+      expect(bookingService.listMyBookings).toHaveBeenCalledWith(
+        'user-1',
+        1,
+        10,
+      );
     });
   });
 
@@ -73,10 +84,13 @@ describe('BookingController', () => {
       const expected = { id: bookingId, status: 'CONFIRMED' };
       bookingService.getBooking.mockResolvedValue(expected);
 
-      const result = await controller.getBooking(bookingId);
+      const result = await controller.getBooking('user-1', bookingId);
 
       expect(result).toEqual(expected);
-      expect(bookingService.getBooking).toHaveBeenCalledWith(bookingId);
+      expect(bookingService.getBooking).toHaveBeenCalledWith(
+        'user-1',
+        bookingId,
+      );
     });
   });
 });

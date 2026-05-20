@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Merge external OpenAPI spec files into the main user_apis.json / admin_apis.json.
+ * Merge ai_apis.json into both user_apis.json and admin_apis.json.
  *
  * Usage:
- *   node bin/merge-apis.js <source_file> <target_file>
- *
- * Examples:
- *   node bin/merge-apis.js ai_apis.json user_apis.json
- *   node bin/merge-apis.js ai_apis.json admin_apis.json
+ *   node bin/merge-apis.js
  */
 
 const fs = require('fs');
@@ -16,15 +12,10 @@ const path = require('path');
 
 const BASE_DIR = path.resolve(__dirname, '..');
 
-function main() {
-    const [sourceArg, targetArg] = process.argv.slice(2);
+const SOURCE_FILE = 'ai_apis.json';
+const TARGET_FILES = ['user_apis.json', 'admin_apis.json'];
 
-    if (!sourceArg || !targetArg) {
-        console.error('Usage: node bin/merge-apis.js <source_file> <target_file>');
-        console.error('Example: node bin/merge-apis.js ai_apis.json user_apis.json');
-        process.exit(1);
-    }
-
+function mergeInto(sourceArg, targetArg) {
     const sourcePath = path.resolve(BASE_DIR, sourceArg);
     const targetPath = path.resolve(BASE_DIR, targetArg);
 
@@ -41,9 +32,10 @@ function main() {
     const target = JSON.parse(fs.readFileSync(targetPath, 'utf8'));
 
     let addedPaths = 0;
-    let skippedPaths = 0;
+    let replacedPaths = 0;
     let addedSchemas = 0;
-    let skippedSchemas = 0;
+    let replacedSchemas = 0;
+    let identicalSchemas = 0;
 
     // --- Merge paths ---
     if (!target.paths) target.paths = {};
@@ -53,8 +45,9 @@ function main() {
             console.log('  + path:', pathKey);
             addedPaths++;
         } else {
-            console.log('  ~ skipped path (duplicate):', pathKey);
-            skippedPaths++;
+            target.paths[pathKey] = methods;
+            console.log('  ⟳ replaced path:', pathKey);
+            replacedPaths++;
         }
     }
 
@@ -66,9 +59,13 @@ function main() {
             target.components.schemas[name] = schema;
             console.log('  + schema:', name);
             addedSchemas++;
+        } else if (JSON.stringify(target.components.schemas[name]) === JSON.stringify(schema)) {
+            console.log('  = schema (identical):', name);
+            identicalSchemas++;
         } else {
-            console.log('  ~ skipped schema (duplicate):', name);
-            skippedSchemas++;
+            target.components.schemas[name] = schema;
+            console.log('  ⟳ replaced schema:', name);
+            replacedSchemas++;
         }
     }
 
@@ -103,8 +100,17 @@ function main() {
 
     console.log('');
     console.log(`Merge complete: ${sourceArg} → ${targetArg}`);
-    console.log(`  Paths:   ${addedPaths} added, ${skippedPaths} skipped`);
-    console.log(`  Schemas: ${addedSchemas} added, ${skippedSchemas} skipped`);
+    console.log(`  Paths:   ${addedPaths} added, ${replacedPaths} replaced`);
+    console.log(`  Schemas: ${addedSchemas} added, ${replacedSchemas} replaced, ${identicalSchemas} identical`);
+}
+
+function main() {
+    for (const targetFile of TARGET_FILES) {
+        console.log(`\n========================================`);
+        console.log(`Merging ${SOURCE_FILE} → ${targetFile}`);
+        console.log(`========================================`);
+        mergeInto(SOURCE_FILE, targetFile);
+    }
 }
 
 main();

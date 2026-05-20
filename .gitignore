@@ -16,3 +16,16 @@ vectordb/
 # Data generated
 data/processed/
 ai_services/ner-service/.env
+/ai_services/ner-service/scripts
+/ai_services/ner-service/evaluation/archive
+ai_services/gateway-service/.env
+ai_services/recommender2/.env
+ai_services/recommender2/.env
+/Report/DATN
+/Report/poster
+/Report/DATN - Copy
+/Report/extracted_images
+/Report/rendered_slides
+# Ignore env files in ai_services
+ai_services/**/.env
+!ai_services/**/.env.example

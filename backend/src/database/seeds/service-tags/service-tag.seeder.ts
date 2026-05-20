@@ -7,11 +7,61 @@ import { Role } from '@/account/enum/role.enum';
 import { ISeeder } from '../seeder.interface';
 
 const SEED_FEATURE_TAGS = [
-  { name: 'Pain Relief', description: 'Pain management and relief services', colorValue: "#FF4CAF50" },
-  { name: 'Relaxation', description: 'Relaxation and stress relief services', colorValue: "#FF2196F3" },
-  { name: 'Rehabilitation', description: 'Functional rehabilitation services', colorValue: "#FFFF9800" },
-  { name: 'Beauty', description: 'Beauty and aesthetic services', colorValue: "#FFE91E63" },
-  { name: 'Skincare', description: 'Skincare and dermatology services', colorValue: "#FF9C27B0" },
+  {
+    name: 'Pain Relief',
+    description: 'Pain management and relief services',
+    colorValue: '#FF4CAF50',
+  },
+  {
+    name: 'Relaxation',
+    description: 'Relaxation and stress relief services',
+    colorValue: '#FF2196F3',
+  },
+  {
+    name: 'Rehabilitation',
+    description: 'Functional rehabilitation services',
+    colorValue: '#FFFF9800',
+  },
+  {
+    name: 'Beauty',
+    description: 'Beauty and aesthetic services',
+    colorValue: '#FFE91E63',
+  },
+  {
+    name: 'Skincare',
+    description: 'Skincare and dermatology services',
+    colorValue: '#FF9C27B0',
+  },
+  {
+    name: 'Dental Care',
+    description: 'Dental treatments, cleaning and cosmetic dentistry',
+    colorValue: '#FF00BCD4',
+  },
+  {
+    name: 'Fitness',
+    description: 'Fitness, yoga and recovery-focused services',
+    colorValue: '#FF009688',
+  },
+  {
+    name: 'Nutrition',
+    description: 'Nutrition consultation and meal planning services',
+    colorValue: '#FF8BC34A',
+  },
+  {
+    name: 'Traditional Medicine',
+    description: 'Traditional medicine and acupuncture services',
+    colorValue: '#FF795548',
+  },
+  {
+    name: 'Mental Wellness',
+    description: 'Psychology, counseling and stress management services',
+    colorValue: '#FF607D8B',
+  },
+  {
+    name: 'Dermatology',
+    description: 'Dermatology consultation and skin treatment services',
+    colorValue: '#FF673AB7',
+  },
 ];
 
 @Injectable()
@@ -29,13 +79,19 @@ export class ServiceTagSeeder implements ISeeder {
   async seed(): Promise<void> {
     this.logger.log('Seeding product feature tags...');
 
-    // Requires an admin user to attach tags to
-    const adminUser = await this.accountRepo.findOne({
-      where: { role: Role.HEALTH_PARTNER },
-    });
+    // Tags are owned by the primary seed partner account for deterministic lookup.
+    const adminUser =
+      (await this.accountRepo.findOne({
+        where: { email: 'partner@healytics.vn', role: Role.HEALTH_PARTNER },
+      })) ??
+      (await this.accountRepo.findOne({
+        where: { role: Role.HEALTH_PARTNER },
+      }));
 
     if (!adminUser) {
-      this.logger.warn('⚠ No admin user found — skipping feature tag seeding. Run UserSeeder first.');
+      this.logger.warn(
+        '⚠ No admin user found — skipping feature tag seeding. Run UserSeeder first.',
+      );
       return;
     }
 
@@ -45,7 +101,9 @@ export class ServiceTagSeeder implements ISeeder {
       });
 
       if (exists) {
-        this.logger.log(`  ⏭ Feature tag "${tagData.name}" already exists, skipping`);
+        this.logger.log(
+          `  ⏭ Feature tag "${tagData.name}" already exists, skipping`,
+        );
         continue;
       }
 

@@ -2,15 +2,18 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Product } from '@/common/entities/product.entity';
 
 export class PublicHealthServiceRecommendedResponseDto {
-  @ApiProperty() id: string;
-  @ApiProperty() title: string;
-  @ApiPropertyOptional() imageUrl: string | null;
-  @ApiProperty({ example: 4.9 }) rating: number;
-  @ApiProperty({ example: '(500+ Reviews)' }) reviewLabel: string;
-  @ApiProperty({ example: '1.2k+ Booked' }) bookedLabel: string;
-  @ApiProperty({ example: '350.000₫' }) price: string;
+  @ApiProperty({ type: String }) id: string;
+  @ApiProperty({ type: String }) title: string;
+  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl: string | null;
+  @ApiProperty({ type: Number, example: 4.9 }) rating: number;
+  @ApiProperty({ type: String, example: '(500+ Reviews)' }) reviewLabel: string;
+  @ApiProperty({ type: String, example: '1.2k+ Booked' }) bookedLabel: string;
+  @ApiProperty({ type: String, example: '350.000₫' }) price: string;
 
-  static fromEntity(product: Product): PublicHealthServiceRecommendedResponseDto {
+  static fromEntity(
+    product: Product,
+    ratingData?: { rating: number; count: number },
+  ): PublicHealthServiceRecommendedResponseDto {
     const dto = new PublicHealthServiceRecommendedResponseDto();
 
     dto.id = product.id;
@@ -20,14 +23,11 @@ export class PublicHealthServiceRecommendedResponseDto {
       product.media?.[0]?.url ??
       null;
 
-    // Rating from reviews
-    const reviews = product.reviews ?? [];
-    dto.rating = reviews.length
-      ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10
-      : 0;
+    // Rating — pre-computed from TreatmentReview aggregate
+    dto.rating = ratingData?.rating ?? 0;
 
     // Review label
-    const count = reviews.length;
+    const count = ratingData?.count ?? 0;
     if (count >= 500) {
       dto.reviewLabel = '(500+ Reviews)';
     } else if (count > 0) {
@@ -46,7 +46,15 @@ export class PublicHealthServiceRecommendedResponseDto {
     return dto;
   }
 
-  static fromEntities(products: Product[]): PublicHealthServiceRecommendedResponseDto[] {
-    return products.map((p) => PublicHealthServiceRecommendedResponseDto.fromEntity(p));
+  static fromEntities(
+    products: Product[],
+    ratingsMap?: Map<string, { rating: number; count: number }>,
+  ): PublicHealthServiceRecommendedResponseDto[] {
+    return products.map((p) =>
+      PublicHealthServiceRecommendedResponseDto.fromEntity(
+        p,
+        ratingsMap?.get(p.id),
+      ),
+    );
   }
 }

@@ -1,7 +1,10 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PartnersService } from './partners.service';
-import { PartnersController, PartnerSelfController } from './partners.controller';
+import {
+  PartnersController,
+  PartnerSelfController,
+} from './partners.controller';
 import { Partner } from '@/common/entities/partner.entity';
 import { LegalRepresentative } from '@/common/entities/legal-representative.entity';
 import { Account } from '@/common/entities/account.entity';
@@ -15,6 +18,8 @@ import { AccountModule } from '@/account/account.module';
 import { MapboxModule } from '@/mapbox/mapbox.module';
 import { RegisterPartnerHandler } from './application/handlers/register-partner.handler';
 import { UpdatePartnerProfileHandler } from './application/handlers/update-partner-profile.handler';
+import { UpdatePartnerPublicProfileHandler } from './application/handlers/update-partner-public-profile.handler';
+import { PartnerCertification } from '@/clinic/entities/partner-certification.entity';
 
 @Module({
   imports: [
@@ -25,6 +30,7 @@ import { UpdatePartnerProfileHandler } from './application/handlers/update-partn
       DocumentRequirement,
       PartnerDocument,
       PartnerReviewLog,
+      PartnerCertification,
     ]),
     LocationsModule,
     S3Module,
@@ -36,6 +42,7 @@ import { UpdatePartnerProfileHandler } from './application/handlers/update-partn
     PartnersService,
     RegisterPartnerHandler,
     UpdatePartnerProfileHandler,
+    UpdatePartnerPublicProfileHandler,
   ],
   exports: [PartnersService],
 })

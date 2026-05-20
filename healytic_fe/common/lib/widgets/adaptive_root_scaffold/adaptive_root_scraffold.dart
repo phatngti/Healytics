@@ -29,6 +29,7 @@ class AdaptiveRootScraffold extends HookConsumerWidget {
     super.key,
     required this.navigationShell,
     this.destinationKeys,
+    this.notificationBadgeCount = 0,
   });
 
   /// The stateful navigation shell managing tab-based branch routing.
@@ -39,9 +40,22 @@ class AdaptiveRootScraffold extends HookConsumerWidget {
   /// Must match the number of destinations if provided.
   final List<Key>? destinationKeys;
 
+  /// Optional unread notification badge count.
+  ///
+  /// When > 0, a badge is shown on the
+  /// Notifications tab icon.
+  final int notificationBadgeCount;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = navigationShell.currentIndex;
+
+    final notifIcon = notificationBadgeCount > 0
+        ? Badge.count(
+            count: notificationBadgeCount,
+            child: const Icon(Icons.notifications),
+          )
+        : const Icon(Icons.notifications);
 
     final destinations = [
       NavigationDestination(
@@ -61,7 +75,7 @@ class AdaptiveRootScraffold extends HookConsumerWidget {
       ),
       NavigationDestination(
         key: destinationKeys?.elementAtOrNull(3),
-        icon: Icon(Icons.notifications),
+        icon: notifIcon,
         label: 'Notifications',
       ),
       NavigationDestination(

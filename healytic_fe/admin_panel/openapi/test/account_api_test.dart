@@ -17,6 +17,13 @@ void main() {
   // final instance = AccountApi();
 
   group('tests for AccountApi', () {
+    // Get current user account details
+    //
+    //Future<AccountMeResponseDto> accountControllerGetMe() async
+    test('test accountControllerGetMe', () async {
+      // TODO
+    });
+
     // Get current user survey
     //
     //Future<SurveyResponseDto> accountControllerGetSurvey() async
@@ -28,6 +35,13 @@ void main() {
     //
     //Future<SurveyResponseDto> accountControllerPostSurvey(SurveyDto surveyDto) async
     test('test accountControllerPostSurvey', () async {
+      // TODO
+    });
+
+    // Update current user avatar
+    //
+    //Future<AccountMeResponseDto> accountControllerUpdateAvatar(UpdateAvatarDto updateAvatarDto) async
+    test('test accountControllerUpdateAvatar', () async {
       // TODO
     });
 

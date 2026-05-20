@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -42,28 +45,35 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hPad = AppDimens.horizontalPadding(context);
+
     return CustomScrollView(
       slivers: [
-        _SliverBackButton(),
+        const _SliverHeader(),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: hPad),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 8),
+                AppDimens.verticalSmall,
                 HeroImage(imageUrl: appointment.imageUrl),
-                const SizedBox(height: 24),
+                AppDimens.verticalLarge,
                 ServiceHeader(appointment: appointment),
-                const SizedBox(height: 24),
+                AppDimens.verticalLarge,
                 CheckInOutCard(appointment: appointment),
-                const SizedBox(height: 32),
+                AppDimens.verticalExtraLarge,
                 DetailRow(
                   icon: Symbols.local_hospital,
                   title: 'Doctor or Therapist',
-                  subtitle: appointment.providerName,
+                  subtitle: appointment.specialistName,
+                  onTap: appointment.specialistId != null
+                      ? () => EmployeeDetailRoute(
+                          employeeId: appointment.specialistId!,
+                        ).push(context)
+                      : null,
                 ),
-                const SizedBox(height: 28),
+                SizedBox(height: AppDimens.spaceXxl + AppDimens.spaceXs),
                 DetailRow(
                   icon: Symbols.storefront,
                   title: 'Service manual',
@@ -74,13 +84,17 @@ class _Content extends StatelessWidget {
                     appointmentId: appointment.id,
                   ).push(context),
                 ),
-                const SizedBox(height: 28),
+                SizedBox(height: AppDimens.spaceXxl + AppDimens.spaceXs),
                 DetailRow(
                   icon: Symbols.chat_bubble,
                   title: 'Message your services',
-                  subtitle: appointment.vendorName,
+                  subtitle: appointment.healthPartnerName,
+                  onTap: () => PartnerChatRoute(
+                    partnerAccountId: appointment.healthPartnerId,
+                    partnerName: appointment.healthPartnerName,
+                  ).push(context),
                 ),
-                const SizedBox(height: 32),
+                AppDimens.verticalExtraLarge,
               ],
             ),
           ),
@@ -90,23 +104,44 @@ class _Content extends StatelessWidget {
   }
 }
 
-// ─── Sliver back button ────────────────────────────
+// ─── Pinned header ─────────────────────────────────
 
-class _SliverBackButton extends StatelessWidget {
+class _SliverHeader extends StatelessWidget {
+  const _SliverHeader();
+
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 8, top: 4),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, size: 24),
-              onPressed: () => Navigator.of(context).maybePop(),
-            ),
-          ),
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return SliverAppBar(
+      pinned: true,
+      centerTitle: true,
+
+      surfaceTintColor: Colors.transparent,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: 'Back',
+        onPressed: () => Navigator.of(context).maybePop(),
+      ),
+      title: Text(
+        'Appointment Details',
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      flexibleSpace: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: const SizedBox.expand(),
+        ),
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(AppDimens.borderWidth),
+        child: Divider(
+          height: AppDimens.borderWidth,
+          thickness: AppDimens.borderWidth,
+          color: colors.outlineVariant.withValues(alpha: 0.3),
         ),
       ),
     );

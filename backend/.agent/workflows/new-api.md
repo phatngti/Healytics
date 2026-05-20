@@ -42,26 +42,29 @@ Decide which audience this endpoint serves:
 
 ### Create Request DTO (Input)
 
+> ⚠️ **Every `@ApiProperty` MUST have explicit `type`.** See `dto-type-expert` skill for full reference.
+
 ```typescript
 // src/<module>/dto/<audience>/create-<entity>.dto.ts
 import { IsString, IsNotEmpty, IsOptional, MaxLength, IsUUID, IsNumber, Min, IsEnum, IsArray, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateEntityDto {
-  @ApiProperty({ example: 'Example Name', description: 'Name of the entity' })
+  @ApiProperty({ type: String, example: 'Example Name', description: 'Name of the entity' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
+  @Transform(({ value }) => value?.trim())
   name: string;
 
-  @ApiPropertyOptional({ example: 'uuid-category-id' })
+  @ApiPropertyOptional({ type: String, format: 'uuid', example: 'uuid-category-id' })
   @IsUUID()
   @IsOptional()
   categoryId?: string;
 
   // For nested objects:
-  @ApiPropertyOptional({ type: NestedDto })
+  @ApiPropertyOptional({ type: () => NestedDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => NestedDto)          // ⚠️ REQUIRED - without this, validation fails silently
@@ -102,26 +105,28 @@ export class GetEntitiesQueryDto extends BasePaginationDto {
 
 ## 3. Create Response DTO (Output)
 
+> ⚠️ **Every `@ApiProperty` MUST have explicit `type`.** Never use bare `@ApiProperty()`. See `dto-type-expert` skill.
+
 ```typescript
 // src/<module>/dto/<audience>/<entity>-response.dto.ts
 import { Expose, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class EntityResponseDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Expose()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: () => CategoryResponseDto })
   @Expose()
   @Type(() => CategoryResponseDto)
   category?: CategoryResponseDto;
 
-  @ApiProperty()
+  @ApiProperty({ type: Date })
   @Expose()
   createdAt: Date;
 

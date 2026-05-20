@@ -2,6 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateCheckoutTicketHandler } from './create-checkout-ticket.handler';
 import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
+import { Account } from '@/common/entities/account.entity';
+import { Employee } from '@/common/entities/employee.entity';
+import { Product } from '@/common/entities/product.entity';
 import { CheckSlotAvailabilityHandler } from './check-slot-availability.handler';
 import { AsyncCheckoutResponseDto } from '../../dto/async-checkout-response.dto';
 import { CheckoutTicketStatus } from '@/booking/enums/checkout-ticket-status.enum';
@@ -10,17 +13,32 @@ import {
   createMockRepository,
 } from '../../../../test/mocks/mock-types';
 import { createCheckoutTicketEntity } from '../../../../test/fixtures/test-data.factory';
+import { BadRequestException } from '@nestjs/common';
+import { RedisService } from '@/redis/redis.service';
 
 describe('CreateCheckoutTicketHandler', () => {
   let handler: CreateCheckoutTicketHandler;
   let ticketRepo: MockRepository<CheckoutTicket>;
+  let accountRepo: MockRepository<Account>;
+  let employeeRepo: MockRepository<Employee>;
+  let productRepo: MockRepository<Product>;
   let slotChecker: { execute: jest.Mock };
   let rmqClient: { emit: jest.Mock };
+  let redisService: { [key: string]: jest.Mock };
 
   beforeEach(async () => {
     ticketRepo = createMockRepository<CheckoutTicket>();
+    accountRepo = createMockRepository<Account>();
+    employeeRepo = createMockRepository<Employee>();
+    productRepo = createMockRepository<Product>();
     slotChecker = { execute: jest.fn() };
     rmqClient = { emit: jest.fn() };
+    redisService = {
+      get: jest.fn().mockResolvedValue(null),
+      set: jest.fn().mockResolvedValue(undefined),
+      acquireLock: jest.fn().mockResolvedValue('mock-lock-token'),
+      releaseLock: jest.fn().mockResolvedValue(undefined),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -30,6 +48,18 @@ describe('CreateCheckoutTicketHandler', () => {
           useValue: ticketRepo,
         },
         {
+          provide: getRepositoryToken(Account),
+          useValue: accountRepo,
+        },
+        {
+          provide: getRepositoryToken(Employee),
+          useValue: employeeRepo,
+        },
+        {
+          provide: getRepositoryToken(Product),
+          useValue: productRepo,
+        },
+        {
           provide: 'RABBITMQ_CLIENT',
           useValue: rmqClient,
         },
@@ -37,10 +67,21 @@ describe('CreateCheckoutTicketHandler', () => {
           provide: CheckSlotAvailabilityHandler,
           useValue: slotChecker,
         },
+        {
+          provide: RedisService,
+          useValue: redisService,
+        },
       ],
     }).compile();
 
-    handler = module.get<CreateCheckoutTicketHandler>(CreateCheckoutTicketHandler);
+    handler = module.get<CreateCheckoutTicketHandler>(
+      CreateCheckoutTicketHandler,
+    );
+
+    // Default: FK validation passes (entities exist)
+    accountRepo.findOne.mockResolvedValue({ id: 'user-1' });
+    employeeRepo.findOne.mockResolvedValue({ id: 'staff-1' });
+    productRepo.findOne.mockResolvedValue({ id: 'prod-1' });
   });
 
   afterEach(() => {
@@ -77,6 +118,44 @@ describe('CreateCheckoutTicketHandler', () => {
       // Should not check slot or create new ticket
       expect(slotChecker.execute).not.toHaveBeenCalled();
       expect(ticketRepo.save).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('FK validation', () => {
+    it('should throw BadRequestException when userId does not exist', async () => {
+      // Arrange
+      ticketRepo.findOne.mockResolvedValue(null); // No existing ticket
+      accountRepo.findOne.mockResolvedValue(null); // User not found
+
+      // Act & Assert
+      await expect(handler.execute(baseDto as any)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(slotChecker.execute).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestException when staffId does not exist', async () => {
+      // Arrange
+      ticketRepo.findOne.mockResolvedValue(null);
+      employeeRepo.findOne.mockResolvedValue(null); // Staff not found
+
+      // Act & Assert
+      await expect(handler.execute(baseDto as any)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw BadRequestException when productId does not exist', async () => {
+      // Arrange
+      ticketRepo.findOne.mockResolvedValue(null);
+      productRepo.findOne.mockResolvedValue(null); // Product not found
+
+      const dtoWithProduct = { ...baseDto, productId: 'non-existent' };
+
+      // Act & Assert
+      await expect(handler.execute(dtoWithProduct as any)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -155,7 +234,37 @@ describe('CreateCheckoutTicketHandler', () => {
         userId: dto.userId,
         productId: dto.productId,
         webhookUrl: dto.webhookUrl,
+        lockToken: 'mock-lock-token',
+        payLater: false,
       });
+    });
+
+    it('should publish payLater=true when requested', async () => {
+      // Arrange
+      ticketRepo.findOne.mockResolvedValue(null);
+      slotChecker.execute.mockResolvedValue(true);
+
+      const savedTicket = createCheckoutTicketEntity({ id: 'tk-pay-later' });
+      ticketRepo.create.mockReturnValue(savedTicket);
+      ticketRepo.save.mockResolvedValue(savedTicket);
+
+      const dto = {
+        ...baseDto,
+        productId: 'prod-1',
+        payLater: true,
+      };
+
+      // Act
+      await handler.execute(dto as any);
+
+      // Assert
+      expect(rmqClient.emit).toHaveBeenCalledWith(
+        'checkout.process',
+        expect.objectContaining({
+          ticketId: 'tk-pay-later',
+          payLater: true,
+        }),
+      );
     });
   });
 });

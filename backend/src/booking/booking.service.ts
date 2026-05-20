@@ -1,11 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AcquireMicroLockHandler } from './application/handlers/acquire-micro-lock.handler';
+import { CheckDuplicateSlotHandler } from './application/handlers/check-duplicate-slot.handler';
 import { CreateCheckoutTicketHandler } from './application/handlers/create-checkout-ticket.handler';
 import { GetBookingHandler } from './application/handlers/get-booking.handler';
 import { GetCheckoutTicketHandler } from './application/handlers/get-checkout-ticket.handler';
 import { ListUserBookingsHandler } from './application/handlers/list-user-bookings.handler';
 import { MicroLockDto } from './dto/micro-lock.dto';
 import { MicroLockResponseDto } from './dto/micro-lock-response.dto';
+import { CheckDuplicateSlotDto } from './dto/check-duplicate-slot.dto';
+import { CheckDuplicateSlotResponseDto } from './dto/check-duplicate-slot-response.dto';
 import { AsyncCheckoutDto } from './dto/async-checkout.dto';
 import { AsyncCheckoutResponseDto } from './dto/async-checkout-response.dto';
 import { BookingResponseDto } from './dto/booking-response.dto';
@@ -20,6 +23,7 @@ export class BookingService {
 
   constructor(
     private readonly acquireMicroLockHandler: AcquireMicroLockHandler,
+    private readonly checkDuplicateSlotHandler: CheckDuplicateSlotHandler,
     private readonly createCheckoutTicketHandler: CreateCheckoutTicketHandler,
     private readonly getBookingHandler: GetBookingHandler,
     private readonly getCheckoutTicketHandler: GetCheckoutTicketHandler,
@@ -29,14 +33,30 @@ export class BookingService {
   // ── Slot Lock ─────────────────────────────────────────────
 
   async acquireMicroLock(dto: MicroLockDto): Promise<MicroLockResponseDto> {
-    this.logger.log(`acquireMicroLock: staff=${dto.staffId}, time=${dto.startTime}`);
+    this.logger.log(
+      `acquireMicroLock: staff=${dto.staffId}, time=${dto.startTime}`,
+    );
     return this.acquireMicroLockHandler.execute(dto);
+  }
+
+  async checkDuplicateSlot(
+    userId: string,
+    dto: CheckDuplicateSlotDto,
+  ): Promise<CheckDuplicateSlotResponseDto> {
+    this.logger.log(
+      `checkDuplicateSlot: user=${userId}, time=${dto.startTime}`,
+    );
+    return this.checkDuplicateSlotHandler.execute(userId, dto.startTime);
   }
 
   // ── Async Checkout ────────────────────────────────────────
 
-  async asyncCheckout(dto: AsyncCheckoutDto): Promise<AsyncCheckoutResponseDto> {
-    this.logger.log(`asyncCheckout: user=${dto.userId}, key=${dto.idempotencyKey}`);
+  async asyncCheckout(
+    dto: AsyncCheckoutDto,
+  ): Promise<AsyncCheckoutResponseDto> {
+    this.logger.log(
+      `asyncCheckout: user=${dto.userId}, key=${dto.idempotencyKey}`,
+    );
     return this.createCheckoutTicketHandler.execute(dto);
   }
 
@@ -47,9 +67,9 @@ export class BookingService {
     return this.getCheckoutTicketHandler.execute(id);
   }
 
-  async getBooking(id: string): Promise<BookingResponseDto> {
-    this.logger.log(`getBooking: ${id}`);
-    return this.getBookingHandler.execute(id);
+  async getBooking(userId: string, id: string): Promise<BookingResponseDto> {
+    this.logger.log(`getBooking: user=${userId}, booking=${id}`);
+    return this.getBookingHandler.execute(userId, id);
   }
 
   async listMyBookings(

@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
@@ -46,7 +42,10 @@ export class ServiceTagsService {
   /**
    * Creates a new service tag for a user.
    */
-  async create(dto: CreateServiceTagDto, userId: string): Promise<ServiceTagResponseDto> {
+  async create(
+    dto: CreateServiceTagDto,
+    userId: string,
+  ): Promise<ServiceTagResponseDto> {
     const entity = await this.createServiceTagHandler.execute(dto, userId);
     return ServiceTagResponseDto.fromEntity(entity);
   }
@@ -78,7 +77,11 @@ export class ServiceTagsService {
     productId: string,
     userId: string,
   ): Promise<AttachTagResponseDto> {
-    const productTag = await this.attachProductTagHandler.execute(tagId, productId, userId);
+    const productTag = await this.attachProductTagHandler.execute(
+      tagId,
+      productId,
+      userId,
+    );
     const dto = new AttachTagResponseDto();
     dto.tagId = productTag.tagId;
     dto.productId = productTag.productId;

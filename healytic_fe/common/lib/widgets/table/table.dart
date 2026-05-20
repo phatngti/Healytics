@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:common/widgets/button/button.dart';
-import 'package:common/widgets/table/header.dart';
+import 'package:common/widgets/input/search_field.dart';
 import 'package:common/widgets/table/function_button.dart';
 import 'package:common/widgets/table/helper.dart';
 import 'package:common/utils/demensions.dart';
@@ -17,6 +17,10 @@ import 'package:data_table_2/data_table_2.dart';
 /// with a [TableHeaderWidget] for search and actions, automatic data source
 /// caching via [AppDataTableSource], and retry-on-error support.
 ///
+/// The search field is rendered **above** the table in a separate
+/// [Column] so that [PaginatedDataTable2]'s internal gesture
+/// detectors do not block user input.
+///
 /// ```dart
 /// AppTable(
 ///   columns: myColumns.dataColumns(context),
@@ -31,6 +35,8 @@ class AppTable extends StatefulWidget {
     super.key,
     this.functionButtons,
     this.onSearchChanged,
+    this.searchFieldKey,
+    this.refreshToken,
     this.buttons,
     required this.columns,
     this.sortColumnIndex,
@@ -48,6 +54,12 @@ class AppTable extends StatefulWidget {
 
   /// Callback invoked when the search text changes.
   final ValueChanged<String>? onSearchChanged;
+
+  /// Optional key applied to the search [TextField].
+  final Key? searchFieldKey;
+
+  /// Optional token that invalidates cached rows without remounting the table.
+  final Object? refreshToken;
 
   /// Optional action buttons displayed in the table header.
   final List<AppButton>? buttons;
@@ -106,14 +118,13 @@ class _AppTableState extends State<AppTable>
   @override
   void didUpdateWidget(covariant AppTable oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Recreate source if callbacks changed
-    if (oldWidget.getTotalRows != widget.getTotalRows ||
-        oldWidget.getData != widget.getData) {
-      _source.dispose();
-      _source = AppDataTableSource(
-        getTotalRows: widget.getTotalRows,
-        getData: widget.getData,
-      );
+    _source.updateCallbacks(
+      getTotalRows: widget.getTotalRows,
+      getData: widget.getData,
+    );
+
+    if (oldWidget.refreshToken != widget.refreshToken) {
+      _source.refreshDatasource();
     }
   }
 
@@ -124,6 +135,12 @@ class _AppTableState extends State<AppTable>
     super.dispose();
   }
 
+  /// Whether the header row has any visible content
+  /// (buttons or function buttons).
+  bool get _hasHeaderContent =>
+      (widget.functionButtons?.isNotEmpty ?? false) ||
+      (widget.buttons?.isNotEmpty ?? false);
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // Required for AutomaticKeepAliveClientMixin
@@ -132,8 +149,9 @@ class _AppTableState extends State<AppTable>
       return const SizedBox.shrink();
     }
 
-    // Last ppage example uses extra API call to get the number of items in datasource
-    final columns = widget.columns;
+    // Create a local copy so we never mutate
+    // widget.columns on rebuild.
+    final columns = [...widget.columns];
     if (widget.actionButtons) {
       columns.add(
         DataColumn(
@@ -164,82 +182,135 @@ class _AppTableState extends State<AppTable>
           ),
         ],
       ),
-      child: AsyncPaginatedDataTable2(
-        horizontalMargin: 20,
-        checkboxHorizontalMargin: 12,
-        columnSpacing: 0,
-        wrapInCard: false,
-        header: TableHeaderWidget(
-          functionButtons: widget.functionButtons,
-          onSearchChanged: widget.onSearchChanged,
-          buttons: widget.buttons,
-        ),
-        actions: widget.actions,
-        rowsPerPage: _rowsPerPage,
-        availableRowsPerPage: {
-          _rowsPerPage,
-          widget.defaultRowsPerPage,
-          widget.defaultRowsPerPage * 2,
-          widget.defaultRowsPerPage * 3,
-          widget.defaultRowsPerPage * 4,
-        }.toList()..sort(),
-        // autoRowsToHeight: true,
-        minWidth: responsive<double>(context, mobile: 500, web: 800),
-        fit: FlexFit.tight,
-        border: TableBorder(
-          top: BorderSide(
-            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
-          ),
-          bottom: BorderSide(
-            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
-          ),
-          left: BorderSide(
-            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
-          ),
-          right: BorderSide(
-            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
-          ),
-          // verticalInside: BorderSide(color: Colors.grey[500]!),
-          horizontalInside: BorderSide(
-            color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
-          ),
-          borderRadius: AppDimens.radiusLarge,
-        ),
-        onRowsPerPageChanged: (value) {
-          if (value != null && value != _rowsPerPage) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) {
-                setState(() {
-                  _rowsPerPage = value;
-                  print('Row per page changed to $value');
-                });
-              }
-            });
-          }
-        },
-        onPageChanged: (rowIndex) {
-          print(rowIndex / widget.defaultRowsPerPage);
-        },
-        sortColumnIndex: widget.sortColumnIndex,
-        sortAscending: widget.sortAscending,
-        sortArrowIcon: Icons.keyboard_arrow_up,
-        sortArrowAnimationDuration: const Duration(milliseconds: 0),
-        onSelectAll: (select) => (),
-
-        hidePaginator: false,
-        columns: widget.columns,
-        empty: Center(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            child: const Text('No data'),
-          ),
-        ),
-        loading: _Loading(),
-        errorBuilder: (e) =>
-            _ErrorAndRetry(e.toString(), () => _source.refreshDatasource()),
-        source: _source,
+      child: Column(
+        children: [
+          // Search + buttons row — rendered OUTSIDE
+          // PaginatedDataTable2 so TextField receives
+          // taps without being blocked by DataTable2's
+          // internal gesture detectors.
+          _buildSearchRow(context),
+          Expanded(child: _buildTable(context, columns)),
+        ],
       ),
+    );
+  }
+
+  /// Builds the search field + action buttons row above
+  /// the table. Lives outside [AsyncPaginatedDataTable2]
+  /// so taps are never intercepted.
+  Widget _buildSearchRow(BuildContext context) {
+    if (widget.onSearchChanged == null && !_hasHeaderContent) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: AppDimens.paddingAllSmall,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          if (widget.onSearchChanged != null)
+            SizedBox(
+              width: responsive<double>(
+                context,
+                mobile: 200,
+                tablet: 250,
+                web: 300,
+              ),
+              child: AppSearchField(
+                fieldKey: widget.searchFieldKey,
+                onChanged: widget.onSearchChanged,
+              ),
+            )
+          else
+            const SizedBox.shrink(),
+          Row(
+            children: [
+              if (widget.functionButtons != null)
+                for (var btn in widget.functionButtons!) ...[
+                  AppDimens.horizontalSmall,
+                  btn,
+                ],
+              if (widget.buttons != null)
+                for (var btn in widget.buttons!) ...[
+                  AppDimens.horizontalSmall,
+                  btn,
+                ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the [AsyncPaginatedDataTable2] without a
+  /// header — search is handled by [_buildSearchRow].
+  Widget _buildTable(BuildContext context, List<DataColumn> columns) {
+    return AsyncPaginatedDataTable2(
+      horizontalMargin: 20,
+      checkboxHorizontalMargin: 12,
+      columnSpacing: 0,
+      wrapInCard: false,
+      // No header — search + buttons are above.
+      actions: widget.actions,
+      rowsPerPage: _rowsPerPage,
+      availableRowsPerPage: {
+        _rowsPerPage,
+        widget.defaultRowsPerPage,
+        widget.defaultRowsPerPage * 2,
+        widget.defaultRowsPerPage * 3,
+        widget.defaultRowsPerPage * 4,
+      }.toList()..sort(),
+      minWidth: responsive<double>(context, mobile: 500, web: 800),
+      fit: FlexFit.tight,
+      border: TableBorder(
+        top: BorderSide(
+          color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+        ),
+        bottom: BorderSide(
+          color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+        ),
+        left: BorderSide(
+          color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+        ),
+        right: BorderSide(
+          color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+        ),
+        horizontalInside: BorderSide(
+          color: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(20),
+        ),
+        borderRadius: AppDimens.radiusLarge,
+      ),
+      onRowsPerPageChanged: (value) {
+        if (value != null && value != _rowsPerPage) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {
+                _rowsPerPage = value;
+              });
+            }
+          });
+        }
+      },
+      onPageChanged: (rowIndex) {
+        debugPrint('Table page changed to row $rowIndex');
+      },
+      sortColumnIndex: widget.sortColumnIndex,
+      sortAscending: widget.sortAscending,
+      sortArrowIcon: Icons.keyboard_arrow_up,
+      sortArrowAnimationDuration: const Duration(milliseconds: 0),
+      hidePaginator: false,
+      columns: columns,
+      empty: Center(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          child: const Text('No data'),
+        ),
+      ),
+      loading: _Loading(),
+      errorBuilder: (e) =>
+          _ErrorAndRetry(e.toString(), () => _source.refreshDatasource()),
+      source: _source,
     );
   }
 }

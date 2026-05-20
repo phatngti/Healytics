@@ -2,6 +2,7 @@ import 'package:admin_panel/features/common/widgets/responsive/responsive.dart';
 import 'package:admin_panel/features/partner/products/presentation/layouts/product_details_desktop.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product_details.provider.dart';
 import 'package:admin_panel/router/partner_routes.dart';
+import 'package:common/widgets/card/error_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -34,7 +35,14 @@ class ProductDetailsScreen extends ConsumerWidget {
             onPressed: () => context.goNamed(ProductHomeRoute.name),
           ),
         ),
-        body: Center(child: Text('Error loading product: $error')),
+        body: Center(
+          child: ErrorCard(
+            title: 'Error loading product',
+            error: error,
+            stackTrace: stack,
+            onRetry: () => ref.invalidate(productDetailsProvider(productId)),
+          ),
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 # app/orchestrators/recommendation_orchestrator.py
 from datetime import datetime, timezone
 from typing import Any, Dict
+import json
 import logging
 import httpx
 from fastapi import HTTPException
@@ -77,6 +78,90 @@ MOCK_SERVICES: Dict[str, Dict] = {
     "SV060": {"service_id": "SV060", "name": "Thực đơn Mediterranean diet", "description": "Chế độ ăn Địa Trung Hải - một trong những chế độ ăn lành mạnh nhất thế giới. Nhiều rau củ, cá, dầu ô liu.", "image_url": "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop", "badge": "Phổ biến", "booked_count": 370, "price": {"amount": 450000, "currency": "VND"}, "staff_name": "CN Trương Thị HHH", "rating": {"average": 4.7, "total_reviews": 125}, "location": {"address": "Online", "district": "Toàn quốc", "city": "Hồ Chí Minh"}, "slots": ["2026-03-12T14:00:00", "2026-03-14T14:00:00"]},
 }
 
+# products.id từ ner-service seed_local / môi trường test — trùng với DB mà NER filter ra.
+# MOCK_SERVICES chỉ có khóa SVxxx nên UUID từ pipeline sẽ thành "Unknown" nếu không có bảng này.
+SEED_PRODUCT_FALLBACK: dict[str, dict[str, str]] = {
+    "f0000001-0000-0000-0000-000000000001": {
+        "name": "Tư vấn tim mạch trực tuyến",
+        "description": "Tư vấn và đánh giá sức khỏe tim mạch qua video call với bác sĩ chuyên khoa.",
+    },
+    "f0000001-0000-0000-0000-000000000002": {
+        "name": "Vật lý trị liệu thoát vị đĩa đệm",
+        "description": "Chương trình phục hồi chuyên sâu cho bệnh nhân thoát vị đĩa đệm.",
+    },
+    "f0000001-0000-0000-0000-000000000003": {
+        "name": "Châm cứu bấm huyệt tại gia",
+        "description": "Dịch vụ châm cứu và bấm huyệt tại nhà bởi lương y có kinh nghiệm.",
+    },
+    "f0000001-0000-0000-0000-000000000004": {
+        "name": "Tư vấn tâm lý trị liệu",
+        "description": "Buổi tư vấn tâm lý 1-1 với chuyên gia trị liệu tâm lý.",
+    },
+    "f0000001-0000-0000-0000-000000000005": {
+        "name": "Làm sạch răng chuyên sâu",
+        "description": "Vệ sinh răng miệng chuyên sâu, loại bỏ cao răng và làm trắng nhẹ.",
+    },
+    "f0000001-0000-0000-0000-000000000006": {
+        "name": "Massage cổ vai gáy 45 phút",
+        "description": "Liệu trình massage cổ vai gáy giảm căng cứng, phù hợp dân văn phòng.",
+    },
+    "f0000001-0000-0000-0000-000000000007": {
+        "name": "Massage đá nóng thư giãn 60 phút",
+        "description": "Massage toàn thân kết hợp đá nóng giúp thư giãn sâu và ngủ ngon.",
+    },
+    "f0000001-0000-0000-0000-000000000008": {
+        "name": "Gội đầu dưỡng sinh 60 phút",
+        "description": "Gội đầu dưỡng sinh kết hợp bấm huyệt đầu vai gáy.",
+    },
+}
+
+
+def _enrichment_fallback_detail(service_id: str) -> dict:
+    """Khi không gọi được backend hoặc backend không trả đủ — vẫn hiển thị tên từ seed/mock."""
+    sid = str(service_id)
+    mock = MOCK_SERVICES.get(sid)
+    if mock:
+        return mock
+    seed = SEED_PRODUCT_FALLBACK.get(sid)
+    if seed:
+        return {
+            "service_id": sid,
+            "name": seed["name"],
+            "description": seed.get("description", ""),
+        }
+    return {"service_id": sid, "name": "Unknown", "description": ""}
+
+def _safe_sample(values: list[str], max_items: int = 5) -> list[str]:
+    if not values:
+        return []
+    out: list[str] = []
+    for v in values[:max_items]:
+        try:
+            out.append(str(v))
+        except Exception:
+            out.append("<unprintable>")
+    return out
+
+
+def _extract_service_id_any_shape(obj: dict) -> str | None:
+    """
+    Extract service identifier from various backend response shapes without changing behavior.
+    (Used for logging + ordering diagnostics only.)
+    """
+    if not isinstance(obj, dict):
+        return None
+    for key in ("service_id", "serviceId", "id", "serviceID", "service_id_str"):
+        val = obj.get(key)
+        if val is None:
+            continue
+        try:
+            s = str(val).strip()
+        except Exception:
+            continue
+        if s:
+            return s
+    return None
+
 
 async def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
     """Dùng API backend thật để lấy full thông tin service."""
@@ -85,43 +170,104 @@ async def _enrich_with_service_info(service_ids: list[str]) -> list[dict]:
 
     # Don't break current system if key missing.
     if not settings.AI_API_KEY:
-        return [
-            MOCK_SERVICES.get(sid, {"service_id": sid, "name": "Unknown", "description": ""})
-            for sid in service_ids
-        ]
+        logger.warning(
+            "[ENRICH] skip_backend reason=AI_API_KEY_unset service_ids_count=%s service_ids_sample=%s backend_base_url=%s",
+            len(service_ids),
+            _safe_sample(service_ids),
+            settings.BACKEND_BASE_URL,
+        )
+        return [_enrichment_fallback_detail(sid) for sid in service_ids]
 
     client = BackendAIClient()
     try:
+        logger.info(
+            "[ENRICH] backend_request endpoint=/backend/ai/recommendations service_ids_count=%s service_ids_sample=%s backend_base_url=%s header=%s",
+            len(service_ids),
+            _safe_sample(service_ids),
+            settings.BACKEND_BASE_URL,
+            settings.AI_API_KEY_HEADER,
+        )
         services = await client.get_service_details(service_ids)
     except Exception as e:
         # Do not break main recommendation flow if backend enrichment API is down.
         logger.warning("Backend enrichment failed, fallback to basic payload. error=%r", e)
-        return [{"service_id": sid, "name": "Unknown", "description": ""} for sid in service_ids]
+        return [_enrichment_fallback_detail(sid) for sid in service_ids]
     if not services:
-        return [{"service_id": sid, "name": "Unknown", "description": ""} for sid in service_ids]
+        logger.warning(
+            "Backend enrichment returned empty list for service_ids=%s — using local fallback",
+            service_ids,
+        )
+        return [_enrichment_fallback_detail(sid) for sid in service_ids]
 
     # Preserve the ordering from recommender response
     by_id: dict[str, dict] = {}
+    returned_ids: list[str] = []
     for s in services:
         sid = s.get("service_id") or s.get("id")
         if sid is not None:
-            by_id[str(sid)] = s
+            sid_str = str(sid)
+            by_id[sid_str] = s
+            returned_ids.append(sid_str)
 
-    return [by_id.get(sid, {"service_id": sid, "name": "Unknown", "description": ""}) for sid in service_ids]
+    # Diagnostics: detect missing IDs / mismatched key naming.
+    returned_any = [_extract_service_id_any_shape(s) for s in services if isinstance(s, dict)]
+    returned_any = [r for r in returned_any if r]
+    missing = [sid for sid in service_ids if sid not in by_id]
+    logger.info(
+        "[ENRICH] backend_response services_count=%s returned_ids_count=%s returned_ids_sample=%s returned_any_ids_sample=%s missing_count=%s missing_sample=%s",
+        len(services),
+        len(returned_ids),
+        _safe_sample(returned_ids),
+        _safe_sample(returned_any),
+        len(missing),
+        _safe_sample(missing),
+    )
+
+    return [
+        by_id[sid] if sid in by_id else _enrichment_fallback_detail(sid)
+        for sid in service_ids
+    ]
 
 
-def _format_services_for_prompt(services: list[dict]) -> str:
+def _format_services_for_prompt(services: list[Any]) -> str:
     """Format thông tin dịch vụ thành text để inject vào prompt chatbot."""
     if not services:
         return ""
     lines = []
     for s in services:
+        if not isinstance(s, dict):
+            # Graceful degradation for unexpected shapes (e.g., list[str]).
+            try:
+                raw = str(s)
+            except Exception:
+                raw = "<unprintable>"
+            lines.append(f"- {raw}")
+            continue
+
         name = s.get("name", "")
         desc = s.get("description", "")
-        price = s.get("price", {}).get("amount", "")
+
+        price_obj = s.get("price")
+        price = None
+        if isinstance(price_obj, dict):
+            price = price_obj.get("amount")
+
         staff = s.get("staff_name", "")
-        rating = s.get("rating", {}).get("average", "")
-        sid = s.get("service_id", "")
+
+        rating_obj = s.get("rating")
+        rating = None
+        if isinstance(rating_obj, dict):
+            rating = rating_obj.get("average")
+
+        sid = s.get("service_id", "") or s.get("id", "")
+
+        # Optional extra debug for bad backend shapes (kept small).
+        if not name and not desc and isinstance(sid, str) and sid and len(s.keys()) <= 3:
+            try:
+                logger.debug("[ENRICH] thin_service_payload=%s", json.dumps(s, ensure_ascii=False)[:300])
+            except Exception:
+                pass
+
         lines.append(
             f"- [{sid}] {name}: {desc} "
             f"(Giá: {price:,} VND, Bác sĩ/HLV: {staff}, Rating: {rating}/5)"
@@ -150,11 +296,11 @@ class RecommendationOrchestrator:
 
         service_ids = result["recommendations"][0]["service_ids"] if result.get("recommendations") else []
 
-        # Enrich service_ids → ServiceDetail
+        # Enrich service_ids → AiRecommendationItemDto (pass-through từ backend AI)
         services = await _enrich_with_service_info(service_ids)
 
         return {
-            "recommendations": services,   # ← list ServiceDetail, không phải list RecommendationItem
+            "recommendations": services,
             "total": len(services),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
@@ -182,7 +328,7 @@ class RecommendationOrchestrator:
 
         return {
             "conversation_id": str(request.conversation_id),
-            "recommendations": services,   # ← list ServiceDetail
+            "recommendations": services,
             "total": len(services),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }

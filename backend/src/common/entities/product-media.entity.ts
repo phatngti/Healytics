@@ -19,7 +19,12 @@ export class ProductMedia {
   @Column({ length: 500 })
   url: string;
 
-  @Column({ name: 'media_type', type: 'varchar', length: 20, default: MediaType.IMAGE })
+  @Column({
+    name: 'media_type',
+    type: 'varchar',
+    length: 20,
+    default: MediaType.IMAGE,
+  })
   mediaType: MediaType;
 
   @Column({ name: 'is_thumbnail', default: false })

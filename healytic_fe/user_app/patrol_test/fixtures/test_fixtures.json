@@ -1,0 +1,18 @@
+{
+  "backdoor": {
+    "enabled": true,
+    "baseUrl": "https://dev.healytics.me/backend",
+    "resetBeforeEachTest": true
+  },
+  "auth": {
+    "defaultUserKey": "main_user"
+  },
+  "defaultScenario": "core",
+  "scenarios": {
+    "core": "patrol_test/fixtures/scenarios/core_seed.json",
+    "home": "patrol_test/fixtures/scenarios/home_seed.json",
+    "cartCheckout": "patrol_test/fixtures/scenarios/cart_checkout_seed.json",
+    "orders": "patrol_test/fixtures/scenarios/orders_seed.json",
+    "notifications": "patrol_test/fixtures/scenarios/notifications_seed.json"
+  }
+}

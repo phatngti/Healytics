@@ -2,12 +2,14 @@ import {
   Injectable,
   Logger,
   InternalServerErrorException,
+  Optional,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { CreateDoctorDto } from '../../dto/create-doctor.dto';
 import { Employee } from '@/common/entities/employee.entity';
 import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
 import { EmployeeRole } from '../../enum/employee-role.enum';
+import { SearchIndexOutboxService } from '@/search/services/search-index-outbox.service';
 
 /**
  * Handler for creating doctor employees with transactional boundaries.
@@ -17,7 +19,11 @@ import { EmployeeRole } from '../../enum/employee-role.enum';
 export class CreateDoctorHandler {
   private readonly logger = new Logger(CreateDoctorHandler.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    @Optional()
+    private readonly searchIndexOutboxService?: SearchIndexOutboxService,
+  ) {}
 
   /**
    * Executes the create doctor command within a transaction.
@@ -45,11 +51,10 @@ export class CreateDoctorHandler {
         employmentType: command.employmentType,
         startDate: command.startDate ? new Date(command.startDate) : undefined,
         schedule: command.schedule,
+        workHistory: command.workHistory,
         avatarUrl: command.avatar,
-        idCardUrl: command.idCardUrl,
+        verificationDocuments: command.verificationDocuments,
         status: command.status,
-        branchId: command.branch || undefined,
-        password: command.password,
         description: command.description,
         jobTitle: command.jobTitle,
         partnerId: command.partnerId,
@@ -60,8 +65,7 @@ export class CreateDoctorHandler {
       // 2. Map flat DTO → DoctorProfile entity fields
       const doctorProfile = queryRunner.manager.create(DoctorProfile, {
         employeeId: savedEmployee.id,
-        medicalTitles: command.medicalTitles,
-        medicalLicenses: command.medicalLicenses,
+        medicalCredentials: command.medicalCredentials,
         experienceYears: command.experienceYears,
         consultationFee: command.consultationFee,
         specializations: command.specializations,
@@ -69,6 +73,11 @@ export class CreateDoctorHandler {
         certifications: command.certifications,
       });
       await queryRunner.manager.save(DoctorProfile, doctorProfile);
+
+      await this.searchIndexOutboxService?.enqueueEmployee(
+        queryRunner.manager,
+        savedEmployee.id,
+      );
 
       // 3. Commit transaction
       await queryRunner.commitTransaction();

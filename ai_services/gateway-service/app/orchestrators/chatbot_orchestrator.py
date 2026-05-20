@@ -10,9 +10,12 @@ from app.clients.ner_client import NERClient
 from app.core.sse import SSEEvent
 from app.core.enums import SSEEventType
 from app.intent_classification.main import load_model, predict_intent
-from uuid import uuid4
+from uuid import uuid4, UUID
+from app.utils import formatters
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_CONVERSATION_TITLE = "New conversation"
 
 
 class ChatbotOrchestrator:
@@ -42,8 +45,8 @@ class ChatbotOrchestrator:
         # 1. Get or create conversation
         conversation = await conversation_repo.get_or_create_conversation(
             session=session,
-            conversation_id=str(request.conversation_id),
-            user_id=getattr(request, "user_id", None),
+            conversation_id=request.conversation_id,
+            user_id=request.user_id,
         )
 
         # 2. Save user message
@@ -130,6 +133,12 @@ class ChatbotOrchestrator:
                 role="assistant",
                 content=full_response,
             )
+            await self._update_conversation_title_if_needed(
+                session=session,
+                conversation=conversation,
+                user_message=request.message,
+                assistant_message=full_response,
+            )
 
         # 9. Emit DONE
         yield SSEEvent(
@@ -141,16 +150,97 @@ class ChatbotOrchestrator:
             },
         )
 
+    async def get_conversations(
+        self,
+        session: Any,
+        user_id: UUID,
+        page: int = 1,
+        limit: int = 10,
+    ) -> Dict[str, Any]:
+        """
+        Return a paginated list of conversations for a user.
+        """
+        conversations, total = await conversation_repo.get_conversations_page(
+            session=session,
+            user_id=user_id,
+            page=page,
+            limit=limit,
+        )
+        return formatters.format_conversations_page(conversations, total, page, limit)
+
+    async def get_messages(
+        self,
+        session: Any,
+        conversation_id: str | UUID,
+        page: int = 1,
+        limit: int = 20,
+    ) -> Dict[str, Any]:
+        """
+        Return a paginated list of messages for a conversation.
+        """
+        messages, total = await message_repo.get_messages_page(
+            session=session,
+            conversation_id=conversation_id,
+            page=page,
+            limit=limit,
+        )
+        return formatters.format_messages_page(messages, total, page, limit)
+
     # ============================================
     # PRIVATE HELPERS
     # ============================================
 
+    async def _update_conversation_title_if_needed(
+        self,
+        session: Any,
+        conversation: Any,
+        user_message: str,
+        assistant_message: str,
+    ) -> None:
+        """
+        Cập nhật title bằng AI cho conversation mới, không làm hỏng luồng chat nếu lỗi.
+        """
+        if (conversation.title or "").strip() != DEFAULT_CONVERSATION_TITLE:
+            return
+
+        try:
+            title = await self.chatbot_client.generate_title(
+                {
+                    "user_message": user_message,
+                    "assistant_message": assistant_message,
+                }
+            )
+            if not title:
+                return
+
+            await conversation_repo.update_conversation_title(
+                session=session,
+                conversation_id=conversation.id,
+                new_title=title[:255],
+            )
+        except Exception as e:
+            logger.warning(
+                "Conversation title generation failed: %r",
+                e,
+                exc_info=True,
+            )
+
     async def _call_recommender_safe(self, request: Any) -> Optional[Dict[str, Any]]:
         try:
             ner_payload = {
-                "text": request.message
+                "text": request.message,
+                "current_lat": getattr(request, "current_lat", None),
+                "current_lng": getattr(request, "current_lng", None),
             }
             filtered_ids = await self.ner_client.get_service_ids(payload=ner_payload)
+            logger.info(
+                "[TRACE] ner_prefilter conversation_id=%s message_len=%s filtered_ids_count=%s filtered_ids_sample=%s ner_url=%s",
+                str(request.conversation_id),
+                len(request.message or ""),
+                len(filtered_ids) if isinstance(filtered_ids, list) else -1,
+                [str(x) for x in (filtered_ids or [])[:5]] if isinstance(filtered_ids, list) else [],
+                self.ner_client.base_url,
+            )
             recommender_payload = {
                 "conversation_id": str(request.conversation_id),
                 "query": request.message,
@@ -164,10 +254,28 @@ class ChatbotOrchestrator:
                 result["recommendations"][0]["service_ids"]
                 if result.get("recommendations") else []
             )
+            scores = (
+                result["recommendations"][0].get("scores")
+                if result.get("recommendations") else []
+            )
+            logger.info(
+                "[TRACE] recommender_chatbot conversation_id=%s top_k=%s service_ids_count=%s service_ids_sample=%s scores_sample=%s recommender_url=%s",
+                str(request.conversation_id),
+                request.top_k,
+                len(service_ids) if isinstance(service_ids, list) else -1,
+                [str(x) for x in (service_ids or [])[:5]] if isinstance(service_ids, list) else [],
+                (scores or [])[:5] if isinstance(scores, list) else [],
+                self.recommender_client.base_url,
+            )
 
             # Enrich thành thông tin chi tiết
             services = await self.recommendation_orchestrator.get_enriched_services(service_ids)
             services_text = await self.recommendation_orchestrator.get_enriched_services_for_prompt(service_ids)
+            logger.info(
+                "[TRACE] enrich_done conversation_id=%s services_count=%s",
+                str(request.conversation_id),
+                len(services) if isinstance(services, list) else -1,
+            )
 
             return {
                 "services": services,        # list dict chi tiết → dùng cho SSE

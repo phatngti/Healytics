@@ -26,8 +26,7 @@ class EmployeeSkillsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>()!;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Container(
       decoration: BoxDecoration(
@@ -46,34 +45,24 @@ class EmployeeSkillsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 16,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  colorScheme.surfaceContainerHighest
-                      .withAlpha(100),
+                  colorScheme.surfaceContainerHighest.withAlpha(100),
                   colorScheme.surface,
                 ],
               ),
               border: Border(
-                bottom: BorderSide(
-                  color: colorScheme.outlineVariant,
-                ),
+                bottom: BorderSide(color: colorScheme.outlineVariant),
               ),
             ),
             child: Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.psychology,
-                      color: semanticColors.success,
-                    ),
+                    Icon(Icons.psychology, color: semanticColors.success),
                     AppDimens.horizontalSmall,
                     Text(
                       _headerTitle,
@@ -83,9 +72,7 @@ class EmployeeSkillsCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                _HealthCheckBadge(
-                  healthCheckDate: _healthCheckDate,
-                ),
+                _HealthCheckBadge(healthCheckDate: _healthCheckDate),
               ],
             ),
           ),
@@ -103,14 +90,10 @@ class EmployeeSkillsCard extends StatelessWidget {
                 Container(
                   width: 1,
                   height: 150,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                  ),
+                  margin: const EdgeInsets.symmetric(horizontal: 32),
                   decoration: BoxDecoration(
                     border: Border(
-                      left: BorderSide(
-                        color: colorScheme.outlineVariant,
-                      ),
+                      left: BorderSide(color: colorScheme.outlineVariant),
                     ),
                   ),
                 ),
@@ -166,32 +149,25 @@ class _HealthCheckBadge extends StatelessWidget {
 
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>()!;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     final formatted = _formatDate(healthCheckDate!);
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: semanticColors.success?.withAlpha(25),
         borderRadius: AppDimens.radiusLarge,
         border: Border.all(
-          color: semanticColors.success?.withAlpha(75) ??
+          color:
+              semanticColors.success?.withAlpha(75) ??
               colorScheme.outlineVariant,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.verified_user,
-            size: 18,
-            color: semanticColors.success,
-          ),
+          Icon(Icons.verified_user, size: 18, color: semanticColors.success),
           const SizedBox(width: 6),
           Text(
             'Health Check Verified: $formatted',

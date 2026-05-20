@@ -1,22 +1,26 @@
+import 'package:common/widgets/images/network_image_auto.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 
 import 'package:user_app/features/home/domain/entities/'
-    'home.entity.dart';
+    'ai_recommendation.entity.dart';
 import 'package:user_app/features/home/presentation/'
     'providers/home.provider.dart';
+import 'package:user_app/features/home/presentation/widgets/'
+    'home_section_header.widget.dart';
+import 'package:user_app/router/routes.dart';
 
-/// Displays a horizontally-scrollable list of recommended
-/// services fetched via [productsProvider].
+/// Displays a horizontally-scrollable list of
+/// AI-recommended services fetched via
+/// [recommendedProductsProvider].
 class RecommendSection extends ConsumerWidget {
   const RecommendSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final productsAsync = ref.watch(recommendedProductsProvider);
+    final aiAsync = ref.watch(recommendedProductsProvider);
     final titleGap = AppDimens.titleGap(context);
 
     // Proportional card width: ~65 % of screen so
@@ -28,44 +32,23 @@ class RecommendSection extends ConsumerWidget {
 
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Flexible(
-              child: Text(
-                'Recommend For You',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {},
-              child: Text(
-                'See All',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
+        HomeSectionHeader(
+          title: 'Recommend For You',
+          onViewAll: () {
+            const HomeRecommendationsRoute().push(context);
+          },
         ),
         SizedBox(height: titleGap),
         SizedBox(
           height: listHeight,
-          child: productsAsync.when(
+          child: aiAsync.when(
             loading: () => _LoadingList(cardWidth: cardWidth),
             error: (_, __) => const _EmptyState(),
-            data: (products) {
-              if (products.isEmpty) {
+            data: (items) {
+              if (items.isEmpty) {
                 return const _EmptyState();
               }
-              return _ProductList(products: products, cardWidth: cardWidth);
+              return _RecommendList(items: items, cardWidth: cardWidth);
             },
           ),
         ),
@@ -75,33 +58,24 @@ class RecommendSection extends ConsumerWidget {
 }
 
 // ─────────────────────────────────────────────────────────
-// Horizontal product list
+// Horizontal recommendation list
 // ─────────────────────────────────────────────────────────
 
-class _ProductList extends StatelessWidget {
-  final List<HomeProduct> products;
+class _RecommendList extends StatelessWidget {
+  final List<AiRecommendation> items;
   final double cardWidth;
 
-  const _ProductList({required this.products, required this.cardWidth});
+  const _RecommendList({required this.items, required this.cardWidth});
 
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.none,
-      itemCount: products.length,
+      itemCount: items.length,
       separatorBuilder: (_, __) => SizedBox(width: AppDimens.spaceLg),
       itemBuilder: (_, index) {
-        final product = products[index];
-        return _RecommendCard(
-          width: cardWidth,
-          title: product.name,
-          imageUrl: product.imageUrl,
-          rating: product.rating,
-          duration: product.duration,
-          category: product.category,
-          price: product.price,
-        );
+        return _RecommendCard(width: cardWidth, item: items[index]);
       },
     );
   }
@@ -227,22 +201,9 @@ class _EmptyState extends StatelessWidget {
 
 class _RecommendCard extends StatelessWidget {
   final double width;
-  final String title;
-  final String imageUrl;
-  final String rating;
-  final String duration;
-  final String category;
-  final String price;
+  final AiRecommendation item;
 
-  const _RecommendCard({
-    required this.width,
-    required this.title,
-    required this.imageUrl,
-    required this.rating,
-    required this.duration,
-    required this.category,
-    required this.price,
-  });
+  const _RecommendCard({required this.width, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -268,51 +229,13 @@ class _RecommendCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
-            children: [
-              Container(
-                height: imageHeight,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(
-                    cardRad - AppDimens.spaceXs,
-                  ),
-                  image: DecorationImage(
-                    image: NetworkImage(imageUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: AppDimens.spaceMd,
-                right: AppDimens.spaceMd,
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: AppDimens.spaceSm,
-                    vertical: AppDimens.spaceXs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface.withValues(alpha: 0.9),
-                    borderRadius: AppDimens.radiusPill,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Symbols.star,
-                        size: AppDimens.iconXs,
-                        color: theme.colorScheme.primary,
-                      ),
-                      SizedBox(width: AppDimens.spaceXs),
-                      Text(
-                        rating,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          _CardImage(
+            imageUrl: item.imageUrl,
+            rating: item.rating,
+            totalReviews: item.totalReviews,
+            badge: item.badge,
+            height: imageHeight,
+            cardRadius: cardRad,
           ),
           SizedBox(height: AppDimens.spaceMd),
           Padding(
@@ -320,101 +243,276 @@ class _RecommendCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppDimens.adaptive(
-                      context,
-                      small: AppDimens.spaceLg,
-                      medium: AppDimens.spaceXl - 2,
-                      large: AppDimens.spaceXl - 2,
-                    ),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                _CardTitle(name: item.name, width: width),
+                if (item.staffName != null) ...[
+                  SizedBox(height: AppDimens.spaceXxs),
+                  _CardStaff(staffName: item.staffName!),
+                ],
                 SizedBox(height: AppDimens.spaceXs),
-                Row(
-                  children: [
-                    Icon(
-                      Symbols.schedule,
-                      size: AppDimens.iconSm,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    SizedBox(width: AppDimens.spaceXs),
-                    Text(
-                      duration,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    if (category.isNotEmpty) ...[
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppDimens.spaceXs,
-                        ),
-                        child: Text(
-                          '•',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                      Flexible(
-                        child: Text(
-                          category,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ],
+                _CardMeta(
+                  location: item.location,
+                  bookedCount: item.bookedCount,
                 ),
                 SizedBox(height: AppDimens.spaceMd),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        price,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: AppDimens.avatarSm,
-                      width: AppDimens.avatarSm,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.secondary,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.colorScheme.secondary.withValues(
-                              alpha: 0.3,
-                            ),
-                            blurRadius: AppDimens.spaceLg - 1,
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Symbols.add,
-                        color: theme.colorScheme.onSecondary,
-                        size: AppDimens.iconMd,
-                      ),
-                    ),
-                  ],
-                ),
+                _CardFooter(price: item.price, currency: item.currency),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+// Card sub-widgets
+// ─────────────────────────────────────────────────────────
+
+class _CardImage extends StatelessWidget {
+  final String imageUrl;
+  final double rating;
+  final int totalReviews;
+  final String? badge;
+  final double height;
+  final double cardRadius;
+
+  const _CardImage({
+    required this.imageUrl,
+    required this.rating,
+    required this.totalReviews,
+    this.badge,
+    required this.height,
+    required this.cardRadius,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final innerRadius = cardRadius - AppDimens.spaceXs;
+
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(innerRadius),
+          child: SizedBox(
+            height: height,
+            width: double.infinity,
+            child: NetworkImageAuto(imageUrl: imageUrl, fit: BoxFit.cover),
+          ),
+        ),
+        // Rating badge with review count
+        Positioned(
+          top: AppDimens.spaceMd,
+          right: AppDimens.spaceMd,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppDimens.spaceSm,
+              vertical: AppDimens.spaceXs,
+            ),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface.withValues(alpha: 0.9),
+              borderRadius: AppDimens.radiusPill,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Symbols.star,
+                  size: AppDimens.iconXs,
+                  color: theme.colorScheme.primary,
+                ),
+                SizedBox(width: AppDimens.spaceXs),
+                Text(
+                  rating.toStringAsFixed(1),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (totalReviews > 0) ...[
+                  SizedBox(width: AppDimens.spaceXxs),
+                  Text(
+                    '($totalReviews)',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        // Optional badge (e.g. "Popular")
+        if (badge != null)
+          Positioned(
+            top: AppDimens.spaceMd,
+            left: AppDimens.spaceMd,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppDimens.spaceSm,
+                vertical: AppDimens.spaceXs,
+              ),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary,
+                borderRadius: AppDimens.radiusPill,
+              ),
+              child: Text(
+                badge!,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _CardTitle extends StatelessWidget {
+  final String name;
+  final double width;
+
+  const _CardTitle({required this.name, required this.width});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Text(
+      name,
+      style: theme.textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.bold,
+        fontSize: AppDimens.adaptive(
+          context,
+          small: AppDimens.spaceLg,
+          medium: AppDimens.iconSmMd,
+          large: AppDimens.iconSmMd,
+        ),
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+/// Shows the staff/specialist name when the DTO
+/// provides it via [ServiceDetail.staffName].
+class _CardStaff extends StatelessWidget {
+  final String staffName;
+
+  const _CardStaff({required this.staffName});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      children: [
+        Icon(
+          Symbols.person,
+          size: AppDimens.iconXs,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        SizedBox(width: AppDimens.spaceXs),
+        Flexible(
+          child: Text(
+            staffName,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontStyle: FontStyle.italic,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CardMeta extends StatelessWidget {
+  final String location;
+  final int bookedCount;
+
+  const _CardMeta({required this.location, required this.bookedCount});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final metaStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+
+    return Row(
+      children: [
+        Icon(
+          Symbols.location_on,
+          size: AppDimens.iconSm,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        SizedBox(width: AppDimens.spaceXs),
+        Flexible(
+          child: Text(
+            location,
+            style: metaStyle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (bookedCount > 0) ...[
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
+            child: Text('•', style: metaStyle),
+          ),
+          Text('$bookedCount booked', style: metaStyle),
+        ],
+      ],
+    );
+  }
+}
+
+class _CardFooter extends StatelessWidget {
+  final String price;
+  final String currency;
+
+  const _CardFooter({required this.price, required this.currency});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(
+          child: Text(
+            price,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Container(
+          height: AppDimens.avatarSm,
+          width: AppDimens.avatarSm,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.secondary,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: theme.colorScheme.secondary.withValues(alpha: 0.3),
+                blurRadius: AppDimens.spaceMdLg,
+              ),
+            ],
+          ),
+          child: Icon(
+            Symbols.add,
+            color: theme.colorScheme.onSecondary,
+            size: AppDimens.iconMd,
+          ),
+        ),
+      ],
     );
   }
 }

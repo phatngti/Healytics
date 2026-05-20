@@ -16,29 +16,38 @@ import { RedisService, REDIS_CLIENT } from './redis.service';
           host: string;
           port: number;
           password?: string;
+          username?: string;
+          tls: boolean;
         };
+
+        const useTls = cfg.tls === true;
 
         const client = new Redis({
           host: cfg.host,
           port: cfg.port,
           password: cfg.password,
+          username: cfg.username,
+          ...(useTls ? { tls: {} } : {}),
           retryStrategy: (times) => {
-            if (times > 10) {
+            if (times > 5) {
               logger.error(
-                'Redis: max retries reached, stopping reconnection',
+                'Redis: max retries reached, giving up. App will work without Redis.',
               );
               return null; // stop retrying
             }
-            const delay = Math.min(times * 200, 5000);
+            const delay = Math.min(times * 1000, 5000);
             logger.warn(`Redis: reconnecting in ${delay}ms (attempt ${times})`);
             return delay;
           },
-          maxRetriesPerRequest: 3,
+          maxRetriesPerRequest: 1,
+          enableOfflineQueue: false,
           lazyConnect: true,
         });
 
         client.on('connect', () => logger.log('Redis connected'));
-        client.on('error', (err) => logger.error(`Redis error: ${err.message}`));
+        client.on('error', (err) =>
+          logger.error(`Redis error: ${err.message}`),
+        );
         client.on('close', () => logger.warn('Redis connection closed'));
 
         // Connect eagerly but don't crash the app if Redis is unavailable

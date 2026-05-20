@@ -6,6 +6,7 @@ class EmployeeFormActions extends StatelessWidget {
   final VoidCallback? onCancel;
   final VoidCallback? onSubmit;
   final bool isLoading;
+  final bool isFormValid;
   final String submitLabel;
   final Widget? submitIcon;
 
@@ -14,6 +15,7 @@ class EmployeeFormActions extends StatelessWidget {
     this.onCancel,
     this.onSubmit,
     this.isLoading = false,
+    this.isFormValid = false,
     this.submitLabel = 'Create Employee',
     this.submitIcon,
   });
@@ -27,19 +29,28 @@ class EmployeeFormActions extends StatelessWidget {
           onPressed: isLoading ? null : onCancel,
           child: const Text('Cancel'),
         ),
-        AppDimens.horizontalSmall,
-        AppButton(
-          buttonType: ButtonType.elevated,
-          onPressed: isLoading ? null : onSubmit,
-          isLoading: isLoading,
+        AnimatedSize(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (submitIcon != null) ...[
-                submitIcon!,
-                AppDimens.horizontalSmall,
-              ],
-              Text(submitLabel),
+              AppDimens.horizontalSmall,
+              AppButton(
+                buttonType: ButtonType.elevated,
+                onPressed: isLoading || !isFormValid ? null : onSubmit,
+                isLoading: isLoading,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (submitIcon != null) ...[
+                      submitIcon!,
+                      AppDimens.horizontalSmall,
+                    ],
+                    Text(submitLabel),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

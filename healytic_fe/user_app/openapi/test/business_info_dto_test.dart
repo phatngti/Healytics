@@ -21,6 +21,11 @@ void main() {
       // TODO
     });
 
+    // VerifiedField legalName
+    test('to test the property `legalName`', () async {
+      // TODO
+    });
+
     // VerifiedField taxRegistrationCode
     test('to test the property `taxRegistrationCode`', () async {
       // TODO

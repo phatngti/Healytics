@@ -9,7 +9,10 @@ Pipeline:
   1c. Location fallback scan → N-gram lookup trên DB cache
   1d. Distance & Proximity extraction
   1e. Semantic Fallback → feed cả câu vào SemanticMatcher nếu chưa có BUSINESS_TYPE
-  2.  Price/Rating regex → PRICE, RATING
+    2.  Numeric handling
+            - PRICE: Gemini-first, fallback local regex nếu Gemini không trả PRICE
+            - DISTANCE: Gemini-first, fallback local deterministic extractor nếu Gemini không trả DISTANCE
+            - RATING: disabled (không trả ra entity)
   3.  LRU query cache → tránh xử lý lại câu truy vấn giống nhau
 
 Kết quả trả về: list[dict] dạng:
@@ -114,7 +117,10 @@ _PRICE_SINGLE_PATTERN = re.compile(
     r"(dưới|trên|tối đa|tối thiểu|khoảng|cỡ|tầm|<=?|>=?)\s*"
     r"([\d.,]+)\s*"
     r"(k|nghìn|ngàn|triệu|tr|đồng|đ|vnđ)?\b"
-    r"(?!\s*(?:sao|điểm|★|\*|km\b|m\b|cây\s*số|dặm))",
+    r"(?!\s*(?:"
+    r"sao|điểm|★|\*|km\b|m\b|cây\s*số|dặm"
+    r"|(?:đến|tới|-|–|—)\s*[\d.,]+\s*(?:km\b|m\b|cây\s*số|dặm)"
+    r"))",
     re.IGNORECASE,
 )
 
@@ -136,7 +142,7 @@ _PRICE_RANGE_PATTERN = re.compile(
 )
 
 # ============================================================================
-# Rating Regex
+# Rating Regex (currently disabled in output flow)
 # ============================================================================
 _RATING_PATTERN = re.compile(
     r"(trên|từ|dưới|tối thiểu|ít nhất|>=?|<=?)\s*"
@@ -188,10 +194,18 @@ async def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
     entities: list[dict] = []
     t0 = time.perf_counter()
     extraction_source = "local"
+    gemini_returned_entities = False
+    gemini_has_business_type = False
 
     llm_entities = await extract_entities_with_gemini(text)
+    gemini_price_entities: list[dict] = []
+    gemini_distance_entities: list[dict] = []
     if llm_entities:
         entities.extend(llm_entities)
+        gemini_returned_entities = True
+        gemini_has_business_type = any(e.get("type") == "BUSINESS_TYPE" for e in llm_entities)
+        gemini_price_entities = [e for e in llm_entities if e.get("type") == "PRICE"]
+        gemini_distance_entities = [e for e in llm_entities if e.get("type") == "DISTANCE"]
         extraction_source = "gemini"
         t_llm = time.perf_counter()
         logger.info(f"[Perf] Gemini NER: {(t_llm-t0)*1000:.2f}ms | entities={len(llm_entities)}")
@@ -225,39 +239,68 @@ async def extract_entities_with_source(text: str) -> tuple[list[dict], str]:
     t3_dist = time.perf_counter()
     logger.info(f"[Perf] Distance Extraction: {(t3_dist-t3)*1000:.2f}ms")
 
-    has_business_type = any(e["type"] == "BUSINESS_TYPE" for e in entities)
-    if not has_business_type:
-        try:
-            from app.ner.semantic_matcher import get_matcher
+    # ============================================================================
+    # SEMANTIC FALLBACK - TEMPORARILY DISABLED
+    # ============================================================================
+    # Reason: Semantic fallback was bypassing confidence filter by adding
+    # entities with hardcoded confidence=0.75, causing 26+ false positives.
+    # 
+    # Gemini NER with confidence filter (threshold=0.8) is sufficient.
+    # If recall drops significantly, we can re-enable with stricter conditions:
+    #   - Higher semantic matching threshold (0.5+ instead of 0.35)
+    #   - Higher confidence score (0.85+ to pass filter)
+    #   - Mandatory business keyword validation
+    #
+    # Current strategy: Trust Gemini + confidence filter only.
+    #
+    # has_business_type = any(e["type"] == "BUSINESS_TYPE" for e in entities)
+    # if not has_business_type and settings.LLM_NER_ENABLED:
+    #     try:
+    #         from app.ner.semantic_matcher import get_matcher
+    #         matcher = get_matcher()
+    #         matched_bt = await asyncio.to_thread(matcher.match_business_type, text, 0.5)
+    #         if matched_bt:
+    #             business_keywords = ['spa', 'gym', 'massage', 'nha khoa', 'yoga', 'phòng khám', 
+    #                                 'fitness', 'tâm lý', 'dinh dưỡng', 'da liễu']
+    #             has_keyword = any(kw in text.lower() for kw in business_keywords)
+    #             if has_keyword:
+    #                 entities.append({
+    #                     "type": "BUSINESS_TYPE",
+    #                     "value": text.strip(),
+    #                     "confidence": 0.85,
+    #                     "business_type": matched_bt,
+    #                     "business_evidence": text.strip(),
+    #                 })
+    #                 logger.info(f"[Extractor] Semantic Fallback: '{text[:60]}' -> {matched_bt}")
+    #     except Exception as exc:
+    #         logger.warning("[Extractor] Semantic fallback unavailable: %s", exc)
 
-            matcher = get_matcher()
-            matched_bt = await asyncio.to_thread(matcher.match_business_type, text, 0.35)
-            if matched_bt:
-                entities.append(
-                    {
-                        "type": "BUSINESS_TYPE",
-                        "value": text.strip(),
-                        "confidence": 0.75,
-                        "business_type": matched_bt,
-                    }
-                )
-                logger.info(f"[Extractor] Semantic Fallback: '{text[:60]}' -> {matched_bt}")
-        except Exception as exc:
-            logger.warning("[Extractor] Semantic fallback unavailable: %s", exc)
-
-    # Deterministic numeric extraction is strictly superior for VN queries.
-    # We strip LLM's naive attempts at PRICE/RATING/DISTANCE to let local regex handle rules & overlaps properly.
+    # Numeric policy:
+    # - PRICE: Gemini-first, fallback local regex when Gemini has no PRICE.
+    # - DISTANCE: Gemini-first, fallback local deterministic extraction.
+    # - RATING: disabled (drop from output).
     entities = [e for e in entities if e.get("type") not in {"PRICE", "RATING", "DISTANCE"}]
 
-    entities.extend(extract_distance_entities(text))
-    entities.extend(_parse_price(text))
-    entities.extend(_parse_rating(text))
+    if gemini_distance_entities:
+        entities.extend(gemini_distance_entities)
+    else:
+        entities.extend(distance_entities)
+
+    if gemini_price_entities:
+        entities.extend(gemini_price_entities)
+    else:
+        entities.extend(_parse_price(text))
 
     t4 = time.perf_counter()
     logger.info(f"[Perf] Post-process (Distance/Price/Rating): {(t4-t0)*1000:.2f}ms")
 
     entities = _deduplicate(entities)
     entities = _resolve_distance_priority(entities)
+
+    # If Gemini already returned entities but none are BUSINESS_TYPE,
+    # do not allow local fallback paths to add BUSINESS_TYPE.
+    if gemini_returned_entities and not gemini_has_business_type:
+        entities = [e for e in entities if e.get("type") != "BUSINESS_TYPE"]
 
     from app.ner.cache import find_location
 
@@ -382,6 +425,7 @@ def _keyword_scan(text: str) -> tuple[list[dict], list[tuple[int, int]]]:
                 "value": text[start:end],
                 "confidence": 0.90,
                 "business_type": BUSINESS_TYPE_ALIASES[keyword],
+                    "business_evidence": text[start:end],
             })
 
     return found, already_matched_ranges
@@ -715,6 +759,8 @@ def _deduplicate(entities: list[dict]) -> list[dict]:
         # Fill missing normalized fields from the secondary candidate.
         for fld in (
             "business_type",
+            "business_evidence",
+            "business_phrase",
             "operator",
             "amount",
             "amount_max",
@@ -760,7 +806,10 @@ def _deduplicate(entities: list[dict]) -> list[dict]:
 
 def _resolve_distance_priority(entities: list[dict]) -> list[dict]:
     """
-    Keep at most one DISTANCE entity, prioritizing explicit distance over implicit proximity.
+    Keep at most one DISTANCE entity.
+
+    If multiple explicit DISTANCE constraints exist (e.g., "trên 2km" + "dưới 5km"),
+    merge them into a single range entity instead of dropping one side.
     """
     distances = [e for e in entities if e.get("type") == "DISTANCE"]
     if len(distances) <= 1:
@@ -771,7 +820,8 @@ def _resolve_distance_priority(entities: list[dict]) -> list[dict]:
         if e.get("radius_meters") is not None and e.get("proximity_intent") is False
     ]
     if explicit:
-        chosen = max(explicit, key=lambda x: float(x.get("confidence", 0)))
+        merged = _merge_distance_constraints(explicit)
+        chosen = merged if merged else max(explicit, key=lambda x: float(x.get("confidence", 0)))
     else:
         # Fall back to any distance with meters, then highest confidence.
         with_radius = [e for e in distances if e.get("radius_meters") is not None]
@@ -789,3 +839,94 @@ def _resolve_distance_priority(entities: list[dict]) -> list[dict]:
             used_distance = True
 
     return kept
+
+
+def _merge_distance_constraints(distances: list[dict]) -> Optional[dict]:
+    """Merge multiple DISTANCE entities into one coherent bound if possible."""
+    if not distances:
+        return None
+
+    lowers: list[float] = []
+    uppers: list[float] = []
+    has_explicit = False
+
+    for e in distances:
+        op = str(e.get("operator") or "").lower().strip()
+        amount = e.get("amount")
+        amount_max = e.get("amount_max")
+        radius = e.get("radius_meters")
+
+        try:
+            amount_f = float(amount) if amount is not None else None
+        except (TypeError, ValueError):
+            amount_f = None
+
+        try:
+            amount_max_f = float(amount_max) if amount_max is not None else None
+        except (TypeError, ValueError):
+            amount_max_f = None
+
+        try:
+            radius_f = float(radius) if radius is not None else None
+        except (TypeError, ValueError):
+            radius_f = None
+
+        if e.get("proximity_intent") is False:
+            has_explicit = True
+
+        if op == "between":
+            if amount_f is not None:
+                lowers.append(amount_f)
+            if amount_max_f is not None:
+                uppers.append(amount_max_f)
+            continue
+
+        if op == "gte":
+            if amount_f is not None:
+                lowers.append(amount_f)
+            if amount_max_f is not None:
+                uppers.append(amount_max_f)
+            continue
+
+        if op == "lte":
+            if amount_f is not None:
+                uppers.append(amount_f)
+            continue
+
+        # Legacy fallback without operator: treat radius as upper bound.
+        if radius_f is not None:
+            uppers.append(radius_f)
+
+    lower = max(lowers) if lowers else None
+    upper = min(uppers) if uppers else None
+
+    if lower is not None and upper is not None and lower > upper:
+        return None
+
+    chosen = dict(max(distances, key=lambda x: float(x.get("confidence", 0))))
+    chosen["type"] = "DISTANCE"
+    chosen["proximity_intent"] = False if has_explicit else chosen.get("proximity_intent")
+
+    if lower is not None and upper is not None:
+        chosen["operator"] = "between"
+        chosen["amount"] = float(lower)
+        chosen["amount_max"] = float(upper)
+        chosen["radius_meters"] = int(upper)
+        return chosen
+
+    if upper is not None:
+        chosen["operator"] = "lte"
+        chosen["amount"] = float(upper)
+        chosen["amount_max"] = None
+        chosen["radius_meters"] = int(upper)
+        return chosen
+
+    if lower is not None:
+        chosen["operator"] = "gte"
+        chosen["amount"] = float(lower)
+        chosen["amount_max"] = float(settings.MAX_PROXIMITY_RADIUS_M)
+        # Keep compatibility for callers still reading radius_meters.
+        chosen["radius_meters"] = int(lower)
+        return chosen
+
+    return chosen

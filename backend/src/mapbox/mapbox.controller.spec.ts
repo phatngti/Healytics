@@ -10,15 +10,14 @@ describe('MapboxController', () => {
     geocode: jest.fn(),
     reverseGeocode: jest.fn(),
     distanceMatrix: jest.fn(),
+    directions: jest.fn(),
     getClientApiKey: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MapboxController],
-      providers: [
-        { provide: MapboxService, useValue: mockService },
-      ],
+      providers: [{ provide: MapboxService, useValue: mockService }],
     }).compile();
 
     controller = module.get(MapboxController);
@@ -28,7 +27,11 @@ describe('MapboxController', () => {
   afterEach(() => jest.clearAllMocks());
 
   it('geocode should delegate to service', async () => {
-    const expected = { results: [{ lat: 10, lng: 106, formattedAddress: 'A', placeId: 'address.1' }] };
+    const expected = {
+      results: [
+        { lat: 10, lng: 106, formattedAddress: 'A', placeId: 'address.1' },
+      ],
+    };
     mockService.geocode.mockResolvedValue(expected);
 
     const result = await controller.geocode({ address: 'test' });
@@ -46,10 +49,17 @@ describe('MapboxController', () => {
   });
 
   it('distanceMatrix should delegate to service', async () => {
-    const expected = { originAddresses: [], destinationAddresses: [], rows: [] };
+    const expected = {
+      originAddresses: [],
+      destinationAddresses: [],
+      rows: [],
+    };
     mockService.distanceMatrix.mockResolvedValue(expected);
 
-    const result = await controller.distanceMatrix({ origins: 'A', destinations: 'B' });
+    const result = await controller.distanceMatrix({
+      origins: 'A',
+      destinations: 'B',
+    });
     expect(service.distanceMatrix).toHaveBeenCalledWith('A', 'B');
     expect(result).toBe(expected);
   });
@@ -60,5 +70,23 @@ describe('MapboxController', () => {
     const result = controller.getClientKey();
     expect(service.getClientApiKey).toHaveBeenCalled();
     expect(result).toEqual({ apiKey: 'pk.test-key' });
+  });
+
+  it('directions should delegate to service', async () => {
+    const expected = {
+      route: [{ latitude: 10, longitude: 106 }],
+      distanceText: '1.0 km',
+      distanceValue: 1000,
+      durationText: '5 mins',
+      durationValue: 300,
+    };
+    mockService.directions.mockResolvedValue(expected);
+
+    const result = await controller.directions({
+      origin: '10,106',
+      destination: '11,107',
+    });
+    expect(service.directions).toHaveBeenCalledWith('10,106', '11,107');
+    expect(result).toBe(expected);
   });
 });

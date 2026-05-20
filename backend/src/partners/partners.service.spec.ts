@@ -4,14 +4,20 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Account } from '@/common/entities/account.entity';
 import { Partner } from '@/common/entities/partner.entity';
 import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
+import { PartnerCertification } from '@/clinic/entities/partner-certification.entity';
 import { NotFoundException } from '@nestjs/common';
 import { BusinessType } from './enum/business-type.enum';
 import { PartnerVerificationStatus } from './enum/partner-verification-status.enum';
 import { RegisterPartnerHandler } from './application/handlers/register-partner.handler';
 import { UpdatePartnerProfileHandler } from './application/handlers/update-partner-profile.handler';
+import { UpdatePartnerPublicProfileHandler } from './application/handlers/update-partner-public-profile.handler';
 import { Role } from '@/account/enum/role.enum';
+import { BadRequestException } from '@nestjs/common';
 
 describe('PartnersService', () => {
+  const completedDescription =
+    'A modern wellness clinic focused on preventive care, personalized treatment planning, and a calm patient experience across consultation, therapy, and follow-up visits.';
+
   let service: PartnersService;
   let accountRepository: Record<string, jest.Mock>;
   let partnerRepository: Record<string, jest.Mock>;
@@ -24,6 +30,7 @@ describe('PartnersService', () => {
 
   const mockPartnerRepository = {
     findOne: jest.fn(),
+    save: jest.fn(),
   };
 
   const mockReviewLogRepository = {
@@ -35,6 +42,10 @@ describe('PartnersService', () => {
   };
 
   const mockUpdatePartnerProfileHandler = {
+    execute: jest.fn(),
+  };
+
+  const mockUpdatePartnerPublicProfileHandler = {
     execute: jest.fn(),
   };
 
@@ -72,6 +83,17 @@ describe('PartnersService', () => {
     },
     account: mockAccount,
     documents: [],
+    coverImageUrl: null,
+    logoImageUrl: null,
+    gallery: [],
+    description: null,
+  };
+
+  const mockCertificationRepository = {
+    find: jest.fn(),
+    save: jest.fn(),
+    create: jest.fn((value) => value),
+    delete: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -93,12 +115,20 @@ describe('PartnersService', () => {
           useValue: mockReviewLogRepository,
         },
         {
+          provide: getRepositoryToken(PartnerCertification),
+          useValue: mockCertificationRepository,
+        },
+        {
           provide: RegisterPartnerHandler,
           useValue: mockRegisterPartnerHandler,
         },
         {
           provide: UpdatePartnerProfileHandler,
           useValue: mockUpdatePartnerProfileHandler,
+        },
+        {
+          provide: UpdatePartnerPublicProfileHandler,
+          useValue: mockUpdatePartnerPublicProfileHandler,
         },
       ],
     }).compile();
@@ -225,6 +255,131 @@ describe('PartnersService', () => {
       await expect(service.getMyProfile('invalid-account')).rejects.toThrow(
         'Partner not found',
       );
+    });
+  });
+
+  describe('profile completion', () => {
+    it('should compute partner profile completion status', () => {
+      expect(
+        service.isPartnerProfileCompleted({
+          coverImageUrl: 'https://cdn.example.com/cover.jpg',
+          logoImageUrl: 'https://cdn.example.com/logo.jpg',
+          description: completedDescription,
+          gallery: ['1', '2', '3'],
+        }),
+      ).toBe(true);
+
+      expect(
+        service.isPartnerProfileCompleted({
+          coverImageUrl: 'https://cdn.example.com/cover.jpg',
+          logoImageUrl: null,
+          description: 'Incomplete clinic profile',
+          gallery: ['1', '2', '3'],
+        }),
+      ).toBe(false);
+    });
+
+    it('should return profile completion data for approved partners', async () => {
+      mockPartnerRepository.findOne.mockResolvedValue({
+        ...mockPartner,
+        verificationStatus: PartnerVerificationStatus.APPROVED,
+        brandName: 'Approved Clinic',
+      });
+      mockCertificationRepository.find.mockResolvedValue([
+        {
+          id: 'cert-1',
+          partnerId: 'partner-uuid',
+          title: 'ISO 9001:2015',
+          subtitle: 'Quality',
+          iconName: 'workspace_premium',
+          sortOrder: 0,
+        },
+      ]);
+
+      const result = await service.getMyProfileCompletion('account-uuid');
+
+      expect(result.clinicIdentity.brandName).toBe('Approved Clinic');
+      expect(result.certifications).toHaveLength(1);
+      expect(result.isCompleted).toBe(false);
+    });
+
+    it('should reject completion access for non-approved partners', async () => {
+      mockPartnerRepository.findOne.mockResolvedValue({
+        ...mockPartner,
+        verificationStatus: PartnerVerificationStatus.PENDING,
+      });
+
+      await expect(
+        service.getMyProfileCompletion('account-uuid'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should update completion data and certifications', async () => {
+      mockPartnerRepository.findOne
+        .mockResolvedValueOnce({
+          ...mockPartner,
+          verificationStatus: PartnerVerificationStatus.APPROVED,
+        })
+        .mockResolvedValueOnce({
+          ...mockPartner,
+          verificationStatus: PartnerVerificationStatus.APPROVED,
+          coverImageUrl: 'https://cdn.example.com/cover.jpg',
+          logoImageUrl: 'https://cdn.example.com/logo.jpg',
+          description: completedDescription,
+          gallery: ['a', 'b', 'c'],
+        });
+      mockPartnerRepository.save.mockResolvedValue(undefined);
+      mockCertificationRepository.find
+        .mockResolvedValueOnce([
+          {
+            id: 'cert-old',
+            partnerId: 'partner-uuid',
+            title: 'Old',
+            subtitle: null,
+            iconName: 'verified',
+            sortOrder: 0,
+          },
+        ])
+        .mockResolvedValueOnce([
+          {
+            id: 'cert-new',
+            partnerId: 'partner-uuid',
+            title: 'ISO 9001:2015',
+            subtitle: 'Quality',
+            iconName: 'workspace_premium',
+            sortOrder: 0,
+          },
+        ]);
+      mockCertificationRepository.save.mockResolvedValue([
+        {
+          id: 'cert-new',
+          partnerId: 'partner-uuid',
+          title: 'ISO 9001:2015',
+          subtitle: 'Quality',
+          iconName: 'workspace_premium',
+          sortOrder: 0,
+        },
+      ]);
+      mockCertificationRepository.delete.mockResolvedValue(undefined);
+
+      const result = await service.updateMyProfileCompletion('account-uuid', {
+        coverImageUrl: 'https://cdn.example.com/cover.jpg',
+        logoImageUrl: 'https://cdn.example.com/logo.jpg',
+        description: completedDescription,
+        gallery: ['a', 'b', 'c'],
+        certifications: [
+          {
+            title: 'ISO 9001:2015',
+            subtitle: 'Quality',
+            iconName: 'workspace_premium',
+            sortOrder: 0,
+          },
+        ],
+      });
+
+      expect(mockPartnerRepository.save).toHaveBeenCalled();
+      expect(result.isCompleted).toBe(true);
+      expect(result.certifications).toHaveLength(1);
     });
   });
 

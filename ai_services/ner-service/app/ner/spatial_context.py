@@ -8,6 +8,7 @@ Handles:
 """
 
 import logging
+import re
 from typing import Optional, Tuple, List
 from dataclasses import dataclass
 
@@ -16,6 +17,48 @@ from app.ner.cache import PROVINCE_MAP, to_canonical  # reuse cache's canonical 
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
+
+
+# District-level location codes currently used in fallback maps.
+# These map to province centers when district center coordinates are unavailable.
+_DISTRICT_CODE_TO_PROVINCE_CODE: dict[str, str] = {
+    # Ha Noi
+    "001": "01",
+    "002": "01",
+    "003": "01",
+    "005": "01",
+    "006": "01",
+    "007": "01",
+    "008": "01",
+    "009": "01",
+    "016": "01",
+    "017": "01",
+    "018": "01",
+    "019": "01",
+    "021": "01",
+    # Ho Chi Minh City
+    "760": "79",
+    "761": "79",
+    "762": "79",
+    "763": "79",
+    "764": "79",
+    "765": "79",
+    "766": "79",
+    "767": "79",
+    "768": "79",
+    "769": "79",
+    "770": "79",
+    "771": "79",
+    "772": "79",
+    "773": "79",
+    "774": "79",
+    "775": "79",
+    "776": "79",
+    "777": "79",
+    "778": "79",
+    "784": "79",
+    "786": "79",
+}
 
 
 # ============================================================================
@@ -61,7 +104,7 @@ def resolve_spatial_context(
         logger.info("[SpatialContext] No DISTANCE entity found, no spatial context")
         return None
 
-    radius_meters = distance_entity.radius_meters or settings.DEFAULT_PROXIMITY_RADIUS_M
+    radius_meters = _resolve_distance_radius(distance_entity)
 
     # Priority 1: Use provided current coordinates (real GPS — no boundary restriction)
     if current_lat is not None and current_lng is not None:
@@ -108,37 +151,116 @@ def resolve_spatial_context(
     return None
 
 
+def _resolve_distance_radius(distance_entity: NerEntity) -> int:
+    """Resolve max search radius from DISTANCE entity with operator semantics."""
+    max_radius = max(settings.MAX_PROXIMITY_RADIUS_M, settings.DEFAULT_PROXIMITY_RADIUS_M)
+    op = (distance_entity.operator or "").strip().lower()
+
+    if op == "between" and distance_entity.amount_max is not None:
+        try:
+            return int(max(1, min(max_radius, float(distance_entity.amount_max))))
+        except (TypeError, ValueError):
+            pass
+
+    if op == "lte" and distance_entity.amount is not None:
+        try:
+            return int(max(1, min(max_radius, float(distance_entity.amount))))
+        except (TypeError, ValueError):
+            pass
+
+    if op == "gte":
+        # Open upper bound needs a finite search cap for PostGIS index-friendly query.
+        try:
+            if distance_entity.amount_max is not None:
+                return int(max(1, min(max_radius, float(distance_entity.amount_max))))
+        except (TypeError, ValueError):
+            pass
+        return max_radius
+
+    if distance_entity.radius_meters is not None:
+        try:
+            return int(max(1, min(max_radius, float(distance_entity.radius_meters))))
+        except (TypeError, ValueError):
+            pass
+
+    return settings.DEFAULT_PROXIMITY_RADIUS_M
+
+
 # ============================================================================
 # Address Resolution Helpers
 # ============================================================================
 
 def resolve_registered_address(address: str) -> Optional[Tuple[float, float]]:
-    """Resolve address string → (lat, lng) using cache's to_canonical for matching."""
+    """
+    Resolve free-form address string → (lat, lng) by matching province aliases.
+
+    Supports exact province names and full addresses containing province tokens,
+    e.g. "123 Le Loi, Quan 1, TP HCM".
+    """
     if not address:
         return None
 
-    canonical_address = to_canonical(address)
+    canonical_address = _normalize_for_token_match(to_canonical(address))
 
+    # 1) Exact canonical province alias match.
     for province_name, province_info in PROVINCE_MAP.items():
-        if to_canonical(province_name) == canonical_address:
+        province_key = _normalize_for_token_match(to_canonical(province_name))
+        if province_key == canonical_address:
             coords = _get_province_center_coordinates(province_info.get("code", ""))
             if coords:
                 return coords
+
+    # 2) Province alias appears as a token phrase inside full address.
+    # Prefer the longest alias to avoid short-token ambiguity.
+    matched: list[tuple[int, str]] = []
+    wrapped_address = f" {canonical_address} "
+
+    for province_name, province_info in PROVINCE_MAP.items():
+        province_key = _normalize_for_token_match(to_canonical(province_name))
+        if not province_key:
+            continue
+        if f" {province_key} " in wrapped_address:
+            matched.append((len(province_key), province_info.get("code", "")))
+
+    if matched:
+        _, province_code = max(matched, key=lambda item: item[0])
+        coords = _get_province_center_coordinates(province_code)
+        if coords:
+            return coords
 
     logger.warning(f"[SpatialContext] Could not resolve address: {address}")
     return None
 
 
 def resolve_location_code_to_coordinates(location_code: str) -> Optional[Tuple[float, float]]:
-    """Resolve province code → (lat, lng) center coordinates."""
+    """
+    Resolve location code → (lat, lng) center coordinates.
+
+    Supports:
+      - Province code directly
+      - District code fallback to owning province center when district center is unavailable
+    """
     if not location_code:
         return None
 
-    coords = _get_province_center_coordinates(location_code)
+    code = str(location_code).strip()
+
+    coords = _get_province_center_coordinates(code)
     if coords:
         return coords
 
-    logger.warning(f"[SpatialContext] No center coords for location_code: {location_code}")
+    province_code = _DISTRICT_CODE_TO_PROVINCE_CODE.get(code)
+    if province_code:
+        coords = _get_province_center_coordinates(province_code)
+        if coords:
+            logger.info(
+                "[SpatialContext] Fallback district code %s -> province %s center",
+                code,
+                province_code,
+            )
+            return coords
+
+    logger.warning(f"[SpatialContext] No center coords for location_code: {code}")
     return None
 
 
@@ -218,3 +340,11 @@ def _get_province_center_coordinates(province_code: str) -> Optional[Tuple[float
         "96": (9.1769,  105.1524),  # Cà Mau
     }
     return PROVINCE_CENTERS.get(province_code)
+
+
+def _normalize_for_token_match(text: str) -> str:
+    """Normalize text for conservative token-phrase matching."""
+    if not text:
+        return ""
+    cleaned = re.sub(r"[^\w\s]", " ", text)
+    return " ".join(cleaned.split())

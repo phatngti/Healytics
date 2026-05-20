@@ -155,11 +155,15 @@ class _EmployeeWorkScheduleCardState extends State<EmployeeWorkScheduleCard> {
                     ),
                   ),
                   AppDimens.horizontalMediumSmall,
-                  Text(
-                    'Work Schedule',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        'Work Schedule',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Text(' *', style: TextStyle(color: Colors.red)),
+                    ],
                   ),
                   const Spacer(),
                   AnimatedRotation(

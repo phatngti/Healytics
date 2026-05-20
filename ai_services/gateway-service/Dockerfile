@@ -2,45 +2,48 @@ FROM python:3.11-slim
 
 # docker build -t giahung2111/healytics_gateway:latest .
 # docker run --name healytics_gateway -p 9000:9000 --env-file .env healytics_gateway
-# uvicorn app.main:app --host 0.0.0.0 --port 9000
+# uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload
 # docker start -ai healytics_gateway
-# docker tag healytics_gateway giahung2111/healytics_gateway:latest 
+# docker tag healytics_gateway giahung2111/healytics_gateway:latest
 # docker push giahung2111/healytics_gateway:latest
 
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# 1. Workdir
 WORKDIR /app
 
-# 2. System dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+# ── 1. System deps + pip upgrade (layer hiếm khi đổi) ─────────────
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --upgrade pip
 
-# 3. Upgrade pip
-RUN pip install --upgrade pip
+# ── 2. PyTorch CPU-only (~200 MB, thay vì 530 MB CUDA + 5 GB NVIDIA libs) ──
+RUN pip install --index-url https://download.pytorch.org/whl/cpu \
+        torch
 
-# 4. Install python libraries
-RUN pip install --no-cache-dir \
-    fastapi \
-    uvicorn \
-    httpx \
-    pydantic \
-    sqlalchemy \
-    asyncpg \
-    python-dotenv \
-    pydantic_settings \
-    sentence-transformers \
-    scikit-learn \
-    joblib \
-    pandas
+# ── 3. Heavy ML libs (layer riêng: ít đổi, tái dùng cache tốt) ────
+RUN pip install \
+        sentence-transformers \
+        scikit-learn
 
-# 5. Copy source code
+# ── 4. Light app libs (thêm/bớt lib nhẹ chỉ invalidate layer này) ─
+RUN pip install \
+        fastapi \
+        uvicorn \
+        httpx \
+        pydantic \
+        pydantic-settings \
+        python-dotenv \
+        sqlalchemy \
+        asyncpg \
+        joblib
+
+# ── 5. Copy source code (layer đổi mỗi lần dev) ───────────────────
 COPY . /app
 
-# 6. Expose port
 EXPOSE 9000
 
-# 7. Start service
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000"]

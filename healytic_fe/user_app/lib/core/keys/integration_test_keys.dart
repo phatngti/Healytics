@@ -11,60 +11,64 @@ import 'package:flutter/foundation.dart';
 
 class OnboardPageKeys {
   final signInButton = const Key('onboardSignInButton');
-  final createAccountButton = const Key(
-    'onboardCreateAccountButton',
-  );
+  final createAccountButton = const Key('onboardCreateAccountButton');
 }
 
 // --- Sign In ---
 
 class SignInPageKeys {
   final emailTextField = const Key('signInEmailTextField');
-  final passwordTextField = const Key(
-    'signInPasswordTextField',
-  );
+  final passwordTextField = const Key('signInPasswordTextField');
   final signInButton = const Key('signInButton');
-  final forgotPasswordButton = const Key(
-    'forgotPasswordButton',
-  );
+  final forgotPasswordButton = const Key('forgotPasswordButton');
   final googleButton = const Key('googleSignInButton');
-  final facebookButton = const Key(
-    'facebookSignInButton',
+  final facebookButton = const Key('facebookSignInButton');
+}
+
+class ForgotPasswordPageKeys {
+  final emailTextField = const Key('forgotPasswordEmailTextField');
+  final sendResetCodeButton = const Key('forgotPasswordSendResetCodeButton');
+}
+
+class PasswordResetCodePageKeys {
+  final pinput = const Key('passwordResetCodePinput');
+  final submitButton = const Key('passwordResetCodeSubmitButton');
+  final resendButton = const Key('passwordResetCodeResendButton');
+}
+
+class ResetPasswordPageKeys {
+  final passwordTextField = const Key('resetPasswordPasswordTextField');
+  final confirmPasswordTextField = const Key(
+    'resetPasswordConfirmPasswordTextField',
   );
+  final submitButton = const Key('resetPasswordSubmitButton');
 }
 
 // --- Sign Up: Email Form ---
 
 class EmailFormPageKeys {
-  final emailTextField = const Key(
-    'emailFormEmailTextField',
-  );
-  final continueButton = const Key(
-    'emailFormContinueButton',
-  );
+  final emailTextField = const Key('emailFormEmailTextField');
+  final continueButton = const Key('emailFormContinueButton');
 }
 
 // --- Sign Up: Code Confirmation ---
 
 class CodeConfirmationPageKeys {
   final pinput = const Key('codeConfirmationPinput');
-  final submitButton = const Key(
-    'codeConfirmationSubmitButton',
-  );
-  final resendLink = const Key(
-    'codeConfirmationResendLink',
-  );
+  final submitButton = const Key('codeConfirmationSubmitButton');
+  final resendLink = const Key('codeConfirmationResendLink');
 }
 
 // --- Home ---
 
 class HomePageKeys {
   final searchField = const Key('homeSearchField');
+  final cartButton = const Key('homeCartButton');
 }
 
-// --- Bot Chat ---
+// --- AI Health Assistant Chat ---
 
-class ChatPageKeys {
+class ChatScreenKeys {
   final messageInput = const Key('chatMessageInput');
   final sendButton = const Key('chatSendButton');
   final newChatButton = const Key('chatNewButton');
@@ -73,9 +77,24 @@ class ChatPageKeys {
 // --- Checkout ---
 
 class CheckoutPageKeys {
-  final confirmButton = const Key(
-    'checkoutConfirmButton',
-  );
+  final confirmButton = const Key('checkoutConfirmButton');
+
+  Key paymentMethodTile(String method) =>
+      ValueKey('checkoutPaymentMethod-$method');
+}
+
+// --- Cart ---
+
+class CartPageKeys {
+  final searchField = const Key('cartSearchField');
+  final checkoutButton = const Key('cartCheckoutButton');
+  final voucherApplyButton = const Key('cartVoucherApplyButton');
+
+  Key itemSelection(String itemId) => ValueKey('cartItemSelection-$itemId');
+
+  Key voucherSelector(String itemId) => ValueKey('cartVoucherSelector-$itemId');
+
+  Key voucherTile(String code) => ValueKey('cartVoucherTile-$code');
 }
 
 // --- Profile ---
@@ -83,17 +102,21 @@ class CheckoutPageKeys {
 class ProfilePageKeys {
   final editButton = const Key('profileEditButton');
   final saveButton = const Key('profileSaveButton');
-  final displayNameField = const Key(
-    'profileDisplayNameField',
-  );
+  final displayNameField = const Key('profileDisplayNameField');
+  final logoutButton = const Key('profileLogoutButton');
+}
+
+// --- Logout Confirmation Dialog ---
+
+class LogoutDialogKeys {
+  final confirmButton = const Key('logoutDialogConfirmButton');
+  final cancelButton = const Key('logoutDialogCancelButton');
 }
 
 // --- Notifications ---
 
 class NotificationsPageKeys {
-  final notificationsList = const Key(
-    'notificationsList',
-  );
+  final notificationsList = const Key('notificationsList');
 }
 
 // --- Bottom Navigation ---
@@ -102,9 +125,7 @@ class BottomNavKeys {
   final homeTab = const Key('bottomNavHome');
   final ordersTab = const Key('bottomNavOrders');
   final chatTab = const Key('bottomNavChat');
-  final notificationsTab = const Key(
-    'bottomNavNotifications',
-  );
+  final notificationsTab = const Key('bottomNavNotifications');
   final profileTab = const Key('bottomNavProfile');
 }
 
@@ -113,12 +134,17 @@ class BottomNavKeys {
 class Keys {
   final onboardPage = OnboardPageKeys();
   final signInPage = SignInPageKeys();
+  final forgotPasswordPage = ForgotPasswordPageKeys();
+  final passwordResetCodePage = PasswordResetCodePageKeys();
+  final resetPasswordPage = ResetPasswordPageKeys();
   final emailFormPage = EmailFormPageKeys();
   final codeConfirmationPage = CodeConfirmationPageKeys();
   final homePage = HomePageKeys();
-  final chatPage = ChatPageKeys();
+  final chatScreen = ChatScreenKeys();
   final checkoutPage = CheckoutPageKeys();
+  final cartPage = CartPageKeys();
   final profilePage = ProfilePageKeys();
+  final logoutDialog = LogoutDialogKeys();
   final notificationsPage = NotificationsPageKeys();
   final bottomNav = BottomNavKeys();
 }

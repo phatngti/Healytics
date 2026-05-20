@@ -24,6 +24,7 @@ class PartnerRequestDto {
     this.phoneNumber,
   });
 
+
   /// Tax code of the business (unique identifier)
   String taxCode;
 
@@ -47,7 +48,7 @@ class PartnerRequestDto {
   /// Street address of the business
   String streetAddress;
 
-  /// Contact phone number for the business
+  /// Clinic/business contact phone number. This is the public-facing phone shown on the clinic info screen — NOT the legal representative's personal phone.
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated

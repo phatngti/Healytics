@@ -288,10 +288,14 @@ configure_ingress_json() {
     ] + [{ service: "http_status:404" }]
   ' "$TUNNELS_FILE")
 
-  # Log routes
+  # Log routes (including originRequest details for visibility)
   jq -r --arg idx "$_tunnel_idx" '
     .tunnels[$idx | tonumber].routes[] |
-    "  Route: \(.hostname) → \(.origin)"
+    "  Route: \(.hostname) → \(.origin)" +
+    (if (.originRequest // {} | length) > 0 then
+      "\n         originRequest: " +
+        ([.originRequest | to_entries[] | "\(.key)=\(.value)"] | join(", "))
+    else "" end)
   ' "$TUNNELS_FILE" | while IFS= read -r line; do info "$line"; done
 
   info "Configuring ingress for tunnel ${_tunnel_id}..."

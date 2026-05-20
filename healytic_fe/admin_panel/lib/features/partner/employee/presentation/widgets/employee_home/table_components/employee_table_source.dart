@@ -1,3 +1,4 @@
+import 'package:admin_panel/core/keys/integration_test_keys.dart';
 import 'package:common/widgets/table/helper.dart';
 import 'package:admin_panel/features/partner/employee/presentation/providers/employee.provider.dart';
 import 'package:admin_panel/features/partner/employee/presentation/widgets/employee_home/table_components/employee_table_actions.dart';
@@ -14,19 +15,22 @@ class EmployeeTableSource {
   ) async {
     final employees = await ref
         .read(employeeProvider.notifier)
-        .getEmployees(
-          startingAt: startingAt,
-          count: count,
-          search: null,
-          sortAscending: false,
-        );
+        .getVisiblePage(startingAt: startingAt, count: count);
+    if (!context.mounted) return [];
+
+    final selectedIds =
+        ref.read(employeeProvider).value?.selectedIds ?? const <String>{};
 
     final rows = employees.map((employee) {
       return DataRow(
         key: ValueKey<String>(employee.id.value),
+        selected: selectedIds.contains(employee.id.value),
         onSelectChanged: (value) {
           if (value != null) {
             setRowSelection(ValueKey<String>(employee.id.value), value);
+            ref
+                .read(employeeProvider.notifier)
+                .toggleSelection(employee.id.value, value);
           }
         },
         cells: [
@@ -50,9 +54,7 @@ class EmployeeTableSource {
               child: employee.avatar.isEmpty
                   ? Text(
                       _getInitials(employee.fullName),
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelMedium,
+                      style: Theme.of(context).textTheme.labelMedium,
                     )
                   : null,
             ),
@@ -97,9 +99,13 @@ class EmployeeTableSource {
     }).toList();
 
     // Add action button cells to each row
-    final actionButtons = EmployeeTableActions.buildRowActionButtons(context);
+    final actionButtons = EmployeeTableActions.buildRowActionButtons(
+      context,
+      ref,
+    );
     if (actionButtons.isNotEmpty) {
       for (final row in rows) {
+        final rowId = (row.key as ValueKey<String>).value;
         row.cells.add(
           DataCell(
             Row(
@@ -107,6 +113,12 @@ class EmployeeTableSource {
               children: actionButtons
                   .map(
                     (action) => IconButton(
+                      key: action.icon == Icons.delete
+                          ? keys.managementTables.rowDeleteButton(
+                              'employee',
+                              rowId,
+                            )
+                          : null,
                       onPressed: () => action.onPressed(row.key),
                       icon: Icon(action.icon, size: 20),
                       padding: const EdgeInsets.all(4),
@@ -131,7 +143,6 @@ class EmployeeTableSource {
     if (parts.length == 1) {
       return parts[0][0].toUpperCase();
     }
-    return '${parts[0][0]}${parts[parts.length - 1][0]}'
-        .toUpperCase();
+    return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
   }
 }

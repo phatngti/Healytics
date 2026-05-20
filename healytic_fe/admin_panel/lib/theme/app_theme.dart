@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/partner/bookings/presentation/widgets/booking_status_colors.theme.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -252,9 +253,9 @@ class AppTheme {
       ).copyWith(
         extensions: <ThemeExtension<dynamic>>[
           SemanticColors(
-            success: const Color.fromARGB(255, 130, 226, 196),
+            success: Colors.green,
             onSuccess: Colors.white,
-            onSuccessContainer: const Color.fromARGB(255, 81, 223, 88),
+            onSuccessContainer: Colors.green.shade300,
             warning: Colors.orange,
             onWarning: Colors.white,
             onWarningContainer: Colors.orange.shade300,
@@ -264,8 +265,8 @@ class AppTheme {
             error: Colors.red,
             onError: Colors.white,
             onErrorContainer: Colors.red.shade300,
-            // Light Blue
           ),
+          BookingStatusColors.light,
         ],
       );
 
@@ -293,11 +294,20 @@ class AppTheme {
       ).copyWith(
         extensions: <ThemeExtension<dynamic>>[
           SemanticColors(
-            success: Colors.green, // Green
-            warning: Colors.orange, // Orange
-            info: Colors.blue, // Light Blue
+            success: Colors.green,
+            onSuccess: Colors.white,
+            onSuccessContainer: Colors.green.shade300,
+            warning: Colors.orange,
+            onWarning: Colors.white,
+            onWarningContainer: Colors.orange.shade300,
+            info: Colors.blue,
+            onInfo: Colors.white,
+            onInfoContainer: Colors.blue.shade300,
             error: Colors.red,
+            onError: Colors.white,
+            onErrorContainer: Colors.red.shade300,
           ),
+          BookingStatusColors.dark,
         ],
       );
 }

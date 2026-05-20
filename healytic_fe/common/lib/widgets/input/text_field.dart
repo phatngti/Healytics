@@ -36,7 +36,7 @@ class _AppTextField extends StatelessWidget {
     this.maxLines,
     this.style,
     this.contentPadding,
-    this.isRequired = false,
+    this.isRequired,
     this.uppercaseLabel = true,
     this.suffix,
   });
@@ -126,7 +126,7 @@ class _AppTextField extends StatelessWidget {
   final EdgeInsetsGeometry? contentPadding;
 
   /// Whether the field is required (shows red asterisk).
-  final bool isRequired;
+  final bool? isRequired;
 
   /// Whether to uppercase the label text.
   final bool uppercaseLabel;
@@ -165,7 +165,7 @@ class _AppTextField extends StatelessWidget {
                                 letterSpacing: 0.5,
                               ),
                         ),
-                        if (isRequired)
+                        if (isRequired == true)
                           const TextSpan(
                             text: ' *',
                             style: TextStyle(
@@ -271,7 +271,6 @@ class _AppTextField extends StatelessWidget {
                 onTapOutside: (_) {
                   if (isEnabled) {
                     field.validate();
-                    FocusScope.of(context).unfocus();
                   }
                 },
               ),

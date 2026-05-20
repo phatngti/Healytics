@@ -98,7 +98,7 @@ class FormFieldBuilders {
     BuildContext context, {
     required String label,
     String? hintText,
-    bool isRequired = false,
+    bool? isRequired,
     IconData? prefixIcon,
     String? fieldKey,
     Widget? suffixIcon,
@@ -193,6 +193,8 @@ class FormFieldBuilders {
     String? hintText,
     String? fieldKey,
     bool enabled = true,
+    bool isRequired = false,
+    String? Function(dynamic)? validator,
     Key? widgetKey,
   }) {
     return _AppDatePickField(
@@ -208,6 +210,8 @@ class FormFieldBuilders {
       hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
         color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
+      isRequired: isRequired,
+      validator: validator,
     );
   }
 
@@ -520,10 +524,7 @@ class FormFieldBuilders {
     );
 
     if (widgetKey != null) {
-      return KeyedSubtree(
-        key: widgetKey,
-        child: child,
-      );
+      return KeyedSubtree(key: widgetKey, child: child);
     }
     return child;
   }
@@ -579,6 +580,7 @@ class FormFieldBuilders {
   /// [height] - Height of the editor container.
   /// [labelStyle] - Optional custom label style.
   /// [enabled] - Whether the field is enabled.
+  /// [isRequired] - Whether the field is required.
   static Widget buildQuillEditor(
     BuildContext context, {
     required String label,
@@ -588,6 +590,7 @@ class FormFieldBuilders {
     double height = 250,
     TextStyle? labelStyle,
     bool enabled = true,
+    bool isRequired = false,
     Key? widgetKey,
   }) {
     final widget = _AppQuillEditorField(
@@ -598,13 +601,11 @@ class FormFieldBuilders {
       height: height,
       labelStyle: labelStyle,
       enabled: enabled,
+      isRequired: isRequired,
     );
 
     if (widgetKey != null) {
-      return KeyedSubtree(
-        key: widgetKey,
-        child: widget,
-      );
+      return KeyedSubtree(key: widgetKey, child: widget);
     }
     return widget;
   }

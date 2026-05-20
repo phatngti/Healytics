@@ -12,8 +12,8 @@ Name | Type | Description | Notes
 **businessInfo** | [**BusinessInfoDto**](BusinessInfoDto.md) |  | 
 **legalRepresentative** | [**LegalRepresentativeDto**](LegalRepresentativeDto.md) |  | [optional] 
 **kycDocuments** | [**List<VerifiedField>**](VerifiedField.md) |  | [default to const []]
-**status** | **String** |  | 
-**priority** | **String** |  | 
+**status** | [**PartnerVerificationStatus**](PartnerVerificationStatus.md) |  | 
+**priority** | [**PartnerPriority**](PartnerPriority.md) |  | 
 **submittedAt** | [**DateTime**](DateTime.md) |  | 
 **reviewNote** | **String** |  | [optional] 
 

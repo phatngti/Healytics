@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PartnersService } from '@/partners/partners.service';
+import { AccountService } from '@/account/account.service';
 import { RegisterDto } from './dto/request/register.dto';
 import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto';
 import { MockType } from '../../test/mocks/mock-types';
@@ -17,10 +18,17 @@ describe('AuthController', () => {
       loginAdmin: jest.fn(),
       refresh: jest.fn(),
       logout: jest.fn(),
+      requestUserPasswordReset: jest.fn(),
+      validateUserPasswordResetCode: jest.fn(),
+      resetUserPassword: jest.fn(),
     };
 
     const mockPartnersService: MockType<PartnersService> = {
       registerPartner: jest.fn(),
+    };
+
+    const mockAccountService: MockType<AccountService> = {
+      checkEmailExists: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -28,6 +36,7 @@ describe('AuthController', () => {
       providers: [
         { provide: AuthService, useValue: mockAuthService },
         { provide: PartnersService, useValue: mockPartnersService },
+        { provide: AccountService, useValue: mockAccountService },
       ],
     }).compile();
 
@@ -77,6 +86,55 @@ describe('AuthController', () => {
       // Assert
       expect(result).toEqual(expectedTokens);
       expect(authService.loginUser).toHaveBeenCalledWith(mockReq.user);
+    });
+  });
+
+  describe('forgotUserPassword', () => {
+    it('should delegate to authService.requestUserPasswordReset', async () => {
+      const dto = { email: 'user@test.com' };
+      const expectedResponse = {
+        message:
+          'If the email is registered, a password reset code has been sent.',
+      };
+      authService.requestUserPasswordReset!.mockResolvedValue(expectedResponse);
+
+      const result = await controller.forgotUserPassword(dto);
+
+      expect(result).toEqual(expectedResponse);
+      expect(authService.requestUserPasswordReset).toHaveBeenCalledWith(dto);
+    });
+  });
+
+  describe('validateUserPasswordResetCode', () => {
+    it('should delegate to authService.validateUserPasswordResetCode', async () => {
+      const dto = { email: 'user@test.com', code: '123456' };
+      const expectedResponse = {
+        message: 'Password reset code verified.',
+        resetToken: 'reset-token',
+      };
+      authService.validateUserPasswordResetCode!.mockResolvedValue(
+        expectedResponse,
+      );
+
+      const result = await controller.validateUserPasswordResetCode(dto);
+
+      expect(result).toEqual(expectedResponse);
+      expect(authService.validateUserPasswordResetCode).toHaveBeenCalledWith(
+        dto,
+      );
+    });
+  });
+
+  describe('resetUserPassword', () => {
+    it('should delegate to authService.resetUserPassword', async () => {
+      const dto = { token: 'reset-token', password: 'Password123!' };
+      const expectedResponse = { message: 'Password reset successfully.' };
+      authService.resetUserPassword!.mockResolvedValue(expectedResponse);
+
+      const result = await controller.resetUserPassword(dto);
+
+      expect(result).toEqual(expectedResponse);
+      expect(authService.resetUserPassword).toHaveBeenCalledWith(dto);
     });
   });
 
@@ -132,7 +190,9 @@ describe('AuthController', () => {
   describe('refresh', () => {
     it('should call authService.refresh with token and return new tokens', async () => {
       // Arrange
-      const dto: RefreshTokenRequestDto = { refresh_token: 'old-refresh-token' };
+      const dto: RefreshTokenRequestDto = {
+        refresh_token: 'old-refresh-token',
+      };
       const expectedTokens = {
         access_token: 'new-access-token',
         refresh_token: 'new-refresh-token',

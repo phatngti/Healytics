@@ -18,7 +18,9 @@ export interface CategoryTestData {
 /**
  * Creates category test data
  */
-export function createCategoryDto(overrides: Partial<CategoryTestData> = {}): CategoryTestData {
+export function createCategoryDto(
+  overrides: Partial<CategoryTestData> = {},
+): CategoryTestData {
   const timestamp = Date.now();
   return {
     name: `Test Category ${timestamp}`,
@@ -71,7 +73,9 @@ const DEFAULT_MERCHANT_ID = '00000000-0000-0000-0000-000000000001';
 /**
  * Creates service product test data
  */
-export function createServiceProductDto(overrides: Partial<ProductTestData> = {}): ProductTestData {
+export function createServiceProductDto(
+  overrides: Partial<ProductTestData> = {},
+): ProductTestData {
   const timestamp = Date.now();
   return {
     merchantId: DEFAULT_MERCHANT_ID,
@@ -95,7 +99,9 @@ export function createServiceProductDto(overrides: Partial<ProductTestData> = {}
 /**
  * Creates physical product test data
  */
-export function createPhysicalProductDto(overrides: Partial<ProductTestData> = {}): ProductTestData {
+export function createPhysicalProductDto(
+  overrides: Partial<ProductTestData> = {},
+): ProductTestData {
   const timestamp = Date.now();
   return {
     merchantId: DEFAULT_MERCHANT_ID,
@@ -155,7 +161,9 @@ export interface EmployeeTestData {
 /**
  * Creates doctor employee test data
  */
-export function createDoctorDto(overrides: Partial<EmployeeTestData> = {}): EmployeeTestData {
+export function createDoctorDto(
+  overrides: Partial<EmployeeTestData> = {},
+): EmployeeTestData {
   const timestamp = Date.now();
   return {
     employeeCode: `EMP-DR-${timestamp}`,
@@ -181,7 +189,9 @@ export function createDoctorDto(overrides: Partial<EmployeeTestData> = {}): Empl
 /**
  * Creates therapist employee test data
  */
-export function createTherapistDto(overrides: Partial<EmployeeTestData> = {}): EmployeeTestData {
+export function createTherapistDto(
+  overrides: Partial<EmployeeTestData> = {},
+): EmployeeTestData {
   const timestamp = Date.now();
   return {
     employeeCode: `EMP-TH-${timestamp}`,
@@ -208,7 +218,9 @@ export function createTherapistDto(overrides: Partial<EmployeeTestData> = {}): E
 /**
  * Creates receptionist employee test data
  */
-export function createReceptionistDto(overrides: Partial<EmployeeTestData> = {}): EmployeeTestData {
+export function createReceptionistDto(
+  overrides: Partial<EmployeeTestData> = {},
+): EmployeeTestData {
   const timestamp = Date.now();
   return {
     employeeCode: `EMP-RC-${timestamp}`,
@@ -223,7 +235,9 @@ export function createReceptionistDto(overrides: Partial<EmployeeTestData> = {})
 /**
  * Creates manager employee test data
  */
-export function createManagerDto(overrides: Partial<EmployeeTestData> = {}): EmployeeTestData {
+export function createManagerDto(
+  overrides: Partial<EmployeeTestData> = {},
+): EmployeeTestData {
   const timestamp = Date.now();
   return {
     employeeCode: `EMP-MG-${timestamp}`,
@@ -246,7 +260,9 @@ export interface SurveyTestData {
 /**
  * Creates survey test data
  */
-export function createSurveyDto(overrides: Partial<Record<string, any>> = {}): SurveyTestData {
+export function createSurveyDto(
+  overrides: Partial<Record<string, any>> = {},
+): SurveyTestData {
   return {
     survey: {
       healthGoals: ['weight_loss', 'stress_relief'],
@@ -281,7 +297,9 @@ export interface BookingEntityData {
 /**
  * Creates a mock Booking entity
  */
-export function createBookingEntity(overrides: Partial<BookingEntityData> = {}): BookingEntityData {
+export function createBookingEntity(
+  overrides: Partial<BookingEntityData> = {},
+): BookingEntityData {
   const now = new Date();
   return {
     id: `bk-${Date.now()}`,
@@ -320,7 +338,9 @@ export interface CheckoutTicketEntityData {
 /**
  * Creates a mock CheckoutTicket entity
  */
-export function createCheckoutTicketEntity(overrides: Partial<CheckoutTicketEntityData> = {}): CheckoutTicketEntityData {
+export function createCheckoutTicketEntity(
+  overrides: Partial<CheckoutTicketEntityData> = {},
+): CheckoutTicketEntityData {
   const now = new Date();
   return {
     id: `tk-${Date.now()}`,
@@ -351,7 +371,9 @@ export interface AsyncCheckoutTestData {
 /**
  * Creates async checkout DTO test data
  */
-export function createAsyncCheckoutDto(overrides: Partial<AsyncCheckoutTestData> = {}): AsyncCheckoutTestData {
+export function createAsyncCheckoutDto(
+  overrides: Partial<AsyncCheckoutTestData> = {},
+): AsyncCheckoutTestData {
   return {
     userId: FAKE_UUID,
     staffId: 'a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c4d5',
@@ -370,7 +392,9 @@ export interface MicroLockTestData {
 /**
  * Creates micro lock DTO test data
  */
-export function createMicroLockDto(overrides: Partial<MicroLockTestData> = {}): MicroLockTestData {
+export function createMicroLockDto(
+  overrides: Partial<MicroLockTestData> = {},
+): MicroLockTestData {
   return {
     staffId: 'a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c4d5',
     startTime: '2025-10-25T14:00:00Z',

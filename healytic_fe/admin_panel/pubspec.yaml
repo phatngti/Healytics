@@ -92,6 +92,7 @@ dependencies:
   file_picker: ^10.3.8
   flutter_map: ^8.2.2
   latlong2: ^0.9.1
+  socket_io_client: ^3.1.4
 
 dev_dependencies:
   flutter_test:
@@ -105,14 +106,15 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   integration_test:
     sdk: flutter
-  custom_lint: ^0.8.0
-  riverpod_lint: ^3.0.3
+  custom_lint: 0.8.0
+  riverpod_lint: 3.0.3
   riverpod_generator: ^3.0.3
   build_runner: ^2.7.1
   slang_build_runner: ^4.9.0
   go_router_builder: ^4.1.0
   json_serializable: ^6.11.1
   drift_dev: ^2.28.0
+  patrol: 4.2.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -134,6 +136,7 @@ flutter:
     - assets/images/
     - assets/translations/
     - assets/animations/
+    - patrol_test/fixtures/
     
   #   - images/a_dot_ham.jpeg
 
@@ -162,3 +165,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+patrol:
+  app_name: GoHealth Admin
+  test_directory: patrol_test

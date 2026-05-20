@@ -16,7 +16,7 @@ Name | Type | Description | Notes
 **reviewCount** | **num** |  | 
 **price** | **String** |  | 
 **isVerified** | **bool** |  | 
-**description** | [**Object**](.md) |  | [optional] 
+**description** | **String** |  | [optional] 
 **duration** | **num** |  | 
 **featureTags** | [**List<PartnerFeatureTagDto>**](PartnerFeatureTagDto.md) |  | [default to const []]
 **clinic** | [**PartnerClinicDto**](PartnerClinicDto.md) |  | 
@@ -25,6 +25,7 @@ Name | Type | Description | Notes
 **facilityImages** | [**List<PartnerFacilityImageDto>**](PartnerFacilityImageDto.md) |  | [default to const []]
 **reviews** | [**List<PartnerReviewDto>**](PartnerReviewDto.md) |  | [default to const []]
 **recommendedServices** | [**List<PartnerRecommendedServiceDto>**](PartnerRecommendedServiceDto.md) |  | [default to const []]
+**serviceManual** | [**PartnerDetailServiceManualDto**](PartnerDetailServiceManualDto.md) |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

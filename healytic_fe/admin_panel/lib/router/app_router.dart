@@ -21,7 +21,7 @@ final List<Map<String, dynamic>> providerSlideMenuItems = [
   },
   {
     "icon": Icons.production_quantity_limits_outlined,
-    "label": 'Products',
+    "label": 'Services',
     "route": partner.ProductHomeRoute().location,
   },
   {
@@ -34,6 +34,21 @@ final List<Map<String, dynamic>> providerSlideMenuItems = [
     "label": 'Service Tags',
     "route": partner.ServiceTagsHomeRoute().location,
   },
+  {
+    "icon": Icons.account_balance_wallet_outlined,
+    "label": 'Finance',
+    "route": partner.TransactionHomeRoute().location,
+  },
+  {
+    "icon": Icons.calendar_month_outlined,
+    "label": 'Bookings',
+    "route": partner.PartnerBookingsRoute().location,
+  },
+  {
+    "icon": Icons.chat_bubble_outline_rounded,
+    "label": 'Messages',
+    "route": partner.PartnerChatInboxRoute().location,
+  },
 ];
 
 final List<Map<String, dynamic>> adminSlideMenuItems = [
@@ -41,6 +56,11 @@ final List<Map<String, dynamic>> adminSlideMenuItems = [
     "icon": Icons.admin_panel_settings_outlined,
     "label": 'Dashboard',
     "route": admin.AdminDashboardRoute().location,
+  },
+  {
+    "icon": Icons.account_balance_outlined,
+    "label": 'Finance',
+    "route": admin.AdminFinanceManagerRoute().location,
   },
   {
     "icon": Icons.production_quantity_limits_outlined,
@@ -52,6 +72,11 @@ final List<Map<String, dynamic>> adminSlideMenuItems = [
     "label": 'Provider',
     "route": admin.PartnerManagerRoute().location,
   },
+  {
+    "icon": Icons.notifications_active_outlined,
+    "label": 'Notifications',
+    "route": admin.AdminNotificationCampaignIndexRoute().location,
+  },
 ];
 
 @riverpod
@@ -62,11 +87,14 @@ GoRouter router(Ref ref) {
   final String initialLocation;
   if (!UserRoleHelper.isLoggedIn()) {
     initialLocation = '/';
-  } else if (Store.get(StoreKey.mockRole, Role.health_partner.value) ==
-      Role.health_partner.value) {
-    initialLocation = '/provider/dashboard';
-  } else {
+  } else if (UserRoleHelper.isAdmin()) {
     initialLocation = '/admin/dashboard';
+  } else {
+    initialLocation = UserRoleHelper.isProviderVerified()
+        ? (UserRoleHelper.isProviderProfileCompleted()
+              ? '/provider/dashboard'
+              : '/provider/profile-completion')
+        : '/provider/verification-status';
   }
 
   String? redirect(BuildContext context, GoRouterState state) {
@@ -74,11 +102,14 @@ GoRouter router(Ref ref) {
     final role = UserRoleHelper.getRole();
     final path = state.uri.path;
     final isProviderVerified = UserRoleHelper.isProviderVerified();
+    final isProviderProfileCompleted =
+        UserRoleHelper.isProviderProfileCompleted();
 
     log(
       'Router redirect — isLoggedIn: $isLoggedIn, '
       'role: $role, path: $path, '
-      'isProviderVerified: $isProviderVerified',
+      'isProviderVerified: $isProviderVerified, '
+      'isProviderProfileCompleted: $isProviderProfileCompleted',
       name: 'AppRouter',
     );
 
@@ -89,6 +120,7 @@ GoRouter router(Ref ref) {
         path.startsWith('/sign-up/');
 
     final isVerificationRoute = path == '/provider/verification-status';
+    final isProfileCompletionRoute = path == '/provider/profile-completion';
 
     if (isLoggedIn) {
       // Authenticated user on a public route → send to home.
@@ -96,8 +128,25 @@ GoRouter router(Ref ref) {
         if (role == Role.admin.value) {
           return '/admin/dashboard';
         }
-        return isProviderVerified
+        if (!isProviderVerified) {
+          return '/provider/verification-status';
+        }
+        return isProviderProfileCompleted
             ? '/provider/dashboard'
+            : '/provider/profile-completion';
+      }
+
+      // Admin on a provider route → redirect to admin dashboard.
+      if (role == Role.admin.value && path.startsWith('/provider/')) {
+        return '/admin/dashboard';
+      }
+
+      // Provider on an admin route → redirect to provider home.
+      if (role == Role.health_partner.value && path.startsWith('/admin/')) {
+        return isProviderVerified
+            ? (isProviderProfileCompleted
+                  ? '/provider/dashboard'
+                  : '/provider/profile-completion')
             : '/provider/verification-status';
       }
 
@@ -105,7 +154,13 @@ GoRouter router(Ref ref) {
       if (role == Role.health_partner.value) {
         if (!isProviderVerified && !isVerificationRoute) {
           return '/provider/verification-status';
-        } else if (isProviderVerified && isVerificationRoute) {
+        } else if (isProviderVerified && !isProviderProfileCompleted) {
+          if (!isProfileCompletionRoute) {
+            return '/provider/profile-completion';
+          }
+        } else if (isProviderVerified &&
+            isProviderProfileCompleted &&
+            (isVerificationRoute || isProfileCompletionRoute)) {
           return '/provider/dashboard';
         }
       }
@@ -140,11 +195,20 @@ class RouterListenable extends _$RouterListenable implements Listenable {
 
   @override
   FutureOr<void> build() {
-    // Watch auth state
-    final subscription = Store.watch(StoreKey.accessToken).listen((_) {
-      _notifyListeners();
+    // Watch auth state changes to trigger redirects.
+    final subscriptions = [
+      Store.watch(StoreKey.accessToken).listen((_) => _notifyListeners()),
+      Store.watch(StoreKey.mockRole).listen((_) => _notifyListeners()),
+      Store.watch(StoreKey.partnerVerified).listen((_) => _notifyListeners()),
+      Store.watch(
+        StoreKey.partnerProfileCompleted,
+      ).listen((_) => _notifyListeners()),
+    ];
+    ref.onDispose(() {
+      for (final subscription in subscriptions) {
+        subscription.cancel();
+      }
     });
-    ref.onDispose(subscription.cancel);
   }
 
   // ignore: unused_element

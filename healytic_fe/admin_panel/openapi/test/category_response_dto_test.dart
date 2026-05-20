@@ -35,13 +35,13 @@ void main() {
     });
 
     // Category description
-    // Object description
+    // String description
     test('to test the property `description`', () async {
       // TODO
     });
 
     // Category image URL
-    // Object imageUrl
+    // String imageUrl
     test('to test the property `imageUrl`', () async {
       // TODO
     });
@@ -49,6 +49,12 @@ void main() {
     // Whether category is active
     // bool isActive
     test('to test the property `isActive`', () async {
+      // TODO
+    });
+
+    // Category type for UI grouping
+    // String categoryType (default value: 'primary')
+    test('to test the property `categoryType`', () async {
       // TODO
     });
 

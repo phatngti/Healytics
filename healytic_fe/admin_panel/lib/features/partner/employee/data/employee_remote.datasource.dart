@@ -6,7 +6,18 @@ import 'package:admin_panel/core/providers/api.provider.dart';
 import 'package:admin_panel/core/services/api.service.dart';
 import 'package:admin_panel/features/partner/employee/data/employee_mock_data.dart';
 import 'package:admin_panel/features/partner/employee/domain/create_employee.request.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_assigned_service.entity.dart';
 import 'package:admin_panel/features/partner/employee/domain/employee.entity.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_gender.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_role.dart';
+import 'package:admin_panel/features/partner/employee/domain/employee_status.dart';
+import 'package:admin_panel/features/partner/employee/domain/employment_type.dart';
+import 'package:admin_panel/features/partner/employee/domain/massage_strength_level.dart';
+import 'package:admin_panel/features/partner/employee/domain/schedule_entry_key.dart';
+import 'package:admin_panel/features/partner/employee/domain/therapist_level.dart';
+import 'package:admin_panel/features/partner/employee/domain/verification_document_entry.entity.dart';
+import 'package:admin_panel/features/partner/employee/domain/work_history_key.dart';
+import 'package:admin_panel/features/partner/employee/domain/therapist_type.dart';
 import 'package:admin_panel/features/partner/employee/domain/update_employee.request.dart';
 import 'package:admin_openapi/api.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -35,6 +46,12 @@ abstract class EmployeeRemoteDataSource {
     bool? sortedAsc,
   );
 
+  /// Retrieves all employees for client-side filtering/sorting.
+  Future<List<EmployeeEntity>> getAllEmployees({
+    String? sortedBy,
+    bool? sortedAsc,
+  });
+
   /// Returns the total count of employees.
   Future<int> getTotalRows();
 
@@ -55,8 +72,16 @@ abstract class EmployeeRemoteDataSource {
   /// Updates an existing employee's information.
   Future<void> updateEmployee(UpdateEmployeeRequest request);
 
+  /// Updates only the employee status.
+  Future<void> updateEmployeeStatus(EmployeeId id, EmployeeStatusType status);
+
   /// Deletes an employee by their unique identifier.
   Future<void> deleteEmployee(EmployeeId id);
+
+  /// Retrieves services assigned to an employee.
+  Future<List<EmployeeAssignedServiceEntity>> getEmployeeAssignedServices(
+    EmployeeId id,
+  );
 
   /// Retrieves employees filtered by role.
   ///
@@ -72,6 +97,15 @@ abstract class EmployeeRemoteDataSource {
 
   /// Retrieves available device proficiency options.
   Future<Map<String, String>> getDeviceProficiency();
+
+  /// Retrieves available massage skills options.
+  Future<Map<String, String>> getMassageSkills();
+
+  /// Creates a new massage skill for the partner.
+  Future<Map<String, String>> createMassageSkill(String name);
+
+  /// Creates a new spa skill for the partner.
+  Future<Map<String, String>> createSpaSkill(String name);
 }
 
 // ============================================================================
@@ -95,6 +129,26 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
+    final employees = await getAllEmployees(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
+
+    final endIndex = (startingAt + count) > employees.length
+        ? employees.length
+        : startingAt + count;
+    if (startingAt >= employees.length) {
+      return [];
+    }
+
+    return employees.sublist(startingAt, endIndex);
+  }
+
+  @override
+  Future<List<EmployeeEntity>> getAllEmployees({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
     final response = await _employeesApi.partnerEmployeesControllerFindAll();
     if (response == null) {
       return [];
@@ -105,16 +159,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       name: 'EmployeeRemoteDataSource',
     );
 
-    final employees = response.map(_mapToEmployeeEntity).toList();
-
-    final endIndex = (startingAt + count) > employees.length
-        ? employees.length
-        : startingAt + count;
-    if (startingAt >= employees.length) {
-      return [];
-    }
-
-    return employees.sublist(startingAt, endIndex);
+    return response.map(_mapToEmployeeEntity).toList();
   }
 
   @override
@@ -143,26 +188,49 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
   @override
   Future<void> updateEmployee(UpdateEmployeeRequest request) async {
-    final dto = UpdateEmployeeDto(
-      fullName: request.fullName,
-      displayName: request.displayName,
-      email: request.email,
-      phone: request.phone,
-      avatarUrl: request.avatar,
-      role: _mapUpdateRole(request.role),
-      status: _mapUpdateStatus(request.status),
-      branchId: request.branch,
-    );
-
-    await _employeesApi.partnerEmployeesControllerUpdate(
+    await _patchEmployee(
       request.id.value.toString(),
-      dto,
+      request.fields,
     );
 
     developer.log(
-      'Updated employee: ${request.id}',
+      'Updated employee: ${request.id} (${request.fields.keys.join(', ')})',
       name: 'EmployeeRemoteDataSource',
     );
+  }
+
+  @override
+  Future<void> updateEmployeeStatus(
+    EmployeeId id,
+    EmployeeStatusType status,
+  ) async {
+    await _patchEmployee(
+      id.value.toString(),
+      <String, dynamic>{'status': status.apiValue},
+    );
+
+    developer.log(
+      'Updated employee status: $id -> ${status.apiValue}',
+      name: 'EmployeeRemoteDataSource',
+    );
+  }
+
+  Future<void> _patchEmployee(String id, Map<String, dynamic> fields) async {
+    if (fields.isEmpty) return;
+
+    final response = await apiService.apiClient.invokeAPI(
+      '/partner/employees/$id',
+      'PATCH',
+      <QueryParam>[],
+      fields,
+      <String, String>{},
+      <String, String>{},
+      'application/json',
+    );
+
+    if (response.statusCode >= 400) {
+      throw ApiException(response.statusCode, response.body);
+    }
   }
 
   @override
@@ -170,6 +238,16 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     await _employeesApi.partnerEmployeesControllerRemove(id.value.toString());
 
     developer.log('Deleted employee: $id', name: 'EmployeeRemoteDataSource');
+  }
+
+  @override
+  Future<List<EmployeeAssignedServiceEntity>> getEmployeeAssignedServices(
+    EmployeeId id,
+  ) async {
+    final response = await _employeesApi
+        .partnerEmployeesControllerFindAssignedServices(id.value.toString());
+    if (response == null) return [];
+    return response.map(_mapAssignedService).toList();
   }
 
   @override
@@ -182,16 +260,29 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       phone: request.phone,
       avatar: request.avatar,
       dateOfBirth: request.dateOfBirth,
-      gender: _mapDoctorGender(request.gender),
+      gender: _toDoctorGender(EmployeeGender.fromApiValue(request.gender)),
+      emergencyContactName: request.emergencyContactName,
+      emergencyContactPhone: request.emergencyContactPhone,
+      employmentType: request.employmentType,
+      startDate: request.startDate,
+      schedule: _toScheduleEntries(request.schedule),
+
       status: CreateDoctorDtoStatusEnum.ACTIVE,
+      description: request.description ?? '',
       jobTitle: request.jobTitle,
-      medicalTitles: request.medicalTitles,
-      medicalLicenses: request.medicalLicenses,
-      experienceYears: request.experienceYears,
-      consultationFee: request.consultationFee,
+      verificationDocuments: _toVerificationDocumentDtos(
+        request.verificationDocuments,
+      ),
+      medicalCredentials: _toMedicalCredentials(
+        request.medicalTitles,
+        request.medicalLicenses,
+      ),
+      experienceYears: request.experienceYears ?? 0,
+      consultationFee: request.consultationFee ?? 0,
       specializations: request.specializations,
       education: request.education,
       certifications: request.certifications,
+      workHistory: _toWorkHistoryEntries(request.workHistory),
     );
 
     final response = await _employeesApi.partnerEmployeesControllerCreateDoctor(
@@ -222,14 +313,27 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       phone: request.phone,
       avatar: request.avatar,
       dateOfBirth: request.dateOfBirth,
-      gender: _mapSpaGender(request.gender),
+      gender: _toSpaGender(EmployeeGender.fromApiValue(request.gender)),
+      emergencyContactName: request.emergencyContactName,
+      emergencyContactPhone: request.emergencyContactPhone,
+      employmentType: request.employmentType,
+      startDate: request.startDate,
+      schedule: _toScheduleEntries(request.schedule),
+
       status: CreateSpaTherapistDtoStatusEnum.ACTIVE,
+      description: request.description ?? '',
       jobTitle: request.jobTitle,
-      therapistLevel: _mapSpaLevel(request.therapistLevel),
+      verificationDocuments: _toVerificationDocumentDtos(
+        request.verificationDocuments,
+      ),
+      therapistLevel: _toSpaLevel(
+        TherapistLevel.fromApiValue(request.therapistLevel),
+      ),
       commissionRate: request.commissionRate,
       healthCheckDate: request.healthCheckDate,
       skills: request.skills,
       deviceProficiency: request.deviceProficiency,
+      workHistory: _toWorkHistoryEntries(request.workHistory),
     );
 
     final response = await _employeesApi
@@ -259,14 +363,29 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       phone: request.phone,
       avatar: request.avatar,
       dateOfBirth: request.dateOfBirth,
-      gender: _mapMassageGender(request.gender),
+      gender: _toMassageGender(EmployeeGender.fromApiValue(request.gender)),
+      emergencyContactName: request.emergencyContactName,
+      emergencyContactPhone: request.emergencyContactPhone,
+      employmentType: request.employmentType,
+      startDate: request.startDate,
+      schedule: _toScheduleEntries(request.schedule),
+
       status: CreateMassageTherapistDtoStatusEnum.ACTIVE,
+      description: request.description ?? '',
       jobTitle: request.jobTitle,
-      therapistLevel: _mapMassageLevel(request.therapistLevel),
-      strengthLevel: _mapMassageStrength(request.strengthLevel),
+      verificationDocuments: _toVerificationDocumentDtos(
+        request.verificationDocuments,
+      ),
+      therapistLevel: _toMassageLevel(
+        TherapistLevel.fromApiValue(request.therapistLevel),
+      ),
+      strengthLevel: _toMassageStrength(
+        MassageStrengthLevel.fromApiValue(request.strengthLevel),
+      ),
       commissionRate: request.commissionRate,
       healthCheckDate: request.healthCheckDate,
       skills: request.skills,
+      workHistory: _toWorkHistoryEntries(request.workHistory),
     );
 
     final response = await _employeesApi
@@ -311,8 +430,36 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
   @override
   Future<Map<String, String>> getSpaSkills() async {
-    // TODO(api): Implement when endpoint is available
-    return {};
+    final response = await _employeesApi
+        .partnerEmployeesControllerGetSpaSkills();
+    if (response == null) return {};
+    return {for (final item in response) item.key: item.label};
+  }
+
+  @override
+  Future<Map<String, String>> getMassageSkills() async {
+    final response = await _employeesApi
+        .partnerEmployeesControllerGetMassageSkills();
+    if (response == null) return {};
+    return {for (final item in response) item.key: item.label};
+  }
+
+  @override
+  Future<Map<String, String>> createMassageSkill(String name) async {
+    final dto = CreateSkillDto(name: name);
+    final response = await _employeesApi
+        .partnerEmployeesControllerCreateMassageSkill(dto);
+    if (response == null) return {};
+    return {response.key: response.label};
+  }
+
+  @override
+  Future<Map<String, String>> createSpaSkill(String name) async {
+    final dto = CreateSkillDto(name: name);
+    final response = await _employeesApi
+        .partnerEmployeesControllerCreateSpaSkill(dto);
+    if (response == null) return {};
+    return {response.key: response.label};
   }
 
   // ==========================================================
@@ -321,18 +468,21 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
   /// Maps an [EmployeeResponseDto] to [EmployeeEntity].
   EmployeeEntity _mapToEmployeeEntity(EmployeeResponseDto dto) {
-    final role = dto.role.value.toUpperCase();
+    final roleStr = dto.role.value.toUpperCase();
+    final role = EmployeeRoleType.fromApiValue(roleStr);
     final id = EmployeeId(dto.id);
     final common = _mapCommonFields(dto);
+    final schedule = _mapSchedule(dto.schedule);
 
-    if (role == 'DOCTOR' && dto.doctorProfile != null) {
+    if (role == EmployeeRoleType.doctor && dto.doctorProfile != null) {
       final profile = dto.doctorProfile!;
       return DoctorEntity(
         id: id,
+        employeeCode: common.employeeCode,
         fullName: common.fullName,
         displayName: common.displayName,
         avatar: common.avatar,
-        role: role,
+        role: roleStr,
         position: common.position,
         rating: common.rating,
         reviewCount: common.reviewCount,
@@ -344,32 +494,46 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         state: '',
         country: '',
         description: dto.description?.toString(),
-        documents: const [],
+        verificationDocuments: _mapVerificationDocuments(
+          dto.verificationDocuments,
+        ),
+        workHistory: _mapWorkHistory(dto.workHistory),
+        workSchedule: schedule,
         dateOfBirth: common.dateOfBirth,
         gender: common.gender,
         employmentType: common.employmentType,
         startDate: common.startDate,
-        jobTitle: profile.title ?? '',
+        emergencyContactName: common.emergencyContactName,
+        emergencyContactPhone: common.emergencyContactPhone,
+        jobTitle: dto.jobTitle?.toString() ?? '',
 
-        medicalLicenses: profile.medicalLicenses,
-        medicalTitles: profile.medicalTitles,
+        medicalLicenses: profile.medicalCredentials
+            .map((c) => c.license ?? '')
+            .where((s) => s.isNotEmpty)
+            .toList(),
+        medicalTitles: profile.medicalCredentials
+            .map((c) => c.title ?? '')
+            .where((s) => s.isNotEmpty)
+            .toList(),
         experienceYears: profile.experienceYears?.toInt(),
         consultationFee: profile.consultationFee?.toDouble(),
         specializations: profile.specializations,
         education: profile.education,
         certifications: profile.certifications,
       );
-    } else if (role == 'THERAPIST' && dto.therapistProfile != null) {
+    } else if (role == EmployeeRoleType.therapist &&
+        dto.therapistProfile != null) {
       final profile = dto.therapistProfile!;
-      final type = profile.type?.toUpperCase() ?? '';
+      final therapistType = TherapistType.fromApiValue(profile.type);
 
-      if (type == 'SPA') {
+      if (therapistType == TherapistType.spa) {
         return SpaTherapistEntity(
           id: id,
+          employeeCode: common.employeeCode,
           fullName: common.fullName,
           displayName: common.displayName,
           avatar: common.avatar,
-          role: role,
+          role: roleStr,
           position: common.position,
           rating: common.rating,
           reviewCount: common.reviewCount,
@@ -381,25 +545,32 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
           state: '',
           country: '',
           description: dto.description?.toString(),
-          documents: const [],
+          verificationDocuments: _mapVerificationDocuments(
+            dto.verificationDocuments,
+          ),
+          workHistory: _mapWorkHistory(dto.workHistory),
+          workSchedule: schedule,
           dateOfBirth: common.dateOfBirth,
           gender: common.gender,
           employmentType: common.employmentType,
           startDate: common.startDate,
-          jobTitle: 'Spa Therapist',
+          emergencyContactName: common.emergencyContactName,
+          emergencyContactPhone: common.emergencyContactPhone,
+          jobTitle: TherapistType.spa.displayName,
           therapistLevel: profile.level,
           commissionRate: profile.commissionRate?.toDouble() ?? 0.0,
           healthCheckDate: profile.healthCheckDate?.toIso8601String(),
           skills: profile.skills,
           deviceProficiency: profile.deviceProficiency,
         );
-      } else if (type == 'MASSAGE') {
+      } else if (therapistType == TherapistType.massage) {
         return MassageTherapistEntity(
           id: id,
+          employeeCode: common.employeeCode,
           fullName: common.fullName,
           displayName: common.displayName,
           avatar: common.avatar,
-          role: role,
+          role: roleStr,
           position: common.position,
           rating: common.rating,
           reviewCount: common.reviewCount,
@@ -411,12 +582,18 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
           state: '',
           country: '',
           description: dto.description?.toString(),
-          documents: const [],
+          verificationDocuments: _mapVerificationDocuments(
+            dto.verificationDocuments,
+          ),
+          workHistory: _mapWorkHistory(dto.workHistory),
+          workSchedule: schedule,
           dateOfBirth: common.dateOfBirth,
           gender: common.gender,
           employmentType: common.employmentType,
           startDate: common.startDate,
-          jobTitle: 'Massage Therapist',
+          emergencyContactName: common.emergencyContactName,
+          emergencyContactPhone: common.emergencyContactPhone,
+          jobTitle: TherapistType.massage.displayName,
           therapistLevel: profile.level,
           commissionRate: profile.commissionRate?.toDouble() ?? 0.0,
           healthCheckDate: profile.healthCheckDate?.toIso8601String(),
@@ -428,10 +605,11 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
     return BasicEmployeeEntity(
       id: id,
+      employeeCode: common.employeeCode,
       fullName: common.fullName,
       displayName: common.displayName,
       avatar: common.avatar,
-      role: role,
+      role: roleStr,
       position: common.position,
       rating: common.rating,
       reviewCount: common.reviewCount,
@@ -443,21 +621,31 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       state: '',
       country: '',
       description: dto.description?.toString(),
-      documents: const [],
+      verificationDocuments: _mapVerificationDocuments(
+        dto.verificationDocuments,
+      ),
+      workHistory: _mapWorkHistory(dto.workHistory),
+      workSchedule: schedule,
       dateOfBirth: common.dateOfBirth,
       gender: common.gender,
       employmentType: common.employmentType,
       startDate: common.startDate,
+      emergencyContactName: common.emergencyContactName,
+      emergencyContactPhone: common.emergencyContactPhone,
     );
   }
 
   /// Extracts common fields from [EmployeeResponseDto].
   _CommonFields _mapCommonFields(EmployeeResponseDto dto) {
+    final jobTitle = dto.jobTitle?.toString().trim();
     return _CommonFields(
+      employeeCode: dto.employeeCode,
       fullName: dto.fullName,
-      displayName: dto.displayName?.toString() ?? '',
+      displayName: dto.fullName,
       avatar: dto.avatarUrl?.toString() ?? '',
-      position: dto.role.value,
+      position: jobTitle == null || jobTitle.isEmpty
+          ? dto.role.value
+          : jobTitle,
       rating: dto.rating.toDouble(),
       reviewCount: dto.reviewCount.toInt(),
       status: dto.status.value,
@@ -467,94 +655,223 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       gender: dto.gender?.value,
       employmentType: dto.employmentType?.toString(),
       startDate: dto.startDate?.toString(),
+      jobTitle: dto.jobTitle?.toString(),
+      emergencyContactName: dto.emergencyContactName?.toString(),
+      emergencyContactPhone: dto.emergencyContactPhone?.toString(),
     );
   }
 
-  UpdateEmployeeDtoRoleEnum? _mapUpdateRole(String role) {
-    return switch (role.toUpperCase()) {
-      'DOCTOR' => UpdateEmployeeDtoRoleEnum.DOCTOR,
-      'THERAPIST' => UpdateEmployeeDtoRoleEnum.THERAPIST,
-      'RECEPTIONIST' => UpdateEmployeeDtoRoleEnum.RECEPTIONIST,
-      'MANAGER' => UpdateEmployeeDtoRoleEnum.MANAGER,
-      _ => null,
-    };
-  }
+  /// Converts schedule maps to [WorkScheduleEntryDto].
+  List<WorkScheduleEntryDto> _toScheduleEntries(
+    List<Map<String, dynamic>> schedule,
+  ) => schedule
+      .map(
+        (entry) => WorkScheduleEntryDto(
+          day:
+              WorkScheduleEntryDtoDayEnum.fromJson(
+                entry[ScheduleEntryKey.day],
+              ) ??
+              WorkScheduleEntryDtoDayEnum.monday,
+          start: entry[ScheduleEntryKey.start]?.toString(),
+          end: entry[ScheduleEntryKey.end]?.toString(),
+          isWorking: entry[ScheduleEntryKey.isWorking] as bool? ?? false,
+        ),
+      )
+      .toList();
 
-  UpdateEmployeeDtoStatusEnum? _mapUpdateStatus(String status) {
-    return switch (status.toUpperCase()) {
-      'ACTIVE' => UpdateEmployeeDtoStatusEnum.ACTIVE,
-      'INACTIVE' => UpdateEmployeeDtoStatusEnum.INACTIVE,
-      'ON_LEAVE' => UpdateEmployeeDtoStatusEnum.ON_LEAVE,
-      _ => null,
-    };
-  }
+  /// Converts work history maps to
+  /// [WorkHistoryEntryDto].
+  List<WorkHistoryEntryDto> _toWorkHistoryEntries(
+    List<Map<String, dynamic>> entries,
+  ) => entries
+      .map(
+        (e) => WorkHistoryEntryDto(
+          facility: e[WorkHistoryKey.facility]?.toString() ?? '',
+          position: e[WorkHistoryKey.position]?.toString() ?? '',
+          period: e[WorkHistoryKey.period]?.toString() ?? '',
+          isCurrent: e[WorkHistoryKey.isCurrent] as bool? ?? false,
+        ),
+      )
+      .toList();
 
-  CreateDoctorDtoGenderEnum? _mapDoctorGender(String? gender) {
-    if (gender == null) return null;
-    return switch (gender.toUpperCase()) {
-      'MALE' => CreateDoctorDtoGenderEnum.MALE,
-      'FEMALE' => CreateDoctorDtoGenderEnum.FEMALE,
-      'OTHER' => CreateDoctorDtoGenderEnum.OTHER,
-      _ => null,
-    };
-  }
-
-  CreateSpaTherapistDtoGenderEnum? _mapSpaGender(String? gender) {
-    if (gender == null) return null;
-    return switch (gender.toUpperCase()) {
-      'MALE' => CreateSpaTherapistDtoGenderEnum.MALE,
-      'FEMALE' => CreateSpaTherapistDtoGenderEnum.FEMALE,
-      'OTHER' => CreateSpaTherapistDtoGenderEnum.OTHER,
-      _ => null,
-    };
-  }
-
-  CreateMassageTherapistDtoGenderEnum? _mapMassageGender(String? gender) {
-    if (gender == null) return null;
-    return switch (gender.toUpperCase()) {
-      'MALE' => CreateMassageTherapistDtoGenderEnum.MALE,
-      'FEMALE' => CreateMassageTherapistDtoGenderEnum.FEMALE,
-      'OTHER' => CreateMassageTherapistDtoGenderEnum.OTHER,
-      _ => null,
-    };
-  }
-
-  CreateSpaTherapistDtoTherapistLevelEnum? _mapSpaLevel(String? level) {
-    if (level == null) return null;
-    return switch (level.toUpperCase()) {
-      'JUNIOR' => CreateSpaTherapistDtoTherapistLevelEnum.JUNIOR,
-      'SENIOR' => CreateSpaTherapistDtoTherapistLevelEnum.SENIOR,
-      'MASTER' => CreateSpaTherapistDtoTherapistLevelEnum.MASTER,
-      _ => null,
-    };
-  }
-
-  CreateMassageTherapistDtoTherapistLevelEnum? _mapMassageLevel(String? level) {
-    if (level == null) return null;
-    return switch (level.toUpperCase()) {
-      'JUNIOR' => CreateMassageTherapistDtoTherapistLevelEnum.JUNIOR,
-      'SENIOR' => CreateMassageTherapistDtoTherapistLevelEnum.SENIOR,
-      'MASTER' => CreateMassageTherapistDtoTherapistLevelEnum.MASTER,
-      _ => null,
-    };
-  }
-
-  CreateMassageTherapistDtoStrengthLevelEnum? _mapMassageStrength(
-    String? level,
+  /// Pairs medical titles and licenses into
+  /// [MedicalCredentialResponseDto] entries.
+  ///
+  /// Entries are paired by index. If the lists
+  /// differ in length the shorter side fills with
+  /// empty strings so no data is lost.
+  List<MedicalCredentialResponseDto> _toMedicalCredentials(
+    List<String> titles,
+    List<String> licenses,
   ) {
-    if (level == null) return null;
-    return switch (level.toUpperCase()) {
-      'SOFT' => CreateMassageTherapistDtoStrengthLevelEnum.SOFT,
-      'MEDIUM' => CreateMassageTherapistDtoStrengthLevelEnum.MEDIUM,
-      'STRONG' => CreateMassageTherapistDtoStrengthLevelEnum.STRONG,
-      _ => null,
-    };
+    final count = titles.length > licenses.length
+        ? titles.length
+        : licenses.length;
+    return List.generate(count, (i) {
+      return MedicalCredentialResponseDto(
+        title: i < titles.length ? titles[i] : '',
+        license: i < licenses.length ? licenses[i] : '',
+      );
+    });
   }
+
+  /// Maps [EmployeeGender] to [CreateDoctorDtoGenderEnum].
+  CreateDoctorDtoGenderEnum? _toDoctorGender(EmployeeGender? gender) =>
+      switch (gender) {
+        EmployeeGender.male => CreateDoctorDtoGenderEnum.MALE,
+        EmployeeGender.female => CreateDoctorDtoGenderEnum.FEMALE,
+        EmployeeGender.nonBinary => CreateDoctorDtoGenderEnum.OTHER,
+        _ => null,
+      };
+
+  /// Maps [EmployeeGender] to [CreateSpaTherapistDtoGenderEnum].
+  CreateSpaTherapistDtoGenderEnum? _toSpaGender(EmployeeGender? gender) =>
+      switch (gender) {
+        EmployeeGender.male => CreateSpaTherapistDtoGenderEnum.MALE,
+        EmployeeGender.female => CreateSpaTherapistDtoGenderEnum.FEMALE,
+        EmployeeGender.nonBinary => CreateSpaTherapistDtoGenderEnum.OTHER,
+        _ => null,
+      };
+
+  /// Maps [EmployeeGender] to
+  /// [CreateMassageTherapistDtoGenderEnum].
+  CreateMassageTherapistDtoGenderEnum? _toMassageGender(
+    EmployeeGender? gender,
+  ) => switch (gender) {
+    EmployeeGender.male => CreateMassageTherapistDtoGenderEnum.MALE,
+    EmployeeGender.female => CreateMassageTherapistDtoGenderEnum.FEMALE,
+    EmployeeGender.nonBinary => CreateMassageTherapistDtoGenderEnum.OTHER,
+    _ => null,
+  };
+
+  /// Maps [TherapistLevel] to
+  /// [CreateSpaTherapistDtoTherapistLevelEnum].
+  CreateSpaTherapistDtoTherapistLevelEnum? _toSpaLevel(TherapistLevel? level) =>
+      switch (level) {
+        TherapistLevel.junior => CreateSpaTherapistDtoTherapistLevelEnum.JUNIOR,
+        TherapistLevel.senior => CreateSpaTherapistDtoTherapistLevelEnum.SENIOR,
+        TherapistLevel.master => CreateSpaTherapistDtoTherapistLevelEnum.MASTER,
+        null => null,
+      };
+
+  /// Maps [TherapistLevel] to
+  /// [CreateMassageTherapistDtoTherapistLevelEnum].
+  CreateMassageTherapistDtoTherapistLevelEnum? _toMassageLevel(
+    TherapistLevel? level,
+  ) => switch (level) {
+    TherapistLevel.junior => CreateMassageTherapistDtoTherapistLevelEnum.JUNIOR,
+    TherapistLevel.senior => CreateMassageTherapistDtoTherapistLevelEnum.SENIOR,
+    TherapistLevel.master => CreateMassageTherapistDtoTherapistLevelEnum.MASTER,
+    null => null,
+  };
+
+  /// Maps [MassageStrengthLevel] to
+  /// [CreateMassageTherapistDtoStrengthLevelEnum].
+  CreateMassageTherapistDtoStrengthLevelEnum? _toMassageStrength(
+    MassageStrengthLevel? level,
+  ) => switch (level) {
+    MassageStrengthLevel.soft =>
+      CreateMassageTherapistDtoStrengthLevelEnum.SOFT,
+    MassageStrengthLevel.medium =>
+      CreateMassageTherapistDtoStrengthLevelEnum.MEDIUM,
+    MassageStrengthLevel.strong =>
+      CreateMassageTherapistDtoStrengthLevelEnum.STRONG,
+    null => null,
+  };
+
+  /// Maps [WorkHistoryEntryDto] list to domain
+  /// [WorkHistoryEntry] list.
+  List<WorkHistoryEntry> _mapWorkHistory(List<WorkHistoryEntryDto> dtos) => dtos
+      .map(
+        (d) => WorkHistoryEntry(
+          facility: d.facility,
+          position: d.position,
+          period: d.period,
+          isCurrent: d.isCurrent,
+        ),
+      )
+      .toList();
+
+  /// Maps [WorkScheduleEntryDto] list to domain
+  /// [EmployeeSchedule] list.
+  List<EmployeeSchedule> _mapSchedule(List<WorkScheduleEntryDto> dtos) => dtos
+      .map(
+        (d) => EmployeeSchedule(
+          day: d.day.value,
+          start: d.start ?? '',
+          end: d.end ?? '',
+          isWorking: d.isWorking,
+        ),
+      )
+      .toList();
+
+  /// Maps [VerificationDocumentEntryDto] list
+  /// to domain [VerificationDocumentEntry] list.
+  List<VerificationDocumentEntry> _mapVerificationDocuments(
+    List<VerificationDocumentEntryDto> dtos,
+  ) => dtos
+      .map(
+        (d) => VerificationDocumentEntry(
+          fieldKey: d.fieldKey,
+          documents: d.documents
+              .map(
+                (doc) => DocumentEntry(
+                  name: doc.name,
+                  url: doc.url,
+                  updatedTime: doc.updatedTime,
+                ),
+              )
+              .toList(),
+        ),
+      )
+      .toList();
+
+  /// Maps an assigned service DTO to the detail-page display entity.
+  EmployeeAssignedServiceEntity _mapAssignedService(
+    EmployeeAssignedServiceDto dto,
+  ) {
+    return EmployeeAssignedServiceEntity(
+      id: dto.id,
+      name: dto.name,
+      status: dto.status.value,
+      basePrice: dto.basePrice.toDouble(),
+      salePrice: dto.salePrice?.toDouble(),
+      currency: dto.currency,
+      durationMinutes: dto.durationMinutes?.toInt(),
+      categoryName: dto.categoryName,
+      imageUrl: dto.imageUrl,
+      isPrimary: dto.isPrimary,
+    );
+  }
+
+  /// Converts domain verification document maps
+  /// to [VerificationDocumentEntryDto].
+  ///
+  /// Each map is expected to have the nested
+  /// shape `{fieldKey, documents: [{name, url}]}`.
+  List<VerificationDocumentEntryDto> _toVerificationDocumentDtos(
+    List<Map<String, dynamic>> entries,
+  ) => entries.map((e) {
+    final rawDocs = e['documents'] as List? ?? [];
+    return VerificationDocumentEntryDto(
+      fieldKey: e['fieldKey']?.toString() ?? '',
+      documents: rawDocs
+          .whereType<Map<String, dynamic>>()
+          .map(
+            (d) => DocumentEntryDto(
+              name: d['name']?.toString() ?? '',
+              url: d['url']?.toString() ?? '',
+            ),
+          )
+          .toList(),
+    );
+  }).toList();
 }
 
 /// Helper class for common employee fields.
 class _CommonFields {
   const _CommonFields({
+    required this.employeeCode,
     required this.fullName,
     required this.displayName,
     required this.avatar,
@@ -568,8 +885,12 @@ class _CommonFields {
     this.gender,
     this.employmentType,
     this.startDate,
+    this.jobTitle,
+    this.emergencyContactName,
+    this.emergencyContactPhone,
   });
 
+  final String employeeCode;
   final String fullName;
   final String displayName;
   final String avatar;
@@ -583,6 +904,9 @@ class _CommonFields {
   final String? gender;
   final String? employmentType;
   final String? startDate;
+  final String? jobTitle;
+  final String? emergencyContactName;
+  final String? emergencyContactPhone;
 }
 
 // ============================================================================
@@ -593,6 +917,20 @@ class _CommonFields {
 ///
 /// Provides rich static data with simulated network delays.
 class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
+  final List<EmployeeEntity> _employees = List.generate(100, _mockEmployeeAt);
+
+  static EmployeeEntity _mockEmployeeAt(int index) {
+    final type = index % 3;
+    final id = EmployeeId('mock-id-$index');
+
+    if (type == 0) {
+      return createMockDoctor(id);
+    } else if (type == 1) {
+      return createMockSpaTherapist(id);
+    }
+    return createMockMassageTherapist(id);
+  }
+
   @override
   Future<List<EmployeeEntity>> getEmployees(
     int startingAt,
@@ -600,31 +938,37 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
     String? sortedBy,
     bool? sortedAsc,
   ) async {
-    await Future<void>.delayed(const Duration(seconds: 1));
-    return List.generate(count, (index) {
-      final i = startingAt + index;
-      final type = i % 3;
-      final id = EmployeeId('mock-id-$i');
+    final employees = await getAllEmployees(
+      sortedBy: sortedBy,
+      sortedAsc: sortedAsc,
+    );
+    final end = (startingAt + count).clamp(0, employees.length);
+    return employees.sublist(startingAt.clamp(0, employees.length), end);
+  }
 
-      if (type == 0) {
-        return createMockDoctor(id);
-      } else if (type == 1) {
-        return createMockSpaTherapist(id);
-      } else {
-        return createMockMassageTherapist(id);
-      }
-    });
+  @override
+  Future<List<EmployeeEntity>> getAllEmployees({
+    String? sortedBy,
+    bool? sortedAsc,
+  }) async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+    return [..._employees];
   }
 
   @override
   Future<int> getTotalRows() async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
-    return 100;
+    return _employees.length;
   }
 
   @override
   Future<EmployeeEntity> getEmployeeById(EmployeeId id) async {
     await Future<void>.delayed(const Duration(seconds: 1));
+    final existing = _employees.where((employee) => employee.id == id);
+    if (existing.isNotEmpty) {
+      return existing.first;
+    }
+
     final idVal = id.value.toLowerCase();
 
     if (idVal.contains('doctor')) {
@@ -667,16 +1011,16 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       name: 'EmployeeRemoteDataSourceMock',
     );
 
-    return DoctorEntity(
+    final employee = DoctorEntity(
       id: EmployeeId('new-doctor-id-${DateTime.now().millisecondsSinceEpoch}'),
       fullName: '${request.firstName} ${request.lastName}',
       displayName: '${request.firstName} ${request.lastName}',
       avatar: request.avatar ?? '',
-      role: 'DOCTOR',
-      position: 'Doctor',
+      role: EmployeeRoleType.doctor.apiValue,
+      position: EmployeeRoleType.doctor.displayName,
       rating: 0.0,
       reviewCount: 0,
-      status: 'ACTIVE',
+      status: EmployeeStatusType.active.apiValue,
       email: request.email,
       phone: request.phone,
       address: '',
@@ -694,9 +1038,11 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       workSchedule: [],
       dateOfBirth: request.dateOfBirth,
       gender: request.gender,
-      employmentType: 'Full-Time',
+      employmentType: EmploymentType.fullTime.displayName,
       startDate: DateTime.now().toIso8601String(),
     );
+    _employees.insert(0, employee);
+    return employee;
   }
 
   @override
@@ -710,18 +1056,18 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       name: 'EmployeeRemoteDataSourceMock',
     );
 
-    return SpaTherapistEntity(
+    final employee = SpaTherapistEntity(
       id: EmployeeId(
         'new-spa-therapist-id-${DateTime.now().millisecondsSinceEpoch}',
       ),
       fullName: '${request.firstName} ${request.lastName}',
       displayName: '${request.firstName} ${request.lastName}',
       avatar: request.avatar ?? '',
-      role: 'THERAPIST',
-      position: 'Spa Therapist',
+      role: EmployeeRoleType.therapist.apiValue,
+      position: TherapistType.spa.displayName,
       rating: 0.0,
       reviewCount: 0,
-      status: 'ACTIVE',
+      status: EmployeeStatusType.active.apiValue,
       email: request.email,
       phone: request.phone,
       address: '',
@@ -737,9 +1083,11 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       workSchedule: [],
       dateOfBirth: request.dateOfBirth,
       gender: request.gender,
-      employmentType: 'Part-Time',
+      employmentType: EmploymentType.partTime.displayName,
       startDate: DateTime.now().toIso8601String(),
     );
+    _employees.insert(0, employee);
+    return employee;
   }
 
   @override
@@ -753,18 +1101,18 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       name: 'EmployeeRemoteDataSourceMock',
     );
 
-    return MassageTherapistEntity(
+    final employee = MassageTherapistEntity(
       id: EmployeeId(
         'new-massage-therapist-id-${DateTime.now().millisecondsSinceEpoch}',
       ),
       fullName: '${request.firstName} ${request.lastName}',
       displayName: '${request.firstName} ${request.lastName}',
       avatar: request.avatar ?? '',
-      role: 'THERAPIST',
-      position: 'Massage Therapist',
+      role: EmployeeRoleType.therapist.apiValue,
+      position: TherapistType.massage.displayName,
       rating: 0.0,
       reviewCount: 0,
-      status: 'ACTIVE',
+      status: EmployeeStatusType.active.apiValue,
       email: request.email,
       phone: request.phone,
       address: '',
@@ -780,9 +1128,11 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       workSchedule: [],
       dateOfBirth: request.dateOfBirth,
       gender: request.gender,
-      employmentType: 'Contract',
+      employmentType: EmploymentType.contractor.displayName,
       startDate: DateTime.now().toIso8601String(),
     );
+    _employees.insert(0, employee);
+    return employee;
   }
 
   @override
@@ -796,13 +1146,57 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
   }
 
   @override
+  Future<void> updateEmployeeStatus(
+    EmployeeId id,
+    EmployeeStatusType status,
+  ) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+
+    developer.log(
+      'Mock: Updated employee status $id -> ${status.apiValue}',
+      name: 'EmployeeRemoteDataSourceMock',
+    );
+  }
+
+  @override
   Future<void> deleteEmployee(EmployeeId id) async {
     await Future<void>.delayed(const Duration(seconds: 1));
+    _employees.removeWhere((employee) => employee.id == id);
 
     developer.log(
       'Mock: Deleted employee $id',
       name: 'EmployeeRemoteDataSourceMock',
     );
+  }
+
+  @override
+  Future<List<EmployeeAssignedServiceEntity>> getEmployeeAssignedServices(
+    EmployeeId id,
+  ) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    return [
+      const EmployeeAssignedServiceEntity(
+        id: 'mock-service-consultation',
+        name: 'General Consultation',
+        status: 'ACTIVE',
+        basePrice: 500000,
+        salePrice: 450000,
+        currency: 'VND',
+        durationMinutes: 45,
+        categoryName: 'Consultation',
+        isPrimary: true,
+      ),
+      const EmployeeAssignedServiceEntity(
+        id: 'mock-service-follow-up',
+        name: 'Follow-up Session',
+        status: 'DRAFT',
+        basePrice: 300000,
+        currency: 'VND',
+        durationMinutes: 30,
+        categoryName: 'Care Plan',
+        isPrimary: false,
+      ),
+    ];
   }
 
   @override
@@ -813,7 +1207,8 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
     await Future<void>.delayed(const Duration(seconds: 1));
     final count = limit ?? 10;
 
-    if (role.toUpperCase() == 'DOCTOR') {
+    final parsedRole = EmployeeRoleType.fromApiValue(role);
+    if (parsedRole == EmployeeRoleType.doctor) {
       return List.generate(
         count,
         (index) => createMockDoctor(EmployeeId('mock-doc-$index')),
@@ -839,6 +1234,34 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
   Future<Map<String, String>> getSpaSkills() async {
     await Future<void>.delayed(const Duration(seconds: 1));
     return employeeMockSpaSkills;
+  }
+
+  @override
+  Future<Map<String, String>> getMassageSkills() async {
+    await Future<void>.delayed(const Duration(seconds: 1));
+    return employeeMockMassageSkills;
+  }
+
+  @override
+  Future<Map<String, String>> createMassageSkill(String name) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    final key = name.toLowerCase().replaceAll(' ', '_');
+    developer.log(
+      'Mock: Created massage skill: $name',
+      name: 'EmployeeRemoteDataSourceMock',
+    );
+    return {key: name};
+  }
+
+  @override
+  Future<Map<String, String>> createSpaSkill(String name) async {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    final key = name.toLowerCase().replaceAll(' ', '_');
+    developer.log(
+      'Mock: Created spa skill: $name',
+      name: 'EmployeeRemoteDataSourceMock',
+    );
+    return {key: name};
   }
 }
 

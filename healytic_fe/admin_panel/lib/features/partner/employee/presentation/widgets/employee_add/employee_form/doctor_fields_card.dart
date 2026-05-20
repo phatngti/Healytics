@@ -15,19 +15,13 @@ class DoctorFieldsCard extends StatefulWidget {
   /// Existing doctor entity for pre-fill in edit mode.
   final DoctorEntity? doctor;
 
-  const DoctorFieldsCard({
-    super.key,
-    this.isEditing = true,
-    this.doctor,
-  });
+  const DoctorFieldsCard({super.key, this.isEditing = true, this.doctor});
 
   @override
-  State<DoctorFieldsCard> createState() =>
-      _DoctorFieldsCardState();
+  State<DoctorFieldsCard> createState() => _DoctorFieldsCardState();
 }
 
-class _DoctorFieldsCardState
-    extends State<DoctorFieldsCard> {
+class _DoctorFieldsCardState extends State<DoctorFieldsCard> {
   bool _isExpanded = true;
 
   /// Number of medical title/license rows.
@@ -47,8 +41,7 @@ class _DoctorFieldsCardState
 
     final titles = doctor.medicalTitles.length;
     final licenses = doctor.medicalLicenses.length;
-    final max =
-        titles > licenses ? titles : licenses;
+    final max = titles > licenses ? titles : licenses;
     if (max > 1) {
       _credentialCount = max;
     }
@@ -71,16 +64,13 @@ class _DoctorFieldsCardState
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>()!;
+    final semanticColors = Theme.of(context).extension<SemanticColors>()!;
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: AppDimens.radiusMedium,
-        border: Border.all(
-          color: colorScheme.outlineVariant,
-        ),
+        border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withAlpha(10),
@@ -92,20 +82,14 @@ class _DoctorFieldsCardState
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          _buildHeader(
-            colorScheme,
-            textTheme,
-            semanticColors,
-          ),
+          _buildHeader(colorScheme, textTheme, semanticColors),
           AnimatedCrossFade(
             firstChild: _buildContent(context),
             secondChild: const SizedBox.shrink(),
             crossFadeState: _isExpanded
                 ? CrossFadeState.showFirst
                 : CrossFadeState.showSecond,
-            duration: const Duration(
-              milliseconds: 200,
-            ),
+            duration: const Duration(milliseconds: 200),
           ),
         ],
       ),
@@ -118,10 +102,7 @@ class _DoctorFieldsCardState
     SemanticColors semanticColors,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: 16,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: InkWell(
         onTap: () {
           setState(() {
@@ -134,12 +115,11 @@ class _DoctorFieldsCardState
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: semanticColors.info
-                    ?.withAlpha(25),
+                color: semanticColors.info?.withAlpha(25),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: semanticColors.info
-                          ?.withAlpha(75) ??
+                  color:
+                      semanticColors.info?.withAlpha(75) ??
                       colorScheme.outlineVariant,
                 ),
               ),
@@ -152,17 +132,14 @@ class _DoctorFieldsCardState
             AppDimens.horizontalMediumSmall,
             Text(
               'Education & Qualifications',
-              style:
-                  textTheme.titleMedium?.copyWith(
+              style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const Spacer(),
             AnimatedRotation(
               turns: _isExpanded ? 0.5 : 0,
-              duration: const Duration(
-                milliseconds: 200,
-              ),
+              duration: const Duration(milliseconds: 200),
               child: Icon(
                 Icons.expand_more,
                 color: colorScheme.onSurfaceVariant,
@@ -180,11 +157,7 @@ class _DoctorFieldsCardState
     return Container(
       padding: AppDimens.paddingAllLarge,
       decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: colorScheme.outlineVariant,
-          ),
-        ),
+        border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,9 +176,7 @@ class _DoctorFieldsCardState
   // Multi medical title / license rows
   // ──────────────────────────────────────────────
 
-  Widget _buildCredentialRows(
-    BuildContext context,
-  ) {
+  Widget _buildCredentialRows(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
@@ -221,28 +192,22 @@ class _DoctorFieldsCardState
             child: Row(
               children: [
                 Expanded(
-                  child: FormFieldBuilders
-                      .buildTextField(
+                  child: FormFieldBuilders.buildTextField(
                     context,
                     fieldKey: 'medical_title_$i',
-                    label: i == 0
-                        ? 'Medical Title'
-                        : '',
-                    hintText:
-                        'e.g. BS CKI, Thạc sĩ',
+                    label: i == 0 ? 'Medical Title' : '',
+                    hintText: 'e.g. BS CKI, Thạc sĩ',
                     enabled: widget.isEditing,
                     initialValue: _titleAt(i),
+                    isRequired: true,
                   ),
                 ),
                 AppDimens.horizontalLarge,
                 Expanded(
-                  child: FormFieldBuilders
-                      .buildTextField(
+                  child: FormFieldBuilders.buildTextField(
                     context,
                     fieldKey: 'medical_license_$i',
-                    label: i == 0
-                        ? 'Medical License ID'
-                        : '',
+                    label: i == 0 ? 'Medical License ID' : '',
                     hintText: 'e.g. CCHN-00123',
                     isRequired: i == 0,
                     prefixIcon: Icons.badge_outlined,
@@ -251,11 +216,7 @@ class _DoctorFieldsCardState
                   ),
                 ),
                 if (widget.isEditing)
-                  _buildRowAction(
-                    context,
-                    index: i,
-                    colorScheme: colorScheme,
-                  ),
+                  _buildRowAction(context, index: i, colorScheme: colorScheme),
               ],
             ),
           ),
@@ -278,14 +239,10 @@ class _DoctorFieldsCardState
             : () => _removeCredentialRow(index),
         icon: Icon(
           isLast ? Icons.add_circle_outline : Icons.remove_circle_outline,
-          color: isLast
-              ? colorScheme.primary
-              : colorScheme.error,
+          color: isLast ? colorScheme.primary : colorScheme.error,
           size: 22,
         ),
-        tooltip: isLast
-            ? 'Add credential'
-            : 'Remove credential',
+        tooltip: isLast ? 'Add credential' : 'Remove credential',
       ),
     );
   }
@@ -299,10 +256,8 @@ class _DoctorFieldsCardState
   }
 
   String? _licenseAt(int index) {
-    final licenses =
-        widget.doctor?.medicalLicenses;
-    if (licenses == null ||
-        index >= licenses.length) {
+    final licenses = widget.doctor?.medicalLicenses;
+    if (licenses == null || index >= licenses.length) {
       return null;
     }
     return licenses[index];
@@ -312,11 +267,8 @@ class _DoctorFieldsCardState
   // Education (multi-select popover)
   // ──────────────────────────────────────────────
 
-  Widget _buildEducationField(
-    BuildContext context,
-  ) {
-    return FormFieldBuilders
-        .buildMultiSelectPopoverField<String>(
+  Widget _buildEducationField(BuildContext context) {
+    return FormFieldBuilders.buildMultiSelectPopoverField<String>(
       context,
       fieldKey: 'education',
       label: 'Education',
@@ -324,6 +276,7 @@ class _DoctorFieldsCardState
       initialValue: widget.doctor?.education,
       searchHint: 'Search education...',
       enabled: widget.isEditing,
+      isRequired: true,
     );
   }
 
@@ -331,19 +284,16 @@ class _DoctorFieldsCardState
   // Certifications (multi-select popover)
   // ──────────────────────────────────────────────
 
-  Widget _buildCertificationsField(
-    BuildContext context,
-  ) {
-    return FormFieldBuilders
-        .buildMultiSelectPopoverField<String>(
+  Widget _buildCertificationsField(BuildContext context) {
+    return FormFieldBuilders.buildMultiSelectPopoverField<String>(
       context,
       fieldKey: 'certifications',
       label: 'Certifications',
       items: MedicalCertification.optionsMap,
-      initialValue:
-          widget.doctor?.certifications,
+      initialValue: widget.doctor?.certifications,
       searchHint: 'Search certification...',
       enabled: widget.isEditing,
+      isRequired: true,
     );
   }
 }

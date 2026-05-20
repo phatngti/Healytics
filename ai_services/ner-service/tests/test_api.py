@@ -5,7 +5,7 @@ Integration tests cho NER API endpoints.
 Dùng httpx.AsyncClient + FastAPI ASGITransport (no live server needed).
 
 Changes from previous version:
-- Default proximity radius updated to 5000m (was 3000m)
+- Default proximity radius updated to 10000m (was 3000m)
 - Added TPHCM alias test, Quận 1 location test
 - Added 3-case spatial routing tests (TH1/TH2/TH3)
 - Added false-positive prevention tests (hiệu thuốc, làm đẹp)
@@ -17,6 +17,9 @@ from unittest.mock import patch, AsyncMock
 from httpx import ASGITransport, AsyncClient
 
 from app.main import app
+
+
+pytestmark = pytest.mark.asyncio
 
 
 @pytest_asyncio.fixture
@@ -94,8 +97,8 @@ class TestNerExtractNewFeatures:
         assert dist_entities[0]["radius_meters"] == 5000
         assert dist_entities[0].get("proximity_intent") is False
 
-    async def test_implicit_proximity_gan_day_default_5000m(self, client):
-        """'gần đây' → DISTANCE entity with proximity_intent=True and default 5000m (not 3000m)."""
+    async def test_implicit_proximity_gan_day_default_10000m(self, client):
+        """'gần đây' → DISTANCE entity with proximity_intent=True and default 10000m (not 3000m)."""
         response = await client.post(
             "/ner/extract",
             json={"text": "Tìm gym gần đây"},
@@ -104,8 +107,8 @@ class TestNerExtractNewFeatures:
         data = response.json()
         dist_entities = [e for e in data["entities"] if e["type"] == "DISTANCE"]
         assert len(dist_entities) == 1
-        assert dist_entities[0]["radius_meters"] == 5000, \
-            f"Default radius should be 5000m, got {dist_entities[0]['radius_meters']}"
+        assert dist_entities[0]["radius_meters"] == 10000, \
+            f"Default radius should be 10000m, got {dist_entities[0]['radius_meters']}"
         assert dist_entities[0].get("proximity_intent") is True
 
     async def test_explicit_distance_overrides_implicit(self, client):
@@ -196,6 +199,40 @@ class TestNerExtractNewFeatures:
         assert len(dist_entities) == 1
         assert dist_entities[0]["radius_meters"] == 2000, \
             f"Expected 2000m for '2 cây số', got {dist_entities[0]['radius_meters']}"
+
+    async def test_distance_between_range_operator(self, client):
+        """'từ 2km đến 5km' -> DISTANCE operator=between (min=2000, max=5000)."""
+        response = await client.post(
+            "/ner/extract",
+            json={"text": "Tìm spa từ 2km đến 5km"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        dist_entities = [e for e in data["entities"] if e["type"] == "DISTANCE"]
+        assert len(dist_entities) == 1
+        d = dist_entities[0]
+        assert d["operator"] == "between"
+        assert d["amount"] == 2000.0
+        assert d["amount_max"] == 5000.0
+
+    async def test_distance_between_khoang_toi_no_price_false_positive(self, client):
+        """'khoảng 2 tới 5km' should be DISTANCE between and must not create PRICE entity."""
+        response = await client.post(
+            "/ner/extract",
+            json={"text": "gợi ý các dịch vụ spa và nha sĩ cách đây khoảng 2 tới 5km"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        dist_entities = [e for e in data["entities"] if e["type"] == "DISTANCE"]
+        price_entities = [e for e in data["entities"] if e["type"] == "PRICE"]
+
+        assert len(dist_entities) == 1
+        d = dist_entities[0]
+        assert d["operator"] == "between"
+        assert d["amount"] == 2000.0
+        assert d["amount_max"] == 5000.0
+        assert price_entities == []
 
 
 # ============================================================================
@@ -408,6 +445,204 @@ class TestPrefilterEndpoint:
                 call_kwargs.args[1] if len(call_kwargs.args) > 1 else False
             )
             assert use_postgis_arg is False
+
+
+class TestPrefilterDebugEndpoint:
+
+    async def test_prefilter_debug_returns_prefilter_response_shape(self, client):
+        mocked_normalized = [
+            {
+                "type": "BUSINESS_TYPE",
+                "value": "spa",
+                "confidence": 0.9,
+                "business_type": "SPA_BEAUTY",
+            }
+        ]
+        mocked_candidates = [
+            {
+                "service_id": "svc-1",
+                "name": "Spa Test",
+                "image_url": None,
+            }
+        ]
+
+        with patch(
+            "app.api.prefilter_routes.extractor.extract_entities_with_source",
+            new=AsyncMock(return_value=([{"type": "MISC", "value": "spa", "confidence": 0.8}], "gemini")),
+        ), patch(
+            "app.api.prefilter_routes.normalizer.normalize_entities",
+            return_value=mocked_normalized,
+        ), patch(
+            "app.api.prefilter_routes.db_fetcher.fetch_candidates_from_db",
+            new=AsyncMock(return_value=mocked_candidates),
+        ):
+            response = await client.post(
+                "/prefilter/search/debug",
+                json={"text": "Tìm spa ở Hà Nội", "limit": 20},
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["text"] == "Tìm spa ở Hà Nội"
+        assert isinstance(data["entities"], list)
+        assert isinstance(data["query_params"], dict)
+        assert isinstance(data["candidates"], list)
+        assert data["total"] == 1
+
+    async def test_prefilter_debug_skips_tag_category_without_business_type(self, client):
+        mocked_entities = [
+            {
+                "type": "LOC",
+                "value": "Hồ Chí Minh",
+                "confidence": 0.9,
+            }
+        ]
+
+        with patch(
+            "app.api.prefilter_routes.extractor.extract_entities_with_source",
+            new=AsyncMock(return_value=(mocked_entities, "gemini")),
+        ), patch(
+            "app.api.prefilter_routes.normalizer.normalize_entities",
+            return_value=mocked_entities,
+        ), patch(
+            "app.api.prefilter_routes.db_fetcher.fetch_candidates_from_db",
+            new=AsyncMock(return_value=[]),
+        ) as mock_fetch:
+            response = await client.post(
+                "/prefilter/search/debug",
+                json={"text": "dịch vụ ở hồ chí minh", "limit": 20},
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert "tagFilters" not in data["query_params"]
+        assert "categorySlug" not in data["query_params"]
+        assert mock_fetch.await_count >= 1
+
+    async def test_prefilter_debug_keeps_multiple_business_types(self, client):
+        mocked_entities = [
+            {
+                "type": "BUSINESS_TYPE",
+                "value": "dịch vụ gym",
+                "confidence": 0.9,
+                "business_type": "FITNESS",
+            },
+            {
+                "type": "BUSINESS_TYPE",
+                "value": "dịch vụ spa",
+                "confidence": 0.85,
+                "business_type": "SPA_BEAUTY",
+            },
+        ]
+
+        with patch(
+            "app.api.prefilter_routes.extractor.extract_entities_with_source",
+            new=AsyncMock(return_value=(mocked_entities, "gemini")),
+        ), patch(
+            "app.api.prefilter_routes.normalizer.normalize_entities",
+            return_value=mocked_entities,
+        ), patch(
+            "app.api.prefilter_routes.db_fetcher.fetch_candidates_from_db",
+            new=AsyncMock(return_value=[]),
+        ):
+            response = await client.post(
+                "/prefilter/search/debug",
+                json={"text": "dịch vụ gym hoặc spa", "limit": 20},
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["query_params"].get("businessTypes") == ["FITNESS", "SPA_BEAUTY"]
+
+    async def test_prefilter_debug_keeps_only_selected_location_from_gemini(self, client):
+        mocked_entities = [
+            {
+                "type": "LOCATION",
+                "value": "Hồ Chí Minh",
+                "confidence": 0.9,
+                "location_code": "79",
+                "location_level": "PROVINCE",
+                "location_intent": False,
+            },
+            {
+                "type": "LOCATION",
+                "value": "Hà Nội",
+                "confidence": 0.9,
+                "location_code": "01",
+                "location_level": "PROVINCE",
+                "location_intent": False,
+            },
+        ]
+        with patch(
+            "app.api.prefilter_routes.extractor.extract_entities_with_source",
+            new=AsyncMock(return_value=(mocked_entities, "gemini")),
+        ), patch(
+            "app.api.prefilter_routes.normalizer.normalize_entities",
+            return_value=mocked_entities,
+        ), patch(
+            "app.api.prefilter_routes.select_requested_location_with_gemini",
+            new=AsyncMock(return_value={
+                "selected_location_code": "79",
+                "apply_filter": True,
+                "confidence": 0.92,
+                "excluded_location_codes": ["01"],
+                "reason": "Query asks for HCM",
+            }),
+        ), patch(
+            "app.api.prefilter_routes.db_fetcher.fetch_candidates_from_db",
+            new=AsyncMock(return_value=[]),
+        ):
+            response = await client.post(
+                "/prefilter/search/debug",
+                json={"text": "gợi ý dịch vụ khám sức khỏe hồ chí minh", "limit": 20},
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["query_params"].get("locationCode") == "79"
+        kept_codes = [e.get("location_code") for e in data["entities"] if e.get("type") == "LOCATION"]
+        assert kept_codes == ["79"]
+
+    async def test_prefilter_debug_drops_locations_when_gemini_says_no_filter(self, client):
+        mocked_entities = [
+            {
+                "type": "LOCATION",
+                "value": "Hồ Chí Minh",
+                "confidence": 0.9,
+                "location_code": "79",
+                "location_level": "PROVINCE",
+                "location_intent": True,
+            }
+        ]
+        with patch(
+            "app.api.prefilter_routes.extractor.extract_entities_with_source",
+            new=AsyncMock(return_value=(mocked_entities, "gemini")),
+        ), patch(
+            "app.api.prefilter_routes.normalizer.normalize_entities",
+            return_value=mocked_entities,
+        ), patch(
+            "app.api.prefilter_routes.select_requested_location_with_gemini",
+            new=AsyncMock(return_value={
+                "selected_location_code": None,
+                "apply_filter": False,
+                "confidence": 0.77,
+                "excluded_location_codes": ["79"],
+                "reason": "Location mentioned as context only",
+            }),
+        ), patch(
+            "app.api.prefilter_routes.db_fetcher.fetch_candidates_from_db",
+            new=AsyncMock(return_value=[]),
+        ):
+            response = await client.post(
+                "/prefilter/search/debug",
+                json={"text": "mình ở hồ chí minh, gợi ý dịch vụ tốt", "limit": 20},
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert "locationCode" not in data["query_params"]
+        remaining_locations = [e for e in data["entities"] if e.get("type") == "LOCATION"]
+        assert remaining_locations == []
 
 
 # ============================================================================

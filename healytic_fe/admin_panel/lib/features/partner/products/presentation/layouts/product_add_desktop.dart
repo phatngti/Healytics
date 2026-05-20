@@ -6,6 +6,7 @@ import 'package:admin_panel/features/partner/products/presentation/widgets/produ
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_organization_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_pricing_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_facility_images_card.widget.dart';
+import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_service_manual_card.widget.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/product_add/product_visibility_card.widget.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +15,20 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class ProductAddDesktop extends ConsumerStatefulWidget {
   const ProductAddDesktop({
     super.key,
+    this.isFormValid = false,
     this.onSubmit,
     required this.onCancel,
     this.initialStatus = 'draft',
     this.initialOnlineStore = false,
     this.initialDescription,
+    this.serviceManualKey,
+    this.initialGuidelines = const [],
+    this.initialRules = const [],
+    this.initialSteps = const [],
   });
+
+  /// Whether all form fields are currently valid.
+  final bool isFormValid;
 
   final VoidCallback? onSubmit;
   final VoidCallback onCancel;
@@ -28,6 +37,22 @@ class ProductAddDesktop extends ConsumerStatefulWidget {
 
   /// Initial Quill Delta JSON for the description editor.
   final String? initialDescription;
+
+  /// Key to access the service manual card
+  /// for data extraction.
+  final GlobalKey<ProductServiceManualCardState>?
+      serviceManualKey;
+
+  /// Pre-populated service manual guidelines.
+  final List<String> initialGuidelines;
+
+  /// Pre-populated service manual rules.
+  /// Each map: {iconSlug, title, description}.
+  final List<Map<String, String>> initialRules;
+
+  /// Pre-populated procedure steps.
+  /// Each map: {title, description}.
+  final List<Map<String, String>> initialSteps;
 
   @override
   ConsumerState<ProductAddDesktop> createState() => _ProductAddDesktopState();
@@ -75,7 +100,15 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                             initialDescription: widget.initialDescription,
                           ),
                           AppDimens.verticalMedium,
-                          const ProductOperationsCard(),
+                          ProductServiceManualCard(
+                            key: widget.serviceManualKey,
+                            initialGuidelines:
+                                widget.initialGuidelines,
+                            initialRules:
+                                widget.initialRules,
+                            initialSteps:
+                                widget.initialSteps,
+                          ),
                           AppDimens.verticalMedium,
                           const ProductPricingCard(),
                           AppDimens.verticalMedium,
@@ -114,6 +147,8 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                               });
                             },
                           ),
+                          AppDimens.verticalMedium,
+                          const ProductOperationsCard(),
                         ],
                       ),
                     ),
@@ -167,20 +202,31 @@ class _ProductAddDesktopState extends ConsumerState<ProductAddDesktop> {
                       onPressed: widget.onCancel,
                       child: const Text('Cancel'),
                     ),
-                    AppDimens.horizontalSmall,
-                    AppButton(
-                      buttonType: ButtonType.elevated,
-                      onPressed: widget.onSubmit,
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeInOut,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.save_outlined,
-                            size: 18,
-                            color: colorScheme.onPrimary,
-                          ),
                           AppDimens.horizontalSmall,
-                          const Text('Save & Publish'),
+                          AppButton(
+                            buttonType: ButtonType.elevated,
+                            onPressed: widget.isFormValid
+                                ? widget.onSubmit
+                                : null,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.save_outlined,
+                                  size: 18,
+                                  color: colorScheme.onPrimary,
+                                ),
+                                AppDimens.horizontalSmall,
+                                const Text('Save & Publish'),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),

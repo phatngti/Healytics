@@ -1,9 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import {
-  createTestApp,
-  closeTestApp,
-} from '../../helpers/test-utils';
+import { createTestApp, closeTestApp } from '../../helpers/test-utils';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication;
@@ -107,7 +104,10 @@ describe('Auth (e2e)', () => {
     it('should fail with invalid credentials', async () => {
       const res = await request(app.getHttpServer())
         .post('/auth/admin/login')
-        .send({ email: 'invalid-admin@example.com', password: 'wrongpassword' });
+        .send({
+          email: 'invalid-admin@example.com',
+          password: 'wrongpassword',
+        });
 
       expect(res.status).toBeGreaterThanOrEqual(400);
     });

@@ -7,15 +7,15 @@ import { Category } from '@/common/entities/category.entity';
  */
 class CategorySummaryDto {
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ type: String })
   id: string;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ type: String })
   name: string;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ type: String })
   slug: string;
 
   static fromEntity(entity: Category): CategorySummaryDto {
@@ -33,45 +33,59 @@ class CategorySummaryDto {
  */
 export class CategoryResponseDto {
   @Expose()
-  @ApiProperty({ description: 'Unique category identifier' })
+  @ApiProperty({ type: String, description: 'Unique category identifier' })
   id: string;
 
   @Expose()
-  @ApiProperty({ description: 'Category name' })
+  @ApiProperty({ type: String, description: 'Category name' })
   name: string;
 
   @Expose()
-  @ApiProperty({ description: 'URL-friendly slug' })
+  @ApiProperty({ type: String, description: 'URL-friendly slug' })
   slug: string;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Category description' })
+  @ApiPropertyOptional({ type: String, nullable: true, description: 'Category description' })
   description: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ description: 'Category image URL' })
+  @ApiPropertyOptional({ type: String, nullable: true, description: 'Category image URL' })
   imageUrl: string | null;
 
   @Expose()
-  @ApiProperty({ description: 'Whether category is active' })
+  @ApiProperty({ type: Boolean, description: 'Whether category is active' })
   isActive: boolean;
 
   @Expose()
-  @ApiProperty({ description: 'Creation timestamp' })
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Category type for UI grouping',
+    default: 'primary',
+  })
+  categoryType: string;
+
+  @Expose()
+  @ApiProperty({ type: Date, description: 'Creation timestamp' })
   createdAt: Date;
 
   @Expose()
-  @ApiProperty({ description: 'Last update timestamp' })
+  @ApiProperty({ type: Date, description: 'Last update timestamp' })
   updatedAt: Date;
 
   @Expose()
   @Type(() => CategorySummaryDto)
-  @ApiPropertyOptional({ type: CategorySummaryDto, description: 'Parent category' })
+  @ApiPropertyOptional({
+    type: CategorySummaryDto,
+    description: 'Parent category',
+  })
   parent: CategorySummaryDto | null;
 
   @Expose()
   @Type(() => CategorySummaryDto)
-  @ApiPropertyOptional({ type: [CategorySummaryDto], description: 'Child categories' })
+  @ApiPropertyOptional({
+    type: [CategorySummaryDto],
+    description: 'Child categories',
+  })
   children: CategorySummaryDto[];
 
   static fromEntity(entity: Category): CategoryResponseDto {
@@ -82,6 +96,7 @@ export class CategoryResponseDto {
     dto.description = entity.description;
     dto.imageUrl = entity.imageUrl;
     dto.isActive = entity.isActive;
+    dto.categoryType = 'primary';
     dto.createdAt = entity.createdAt;
     dto.updatedAt = entity.updatedAt;
     dto.parent = entity.parent

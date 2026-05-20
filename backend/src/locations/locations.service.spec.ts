@@ -17,18 +17,54 @@ describe('LocationsService', () => {
 
   // Mock entity data
   const mockProvinceEntities = [
-    { id: 'province-1', code: '01', name: 'Hà Nội', fullName: 'Thành phố Hà Nội', level: LocationLevel.PROVINCE },
-    { id: 'province-2', code: '79', name: 'Hồ Chí Minh', fullName: 'Thành phố Hồ Chí Minh', level: LocationLevel.PROVINCE },
+    {
+      id: 'province-1',
+      code: '01',
+      name: 'Hà Nội',
+      fullName: 'Thành phố Hà Nội',
+      level: LocationLevel.PROVINCE,
+    },
+    {
+      id: 'province-2',
+      code: '79',
+      name: 'Hồ Chí Minh',
+      fullName: 'Thành phố Hồ Chí Minh',
+      level: LocationLevel.PROVINCE,
+    },
   ];
 
   const mockDistrictEntities = [
-    { id: 'district-1', code: '001', name: 'Quận 1', fullName: 'Quận 1', level: LocationLevel.DISTRICT },
-    { id: 'district-2', code: '002', name: 'Quận 2', fullName: 'Quận 2', level: LocationLevel.DISTRICT },
+    {
+      id: 'district-1',
+      code: '001',
+      name: 'Quận 1',
+      fullName: 'Quận 1',
+      level: LocationLevel.DISTRICT,
+    },
+    {
+      id: 'district-2',
+      code: '002',
+      name: 'Quận 2',
+      fullName: 'Quận 2',
+      level: LocationLevel.DISTRICT,
+    },
   ];
 
   const mockWardEntities = [
-    { id: 'ward-1', code: '00001', name: 'Phường 1', fullName: 'Phường 1', level: LocationLevel.WARD },
-    { id: 'ward-2', code: '00002', name: 'Phường 2', fullName: 'Phường 2', level: LocationLevel.WARD },
+    {
+      id: 'ward-1',
+      code: '00001',
+      name: 'Phường 1',
+      fullName: 'Phường 1',
+      level: LocationLevel.WARD,
+    },
+    {
+      id: 'ward-2',
+      code: '00002',
+      name: 'Phường 2',
+      fullName: 'Phường 2',
+      level: LocationLevel.WARD,
+    },
   ];
 
   beforeEach(async () => {

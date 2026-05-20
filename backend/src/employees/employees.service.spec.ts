@@ -3,12 +3,20 @@ import { EmployeesService } from './employees.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Employee } from '@/common/entities/employee.entity';
 import { Partner } from '@/common/entities/partner.entity';
+import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
+import { Booking } from '@/common/entities/booking.entity';
+import { SkillCatalog } from '@/common/entities/skill-catalog.entity';
+import { SpecialistReview } from '@/common/entities/specialist-review.entity';
 import { NotFoundException } from '@nestjs/common';
 import { EmployeeRole } from './enum/employee-role.enum';
+import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
+import { PartnersService } from '@/partners/partners.service';
 import { CreateDoctorHandler } from './application/handlers/create-doctor.handler';
 import { CreateTherapistHandler } from './application/handlers/create-therapist.handler';
 import { UpdateEmployeeHandler } from './application/handlers/update-employee.handler';
 import { RemoveEmployeeHandler } from './application/handlers/remove-employee.handler';
+import { GetEmployeeOverviewAnalyticsHandler } from './application/handlers/get-employee-overview-analytics.handler';
+import { GetEmployeeDetailAnalyticsHandler } from './application/handlers/get-employee-detail-analytics.handler';
 
 describe('EmployeesService', () => {
   let service: EmployeesService;
@@ -18,6 +26,7 @@ describe('EmployeesService', () => {
   let createTherapistHandler: Record<string, jest.Mock>;
   let updateEmployeeHandler: Record<string, jest.Mock>;
   let removeEmployeeHandler: Record<string, jest.Mock>;
+  let specialistReviewRepository: Record<string, jest.Mock>;
 
   const mockEmployeeRepository = {
     find: jest.fn(),
@@ -44,6 +53,38 @@ describe('EmployeesService', () => {
     execute: jest.fn(),
   };
 
+  const mockGetOverviewAnalyticsHandler = {
+    execute: jest.fn(),
+  };
+
+  const mockGetDetailAnalyticsHandler = {
+    execute: jest.fn(),
+  };
+
+  const mockEligibilityRepository = {
+    find: jest.fn(),
+    createQueryBuilder: jest.fn(),
+  };
+
+  const mockBookingRepository = {
+    find: jest.fn(),
+  };
+
+  const mockSpecialistReviewRepository = {
+    createQueryBuilder: jest.fn(),
+  };
+
+  const mockSkillCatalogRepository = {
+    find: jest.fn(),
+    findOne: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockPartnersService = {
+    getFirstHealthPartner: jest.fn().mockResolvedValue(null),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -55,6 +96,26 @@ describe('EmployeesService', () => {
         {
           provide: getRepositoryToken(Partner),
           useValue: mockPartnerRepository,
+        },
+        {
+          provide: getRepositoryToken(ProductEmployeeEligibility),
+          useValue: mockEligibilityRepository,
+        },
+        {
+          provide: getRepositoryToken(Booking),
+          useValue: mockBookingRepository,
+        },
+        {
+          provide: getRepositoryToken(SpecialistReview),
+          useValue: mockSpecialistReviewRepository,
+        },
+        {
+          provide: getRepositoryToken(SkillCatalog),
+          useValue: mockSkillCatalogRepository,
+        },
+        {
+          provide: PartnersService,
+          useValue: mockPartnersService,
         },
         {
           provide: CreateDoctorHandler,
@@ -72,6 +133,14 @@ describe('EmployeesService', () => {
           provide: RemoveEmployeeHandler,
           useValue: mockRemoveEmployeeHandler,
         },
+        {
+          provide: GetEmployeeOverviewAnalyticsHandler,
+          useValue: mockGetOverviewAnalyticsHandler,
+        },
+        {
+          provide: GetEmployeeDetailAnalyticsHandler,
+          useValue: mockGetDetailAnalyticsHandler,
+        },
       ],
     }).compile();
 
@@ -82,6 +151,9 @@ describe('EmployeesService', () => {
     createTherapistHandler = module.get(CreateTherapistHandler);
     updateEmployeeHandler = module.get(UpdateEmployeeHandler);
     removeEmployeeHandler = module.get(RemoveEmployeeHandler);
+    specialistReviewRepository = module.get(
+      getRepositoryToken(SpecialistReview),
+    );
   });
 
   afterEach(() => {
@@ -134,7 +206,11 @@ describe('EmployeesService', () => {
         email: 'doctor@example.com',
         employeeId: 'DOC-001',
       };
-      const expectedEmployee = { id: 'uuid-1', ...inputDto, role: EmployeeRole.DOCTOR };
+      const expectedEmployee = {
+        id: 'uuid-1',
+        ...inputDto,
+        role: EmployeeRole.DOCTOR,
+      };
       mockCreateDoctorHandler.execute.mockResolvedValue(expectedEmployee);
 
       // Act
@@ -147,7 +223,12 @@ describe('EmployeesService', () => {
 
     it('should assign partnerId when provided', async () => {
       // Arrange
-      const inputDto = { email: 'doctor@example.com', firstName: 'Nguyen', lastName: 'Van A', employeeId: 'DOC-001' } as any;
+      const inputDto = {
+        email: 'doctor@example.com',
+        firstName: 'Nguyen',
+        lastName: 'Van A',
+        employeeId: 'DOC-001',
+      } as any;
       const partnerId = 'partner-uuid';
       mockCreateDoctorHandler.execute.mockResolvedValue({ id: 'uuid-1' });
 
@@ -170,7 +251,11 @@ describe('EmployeesService', () => {
         email: 'spa@example.com',
         employeeId: 'SPA-001',
       };
-      const expectedEmployee = { id: 'uuid-2', ...inputDto, role: EmployeeRole.THERAPIST };
+      const expectedEmployee = {
+        id: 'uuid-2',
+        ...inputDto,
+        role: EmployeeRole.THERAPIST,
+      };
       mockCreateTherapistHandler.execute.mockResolvedValue(expectedEmployee);
 
       // Act
@@ -178,12 +263,20 @@ describe('EmployeesService', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(inputDto, 'SPA');
+      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(
+        inputDto,
+        'SPA',
+      );
     });
 
     it('should assign partnerId when provided', async () => {
       // Arrange
-      const inputDto = { email: 'spa@example.com', firstName: 'Le', lastName: 'Thi C', employeeId: 'SPA-001' } as any;
+      const inputDto = {
+        email: 'spa@example.com',
+        firstName: 'Le',
+        lastName: 'Thi C',
+        employeeId: 'SPA-001',
+      } as any;
       const partnerId = 'partner-uuid';
       mockCreateTherapistHandler.execute.mockResolvedValue({ id: 'uuid-2' });
 
@@ -207,7 +300,11 @@ describe('EmployeesService', () => {
         email: 'massage@example.com',
         employeeId: 'MSG-001',
       };
-      const expectedEmployee = { id: 'uuid-3', ...inputDto, role: EmployeeRole.THERAPIST };
+      const expectedEmployee = {
+        id: 'uuid-3',
+        ...inputDto,
+        role: EmployeeRole.THERAPIST,
+      };
       mockCreateTherapistHandler.execute.mockResolvedValue(expectedEmployee);
 
       // Act
@@ -215,12 +312,20 @@ describe('EmployeesService', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(inputDto, 'MASSAGE');
+      expect(mockCreateTherapistHandler.execute).toHaveBeenCalledWith(
+        inputDto,
+        'MASSAGE',
+      );
     });
 
     it('should assign partnerId when provided', async () => {
       // Arrange
-      const inputDto = { email: 'massage@example.com', firstName: 'Hoang', lastName: 'Van E', employeeId: 'MSG-001' } as any;
+      const inputDto = {
+        email: 'massage@example.com',
+        firstName: 'Hoang',
+        lastName: 'Van E',
+        employeeId: 'MSG-001',
+      } as any;
       const partnerId = 'partner-uuid';
       mockCreateTherapistHandler.execute.mockResolvedValue({ id: 'uuid-3' });
 
@@ -302,7 +407,142 @@ describe('EmployeesService', () => {
       mockEmployeeRepository.findOne.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.findOne('missing-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('missing-id')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('findReviewsByEmployee', () => {
+    const createReviewQueryBuilder = (result: any[]) => ({
+      innerJoinAndSelect: jest.fn().mockReturnThis(),
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue(result),
+    });
+
+    it('should throw NotFoundException when employee is missing', async () => {
+      // Arrange
+      mockEmployeeRepository.findOne.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(service.findReviewsByEmployee('missing-id')).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(
+        specialistReviewRepository.createQueryBuilder,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should return an empty list for an employee with no reviews', async () => {
+      // Arrange
+      const queryBuilder = createReviewQueryBuilder([]);
+      mockEmployeeRepository.findOne.mockResolvedValue({ id: 'emp-uuid' });
+      specialistReviewRepository.createQueryBuilder.mockReturnValue(
+        queryBuilder,
+      );
+
+      // Act
+      const result = await service.findReviewsByEmployee('emp-uuid');
+
+      // Assert
+      expect(result).toEqual([]);
+      expect(queryBuilder.where).toHaveBeenCalledWith(
+        'review.specialist_id = :id',
+        { id: 'emp-uuid' },
+      );
+      expect(queryBuilder.orderBy).toHaveBeenCalledWith(
+        'review.createdAt',
+        'DESC',
+      );
+    });
+
+    it('should return newest-first public employee reviews', async () => {
+      // Arrange
+      const newer = {
+        id: 'review-new',
+        rating: 5,
+        comment: 'Excellent',
+        tags: ['Professional'],
+        wouldRecommend: true,
+        createdAt: new Date('2026-03-30T10:00:00.000Z'),
+        user: {
+          userProfile: {
+            firstName: 'Jane',
+            lastName: 'Doe',
+          },
+        },
+      };
+      const older = {
+        id: 'review-old',
+        rating: 4,
+        comment: null,
+        tags: [],
+        wouldRecommend: true,
+        createdAt: new Date('2026-03-29T10:00:00.000Z'),
+        user: {
+          userProfile: {
+            firstName: 'John',
+            lastName: 'Smith',
+          },
+        },
+      };
+      const queryBuilder = createReviewQueryBuilder([newer, older]);
+      mockEmployeeRepository.findOne.mockResolvedValue({ id: 'emp-uuid' });
+      specialistReviewRepository.createQueryBuilder.mockReturnValue(
+        queryBuilder,
+      );
+
+      // Act
+      const result = await service.findReviewsByEmployee('emp-uuid');
+
+      // Assert
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 'review-new',
+          reviewerName: 'Jane Doe',
+          rating: 5,
+          createdAt: '2026-03-30T10:00:00.000Z',
+        }),
+        expect.objectContaining({
+          id: 'review-old',
+          reviewerName: 'John Smith',
+          rating: 4,
+          createdAt: '2026-03-29T10:00:00.000Z',
+        }),
+      ]);
+    });
+
+    it('should map missing reviewer profile to Anonymous', async () => {
+      // Arrange
+      const queryBuilder = createReviewQueryBuilder([
+        {
+          id: 'review-anon',
+          rating: 3,
+          comment: 'Okay',
+          tags: null,
+          wouldRecommend: false,
+          createdAt: new Date('2026-03-30T10:00:00.000Z'),
+          user: {},
+        },
+      ]);
+      mockEmployeeRepository.findOne.mockResolvedValue({ id: 'emp-uuid' });
+      specialistReviewRepository.createQueryBuilder.mockReturnValue(
+        queryBuilder,
+      );
+
+      // Act
+      const result = await service.findReviewsByEmployee('emp-uuid');
+
+      // Assert
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 'review-anon',
+          reviewerName: 'Anonymous',
+          tags: [],
+        }),
+      ]);
     });
   });
 
@@ -313,7 +553,10 @@ describe('EmployeesService', () => {
       mockEmployeeRepository.findOne.mockResolvedValue(employee);
 
       // Act
-      const result = await service.findOneForPartner('emp-uuid', 'partner-uuid');
+      const result = await service.findOneForPartner(
+        'emp-uuid',
+        'partner-uuid',
+      );
 
       // Assert
       expect(result).toEqual(employee);
@@ -334,6 +577,121 @@ describe('EmployeesService', () => {
     });
   });
 
+  describe('findAssignedServicesForPartner', () => {
+    const createQueryBuilder = (result: any[]) => ({
+      innerJoinAndSelect: jest.fn().mockReturnThis(),
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      addOrderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue(result),
+    });
+
+    it('should return assigned services for a partner-owned employee', async () => {
+      // Arrange
+      const queryBuilder = createQueryBuilder([
+        {
+          isPrimary: true,
+          product: {
+            id: 'service-uuid',
+            name: 'Skin Consultation',
+            status: HealthServiceStatus.ACTIVE,
+            basePrice: '500000.00',
+            salePrice: '450000.00',
+            currency: 'VND',
+            category: { name: 'Dermatology' },
+            productDefinition: { durationMinutes: 45 },
+            media: [
+              {
+                url: 'https://cdn.example.com/other.jpg',
+                isThumbnail: false,
+                sortOrder: 2,
+              },
+              {
+                url: 'https://cdn.example.com/thumb.jpg',
+                isThumbnail: true,
+                sortOrder: 1,
+              },
+            ],
+          },
+        },
+      ]);
+      mockEmployeeRepository.findOne.mockResolvedValue({
+        id: 'emp-uuid',
+        partnerId: 'partner-uuid',
+      });
+      mockEligibilityRepository.createQueryBuilder.mockReturnValue(
+        queryBuilder,
+      );
+
+      // Act
+      const result = await service.findAssignedServicesForPartner(
+        'emp-uuid',
+        'partner-uuid',
+      );
+
+      // Assert
+      expect(result).toEqual([
+        {
+          id: 'service-uuid',
+          name: 'Skin Consultation',
+          status: HealthServiceStatus.ACTIVE,
+          basePrice: 500000,
+          salePrice: 450000,
+          currency: 'VND',
+          durationMinutes: 45,
+          categoryName: 'Dermatology',
+          imageUrl: 'https://cdn.example.com/thumb.jpg',
+          isPrimary: true,
+        },
+      ]);
+      expect(queryBuilder.innerJoinAndSelect).toHaveBeenCalledWith(
+        'eligibility.product',
+        'product',
+        'product.partner_id = :partnerId AND product.deleted_at IS NULL',
+        { partnerId: 'partner-uuid' },
+      );
+      expect(queryBuilder.where).toHaveBeenCalledWith(
+        'eligibility.employee_id = :employeeId',
+        { employeeId: 'emp-uuid' },
+      );
+    });
+
+    it('should return an empty list when the employee has no assignments', async () => {
+      // Arrange
+      const queryBuilder = createQueryBuilder([]);
+      mockEmployeeRepository.findOne.mockResolvedValue({
+        id: 'emp-uuid',
+        partnerId: 'partner-uuid',
+      });
+      mockEligibilityRepository.createQueryBuilder.mockReturnValue(
+        queryBuilder,
+      );
+
+      // Act
+      const result = await service.findAssignedServicesForPartner(
+        'emp-uuid',
+        'partner-uuid',
+      );
+
+      // Assert
+      expect(result).toEqual([]);
+    });
+
+    it('should throw NotFoundException when employee is not owned by partner', async () => {
+      // Arrange
+      mockEmployeeRepository.findOne.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(
+        service.findAssignedServicesForPartner('emp-uuid', 'other-partner'),
+      ).rejects.toThrow(NotFoundException);
+      expect(
+        mockEligibilityRepository.createQueryBuilder,
+      ).not.toHaveBeenCalled();
+    });
+  });
+
   // ──────────────────────────────────────────────────────────────
   // Mutation operations
   // ──────────────────────────────────────────────────────────────
@@ -350,7 +708,10 @@ describe('EmployeesService', () => {
 
       // Assert
       expect(result).toEqual(expectedEmployee);
-      expect(mockUpdateEmployeeHandler.execute).toHaveBeenCalledWith('uuid-1', updateDto);
+      expect(mockUpdateEmployeeHandler.execute).toHaveBeenCalledWith(
+        'uuid-1',
+        updateDto,
+      );
     });
   });
 
@@ -360,10 +721,17 @@ describe('EmployeesService', () => {
       const employee = { id: 'emp-uuid', partnerId: 'partner-uuid' };
       const updateDto = { fullName: 'Updated' } as any;
       mockEmployeeRepository.findOne.mockResolvedValue(employee);
-      mockUpdateEmployeeHandler.execute.mockResolvedValue({ ...employee, ...updateDto });
+      mockUpdateEmployeeHandler.execute.mockResolvedValue({
+        ...employee,
+        ...updateDto,
+      });
 
       // Act
-      const result = await service.updateForPartner('emp-uuid', 'partner-uuid', updateDto);
+      const result = await service.updateForPartner(
+        'emp-uuid',
+        'partner-uuid',
+        updateDto,
+      );
 
       // Assert
       expect(result).toEqual({ ...employee, ...updateDto });
@@ -371,7 +739,10 @@ describe('EmployeesService', () => {
         where: { id: 'emp-uuid', partnerId: 'partner-uuid' },
         relations: ['doctorProfile', 'therapistProfile'],
       });
-      expect(mockUpdateEmployeeHandler.execute).toHaveBeenCalledWith('emp-uuid', updateDto);
+      expect(mockUpdateEmployeeHandler.execute).toHaveBeenCalledWith(
+        'emp-uuid',
+        updateDto,
+      );
     });
 
     it('should throw NotFoundException if not owned', async () => {
@@ -413,7 +784,9 @@ describe('EmployeesService', () => {
         where: { id: 'emp-uuid', partnerId: 'partner-uuid' },
         relations: ['doctorProfile', 'therapistProfile'],
       });
-      expect(mockRemoveEmployeeHandler.execute).toHaveBeenCalledWith('emp-uuid');
+      expect(mockRemoveEmployeeHandler.execute).toHaveBeenCalledWith(
+        'emp-uuid',
+      );
     });
 
     it('should throw NotFoundException if not owned', async () => {

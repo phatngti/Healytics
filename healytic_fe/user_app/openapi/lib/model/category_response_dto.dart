@@ -19,11 +19,13 @@ class CategoryResponseDto {
     this.description,
     this.imageUrl,
     required this.isActive,
+    this.categoryType = 'primary',
     required this.createdAt,
     required this.updatedAt,
     this.parent,
     this.children = const [],
   });
+
 
   /// Unique category identifier
   String id;
@@ -35,25 +37,16 @@ class CategoryResponseDto {
   String slug;
 
   /// Category description
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? description;
+  String? description;
 
   /// Category image URL
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Object? imageUrl;
+  String? imageUrl;
 
   /// Whether category is active
   bool isActive;
+
+  /// Category type for UI grouping
+  String categoryType;
 
   /// Creation timestamp
   DateTime createdAt;
@@ -81,6 +74,7 @@ class CategoryResponseDto {
     other.description == description &&
     other.imageUrl == imageUrl &&
     other.isActive == isActive &&
+    other.categoryType == categoryType &&
     other.createdAt == createdAt &&
     other.updatedAt == updatedAt &&
     other.parent == parent &&
@@ -95,13 +89,14 @@ class CategoryResponseDto {
     (description == null ? 0 : description!.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (isActive.hashCode) +
+    (categoryType.hashCode) +
     (createdAt.hashCode) +
     (updatedAt.hashCode) +
     (parent == null ? 0 : parent!.hashCode) +
     (children.hashCode);
 
   @override
-  String toString() => 'CategoryResponseDto[id=$id, name=$name, slug=$slug, description=$description, imageUrl=$imageUrl, isActive=$isActive, createdAt=$createdAt, updatedAt=$updatedAt, parent=$parent, children=$children]';
+  String toString() => 'CategoryResponseDto[id=$id, name=$name, slug=$slug, description=$description, imageUrl=$imageUrl, isActive=$isActive, categoryType=$categoryType, createdAt=$createdAt, updatedAt=$updatedAt, parent=$parent, children=$children]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -119,6 +114,7 @@ class CategoryResponseDto {
       json[r'imageUrl'] = null;
     }
       json[r'isActive'] = this.isActive;
+      json[r'categoryType'] = this.categoryType;
       json[r'createdAt'] = this.createdAt.toUtc().toIso8601String();
       json[r'updatedAt'] = this.updatedAt.toUtc().toIso8601String();
     if (this.parent != null) {
@@ -152,9 +148,10 @@ class CategoryResponseDto {
         id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
         slug: mapValueOfType<String>(json, r'slug')!,
-        description: mapValueOfType<Object>(json, r'description'),
-        imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
+        description: mapValueOfType<String>(json, r'description'),
+        imageUrl: mapValueOfType<String>(json, r'imageUrl'),
         isActive: mapValueOfType<bool>(json, r'isActive')!,
+        categoryType: mapValueOfType<String>(json, r'categoryType') ?? 'primary',
         createdAt: mapDateTime(json, r'createdAt', r'')!,
         updatedAt: mapDateTime(json, r'updatedAt', r'')!,
         parent: CategorySummaryDto.fromJson(json[r'parent']),

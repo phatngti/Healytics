@@ -16,10 +16,12 @@ class AsyncCheckoutDto {
     required this.userId,
     required this.staffId,
     required this.startTime,
-    this.productId,
+    required this.productId,
     required this.idempotencyKey,
     this.webhookUrl,
+    this.payLater = false,
   });
+
 
   /// User account UUID
   String userId;
@@ -31,13 +33,7 @@ class AsyncCheckoutDto {
   String startTime;
 
   /// Product/service UUID
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? productId;
+  String productId;
 
   /// Idempotency key to prevent duplicate requests from AI retry
   String idempotencyKey;
@@ -51,6 +47,9 @@ class AsyncCheckoutDto {
   ///
   String? webhookUrl;
 
+  /// If true, booking is immediately CONFIRMED without requiring payment. The booking has no payment URL or expiry — suitable for in-person pay-later scenarios.
+  bool payLater;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is AsyncCheckoutDto &&
     other.userId == userId &&
@@ -58,7 +57,8 @@ class AsyncCheckoutDto {
     other.startTime == startTime &&
     other.productId == productId &&
     other.idempotencyKey == idempotencyKey &&
-    other.webhookUrl == webhookUrl;
+    other.webhookUrl == webhookUrl &&
+    other.payLater == payLater;
 
   @override
   int get hashCode =>
@@ -66,29 +66,27 @@ class AsyncCheckoutDto {
     (userId.hashCode) +
     (staffId.hashCode) +
     (startTime.hashCode) +
-    (productId == null ? 0 : productId!.hashCode) +
+    (productId.hashCode) +
     (idempotencyKey.hashCode) +
-    (webhookUrl == null ? 0 : webhookUrl!.hashCode);
+    (webhookUrl == null ? 0 : webhookUrl!.hashCode) +
+    (payLater.hashCode);
 
   @override
-  String toString() => 'AsyncCheckoutDto[userId=$userId, staffId=$staffId, startTime=$startTime, productId=$productId, idempotencyKey=$idempotencyKey, webhookUrl=$webhookUrl]';
+  String toString() => 'AsyncCheckoutDto[userId=$userId, staffId=$staffId, startTime=$startTime, productId=$productId, idempotencyKey=$idempotencyKey, webhookUrl=$webhookUrl, payLater=$payLater]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'userId'] = this.userId;
       json[r'staffId'] = this.staffId;
       json[r'startTime'] = this.startTime;
-    if (this.productId != null) {
       json[r'productId'] = this.productId;
-    } else {
-      json[r'productId'] = null;
-    }
       json[r'idempotencyKey'] = this.idempotencyKey;
     if (this.webhookUrl != null) {
       json[r'webhookUrl'] = this.webhookUrl;
     } else {
       json[r'webhookUrl'] = null;
     }
+      json[r'payLater'] = this.payLater;
     return json;
   }
 
@@ -114,9 +112,10 @@ class AsyncCheckoutDto {
         userId: mapValueOfType<String>(json, r'userId')!,
         staffId: mapValueOfType<String>(json, r'staffId')!,
         startTime: mapValueOfType<String>(json, r'startTime')!,
-        productId: mapValueOfType<String>(json, r'productId'),
+        productId: mapValueOfType<String>(json, r'productId')!,
         idempotencyKey: mapValueOfType<String>(json, r'idempotencyKey')!,
         webhookUrl: mapValueOfType<String>(json, r'webhookUrl'),
+        payLater: mapValueOfType<bool>(json, r'payLater') ?? false,
       );
     }
     return null;
@@ -167,6 +166,7 @@ class AsyncCheckoutDto {
     'userId',
     'staffId',
     'startTime',
+    'productId',
     'idempotencyKey',
   };
 }

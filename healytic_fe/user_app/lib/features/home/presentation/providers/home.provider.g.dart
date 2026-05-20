@@ -54,24 +54,27 @@ final class CategoriesProvider
 
 String _$categoriesHash() => r'ccdbbc2a859dcec6c5184d26a13f99dd1a95991e';
 
-/// Provider for fetching home-recommend products.
+/// Provider for fetching home-recommend products
+/// via the Recommender AI microservice.
 
 @ProviderFor(recommendedProducts)
 const recommendedProductsProvider = RecommendedProductsProvider._();
 
-/// Provider for fetching home-recommend products.
+/// Provider for fetching home-recommend products
+/// via the Recommender AI microservice.
 
 final class RecommendedProductsProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<HomeProduct>>,
-          List<HomeProduct>,
-          FutureOr<List<HomeProduct>>
+          AsyncValue<List<AiRecommendation>>,
+          List<AiRecommendation>,
+          FutureOr<List<AiRecommendation>>
         >
     with
-        $FutureModifier<List<HomeProduct>>,
-        $FutureProvider<List<HomeProduct>> {
-  /// Provider for fetching home-recommend products.
+        $FutureModifier<List<AiRecommendation>>,
+        $FutureProvider<List<AiRecommendation>> {
+  /// Provider for fetching home-recommend products
+  /// via the Recommender AI microservice.
   const RecommendedProductsProvider._()
     : super(
         from: null,
@@ -88,18 +91,65 @@ final class RecommendedProductsProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<HomeProduct>> $createElement(
+  $FutureProviderElement<List<AiRecommendation>> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<HomeProduct>> create(Ref ref) {
+  FutureOr<List<AiRecommendation>> create(Ref ref) {
     return recommendedProducts(ref);
   }
 }
 
 String _$recommendedProductsHash() =>
-    r'f216d32cb730fe3b9512239c6406e8f2f9e3efe1';
+    r'4dd8a35b6af9b8c7a1523324df05055fcd9d8dcd';
+
+/// Provider for the full recommendations list.
+
+@ProviderFor(allRecommendedProducts)
+const allRecommendedProductsProvider = AllRecommendedProductsProvider._();
+
+/// Provider for the full recommendations list.
+
+final class AllRecommendedProductsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<AiRecommendation>>,
+          List<AiRecommendation>,
+          FutureOr<List<AiRecommendation>>
+        >
+    with
+        $FutureModifier<List<AiRecommendation>>,
+        $FutureProvider<List<AiRecommendation>> {
+  /// Provider for the full recommendations list.
+  const AllRecommendedProductsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'allRecommendedProductsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$allRecommendedProductsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<AiRecommendation>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<AiRecommendation>> create(Ref ref) {
+    return allRecommendedProducts(ref);
+  }
+}
+
+String _$allRecommendedProductsHash() =>
+    r'ced9649efdf86a115d8aacabfa86f695170bef36';
 
 /// Provider for fetching premium treatments.
 
@@ -190,3 +240,145 @@ final class ServiceTagsProvider
 }
 
 String _$serviceTagsHash() => r'e50a3a3d971dbbf375c6738326558aaea065e7db';
+
+/// Provider for fetching featured specialists.
+
+@ProviderFor(featuredSpecialists)
+const featuredSpecialistsProvider = FeaturedSpecialistsProvider._();
+
+/// Provider for fetching featured specialists.
+
+final class FeaturedSpecialistsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<HomeSpecialist>>,
+          List<HomeSpecialist>,
+          FutureOr<List<HomeSpecialist>>
+        >
+    with
+        $FutureModifier<List<HomeSpecialist>>,
+        $FutureProvider<List<HomeSpecialist>> {
+  /// Provider for fetching featured specialists.
+  const FeaturedSpecialistsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'featuredSpecialistsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$featuredSpecialistsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<HomeSpecialist>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<HomeSpecialist>> create(Ref ref) {
+    return featuredSpecialists(ref);
+  }
+}
+
+String _$featuredSpecialistsHash() =>
+    r'eb47f7a9ea9f6ba9ad949354715b6d89f699fd5b';
+
+/// Provider for fetching recent appointment activity
+/// shown on the home dashboard.
+
+@ProviderFor(recentActivity)
+const recentActivityProvider = RecentActivityProvider._();
+
+/// Provider for fetching recent appointment activity
+/// shown on the home dashboard.
+
+final class RecentActivityProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<AppointmentEntity>>,
+          List<AppointmentEntity>,
+          FutureOr<List<AppointmentEntity>>
+        >
+    with
+        $FutureModifier<List<AppointmentEntity>>,
+        $FutureProvider<List<AppointmentEntity>> {
+  /// Provider for fetching recent appointment activity
+  /// shown on the home dashboard.
+  const RecentActivityProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'recentActivityProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$recentActivityHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<AppointmentEntity>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<AppointmentEntity>> create(Ref ref) {
+    return recentActivity(ref);
+  }
+}
+
+String _$recentActivityHash() => r'146baa436822fe074bfaa51a047da657d64224e4';
+
+/// Provider for the full recent activity list.
+
+@ProviderFor(allRecentActivity)
+const allRecentActivityProvider = AllRecentActivityProvider._();
+
+/// Provider for the full recent activity list.
+
+final class AllRecentActivityProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<AppointmentEntity>>,
+          List<AppointmentEntity>,
+          FutureOr<List<AppointmentEntity>>
+        >
+    with
+        $FutureModifier<List<AppointmentEntity>>,
+        $FutureProvider<List<AppointmentEntity>> {
+  /// Provider for the full recent activity list.
+  const AllRecentActivityProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'allRecentActivityProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$allRecentActivityHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<AppointmentEntity>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<AppointmentEntity>> create(Ref ref) {
+    return allRecentActivity(ref);
+  }
+}
+
+String _$allRecentActivityHash() => r'fc7e0a36a444a2d49ecdaaaa47c4ece1deb3dbe3';

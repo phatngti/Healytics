@@ -10,15 +10,6 @@
 \usepackage{titlesec}
 
 %\usepackage{soul}
-\usepackage[style=ieee,sorting=none]{biblatex} %Imports biblatex package
-\AtEveryBibitem{%
-  \clearfield{issn} % Remove issn
-  \clearfield{doi} % Remove doi
-  \ifentrytype{online}{}{% Remove url except for @online
-    \clearfield{url}
-  }
-}
-\addbibresource{refs.bib}
 \usepackage[makeroom]{cancel}
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -28,7 +19,7 @@
 \usepackage{alltt}
 \usepackage[framemethod=tikz]{mdframed}% For highlighting paragraph backgrounds
 \usepackage{caption,subcaption}
-
+\captionsetup{skip=16pt} % Increase space between figure and caption globally
 
 \usepackage[lined,boxed,commentsnumbered]{algorithm2e}
 \usepackage{enumerate}
@@ -36,6 +27,7 @@
 \usepackage{graphicx}							% Standard graphics package
 \usepackage{array}
 \usepackage{tabularx, caption}
+\usepackage{xltabular}
 \usepackage{ragged2e}
 \usepackage{fontawesome5}
 \usepackage{multirow}
@@ -53,7 +45,9 @@
 \hypersetup{urlcolor=blue,linkcolor=black,citecolor=black,colorlinks=true} 
 \usepackage{listings}
 \usepackage{float}
+\usepackage{pdflscape}
 \usepackage{pdfpages}
+\usepackage[export]{adjustbox} % Cho phép ảnh tự cắt khi hết trang
 \usepackage{tocloft}
 
 \usepackage{appendix}
@@ -64,6 +58,8 @@
 \usepackage{enumitem} % Put this in the preamble
 \usepackage[normalem]{ulem}
 \usepackage{lastpage}   % Load this LAST
+
+\newcommand{\autofitgraphics}[2][]{\includegraphics[#1]{#2}}
 
 \renewcommand{\bibname}{Tài liệu tham khảo}
 
@@ -169,7 +165,7 @@ morekeywords={}
 		\tiny \bf 
 	\end{tabular}  }
 \fancyfoot{} % clear all footer fields
-\fancyfoot[L]{\scriptsize  Báo cáo Đồ án chuyên ngành (CO4029) - HK1 2025 - 2026}
+\fancyfoot[L]{\scriptsize  Báo cáo Đồ án tốt nghiệp (CO4337) - HK2 2025 - 2026}
 \fancyfoot[R]{\scriptsize  Trang {\thepage}/\pageref{LastPage}}
 
 \renewcommand{\headrulewidth}{0.3pt}
@@ -189,13 +185,15 @@ morekeywords={}
                                      {\normalfont\normalsize\bfseries}}
 \newcommand*\l@subsubsubsection{\@dottedtocline{3}{10.0em}{4.1em}}
 \newcommand*{\subsubsubsectionmark}[1]{}
+\@addtoreset{paragraph}{subsubsection}
+\renewcommand\theparagraph{\arabic{paragraph}}
 \makeatother
 \newcommand\tab[1][1cm]{\hspace*{#1}}
 \newcommand\blank[1]{\rule[-.2ex]{#1}{.4pt}}
 \everymath{\color{black}}%make in-line maths symbols blue to read/check easily
 
 \sloppy
-\captionsetup[figure]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=-9pt}
+\captionsetup[figure]{labelfont={small,bf},textfont={small,it},belowskip=0pt,aboveskip=-5pt}
 %space remove between caption, figure, and text
 \captionsetup[table]{labelfont={small,bf},textfont={small,it},belowskip=-1pt,aboveskip=7pt}
 \setlength{\floatsep}{5pt plus 2pt minus 2pt}
@@ -204,18 +202,29 @@ morekeywords={}
 
 \titleformat{\chapter}[display]
 {\normalfont\huge\bfseries}{\chaptertitlename{} \thechapter}{15pt}{\Huge}
+
+% Number paragraph headings in a local simple format (1,2,3,...) and avoid run-in sticking.
+\titleformat{\paragraph}[block]
+{\normalfont\normalsize\bfseries}{\theparagraph.}{0.6em}{}
+\titlespacing*{\paragraph}{0pt}{1.2ex plus .2ex minus .1ex}{0.6ex}
+
+\titleformat{\subparagraph}[runin]
+{\normalfont\normalsize\bfseries}{}{0pt}{}[\ ]
+\titlespacing*{\subparagraph}{0pt}{1ex plus .2ex minus .1ex}{1em}
+
 \thesislayout
 
 % Redefine plain style for chapters and lists to have the footer
 \fancypagestyle{plain}{%
   \fancyhf{}%
-  \fancyfoot[L]{\scriptsize  Báo cáo Đồ án chuyên ngành (CO4029) - HK1 2025 - 2026}
+  \fancyfoot[L]{\scriptsize  Báo cáo Đồ án tốt nghiệp (CO4337) - HK2 2025 - 2026}
   \fancyfoot[R]{\scriptsize  Trang {\thepage}/\pageref{LastPage}}
   \renewcommand{\headrulewidth}{0pt}
   \renewcommand{\footrulewidth}{0.3pt}
 }
 
 \begin{document}
+\pagenumbering{Roman}
 
 \begin{titlepage}
 \begin{tikzpicture}[remember picture, overlay]
@@ -262,13 +271,13 @@ morekeywords={}
 % \vspace{0.5cm}
 \begin{table}[h]
 \begin{tabular}{rll}
-\hspace{4 cm} &  \textbf{\Large HỘI ĐỒNG:} & {\Large Hội đồng 24L Đồ án chuyên ngành}
+\hspace{4 cm} &  \textbf{\Large HỘI ĐỒNG:} & {\Large Hội đồng 11L Khoa học Máy tính}
 \\[0.3cm]
 \hspace{4 cm} &   \textbf{\Large GVHD:} & {\Large TS. Trương Tuấn Anh}
 \\[0.3cm]
 \hspace{4 cm}  &    & {\Large CN. Dương Huỳnh Anh Đức}
 \\[0.3cm]
-\hspace{4 cm}  &   \textbf{\Large GVPB:} & {\Large CN. Nguyễn Minh Tâm}
+\hspace{4 cm}  &   \textbf{\Large GVPB:} & {\Large ThS. Trần Thị Quế Nguyệt}
 \\[0.3cm]
 % TKHĐ là THƯ KÝ HỘI ĐỒNG
 \hspace{4 cm} &     \multicolumn{2}{l}{\textbf{$\;$ $\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$$\;$ \Large ---o0o---}} 
@@ -282,7 +291,7 @@ morekeywords={}
 \end{table}
 \vspace{0.5cm}
 \begin{center}
-{\Large TP. HỒ CHÍ MINH, 12/25 }
+{\Large TP. HỒ CHÍ MINH, 5/26 }
 \end{center}
 \end{titlepage}
 \setcounter{page}{2}
@@ -300,7 +309,7 @@ morekeywords={}
 \newpage
 \listoftables
 \newpage
-% \setcounter{page}{1}
+\pagenumbering{arabic}
 
 %%%%%%%%%%%%%%%%%CONTENTS%%%%%%%%%%%%%%%%%%%
 \input{Contents/GioiThieu}
@@ -330,5 +339,4 @@ morekeywords={}
 \newpage
 \input{Outro/PhuLuc}
 \end{document}
-
 
