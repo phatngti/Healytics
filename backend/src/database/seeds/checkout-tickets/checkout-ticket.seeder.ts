@@ -106,6 +106,7 @@ export class CheckoutTicketSeeder implements ISeeder {
           email: In([...new Set(SEED_TICKETS.map((item) => item.userEmail))]),
         },
         select: ['id', 'email'],
+        loadEagerRelations: false,
       }),
       this.employeeRepo.find({
         where: {

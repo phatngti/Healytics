@@ -21,7 +21,12 @@ class EmployeeDetailsProfileSection extends StatelessWidget {
       children: [
         EmployeeProfileImageCard(avatarUrl: avatarUrl, fullName: fullName),
         AppDimens.verticalLarge,
-        EmployeeContactInfoCard(enabled: isEditing),
+        EmployeeContactInfoCard(
+          enabled: isEditing,
+          showPasswordField: isEditing,
+          passwordLabel: 'New Password',
+          passwordHintText: 'Leave blank to keep current password',
+        ),
       ],
     );
   }

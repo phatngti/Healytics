@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/booking_filters.entity.dart';
@@ -37,12 +38,19 @@ import 'sort_selector.widget.dart';
 /// ≥ 3:1 contrast in both themes.
 ///
 /// _(Req 1.1, 1.4, 1.5, 1.6, 5.8, 5.10, 6.1–6.6, 7.5, 7.6)_
-class BookingsDashboard extends ConsumerWidget {
+class BookingsDashboard extends ConsumerStatefulWidget {
   /// Creates the bookings dashboard widget.
   const BookingsDashboard({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<BookingsDashboard> createState() => _BookingsDashboardState();
+}
+
+class _BookingsDashboardState extends ConsumerState<BookingsDashboard> {
+  bool _isChromeCollapsed = false;
+
+  @override
+  Widget build(BuildContext context) {
     ref.watch(partnerBookingStatusRealtimeProvider);
 
     final asyncState = ref.watch(bookingsControllerProvider);
@@ -79,17 +87,18 @@ class BookingsDashboard extends ConsumerWidget {
     if (state.visible.isEmpty) {
       return Column(
         children: [
-          const BookingsHeader(),
-          const _FilterSortControls(key: Key('filter_sort_controls')),
-          const SizedBox(height: 12),
+          _CollapsibleBookingChrome(isCollapsed: _isChromeCollapsed),
           Expanded(
-            child: BookingsEmptyState(
-              hasActiveFilters: hasActiveFilters,
-              onClearFilters: hasActiveFilters
-                  ? () => ref
-                        .read(bookingsControllerProvider.notifier)
-                        .clearFilters()
-                  : null,
+            child: _CardAreaScrollCollapseListener(
+              onScrollDirection: _handleCardAreaScroll,
+              child: BookingsEmptyState(
+                hasActiveFilters: hasActiveFilters,
+                onClearFilters: hasActiveFilters
+                    ? () => ref
+                          .read(bookingsControllerProvider.notifier)
+                          .clearFilters()
+                    : null,
+              ),
             ),
           ),
         ],
@@ -99,14 +108,26 @@ class BookingsDashboard extends ConsumerWidget {
     // Normal data state with grid
     return Column(
       children: [
-        const BookingsHeader(),
-        const _FilterSortControls(key: Key('filter_sort_controls')),
-        const SizedBox(height: 12),
+        _CollapsibleBookingChrome(isCollapsed: _isChromeCollapsed),
         BookingsRefreshIndicator(isRefreshing: isRefreshing),
         if (isRefreshing) const SizedBox(height: 8),
-        Expanded(child: ResponsiveBookingsGrid(bookings: state.visible)),
+        Expanded(
+          child: _CardAreaScrollCollapseListener(
+            onScrollDirection: _handleCardAreaScroll,
+            child: ResponsiveBookingsGrid(bookings: state.visible),
+          ),
+        ),
       ],
     );
+  }
+
+  void _handleCardAreaScroll(double deltaY) {
+    const threshold = 1.0;
+    if (deltaY > threshold && !_isChromeCollapsed) {
+      setState(() => _isChromeCollapsed = true);
+    } else if (deltaY < -threshold && _isChromeCollapsed) {
+      setState(() => _isChromeCollapsed = false);
+    }
   }
 
   /// Returns `true` when at least one filter axis is
@@ -124,6 +145,57 @@ class BookingsDashboard extends ConsumerWidget {
     return filters.statuses.isNotEmpty ||
         !isDefaultDate ||
         filters.searchQuery.isNotEmpty;
+  }
+}
+
+class _CollapsibleBookingChrome extends StatelessWidget {
+  const _CollapsibleBookingChrome({required this.isCollapsed});
+
+  final bool isCollapsed;
+
+  static const _animationDuration = Duration(milliseconds: 180);
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSize(
+      duration: _animationDuration,
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.topCenter,
+      clipBehavior: Clip.hardEdge,
+      child: isCollapsed
+          ? const SizedBox(width: double.infinity)
+          : const Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                BookingsHeader(),
+                _FilterSortControls(key: Key('filter_sort_controls')),
+                SizedBox(height: 12),
+              ],
+            ),
+    );
+  }
+}
+
+class _CardAreaScrollCollapseListener extends StatelessWidget {
+  const _CardAreaScrollCollapseListener({
+    required this.onScrollDirection,
+    required this.child,
+  });
+
+  final ValueChanged<double> onScrollDirection;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerSignal: (event) {
+        if (event is PointerScrollEvent) {
+          onScrollDirection(event.scrollDelta.dy);
+        }
+      },
+      child: child,
+    );
   }
 }
 

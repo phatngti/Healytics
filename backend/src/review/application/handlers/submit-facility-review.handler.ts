@@ -39,7 +39,7 @@ export class SubmitFacilityReviewHandler {
     try {
       const booking = await queryRunner.manager.findOne(Booking, {
         where: { id: dto.appointmentId },
-        relations: { product: true },
+        relations: { product: { partner: true } },
       });
 
       if (!booking) {
@@ -56,13 +56,24 @@ export class SubmitFacilityReviewHandler {
         );
       }
 
-      if (!booking.product?.partnerId) {
+      const canonicalFacilityId =
+        booking.product?.partnerId ?? booking.product?.partner?.id ?? null;
+
+      if (!canonicalFacilityId) {
         throw new BadRequestException(
           'Facility not found for this appointment',
         );
       }
 
-      if (booking.product.partnerId !== dto.facilityId) {
+      const appointmentFacilityIds = new Set(
+        [
+          booking.product?.partnerId,
+          booking.product?.partner?.id,
+          booking.product?.partner?.accountId,
+        ].filter(Boolean),
+      );
+
+      if (!appointmentFacilityIds.has(dto.facilityId)) {
         throw new BadRequestException(
           'Facility not found for this appointment',
         );
@@ -86,7 +97,7 @@ export class SubmitFacilityReviewHandler {
 
       const review = queryRunner.manager.create(FacilityReview, {
         appointmentId: dto.appointmentId,
-        facilityId: dto.facilityId,
+        facilityId: canonicalFacilityId,
         userId,
         rating: dto.rating,
         comment: dto.comment?.trim() || null,

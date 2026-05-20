@@ -4,7 +4,8 @@ enum StoreKey<T> {
   accessToken<String>._(2),
   customHeaders<String>._(3),
   refreshToken<String>._(4),
-  stripePublishableKey<String>._(5);
+  stripePublishableKey<String>._(5),
+  notificationConfig<String>._(6);
 
   const StoreKey._(this.id);
   final int id;

@@ -3,12 +3,16 @@ import {
   Logger,
   NotFoundException,
   ConflictException,
+  BadRequestException,
   Optional,
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Raw, Repository } from 'typeorm';
+import { DataSource, EntityManager, Raw, Repository } from 'typeorm';
 import { Account } from '@/common/entities/account.entity';
+import { Address } from '@/common/entities/address.entity';
+import { Location } from '@/common/entities/location.entity';
+import { UserProfile } from '@/common/entities/user-profile.entity';
 import { CreateAccountHandler } from './application/handlers/create-account.handler';
 import { SetSurveyHandler } from './application/handlers/set-survey.handler';
 import { SetRefreshTokenHandler } from './application/handlers/set-refresh-token.handler';
@@ -16,6 +20,30 @@ import { SurveyResponseDto } from './dto/response/survey-response.dto';
 import { AccountMeResponseDto } from './dto/response/account-me-response.dto';
 import { RedisService } from '@/redis/redis.service';
 import { createHash } from 'crypto';
+import { RegisterProfileDto } from '@/auth/dto/request/register-profile.dto';
+import { UpdateAccountAddressDto } from './dto/request/update-account-address.dto';
+import { UpdateAccountProfileDto } from './dto/request/update-account-profile.dto';
+import { LocationsService } from '@/locations/locations.service';
+import { MapboxService } from '@/mapbox/mapbox.service';
+import { Role } from './enum/role.enum';
+
+type AddressLocationInput = Pick<
+  UpdateAccountAddressDto,
+  'streetAddress' | 'provinceId' | 'districtId' | 'wardId'
+>;
+
+interface PreparedAddress {
+  street: string;
+  ward: string;
+  district: string;
+  cityOrProvince: string;
+  provinceId: string;
+  districtId: string;
+  wardId: string;
+  coordinates: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
 
 /**
  * Service facade for managing user accounts.
@@ -38,9 +66,12 @@ export class AccountService {
   constructor(
     @InjectRepository(Account)
     private readonly accountRepo: Repository<Account>,
+    private readonly dataSource: DataSource,
     private readonly createAccountHandler: CreateAccountHandler,
     private readonly setSurveyHandler: SetSurveyHandler,
     private readonly setRefreshTokenHandler: SetRefreshTokenHandler,
+    private readonly locationsService: LocationsService,
+    private readonly mapboxService: MapboxService,
     @Optional()
     private readonly redisService?: RedisService,
   ) {}
@@ -75,9 +106,20 @@ export class AccountService {
           dateOfBirth: true,
           avatarUrl: true,
           profileCompleted: true,
+          address: {
+            id: true,
+            street: true,
+            ward: true,
+            district: true,
+            cityOrProvince: true,
+            provinceId: true,
+            districtId: true,
+            wardId: true,
+            coordinates: true,
+          },
         },
       } as any,
-      relations: { userProfile: true } as any,
+      relations: { userProfile: { address: true } } as any,
       loadEagerRelations: false,
     });
 
@@ -118,6 +160,38 @@ export class AccountService {
     return this.getMe(accountId);
   }
 
+  async updateProfile(
+    accountId: string,
+    dto: UpdateAccountProfileDto,
+  ): Promise<AccountMeResponseDto> {
+    await this.dataSource.transaction(async (manager) => {
+      const account = await manager.findOne(Account, {
+        where: { id: accountId },
+        relations: { userProfile: true } as any,
+        loadEagerRelations: false,
+      });
+
+      if (!account) {
+        throw new NotFoundException('Account not found');
+      }
+
+      const userProfile =
+        account.userProfile ??
+        manager.create(UserProfile, {
+          accountId: account.id,
+        });
+
+      userProfile.firstName = this.normalizeProfileField(dto.firstName);
+      userProfile.lastName = this.normalizeProfileField(dto.lastName);
+      userProfile.phone = this.normalizeProfileField(dto.phone);
+
+      await manager.save(UserProfile, userProfile);
+    });
+
+    await this.invalidateAccountMeCache(accountId);
+    return this.getMe(accountId);
+  }
+
   /**
    * Facade: Delegates to CreateAccountHandler.
    * @param data - Partial account data to create
@@ -129,6 +203,116 @@ export class AccountService {
       await this.markEmailExists(account.email);
     }
     return account;
+  }
+
+  async createRegisteredUser(
+    email: string,
+    passwordHash: string,
+    profile?: RegisterProfileDto,
+  ): Promise<Account> {
+    const preparedAddress = profile?.address
+      ? await this.prepareAddress(profile.address)
+      : null;
+
+    const account = await this.dataSource.transaction(async (manager) => {
+      const accountEntity = manager.create(Account, {
+        email,
+        passwordHash,
+        role: Role.USER,
+        isActive: true,
+      });
+      const savedAccount = await manager.save(Account, accountEntity);
+
+      let savedAddress: Address | null = null;
+      if (preparedAddress) {
+        const address = manager.create(Address, {
+          street: preparedAddress.street,
+          ward: preparedAddress.ward,
+          district: preparedAddress.district,
+          cityOrProvince: preparedAddress.cityOrProvince,
+          provinceId: preparedAddress.provinceId,
+          districtId: preparedAddress.districtId,
+          wardId: preparedAddress.wardId,
+          coordinates: preparedAddress.coordinates,
+        });
+        savedAddress = await manager.save(Address, address);
+        await this.writeAddressLocation(
+          manager,
+          savedAddress.id,
+          preparedAddress,
+        );
+      }
+
+      if (profile) {
+        const userProfile = manager.create(UserProfile, {
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          phone: profile.phone,
+          bio: profile.bio,
+          dateOfBirth: profile.dateOfBirth
+            ? new Date(profile.dateOfBirth)
+            : undefined,
+          accountId: savedAccount.id,
+          addressId: savedAddress?.id ?? null,
+        });
+        const savedProfile = await manager.save(UserProfile, userProfile);
+        if (savedAddress) {
+          savedProfile.address = savedAddress;
+        }
+        savedAccount.userProfile = savedProfile;
+      }
+
+      return savedAccount;
+    });
+
+    await this.markEmailExists(email);
+    return account;
+  }
+
+  async updateAddress(
+    accountId: string,
+    dto: UpdateAccountAddressDto,
+  ): Promise<AccountMeResponseDto> {
+    const preparedAddress = await this.prepareAddress(dto);
+
+    await this.dataSource.transaction(async (manager) => {
+      const account = await manager.findOne(Account, {
+        where: { id: accountId },
+        relations: { userProfile: { address: true } } as any,
+        loadEagerRelations: false,
+      });
+
+      if (!account) {
+        throw new NotFoundException('Account not found');
+      }
+      if (!account.userProfile) {
+        throw new NotFoundException('User profile not found');
+      }
+
+      const address = account.userProfile.address ?? manager.create(Address);
+      address.street = preparedAddress.street;
+      address.ward = preparedAddress.ward;
+      address.district = preparedAddress.district;
+      address.cityOrProvince = preparedAddress.cityOrProvince;
+      address.provinceId = preparedAddress.provinceId;
+      address.districtId = preparedAddress.districtId;
+      address.wardId = preparedAddress.wardId;
+      address.coordinates = preparedAddress.coordinates;
+
+      const savedAddress = await manager.save(Address, address);
+      if (account.userProfile.addressId !== savedAddress.id) {
+        account.userProfile.addressId = savedAddress.id;
+        await manager.save(UserProfile, account.userProfile);
+      }
+      await this.writeAddressLocation(
+        manager,
+        savedAddress.id,
+        preparedAddress,
+      );
+    });
+
+    await this.invalidateAccountMeCache(accountId);
+    return this.getMe(accountId);
   }
 
   /**
@@ -361,6 +545,19 @@ export class AccountService {
         dateOfBirth: account.userProfile.dateOfBirth,
         avatarUrl: account.userProfile.avatarUrl ?? null,
         profileCompleted: account.userProfile.profileCompleted,
+        address: account.userProfile.address
+          ? {
+              street: account.userProfile.address.street,
+              ward: account.userProfile.address.ward,
+              district: account.userProfile.address.district,
+              cityOrProvince: account.userProfile.address.cityOrProvince,
+              provinceId: account.userProfile.address.provinceId,
+              districtId: account.userProfile.address.districtId,
+              wardId: account.userProfile.address.wardId,
+              latitude: account.userProfile.address.latitude,
+              longitude: account.userProfile.address.longitude,
+            }
+          : null,
       };
     } else {
       response.userProfile = null;
@@ -371,6 +568,13 @@ export class AccountService {
 
   private normalizeEmail(email: string): string {
     return email.trim().toLowerCase();
+  }
+
+  private normalizeProfileField(
+    value: string | null | undefined,
+  ): string | null {
+    const normalized = value?.trim() ?? '';
+    return normalized.length === 0 ? null : normalized;
   }
 
   private emailEquals(normalizedEmail: string) {
@@ -389,6 +593,103 @@ export class AccountService {
 
   private sha256(value: string): string {
     return createHash('sha256').update(value).digest('hex');
+  }
+
+  private async prepareAddress(
+    dto: AddressLocationInput,
+  ): Promise<PreparedAddress> {
+    const street = dto.streetAddress.trim();
+    if (!street) {
+      throw new BadRequestException('Street address is required');
+    }
+
+    try {
+      await this.locationsService.validateAddress(
+        dto.provinceId,
+        dto.districtId,
+        dto.wardId,
+      );
+    } catch (error) {
+      throw new BadRequestException(
+        `Invalid address: ${(error as Error).message}`,
+      );
+    }
+
+    const locationRepo = this.dataSource.getRepository(Location);
+    const [province, district, ward] = await Promise.all([
+      locationRepo.findOne({ where: { id: dto.provinceId } }),
+      locationRepo.findOne({ where: { id: dto.districtId } }),
+      locationRepo.findOne({ where: { id: dto.wardId } }),
+    ]);
+
+    if (!province || !district || !ward) {
+      throw new BadRequestException('Invalid address location selection');
+    }
+
+    const fullAddress = [
+      street,
+      ward.fullName || ward.name,
+      district.fullName || district.name,
+      province.fullName || province.name,
+      'Vietnam',
+    ].join(', ');
+
+    let latitude: number | null = null;
+    let longitude: number | null = null;
+    try {
+      const geoResult = await this.mapboxService.geocode(fullAddress);
+      const firstResult = geoResult.results[0];
+      if (firstResult) {
+        latitude = firstResult.lat;
+        longitude = firstResult.lng;
+      } else {
+        this.logger.warn(
+          `User address geocoding returned no results: ${fullAddress}`,
+        );
+      }
+    } catch (error) {
+      this.logger.warn(
+        `User address geocoding failed (non-blocking): ${(error as Error).message}`,
+      );
+    }
+
+    return {
+      street,
+      ward: ward.fullName || ward.name,
+      district: district.fullName || district.name,
+      cityOrProvince: province.fullName || province.name,
+      provinceId: province.id,
+      districtId: district.id,
+      wardId: ward.id,
+      coordinates:
+        latitude != null && longitude != null
+          ? `${latitude},${longitude}`
+          : null,
+      latitude,
+      longitude,
+    };
+  }
+
+  private async writeAddressLocation(
+    manager: EntityManager,
+    addressId: string,
+    address: PreparedAddress,
+  ): Promise<void> {
+    if (address.latitude == null || address.longitude == null) {
+      await manager.query(`UPDATE address SET location = NULL WHERE id = $1`, [
+        addressId,
+      ]);
+      return;
+    }
+
+    await manager.query(
+      `
+        UPDATE address
+        SET location = ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
+        WHERE id = $3
+      `,
+      [address.longitude, address.latitude, addressId],
+    );
   }
 
   private async getCache<T>(key: string): Promise<T | null> {

@@ -14,6 +14,8 @@ describe('AuthService', () => {
     findByEmail: jest.fn(),
     findOne: jest.fn(),
     create: jest.fn(),
+    createRegisteredUser: jest.fn(),
+    checkEmailExists: jest.fn(),
     setRefreshTokenHash: jest.fn(),
     updatePasswordHash: jest.fn(),
   };
@@ -75,6 +77,40 @@ describe('AuthService', () => {
         partnerProfileCompleted: true,
       }),
       expect.any(Object),
+    );
+  });
+
+  it('should register a user through the explicit account/profile creation path', async () => {
+    mockAccountService.checkEmailExists.mockResolvedValue(false);
+    mockAccountService.createRegisteredUser.mockResolvedValue({
+      id: 'account-uuid',
+      email: 'user@test.com',
+      role: Role.USER,
+      userProfile: {
+        id: 'profile-uuid',
+        firstName: 'Test',
+        lastName: 'User',
+      },
+    });
+    mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce(
+      'refresh-token',
+    );
+    mockAccountService.setRefreshTokenHash.mockResolvedValue(undefined);
+
+    const result = await service.register({
+      email: ' USER@Test.com ',
+      password: 'Password123!',
+      profile: {
+        firstName: 'Test',
+        lastName: 'User',
+      },
+    });
+
+    expect(result.access_token).toBe('access-token');
+    expect(mockAccountService.createRegisteredUser).toHaveBeenCalledWith(
+      'user@test.com',
+      expect.any(String),
+      expect.objectContaining({ firstName: 'Test' }),
     );
   });
 

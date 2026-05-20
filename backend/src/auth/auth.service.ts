@@ -219,19 +219,11 @@ export class AuthService {
       throw new ConflictException('Email already in use');
     }
     const hash = await bcrypt.hash(dto.password, 10);
-    const createData: Partial<Account> = {
+    const user = await this.accountService.createRegisteredUser(
       email,
-      passwordHash: hash,
-      role: Role.USER,
-    };
-    if (dto.profile) {
-      const profileData = { ...dto.profile } as UserProfile;
-      if (profileData.dateOfBirth) {
-        profileData.dateOfBirth = new Date(profileData.dateOfBirth);
-      }
-      createData.userProfile = profileData;
-    }
-    const user = await this.accountService.create(createData);
+      hash,
+      dto.profile,
+    );
     this.logger.log(`User registered: ${user.id}`);
     const tokens = await this.createTokensForUser(
       user.id,
@@ -807,8 +799,8 @@ export class AuthService {
         .join(' ')
         .trim();
       payload.name = fullName || undefined;
-      payload.firstName = profile.firstName;
-      payload.lastName = profile.lastName;
+      payload.firstName = profile.firstName ?? undefined;
+      payload.lastName = profile.lastName ?? undefined;
       payload.profileCompleted = profile.profileCompleted;
     }
 

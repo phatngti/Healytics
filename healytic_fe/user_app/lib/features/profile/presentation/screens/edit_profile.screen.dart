@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
 import 'package:user_app/core/providers/s3.provider.dart';
+import 'package:user_app/features/profile/domain/entities/account_address.entity.dart';
 import 'package:user_app/features/profile/domain/entities/user_account.entity.dart';
 
 import '../providers/profile.provider.dart';
@@ -29,9 +30,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
-  late TextEditingController _locationController;
+  late TextEditingController _streetAddressController;
   final ImagePicker _imagePicker = ImagePicker();
   bool _isPopulated = false;
+  bool _isAddressPopulated = false;
+  AccountAddressEntity? _initialAddress;
+  EditProfileAddressSelection? _addressSelection;
 
   /// Local override URL shown immediately after
   /// a successful avatar upload, before the
@@ -45,11 +49,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _nameController = TextEditingController();
     _emailController = TextEditingController();
     _phoneController = TextEditingController();
-    _locationController = TextEditingController();
+    _streetAddressController = TextEditingController();
 
     // Populate on first data emission
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _tryPopulateFields(ref.read(accountMeProvider));
+      _tryPopulateAddress(ref.read(accountAddressProvider));
     });
   }
 
@@ -62,10 +67,33 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (data == null) return;
 
     _isPopulated = true;
-    _nameController.text = data.displayName;
+    _nameController.text = _profileFullName(data);
     _emailController.text = data.email;
     _phoneController.text = data.phone ?? '';
-    _locationController.text = '';
+  }
+
+  String _profileFullName(UserAccountEntity data) {
+    return [
+      data.firstName?.trim(),
+      data.lastName?.trim(),
+    ].whereType<String>().where((part) => part.isNotEmpty).join(' ');
+  }
+
+  void _tryPopulateAddress(AsyncValue<AccountAddressEntity?> state) {
+    if (_isAddressPopulated) return;
+    final address = state.value;
+    if (address == null) return;
+
+    _isAddressPopulated = true;
+    _initialAddress = address;
+    _streetAddressController.text = address.streetAddress;
+    _addressSelection = EditProfileAddressSelection(
+      streetAddress: address.streetAddress,
+      provinceId: address.provinceId,
+      districtId: address.districtId,
+      wardId: address.wardId,
+    );
+    if (mounted) setState(() {});
   }
 
   @override
@@ -73,7 +101,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _locationController.dispose();
+    _streetAddressController.dispose();
     super.dispose();
   }
 
@@ -83,7 +111,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       fullName: _nameController.text.trim(),
       email: _emailController.text.trim(),
       phone: _phoneController.text.trim(),
-      location: _locationController.text.trim(),
+      streetAddress: _streetAddressController.text.trim(),
+      provinceId: _addressSelection?.provinceId ?? '',
+      districtId: _addressSelection?.districtId ?? '',
+      wardId: _addressSelection?.wardId ?? '',
     );
 
     if (success && mounted) {
@@ -119,10 +150,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
       if (!mounted || key == null) {
         if (mounted) {
-          AppToast.error(
-            context,
-            'Unable to update avatar.',
-          );
+          AppToast.error(context, 'Unable to update avatar.');
         }
         return;
       }
@@ -149,10 +177,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
       setState(() => _avatarOverrideUrl = url);
       ref.invalidate(accountMeProvider);
-      AppToast.success(
-        context,
-        'Avatar updated successfully.',
-      );
+      AppToast.success(context, 'Avatar updated successfully.');
     } catch (e, st) {
       developer.log(
         'Avatar upload failed',
@@ -161,16 +186,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         stackTrace: st,
       );
       if (mounted) {
-        AppToast.error(
-          context,
-          'Unable to update avatar.',
-        );
+        AppToast.error(context, 'Unable to update avatar.');
       }
     } finally {
       if (mounted) {
-        setState(
-          () => _isUploadingAvatar = false,
-        );
+        setState(() => _isUploadingAvatar = false);
       }
     }
   }
@@ -346,12 +366,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       accountMeProvider,
       (_, next) => _tryPopulateFields(next),
     );
+    ref.listen<AsyncValue<AccountAddressEntity?>>(
+      accountAddressProvider,
+      (_, next) => _tryPopulateAddress(next),
+    );
 
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final state = ref.watch(editProfileControllerProvider);
     final isLoading = state.isLoading;
     final accountData = ref.watch(accountMeProvider).value;
+    final addressData = ref.watch(accountAddressProvider).value;
 
     return Scaffold(
       body: CustomScrollView(
@@ -410,8 +435,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 children: [
                   EditProfilePicture(
                     name: accountData?.displayName ?? '',
-                    imageUrl: _avatarOverrideUrl ??
-                        accountData?.avatarUrl,
+                    imageUrl: _avatarOverrideUrl ?? accountData?.avatarUrl,
                     onEditAvatar: _pickAvatar,
                     isBusy: _isUploadingAvatar,
                   ),
@@ -420,7 +444,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     nameController: _nameController,
                     emailController: _emailController,
                     phoneController: _phoneController,
-                    locationController: _locationController,
+                    streetAddressController: _streetAddressController,
+                    initialAddress: _initialAddress ?? addressData,
+                    onAddressChanged: (selection) {
+                      _addressSelection = selection;
+                    },
                   ),
                   const SizedBox(height: 32),
                   EditProfileSecurity(

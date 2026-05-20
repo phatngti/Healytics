@@ -14,7 +14,10 @@ class EmployeeFormProfileSection extends StatelessWidget {
       children: [
         EmployeeProfileImageCard(avatarUrl: avatarUrl),
         AppDimens.verticalLarge,
-        EmployeeContactInfoCard(),
+        const EmployeeContactInfoCard(
+          showPasswordField: true,
+          passwordRequired: true,
+        ),
       ],
     );
   }

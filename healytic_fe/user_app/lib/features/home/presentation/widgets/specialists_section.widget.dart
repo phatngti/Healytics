@@ -239,7 +239,7 @@ class _SpecialistCard extends ConsumerWidget {
               icon: Symbols.star,
               iconColor: colorScheme.primary,
               text:
-                  '${specialist.rating}'
+                  '${specialist.rating > 0 ? specialist.rating : 5}'
                   ' · ${specialist.soldCount} sold',
             ),
             SizedBox(height: AppDimens.spaceXxs),

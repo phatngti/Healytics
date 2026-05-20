@@ -1,0 +1,1 @@
+bash scripts/docker-build.sh 05f8b58f373a nonameaaaa/healytics_panel

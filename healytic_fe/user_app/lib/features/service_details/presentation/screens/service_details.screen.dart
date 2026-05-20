@@ -508,12 +508,6 @@ class _BottomActionBarState extends ConsumerState<_BottomActionBar> {
                 ],
               ),
               AppDimens.horizontalMedium,
-              // Add to Cart button
-              _AddToCartButton(
-                isLoading: _isAddingToCart,
-                onTap: _handleAddToCart,
-              ),
-              SizedBox(width: AppDimens.spaceSm),
               Expanded(
                 child: Material(
                   color: colorScheme.primary,

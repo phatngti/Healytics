@@ -9,10 +9,7 @@ import 'package:user_app/theme/app_theme.dart';
 /// score, filled stars, a quality label, and
 /// per-star distribution progress bars.
 class ReviewSummaryCard extends StatelessWidget {
-  const ReviewSummaryCard({
-    super.key,
-    required this.summary,
-  });
+  const ReviewSummaryCard({super.key, required this.summary});
 
   final ClinicReviewSummary summary;
 
@@ -33,9 +30,7 @@ class ReviewSummaryCard extends StatelessWidget {
           SizedBox(width: AppDimens.sectionSpacing(context)),
           // ── Right: Star bars ──
           Expanded(
-            child: _StarDistribution(
-              distribution: summary.starDistribution,
-            ),
+            child: _StarDistribution(distribution: summary.starDistribution),
           ),
         ],
       ),
@@ -54,8 +49,7 @@ class _RatingScore extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final semanticColors =
-        Theme.of(context).extension<SemanticColors>();
+    final semanticColors = Theme.of(context).extension<SemanticColors>();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -67,7 +61,7 @@ class _RatingScore extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              summary.averageRating.toStringAsFixed(1),
+              '${summary.averageRating > 0 ? summary.averageRating : 5.0}',
               style: textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: colorScheme.onSurface,
@@ -94,9 +88,7 @@ class _RatingScore extends StatelessWidget {
             (_) => Icon(
               Symbols.star,
               size: AppDimens.iconSm,
-              color:
-                  semanticColors?.warning ??
-                  colorScheme.tertiary,
+              color: semanticColors?.warning ?? colorScheme.tertiary,
               fill: 1,
             ),
           ),
@@ -137,10 +129,7 @@ class _StarDistribution extends StatelessWidget {
         final fraction = distribution[star] ?? 0.0;
 
         return Padding(
-          padding: EdgeInsets.only(
-            bottom:
-                index < 4 ? AppDimens.spaceXs : 0,
-          ),
+          padding: EdgeInsets.only(bottom: index < 4 ? AppDimens.spaceXs : 0),
           child: Row(
             children: [
               SizedBox(
@@ -153,19 +142,15 @@ class _StarDistribution extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(
-                width: AppDimens.spaceSm,
-              ),
+              const SizedBox(width: AppDimens.spaceSm),
               Expanded(
                 child: ClipRRect(
                   borderRadius: AppDimens.radiusPill,
                   child: LinearProgressIndicator(
                     value: fraction,
                     minHeight: AppDimens.spaceXxs + 1,
-                    backgroundColor: colorScheme
-                        .surfaceContainerHighest,
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(
+                    backgroundColor: colorScheme.surfaceContainerHighest,
+                    valueColor: AlwaysStoppedAnimation<Color>(
                       colorScheme.primary,
                     ),
                   ),

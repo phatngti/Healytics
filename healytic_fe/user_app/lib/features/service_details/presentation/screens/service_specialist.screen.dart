@@ -262,6 +262,10 @@ class _ServiceSpecialistBody extends StatelessWidget {
             if (selectedSpecialistIdx >= 0 && specialists.isNotEmpty)
               ReviewsSectionLoader(
                 employeeId: specialists[selectedSpecialistIdx].id,
+                onViewMoreTap: (context) => EmployeeReviewsRoute(
+                  employeeId: specialists[selectedSpecialistIdx].id,
+                  employeeName: specialists[selectedSpecialistIdx].name,
+                ).push(context),
               ),
 
             SizedBox(height: sectionGap),

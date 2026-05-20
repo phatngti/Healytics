@@ -66,6 +66,17 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
   }
 
   @override
+  Future<void> confirmMoMoReturn({
+    required String bookingId,
+    required Map<String, String> returnParams,
+  }) {
+    return remoteDatasource.confirmMoMoReturn(
+      bookingId: bookingId,
+      returnParams: returnParams,
+    );
+  }
+
+  @override
   Future<void> refundMoMoPayment({
     required String bookingId,
     required int transId,

@@ -29,34 +29,37 @@ class QuickActionsSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: titleGap),
-        Row(
-          children: [
-            Expanded(
-              child: _QuickActionCard(
-                icon: Symbols.calendar_add_on,
-                iconColor: theme.colorScheme.primary,
-                backgroundColor: theme.colorScheme.primaryContainer,
-                title: 'Book Appointment',
-                subtitle: 'Quick booking with AI suggestions',
-                onTap: () {
-                  const BookAppointmentRoute().push(context);
-                },
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _QuickActionCard(
+                  icon: Symbols.calendar_add_on,
+                  iconColor: theme.colorScheme.primary,
+                  backgroundColor: theme.colorScheme.primaryContainer,
+                  title: 'Book Appointment',
+                  subtitle: 'Quick booking with AI suggestions',
+                  onTap: () {
+                    const BookAppointmentRoute().push(context);
+                  },
+                ),
               ),
-            ),
-            SizedBox(width: cardGap),
-            Expanded(
-              child: _QuickActionCard(
-                icon: Symbols.smart_toy,
-                iconColor: theme.colorScheme.secondary,
-                backgroundColor: theme.colorScheme.secondaryContainer,
-                title: 'AI Health Assistant',
-                subtitle: 'Get instant health guidance',
-                onTap: () {
-                  const AiHealthAssistantRoute().push(context);
-                },
+              SizedBox(width: cardGap),
+              Expanded(
+                child: _QuickActionCard(
+                  icon: Symbols.smart_toy,
+                  iconColor: theme.colorScheme.secondary,
+                  backgroundColor: theme.colorScheme.secondaryContainer,
+                  title: 'AI Health Assistant',
+                  subtitle: 'Get instant health guidance',
+                  onTap: () {
+                    const AiHealthAssistantRoute().push(context);
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );

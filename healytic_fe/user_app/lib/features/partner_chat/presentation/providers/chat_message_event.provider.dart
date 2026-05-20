@@ -17,14 +17,20 @@ final _log = Logger('ChatMessageEventProvider');
 
 /// Tracks which conversation is currently visible
 /// so inline toasts can be suppressed for it.
-@riverpod
+@Riverpod(keepAlive: true)
 class ActiveChatConversationId extends _$ActiveChatConversationId {
   @override
   String? build() => null;
 
   // ignore: use_setters_to_change_properties
   void set(String? conversationId) {
+    if (!ref.mounted) return;
     state = conversationId;
+  }
+
+  void clearIf(String conversationId) {
+    if (!ref.mounted || state != conversationId) return;
+    state = null;
   }
 }
 

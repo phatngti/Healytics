@@ -16,6 +16,7 @@ import { MoMoController } from './momo.controller';
 import { StripeWebhookController } from './stripe-webhook.controller';
 import { UserPaymentController } from './user-payment.controller';
 import { BookingStatusLogWriterService } from '@/booking/services/booking-status-log-writer.service';
+import { NotificationModule } from '@/notification/notification.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { BookingStatusLogWriterService } from '@/booking/services/booking-status
       UserPaymentMethod,
     ]),
     ConfigModule,
+    NotificationModule,
   ],
   controllers: [MoMoController, StripeWebhookController, UserPaymentController],
   providers: [

@@ -71,7 +71,7 @@ const kMockPaymentMethods = <PaymentMethodOption>[
   ),
   PaymentMethodOption(
     type: PaymentMethodType.eWallet,
-    label: 'E-Wallet (Momo/ZaloPay)',
+    label: 'E-Wallet (Momo)',
   ),
   PaymentMethodOption(type: PaymentMethodType.payLater, label: 'Pay Later'),
 ];
@@ -139,7 +139,4 @@ final kMockBooking = BookingEntity(
   updatedAt: DateTime(2026, 3, 16),
 );
 
-const kMockMicroLockResult = MicroLockResult(
-  locked: true,
-  expiresIn: 120,
-);
+const kMockMicroLockResult = MicroLockResult(locked: true, expiresIn: 120);

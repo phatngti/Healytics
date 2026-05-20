@@ -415,7 +415,7 @@
       },
       {
         "type": "eWallet",
-        "label": "E-Wallet (Momo/ZaloPay)"
+        "label": "E-Wallet (Momo)"
       },
       {
         "type": "payLater",

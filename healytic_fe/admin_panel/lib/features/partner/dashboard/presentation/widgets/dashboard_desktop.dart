@@ -5,6 +5,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../providers/dashboard.provider.dart';
 import '../providers/dashboard_state.dart';
+import '../../domain/dashboard_notification.entity.dart';
+import '../../domain/inventory_alert.entity.dart';
+import '../../domain/staff_schedule.entity.dart';
 import 'dashboard_constants.dart';
 import 'employee_overview_chart.widget.dart';
 import 'inventory_alerts.widget.dart';
@@ -124,25 +127,11 @@ class _DashboardContent extends ConsumerWidget {
             ),
             AppDimens.verticalLarge,
 
-            // Row 5: Schedule + Notifications +
-            //         Inventory
-            _ResponsiveRow(
-              children: [
-                Expanded(
-                  flex: DashboardLayout.staffScheduleFlex,
-                  child: StaffScheduleWidget(schedule: state.staffSchedule),
-                ),
-                Expanded(
-                  flex: DashboardLayout.notificationFlex,
-                  child: NotificationCenterWidget(
-                    notifications: state.notifications,
-                  ),
-                ),
-                Expanded(
-                  flex: DashboardLayout.inventoryFlex,
-                  child: InventoryAlertsWidget(alerts: state.inventoryAlerts),
-                ),
-              ],
+            // Row 5: Daily operations
+            _OperationsSection(
+              schedule: state.staffSchedule,
+              notifications: state.notifications,
+              inventoryAlerts: state.inventoryAlerts,
             ),
             AppDimens.verticalLarge,
 
@@ -152,6 +141,60 @@ class _DashboardContent extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _OperationsSection extends StatelessWidget {
+  const _OperationsSection({
+    required this.schedule,
+    required this.notifications,
+    required this.inventoryAlerts,
+  });
+
+  final List<StaffScheduleEntry> schedule;
+  final List<DashboardNotification> notifications;
+  final List<InventoryAlert> inventoryAlerts;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth > DashboardLayout.wideBreakpoint;
+
+        if (!isWide) {
+          return Column(
+            children: [
+              StaffScheduleWidget(schedule: schedule),
+              AppDimens.verticalMedium,
+              NotificationCenterWidget(notifications: notifications),
+              AppDimens.verticalMedium,
+              InventoryAlertsWidget(alerts: inventoryAlerts),
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: DashboardLayout.operationsScheduleFlex,
+                  child: StaffScheduleWidget(schedule: schedule),
+                ),
+                AppDimens.horizontalMedium,
+                Expanded(
+                  flex: DashboardLayout.operationsNotificationFlex,
+                  child: NotificationCenterWidget(notifications: notifications),
+                ),
+              ],
+            ),
+            AppDimens.verticalMedium,
+            InventoryAlertsWidget(alerts: inventoryAlerts),
+          ],
+        );
+      },
     );
   }
 }

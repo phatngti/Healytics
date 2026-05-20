@@ -50,6 +50,13 @@ abstract class CheckoutRemoteDatasource {
   /// redirect URLs.
   Future<MoMoPaymentResult> createMoMoPayment(String bookingId);
 
+  /// Confirms the signed MoMo return payload received
+  /// through the app deeplink.
+  Future<void> confirmMoMoReturn({
+    required String bookingId,
+    required Map<String, String> returnParams,
+  });
+
   /// Requests a MoMo refund for a completed payment.
   Future<void> refundMoMoPayment({
     required String bookingId,
@@ -203,6 +210,29 @@ class CheckoutRemoteDatasourceImpl implements CheckoutRemoteDatasource {
   }
 
   @override
+  Future<void> confirmMoMoReturn({
+    required String bookingId,
+    required Map<String, String> returnParams,
+  }) async {
+    final response = await _apiService.apiClient.invokeAPI(
+      '/user/payments/momo/$bookingId/return',
+      'POST',
+      const [],
+      _mapMoMoReturnPayload(returnParams),
+      {},
+      {},
+      'application/json',
+    );
+
+    if (response.statusCode >= 400) {
+      throw ApiException(
+        response.statusCode,
+        'Failed to verify MoMo payment return.',
+      );
+    }
+  }
+
+  @override
   Future<void> refundMoMoPayment({
     required String bookingId,
     required int transId,
@@ -228,6 +258,35 @@ class CheckoutRemoteDatasourceImpl implements CheckoutRemoteDatasource {
       resultCode: (map['resultCode'] as num?)?.toInt() ?? -1,
       message: map['message']?.toString() ?? '',
     );
+  }
+
+  Map<String, Object?> _mapMoMoReturnPayload(Map<String, String> params) {
+    return {
+      'partnerCode': params['partnerCode'],
+      'orderId': params['orderId'],
+      'requestId': params['requestId'],
+      'amount': int.tryParse(params['amount'] ?? ''),
+      'orderInfo': params['orderInfo'],
+      'orderType': params['orderType'],
+      'transId': int.tryParse(params['transId'] ?? ''),
+      'resultCode': int.tryParse(params['resultCode'] ?? ''),
+      'message': params['message'],
+      'responseTime': int.tryParse(params['responseTime'] ?? ''),
+      'payType': params['payType'],
+      'extraData': params['extraData'],
+      'signature': params['signature'],
+      if (params['partnerUserId'] != null)
+        'partnerUserId': params['partnerUserId'],
+      if (params['storeId'] != null) 'storeId': params['storeId'],
+      if (params['localMessage'] != null)
+        'localMessage': params['localMessage'],
+      if (params['paymentOption'] != null)
+        'paymentOption': params['paymentOption'],
+      if (params['userFee'] != null)
+        'userFee': int.tryParse(params['userFee'] ?? ''),
+      if (params['promotionInfo'] != null)
+        'promotionInfo': params['promotionInfo'],
+    };
   }
 
   CheckoutTicketEntity _mapTicketDto(CheckoutTicketResponseDto dto) {
@@ -533,6 +592,15 @@ class CheckoutRemoteDatasourceMock implements CheckoutRemoteDatasource {
       resultCode: 0,
       message: 'Successful.',
     );
+  }
+
+  @override
+  Future<void> confirmMoMoReturn({
+    required String bookingId,
+    required Map<String, String> returnParams,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    // No-op in mock.
   }
 
   @override

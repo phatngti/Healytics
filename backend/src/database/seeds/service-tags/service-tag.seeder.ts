@@ -5,6 +5,7 @@ import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity'
 import { Account } from '@/common/entities/account.entity';
 import { Role } from '@/account/enum/role.enum';
 import { ISeeder } from '../seeder.interface';
+import { BULK_WELLNESS_TAGS } from '../wellness-bulk.seed';
 
 const SEED_FEATURE_TAGS = [
   {
@@ -62,6 +63,7 @@ const SEED_FEATURE_TAGS = [
     description: 'Dermatology consultation and skin treatment services',
     colorValue: '#FF673AB7',
   },
+  ...BULK_WELLNESS_TAGS,
 ];
 
 @Injectable()
@@ -83,9 +85,11 @@ export class ServiceTagSeeder implements ISeeder {
     const adminUser =
       (await this.accountRepo.findOne({
         where: { email: 'partner@healytics.vn', role: Role.HEALTH_PARTNER },
+        loadEagerRelations: false,
       })) ??
       (await this.accountRepo.findOne({
         where: { role: Role.HEALTH_PARTNER },
+        loadEagerRelations: false,
       }));
 
     if (!adminUser) {

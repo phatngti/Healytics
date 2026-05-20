@@ -3,5 +3,17 @@
     "customHeaders": {
         "deviceModel": "iPhone 13",
         "deviceType": "iOS"
+    },
+    "notificationConfig": {
+        "inAppEnabled": true,
+        "webSocketEnabled": false,
+        "localNotificationsEnabled": false,
+        "pushRegistrationEnabled": false,
+        "mockPushTokenEnabled": true,
+        "androidChannel": {
+            "id": "healytics_notifications_dev",
+            "name": "Healytics Dev",
+            "description": "Healytics development notifications"
+        }
     }
 }

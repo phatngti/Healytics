@@ -6,6 +6,7 @@ import 'package:common/widgets/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:user_app/features/cart/presentation/providers/cart.provider.dart';
 import 'package:user_app/features/checkout/domain/entities/checkout.entity.dart'
     as checkout;
 import 'package:user_app/features/checkout/domain/entities/payment_card.entity.dart';
@@ -106,6 +107,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
       case CheckoutSubmissionStatus.success:
         _disposeMoMoReturnHandlers();
+        unawaited(_removeCheckedOutCartItem(ref, next));
         _showSuccessDialog(context, next);
 
       case CheckoutSubmissionStatus.awaitingMoMoPayment:
@@ -116,6 +118,21 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
       default:
         break;
+    }
+  }
+
+  Future<void> _removeCheckedOutCartItem(
+    WidgetRef ref,
+    CheckoutState state,
+  ) async {
+    final cartItemId = state.bookingParams?.cartItemId;
+    if (cartItemId == null || cartItemId.isEmpty) return;
+
+    try {
+      await ref.read(cartProvider.notifier).removeItem(cartItemId);
+    } catch (_) {
+      // Checkout has already succeeded. Keep the booking success path intact;
+      // the cart can be refreshed or manually edited if cleanup fails.
     }
   }
 
@@ -140,10 +157,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     _lifecycleListener = AppLifecycleListener(
       onResume: () {
         if (_moMoReturnHandled) return;
-        _moMoReturnHandled = true;
-        // Only verify once — dispose immediately.
-        _disposeMoMoReturnHandlers();
-        ref.read(checkoutProvider.notifier).verifyMoMoPayment(bookingId);
+        unawaited(_verifyMoMoAfterResumeFallback(bookingId));
       },
     );
   }
@@ -220,7 +234,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     final resultCode = uri.queryParameters['resultCode'];
     if (resultCode == null || resultCode == '0') {
-      ref.read(checkoutProvider.notifier).verifyMoMoPayment(bookingId);
+      ref
+          .read(checkoutProvider.notifier)
+          .verifyMoMoPayment(bookingId, returnParams: uri.queryParameters);
       return;
     }
 
@@ -237,6 +253,26 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     return uri.scheme == 'healytics' &&
         uri.host == 'payment' &&
         uri.path == '/momo/success';
+  }
+
+  Future<void> _verifyMoMoAfterResumeFallback(String bookingId) async {
+    // Android can deliver the lifecycle resume before app_links emits the
+    // intent URI. Give the deeplink stream a chance to hand us MoMo's signed
+    // return payload before falling back to status polling.
+    await Future<void>.delayed(const Duration(seconds: 2));
+    if (!mounted || _moMoReturnHandled) return;
+
+    final latestUri = await AppLinks().getLatestLink();
+    if (!mounted || _moMoReturnHandled) return;
+
+    if (latestUri != null && _isMoMoReturnUri(latestUri)) {
+      _handleMoMoReturnUri(latestUri);
+      if (_moMoReturnHandled) return;
+    }
+
+    _moMoReturnHandled = true;
+    _disposeMoMoReturnHandlers();
+    await ref.read(checkoutProvider.notifier).verifyMoMoPayment(bookingId);
   }
 
   void _disposeMoMoReturnHandlers() {

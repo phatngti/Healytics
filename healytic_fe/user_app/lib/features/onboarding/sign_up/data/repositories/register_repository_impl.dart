@@ -92,6 +92,16 @@ class RegisterRepositoryImpl implements RegisterRepository {
       throw Exception("Failed to complete survey");
     }
   }
+
+  @override
+  Future<AuthTokensEntity?> completeProfile(UserEntity profile) async {
+    try {
+      return await _remoteDatasource.completeProfile(profile);
+    } catch (e) {
+      debugPrint('Error completing profile: $e');
+      rethrow;
+    }
+  }
 }
 
 @riverpod

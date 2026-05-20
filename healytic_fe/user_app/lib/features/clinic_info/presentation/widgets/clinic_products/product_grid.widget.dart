@@ -6,8 +6,8 @@ import 'package:user_app/features/clinic_info/presentation/widgets/clinic_produc
 
 /// Responsive grid of [ProductCard] items.
 ///
-/// Uses [LayoutBuilder] for adaptive column counts:
-/// 2 columns for narrow screens, 3 for wider ones.
+/// Uses [LayoutBuilder] so item width and height stay
+/// aligned with the two-column services layout.
 /// The [childAspectRatio] is dynamically calculated
 /// from available width and a fixed content height.
 class ProductGrid extends StatelessWidget {
@@ -16,9 +16,7 @@ class ProductGrid extends StatelessWidget {
   final List<ClinicProductEntity> products;
   final void Function(String id)? onProductTap;
 
-  /// Fixed content height below the image area
-  /// (title + chips + price).
-  static const _kContentHeight = 120.0;
+  static const _kCrossAxisCount = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +38,11 @@ class ProductGrid extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final crossAxisCount = constraints.maxWidth < 400 ? 2 : 3;
         final totalPadding =
-            hPad * 2 + AppDimens.spaceSm * (crossAxisCount - 1);
+            hPad * 2 + AppDimens.spaceSm * (_kCrossAxisCount - 1);
         final itemWidth =
-            (constraints.maxWidth - totalPadding) / crossAxisCount;
-        final itemHeight = itemWidth + _kContentHeight;
+            (constraints.maxWidth - totalPadding) / _kCrossAxisCount;
+        final itemHeight = itemWidth + ProductCard.contentHeight;
 
         return GridView.builder(
           padding: EdgeInsets.symmetric(
@@ -53,7 +50,7 @@ class ProductGrid extends StatelessWidget {
             vertical: AppDimens.spaceSm,
           ),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
+            crossAxisCount: _kCrossAxisCount,
             mainAxisSpacing: AppDimens.spaceSm,
             crossAxisSpacing: AppDimens.spaceSm,
             childAspectRatio: itemWidth / itemHeight,

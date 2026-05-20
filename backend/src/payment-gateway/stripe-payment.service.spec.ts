@@ -16,6 +16,9 @@ import {
   MockRepository,
   createMockRepository,
 } from '../../test/mocks/mock-types';
+import { Product } from '@/common/entities/product.entity';
+import { NotificationEventService } from '@/notification/services/notification-event.service';
+import { NotificationType } from '@/notification/enums/notification-type.enum';
 
 /**
  * StripePaymentService calls Stripe SDK directly in the constructor,
@@ -66,6 +69,8 @@ describe('StripePaymentService', () => {
     updateBookingStatus: jest.Mock;
     updatePaymentLinks: jest.Mock;
   };
+  let notificationEventService: { emit: jest.Mock };
+  let productRepo: MockRepository<Product>;
 
   beforeEach(async () => {
     accountRepo = createMockRepository<Account>();
@@ -80,6 +85,8 @@ describe('StripePaymentService', () => {
       updateBookingStatus: jest.fn(),
       updatePaymentLinks: jest.fn(),
     };
+    notificationEventService = { emit: jest.fn() };
+    productRepo = createMockRepository<Product>();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -114,6 +121,14 @@ describe('StripePaymentService', () => {
             getOrThrow: jest.fn().mockReturnValue('sk_test_mock_key'),
             get: jest.fn().mockReturnValue('vnd'),
           },
+        },
+        {
+          provide: NotificationEventService,
+          useValue: notificationEventService,
+        },
+        {
+          provide: getRepositoryToken(Product),
+          useValue: productRepo,
         },
       ],
     }).compile();
@@ -490,6 +505,13 @@ describe('StripePaymentService', () => {
       txLogRepo.create.mockReturnValue({});
       txLogRepo.save.mockResolvedValue({});
       bookingPaymentService.updateBookingStatus.mockResolvedValue({});
+      bookingPaymentService.findById.mockResolvedValue({
+        id: 'booking-1',
+        userId: 'user-1',
+        productId: 'prod-1',
+        startTime: new Date('2025-10-25T14:00:00Z'),
+      });
+      productRepo.findOne.mockResolvedValue({ id: 'prod-1', name: 'Dental Cleaning' });
 
       const result = await service.handleWebhookEvent(
         Buffer.from('body'),
@@ -505,6 +527,9 @@ describe('StripePaymentService', () => {
         expect.any(String),
         BookingStatusReasonCode.PAYMENT_CONFIRMED_STRIPE,
       );
+
+      // Notification should be emitted after payment success
+      expect(bookingPaymentService.findById).toHaveBeenCalledWith('booking-1');
     });
 
     it('should process payment_intent.payment_failed without changing booking status', async () => {
@@ -540,6 +565,8 @@ describe('StripePaymentService', () => {
 
       expect(result).toBe(true);
       expect(bookingPaymentService.updateBookingStatus).not.toHaveBeenCalled();
+      // Notification should NOT be emitted for failed payment
+      expect(notificationEventService.emit).not.toHaveBeenCalled();
     });
 
     it('should handle unrecognized event types gracefully', async () => {

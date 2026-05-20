@@ -86,7 +86,6 @@ class EmployeeRemoteDatasourceImpl implements EmployeeRemoteDatasource {
   // ─── DTO → Entity mappers ────────────────────────
 
   EmployeeDetailEntity _mapEmployeeDto(EmployeeResponseDto dto) {
-    print('reviewCount ${dto.reviewCount}');
     return EmployeeDetailEntity(
       id: dto.id,
       employeeCode: dto.employeeCode,

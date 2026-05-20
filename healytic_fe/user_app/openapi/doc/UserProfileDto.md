@@ -16,6 +16,7 @@ Name | Type | Description | Notes
 **dateOfBirth** | **String** | Date of birth | [optional] 
 **avatarUrl** | [**Object**](.md) | Avatar image URL | [optional] 
 **profileCompleted** | **bool** | Whether the profile is completed | 
+**address** | [**AccountAddressDto**](AccountAddressDto.md) | Address provided during registration | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

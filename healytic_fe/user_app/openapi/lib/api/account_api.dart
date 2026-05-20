@@ -55,7 +55,7 @@ class AccountApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AccountMeResponseDto',) as AccountMeResponseDto;
-    
+
     }
     return null;
   }
@@ -152,6 +152,58 @@ class AccountApi {
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SurveyResponseDto',) as SurveyResponseDto;
     
+    }
+    return null;
+  }
+
+  /// Update current user address
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [UpdateAccountAddressDto] updateAccountAddressDto (required):
+  Future<Response> accountControllerUpdateAddressWithHttpInfo(UpdateAccountAddressDto updateAccountAddressDto,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/account/me/address';
+
+    // ignore: prefer_final_locals
+    Object? postBody = updateAccountAddressDto;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'PATCH',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Update current user address
+  ///
+  /// Parameters:
+  ///
+  /// * [UpdateAccountAddressDto] updateAccountAddressDto (required):
+  Future<AccountMeResponseDto?> accountControllerUpdateAddress(UpdateAccountAddressDto updateAccountAddressDto,) async {
+    final response = await accountControllerUpdateAddressWithHttpInfo(updateAccountAddressDto,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AccountMeResponseDto',) as AccountMeResponseDto;
+
     }
     return null;
   }

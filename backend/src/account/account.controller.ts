@@ -11,6 +11,8 @@ import {
 import { AccountService } from './account.service';
 import { SurveyDto } from './dto/request/survey.dto';
 import { UpdateAvatarDto } from './dto/request/update-avatar.dto';
+import { UpdateAccountAddressDto } from './dto/request/update-account-address.dto';
+import { UpdateAccountProfileDto } from './dto/request/update-account-profile.dto';
 import { SurveyResponseDto } from './dto/response/survey-response.dto';
 import { AccountMeResponseDto } from './dto/response/account-me-response.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
@@ -74,6 +76,40 @@ export class AccountController {
     @Body() dto: UpdateAvatarDto,
   ): Promise<AccountMeResponseDto> {
     return this.accountService.updateAvatar(userId, dto.avatarUrl);
+  }
+
+  /**
+   * Updates the current user's personal identity fields.
+   */
+  @Patch('me/profile')
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
+  @ApiOperation({ summary: 'Update current user profile identity' })
+  @ApiOkResponse({
+    description: 'Profile updated, returns refreshed account data.',
+    type: AccountMeResponseDto,
+  })
+  async updateProfile(
+    @CurrentUser('id') userId: string,
+    @Body() dto: UpdateAccountProfileDto,
+  ): Promise<AccountMeResponseDto> {
+    return this.accountService.updateProfile(userId, dto);
+  }
+
+  /**
+   * Updates the current user's saved address.
+   */
+  @Patch('me/address')
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
+  @ApiOperation({ summary: 'Update current user address' })
+  @ApiOkResponse({
+    description: 'Address updated, returns refreshed account data.',
+    type: AccountMeResponseDto,
+  })
+  async updateAddress(
+    @CurrentUser('id') userId: string,
+    @Body() dto: UpdateAccountAddressDto,
+  ): Promise<AccountMeResponseDto> {
+    return this.accountService.updateAddress(userId, dto);
   }
 
   /**

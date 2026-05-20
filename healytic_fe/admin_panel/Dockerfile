@@ -56,6 +56,7 @@ COPY --chown=flutter:flutter common/pubspec.yaml       common/pubspec.yaml
 COPY --chown=flutter:flutter user_app/pubspec.yaml     user_app/pubspec.yaml
 COPY --chown=flutter:flutter user_app/openapi/pubspec.yaml user_app/openapi/pubspec.yaml
 COPY --chown=flutter:flutter employee_app/pubspec.yaml employee_app/pubspec.yaml
+COPY --chown=flutter:flutter employee_app/openapi/pubspec.yaml employee_app/openapi/pubspec.yaml
 
 # 3. Resolve dependencies once (layer cache: rebuilds only if pubspecs change).
 RUN --mount=type=cache,target=/home/flutter/.pub-cache,uid=1000,gid=1000 \
@@ -65,9 +66,11 @@ RUN --mount=type=cache,target=/home/flutter/.pub-cache,uid=1000,gid=1000 \
 COPY --chown=flutter:flutter common/ common/
 COPY --chown=flutter:flutter admin_panel/ admin_panel/
 
-# 5. Run code generation (Freezed, Riverpod, GoRouter, Slang, …).
+# 5. Re-resolve deps (source COPY can invalidate .dart_tool state) + code gen.
 RUN --mount=type=cache,target=/home/flutter/.pub-cache,uid=1000,gid=1000 \
-    cd admin_panel && dart run build_runner build --delete-conflicting-outputs
+    flutter pub get --directory=admin_panel \
+    && cd admin_panel \
+    && dart run build_runner build --delete-conflicting-outputs
 
 # 6. Build the optimised web bundle.
 RUN --mount=type=cache,target=/home/flutter/.pub-cache,uid=1000,gid=1000 \

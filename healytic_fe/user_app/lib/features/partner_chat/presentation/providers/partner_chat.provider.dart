@@ -122,6 +122,8 @@ class PartnerChat extends _$PartnerChat {
   /// Resolved current-user ID from JWT.
   String? _currentUserId;
 
+  String? _activeConversationId;
+
   /// Whether we're running against real APIs.
   bool get _isRealMode => !AppEnvironment.current.useMock;
 
@@ -132,9 +134,7 @@ class PartnerChat extends _$PartnerChat {
     _socket = _wsService.userChat;
     _currentUserId = ref.read(currentUserIdProvider);
     // Cache the notifier while ref is still valid.
-    _activeConvNotifier = ref.read(
-      activeChatConversationIdProvider.notifier,
-    );
+    _activeConvNotifier = ref.read(activeChatConversationIdProvider.notifier);
 
     ref.onDispose(_cleanup);
 
@@ -149,6 +149,7 @@ class PartnerChat extends _$PartnerChat {
   /// Mark this conversation as active to suppress
   /// inline toasts while the user is viewing it.
   void _setActiveConversation(String conversationId) {
+    _activeConversationId = conversationId;
     _activeConvNotifier.set(conversationId);
   }
 
@@ -158,7 +159,11 @@ class PartnerChat extends _$PartnerChat {
   /// safe to call from [_cleanup] / [ref.onDispose]
   /// where the ref is already invalidated.
   void _clearActiveConversation() {
-    _activeConvNotifier.set(null);
+    final conversationId = _activeConversationId;
+    if (conversationId != null) {
+      _activeConvNotifier.clearIf(conversationId);
+    }
+    _activeConversationId = null;
   }
 
   /// The current user's account ID for bubble
@@ -179,6 +184,8 @@ class PartnerChat extends _$PartnerChat {
       } else {
         _log.info('Skipping WS connect (mock mode)');
       }
+
+      if (!ref.mounted) return;
 
       // 2. Get or create conversation
       state = state.copyWith(isLoadingMessages: true);

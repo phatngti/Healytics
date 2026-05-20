@@ -8,18 +8,18 @@ part of 'user_entity.dart';
 
 _AddressEntity _$AddressEntityFromJson(Map<String, dynamic> json) =>
     _AddressEntity(
-      street: json['street'] as String,
-      ward: json['ward'] as String,
-      district: json['district'] as String,
-      cityOrProvince: json['cityOrProvince'] as String,
+      streetAddress: json['streetAddress'] as String,
+      provinceId: json['provinceId'] as String,
+      districtId: json['districtId'] as String,
+      wardId: json['wardId'] as String,
     );
 
 Map<String, dynamic> _$AddressEntityToJson(_AddressEntity instance) =>
     <String, dynamic>{
-      'street': instance.street,
-      'ward': instance.ward,
-      'district': instance.district,
-      'cityOrProvince': instance.cityOrProvince,
+      'streetAddress': instance.streetAddress,
+      'provinceId': instance.provinceId,
+      'districtId': instance.districtId,
+      'wardId': instance.wardId,
     };
 
 _UserEntity _$UserEntityFromJson(Map<String, dynamic> json) => _UserEntity(

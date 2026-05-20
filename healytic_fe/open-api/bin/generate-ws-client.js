@@ -793,6 +793,11 @@ function generateClients() {
     out += `      io.OptionBuilder()\n`;
     out += `          .setTransports(['websocket'])\n`;
     out += `          .disableAutoConnect()\n`;
+    out += `          .enableReconnection()\n`;
+    out += `          .setReconnectionAttempts(5)\n`;
+    out += `          .setReconnectionDelay(1000)\n`;
+    out += `          .setReconnectionDelayMax(10000)\n`;
+    out += `          .setTimeout(10000)\n`;
     out += `          .setPath(server.path)\n`;
     out += `          .setAuth({'token': token})\n`;
     out += `          .build(),\n`;
@@ -812,11 +817,11 @@ function generateClients() {
     out += `      _updateStatus(WsConnectionStatus.reconnecting);\n`;
     out += `    });\n\n`;
     out += `    _socket!.onConnectError((err) {\n`;
-    out += `      _log.severe('Connection error: \$err');\n`;
+    out += `      _log.warning('Connection error: \$err');\n`;
     out += `      _updateStatus(WsConnectionStatus.error);\n`;
     out += `    });\n\n`;
     out += `    _socket!.onError((err) {\n`;
-    out += `      _log.severe('Socket error: \$err');\n`;
+    out += `      _log.warning('Socket error: \$err');\n`;
     out += `    });\n\n`;
 
     // Server → Client event listeners

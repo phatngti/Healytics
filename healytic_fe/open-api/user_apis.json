@@ -10989,6 +10989,43 @@
           }
         }
       }
+    },
+    "/account/me/address": {
+      "patch": {
+        "operationId": "AccountController_updateAddress",
+        "summary": "Update current user address",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountAddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Address updated, returns refreshed account data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountMeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -11065,6 +11102,14 @@
             "type": "string",
             "example": "1990-01-01",
             "description": "Date of birth in ISO format"
+          },
+          "address": {
+            "description": "Address provided during user registration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RegisterAddressDto"
+              }
+            ]
           }
         }
       },
@@ -11629,6 +11674,14 @@
           "profileCompleted": {
             "type": "boolean",
             "description": "Whether the profile is completed"
+          },
+          "address": {
+            "description": "Address provided during registration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AccountAddressDto"
+              }
+            ]
           }
         },
         "required": [
@@ -11782,7 +11835,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-19T07:56:43.411Z"
+              "submittedAt": "2026-05-19T09:31:29.852Z"
             }
           }
         },
@@ -23799,6 +23852,118 @@
           "timestamp"
         ],
         "title": "RecommendationResponse"
+      },
+      "RegisterAddressDto": {
+        "type": "object",
+        "properties": {
+          "streetAddress": {
+            "type": "string",
+            "example": "123 Nguyen Hue Street"
+          },
+          "provinceId": {
+            "type": "string",
+            "example": "0f0d876f-92f1-4fcb-8a40-1fd3dd115d6b",
+            "description": "Province/city Location UUID"
+          },
+          "districtId": {
+            "type": "string",
+            "example": "7c4020d4-343d-4a63-b017-6df5f82d8814",
+            "description": "District Location UUID"
+          },
+          "wardId": {
+            "type": "string",
+            "example": "aa3a7de4-4d1d-4bb5-a3c1-79ac1350c743",
+            "description": "Ward/commune Location UUID"
+          }
+        },
+        "required": [
+          "streetAddress",
+          "provinceId",
+          "districtId",
+          "wardId"
+        ]
+      },
+      "UpdateAccountAddressDto": {
+        "type": "object",
+        "properties": {
+          "streetAddress": {
+            "type": "string",
+            "example": "123 Nguyen Hue Street"
+          },
+          "provinceId": {
+            "type": "string",
+            "example": "0f0d876f-92f1-4fcb-8a40-1fd3dd115d6b",
+            "description": "Province/city Location UUID"
+          },
+          "districtId": {
+            "type": "string",
+            "example": "7c4020d4-343d-4a63-b017-6df5f82d8814",
+            "description": "District Location UUID"
+          },
+          "wardId": {
+            "type": "string",
+            "example": "aa3a7de4-4d1d-4bb5-a3c1-79ac1350c743",
+            "description": "Ward/commune Location UUID"
+          }
+        },
+        "required": [
+          "streetAddress",
+          "provinceId",
+          "districtId",
+          "wardId"
+        ]
+      },
+      "AccountAddressDto": {
+        "type": "object",
+        "properties": {
+          "street": {
+            "type": "string",
+            "description": "Street address"
+          },
+          "ward": {
+            "type": "string",
+            "description": "Ward or commune"
+          },
+          "district": {
+            "type": "string",
+            "description": "District"
+          },
+          "cityOrProvince": {
+            "type": "string",
+            "description": "City or province"
+          },
+          "provinceId": {
+            "type": "string",
+            "description": "Province/city Location UUID",
+            "nullable": true
+          },
+          "districtId": {
+            "type": "string",
+            "description": "District Location UUID",
+            "nullable": true
+          },
+          "wardId": {
+            "type": "string",
+            "description": "Ward/commune Location UUID",
+            "nullable": true
+          },
+          "latitude": {
+            "type": "number",
+            "description": "Resolved latitude",
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "description": "Resolved longitude",
+            "nullable": true
+          }
+        },
+        "required": [
+          "street",
+          "ward",
+          "district",
+          "cityOrProvince"
+        ]
       }
     }
   }

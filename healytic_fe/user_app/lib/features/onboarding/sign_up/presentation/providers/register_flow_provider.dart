@@ -115,9 +115,7 @@ class RegisterFlowNotifier extends _$RegisterFlowNotifier {
 
     try {
       _updateState((current) {
-        return current.copyWith(
-          user: current.user?.copyWith(email: email),
-        );
+        return current.copyWith(user: current.user?.copyWith(email: email));
       });
 
       // 2. Check if email already exists before sending OTP
@@ -173,7 +171,7 @@ class RegisterFlowNotifier extends _$RegisterFlowNotifier {
   }
 
   Future<void> updateSurvey(String stepKey, List<SurveyEntity> surveys) async {
-    if (state.value?.isRegistrationCompleted ?? false) {
+    if (state.value?.isSurveyCompleted ?? false) {
       return;
     }
 
@@ -187,7 +185,7 @@ class RegisterFlowNotifier extends _$RegisterFlowNotifier {
       (current) => current.copyWith(
         surveys: updatedSurveys,
         stepIndex: currentStepIndex,
-        isRegistrationCompleted: currentStepIndex == 4,
+        isSurveyCompleted: currentStepIndex == 4,
       ),
     );
     await saveProgress();
@@ -195,10 +193,9 @@ class RegisterFlowNotifier extends _$RegisterFlowNotifier {
 
   Future<void> completeSurvey() async {
     try {
-      debugPrint(
-        'isRegistrationCompleted ${state.value?.isRegistrationCompleted}',
-      );
-      if (state.value?.isRegistrationCompleted ?? false) {
+      debugPrint('isSurveyCompleted ${state.value?.isSurveyCompleted}');
+      if ((state.value?.isRegistrationCompleted ?? false) &&
+          (state.value?.isSurveyCompleted ?? false)) {
         final surveys = state.value?.surveys ?? <String, List<SurveyEntity>>{};
         await ref.read(surveyUseCaseProvider).completeSurvey(surveys: surveys);
         await saveProgress();

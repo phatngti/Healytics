@@ -37,6 +37,13 @@ abstract class CheckoutRepository {
   /// booking and returns the payment URL / deeplink.
   Future<MoMoPaymentResult> createMoMoPayment(String bookingId);
 
+  /// Confirms a signed MoMo return payload received
+  /// from the app deeplink.
+  Future<void> confirmMoMoReturn({
+    required String bookingId,
+    required Map<String, String> returnParams,
+  });
+
   /// Requests a MoMo refund for a completed payment.
   Future<void> refundMoMoPayment({
     required String bookingId,

@@ -1,3 +1,5 @@
+import { IsNumber, IsOptional, IsString } from 'class-validator';
+
 /**
  * DTO cho Instant Payment Notification (IPN)
  * — callback server-to-server từ MoMo.
@@ -39,21 +41,33 @@ export class MoMoIPNDto {
   // ─── Required fields (signature) ───────────
 
   /** Mã đối tác MoMo */
+  @IsOptional()
+  @IsString()
   partnerCode: string;
 
   /** Mã đơn hàng (được gửi trong payment request) */
+  @IsOptional()
+  @IsString()
   orderId: string;
 
   /** ID request gốc */
+  @IsOptional()
+  @IsString()
   requestId: string;
 
   /** Số tiền đã thanh toán (VND) */
+  @IsOptional()
+  @IsNumber()
   amount: number;
 
   /** Thông tin đơn hàng (đã gửi trong request) */
+  @IsOptional()
+  @IsString()
   orderInfo: string;
 
   /** Loại đơn hàng (MoMo tự gán) */
+  @IsOptional()
+  @IsString()
   orderType: string;
 
   /**
@@ -62,6 +76,8 @@ export class MoMoIPNDto {
    * → LƯU vào Payment.gatewayTransId.
    * → Cần cho hoàn tiền (refund) sau này.
    */
+  @IsOptional()
+  @IsNumber()
   transId: number;
 
   /**
@@ -71,40 +87,63 @@ export class MoMoIPNDto {
    * - `1005` = URL hết hạn
    * - Xem thêm: MoMo Result Code docs
    */
+  @IsOptional()
+  @IsNumber()
   resultCode: number;
 
   /** Mô tả kết quả */
+  @IsOptional()
+  @IsString()
   message: string;
 
   /** Timestamp phản hồi (epoch ms) */
+  @IsOptional()
+  @IsNumber()
   responseTime: number;
 
   /** Phương thức thanh toán (vd: `qr`, `napas`) */
+  @IsOptional()
+  @IsString()
   payType: string;
 
   /** Dữ liệu bổ sung (base64, thường rỗng) */
+  @IsOptional()
+  @IsString()
   extraData: string;
 
   /** Chữ ký HMAC-SHA256 — backend PHẢI verify */
+  @IsOptional()
+  @IsString()
   signature: string;
 
   // ─── Optional fields ───────────────────────
 
   /** ID user MoMo (nếu MoMo cung cấp) */
+  @IsOptional()
+  @IsString()
   partnerUserId?: string;
 
   /** ID cửa hàng (nếu có multi-store) */
+  @IsOptional()
+  @IsString()
   storeId?: string;
 
   /** Mô tả kết quả bằng tiếng Việt */
+  @IsOptional()
+  @IsString()
   localMessage?: string;
 
   /** Option thanh toán chi tiết */
+  @IsOptional()
+  @IsString()
   paymentOption?: string;
 
   /** Phí user phải trả (thường = 0) */
+  @IsOptional()
+  @IsNumber()
   userFee?: number;
 
   /** Thông tin khuyến mãi (nếu có) */
+  @IsOptional()
   promotionInfo?: unknown;
 }

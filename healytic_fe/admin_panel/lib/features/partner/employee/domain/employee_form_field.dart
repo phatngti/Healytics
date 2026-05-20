@@ -8,6 +8,7 @@ enum EmployeeFormField {
   firstName('first_name'),
   lastName('last_name'),
   emailAddress('email_address'),
+  password('password'),
   phoneNumber('phone_number'),
   avatarUrl('avatar_url'),
   dateOfBirth('date_of_birth'),

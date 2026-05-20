@@ -158,6 +158,9 @@ class ApiService implements Authentication {
   // ── Cart ────────────────────────────────────────
   late CartApi cartApi;
 
+  // ── Locations ───────────────────────────────────
+  late LocationsApi locationsApi;
+
   // ── Mapbox ──────────────────────────────────────
   late MapboxApi mapboxApi;
 
@@ -243,6 +246,7 @@ class ApiService implements Authentication {
     userDevicesApi = UserDevicesApi(backend);
     userChatApi = UserChatApi(backend);
     mapboxApi = MapboxApi(backend);
+    locationsApi = LocationsApi(backend);
 
     // ── AI APIs ─────────────────────────────────────
     chatbotApi = ChatbotApi(ai);

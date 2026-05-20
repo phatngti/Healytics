@@ -8,6 +8,7 @@ import {
   IsNumber,
   IsArray,
   ValidateNested,
+  MinLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -46,6 +47,16 @@ export class CreateSpaTherapistDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
+
+  @ApiProperty({
+    example: 'Password123!',
+    description: 'Initial employee account password',
+    minLength: 8,
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
+  password: string;
 
   @ApiPropertyOptional({ example: '0923456789', description: 'Phone number' })
   @IsString()
@@ -269,6 +280,16 @@ export class CreateMassageTherapistDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
+
+  @ApiProperty({
+    example: 'Password123!',
+    description: 'Initial employee account password',
+    minLength: 8,
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
+  password: string;
 
   @ApiPropertyOptional({ example: '0945678901', description: 'Phone number' })
   @IsString()

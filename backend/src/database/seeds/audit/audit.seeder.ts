@@ -128,6 +128,7 @@ export class AuditSeeder implements ISeeder {
     const actors = await this.accountRepo.find({
       where: { email: In(actorEmails) },
       select: ['id', 'email'],
+      loadEagerRelations: false,
     });
     const actorMap = new Map(
       actors.map((account) => [account.email, account.id]),

@@ -54,10 +54,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       return;
     }
 
-    final timeLabel = DateFormat('hh:mm a')
-        .format(item.slotTime!);
+    final timeLabel = DateFormat('hh:mm a').format(item.slotTime!);
 
     final params = BookingParams(
+      cartItemId: item.id,
       serviceId: item.serviceId,
       serviceName: item.serviceName,
       serviceImageUrl: item.serviceImageUrl,
@@ -71,9 +71,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       selectedTimeSlot: timeLabel,
     );
 
-    ref
-        .read(bookingParamsProvider.notifier)
-        .set(params);
+    ref.read(bookingParamsProvider.notifier).set(params);
     const CheckoutRoute().push(context);
   }
 
@@ -113,11 +111,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             filteredItems: _filteredItems(cartState.items),
             couponLoadingId: _couponLoadingId,
             onToggleSelection: (id) =>
-                ref.read(cartProvider.notifier)
-                    .toggleItemSelection(id),
-            onDelete: (id) =>
-                ref.read(cartProvider.notifier)
-                    .removeItem(id),
+                ref.read(cartProvider.notifier).toggleItemSelection(id),
+            onDelete: (id) => ref.read(cartProvider.notifier).removeItem(id),
             onApplyCoupon: (id, code) async {
               setState(() {
                 _couponLoadingId = id;
@@ -211,9 +206,7 @@ class _CartBody extends ConsumerWidget {
         itemBuilder: (context, index) {
           // Header row at index 0
           if (index == 0) {
-            return CartHeader(
-              itemCount: cartState.itemCount,
-            );
+            return CartHeader(itemCount: cartState.itemCount);
           }
 
           final itemIndex = index - 1;
@@ -230,44 +223,28 @@ class _CartBody extends ConsumerWidget {
 
           // Dim non-selected items when a
           // selection exists.
-          final hasSelection =
-              cartState.hasSelection;
-          final isDimmed =
-              hasSelection && !isSelected;
+          final hasSelection = cartState.hasSelection;
+          final isDimmed = hasSelection && !isSelected;
 
           return Padding(
-            padding: EdgeInsets.only(
-              bottom: AppDimens.spaceLg,
-            ),
+            padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
             child: _DimmedCartItem(
               isDimmed: isDimmed,
               child: Dismissible(
                 key: ValueKey(item.id),
-                direction:
-                    DismissDirection.endToStart,
-                onDismissed: (_) =>
-                    onDelete(item.id),
+                direction: DismissDirection.endToStart,
+                onDismissed: (_) => onDelete(item.id),
                 background: _SwipeBackground(),
                 child: CartItemCard(
                   item: item,
                   isSelected: isSelected,
-                  onToggleSelection: () =>
-                      onToggleSelection(item.id),
-                  onDelete: () =>
-                      onDelete(item.id),
-                  onApplyCoupon: (code) =>
-                      onApplyCoupon(
-                    item.id,
-                    code,
-                  ),
-                  onRemoveCoupon: () =>
-                      onRemoveCoupon(item.id),
-                  isCouponLoading:
-                      couponLoadingId == item.id,
-                  availableVouchers:
-                      vouchersAsync.value ?? [],
-                  isVouchersLoading:
-                      vouchersAsync.isLoading,
+                  onToggleSelection: () => onToggleSelection(item.id),
+                  onDelete: () => onDelete(item.id),
+                  onApplyCoupon: (code) => onApplyCoupon(item.id, code),
+                  onRemoveCoupon: () => onRemoveCoupon(item.id),
+                  isCouponLoading: couponLoadingId == item.id,
+                  availableVouchers: vouchersAsync.value ?? [],
+                  isVouchersLoading: vouchersAsync.isLoading,
                 ),
               ),
             ),
@@ -286,10 +263,7 @@ class _DimmedCartItem extends StatelessWidget {
   final bool isDimmed;
   final Widget child;
 
-  const _DimmedCartItem({
-    required this.isDimmed,
-    required this.child,
-  });
+  const _DimmedCartItem({required this.isDimmed, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -307,10 +281,8 @@ class _DimmedCartItem extends StatelessWidget {
               child: IgnorePointer(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: colorScheme.surface
-                        .withValues(alpha: 0.3),
-                    borderRadius:
-                        AppDimens.radiusMediumSmall,
+                    color: colorScheme.surface.withValues(alpha: 0.3),
+                    borderRadius: AppDimens.radiusMediumSmall,
                   ),
                 ),
               ),

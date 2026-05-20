@@ -2,6 +2,12 @@ import 'dart:async';
 
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:user_app/core/config/notification_config.dart';
+import 'package:user_app/core/entities/store.entity.dart';
+import 'package:user_app/core/models/store.model.dart';
+import 'package:user_app/core/providers/auth_session.provider.dart';
+import 'package:user_app/core/providers/ws.provider.dart';
+import 'package:user_app/core/services/ws/ws_client.dart';
 import 'package:user_app/features/notifications/'
     'data/datasources/remote/'
     'notification_remote_datasource.dart';
@@ -154,6 +160,19 @@ class NotificationNotifier extends _$NotificationNotifier {
 
     ref.invalidate(unreadCountProvider);
   }
+
+  /// Merge a real-time notification pushed by the backend WS gateway.
+  void addIncoming(NotificationEntity notification) {
+    final index = _all.indexWhere((item) => item.id == notification.id);
+    if (index == -1) {
+      _all.insert(0, notification);
+    } else {
+      _all[index] = notification;
+    }
+
+    _all.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    state = AsyncData(List.unmodifiable(_all));
+  }
 }
 
 // ─── Unread Count (Badge) ──────────────────────────
@@ -193,4 +212,126 @@ class UnreadCount extends _$UnreadCount {
   void reset() {
     state = const AsyncData(0);
   }
+}
+
+// ─── Real-time Notification Events ─────────────────
+
+/// Keeps the backend `/notifications` Socket.IO namespace connected for
+/// authenticated real-backend environments.
+@Riverpod(keepAlive: true)
+Stream<WsConnectionStatus> notificationWsConnection(Ref ref) {
+  final config = NotificationConfig.fromStore();
+  if (!config.inAppEnabled || !config.webSocketEnabled) {
+    return Stream.value(WsConnectionStatus.disconnected);
+  }
+
+  final authSessionStore = ref.read(authSessionStoreProvider);
+  final wsService = ref.read(wsServiceProvider);
+  String previousToken = '';
+
+  void syncWithToken(String? token) {
+    final currentToken = (token ?? '').trim();
+    if (currentToken.isEmpty) {
+      if (wsService.notifications.status != WsConnectionStatus.disconnected) {
+        _log.info('Disconnecting /notifications WS because token is empty');
+        wsService.notifications.disconnect();
+      }
+      previousToken = '';
+      return;
+    }
+
+    final shouldReconnect =
+        previousToken.isNotEmpty && previousToken != currentToken;
+    previousToken = currentToken;
+
+    if (shouldReconnect) {
+      _log.info('Reconnecting /notifications WS after token change');
+      wsService.reconnectNotifications();
+      return;
+    }
+
+    _log.info('Connecting /notifications WS namespace');
+    wsService.connectNotifications();
+  }
+
+  final tokenStream = authSessionStore.watchAccessToken();
+  syncWithToken(Store.tryGet(StoreKey.accessToken));
+  final tokenSub = tokenStream.listen(syncWithToken);
+
+  ref.onDispose(() {
+    tokenSub.cancel();
+    _log.info('Disposed /notifications WS connection');
+  });
+
+  return wsService.notifications.onConnectionChange;
+}
+
+/// Emits notification entities as they arrive from the backend in real time.
+///
+/// Side effects stay here so all global listeners share one subscription:
+/// - insert/update the in-memory notification list
+/// - update the unread badge when the backend sends `unread_count`
+@Riverpod(keepAlive: true)
+Stream<NotificationEntity> latestNotificationEvent(Ref ref) {
+  final config = NotificationConfig.fromStore();
+  if (!config.inAppEnabled || !config.webSocketEnabled) {
+    return const Stream.empty();
+  }
+
+  ref.watch(notificationWsConnectionProvider);
+  final wsService = ref.read(wsServiceProvider);
+  final controller = StreamController<NotificationEntity>.broadcast();
+
+  final notificationSub = wsService.notifications.onNewNotification.listen((
+    event,
+  ) {
+    final notification = _mapWsNotification(event);
+    ref.read(notificationProvider.notifier).addIncoming(notification);
+    controller.add(notification);
+  });
+
+  final countSub = wsService.notifications.onUnreadCount.listen((event) {
+    ref.read(unreadCountProvider.notifier).setCount(event.count.toInt());
+  });
+
+  ref.onDispose(() {
+    notificationSub.cancel();
+    countSub.cancel();
+    controller.close();
+  });
+
+  return controller.stream;
+}
+
+NotificationEntity _mapWsNotification(WsNewNotificationEvent event) {
+  return NotificationEntity(
+    id: event.id,
+    type: _mapWsNotificationType(event.type),
+    title: event.title,
+    body: event.body,
+    data: event.data,
+    isRead: event.isRead,
+    isBroadcast: event.isBroadcast,
+    createdAt: event.createdAt,
+    readAt: event.readAt,
+  );
+}
+
+NotificationType _mapWsNotificationType(WsNotificationType type) {
+  return switch (type) {
+    WsNotificationType.bookingConfirmed => NotificationType.bookingConfirmed,
+    WsNotificationType.bookingCancelled => NotificationType.bookingCancelled,
+    WsNotificationType.bookingCompleted => NotificationType.bookingCompleted,
+    WsNotificationType.appointmentReminder =>
+      NotificationType.appointmentReminder,
+    WsNotificationType.appointmentUpdated =>
+      NotificationType.appointmentUpdated,
+    WsNotificationType.newChatMessage => NotificationType.newChatMessage,
+    WsNotificationType.paymentSuccess => NotificationType.paymentSuccess,
+    WsNotificationType.paymentFailed => NotificationType.paymentFailed,
+    WsNotificationType.systemBroadcast => NotificationType.systemBroadcast,
+    WsNotificationType.systemMaintenance => NotificationType.systemMaintenance,
+    WsNotificationType.partnerVerified => NotificationType.partnerVerified,
+    WsNotificationType.partnerRejected => NotificationType.partnerRejected,
+  };
 }

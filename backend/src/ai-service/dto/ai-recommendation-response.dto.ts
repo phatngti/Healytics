@@ -56,9 +56,11 @@ export class AiRecommendationItemDto {
    */
   static fromEntity(
     product: Product,
-    partner?: Partner | null,
+    fallbackPartner?: Partner | null,
+    ratingAvg?: number,
   ): AiRecommendationItemDto {
     const dto = new AiRecommendationItemDto();
+    const partner = product.partner ?? fallbackPartner ?? null;
 
     dto.service_id = product.id;
     dto.name = product.name;
@@ -81,8 +83,9 @@ export class AiRecommendationItemDto {
     const price = product.salePrice ?? product.basePrice;
     dto.price = new Intl.NumberFormat('vi-VN').format(Number(price));
 
-    // Average rating — defaults to 0 until computed from TreatmentReview aggregate
-    dto.rating = '0';
+    // Average rating — pre-computed from TreatmentReview aggregate
+    const avg = ratingAvg ?? 0;
+    dto.rating = (Math.round(avg * 10) / 10).toString();
 
     // Vendor name: prefer product-level, fall back to partner brand
     dto.vendorName = product.vendorName ?? partner?.brandName ?? '';
@@ -110,9 +113,16 @@ export class AiRecommendationItemDto {
 
   static fromEntities(
     products: Product[],
-    partner?: Partner | null,
+    fallbackPartner?: Partner | null,
+    ratingsMap?: Map<string, { rating: number; count: number }>,
   ): AiRecommendationItemDto[] {
-    return products.map((p) => AiRecommendationItemDto.fromEntity(p, partner));
+    return products.map((p) =>
+      AiRecommendationItemDto.fromEntity(
+        p,
+        fallbackPartner,
+        ratingsMap?.get(p.id)?.rating,
+      ),
+    );
   }
 }
 
@@ -127,12 +137,14 @@ export class AiRecommendationsResponseDto {
 
   static create(
     products: Product[],
-    partner?: Partner | null,
+    fallbackPartner?: Partner | null,
+    ratingsMap?: Map<string, { rating: number; count: number }>,
   ): AiRecommendationsResponseDto {
     const dto = new AiRecommendationsResponseDto();
     dto.recommendations = AiRecommendationItemDto.fromEntities(
       products,
-      partner,
+      fallbackPartner,
+      ratingsMap,
     );
     dto.total = dto.recommendations.length;
     return dto;

@@ -18,4 +18,11 @@ abstract class RegisterRepository {
   Future<void> clearPartialData();
 
   Future<void> completeSurvey(Map<String, dynamic> jsonSurveys);
+
+  /// Completes the authenticated user's profile.
+  ///
+  /// Returns a fresh [AuthTokensEntity] when the backend issues new tokens
+  /// in the success body. Returns `null` when no tokens are present so the
+  /// caller can fall back to `/v1/auth/refresh`.
+  Future<AuthTokensEntity?> completeProfile(UserEntity profile);
 }

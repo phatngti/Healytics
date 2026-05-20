@@ -758,7 +758,10 @@ export class PartnerFinanceSeeder implements ISeeder {
 
     const userIds = [...new Set(bookings.map((booking) => booking.userId))];
     const profiles = userIds.length
-      ? await this.userProfileRepo.find({ where: { accountId: In(userIds) } })
+      ? await this.userProfileRepo.find({
+          where: { accountId: In(userIds) },
+          loadEagerRelations: false,
+        })
       : [];
 
     return {
@@ -952,6 +955,7 @@ export class PartnerFinanceSeeder implements ISeeder {
       ? await this.accountRepo.find({
           where: { id: In(accountIds) },
           select: ['id', 'email'],
+          loadEagerRelations: false,
         })
       : [];
     const accountIdSet = new Set(accounts.map((account) => account.id));

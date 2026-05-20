@@ -55,4 +55,4 @@ final class RevenueRemoteDatasourceProvider
 }
 
 String _$revenueRemoteDatasourceHash() =>
-    r'e31fe2f5ddeeaf0f3c1efec03b550ce25e0f738c';
+    r'bab3c7e8d1301c6a0840ee7bf39d5f20d76aa565';

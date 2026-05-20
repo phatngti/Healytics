@@ -26,14 +26,56 @@ class InventoryAlertsWidget extends StatelessWidget {
           if (alerts.isEmpty)
             const _InventoryEmptyState()
           else
-            ...alerts.map(
-              (a) => Padding(
-                padding: AppDimens.spaceMd.paddingBottom,
-                child: _AlertItem(alert: a),
-              ),
-            ),
+            _InventoryAlertGrid(alerts: alerts),
         ],
       ),
+    );
+  }
+}
+
+class _InventoryAlertGrid extends StatelessWidget {
+  const _InventoryAlertGrid({required this.alerts});
+
+  final List<InventoryAlert> alerts;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isGrid =
+            constraints.maxWidth >= DashboardLayout.inventoryGridBreakpoint;
+
+        if (!isGrid) {
+          return Column(
+            children: [
+              for (final alert in alerts)
+                Padding(
+                  padding: AppDimens.spaceMd.paddingBottom,
+                  child: _AlertItem(alert: alert),
+                ),
+            ],
+          );
+        }
+
+        final columns =
+            constraints.maxWidth >= DashboardLayout.inventoryGridWideBreakpoint
+            ? 3
+            : 2;
+        final totalSpacing = AppDimens.spaceMd * (columns - 1);
+        final itemWidth = (constraints.maxWidth - totalSpacing) / columns;
+
+        return Wrap(
+          spacing: AppDimens.spaceMd,
+          runSpacing: AppDimens.spaceMd,
+          children: [
+            for (final alert in alerts)
+              SizedBox(
+                width: itemWidth,
+                child: _AlertItem(alert: alert),
+              ),
+          ],
+        );
+      },
     );
   }
 }

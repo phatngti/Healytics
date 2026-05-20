@@ -108,6 +108,7 @@ class ClinicHeroSection extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Icon(
                                   Icons.location_on,
@@ -118,8 +119,7 @@ class ClinicHeroSection extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     address,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: true,
                                     style: textTheme.labelSmall?.copyWith(
                                       color: colorScheme.onSurfaceVariant,
                                     ),

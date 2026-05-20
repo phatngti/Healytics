@@ -12,83 +12,119 @@ import '../widgets/revenue/revenue_trend_chart.widget.dart';
 
 /// Revenue dashboard screen displaying KPIs, trend
 /// chart, and service breakdown for the selected period.
-class RevenueScreen extends ConsumerWidget {
+class RevenueScreen extends StatelessWidget {
   const RevenueScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final revenueAsync = ref.watch(revenueProvider);
-
-    return Scaffold(
-      body: SafeArea(
-        child: revenueAsync.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(),
-          ),
-          error: (e, _) => Center(
-            child: Text('Error: $e'),
-          ),
-          data: (data) => _RevenueBody(data: data),
-        ),
-      ),
-    );
+  Widget build(BuildContext context) {
+    return Scaffold(body: SafeArea(child: _RevenueBody()));
   }
 }
 
 /// Composition shell: scrollable content with all
 /// revenue dashboard sections.
 class _RevenueBody extends ConsumerWidget {
-  final RevenueState data;
-  const _RevenueBody({required this.data});
+  const _RevenueBody();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier =
-        ref.read(revenueProvider.notifier);
     final tt = Theme.of(context).textTheme;
 
     return RefreshIndicator(
-      onRefresh: () async =>
-          ref.invalidate(revenueProvider),
+      onRefresh: () async => ref.refresh(revenueProvider.future),
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          20, 24, 20, 32,
-        ),
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
         children: [
           // Title
           Text(
             'Revenue',
-            style: tt.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 24),
           // Period toggle
-          RevenuePeriodToggle(
-            selected: data.period,
-            onChanged: notifier.setPeriod,
-            testKeys: {
-              RevenuePeriod.day:
-                  keys.revenuePage.dayChip,
-              RevenuePeriod.month:
-                  keys.revenuePage.monthChip,
-              RevenuePeriod.year:
-                  keys.revenuePage.yearChip,
-            },
-          ),
+          const _RevenuePeriodToggle(),
           const SizedBox(height: 16),
           // Date navigator
-          RevenueDateNavigator(
-            period: data.period,
-            selectedDate: data.selectedDate,
-            onPrevious: notifier.navigatePrevious,
-            onNext: notifier.navigateNext,
-            onToday: notifier.goToToday,
-            previousKey:
-                keys.revenuePage.previousButton,
-            nextKey: keys.revenuePage.nextButton,
-          ),
+          const _RevenueDateNavigator(),
+          const _RevenueDataSections(),
+        ],
+      ),
+    );
+  }
+}
+
+class _RevenuePeriodToggle extends ConsumerWidget {
+  const _RevenuePeriodToggle();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = ref.watch(
+      revenueFilterProvider.select((state) => state.period),
+    );
+    final notifier = ref.read(revenueFilterProvider.notifier);
+
+    return RevenuePeriodToggle(
+      selected: selected,
+      onChanged: notifier.setPeriod,
+      testKeys: {
+        RevenuePeriod.day: keys.revenuePage.dayChip,
+        RevenuePeriod.month: keys.revenuePage.monthChip,
+        RevenuePeriod.year: keys.revenuePage.yearChip,
+      },
+    );
+  }
+}
+
+class _RevenueDateNavigator extends ConsumerWidget {
+  const _RevenueDateNavigator();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final period = ref.watch(
+      revenueFilterProvider.select((state) => state.period),
+    );
+    final selectedDate = ref.watch(
+      revenueFilterProvider.select((state) => state.selectedDate),
+    );
+    final notifier = ref.read(revenueFilterProvider.notifier);
+
+    return RevenueDateNavigator(
+      period: period,
+      selectedDate: selectedDate,
+      onPrevious: notifier.navigatePrevious,
+      onNext: notifier.navigateNext,
+      onToday: notifier.goToToday,
+      previousKey: keys.revenuePage.previousButton,
+      nextKey: keys.revenuePage.nextButton,
+    );
+  }
+}
+
+class _RevenueDataSections extends ConsumerWidget {
+  const _RevenueDataSections();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final revenueAsync = ref.watch(revenueProvider);
+
+    return revenueAsync.when(
+      skipLoadingOnReload: true,
+      skipLoadingOnRefresh: true,
+      loading: () => const Padding(
+        padding: EdgeInsets.only(top: 48),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => Padding(
+        padding: const EdgeInsets.only(top: 48),
+        child: Center(child: Text('Error: $e')),
+      ),
+      data: (data) => Column(
+        children: [
           const SizedBox(height: 24),
+          if (revenueAsync.isLoading) ...[
+            const LinearProgressIndicator(minHeight: 2),
+            const SizedBox(height: 16),
+          ],
           // KPI cards
           RevenueKpiGrid(summary: data.summary),
           const SizedBox(height: 24),
@@ -96,9 +132,7 @@ class _RevenueBody extends ConsumerWidget {
           RevenueTrendChart(data: data.trendData),
           const SizedBox(height: 24),
           // Service breakdown
-          RevenueBreakdownSection(
-            items: data.breakdown,
-          ),
+          RevenueBreakdownSection(items: data.breakdown),
         ],
       ),
     );

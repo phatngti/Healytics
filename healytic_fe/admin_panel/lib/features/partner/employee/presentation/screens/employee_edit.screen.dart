@@ -55,6 +55,7 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
       EmployeeFormField.firstName.key: firstName,
       EmployeeFormField.lastName.key: lastName,
       EmployeeFormField.emailAddress.key: employee.email,
+      EmployeeFormField.password.key: '',
       EmployeeFormField.phoneNumber.key: employee.phone,
       EmployeeFormField.avatarUrl.key: employee.avatar,
       EmployeeFormField.employeeRole.key: _selectedRole.apiValue,
@@ -277,16 +278,16 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
       _strOrNull(values, EmployeeFormField.avatarUrl),
       _strOrNull(initialValues, EmployeeFormField.avatarUrl),
     );
-    addIfChanged(
-      'role',
-      _roleApiValue(values),
-      _roleApiValue(initialValues),
-    );
+    addIfChanged('role', _roleApiValue(values), _roleApiValue(initialValues));
     addIfChanged(
       'email',
       _strOrNull(values, EmployeeFormField.emailAddress),
       _strOrNull(initialValues, EmployeeFormField.emailAddress),
     );
+    final password = _strOrNull(values, EmployeeFormField.password);
+    if (password != null) {
+      fields['password'] = password;
+    }
     addIfChanged(
       'phone',
       _strOrNull(values, EmployeeFormField.phoneNumber),
@@ -494,9 +495,7 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
     addIfChanged('type', type, initialType);
     addIfChanged(
       'level',
-      _therapistLevelApiValue(
-        values[EmployeeFormField.therapistLevel.key],
-      ),
+      _therapistLevelApiValue(values[EmployeeFormField.therapistLevel.key]),
       _therapistLevelApiValue(
         initialValues[EmployeeFormField.therapistLevel.key],
       ),
@@ -532,9 +531,7 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
         ? _toStringList(values[EmployeeFormField.deviceProficiency.key])
         : const <String>[];
     final initialDeviceProficiency = initialTherapistType == TherapistType.spa
-        ? _toStringList(
-            initialValues[EmployeeFormField.deviceProficiency.key],
-          )
+        ? _toStringList(initialValues[EmployeeFormField.deviceProficiency.key])
         : const <String>[];
     if (!unorderedEq.equals(deviceProficiency, initialDeviceProficiency)) {
       profile['deviceProficiency'] = deviceProficiency;
@@ -559,10 +556,10 @@ class _EmployeeEditScreenState extends ConsumerState<EmployeeEditScreen> {
   }
 
   String? _fullName(String? firstName, String? lastName) {
-    final text = [firstName, lastName]
-        .where((part) => part != null && part.isNotEmpty)
-        .join(' ')
-        .trim();
+    final text = [
+      firstName,
+      lastName,
+    ].where((part) => part != null && part.isNotEmpty).join(' ').trim();
     return text.isEmpty ? null : text;
   }
 

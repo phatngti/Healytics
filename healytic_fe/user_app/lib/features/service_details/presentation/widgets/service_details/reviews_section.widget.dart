@@ -18,6 +18,7 @@ class ReviewsSection extends StatelessWidget {
     required this.reviews,
     required this.rating,
     required this.serviceId,
+    this.onViewMoreTap,
   });
 
   /// Reviews to display (preview only).
@@ -28,6 +29,10 @@ class ReviewsSection extends StatelessWidget {
 
   /// Service identifier passed to the reviews route.
   final String serviceId;
+
+  /// Optional override for screens that show non-service
+  /// reviews, such as specialist reviews.
+  final VoidCallback? onViewMoreTap;
 
   /// Number of review cards shown in the preview.
   static const int _previewCount = 2;
@@ -65,7 +70,9 @@ class ReviewsSection extends StatelessWidget {
           totalCount: reviews.length,
           colorScheme: colorScheme,
           textTheme: textTheme,
-          onTap: () => ReviewsRoute(serviceId: serviceId).push(context),
+          onTap:
+              onViewMoreTap ??
+              () => ReviewsRoute(serviceId: serviceId).push(context),
         ),
       ],
     );
@@ -97,7 +104,7 @@ class _SectionHeader extends StatelessWidget {
         Row(
           children: [
             Text(
-              '${rating.toStringAsFixed(1)}/5',
+              '${rating > 0 ? rating : 5.0}/5',
               style: textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),

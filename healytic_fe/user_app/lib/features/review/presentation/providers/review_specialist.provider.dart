@@ -11,6 +11,8 @@ import 'package:user_app/features/review/domain/'
 import 'package:user_app/features/review/domain/'
     'repositories/specialist_review.repository.dart';
 
+import 'review_rating_defaults.dart';
+
 part 'review_specialist.provider.freezed.dart';
 part 'review_specialist.provider.g.dart';
 
@@ -19,12 +21,8 @@ part 'review_specialist.provider.g.dart';
 /// Provides [SpecialistReviewRepository] backed by
 /// the current datasource (real or mock).
 @riverpod
-SpecialistReviewRepository specialistReviewRepository(
-  Ref ref,
-) {
-  final datasource = ref.read(
-    specialistReviewRemoteDatasourceProvider,
-  );
+SpecialistReviewRepository specialistReviewRepository(Ref ref) {
+  final datasource = ref.read(specialistReviewRemoteDatasourceProvider);
   return SpecialistReviewRepositoryImpl(datasource);
 }
 
@@ -32,11 +30,10 @@ SpecialistReviewRepository specialistReviewRepository(
 
 /// UI state for the specialist review form.
 @freezed
-abstract class ReviewSpecialistState
-    with _$ReviewSpecialistState {
+abstract class ReviewSpecialistState with _$ReviewSpecialistState {
   const factory ReviewSpecialistState({
-    /// Star rating (0 = unset, 1–5).
-    @Default(0) int rating,
+    /// Star rating (1–5).
+    @Default(defaultReviewRating) int rating,
 
     /// Optional free-text comment.
     @Default('') String comment,
@@ -60,11 +57,9 @@ abstract class ReviewSpecialistState
 /// Manages the specialist review form state and
 /// handles submission through the repository.
 @riverpod
-class ReviewSpecialistNotifier
-    extends _$ReviewSpecialistNotifier {
+class ReviewSpecialistNotifier extends _$ReviewSpecialistNotifier {
   @override
-  ReviewSpecialistState build() =>
-      const ReviewSpecialistState();
+  ReviewSpecialistState build() => const ReviewSpecialistState();
 
   /// Sets the star rating (1–5).
   void setRating(int rating) {
@@ -89,9 +84,7 @@ class ReviewSpecialistNotifier
 
   /// Toggles the "would recommend" preference.
   void toggleRecommend() {
-    state = state.copyWith(
-      wouldRecommend: !state.wouldRecommend,
-    );
+    state = state.copyWith(wouldRecommend: !state.wouldRecommend);
   }
 
   /// Submits the review via the repository.
@@ -114,17 +107,12 @@ class ReviewSpecialistNotifier
         wouldRecommend: state.wouldRecommend,
       );
 
-      final repo = ref.read(
-        specialistReviewRepositoryProvider,
-      );
+      final repo = ref.read(specialistReviewRepositoryProvider);
       await repo.submitReview(entity);
 
       if (!ref.mounted) return;
 
-      state = state.copyWith(
-        isSubmitting: false,
-        isSubmitted: true,
-      );
+      state = state.copyWith(isSubmitting: false, isSubmitted: true);
     } catch (e) {
       if (!ref.mounted) return;
       state = state.copyWith(isSubmitting: false);

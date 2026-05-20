@@ -156,11 +156,13 @@ export class AppointmentResponseDto {
   }
 
   /**
-   * Formats a Date to a 12-hour time string (e.g. '09:00 AM').
+   * Formats a Date to a Vietnam-local 12-hour time string
+   * (e.g. '09:00 AM').
    */
   private static formatTime(date: Date | null): string {
     if (!date) return '';
     return date.toLocaleTimeString('en-US', {
+      timeZone: 'Asia/Ho_Chi_Minh',
       hour: '2-digit',
       minute: '2-digit',
       hour12: true,

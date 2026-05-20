@@ -156,6 +156,11 @@ class BookingEventsSocket implements WsNamespaceSocket {
       io.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
+          .enableReconnection()
+          .setReconnectionAttempts(5)
+          .setReconnectionDelay(1000)
+          .setReconnectionDelayMax(10000)
+          .setTimeout(10000)
           .setPath(server.path)
           .setAuth({'token': token})
           .build(),
@@ -177,12 +182,12 @@ class BookingEventsSocket implements WsNamespaceSocket {
     });
 
     _socket!.onConnectError((err) {
-      _log.severe('Connection error: $err');
+      _log.warning('Connection error: $err');
       _updateStatus(WsConnectionStatus.error);
     });
 
     _socket!.onError((err) {
-      _log.severe('Socket error: $err');
+      _log.warning('Socket error: $err');
     });
 
     // ── Server → Client event listeners ─────────────
@@ -319,6 +324,11 @@ class UserChatSocket implements WsNamespaceSocket {
       io.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
+          .enableReconnection()
+          .setReconnectionAttempts(5)
+          .setReconnectionDelay(1000)
+          .setReconnectionDelayMax(10000)
+          .setTimeout(10000)
           .setPath(server.path)
           .setAuth({'token': token})
           .build(),
@@ -340,12 +350,12 @@ class UserChatSocket implements WsNamespaceSocket {
     });
 
     _socket!.onConnectError((err) {
-      _log.severe('Connection error: $err');
+      _log.warning('Connection error: $err');
       _updateStatus(WsConnectionStatus.error);
     });
 
     _socket!.onError((err) {
-      _log.severe('Socket error: $err');
+      _log.warning('Socket error: $err');
     });
 
     // ── Server → Client event listeners ─────────────
@@ -541,6 +551,11 @@ class ChatNotificationsSocket implements WsNamespaceSocket {
       io.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
+          .enableReconnection()
+          .setReconnectionAttempts(5)
+          .setReconnectionDelay(1000)
+          .setReconnectionDelayMax(10000)
+          .setTimeout(10000)
           .setPath(server.path)
           .setAuth({'token': token})
           .build(),
@@ -562,12 +577,12 @@ class ChatNotificationsSocket implements WsNamespaceSocket {
     });
 
     _socket!.onConnectError((err) {
-      _log.severe('Connection error: $err');
+      _log.warning('Connection error: $err');
       _updateStatus(WsConnectionStatus.error);
     });
 
     _socket!.onError((err) {
-      _log.severe('Socket error: $err');
+      _log.warning('Socket error: $err');
     });
 
     // ── Server → Client event listeners ─────────────
@@ -601,6 +616,175 @@ class ChatNotificationsSocket implements WsNamespaceSocket {
   void dispose() {
     disconnect();
     _newMessageNotificationController.close();
+    _connectionController.close();
+  }
+
+  void _updateStatus(WsConnectionStatus newStatus) {
+    _status = newStatus;
+    _connectionController.add(newStatus);
+  }
+}
+
+/// Typed Socket.IO client for the `/notifications` namespace.
+///
+/// Real-time notification delivery gateway
+///
+/// **Auth:** JWT — roles: user
+///
+/// Usage:
+/// ```dart
+/// final socket = NotificationsSocket();
+/// socket.connect(
+///   server: (url: gateway, path: '/notifications/socket.io/'),
+///   token: token,
+/// );
+/// socket.onNewNotification.listen((event) => print(event));
+/// ```
+class NotificationsSocket implements WsNamespaceSocket {
+  static final _log = Logger('NotificationsSocket');
+
+  io.Socket? _socket;
+
+  final _newNotificationController =
+      StreamController<WsNewNotificationEvent>.broadcast();
+  final _unreadCountController =
+      StreamController<WsUnreadCountEvent>.broadcast();
+  final _broadcastSentController =
+      StreamController<WsBroadcastSentEvent>.broadcast();
+  final _connectionController =
+      StreamController<WsConnectionStatus>.broadcast();
+
+  /// A new notification was pushed to the user
+  Stream<WsNewNotificationEvent> get onNewNotification =>
+      _newNotificationController.stream;
+
+  /// The unread notification count changed (after new notification or mark-read)
+  Stream<WsUnreadCountEvent> get onUnreadCount =>
+      _unreadCountController.stream;
+
+  /// A system-wide broadcast was sent (admin-facing)
+  Stream<WsBroadcastSentEvent> get onBroadcastSent =>
+      _broadcastSentController.stream;
+
+  /// Stream of connection state changes.
+  @override
+  Stream<WsConnectionStatus> get onConnectionChange =>
+      _connectionController.stream;
+
+  /// Current connection status.
+  WsConnectionStatus _status = WsConnectionStatus.disconnected;
+  @override
+  WsConnectionStatus get status => _status;
+
+  /// Connect to the `/notifications` WebSocket namespace.
+  ///
+  /// [server] provides the base URL and Socket.IO
+  /// transport path.
+  /// [token] is the JWT access token.
+  @override
+  void connect({
+    required WsServerConfig server,
+    required String token,
+  }) {
+    _silenceSocketIoLoggers();
+
+    if (_socket != null) {
+      _log.info('Already connected, disconnecting first');
+      disconnect();
+    }
+
+    _updateStatus(WsConnectionStatus.connecting);
+
+    _socket = io.io(
+      server.url,
+      io.OptionBuilder()
+          .setTransports(['websocket'])
+          .disableAutoConnect()
+          .enableReconnection()
+          .setReconnectionAttempts(5)
+          .setReconnectionDelay(1000)
+          .setReconnectionDelayMax(10000)
+          .setTimeout(10000)
+          .setPath(server.path)
+          .setAuth({'token': token})
+          .build(),
+    );
+
+    _socket!.onConnect((_) {
+      _log.info('Connected to /notifications');
+      _updateStatus(WsConnectionStatus.connected);
+    });
+
+    _socket!.onDisconnect((_) {
+      _log.info('Disconnected from /notifications');
+      _updateStatus(WsConnectionStatus.disconnected);
+    });
+
+    _socket!.on('reconnecting', (_) {
+      _log.info('Reconnecting to /notifications');
+      _updateStatus(WsConnectionStatus.reconnecting);
+    });
+
+    _socket!.onConnectError((err) {
+      _log.warning('Connection error: $err');
+      _updateStatus(WsConnectionStatus.error);
+    });
+
+    _socket!.onError((err) {
+      _log.warning('Socket error: $err');
+    });
+
+    // ── Server → Client event listeners ─────────────
+
+    _socket!.on(WsNotificationsEvent.newNotification, (data) {
+      try {
+        final map = _requireEventMap(data, 'notifications.new_notification');
+        _newNotificationController.add(WsNewNotificationEvent.fromJson(map));
+      } catch (e, st) {
+        _log.severe('Error parsing new_notification', e, st);
+      }
+    });
+
+    _socket!.on(WsNotificationsEvent.unreadCount, (data) {
+      try {
+        final map = _requireEventMap(data, 'notifications.unread_count');
+        _unreadCountController.add(WsUnreadCountEvent.fromJson(map));
+      } catch (e, st) {
+        _log.severe('Error parsing unread_count', e, st);
+      }
+    });
+
+    _socket!.on(WsNotificationsEvent.broadcastSent, (data) {
+      try {
+        final map = _requireEventMap(data, 'notifications.broadcast_sent');
+        _broadcastSentController.add(WsBroadcastSentEvent.fromJson(map));
+      } catch (e, st) {
+        _log.severe('Error parsing broadcast_sent', e, st);
+      }
+    });
+
+    _socket!.connect();
+  }
+
+  // ── Client → Server emitters ──────────────────────
+
+  /// Disconnect from the WebSocket server.
+  @override
+  void disconnect() {
+    _socket?.disconnect();
+    _socket?.dispose();
+    _socket = null;
+    _updateStatus(WsConnectionStatus.disconnected);
+  }
+
+  /// Clean up all resources. Call when the service
+  /// is permanently disposed.
+  @override
+  void dispose() {
+    disconnect();
+    _newNotificationController.close();
+    _unreadCountController.close();
+    _broadcastSentController.close();
     _connectionController.close();
   }
 

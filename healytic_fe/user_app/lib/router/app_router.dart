@@ -2,6 +2,7 @@ import 'package:logging/logging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:user_app/core/providers/auth_session.provider.dart';
+import 'package:user_app/features/authenticate/presentation/providers/google_sign_in_just_completed.provider.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -39,9 +40,31 @@ class RouterListenable extends _$RouterListenable implements Listenable {
   }
 
   String? redirect(BuildContext context, GoRouterState state) {
+    final uri = state.uri;
+    final path = uri.path;
+
+    // Deep links handled by app_links (e.g. MoMo
+    // payment return) — do not let GoRouter navigate.
+    if (_isPaymentReturnUri(uri)) {
+      _log.info('Ignoring payment return deep link: $uri');
+      return '/checkout';
+    }
+
     final authSessionStore = ref.watch(authSessionStoreProvider);
     final isLoggedIn = authSessionStore.isLoggedIn;
-    final path = state.uri.path;
+
+    // Req 5.12: /finish_google_sign_up is reachable only when the user has
+    // an authenticated session AND has just completed a Google sign-in in
+    // the current session. Otherwise redirect them to /signin so the screen
+    // is never rendered for users who haven't gone through the picker.
+    if (path == FinishGoogleSignUpRoute.pathPattern) {
+      final justCompletedGoogle =
+          ref.read(googleSignInJustCompletedProvider);
+      if (!(isLoggedIn && justCompletedGoogle)) {
+        return SignInRoute.pathPattern;
+      }
+      return null; // Permitted; bypass the rest of the redirect logic.
+    }
 
     final isPublicRoute =
         (LottieSplashRoute.isPublic && path == LottieSplashRoute.pathPattern) ||
@@ -69,7 +92,7 @@ class RouterListenable extends _$RouterListenable implements Listenable {
 
     if (isLoggedIn) {
       _log.info('Logged In Route requested: $path');
-      if (isPublicRoute) {
+      if (isPublicRoute && !_isSurveyRoute(path)) {
         return '/home';
       }
     } else {
@@ -97,4 +120,19 @@ class RouterListenable extends _$RouterListenable implements Listenable {
   void removeListener(VoidCallback listener) {
     _listeners.remove(listener);
   }
+}
+
+bool _isSurveyRoute(String path) {
+  return path == SurveyScreenRoute.pathPattern ||
+      path == GeneralGoalsStepRoute.pathPattern ||
+      path == LifestyleActivityStepRoute.pathPattern ||
+      path == BodyEnergyStepRoute.pathPattern ||
+      path == HealthSafetyStepRoute.pathPattern;
+}
+
+bool _isPaymentReturnUri(Uri uri) {
+  return (uri.scheme == 'healytics' &&
+          uri.host == 'payment' &&
+          uri.path == '/momo/success') ||
+      uri.path.startsWith('/payment/');
 }
