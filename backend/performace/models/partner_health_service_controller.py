@@ -84,9 +84,9 @@ class CreatePartnerHealthServiceDefinitionDto(DtoModel):
 @dataclass(slots=True)
 class CreatePartnerHealthServiceDto(DtoModel):
     name: str
-    slug: str
     type: HealthServiceType
     categoryId: str | None = None
+    slug: str | None = None
     description: str | None = None
     basePrice: float | None = None
     salePrice: float | None = None
@@ -94,6 +94,7 @@ class CreatePartnerHealthServiceDto(DtoModel):
     status: str | None = None
     isVisibleOnline: bool | None = None
     employeeIds: list[str] | None = None
+    tagIds: list[str] | None = None
     media: list[CreatePartnerHealthServiceMediaDto] | None = None
     productDefinition: CreatePartnerHealthServiceDefinitionDto | None = None
     facilityImages: list[CreatePartnerHealthServiceFacilityImageDto] | None = None
@@ -272,6 +273,8 @@ class PartnerHealthServiceResponseDto(DtoModel):
     productDefinition: PartnerHealthServiceDefinitionDto | None = None
     productEmployeeEligibilities: list[PartnerHealthServiceEmployeeEligibilityDto] | None = None
     serviceManual: PartnerServiceManualDto | None = None
+    productTags: list[PartnerProductTagDto] | None = None
+    tagIds: list[str] | None = None
 
 
 @dataclass(slots=True)
@@ -279,6 +282,20 @@ class PartnerProcedureStepDto(DtoModel):
     stepNumber: float
     title: str
     description: str
+
+
+@dataclass(slots=True)
+class PartnerProductTagDetailDto(DtoModel):
+    id: str
+    name: str
+    colorValue: str
+    description: str | None = None
+
+
+@dataclass(slots=True)
+class PartnerProductTagDto(DtoModel):
+    tagId: str
+    tag: PartnerProductTagDetailDto | None = None
 
 
 @dataclass(slots=True)
@@ -359,6 +376,15 @@ class ServiceRuleInputDto(DtoModel):
 
 
 @dataclass(slots=True)
+class UpdatePartnerHealthServiceDefinitionDto(DtoModel):
+    durationMinutes: float | None = None
+    bufferMinutes: float | None = None
+    maxCapacity: float | None = None
+    minLeadTimeHours: float | None = None
+    staffAssignmentType: str | None = None
+
+
+@dataclass(slots=True)
 class UpdatePartnerHealthServiceDto(DtoModel):
     categoryId: str | None = None
     description: str | None = None
@@ -371,8 +397,9 @@ class UpdatePartnerHealthServiceDto(DtoModel):
     status: str | None = None
     isVisibleOnline: bool | None = None
     employeeIds: list[str] | None = None
+    tagIds: list[str] | None = None
     media: list[CreatePartnerHealthServiceMediaDto] | None = None
-    productDefinition: CreatePartnerHealthServiceDefinitionDto | None = None
+    productDefinition: UpdatePartnerHealthServiceDefinitionDto | None = None
     facilityImages: list[CreatePartnerHealthServiceFacilityImageDto] | None = None
     serviceManual: ServiceManualInputDto | None = None
 
@@ -409,6 +436,8 @@ __all__ = [
     "PartnerHealthServiceMediaDto",
     "PartnerHealthServiceResponseDto",
     "PartnerProcedureStepDto",
+    "PartnerProductTagDetailDto",
+    "PartnerProductTagDto",
     "PartnerRecommendedServiceDto",
     "PartnerReviewDto",
     "PartnerServiceManualDto",
@@ -418,6 +447,7 @@ __all__ = [
     "ProcedureStepInputDto",
     "ServiceManualInputDto",
     "ServiceRuleInputDto",
+    "UpdatePartnerHealthServiceDefinitionDto",
     "UpdatePartnerHealthServiceDto",
     "PartnerHealthServiceControllerFindAllResponseDto",
 ]

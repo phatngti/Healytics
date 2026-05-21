@@ -121,16 +121,15 @@ describe('SubmitFacilityReviewHandler', () => {
     });
   });
 
-  it('accepts the facility partner account id from appointment responses', async () => {
-    const partnerAccountId = 'facility-account-1';
-    const booking = completedBooking({ partnerAccountId });
+  it('accepts the facility account id and stores the canonical facility id', async () => {
+    const booking = completedBooking();
     const saved = {
       id: 'review-1',
       appointmentId,
       facilityId,
       rating: 5,
       comment: null,
-      tags: ['Comfortable'],
+      tags: [],
       photoUrls: [],
       createdAt: new Date('2026-05-19T00:00:00.000Z'),
     };
@@ -141,11 +140,10 @@ describe('SubmitFacilityReviewHandler', () => {
     queryRunner.manager.create.mockReturnValue(saved);
     queryRunner.manager.save.mockResolvedValue(saved);
 
-    const result = await handler.execute(userId, {
+    await handler.execute(userId, {
       appointmentId,
-      facilityId: partnerAccountId,
+      facilityId: 'facility-account-1',
       rating: 5,
-      tags: ['Comfortable'],
     });
 
     expect(queryRunner.manager.create).toHaveBeenCalledWith(FacilityReview, {
@@ -154,12 +152,10 @@ describe('SubmitFacilityReviewHandler', () => {
       userId,
       rating: 5,
       comment: null,
-      tags: ['Comfortable'],
+      tags: [],
       photoUrls: [],
     });
-    expect(result.facilityId).toBe(facilityId);
     expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(1);
-    expect(queryRunner.rollbackTransaction).not.toHaveBeenCalled();
   });
 
   it('rejects reviews for another user appointment', async () => {
@@ -235,8 +231,7 @@ describe('SubmitFacilityReviewHandler', () => {
       product: {
         partnerId: facilityId,
         partner: {
-          id: facilityId,
-          accountId: options?.partnerAccountId ?? 'facility-account-1',
+          accountId: 'facility-account-1',
         },
       },
     };

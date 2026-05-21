@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 
 class ReviewBottomAction extends StatelessWidget {
   /// Button label text.
@@ -38,12 +39,12 @@ class ReviewBottomAction extends StatelessWidget {
             left: AppDimens.spaceXxl,
             right: AppDimens.spaceXxl,
             top: AppDimens.spaceXxl,
-            bottom: MediaQuery.of(context).padding.bottom +
-                AppDimens.spaceXxl,
+            bottom: MediaQuery.of(context).padding.bottom + AppDimens.spaceXxl,
           ),
           child: SizedBox(
             width: double.infinity,
             child: FilledButton(
+              key: keys.reviewPage.submitButton,
               onPressed: isLoading ? null : onPressed,
               style: FilledButton.styleFrom(
                 backgroundColor: colors.primary,
@@ -52,11 +53,9 @@ class ReviewBottomAction extends StatelessWidget {
                   vertical: AppDimens.spaceLg,
                 ),
                 elevation: 10,
-                shadowColor: colors.shadow
-                    .withValues(alpha: 0.1),
+                shadowColor: colors.shadow.withValues(alpha: 0.1),
                 shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      AppDimens.radiusMediumLarge,
+                  borderRadius: AppDimens.radiusMediumLarge,
                 ),
               ),
               child: isLoading
@@ -69,15 +68,12 @@ class ReviewBottomAction extends StatelessWidget {
                       ),
                     )
                   : Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           label,
-                          style: theme
-                              .textTheme.titleLarge
-                              ?.copyWith(
+                          style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: colors.onPrimary,
                           ),

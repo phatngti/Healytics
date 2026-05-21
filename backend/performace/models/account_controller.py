@@ -30,6 +30,11 @@ class SurveyResponseDto(DtoModel):
 
 
 @dataclass(slots=True)
+class UpdateAvatarDto(DtoModel):
+    avatarUrl: str
+
+
+@dataclass(slots=True)
 class UserProfileDto(DtoModel):
     id: str
     profileCompleted: bool
@@ -38,11 +43,13 @@ class UserProfileDto(DtoModel):
     phone: str | None = None
     bio: dict[str, Any] | None = None
     dateOfBirth: str | None = None
+    avatarUrl: dict[str, Any] | None = None
 
 
 __all__ = [
     "AccountMeResponseDto",
     "SurveyDto",
     "SurveyResponseDto",
+    "UpdateAvatarDto",
     "UserProfileDto",
 ]

@@ -13,6 +13,7 @@ import 'voucher_picker_sheet.widget.dart';
 /// [onApply] with the selected voucher's code.
 class VoucherSelectorRow extends StatelessWidget {
   final String itemId;
+  final String? serviceName;
 
   /// Currently applied coupon code (null if none).
   final String? appliedCoupon;
@@ -35,6 +36,7 @@ class VoucherSelectorRow extends StatelessWidget {
   const VoucherSelectorRow({
     super.key,
     required this.itemId,
+    this.serviceName,
     this.appliedCoupon,
     required this.vouchers,
     this.isVouchersLoading = false,
@@ -69,6 +71,9 @@ class VoucherSelectorRow extends StatelessWidget {
         onTap: isCouponLoading ? null : () => _openPicker(context),
         borderRadius: AppDimens.radiusMediumSmall,
         child: Container(
+          key: serviceName == null
+              ? null
+              : keys.cartPage.voucherSelectorByService(serviceName!),
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimens.spaceMd,
             vertical: AppDimens.spaceSmMd,

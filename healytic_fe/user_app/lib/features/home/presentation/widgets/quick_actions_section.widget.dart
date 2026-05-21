@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/router/routes.dart';
 
 class QuickActionsSection extends StatelessWidget {
@@ -29,37 +30,36 @@ class QuickActionsSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: titleGap),
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: _QuickActionCard(
-                  icon: Symbols.calendar_add_on,
-                  iconColor: theme.colorScheme.primary,
-                  backgroundColor: theme.colorScheme.primaryContainer,
-                  title: 'Book Appointment',
-                  subtitle: 'Quick booking with AI suggestions',
-                  onTap: () {
-                    const BookAppointmentRoute().push(context);
-                  },
-                ),
+        Row(
+          children: [
+            Expanded(
+              child: _QuickActionCard(
+                cardKey: keys.homePage.bookAppointmentAction,
+                icon: Symbols.calendar_add_on,
+                iconColor: theme.colorScheme.primary,
+                backgroundColor: theme.colorScheme.primaryContainer,
+                title: 'Book Appointment',
+                subtitle: 'Quick booking with AI suggestions',
+                onTap: () {
+                  const BookAppointmentRoute().push(context);
+                },
               ),
-              SizedBox(width: cardGap),
-              Expanded(
-                child: _QuickActionCard(
-                  icon: Symbols.smart_toy,
-                  iconColor: theme.colorScheme.secondary,
-                  backgroundColor: theme.colorScheme.secondaryContainer,
-                  title: 'AI Health Assistant',
-                  subtitle: 'Get instant health guidance',
-                  onTap: () {
-                    const AiHealthAssistantRoute().push(context);
-                  },
-                ),
+            ),
+            SizedBox(width: cardGap),
+            Expanded(
+              child: _QuickActionCard(
+                cardKey: keys.homePage.aiAssistantAction,
+                icon: Symbols.smart_toy,
+                iconColor: theme.colorScheme.secondary,
+                backgroundColor: theme.colorScheme.secondaryContainer,
+                title: 'AI Health Assistant',
+                subtitle: 'Get instant health guidance',
+                onTap: () {
+                  const AiHealthAssistantRoute().push(context);
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
@@ -67,6 +67,7 @@ class QuickActionsSection extends StatelessWidget {
 }
 
 class _QuickActionCard extends StatelessWidget {
+  final Key? cardKey;
   final IconData icon;
   final Color iconColor;
   final Color backgroundColor;
@@ -75,6 +76,7 @@ class _QuickActionCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _QuickActionCard({
+    this.cardKey,
     required this.icon,
     required this.iconColor,
     required this.backgroundColor,
@@ -109,6 +111,7 @@ class _QuickActionCard extends StatelessWidget {
       button: true,
       label: title,
       child: GestureDetector(
+        key: cardKey,
         onTap: onTap,
         child: Container(
           padding: EdgeInsets.all(cardPad),

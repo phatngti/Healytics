@@ -11,6 +11,7 @@ from .base import DtoModel, dto_field
 class AppointmentStatus(str, Enum):
     PENDING_PAYMENT = 'pending_payment'
     UPCOMING = 'upcoming'
+    PROCESSING = 'processing'
     COMPLETED = 'completed'
     CANCELED = 'canceled'
 

@@ -11,6 +11,7 @@ import 'package:user_app/theme/app_theme.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/features/home/presentation/widgets/'
     'home_section_header.widget.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/router/routes.dart';
 
 /// Neutral card colour from the surface-container
@@ -34,6 +35,7 @@ class RecentActivitySection extends ConsumerWidget {
       children: [
         HomeSectionHeader(
           title: 'Recent Activity',
+          actionKey: keys.homePage.recentActivityViewAll,
           onViewAll: () {
             const HomeRecentActivityRoute().push(context);
           },

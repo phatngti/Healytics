@@ -27,7 +27,7 @@ services:
           - http
           - https
   - name: ai-service
-    url: https://papere2921brnl-9000.proxy.runpod.net
+    url: https://ghhz8o0ol8c5jb-9000.proxy.runpod.net
     connect_timeout: 600000
     write_timeout: 600000
     read_timeout: 600000

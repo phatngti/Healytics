@@ -13,6 +13,7 @@
 !admin_panel/lib/
 !admin_panel/web/
 !admin_panel/assets/
+!admin_panel/patrol_test/fixtures/
 !admin_panel/build.yaml
 !admin_panel/analysis_options.yaml
 !admin_panel/Dockerfile
@@ -30,3 +31,4 @@
 !user_app/openapi/
 !employee_app/pubspec.yaml
 !employee_app/openapi/pubspec.yaml
+!employee_app/openapi/

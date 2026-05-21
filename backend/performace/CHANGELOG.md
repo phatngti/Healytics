@@ -13,9 +13,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
   - `locustfiles/health_api.py` — `/health` liveness checks.
   - `locustfiles/auth_api.py` — `/auth/check-email`, user/partner/admin/employee login, and employee refresh coverage.
   - `locustfiles/employee_api.py` — employee profile, revenue, appointment list/detail, and guarded appointment mutations.
-  - New tags: `health`, `auth`, `employee`, `employee-revenue`, `employee-appointments`, `new-api`, `target`, `employee-mutation`.
+  - `locustfiles/current_new_api.py` — safe read-heavy coverage for account/profile reads, booking search, appointment reads, saved-card listing, wishlist listing, clinic/service detail reads, admin dashboard, admin finance, partner bookings, and partner skill catalog/assigned-service reads.
+  - New tags: `health`, `auth`, `employee`, `employee-revenue`, `employee-appointments`, `current-new-api`, `new-api`, `safe-read`, `target`, `employee-mutation`.
   - English target reports: `reports/target_report.md` and `reports/target_report.csv`.
-  - New Make targets: `perf-test-new-apis`, `perf-test-health`, `perf-test-employee`, `perf-test-targets`, `perf-test-employee-mutations`.
+  - New Make targets: `perf-test-new-apis`, `perf-test-current-new-apis`, `perf-test-health`, `perf-test-employee`, `perf-test-targets`, `perf-test-employee-mutations`.
 - **Updated-module stress tests** for the current backend OpenAPI contract
   - Refreshed `api_docs/openapi.json` from the root `openapi/openapi.json`
   - Regenerated Python DTOs for current modules, including Partner Finance and Partner Employee Analytics
@@ -95,25 +96,32 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 | Auth (User) | ⬜ Not started | — |
 | Auth (Partner) | ⬜ Not started | — |
 | Auth (Admin) | ⬜ Not started | — |
-| Account / Survey | ⬜ Not started | — |
+| Account / Survey | 🔨 In progress | 2026-05-20 |
 | Partner Profile | ⬜ Not started | — |
 | Locations | ⬜ Not started | — |
 | Employees | ⬜ Not started | — |
 | Partner Employee Analytics | ✅ Complete | 2026-05-01 |
 | Categories | ⬜ Not started | — |
-| Health Services | ⬜ Not started | — |
+| Health Services | 🔨 In progress | 2026-05-20 |
 | Service Tags | ⬜ Not started | — |
 | Admin (Partners) | ⬜ Not started | — |
-| Booking | ⬜ Not started | — |
-| Appointment | ⬜ Not started | — |
+| Booking | 🔨 In progress | 2026-05-20 |
+| Appointment | 🔨 In progress | 2026-05-20 |
 | Cart | ⬜ Not started | — |
-| Payment Gateway | ⬜ Not started | — |
+| Payment Gateway | 🔨 In progress | 2026-05-20 |
 | Chat / AI Service | ⬜ Not started | — |
 | Notification | ⬜ Not started | — |
-| Clinic | ⬜ Not started | — |
+| Clinic | 🔨 In progress | 2026-05-20 |
 | Review | ⬜ Not started | — |
-| Dashboard Partner | ⬜ Not started | — |
+| Dashboard Partner | 🔨 In progress | 2026-05-20 |
 | Partner Finance | ✅ Complete | 2026-05-01 |
+| Admin Dashboard | ✅ Complete | 2026-05-20 |
+| Admin Finance Read Coverage | ✅ Complete | 2026-05-20 |
+| Booking Search | ✅ Complete | 2026-05-20 |
+| Profile Summary | ✅ Complete | 2026-05-20 |
+| Wishlist List | ✅ Complete | 2026-05-20 |
+| Partner Bookings | ✅ Complete | 2026-05-20 |
+| Skill Catalog Reads | ✅ Complete | 2026-05-20 |
 | **WS: Notifications** | ✅ Complete | 2026-04-13 |
 | **WS: User Chat** | ✅ Complete | 2026-04-13 |
 | **WS: Partner Chat** | ✅ Complete | 2026-04-13 |

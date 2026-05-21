@@ -31,7 +31,27 @@
       "partnerKey": "spa_partner",
       "employeeCode": "PATROL-CART-DR",
       "displayName": "Dr. Nguyen Van A",
-      "role": "DOCTOR"
+      "role": "DOCTOR",
+      "schedule": [
+        {
+          "day": "Wednesday",
+          "start": "08:00",
+          "end": "17:00",
+          "isWorking": true
+        },
+        {
+          "day": "Thursday",
+          "start": "08:00",
+          "end": "17:00",
+          "isWorking": true
+        },
+        {
+          "day": "Friday",
+          "start": "08:00",
+          "end": "17:00",
+          "isWorking": true
+        }
+      ]
     }
   ],
   "services": [
@@ -73,14 +93,14 @@
       "userKey": "main_user",
       "serviceKey": "swedish_relax",
       "employeeKey": "doctor_a",
-      "startsAt": "2026-05-20T09:00:00+07:00"
+      "startsAt": "2026-05-22T09:00:00+07:00"
     },
     {
       "key": "cart_002",
       "userKey": "main_user",
       "serviceKey": "hot_stone",
       "employeeKey": "doctor_a",
-      "startsAt": "2026-05-21T10:00:00+07:00"
+      "startsAt": "2026-05-23T10:00:00+07:00"
     }
   ]
 }

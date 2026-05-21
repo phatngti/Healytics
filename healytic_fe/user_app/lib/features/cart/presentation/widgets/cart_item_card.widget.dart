@@ -102,6 +102,7 @@ class CartItemCard extends StatelessWidget {
                 key: keys.cartPage.itemSelection(item.id),
                 onTap: onToggleSelection,
                 child: SizedBox(
+                  key: keys.cartPage.itemSelectionByService(item.serviceName),
                   width: AppDimens.iconLg,
                   height: AppDimens.iconLg,
                   child: Center(
@@ -130,6 +131,7 @@ class CartItemCard extends StatelessWidget {
                   if (isSelected)
                     VoucherSelectorRow(
                       itemId: item.id,
+                      serviceName: item.serviceName,
                       appliedCoupon: item.couponCode,
                       vouchers: availableVouchers,
                       isVouchersLoading: isVouchersLoading,

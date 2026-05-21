@@ -635,6 +635,12 @@ export class AuthService {
   }
 
   private generatePasswordResetCode(): string {
+    if (process.env.NODE_ENV === 'test') {
+      const fixedCode = process.env.TEST_PASSWORD_RESET_CODE?.trim();
+      if (fixedCode && /^\d{6}$/.test(fixedCode)) {
+        return fixedCode;
+      }
+    }
     return randomInt(0, 1000000).toString().padStart(6, '0');
   }
 

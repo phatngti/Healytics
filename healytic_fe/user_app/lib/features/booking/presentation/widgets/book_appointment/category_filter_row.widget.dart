@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:common/utils/demensions.dart';
 
 import '../../../../../theme/app_theme.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/home/domain/entities/home.entity.dart';
 
 /// 3-column grid of circular category icons with
@@ -33,33 +34,24 @@ class CategoryFilterRow extends StatelessWidget {
       crossAxisSpacing: 0,
       mainAxisSpacing: 0,
       padding: EdgeInsets.zero,
-      children: List.generate(
-        categories.length,
-        (index) {
-          final cat = categories[index];
-          return _CategoryGridItem(
-            icon: cat.icon,
-            label: cat.name,
-            color: _colorForType(
-              context,
-              cat.categoryType,
-            ),
-            isSelected: index == selectedIndex,
-            onTap: () => onSelected(index),
-          );
-        },
-      ),
+      children: List.generate(categories.length, (index) {
+        final cat = categories[index];
+        return _CategoryGridItem(
+          key: keys.bookingPage.categoryTile(cat.id),
+          icon: cat.icon,
+          label: cat.name,
+          color: _colorForType(context, cat.categoryType),
+          isSelected: index == selectedIndex,
+          onTap: () => onSelected(index),
+        );
+      }),
     );
   }
 
   /// Maps a category type to a theme colour.
-  Color _colorForType(
-    BuildContext context,
-    String categoryType,
-  ) {
+  Color _colorForType(BuildContext context, String categoryType) {
     final theme = Theme.of(context);
-    final semantic =
-        theme.extension<SemanticColors>()!;
+    final semantic = theme.extension<SemanticColors>()!;
 
     switch (categoryType) {
       case 'primary':
@@ -86,6 +78,7 @@ class CategoryFilterRow extends StatelessWidget {
 /// [isSelected] is true.
 class _CategoryGridItem extends StatelessWidget {
   const _CategoryGridItem({
+    super.key,
     required this.icon,
     required this.label,
     required this.color,
@@ -111,71 +104,43 @@ class _CategoryGridItem extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Column(
-        mainAxisAlignment:
-            MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AnimatedContainer(
-            duration: const Duration(
-              milliseconds: 200,
-            ),
+            duration: const Duration(milliseconds: 200),
             height: AppDimens.avatarLg,
             width: AppDimens.avatarLg,
             decoration: BoxDecoration(
-              color: color.withValues(
-                alpha: bgAlpha,
-              ),
+              color: color.withValues(alpha: bgAlpha),
               shape: BoxShape.circle,
               border: Border.all(
-                color: color.withValues(
-                  alpha: borderAlpha,
-                ),
+                color: color.withValues(alpha: borderAlpha),
                 width: borderWidth,
               ),
               boxShadow: isSelected
                   ? [
                       BoxShadow(
-                        color: color.withValues(
-                          alpha: 0.20,
-                        ),
+                        color: color.withValues(alpha: 0.20),
                         blurRadius: 10,
-                        offset:
-                            const Offset(0, 3),
+                        offset: const Offset(0, 3),
                       ),
                     ]
                   : [
                       BoxShadow(
-                        color: theme
-                            .colorScheme
-                            .shadow
-                            .withValues(
-                              alpha: 0.02,
-                            ),
-                        blurRadius:
-                            AppDimens.spaceXs,
-                        offset: Offset(
-                          0,
-                          AppDimens.spaceXxs,
-                        ),
+                        color: theme.colorScheme.shadow.withValues(alpha: 0.02),
+                        blurRadius: AppDimens.spaceXs,
+                        offset: Offset(0, AppDimens.spaceXxs),
                       ),
                     ],
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: AppDimens.iconXl,
-            ),
+            child: Icon(icon, color: color, size: AppDimens.iconXl),
           ),
           SizedBox(height: AppDimens.spaceSm),
           Text(
             label,
-            style: theme.textTheme.bodySmall
-                ?.copyWith(
-              fontWeight: isSelected
-                  ? FontWeight.w700
-                  : FontWeight.w600,
-              color: isSelected
-                  ? color
-                  : null,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+              color: isSelected ? color : null,
             ),
             textAlign: TextAlign.center,
             maxLines: 2,

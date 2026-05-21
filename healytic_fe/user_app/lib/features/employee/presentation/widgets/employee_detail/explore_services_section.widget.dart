@@ -10,15 +10,13 @@ import 'package:user_app/features/employee/'
     'employee_services.provider.dart';
 import 'package:user_app/features/booking/domain/'
     'entities/booking.entity.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/router/routes.dart';
 
 /// Displays a 2-column grid of service cards
 /// offered by the given employee.
 class ExploreServicesSection extends ConsumerWidget {
-  const ExploreServicesSection({
-    super.key,
-    required this.employeeId,
-  });
+  const ExploreServicesSection({super.key, required this.employeeId});
 
   /// Employee ID used to fetch services.
   final String employeeId;
@@ -26,30 +24,20 @@ class ExploreServicesSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final hPad =
-        AppDimens.horizontalPadding(context);
+    final hPad = AppDimens.horizontalPadding(context);
     final titleGap = AppDimens.titleGap(context);
-    final contentPad =
-        AppDimens.contentPadding(context);
-    final section =
-        AppDimens.sectionSpacing(context);
-    final servicesAsync = ref.watch(
-      employeeServicesProvider(employeeId),
-    );
+    final contentPad = AppDimens.contentPadding(context);
+    final section = AppDimens.sectionSpacing(context);
+    final servicesAsync = ref.watch(employeeServicesProvider(employeeId));
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: hPad,
-        vertical: section,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: hPad, vertical: section),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Explore Services',
-            style: theme.textTheme.titleLarge
-                ?.copyWith(
+            style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
               letterSpacing: -0.5,
             ),
@@ -58,11 +46,8 @@ class ExploreServicesSection extends ConsumerWidget {
           ),
           SizedBox(height: titleGap),
           servicesAsync.when(
-            loading: () => _LoadingGrid(
-              contentPad: contentPad,
-            ),
-            error: (_, __) =>
-                const _EmptyState(),
+            loading: () => _LoadingGrid(contentPad: contentPad),
+            error: (_, __) => const _EmptyState(),
             data: (services) {
               if (services.isEmpty) {
                 return const _EmptyState();
@@ -97,10 +82,8 @@ class _ServiceGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.builder(
       shrinkWrap: true,
-      physics:
-          const NeverScrollableScrollPhysics(),
-      gridDelegate:
-          SliverGridDelegateWithFixedCrossAxisCount(
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: contentPad,
         crossAxisSpacing: contentPad,
@@ -109,10 +92,7 @@ class _ServiceGrid extends StatelessWidget {
       padding: EdgeInsets.zero,
       itemCount: services.length,
       itemBuilder: (context, index) =>
-          _ServiceCard(
-        service: services[index],
-        employeeId: employeeId,
-      ),
+          _ServiceCard(service: services[index], employeeId: employeeId),
     );
   }
 }
@@ -120,71 +100,52 @@ class _ServiceGrid extends StatelessWidget {
 // ─── Service card ─────────────────────────────────
 
 class _ServiceCard extends StatelessWidget {
-  const _ServiceCard({
-    required this.service,
-    required this.employeeId,
-  });
+  const _ServiceCard({required this.service, required this.employeeId});
 
   final BookingService service;
   final String employeeId;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final cardRad =
-        AppDimens.cardRadius(context);
-    final contentPad =
-        AppDimens.contentPadding(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final cardRad = AppDimens.cardRadius(context);
+    final contentPad = AppDimens.contentPadding(context);
 
     return Semantics(
+      key: keys.employeePage.serviceBookButton(service.id),
       button: true,
       label: service.title,
       child: Material(
         color: colorScheme.surface,
-        borderRadius:
-            BorderRadius.circular(cardRad),
+        borderRadius: BorderRadius.circular(cardRad),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () => EmployeeBookingRoute(
             employeeId: employeeId,
             serviceId: service.id,
           ).push(context),
-          borderRadius:
-              BorderRadius.circular(cardRad),
+          borderRadius: BorderRadius.circular(cardRad),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius:
-                  BorderRadius.circular(cardRad),
+              borderRadius: BorderRadius.circular(cardRad),
               border: Border.all(
-                color: colorScheme.outlineVariant
-                    .withValues(alpha: 0.5),
+                color: colorScheme.outlineVariant.withValues(alpha: 0.5),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: colorScheme.shadow
-                      .withValues(alpha: 0.05),
+                  color: colorScheme.shadow.withValues(alpha: 0.05),
                   blurRadius: AppDimens.spaceXl,
-                  offset: Offset(
-                    0,
-                    AppDimens.spaceXs,
-                  ),
+                  offset: Offset(0, AppDimens.spaceXs),
                 ),
                 BoxShadow(
-                  color: colorScheme.shadow
-                      .withValues(alpha: 0.03),
-                  blurRadius:
-                      AppDimens.spaceSmMd,
-                  offset: Offset(
-                    0,
-                    AppDimens.spaceXxs,
-                  ),
+                  color: colorScheme.shadow.withValues(alpha: 0.03),
+                  blurRadius: AppDimens.spaceSmMd,
+                  offset: Offset(0, AppDimens.spaceXxs),
                 ),
               ],
             ),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _CardImage(service: service),
                 Expanded(
@@ -212,52 +173,36 @@ class _CardImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final cardRad =
-        AppDimens.cardRadius(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final cardRad = AppDimens.cardRadius(context);
     final imageUrl = service.imageUrl;
 
     return AspectRatio(
       aspectRatio: 16 / 10,
       child: ClipRRect(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(cardRad),
-        ),
-        child: imageUrl != null &&
-                imageUrl.isNotEmpty
+        borderRadius: BorderRadius.vertical(top: Radius.circular(cardRad)),
+        child: imageUrl != null && imageUrl.isNotEmpty
             ? NetworkImageAuto(
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,
-                placeholder: (_) =>
-                    _ImageFallback(
-                  colorScheme: colorScheme,
-                ),
-                errorWidget: (_) =>
-                    _ImageFallback(
-                  colorScheme: colorScheme,
-                ),
+                placeholder: (_) => _ImageFallback(colorScheme: colorScheme),
+                errorWidget: (_) => _ImageFallback(colorScheme: colorScheme),
               )
-            : _ImageFallback(
-                colorScheme: colorScheme,
-              ),
+            : _ImageFallback(colorScheme: colorScheme),
       ),
     );
   }
 }
 
 class _ImageFallback extends StatelessWidget {
-  const _ImageFallback({
-    required this.colorScheme,
-  });
+  const _ImageFallback({required this.colorScheme});
 
   final ColorScheme colorScheme;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color:
-          colorScheme.surfaceContainerHighest,
+      color: colorScheme.surfaceContainerHighest,
       child: Icon(
         Symbols.spa,
         color: colorScheme.onSurfaceVariant,
@@ -293,48 +238,32 @@ class _CardContent extends StatelessWidget {
         AppDimens.spaceSm,
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             service.title,
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(
+            style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: AppDimens.spaceXxs),
-          _InfoRow(
-            icon: Symbols.schedule,
-            text: service.duration,
-          ),
-          if (service.clinicName != null &&
-              service
-                  .clinicName!.isNotEmpty) ...[
-            SizedBox(
-              height: AppDimens.spaceXxs,
-            ),
-            _InfoRow(
-              icon: Symbols.storefront,
-              text: service.clinicName!,
-            ),
+          _InfoRow(icon: Symbols.schedule, text: service.duration),
+          if (service.clinicName != null && service.clinicName!.isNotEmpty) ...[
+            SizedBox(height: AppDimens.spaceXxs),
+            _InfoRow(icon: Symbols.storefront, text: service.clinicName!),
           ],
           const Spacer(),
           Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceBetween,
-            crossAxisAlignment:
-                CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Flexible(
                 child: Text(
                   service.price,
-                  style: theme
-                      .textTheme.bodySmall
-                      ?.copyWith(
+                  style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
@@ -344,8 +273,7 @@ class _CardContent extends StatelessWidget {
                 height: AppDimens.ctaButtonSm,
                 width: AppDimens.ctaButtonSm,
                 child: IconButton.filled(
-                  onPressed: () =>
-                      EmployeeBookingRoute(
+                  onPressed: () => EmployeeBookingRoute(
                     employeeId: employeeId,
                     serviceId: service.id,
                   ).push(context),
@@ -354,12 +282,10 @@ class _CardContent extends StatelessWidget {
                   icon: Icon(
                     Symbols.arrow_forward,
                     size: AppDimens.iconSm,
-                    color:
-                        colorScheme.onPrimary,
+                    color: colorScheme.onPrimary,
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor:
-                        colorScheme.primary,
+                    backgroundColor: colorScheme.primary,
                     shape: const CircleBorder(),
                   ),
                 ),
@@ -375,10 +301,7 @@ class _CardContent extends StatelessWidget {
 // ─── Reusable icon + text row ─────────────────────
 
 class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.icon,
-    required this.text,
-  });
+  const _InfoRow({required this.icon, required this.text});
 
   final IconData icon;
   final String text;
@@ -390,19 +313,13 @@ class _InfoRow extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(
-          icon,
-          size: AppDimens.iconXs,
-          color: colorScheme.onSurfaceVariant,
-        ),
+        Icon(icon, size: AppDimens.iconXs, color: colorScheme.onSurfaceVariant),
         SizedBox(width: AppDimens.spaceXs),
         Expanded(
           child: Text(
             text,
-            style: theme.textTheme.bodySmall
-                ?.copyWith(
-              color:
-                  colorScheme.onSurfaceVariant,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -416,23 +333,18 @@ class _InfoRow extends StatelessWidget {
 // ─── Loading placeholders ─────────────────────────
 
 class _LoadingGrid extends StatelessWidget {
-  const _LoadingGrid({
-    required this.contentPad,
-  });
+  const _LoadingGrid({required this.contentPad});
 
   final double contentPad;
 
   @override
   Widget build(BuildContext context) {
-    final cardRad =
-        AppDimens.cardRadius(context);
+    final cardRad = AppDimens.cardRadius(context);
 
     return GridView.builder(
       shrinkWrap: true,
-      physics:
-          const NeverScrollableScrollPhysics(),
-      gridDelegate:
-          SliverGridDelegateWithFixedCrossAxisCount(
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: contentPad,
         crossAxisSpacing: contentPad,
@@ -441,50 +353,38 @@ class _LoadingGrid extends StatelessWidget {
       padding: EdgeInsets.zero,
       itemCount: 4,
       itemBuilder: (_, __) =>
-          _LoadingPlaceholder(
-        cardRad: cardRad,
-        contentPad: contentPad,
-      ),
+          _LoadingPlaceholder(cardRad: cardRad, contentPad: contentPad),
     );
   }
 }
 
 class _LoadingPlaceholder extends StatelessWidget {
-  const _LoadingPlaceholder({
-    required this.cardRad,
-    required this.contentPad,
-  });
+  const _LoadingPlaceholder({required this.cardRad, required this.contentPad});
 
   final double cardRad;
   final double contentPad;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius:
-            BorderRadius.circular(cardRad),
+        borderRadius: BorderRadius.circular(cardRad),
         border: Border.all(
-          color: colorScheme.outlineVariant
-              .withValues(alpha: 0.3),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AspectRatio(
             aspectRatio: 16 / 10,
             child: Container(
               decoration: BoxDecoration(
-                color: colorScheme
-                    .surfaceContainerHighest,
-                borderRadius:
-                    BorderRadius.vertical(
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.vertical(
                   top: Radius.circular(cardRad),
                 ),
               ),
@@ -492,46 +392,34 @@ class _LoadingPlaceholder extends StatelessWidget {
           ),
           Expanded(
             child: Padding(
-              padding:
-                  EdgeInsets.all(contentPad),
+              padding: EdgeInsets.all(contentPad),
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     height: AppDimens.spaceLg,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: colorScheme
-                          .surfaceContainerHighest,
-                      borderRadius: AppDimens
-                          .radiusExtraSmall,
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: AppDimens.radiusExtraSmall,
                     ),
                   ),
-                  SizedBox(
-                    height: AppDimens.spaceSm,
-                  ),
+                  SizedBox(height: AppDimens.spaceSm),
                   Container(
                     height: AppDimens.spaceMd,
                     width: AppDimens.avatarLg,
                     decoration: BoxDecoration(
-                      color: colorScheme
-                          .surfaceContainerHighest,
-                      borderRadius: AppDimens
-                          .radiusExtraSmall,
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: AppDimens.radiusExtraSmall,
                     ),
                   ),
-                  SizedBox(
-                    height: AppDimens.spaceSm,
-                  ),
+                  SizedBox(height: AppDimens.spaceSm),
                   Container(
                     height: AppDimens.spaceMd,
                     width: AppDimens.avatarMd,
                     decoration: BoxDecoration(
-                      color: colorScheme
-                          .surfaceContainerHighest,
-                      borderRadius: AppDimens
-                          .radiusExtraSmall,
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: AppDimens.radiusExtraSmall,
                     ),
                   ),
                 ],
@@ -554,29 +442,21 @@ class _EmptyState extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: AppDimens.spaceXxl,
-      ),
+      padding: EdgeInsets.symmetric(vertical: AppDimens.spaceXxl),
       child: Center(
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Symbols.spa,
               size: AppDimens.avatarMd,
-              color: theme
-                  .colorScheme.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
-            SizedBox(
-              height: AppDimens.spaceSm,
-            ),
+            SizedBox(height: AppDimens.spaceSm),
             Text(
               'No services available',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(
-                color: theme.colorScheme
-                    .onSurfaceVariant,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],

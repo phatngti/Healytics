@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 
+import 'package:user_app/core/keys/integration_test_keys.dart';
+
 /// Sticky bottom action bar used across all
 /// booking flow steps.
 ///
@@ -35,8 +37,7 @@ class BookingBottomAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final hPad =
-        AppDimens.horizontalPadding(context);
+    final hPad = AppDimens.horizontalPadding(context);
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -49,8 +50,7 @@ class BookingBottomAction extends StatelessWidget {
         color: colorScheme.surface,
         border: Border(
           top: BorderSide(
-            color: colorScheme.outlineVariant
-                .withValues(alpha: 0.3),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -58,6 +58,7 @@ class BookingBottomAction extends StatelessWidget {
         children: [
           if (onAddToCart != null) ...[
             _AddToCartButton(
+              key: keys.bookingPage.addToCartButton,
               isLoading: isAddingToCart,
               onTap: onAddToCart!,
             ),
@@ -73,32 +74,27 @@ class BookingBottomAction extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Material(
+      key: keys.bookingPage.continueButton,
       color: canContinue
           ? colorScheme.primary
           : colorScheme.surfaceContainerHighest,
       borderRadius: AppDimens.radiusMedium,
       elevation: canContinue ? 4 : 0,
-      shadowColor: colorScheme.primary
-          .withValues(alpha: 0.2),
+      shadowColor: colorScheme.primary.withValues(alpha: 0.2),
       child: InkWell(
         onTap: canContinue ? onContinue : null,
         borderRadius: AppDimens.radiusMedium,
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: AppDimens.spaceLg,
-          ),
+          padding: EdgeInsets.symmetric(vertical: AppDimens.spaceLg),
           child: Row(
-            mainAxisAlignment:
-                MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 label,
-                style: theme.textTheme.labelLarge
-                    ?.copyWith(
+                style: theme.textTheme.labelLarge?.copyWith(
                   color: canContinue
                       ? colorScheme.onPrimary
-                      : colorScheme
-                            .onSurfaceVariant,
+                      : colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -121,6 +117,7 @@ class BookingBottomAction extends StatelessWidget {
 /// Outlined cart icon button with loading spinner.
 class _AddToCartButton extends StatelessWidget {
   const _AddToCartButton({
+    super.key,
     required this.isLoading,
     required this.onTap,
   });
@@ -130,16 +127,13 @@ class _AddToCartButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Material(
       color: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: AppDimens.radiusMedium,
-        side: BorderSide(
-          color: colorScheme.primary,
-        ),
+        side: BorderSide(color: colorScheme.primary),
       ),
       child: InkWell(
         onTap: isLoading ? null : onTap,
@@ -152,8 +146,7 @@ class _AddToCartButton extends StatelessWidget {
                 ? SizedBox(
                     width: AppDimens.iconSm,
                     height: AppDimens.iconSm,
-                    child:
-                        CircularProgressIndicator(
+                    child: CircularProgressIndicator(
                       strokeWidth: 2,
                       color: colorScheme.primary,
                     ),

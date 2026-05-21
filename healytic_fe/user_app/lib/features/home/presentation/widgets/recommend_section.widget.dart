@@ -10,6 +10,7 @@ import 'package:user_app/features/home/presentation/'
     'providers/home.provider.dart';
 import 'package:user_app/features/home/presentation/widgets/'
     'home_section_header.widget.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/router/routes.dart';
 
 /// Displays a horizontally-scrollable list of
@@ -34,6 +35,7 @@ class RecommendSection extends ConsumerWidget {
       children: [
         HomeSectionHeader(
           title: 'Recommend For You',
+          actionKey: keys.homePage.recommendationsViewAll,
           onViewAll: () {
             const HomeRecommendationsRoute().push(context);
           },

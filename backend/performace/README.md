@@ -108,6 +108,21 @@ support accounts, loads those credentials into Locust, imports all modules from
 `make perf-headless-full` and `make perf-test-all-modules` are aliases for the
 all-module target.
 
+### Current/new safe-read API coverage
+
+Use the focused current/new API target for recently added read-heavy surfaces:
+
+```bash
+make perf-test-current-new-apis
+```
+
+This runs the `current-new-api` tag against account/profile reads, booking
+search, appointment reads, saved-card listing, wishlist listing, safe clinic and
+service detail reads, admin dashboard reads, admin finance reads, partner
+booking reads, and partner skill catalog/assigned-service reads. The suite does
+not submit follow, wishlist mutation, review, payment, refund, booking status,
+card setup, or finance mutation requests.
+
 ### Run with custom host
 
 ```bash
@@ -240,6 +255,7 @@ performace/
 │   └── ws_data_generators.py  # Faker-based payload generators (WebSocket)
 ├── locustfiles/               # Test cases (added incrementally)
 │   ├── __init__.py
+│   ├── current_new_api.py           # Safe read-heavy current/new API coverage
 │   ├── partner_employee_analytics.py # Partner employee analytics stress tests
 │   ├── partner_finance.py            # Partner finance stress + guarded mutations
 │   ├── ws_notification_user.py     # /notifications namespace
@@ -258,6 +274,7 @@ Use `--tags` to run subsets:
 ```bash
 # HTTP API tests
 locust --tags auth             # Only auth flows
+locust --tags current-new-api  # Safe read-heavy current/new API coverage
 locust --tags health           # Only health check
 locust --tags employee         # Employee app read-heavy flows
 locust --tags new-api          # Current new/updated API coverage

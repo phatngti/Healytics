@@ -155,15 +155,20 @@ class PartnerChat extends _$PartnerChat {
 
   /// Clear active conversation on dispose.
   ///
-  /// Uses the cached [_activeConvNotifier] so this is
-  /// safe to call from [_cleanup] / [ref.onDispose]
-  /// where the ref is already invalidated.
+  /// Defers the state mutation so Riverpod can finish
+  /// the current dispose callback stack first.
   void _clearActiveConversation() {
-    final conversationId = _activeConversationId;
-    if (conversationId != null) {
-      _activeConvNotifier.clearIf(conversationId);
-    }
-    _activeConversationId = null;
+    Future<void>.microtask(() {
+      try {
+        _activeConvNotifier.set(null);
+      } catch (error, stackTrace) {
+        _log.fine(
+          'Skipped clearing active conversation after dispose',
+          error,
+          stackTrace,
+        );
+      }
+    });
   }
 
   /// The current user's account ID for bubble

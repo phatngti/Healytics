@@ -15,6 +15,7 @@ import 'package:user_app/features/home/'
     'presentation/providers/home.provider.dart';
 import 'package:user_app/features/home/presentation/widgets/'
     'home_section_header.widget.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/router/routes.dart';
 
 /// Horizontally-scrollable list of featured
@@ -33,6 +34,7 @@ class SpecialistsSection extends ConsumerWidget {
       children: [
         HomeSectionHeader(
           title: 'Our Specialists',
+          actionKey: keys.homePage.specialistsViewAll,
           onViewAll: () {
             const HomeSpecialistsRoute().push(context);
           },

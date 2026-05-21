@@ -11,6 +11,7 @@ import 'package:user_app/features/orders/domain/'
     'entities/appointment.entity.dart';
 import 'package:user_app/features/orders/'
     'presentation/providers/appointment.provider.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import '../../../domain/entities/time_slot.entity.dart';
 import '../../providers/booking.provider.dart';
 
@@ -529,6 +530,7 @@ class _PeriodGroup extends StatelessWidget {
                 return SizedBox(
                   width: itemWidth,
                   child: _TimeChip(
+                    key: keys.bookingPage.timeSlot(indexed.slot.label),
                     label: indexed.slot.label,
                     isSelected: indexed.index == selectedIndex,
                     isDisabled: !indexed.slot.isAvailable,
@@ -550,6 +552,7 @@ class _PeriodGroup extends StatelessWidget {
 /// Individual time slot chip with 3 states.
 class _TimeChip extends StatelessWidget {
   const _TimeChip({
+    super.key,
     required this.label,
     required this.isSelected,
     required this.isDisabled,

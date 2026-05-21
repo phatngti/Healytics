@@ -4,7 +4,6 @@ import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/checkout/presentation/screens/checkout.screen.dart';
 
 import 'common.dart';
-import 'config/test_config.dart';
 import 'helpers/auth_helper.dart';
 import 'helpers/navigation_helper.dart';
 
@@ -16,7 +15,7 @@ Future<void> _openCheckout(PatrolIntegrationTester $) async {
   await $(keys.homePage.cartButton).tap();
   await $.pump(const Duration(seconds: 2));
 
-  await $(keys.cartPage.itemSelection('cart-001')).tap();
+  await $(keys.cartPage.itemSelectionByService('Swedish Relax')).tap();
   await $.pump(const Duration(seconds: 1));
 
   await $(keys.cartPage.checkoutButton).waitUntilVisible();
@@ -25,17 +24,10 @@ Future<void> _openCheckout(PatrolIntegrationTester $) async {
 }
 
 void main() {
-  patrolTest('checkout renders booking details from selected cart item', (
+  patrolTest('checkout renders selected cart item and confirms pay later', (
     $,
   ) async {
     await pumpApp($, scenario: 'cartCheckout');
-    final config = TestConfig.instance;
-
-    if (!config.useMock) {
-      await $.pump(const Duration(seconds: 1));
-      return;
-    }
-
     await _openCheckout($);
 
     expect($(CheckoutScreen), findsOneWidget);
@@ -43,20 +35,6 @@ void main() {
     expect($('Spa An Nhien'), findsOneWidget);
     expect($('Dr. Nguyen Van A'), findsOneWidget);
     expect($('500,000đ'), findsWidgets);
-  });
-
-  patrolTest('confirming checkout with pay later shows success dialog', (
-    $,
-  ) async {
-    await pumpApp($, scenario: 'cartCheckout');
-    final config = TestConfig.instance;
-
-    if (!config.useMock) {
-      await $.pump(const Duration(seconds: 1));
-      return;
-    }
-
-    await _openCheckout($);
 
     await $(keys.checkoutPage.paymentMethodTile('payLater')).tap();
     await $.pump(const Duration(seconds: 1));

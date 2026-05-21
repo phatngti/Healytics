@@ -5,6 +5,7 @@ import 'package:common/widgets/images/avatar.dart';
 import 'package:common/widgets/images/network_image_auto.dart';
 import 'package:flutter/material.dart';
 
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/clinic_info/domain/entities/clinic_info.entity.dart';
 
 /// Shared measurements for the collapsing clinic header.
@@ -510,6 +511,7 @@ class _CompactFollowButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FilledButton(
+      key: keys.clinicPage.followButton,
       onPressed: onPressed,
       style: FilledButton.styleFrom(
         padding: const EdgeInsets.symmetric(

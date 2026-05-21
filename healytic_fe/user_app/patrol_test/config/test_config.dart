@@ -90,6 +90,32 @@ class TestConfig {
     return _defaultScenarioUser['password'] as String;
   }
 
+  /// Password reset fixture data for real backend E2E.
+  Map<String, dynamic> get passwordReset =>
+      (_fixtures['passwordReset'] as Map<String, dynamic>?) ?? const {};
+
+  /// Fixed reset code configured for NODE_ENV=test backend runs.
+  String get passwordResetCode {
+    const override = String.fromEnvironment('TEST_PASSWORD_RESET_CODE');
+    if (override.isNotEmpty) {
+      return override;
+    }
+    final code = passwordReset['code'] as String?;
+    if (code != null && code.isNotEmpty) {
+      return code;
+    }
+    return '123456';
+  }
+
+  /// New password used by password-reset E2E.
+  String get passwordResetNewPassword {
+    final password = passwordReset['newPassword'] as String?;
+    if (password != null && password.isNotEmpty) {
+      return password;
+    }
+    return 'Password1234!';
+  }
+
   // --- Home Data ---
 
   /// Home categories for test assertions.

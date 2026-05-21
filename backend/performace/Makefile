@@ -3,7 +3,7 @@
 	perf-test-locations perf-test-ws perf-test-chat \
 	perf-test-updated-stress perf-test-partner-finance-stress \
 	perf-test-employee-analytics-stress perf-test-updated-mutations \
-	perf-test-new-apis perf-test-health perf-test-employee \
+	perf-test-new-apis perf-test-current-new-apis perf-test-health perf-test-employee \
 	perf-test-targets perf-test-employee-mutations \
 	perf-test-booking-race perf-test-booking-race-spike \
 	perf-accounts-create perf-accounts-clean perf-accounts-status \
@@ -196,6 +196,9 @@ perf-test-updated-mutations:
 
 perf-test-new-apis:
 	$(call run_locust,--tags new-api -u 20 -r 4 --run-time 120s)
+
+perf-test-current-new-apis:
+	$(call run_locust,--tags current-new-api -u 20 -r 4 --run-time 120s)
 
 perf-test-health:
 	$(call run_locust,--tags health -u 10 -r 2 --run-time 60s)

@@ -9,6 +9,15 @@ from dataclasses import dataclass
 from .base import DtoModel, dto_field
 
 
+class BookingStatus(str, Enum):
+    PENDING_PAYMENT = 'PENDING_PAYMENT'
+    CONFIRMED = 'CONFIRMED'
+    IN_PROGRESS = 'IN_PROGRESS'
+    CANCELLED = 'CANCELLED'
+    COMPLETED = 'COMPLETED'
+    NO_SHOW = 'NO_SHOW'
+
+
 class BusinessType(str, Enum):
     MASSAGE_THERAPY = 'MASSAGE_THERAPY'
     MASSAGE_REHABILITATION = 'MASSAGE_REHABILITATION'
@@ -29,6 +38,25 @@ class ConversationStatus(str, Enum):
     CLOSED = 'closed'
 
 
+class EmployeeRole(str, Enum):
+    DOCTOR = 'DOCTOR'
+    THERAPIST = 'THERAPIST'
+    RECEPTIONIST = 'RECEPTIONIST'
+    MANAGER = 'MANAGER'
+
+
+class EmployeeStatus(str, Enum):
+    ACTIVE = 'ACTIVE'
+    INACTIVE = 'INACTIVE'
+    ON_LEAVE = 'ON_LEAVE'
+
+
+class Gender(str, Enum):
+    MALE = 'MALE'
+    FEMALE = 'FEMALE'
+    OTHER = 'OTHER'
+
+
 class HealthServiceStatus(str, Enum):
     DRAFT = 'draft'
     ACTIVE = 'active'
@@ -39,11 +67,17 @@ class HealthServiceType(str, Enum):
     SERVICE = 'service'
 
 
+class PartnerCommerceSourceType(str, Enum):
+    SERVICEBOOKING = 'serviceBooking'
+    PRODUCTORDER = 'productOrder'
+
+
 class PartnerPayoutStatus(str, Enum):
     NOTASSIGNED = 'notAssigned'
     INPAYOUT = 'inPayout'
     PAIDOUT = 'paidOut'
     FAILED = 'failed'
+    HELD = 'held'
 
 
 class PartnerRefundCaseStatus(str, Enum):
@@ -56,6 +90,29 @@ class PartnerRefundCaseStatus(str, Enum):
 class PartnerRefundCaseType(str, Enum):
     REFUND = 'refund'
     DISPUTE = 'dispute'
+
+
+class PartnerSettlementStatus(str, Enum):
+    UNSETTLED = 'unsettled'
+    SCHEDULED = 'scheduled'
+    SETTLED = 'settled'
+    HELD = 'held'
+
+
+class PartnerTransactionStatus(str, Enum):
+    PENDING = 'pending'
+    PAID = 'paid'
+    REFUNDED = 'refunded'
+    FAILED = 'failed'
+    CANCELED = 'canceled'
+
+
+class PartnerTransactionType(str, Enum):
+    CHARGE = 'charge'
+    REFUND = 'refund'
+    ADJUSTMENT = 'adjustment'
+    PAYOUT = 'payout'
+    FEE = 'fee'
 
 
 class PartnerVerificationStatus(str, Enum):
@@ -88,6 +145,15 @@ class BookingServiceResponseDto(DtoModel):
     distance: dict[str, Any] | None = None
     durationMinutes: dict[str, Any] | None = None
     priceVnd: dict[str, Any] | None = None
+
+
+@dataclass(slots=True)
+class BookingSpecialistResponseDto(DtoModel):
+    id: str
+    eligibilityId: str
+    name: str
+    specialty: str
+    avatarUrl: dict[str, Any] | None = None
 
 
 @dataclass(slots=True)
@@ -135,6 +201,7 @@ class DoctorProfileResponseDto(DtoModel):
     consultationFee: float | None = None
     specializations: list[str] | None = None
     education: list[str] | None = None
+    certifications: list[str] | None = None
 
 
 @dataclass(slots=True)
@@ -150,28 +217,28 @@ class EmployeeResponseDto(DtoModel):
     employeeCode: str
     fullName: str
     email: str
-    role: str
-    status: str
+    role: EmployeeRole
+    status: EmployeeStatus
     rating: float
     reviewCount: float
     createdAt: datetime
     updatedAt: datetime
-    firstName: dict[str, Any] | None = None
-    lastName: dict[str, Any] | None = None
-    phone: dict[str, Any] | None = None
-    avatarUrl: dict[str, Any] | None = None
-    jobTitle: dict[str, Any] | None = None
-    startDate: dict[str, Any] | None = None
-    employmentType: dict[str, Any] | None = None
-    description: dict[str, Any] | None = None
-    emergencyContactName: dict[str, Any] | None = None
-    emergencyContactPhone: dict[str, Any] | None = None
+    firstName: str | None = None
+    lastName: str | None = None
+    phone: str | None = None
+    avatarUrl: str | None = None
+    jobTitle: str | None = None
+    startDate: datetime | None = None
+    employmentType: str | None = None
+    description: str | None = None
+    emergencyContactName: str | None = None
+    emergencyContactPhone: str | None = None
     verificationDocuments: list[VerificationDocumentEntryDto] | None = None
     schedule: list[WorkScheduleEntryDto] | None = None
     workHistory: list[WorkHistoryEntryDto] | None = None
-    dob: dict[str, Any] | None = None
-    gender: str | None = None
-    partnerId: dict[str, Any] | None = None
+    dob: datetime | None = None
+    gender: Gender | None = None
+    partnerId: str | None = None
     doctorProfile: DoctorProfileResponseDto | None = None
     therapistProfile: TherapistProfileResponseDto | None = None
 
@@ -278,16 +345,25 @@ class WorkScheduleEntryDto(DtoModel):
 
 
 __all__ = [
+    "BookingStatus",
     "BusinessType",
     "ConversationStatus",
+    "EmployeeRole",
+    "EmployeeStatus",
+    "Gender",
     "HealthServiceStatus",
     "HealthServiceType",
+    "PartnerCommerceSourceType",
     "PartnerPayoutStatus",
     "PartnerRefundCaseStatus",
     "PartnerRefundCaseType",
+    "PartnerSettlementStatus",
+    "PartnerTransactionStatus",
+    "PartnerTransactionType",
     "PartnerVerificationStatus",
     "AddressInfoDto",
     "BookingServiceResponseDto",
+    "BookingSpecialistResponseDto",
     "BusinessInfoDto",
     "CategorySummaryDto",
     "ConversationResponseDto",

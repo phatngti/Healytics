@@ -26,6 +26,8 @@ class LocationInfoDto(DtoModel):
     name: str
     address: str
     mapUrl: dict[str, Any] | None = None
+    latitude: float | None = None
+    longitude: float | None = None
 
 
 @dataclass(slots=True)
@@ -207,6 +209,7 @@ class PublicHealthServiceInfoResponseDto(DtoModel):
     reviewCount: float
     price: str
     isVerified: bool
+    isWishlisted: bool
     featureTags: list[PublicFeatureTagDto]
     clinic: PublicClinicDto
     facilityImages: list[PublicFacilityImageDto]

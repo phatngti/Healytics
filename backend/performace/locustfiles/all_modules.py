@@ -8,6 +8,12 @@ import common.targets  # noqa: F401
 
 from locustfiles.auth_api import AuthApiUser  # noqa: F401
 from locustfiles.booking_race_condition import BookingRaceUser, BookingVerifier  # noqa: F401
+from locustfiles.current_new_api import (  # noqa: F401
+    AdminDashboardCurrentApiUser,
+    AdminFinanceReadApiUser,
+    PartnerCurrentApiUser,
+    UserCurrentNewApiUser,
+)
 from locustfiles.employee_api import EmployeeApiUser, EmployeeAppointmentMutationUser  # noqa: F401
 from locustfiles.health_api import HealthApiUser  # noqa: F401
 from locustfiles.partner_employee_analytics import PartnerEmployeeAnalyticsUser  # noqa: F401

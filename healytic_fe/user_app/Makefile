@@ -4,7 +4,14 @@
 	build-apk build-apk-dev build-apk-uat build-apk-prod \
 	build-ipa build-ipa-dev build-ipa-uat build-ipa-prod \
 	architecture-check \
-	patrol-test-dev patrol-test-uat patrol-test-e2e patrol-dev patrol-dev-e2e
+	patrol-test-dev patrol-test-uat patrol-test-e2e patrol-e2e-preflight patrol-dev patrol-dev-e2e
+
+PATROL_DEVICE ?= emulator-5554
+# BACKDOOR_BASE_URL ?= http://10.0.2.2:8000/backend
+# BACKDOOR_HEALTH_URL ?= http://localhost:8000/backend/test-backdoor/status
+BACKDOOR_BASE_URL ?= https://dev.healytics.me/backend
+BACKDOOR_HEALTH_URL ?= https://dev.healytics.me/backend/test-backdoor/status
+PATROL_E2E_TESTS ?= $(shell find patrol_test -maxdepth 1 -name '*_test.dart' ! -name 'test_bundle.dart' | sort)
 
 # ─── Dependencies ────────────────────────────────
 get:
@@ -86,10 +93,28 @@ patrol-test-uat:
 	patrol test --dart-define=ENV=uat \
 		--dart-define=patrol=true
 
-patrol-test-e2e:
-	patrol test --dart-define=ENV=test \
-		--dart-define=patrol=true \
-		--dart-define=BACKDOOR_BASE_URL=http://10.0.2.2:8000/backend
+patrol-e2e-preflight:
+	@curl -fsS "$(BACKDOOR_HEALTH_URL)" >/dev/null || ( \
+		echo "Patrol E2E backdoor is not ready at $(BACKDOOR_HEALTH_URL)."; \
+		echo "Start backend with NODE_ENV=test, a test database, and TEST_PASSWORD_RESET_CODE=123456."; \
+		exit 1; \
+	)
+
+patrol-test-e2e: patrol-e2e-preflight
+	@set -e; \
+	for test_file in $(PATROL_E2E_TESTS); do \
+		echo "Running $$test_file"; \
+		adb uninstall com.example.user_app >/dev/null 2>&1 || true; \
+		adb uninstall com.example.user_app.test >/dev/null 2>&1 || true; \
+		adb uninstall androidx.test.orchestrator >/dev/null 2>&1 || true; \
+		adb uninstall androidx.test.services >/dev/null 2>&1 || true; \
+		patrol test --device $(PATROL_DEVICE) \
+			--no-uninstall \
+			--dart-define=ENV=test \
+			--dart-define=patrol=true \
+			--dart-define=BACKDOOR_BASE_URL=$(BACKDOOR_BASE_URL) \
+			-t "$$test_file"; \
+	done
 
 patrol-dev:
 	patrol develop --dart-define=ENV=dev \
@@ -99,5 +124,5 @@ patrol-dev:
 patrol-dev-e2e:
 	patrol develop --dart-define=ENV=test \
 		--dart-define=patrol=true \
-		--dart-define=BACKDOOR_BASE_URL=http://10.0.2.2:8000/backend \
+		--dart-define=BACKDOOR_BASE_URL=$(BACKDOOR_BASE_URL) \
 		-t patrol_test/home_test.dart

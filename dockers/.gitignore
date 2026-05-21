@@ -8,3 +8,14 @@ jenkins_home/
 .env.prod
 backend.env.prod
 deploy.env.prod
+
+.env
+.env*
+backend.env
+backend.env.prod
+deploy.env
+deploy.env.prod
+deploy-panel.env
+cloudflare-tunnels.json
+cloudflare-tunnels.dev.json
+jenkins-agent.env

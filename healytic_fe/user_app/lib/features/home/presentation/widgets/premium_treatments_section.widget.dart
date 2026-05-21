@@ -13,6 +13,7 @@ import 'package:user_app/features/home/presentation/widgets/'
     'home_section_header.widget.dart';
 import 'package:user_app/features/home/presentation/'
     'widgets/treatment_card.widget.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/router/routes.dart';
 
 /// Displays a 2-column grid of premium treatment cards
@@ -30,6 +31,7 @@ class PremiumTreatmentsSection extends ConsumerWidget {
       children: [
         HomeSectionHeader(
           title: 'Premium Treatments',
+          actionKey: keys.homePage.premiumTreatmentsViewAll,
           onViewAll: () {
             const HomePremiumTreatmentsRoute().push(context);
           },

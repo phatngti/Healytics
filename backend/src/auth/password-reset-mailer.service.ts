@@ -5,6 +5,13 @@ export class PasswordResetMailerService {
   private readonly logger = new Logger(PasswordResetMailerService.name);
 
   async sendPasswordResetCode(email: string, code: string): Promise<void> {
+    if (process.env.NODE_ENV === 'test' && process.env.TEST_PASSWORD_RESET_CODE) {
+      this.logger.log(
+        `Skipping password reset email in test mode for ${email}: ${code}`,
+      );
+      return;
+    }
+
     const apiKey = process.env.RESEND_API_KEY;
 
     if (!apiKey) {

@@ -83,12 +83,18 @@ AuthSessionStore authSessionStore(Ref ref) {
   return AuthSessionStore();
 }
 
+final accessTokenChangesProvider = StreamProvider<String?>((ref) {
+  return ref.watch(authSessionStoreProvider).watchAccessToken();
+});
+
 final currentUserDisplayNameProvider = Provider<String?>((ref) {
+  ref.watch(accessTokenChangesProvider);
   return ref.watch(authSessionStoreProvider).currentUserDisplayName;
 });
 
 /// Provides the current user's UUID extracted from
 /// the JWT `sub` claim.
 final currentUserIdProvider = Provider<String?>((ref) {
+  ref.watch(accessTokenChangesProvider);
   return ref.watch(authSessionStoreProvider).currentUserId;
 });

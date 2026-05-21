@@ -18,6 +18,12 @@ import common.targets  # noqa: F401
 # from locustfiles.auth_partner import AuthPartnerUser
 # from locustfiles.auth_admin import AuthAdminUser
 from locustfiles.auth_api import AuthApiUser
+from locustfiles.current_new_api import (
+    AdminDashboardCurrentApiUser,
+    AdminFinanceReadApiUser,
+    PartnerCurrentApiUser,
+    UserCurrentNewApiUser,
+)
 from locustfiles.health_api import HealthApiUser
 
 # ── User domain ───────────────────────────────────────────────────────────────

@@ -8,6 +8,10 @@ from .account_controller import *
 from .account_controller import __all__ as _account_controller_all
 from .admin_categories_controller import *
 from .admin_categories_controller import __all__ as _admin_categories_controller_all
+from .admin_dashboard_controller import *
+from .admin_dashboard_controller import __all__ as _admin_dashboard_controller_all
+from .admin_finance_controller import *
+from .admin_finance_controller import __all__ as _admin_finance_controller_all
 from .admin_notification_controller import *
 from .admin_notification_controller import __all__ as _admin_notification_controller_all
 from .admin_partners_controller import *
@@ -18,6 +22,10 @@ from .auth_controller import *
 from .auth_controller import __all__ as _auth_controller_all
 from .booking_controller import *
 from .booking_controller import __all__ as _booking_controller_all
+from .booking_search_controller import *
+from .booking_search_controller import __all__ as _booking_search_controller_all
+from .booking_status_controller import *
+from .booking_status_controller import __all__ as _booking_status_controller_all
 from .cart_controller import *
 from .cart_controller import __all__ as _cart_controller_all
 from .categories_controller import *
@@ -34,6 +42,8 @@ from .mapbox_controller import *
 from .mapbox_controller import __all__ as _mapbox_controller_all
 from .mo_mo_controller import *
 from .mo_mo_controller import __all__ as _mo_mo_controller_all
+from .partner_bookings_controller import *
+from .partner_bookings_controller import __all__ as _partner_bookings_controller_all
 from .partner_chat_controller import *
 from .partner_chat_controller import __all__ as _partner_chat_controller_all
 from .partner_dashboard_controller import *
@@ -74,18 +84,26 @@ from .user_health_service_controller import *
 from .user_health_service_controller import __all__ as _user_health_service_controller_all
 from .user_payment_controller import *
 from .user_payment_controller import __all__ as _user_payment_controller_all
+from .user_profile_controller import *
+from .user_profile_controller import __all__ as _user_profile_controller_all
 from .user_review_controller import *
 from .user_review_controller import __all__ as _user_review_controller_all
+from .user_wishlist_controller import *
+from .user_wishlist_controller import __all__ as _user_wishlist_controller_all
 
 __all__ = [
     *_shared_all,
     *_account_controller_all,
     *_admin_categories_controller_all,
+    *_admin_dashboard_controller_all,
+    *_admin_finance_controller_all,
     *_admin_notification_controller_all,
     *_admin_partners_controller_all,
     *_audit_controller_all,
     *_auth_controller_all,
     *_booking_controller_all,
+    *_booking_search_controller_all,
+    *_booking_status_controller_all,
     *_cart_controller_all,
     *_categories_controller_all,
     *_employee_appointments_controller_all,
@@ -94,6 +112,7 @@ __all__ = [
     *_locations_controller_all,
     *_mapbox_controller_all,
     *_mo_mo_controller_all,
+    *_partner_bookings_controller_all,
     *_partner_chat_controller_all,
     *_partner_dashboard_controller_all,
     *_partner_employees_controller_all,
@@ -114,5 +133,7 @@ __all__ = [
     *_user_employees_controller_all,
     *_user_health_service_controller_all,
     *_user_payment_controller_all,
+    *_user_profile_controller_all,
     *_user_review_controller_all,
+    *_user_wishlist_controller_all,
 ]

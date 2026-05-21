@@ -8,6 +8,10 @@
           "origin": "http://kong-cp:8000"
         },
         {
+          "hostname": "app.example.com",
+          "origin": "http://healytics-home:80"
+        },
+        {
           "hostname": "ci.example.com",
           "origin": "http://jenkins:8080"
         }

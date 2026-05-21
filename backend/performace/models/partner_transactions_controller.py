@@ -2,39 +2,10 @@
 
 from __future__ import annotations
 
-from enum import Enum
 from typing import Any, TypeAlias
 from dataclasses import dataclass
 from .base import DtoModel, dto_field
-from .shared import PartnerPayoutRecordDto, PartnerPayoutStatus, PartnerRefundCaseRecordDto
-
-
-class PartnerCommerceSourceType(str, Enum):
-    SERVICEBOOKING = 'serviceBooking'
-    PRODUCTORDER = 'productOrder'
-
-
-class PartnerSettlementStatus(str, Enum):
-    UNSETTLED = 'unsettled'
-    SCHEDULED = 'scheduled'
-    SETTLED = 'settled'
-    HELD = 'held'
-
-
-class PartnerTransactionStatus(str, Enum):
-    PENDING = 'pending'
-    PAID = 'paid'
-    REFUNDED = 'refunded'
-    FAILED = 'failed'
-    CANCELED = 'canceled'
-
-
-class PartnerTransactionType(str, Enum):
-    CHARGE = 'charge'
-    REFUND = 'refund'
-    ADJUSTMENT = 'adjustment'
-    PAYOUT = 'payout'
-    FEE = 'fee'
+from .shared import PartnerCommerceSourceType, PartnerPayoutRecordDto, PartnerPayoutStatus, PartnerRefundCaseRecordDto, PartnerSettlementStatus, PartnerTransactionStatus, PartnerTransactionType
 
 
 @dataclass(slots=True)
@@ -115,10 +86,6 @@ PartnerTransactionsControllerGetTrendResponseDto: TypeAlias = list[PartnerFinanc
 
 
 __all__ = [
-    "PartnerCommerceSourceType",
-    "PartnerSettlementStatus",
-    "PartnerTransactionStatus",
-    "PartnerTransactionType",
     "FlagReviewDto",
     "MarkSettlementDto",
     "PartnerFinanceSummaryDto",

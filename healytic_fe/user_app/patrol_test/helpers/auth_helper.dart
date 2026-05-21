@@ -27,9 +27,7 @@ Future<void> signOut(PatrolIntegrationTester $) async {
   await $(keys.profilePage.logoutButton).tap();
 
   // Confirm in the dialog.
-  await $(keys.logoutDialog.confirmButton)
-      .waitUntilVisible()
-      .tap();
+  await $(keys.logoutDialog.confirmButton).waitUntilVisible().tap();
 
   // Wait for the router to redirect to onboarding.
   // Use a generous pump to ensure the session is
@@ -42,7 +40,11 @@ Future<void> signOut(PatrolIntegrationTester $) async {
 ///
 /// Calls [signOut] first to ensure a clean session,
 /// then proceeds through the onboarding → sign-in flow.
-Future<void> signIn(PatrolIntegrationTester $) async {
+Future<void> signIn(
+  PatrolIntegrationTester $, {
+  String? email,
+  String? password,
+}) async {
   final config = TestConfig.instance;
 
   // In mock mode the user is already "logged in" and
@@ -63,20 +65,20 @@ Future<void> signIn(PatrolIntegrationTester $) async {
         .then((_) => true)
         .catchError((_) => false)) {
       await signInNavBtn.tap();
-      await $.pumpAndSettle();
+      await $.pump(const Duration(seconds: 1));
     }
   } catch (_) {}
 
   // Wait for the SignInScreen form.
   await $(keys.signInPage.emailTextField).waitUntilVisible();
 
-  await $(keys.signInPage.emailTextField)
-      .enterText(config.testEmail);
+  await $(keys.signInPage.emailTextField).enterText(email ?? config.testEmail);
 
-  await $(keys.signInPage.passwordTextField)
-      .enterText(config.testPassword);
+  await $(
+    keys.signInPage.passwordTextField,
+  ).enterText(password ?? config.testPassword);
 
   await $(keys.signInPage.signInButton).tap();
 
-  await $.pumpAndSettle();
+  await $.pump(const Duration(seconds: 3));
 }

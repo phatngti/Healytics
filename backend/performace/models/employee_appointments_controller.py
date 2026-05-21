@@ -39,8 +39,24 @@ class EmployeeAppointmentResponseDto(DtoModel):
     notes: str | None = None
 
 
+@dataclass(slots=True)
+class PaginatedEmployeeAppointmentsResponseDto(DtoModel):
+    data: list[EmployeeAppointmentResponseDto]
+    meta: PaginationMetaResponseDto
+
+
+@dataclass(slots=True)
+class PaginationMetaResponseDto(DtoModel):
+    page: float
+    limit: float
+    total: float
+    totalPages: float
+
+
 __all__ = [
     "EmployeeBookingStatusFilter",
     "CancelEmployeeAppointmentDto",
     "EmployeeAppointmentResponseDto",
+    "PaginatedEmployeeAppointmentsResponseDto",
+    "PaginationMetaResponseDto",
 ]

@@ -10,6 +10,7 @@ class HomeSectionHeader extends StatelessWidget {
     required this.title,
     this.onViewAll,
     this.actionLabel = 'View all',
+    this.actionKey,
   });
 
   /// Section title displayed on the left.
@@ -20,6 +21,9 @@ class HomeSectionHeader extends StatelessWidget {
 
   /// Text shown in the trailing action.
   final String actionLabel;
+
+  /// Stable key for integration tests.
+  final Key? actionKey;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +49,7 @@ class HomeSectionHeader extends StatelessWidget {
             button: true,
             label: '$actionLabel $title',
             child: AppButton(
+              key: actionKey,
               buttonType: ButtonType.text,
               onPressed: onViewAll,
               customStyle: TextButton.styleFrom(

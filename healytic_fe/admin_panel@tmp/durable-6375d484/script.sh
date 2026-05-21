@@ -1,1 +1,0 @@
-bash scripts/docker-build.sh 4cb64a558a6d nonameaaaa/healytics_panel_dev --env dev

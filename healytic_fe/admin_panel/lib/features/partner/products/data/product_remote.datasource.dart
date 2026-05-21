@@ -396,6 +396,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     }
   }
 
+  // ignore: lines_longer_than_80_chars
   UpdatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum?
   _mapUpdateStaffAssignment(String assignment) {
     switch (assignment.toLowerCase()) {

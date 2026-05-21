@@ -38,6 +38,18 @@ class FeaturedSpecialistResponseDto(DtoModel):
 
 
 @dataclass(slots=True)
+class PublicEmployeeReviewResponseDto(DtoModel):
+    id: str
+    reviewerName: str
+    rating: float
+    tags: list[str]
+    wouldRecommend: bool
+    createdAt: str
+    avatarUrl: str | None = None
+    comment: str | None = None
+
+
+@dataclass(slots=True)
 class TimeSlotDto(DtoModel):
     label: str
     time: str
@@ -50,6 +62,9 @@ UserEmployeesControllerFindAllResponseDto: TypeAlias = list[EmployeeResponseDto]
 UserEmployeesControllerGetFeaturedSpecialistsResponseDto: TypeAlias = list[FeaturedSpecialistResponseDto]  # GET /user/employees/featured-specialists [200]
 
 
+UserEmployeesControllerFindReviewsResponseDto: TypeAlias = list[PublicEmployeeReviewResponseDto]  # GET /user/employees/{id}/reviews [200]
+
+
 UserEmployeesControllerFindServicesResponseDto: TypeAlias = list[BookingServiceResponseDto]  # GET /user/employees/{id}/services [200]
 
 
@@ -57,8 +72,10 @@ __all__ = [
     "DayScheduleDto",
     "EmployeeTimeSlotsResponseDto",
     "FeaturedSpecialistResponseDto",
+    "PublicEmployeeReviewResponseDto",
     "TimeSlotDto",
     "UserEmployeesControllerFindAllResponseDto",
     "UserEmployeesControllerGetFeaturedSpecialistsResponseDto",
+    "UserEmployeesControllerFindReviewsResponseDto",
     "UserEmployeesControllerFindServicesResponseDto",
 ]
