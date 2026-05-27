@@ -1163,7 +1163,7 @@ export class ProductSeeder implements ISeeder {
         categoryId,
         partnerId,
         deletedAt: null,
-      } as Partial<Product>) as Product;
+      } as Partial<Product>);
     });
 
     await this.productRepo.save(productEntities, { chunk: 200 });
@@ -1270,9 +1270,7 @@ export class ProductSeeder implements ISeeder {
     );
     const missingResourceTypes = resourceTypeNames
       .filter((name) => !resourceTypeMap.has(name))
-      .map((name) =>
-        this.resourceTypeRepo.create({ name, totalQuantity: 64 }),
-      );
+      .map((name) => this.resourceTypeRepo.create({ name, totalQuantity: 64 }));
 
     if (missingResourceTypes.length) {
       const savedResourceTypes = await this.resourceTypeRepo.save(
@@ -1381,8 +1379,8 @@ export class ProductSeeder implements ISeeder {
     await this.seedTreatmentReviews(product.id);
 
     // Employee Eligibility (for all product types)
-    if ((prodData as any).eligibleEmployees?.length) {
-      for (const emp of (prodData as any).eligibleEmployees) {
+    if (prodData.eligibleEmployees?.length) {
+      for (const emp of prodData.eligibleEmployees) {
         const employeeId = employeeMap.get(emp.code);
 
         if (!employeeId) {
@@ -1420,21 +1418,21 @@ export class ProductSeeder implements ISeeder {
     if (prodData.type !== HealthServiceType.SERVICE) return;
 
     // Service Definition (1:1)
-    if ((prodData as any).serviceDefinition) {
+    if (prodData.serviceDefinition) {
       await this.serviceDefRepo.save(
         this.serviceDefRepo.create({
           productId: product.id,
-          ...(prodData as any).serviceDefinition,
+          ...prodData.serviceDefinition,
         }),
       );
       this.logger.log(
-        `    📋 Service definition: ${(prodData as any).serviceDefinition.durationMinutes}min + ${(prodData as any).serviceDefinition.bufferMinutes}min buffer`,
+        `    📋 Service definition: ${prodData.serviceDefinition.durationMinutes}min + ${prodData.serviceDefinition.bufferMinutes}min buffer`,
       );
     }
 
     // Resource Requirements (upsert ResourceType, then replace requirements)
-    if ((prodData as any).resourceRequirements?.length) {
-      for (const req of (prodData as any).resourceRequirements) {
+    if (prodData.resourceRequirements?.length) {
+      for (const req of prodData.resourceRequirements) {
         let resourceType = await this.resourceTypeRepo.findOne({
           where: { name: req.resourceTypeName },
         });
@@ -1465,8 +1463,8 @@ export class ProductSeeder implements ISeeder {
     }
 
     // Service Tags (via product_tags junction)
-    if ((prodData as any).tagNames?.length && tagOwner) {
-      for (const tagName of (prodData as any).tagNames) {
+    if (prodData.tagNames?.length && tagOwner) {
+      for (const tagName of prodData.tagNames) {
         const tag = await this.serviceTagRepo.findOne({
           where: { name: tagName, userId: tagOwner.id },
         });
@@ -1495,8 +1493,8 @@ export class ProductSeeder implements ISeeder {
     }
 
     // Facility Images
-    if ((prodData as any).facilityImages?.length) {
-      for (const fi of (prodData as any).facilityImages) {
+    if (prodData.facilityImages?.length) {
+      for (const fi of prodData.facilityImages) {
         await this.facilityImageRepo.save(
           this.facilityImageRepo.create({
             productId: product.id,
@@ -1507,7 +1505,7 @@ export class ProductSeeder implements ISeeder {
         );
       }
       this.logger.log(
-        `    🏢 Upserted ${(prodData as any).facilityImages.length} facility image(s)`,
+        `    🏢 Upserted ${prodData.facilityImages.length} facility image(s)`,
       );
     }
   }
@@ -1614,9 +1612,9 @@ export class ProductSeeder implements ISeeder {
     // Clean up resource_types created during seeding
     const resourceTypeNames = [
       ...new Set(
-        ALL_SEED_PRODUCTS.flatMap((p) => (p as any).resourceRequirements || []).map(
-          (r: any) => r.resourceTypeName,
-        ),
+        ALL_SEED_PRODUCTS.flatMap(
+          (p) => (p as any).resourceRequirements || [],
+        ).map((r: any) => r.resourceTypeName),
       ),
     ];
 

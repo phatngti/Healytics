@@ -108,9 +108,9 @@ describe('AuthService', () => {
         lastName: 'User',
       },
     });
-    mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce(
-      'refresh-token',
-    );
+    mockJwtService.sign
+      .mockReturnValueOnce('access-token')
+      .mockReturnValueOnce('refresh-token');
     mockAccountService.setRefreshTokenHash.mockResolvedValue(undefined);
 
     const result = await service.register({

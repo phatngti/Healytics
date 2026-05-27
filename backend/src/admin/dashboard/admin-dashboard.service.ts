@@ -105,11 +105,7 @@ export class AdminDashboardService {
     const days = this.periodToDays(period);
     const to = new Date();
     const from = new Date(
-      Date.UTC(
-        to.getUTCFullYear(),
-        to.getUTCMonth(),
-        to.getUTCDate(),
-      ),
+      Date.UTC(to.getUTCFullYear(), to.getUTCMonth(), to.getUTCDate()),
     );
     from.setUTCDate(from.getUTCDate() - (days - 1));
     return { from, to, days };
@@ -146,8 +142,7 @@ export class AdminDashboardService {
   }
 
   private normalizeLimit(value: unknown): number {
-    const parsed =
-      typeof value === 'number' ? value : Number(value ?? 5);
+    const parsed = typeof value === 'number' ? value : Number(value ?? 5);
     if (!Number.isFinite(parsed)) return 5;
     return Math.min(Math.max(Math.trunc(parsed), 1), 20);
   }
@@ -198,13 +193,9 @@ export class AdminDashboardService {
         }),
       ]);
 
-    const successfulTransactions = this.toInt(
-      txAgg.successfulTransactions,
-    );
+    const successfulTransactions = this.toInt(txAgg.successfulTransactions);
     const failedTransactions = this.toInt(txAgg.failedTransactions);
-    const canceledTransactions = this.toInt(
-      txAgg.canceledTransactions,
-    );
+    const canceledTransactions = this.toInt(txAgg.canceledTransactions);
     const grossRevenue = this.toNumber(txAgg.grossRevenue);
     const refundAmount = this.toNumber(txAgg.refundAmount);
     const bookingSuccess = this.toInt(bookingAgg.success);
@@ -218,9 +209,7 @@ export class AdminDashboardService {
     dto.refundAmount = refundAmount;
     dto.failedPaymentAmount = this.toNumber(txAgg.failedPaymentAmount);
     dto.averageBookingValue =
-      successfulTransactions > 0
-        ? grossRevenue / successfulTransactions
-        : 0;
+      successfulTransactions > 0 ? grossRevenue / successfulTransactions : 0;
     dto.successfulTransactions = successfulTransactions;
     dto.pendingTransactions = this.toInt(txAgg.pendingTransactions);
     dto.refundedTransactions = this.toInt(txAgg.refundedTransactions);
@@ -272,10 +261,7 @@ export class AdminDashboardService {
     );
 
     const byDate = new Map<string, TrendRow>(
-      (rows as TrendRow[]).map((row) => [
-        this.dateKey(row.date),
-        row,
-      ]),
+      (rows as TrendRow[]).map((row) => [this.dateKey(row.date), row]),
     );
 
     return Array.from({ length: range.days }, (_, index) => {
@@ -291,9 +277,7 @@ export class AdminDashboardService {
       dto.netRevenue = grossRevenue - refundAmount;
       dto.refundAmount = refundAmount;
       dto.transactionCount = this.toInt(row?.transactionCount);
-      dto.successfulBookingCount = this.toInt(
-        row?.successfulBookingCount,
-      );
+      dto.successfulBookingCount = this.toInt(row?.successfulBookingCount);
       return dto;
     });
   }
@@ -380,10 +364,7 @@ export class AdminDashboardService {
       dto.rank = index + 1;
       dto.grossRevenue = this.toNumber(row.grossRevenue);
       dto.bookingCount = bookingCount;
-      dto.successfulBookingRate = this.percent(
-        bookingCount,
-        totalTransactions,
-      );
+      dto.successfulBookingRate = this.percent(bookingCount, totalTransactions);
       dto.verificationStatus = this.mapVerificationStatus(
         row.verificationStatus,
       );
@@ -473,8 +454,7 @@ export class AdminDashboardService {
     );
 
     return (rows as NotificationRow[]).map((row) => {
-      const failed =
-        row.status === PartnerTransactionStatus.FAILED;
+      const failed = row.status === PartnerTransactionStatus.FAILED;
       const dto = new AdminDashboardNotificationItemDto();
       dto.id = row.id;
       dto.title = failed ? 'Payment Failed' : 'Refund Processed';
@@ -519,17 +499,14 @@ export class AdminDashboardService {
       snapshot.name = row.name ?? '';
       snapshot.serviceCount = this.toInt(row.serviceCount);
       snapshot.isActive =
-        row.isActive === true ||
-        row.isActive === 'true' ||
-        row.isActive === 1;
+        row.isActive === true || row.isActive === 'true' || row.isActive === 1;
       return snapshot;
     });
 
     const dto = new AdminCategoryHealthDto();
     dto.totalCategories = categories.length;
     dto.activeCategories = categories.filter((item) => item.isActive).length;
-    dto.inactiveCategories =
-      dto.totalCategories - dto.activeCategories;
+    dto.inactiveCategories = dto.totalCategories - dto.activeCategories;
     dto.emptyCategories = categories.filter(
       (item) => item.serviceCount === 0,
     ).length;

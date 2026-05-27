@@ -31,11 +31,19 @@ export class PartnerFinanceSummaryDto {
   @Expose()
   currency: string;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: '2026-04-10T03:00:00.000Z' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: '2026-04-10T03:00:00.000Z',
+  })
   @Expose()
   nextPayoutAt!: string | null;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: 'Vietcombank ending 1122' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: 'Vietcombank ending 1122',
+  })
   @Expose()
   payoutMethod!: string | null;
 

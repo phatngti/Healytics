@@ -90,6 +90,25 @@ export class RedisService implements OnModuleDestroy {
     return this.redis.del(...keys);
   }
 
+  async scanKeys(match: string, count = 100): Promise<string[]> {
+    const keys: string[] = [];
+    let cursor = '0';
+
+    do {
+      const [nextCursor, batch] = await this.redis.scan(
+        cursor,
+        'MATCH',
+        match,
+        'COUNT',
+        count,
+      );
+      cursor = nextCursor;
+      keys.push(...batch);
+    } while (cursor !== '0');
+
+    return keys;
+  }
+
   async getJson<T>(key: string): Promise<T | null> {
     const value = await this.redis.get(key);
     if (!value) {

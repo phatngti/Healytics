@@ -126,16 +126,8 @@ export class ReconciliationJobService {
       methodLabel: string;
     }> = await this.payoutRepo
       .createQueryBuilder('pp')
-      .leftJoin(
-        PartnerPayoutTransaction,
-        'ppt',
-        'ppt.payout_id = pp.id',
-      )
-      .leftJoin(
-        PartnerLedgerTransaction,
-        'plt',
-        'plt.id = ppt.transaction_id',
-      )
+      .leftJoin(PartnerPayoutTransaction, 'ppt', 'ppt.payout_id = pp.id')
+      .leftJoin(PartnerLedgerTransaction, 'plt', 'plt.id = ppt.transaction_id')
       .select([
         'pp.id AS "payoutId"',
         'pp.included_volume AS "includedVolume"',
@@ -194,11 +186,7 @@ export class ReconciliationJobService {
       paymentMethodLabel: string | null;
     }> = await this.refundCaseRepo
       .createQueryBuilder('prc')
-      .innerJoin(
-        PartnerLedgerTransaction,
-        'plt',
-        'plt.id = prc.transaction_id',
-      )
+      .innerJoin(PartnerLedgerTransaction, 'plt', 'plt.id = prc.transaction_id')
       .select([
         'prc.id AS "refundCaseId"',
         'prc.amount AS "refundAmount"',

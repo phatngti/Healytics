@@ -26,9 +26,13 @@ class PartnerSpecialistDto {
   @ApiProperty({ type: String }) id: string;
   @ApiProperty({ type: String }) name: string;
   @ApiProperty({ type: String }) role: string;
-  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl:
+    | string
+    | null;
   @ApiPropertyOptional({ type: String, nullable: true }) degrees: string | null;
-  @ApiPropertyOptional({ type: String, nullable: true }) experience: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) experience:
+    | string
+    | null;
   @ApiPropertyOptional({ type: [String] }) specializations: string[];
   @ApiPropertyOptional({ type: String, nullable: true }) bio: string | null;
   @ApiPropertyOptional({ type: String, nullable: true }) quote: string | null;
@@ -62,7 +66,9 @@ class PartnerFacilityImageDto {
 class PartnerReviewDto {
   @ApiProperty({ type: String }) id: string;
   @ApiProperty({ type: String }) reviewerName: string;
-  @ApiPropertyOptional({ type: String, nullable: true }) avatarUrl: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) avatarUrl:
+    | string
+    | null;
   @ApiProperty({ type: Number }) rating: number;
   @ApiProperty({ type: String }) status: string;
   @ApiProperty({ type: String }) date: string;
@@ -73,7 +79,9 @@ class PartnerReviewDto {
 class PartnerRecommendedServiceDto {
   @ApiProperty({ type: String }) id: string;
   @ApiProperty({ type: String }) title: string;
-  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl:
+    | string
+    | null;
   @ApiProperty({ type: Number }) rating: number;
   @ApiProperty({ type: Number }) reviewCount: number;
   @ApiProperty({ type: String }) price: string;
@@ -82,14 +90,21 @@ class PartnerRecommendedServiceDto {
 class PartnerDetailServiceRuleDto {
   @ApiProperty({ type: String, example: 'no-eating' }) iconSlug: string;
   @ApiProperty({ type: String, example: 'No Eating Before' }) title: string;
-  @ApiProperty({ type: String, example: 'Avoid eating 2 hours before the service' })
+  @ApiProperty({
+    type: String,
+    example: 'Avoid eating 2 hours before the service',
+  })
   description: string;
 }
 
 class PartnerDetailProcedureStepDto {
   @ApiProperty({ type: Number, example: 1 }) stepNumber: number;
-  @ApiProperty({ type: String, example: 'Check-in & Registration' }) title: string;
-  @ApiProperty({ type: String, example: 'Arrive at the reception and complete registration' })
+  @ApiProperty({ type: String, example: 'Check-in & Registration' })
+  title: string;
+  @ApiProperty({
+    type: String,
+    example: 'Arrive at the reception and complete registration',
+  })
   description: string;
 }
 
@@ -112,7 +127,9 @@ export class PartnerHealthServiceDetailResponseDto {
   @ApiProperty({ type: Number }) reviewCount: number;
   @ApiProperty({ type: String }) price: string;
   @ApiProperty({ type: Boolean }) isVerified: boolean;
-  @ApiPropertyOptional({ type: String, nullable: true }) description: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) description:
+    | string
+    | null;
   @ApiProperty({ type: Number }) duration: number;
   @ApiProperty({ type: [PartnerFeatureTagDto] })
   featureTags: PartnerFeatureTagDto[];

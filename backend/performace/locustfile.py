@@ -21,7 +21,9 @@ from locustfiles.auth_api import AuthApiUser
 from locustfiles.current_new_api import (
     AdminDashboardCurrentApiUser,
     AdminFinanceReadApiUser,
+    AdminOperationsReadApiUser,
     PartnerCurrentApiUser,
+    PublicCatalogCurrentApiUser,
     UserCurrentNewApiUser,
 )
 from locustfiles.health_api import HealthApiUser

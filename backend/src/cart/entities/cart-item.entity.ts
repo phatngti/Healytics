@@ -15,7 +15,11 @@ import { CartItemStatus } from '@/cart/enums/cart-item-status.enum';
 
 @Entity('cart_items')
 @Index('IDX_CART_ITEMS_USER_ID', ['userId'])
-@Index('UQ_CART_ITEMS_USER_SERVICE_EMPLOYEE_SLOT', ['userId', 'serviceId', 'employeeId', 'timeSlot'], { unique: true })
+@Index(
+  'UQ_CART_ITEMS_USER_SERVICE_EMPLOYEE_SLOT',
+  ['userId', 'serviceId', 'employeeId', 'timeSlot'],
+  { unique: true },
+)
 export class CartItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;

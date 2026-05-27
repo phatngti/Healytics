@@ -15,7 +15,10 @@ class PartnerServiceRuleDto {
   title: string;
 
   @Expose()
-  @ApiProperty({ type: String, example: 'Avoid eating 2 hours before the service' })
+  @ApiProperty({
+    type: String,
+    example: 'Avoid eating 2 hours before the service',
+  })
   description: string;
 }
 
@@ -29,7 +32,10 @@ class PartnerProcedureStepDto {
   title: string;
 
   @Expose()
-  @ApiProperty({ type: String, example: 'Arrive at the reception and complete registration' })
+  @ApiProperty({
+    type: String,
+    example: 'Arrive at the reception and complete registration',
+  })
   description: string;
 }
 
@@ -83,11 +89,17 @@ class PartnerHealthServiceMediaDto {
   url: string;
 
   @Expose()
-  @ApiPropertyOptional({ type: String, description: 'Media type (image, video, etc.)' })
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Media type (image, video, etc.)',
+  })
   mediaType?: string;
 
   @Expose()
-  @ApiPropertyOptional({ type: Boolean, description: 'Whether this is the thumbnail' })
+  @ApiPropertyOptional({
+    type: Boolean,
+    description: 'Whether this is the thumbnail',
+  })
   isThumbnail?: boolean;
 
   @Expose()
@@ -109,15 +121,24 @@ class PartnerHealthServiceDefinitionDto {
   durationMinutes: number;
 
   @Expose()
-  @ApiPropertyOptional({ type: Number, description: 'Buffer time between appointments' })
+  @ApiPropertyOptional({
+    type: Number,
+    description: 'Buffer time between appointments',
+  })
   bufferMinutes?: number;
 
   @Expose()
-  @ApiPropertyOptional({ type: Number, description: 'Maximum capacity per slot' })
+  @ApiPropertyOptional({
+    type: Number,
+    description: 'Maximum capacity per slot',
+  })
   maxCapacity?: number;
 
   @Expose()
-  @ApiPropertyOptional({ type: Number, description: 'Minimum lead time for booking (hours)' })
+  @ApiPropertyOptional({
+    type: Number,
+    description: 'Minimum lead time for booking (hours)',
+  })
   minLeadTimeHours?: number;
 
   @Expose()
@@ -139,7 +160,10 @@ class PartnerHealthServiceEmployeeEligibilityDto {
   employeeId: string;
 
   @Expose()
-  @ApiProperty({ type: Boolean, description: 'Whether this is the primary employee' })
+  @ApiProperty({
+    type: Boolean,
+    description: 'Whether this is the primary employee',
+  })
   isPrimary: boolean;
 }
 
@@ -171,7 +195,10 @@ class PartnerProductTagDto {
 
   @Expose()
   @Type(() => PartnerProductTagDetailDto)
-  @ApiPropertyOptional({ type: PartnerProductTagDetailDto, description: 'Tag detail' })
+  @ApiPropertyOptional({
+    type: PartnerProductTagDetailDto,
+    description: 'Tag detail',
+  })
   tag: PartnerProductTagDetailDto | null;
 }
 
@@ -193,19 +220,34 @@ export class PartnerHealthServiceResponseDto {
   slug: string;
 
   @Expose()
-  @ApiPropertyOptional({ type: String, nullable: true, description: 'Description' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Description',
+  })
   description: string | null;
 
   @Expose()
-  @ApiProperty({ enum: HealthServiceType, enumName: 'HealthServiceType', description: 'Type' })
+  @ApiProperty({
+    enum: HealthServiceType,
+    enumName: 'HealthServiceType',
+    description: 'Type',
+  })
   type: HealthServiceType;
 
   @Expose()
-  @ApiProperty({ type: Number, description: 'Base price in specified currency' })
+  @ApiProperty({
+    type: Number,
+    description: 'Base price in specified currency',
+  })
   basePrice: number;
 
   @Expose()
-  @ApiPropertyOptional({ type: Number, nullable: true, description: 'Sale price if on discount' })
+  @ApiPropertyOptional({
+    type: Number,
+    nullable: true,
+    description: 'Sale price if on discount',
+  })
   salePrice: number | null;
 
   @Expose()
@@ -213,7 +255,11 @@ export class PartnerHealthServiceResponseDto {
   currency: string;
 
   @Expose()
-  @ApiProperty({ enum: HealthServiceStatus, enumName: 'HealthServiceStatus', description: 'Status' })
+  @ApiProperty({
+    enum: HealthServiceStatus,
+    enumName: 'HealthServiceStatus',
+    description: 'Status',
+  })
   status: HealthServiceStatus;
 
   @Expose()
@@ -221,7 +267,11 @@ export class PartnerHealthServiceResponseDto {
   isVisibleOnline: boolean;
 
   @Expose()
-  @ApiPropertyOptional({ type: String, nullable: true, description: 'Vendor name' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Vendor name',
+  })
   vendorName: string | null;
 
   @Expose()

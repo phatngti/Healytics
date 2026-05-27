@@ -7,6 +7,7 @@ import 'package:user_app/hooks/bootstrap.dart';
 
 import 'config/test_config.dart';
 import 'helpers/backend_backdoor_helper.dart';
+import 'helpers/permission_helper.dart';
 
 /// Shared Patrol test bootstrap.
 ///
@@ -28,4 +29,6 @@ Future<void> pumpApp(PatrolIntegrationTester $, {String? scenario}) async {
   // the splash screen has continuous animations
   // that prevent pumpAndSettle from completing.
   await $.pump(const Duration(seconds: 3));
+  await grantAllPermissions($);
+  await $.pump(const Duration(milliseconds: 500));
 }

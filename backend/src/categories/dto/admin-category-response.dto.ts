@@ -46,11 +46,19 @@ export class AdminCategoryResponseDto {
   slug: string;
 
   @Expose()
-  @ApiPropertyOptional({ type: String, nullable: true, description: 'Category description' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Category description',
+  })
   description: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ type: String, nullable: true, description: 'Category image URL' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Category image URL',
+  })
   imageUrl: string | null;
 
   @Expose()
@@ -66,15 +74,25 @@ export class AdminCategoryResponseDto {
   iconName: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ type: String, nullable: true, description: 'Hex color value (e.g. #FF6B6B)' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Hex color value (e.g. #FF6B6B)',
+  })
   colorValue: string | null;
 
   @Expose()
-  @ApiProperty({ type: Number, description: 'Sort order for display (lower = first)' })
+  @ApiProperty({
+    type: Number,
+    description: 'Sort order for display (lower = first)',
+  })
   sortOrder: number;
 
   @Expose()
-  @ApiProperty({ type: Number, description: 'Number of health services in this category' })
+  @ApiProperty({
+    type: Number,
+    description: 'Number of health services in this category',
+  })
   serviceCount: number;
 
   @Expose()

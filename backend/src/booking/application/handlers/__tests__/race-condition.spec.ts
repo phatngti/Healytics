@@ -672,7 +672,10 @@ describe('Race Condition: Message ACK behavior', () => {
       .mockResolvedValueOnce({ id: 'bk', paymentUrl: null })
       .mockResolvedValueOnce({});
 
-    await handler.handle(createBaseMessage({ ticketId: 'success-tk' }), successCtx as any);
+    await handler.handle(
+      createBaseMessage({ ticketId: 'success-tk' }),
+      successCtx as any,
+    );
     expect(successCtx.getChannelRef().ack).toHaveBeenCalledTimes(1);
 
     // Reset and test failure path ACK
@@ -680,7 +683,10 @@ describe('Race Condition: Message ACK behavior', () => {
     const failCtx = createMockRmqContext();
     redisService.acquireLock.mockResolvedValue(null);
 
-    await handler.handle(createBaseMessage({ ticketId: 'fail-tk' }), failCtx as any);
+    await handler.handle(
+      createBaseMessage({ ticketId: 'fail-tk' }),
+      failCtx as any,
+    );
     expect(failCtx.getChannelRef().ack).toHaveBeenCalledTimes(1);
   });
 

@@ -45,9 +45,11 @@ function createMockRepo() {
   return {
     findOne: jest.fn().mockResolvedValue(null),
     find: jest.fn().mockResolvedValue([]),
-    save: jest.fn().mockImplementation((entity) =>
-      Promise.resolve({ id: 'new-id', ...entity }),
-    ),
+    save: jest
+      .fn()
+      .mockImplementation((entity) =>
+        Promise.resolve({ id: 'new-id', ...entity }),
+      ),
     create: jest.fn().mockImplementation((entity) => entity),
     createQueryBuilder: jest.fn().mockReturnValue(createMockQueryBuilder()),
   };
@@ -278,9 +280,9 @@ describe('ReconciliationJobService', () => {
       // Check ④ uses txnRepo (orphaned payouts → match),
       // Check ⑥ uses txnRepo (flagged unsettled → empty)
       txnRepo.createQueryBuilder
-        .mockReturnValueOnce(emptyQb)   // ① stale pending
-        .mockReturnValueOnce(orphanQb)  // ④ orphaned payouts
-        .mockReturnValueOnce(emptyQb);  // ⑥ flagged unsettled
+        .mockReturnValueOnce(emptyQb) // ① stale pending
+        .mockReturnValueOnce(orphanQb) // ④ orphaned payouts
+        .mockReturnValueOnce(emptyQb); // ⑥ flagged unsettled
 
       await service.runReconciliation();
 

@@ -85,9 +85,9 @@ class WsUserChatUser(HealyticsSocketIOUser):
     def send_message(self):
         """
         Send a chat message and measure the emit latency.
-        Uses fire-and-forget since test conversations may not exist.
+        Uses the generated perf chat seed when the all-module suite is running.
         """
-        payload = generate_send_message()
+        payload = generate_send_message(sender_role="user")
         self.ws_emit_measured("send_message", payload)
 
     @task(3)
@@ -96,7 +96,7 @@ class WsUserChatUser(HealyticsSocketIOUser):
         Simulate a typing → pause → stop_typing flow.
         This is fire-and-forget (no server ack expected).
         """
-        payload = generate_typing()
+        payload = generate_typing(sender_role="user")
         self.ws_emit_measured("typing", payload)
 
         # Simulate typing duration
@@ -107,7 +107,7 @@ class WsUserChatUser(HealyticsSocketIOUser):
     @task(2)
     def mark_read(self):
         """Mark messages in a conversation as read."""
-        payload = generate_mark_read()
+        payload = generate_mark_read(sender_role="user")
         self.ws_emit_measured("mark_read", payload)
 
     @task(1)

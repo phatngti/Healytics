@@ -1,47 +1,23 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Partner } from '@/common/entities/partner.entity';
-import {
-  PartnerReviewLog,
-} from '@/common/entities/partner-review-log.entity';
-import {
-  AdminPartnerDetailResponseDto,
-} from '../dto/admin-partner-detail-response.dto';
-import {
-  PartnerPriority,
-} from '../dto/admin-partner-detail-response.dto';
-import {
-  ReviewPartnerProfileDto,
-} from '../dto/review-partner-profile.dto';
-import {
-  ReviewPartnerResponseDto,
-} from '../dto/review-partner-response.dto';
-import {
-  TotalPartnersResponseDto,
-} from '../dto/total-partners-response.dto';
+import { PartnerReviewLog } from '@/common/entities/partner-review-log.entity';
+import { AdminPartnerDetailResponseDto } from '../dto/admin-partner-detail-response.dto';
+import { PartnerPriority } from '../dto/admin-partner-detail-response.dto';
+import { ReviewPartnerProfileDto } from '../dto/review-partner-profile.dto';
+import { ReviewPartnerResponseDto } from '../dto/review-partner-response.dto';
+import { TotalPartnersResponseDto } from '../dto/total-partners-response.dto';
 import {
   AdminPartnersQueryDto,
   AdminPartnerScope,
   AdminPartnerSortBy,
   AdminPartnerSortDirection,
 } from '../dto/admin-partners-query.dto';
-import {
-  AdminPartnersResponseDto,
-} from '../dto/admin-partner-list-response.dto';
-import {
-  AdminPartnerStatsResponseDto,
-} from '../dto/admin-partner-stats-response.dto';
-import {
-  ReviewPartnerHandler,
-} from '../application/handlers/review-partner.handler';
-import {
-  PartnerVerificationStatus,
-} from '@/partners/enum/partner-verification-status.enum';
+import { AdminPartnersResponseDto } from '../dto/admin-partner-list-response.dto';
+import { AdminPartnerStatsResponseDto } from '../dto/admin-partner-stats-response.dto';
+import { ReviewPartnerHandler } from '../application/handlers/review-partner.handler';
+import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 
 // Helper type for field review data
 export interface FieldFeedback {
@@ -68,9 +44,7 @@ const HIGH_THRESHOLD_HOURS = 24;
  */
 @Injectable()
 export class AdminPartnersService {
-  private readonly logger = new Logger(
-    AdminPartnersService.name,
-  );
+  private readonly logger = new Logger(AdminPartnersService.name);
 
   constructor(
     @InjectRepository(Partner)
@@ -92,10 +66,7 @@ export class AdminPartnersService {
     query: AdminPartnersQueryDto,
   ): Promise<AdminPartnersResponseDto> {
     this.logger.log('Listing partners with filters');
-    const {
-      page = 1,
-      limit = 10,
-    } = query;
+    const { page = 1, limit = 10 } = query;
     const skip = (page - 1) * limit;
 
     const qb = this.buildBaseQuery();
@@ -104,10 +75,7 @@ export class AdminPartnersService {
     this.applyStatus(qb, query.verificationStatus);
     this.applySort(qb, query.sortBy, query.sortDirection);
 
-    const [data, total] = await qb
-      .skip(skip)
-      .take(limit)
-      .getManyAndCount();
+    const [data, total] = await qb.skip(skip).take(limit).getManyAndCount();
 
     const now = new Date();
 
@@ -120,12 +88,10 @@ export class AdminPartnersService {
         email: p.account?.email ?? '',
         businessType: p.businessType ?? [],
         verificationStatus:
-          p.verificationStatus ??
-          PartnerVerificationStatus.PENDING,
+          p.verificationStatus ?? PartnerVerificationStatus.PENDING,
         priority: this.computePriority(p, now),
         createdAt: p.createdAt,
-        verificationCompletedAt:
-          p.verificationCompletedAt ?? null,
+        verificationCompletedAt: p.verificationCompletedAt ?? null,
         isAccountActive: p.account?.isActive ?? false,
       })),
       total,
@@ -163,10 +129,7 @@ export class AdminPartnersService {
     // Count by status
     const statusCounts = await this.partnerRepo
       .createQueryBuilder('partner')
-      .select(
-        'partner.verificationStatus',
-        'status',
-      )
+      .select('partner.verificationStatus', 'status')
       .addSelect('COUNT(*)', 'count')
       .groupBy('partner.verificationStatus')
       .getRawMany<{
@@ -181,21 +144,16 @@ export class AdminPartnersService {
 
     dto.pendingReview =
       (countMap.get(PartnerVerificationStatus.PENDING) ?? 0) +
-      (countMap.get(
-        PartnerVerificationStatus.REQUIRED_RESUBMIT,
-      ) ?? 0);
+      (countMap.get(PartnerVerificationStatus.REQUIRED_RESUBMIT) ?? 0);
     dto.requiredResubmit =
-      countMap.get(
-        PartnerVerificationStatus.REQUIRED_RESUBMIT,
-      ) ?? 0;
-    dto.approved =
-      countMap.get(PartnerVerificationStatus.APPROVED) ?? 0;
-    dto.rejected =
-      countMap.get(PartnerVerificationStatus.REJECTED) ?? 0;
+      countMap.get(PartnerVerificationStatus.REQUIRED_RESUBMIT) ?? 0;
+    dto.approved = countMap.get(PartnerVerificationStatus.APPROVED) ?? 0;
+    dto.rejected = countMap.get(PartnerVerificationStatus.REJECTED) ?? 0;
     dto.activeToday = dto.approved;
-    dto.totalProviders = Array.from(
-      countMap.values(),
-    ).reduce((a, b) => a + b, 0);
+    dto.totalProviders = Array.from(countMap.values()).reduce(
+      (a, b) => a + b,
+      0,
+    );
 
     // High priority count
     const now = new Date();
@@ -205,10 +163,9 @@ export class AdminPartnersService {
 
     const highPriorityCount = await this.partnerRepo
       .createQueryBuilder('partner')
-      .where(
-        'partner.verificationStatus IN (:...statuses)',
-        { statuses: REVIEW_QUEUE_STATUSES },
-      )
+      .where('partner.verificationStatus IN (:...statuses)', {
+        statuses: REVIEW_QUEUE_STATUSES,
+      })
       .andWhere('partner.createdAt <= :threshold', {
         threshold: highThreshold,
       })
@@ -223,10 +180,9 @@ export class AdminPartnersService {
         'AVG(EXTRACT(EPOCH FROM (NOW() - partner.createdAt)))',
         'avgSeconds',
       )
-      .where(
-        'partner.verificationStatus IN (:...statuses)',
-        { statuses: REVIEW_QUEUE_STATUSES },
-      )
+      .where('partner.verificationStatus IN (:...statuses)', {
+        statuses: REVIEW_QUEUE_STATUSES,
+      })
       .getRawOne<{ avgSeconds: string | null }>();
 
     const avgSeconds = avgResult?.avgSeconds
@@ -243,9 +199,7 @@ export class AdminPartnersService {
    * Get detailed partner information with
    * verification feedback.
    */
-  async getPartnerDetail(
-    id: string,
-  ): Promise<AdminPartnerDetailResponseDto> {
+  async getPartnerDetail(id: string): Promise<AdminPartnerDetailResponseDto> {
     const partner = await this.partnerRepo.findOne({
       where: { id },
       relations: [
@@ -263,17 +217,14 @@ export class AdminPartnersService {
     }
 
     // Fetch the latest review log for feedback data
-    const latestReviewLog =
-      await this.reviewLogRepo.findOne({
-        where: { partnerId: id },
-        order: { createdAt: 'DESC' },
-      });
+    const latestReviewLog = await this.reviewLogRepo.findOne({
+      where: { partnerId: id },
+      order: { createdAt: 'DESC' },
+    });
 
     // Build feedback maps from review log
-    const fieldFeedbackMap =
-      this.buildFieldFeedbackMap(latestReviewLog);
-    const documentFeedbackMap =
-      this.buildDocumentFeedbackMap(latestReviewLog);
+    const fieldFeedbackMap = this.buildFieldFeedbackMap(latestReviewLog);
+    const documentFeedbackMap = this.buildDocumentFeedbackMap(latestReviewLog);
 
     return AdminPartnerDetailResponseDto.fromPartner(
       partner,
@@ -295,11 +246,7 @@ export class AdminPartnersService {
     dto: ReviewPartnerProfileDto,
     adminId: string,
   ): Promise<ReviewPartnerResponseDto> {
-    await this.reviewPartnerHandler.execute(
-      id,
-      dto,
-      adminId,
-    );
+    await this.reviewPartnerHandler.execute(id, dto, adminId);
     const response = new ReviewPartnerResponseDto();
     response.message = 'Review submitted successfully';
     return response;
@@ -334,19 +281,15 @@ export class AdminPartnersService {
     scope?: AdminPartnerScope,
   ): void {
     if (scope === AdminPartnerScope.VERIFICATION_QUEUE) {
-      qb.andWhere(
-        'partner.verificationStatus IN (:...statuses)',
-        { statuses: REVIEW_QUEUE_STATUSES },
-      );
+      qb.andWhere('partner.verificationStatus IN (:...statuses)', {
+        statuses: REVIEW_QUEUE_STATUSES,
+      });
     }
     // ALL_PROVIDERS → no status filter from scope
   }
 
   /** Applies free-text search across key fields. */
-  private applySearch(
-    qb: SelectQueryBuilder<Partner>,
-    search?: string,
-  ): void {
+  private applySearch(qb: SelectQueryBuilder<Partner>, search?: string): void {
     if (!search) return;
     qb.andWhere(
       '(partner.taxCode ILIKE :search ' +
@@ -363,10 +306,7 @@ export class AdminPartnersService {
     status?: PartnerVerificationStatus,
   ): void {
     if (!status) return;
-    qb.andWhere(
-      'partner.verificationStatus = :status',
-      { status },
-    );
+    qb.andWhere('partner.verificationStatus = :status', { status });
   }
 
   /** Applies sorting; defaults to createdAt DESC. */
@@ -375,10 +315,7 @@ export class AdminPartnersService {
     sortBy?: AdminPartnerSortBy,
     direction?: AdminPartnerSortDirection,
   ): void {
-    const dir =
-      direction === AdminPartnerSortDirection.ASC
-        ? 'ASC'
-        : 'DESC';
+    const dir = direction === AdminPartnerSortDirection.ASC ? 'ASC' : 'DESC';
 
     switch (sortBy) {
       case AdminPartnerSortBy.BRAND_NAME:
@@ -403,23 +340,15 @@ export class AdminPartnersService {
    * Computes priority based on age of the
    * verification request.
    */
-  private computePriority(
-    partner: Partner,
-    now: Date,
-  ): PartnerPriority {
+  private computePriority(partner: Partner, now: Date): PartnerPriority {
     const status =
-      partner.verificationStatus ??
-      PartnerVerificationStatus.PENDING;
+      partner.verificationStatus ?? PartnerVerificationStatus.PENDING;
 
-    if (
-      !REVIEW_QUEUE_STATUSES.includes(status)
-    ) {
+    if (!REVIEW_QUEUE_STATUSES.includes(status)) {
       return PartnerPriority.NORMAL;
     }
 
-    const ageHours =
-      (now.getTime() - partner.createdAt.getTime()) /
-      3_600_000;
+    const ageHours = (now.getTime() - partner.createdAt.getTime()) / 3_600_000;
 
     if (ageHours >= URGENT_THRESHOLD_HOURS) {
       return PartnerPriority.URGENT;
@@ -438,12 +367,8 @@ export class AdminPartnersService {
     if (totalSeconds <= 0) return '0m';
 
     const days = Math.floor(totalSeconds / 86400);
-    const hours = Math.floor(
-      (totalSeconds % 86400) / 3600,
-    );
-    const minutes = Math.floor(
-      (totalSeconds % 3600) / 60,
-    );
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
 
     if (days > 0) return `${days}d ${hours}h`;
     if (hours > 0) return `${hours}h ${minutes}m`;
@@ -460,9 +385,7 @@ export class AdminPartnersService {
     const feedbackMap: FieldFeedbackMap = {};
     if (!reviewLog?.fieldReviews) return feedbackMap;
 
-    for (const [fieldName, review] of Object.entries(
-      reviewLog.fieldReviews,
-    )) {
+    for (const [fieldName, review] of Object.entries(reviewLog.fieldReviews)) {
       feedbackMap[fieldName] = {
         isVerified: review.isValid,
         feedback: review.feedback,
@@ -477,9 +400,7 @@ export class AdminPartnersService {
     const feedbackMap: FieldFeedbackMap = {};
     if (!reviewLog?.documentReviews) return feedbackMap;
 
-    for (const [docId, review] of Object.entries(
-      reviewLog.documentReviews,
-    )) {
+    for (const [docId, review] of Object.entries(reviewLog.documentReviews)) {
       feedbackMap[docId] = {
         isVerified: review.isValid,
         feedback: review.feedback,

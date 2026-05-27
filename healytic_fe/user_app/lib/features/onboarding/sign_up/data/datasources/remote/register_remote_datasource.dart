@@ -14,6 +14,8 @@ import 'package:user_openapi/api.dart';
 
 part 'register_remote_datasource.g.dart';
 
+const kDefaultRegisterOtpCode = '12345';
+
 abstract class RegisterRemoteDatasource {
   /// Checks whether the given email already exists.
   Future<bool> checkEmail({required String email});
@@ -50,12 +52,16 @@ class RegisterRemoteDatasourceImpl implements RegisterRemoteDatasource {
   @override
   Future<void> sendOtp({required String email}) async {
     await Future.delayed(const Duration(seconds: 1), () {});
+    debugPrint('Registration OTP for $email: $kDefaultRegisterOtpCode');
     // return await apiService.sendOtp(email: email);
   }
 
   @override
   Future<void> verifyCode({required String email, required String code}) async {
     await Future.delayed(const Duration(seconds: 1), () {});
+    if (code.trim() != kDefaultRegisterOtpCode) {
+      throw Exception('Invalid verification code');
+    }
     // return await apiService.verifyCode(email: email, code: code);
   }
 

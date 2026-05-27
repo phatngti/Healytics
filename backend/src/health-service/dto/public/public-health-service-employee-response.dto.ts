@@ -25,7 +25,8 @@ export class PublicHealthServiceEmployeeDayScheduleDto {
 // ─── Main DTO ────────────────────────────────────────────────
 
 export class PublicHealthServiceEmployeeResponseDto {
-  @ApiProperty({ type: String, description: 'Employee (specialist) ID' }) id: string;
+  @ApiProperty({ type: String, description: 'Employee (specialist) ID' })
+  id: string;
   @ApiProperty({
     type: String,
     description:
@@ -34,12 +35,17 @@ export class PublicHealthServiceEmployeeResponseDto {
   eligibilityId: string;
   @ApiProperty({ type: String }) name: string;
   @ApiProperty({ type: String }) role: string;
-  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl:
+    | string
+    | null;
   @ApiProperty({ type: Boolean, example: false }) isSelected: boolean;
   @ApiPropertyOptional({ type: String, nullable: true }) quote: string | null;
   @ApiPropertyOptional({ type: String, nullable: true }) degrees: string | null;
-  @ApiPropertyOptional({ type: String, nullable: true }) languages: string | null;
-  @ApiPropertyOptional({ type: String, nullable: true, example: '12 years' }) experience: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) languages:
+    | string
+    | null;
+  @ApiPropertyOptional({ type: String, nullable: true, example: '12 years' })
+  experience: string | null;
   @ApiPropertyOptional({ type: [String] }) specializations: string[];
   @ApiPropertyOptional({ type: String, nullable: true }) bio: string | null;
   @ApiProperty({ type: [PublicHealthServiceEmployeeDayScheduleDto] })

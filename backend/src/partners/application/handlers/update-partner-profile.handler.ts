@@ -101,7 +101,8 @@ export class UpdatePartnerProfileHandler {
         const newBusinessType = getValue<string[]>(bizInfo.serviceTags);
         if (
           Array.isArray(newBusinessType) &&
-          JSON.stringify(newBusinessType) !== JSON.stringify(partner.businessType)
+          JSON.stringify(newBusinessType) !==
+            JSON.stringify(partner.businessType)
         ) {
           partner.businessType = newBusinessType as any;
           isModified = true;

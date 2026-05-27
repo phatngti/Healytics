@@ -13,11 +13,19 @@ export class PaginationMetaResponseDto {
   @Expose()
   limit: number;
 
-  @ApiProperty({ type: Number, example: 42, description: 'Total number of items' })
+  @ApiProperty({
+    type: Number,
+    example: 42,
+    description: 'Total number of items',
+  })
   @Expose()
   total: number;
 
-  @ApiProperty({ type: Number, example: 3, description: 'Total number of pages' })
+  @ApiProperty({
+    type: Number,
+    example: 3,
+    description: 'Total number of pages',
+  })
   @Expose()
   totalPages: number;
 }

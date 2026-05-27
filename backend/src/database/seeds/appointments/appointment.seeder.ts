@@ -1090,7 +1090,7 @@ export class AppointmentSeeder implements ISeeder {
       const { apt, userAccount, employee, bookingId } = entry;
 
       for (const log of apt.statusLogs) {
-        const statusLogData = log as any;
+        const statusLogData = log;
         const reasonCode =
           statusLogData.reasonCode ??
           this.inferSeedReasonCode(log.fromStatus, log.toStatus);
@@ -1122,7 +1122,8 @@ export class AppointmentSeeder implements ISeeder {
           gatewayTransId: null,
           paymentUrl: null,
           paymentDeeplink: null,
-          gatewayResultCode: apt.payment.status === PaymentStatus.PAID ? 0 : null,
+          gatewayResultCode:
+            apt.payment.status === PaymentStatus.PAID ? 0 : null,
           gatewayMessage:
             apt.payment.status === PaymentStatus.PAID ? 'Success' : null,
           refundedAt:

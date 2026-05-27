@@ -47,7 +47,7 @@ export class PartnerHealthServiceController {
    * Returns overview analytics for all partner services.
    */
   @Get('analytics/overview')
-    @LogResponse()
+  @LogResponse()
   @ApiOperation({
     summary: 'Get health service overview analytics',
   })
@@ -165,7 +165,8 @@ export class PartnerHealthServiceController {
   update(
     @CurrentUser('id') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body(new StripNullPropertiesPipe()) updateDto: UpdatePartnerHealthServiceDto,
+    @Body(new StripNullPropertiesPipe())
+    updateDto: UpdatePartnerHealthServiceDto,
   ): Promise<PartnerHealthServiceResponseDto> {
     return this.healthServiceService.update(userId, id, updateDto);
   }

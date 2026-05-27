@@ -20,9 +20,13 @@ config({
 
 async function bootstrap() {
   const logLevels: LogLevel[] =
-    process.env.PERF_MODE === 'true' || process.env.NODE_ENV === 'production'
-      ? ['error', 'warn', 'log']
-      : ['log', 'error', 'warn', 'debug', 'verbose'];
+    process.env.NODE_ENV === 'test'
+      ? ['error']
+      : process.env.PERF_MODE === 'true' || process.env.NODE_ENV === 'production'
+        ? ['error', 'warn', 'log']
+        : ['log', 'error', 'warn', 'debug', 'verbose'];
+
+  Logger.overrideLogger(logLevels);
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: logLevels,
@@ -56,7 +60,9 @@ async function bootstrap() {
   // ── Serve the Jest HTML test report at /test-report (opt-in) ───
   if (process.env.SERVE_TEST_REPORT === 'true') {
     const reportPath = path.resolve(process.cwd(), 'test-report');
-    console.log(`[test-report] __dirname=${__dirname} cwd=${process.cwd()} reportPath=${reportPath} exists=${fs.existsSync(reportPath)}`);
+    console.log(
+      `[test-report] __dirname=${__dirname} cwd=${process.cwd()} reportPath=${reportPath} exists=${fs.existsSync(reportPath)}`,
+    );
     if (fs.existsSync(reportPath)) {
       // Get the underlying Express instance and mount static middleware
       const httpAdapter = app.getHttpAdapter();

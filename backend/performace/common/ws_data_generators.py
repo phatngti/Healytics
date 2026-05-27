@@ -25,10 +25,25 @@ from models.ws_models import (
 fake = Faker("vi_VN")
 
 # ── Configurable test IDs ────────────────────────────────────────────────────
-# These can be overridden via environment variables for testing against
-# real conversations in the database. Defaults to random UUIDs.
-WS_CONVERSATION_ID = os.getenv("WS_CONVERSATION_ID", str(uuid.uuid4()))
+# These can be overridden via environment variables for testing against real
+# conversations in the database. The all-module account seed writes the
+# PERF_CHAT_* and role-specific receiver variables.
+WS_CONVERSATION_ID = (
+    os.getenv("WS_CONVERSATION_ID")
+    or os.getenv("PERF_CHAT_CONVERSATION_ID")
+    or str(uuid.uuid4())
+)
 WS_RECEIVER_ID = os.getenv("WS_RECEIVER_ID", str(uuid.uuid4()))
+WS_USER_CHAT_RECEIVER_ID = (
+    os.getenv("WS_USER_CHAT_RECEIVER_ID")
+    or os.getenv("PERF_CHAT_PARTNER_ACCOUNT_ID")
+    or WS_RECEIVER_ID
+)
+WS_PARTNER_CHAT_RECEIVER_ID = (
+    os.getenv("WS_PARTNER_CHAT_RECEIVER_ID")
+    or os.getenv("PERF_CHAT_USER_ID")
+    or WS_RECEIVER_ID
+)
 
 # Additional conversation IDs for variety (comma-separated env var)
 _extra_convos = os.getenv("WS_EXTRA_CONVERSATION_IDS", "")
@@ -47,8 +62,12 @@ def _pick_conversation_id() -> str:
     return random.choice(WS_CONVERSATION_IDS)
 
 
-def _pick_receiver_id() -> str:
+def _pick_receiver_id(sender_role: str | None = None) -> str:
     """Pick a random receiver ID from the configured pool."""
+    if sender_role == "user":
+        return WS_USER_CHAT_RECEIVER_ID
+    if sender_role == "partner":
+        return WS_PARTNER_CHAT_RECEIVER_ID
     return random.choice(WS_RECEIVER_IDS)
 
 
@@ -60,6 +79,7 @@ MESSAGE_TYPES = list(WsMessageType)
 def generate_send_message(
     conversation_id: str | None = None,
     receiver_id: str | None = None,
+    sender_role: str | None = None,
 ) -> dict:
     """
     Generate a WsSendMessagePayload.
@@ -73,7 +93,7 @@ def generate_send_message(
     """
     return WsSendMessagePayload(
         conversationId=conversation_id or _pick_conversation_id(),
-        receiverId=receiver_id or _pick_receiver_id(),
+        receiverId=receiver_id or _pick_receiver_id(sender_role),
         content=fake.paragraph(nb_sentences=random.randint(1, 3))[:500],
         messageType=random.choices(
             MESSAGE_TYPES, weights=[80, 10, 8, 2], k=1
@@ -87,6 +107,7 @@ def generate_send_message(
 def generate_typing(
     conversation_id: str | None = None,
     receiver_id: str | None = None,
+    sender_role: str | None = None,
 ) -> dict:
     """
     Generate a WsTypingPayload.
@@ -97,7 +118,7 @@ def generate_typing(
     """
     return WsTypingPayload(
         conversationId=conversation_id or _pick_conversation_id(),
-        receiverId=receiver_id or _pick_receiver_id(),
+        receiverId=receiver_id or _pick_receiver_id(sender_role),
     ).to_dict()
 
 
@@ -106,6 +127,7 @@ def generate_typing(
 def generate_mark_read(
     conversation_id: str | None = None,
     receiver_id: str | None = None,
+    sender_role: str | None = None,
 ) -> dict:
     """
     Generate a WsMarkReadPayload.
@@ -116,7 +138,7 @@ def generate_mark_read(
     """
     return WsMarkReadPayload(
         conversationId=conversation_id or _pick_conversation_id(),
-        receiverId=receiver_id or _pick_receiver_id(),
+        receiverId=receiver_id or _pick_receiver_id(sender_role),
     ).to_dict()
 
 

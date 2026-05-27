@@ -187,9 +187,7 @@ describe('PaymentExpiryService', () => {
       redisService.del.mockRejectedValue(new Error('Redis down'));
 
       // Act & Assert — should not throw
-      await expect(
-        service.cancelExpiredPayments(),
-      ).resolves.not.toThrow();
+      await expect(service.cancelExpiredPayments()).resolves.not.toThrow();
       expect(bookingRepo.save).toHaveBeenCalledTimes(1);
     });
   });

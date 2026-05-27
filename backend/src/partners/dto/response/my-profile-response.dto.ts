@@ -307,7 +307,6 @@ export class BusinessInfoDto {
   @ApiPropertyOptional({ type: VerifiedField })
   phoneNumber?: VerifiedField<string>;
 
-
   static fromPartner(
     partner: Partner,
     feedbackMap: FieldFeedbackMap = {},

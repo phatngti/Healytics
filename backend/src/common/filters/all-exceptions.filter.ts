@@ -36,7 +36,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message:
         typeof message === 'string'
           ? message
-          : (message as any)?.message ?? message,
+          : ((message as any)?.message ?? message),
     };
 
     // Include request body for mutation endpoints (POST/PUT/PATCH)
@@ -78,7 +78,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       `[${request.method} ${request.url}] ${status} — ${JSON.stringify(errorContext)}`,
     );
 
-    if (exception instanceof Error) {
+    if (
+      exception instanceof Error &&
+      (status >= 500 || !(exception instanceof HttpException))
+    ) {
       this.logger.error(`Stack: ${exception.stack}`);
     }
 
@@ -107,7 +110,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     ];
     const sanitized = { ...body };
     for (const key of Object.keys(sanitized)) {
-      if (sensitiveKeys.some((s) => key.toLowerCase().includes(s.toLowerCase()))) {
+      if (
+        sensitiveKeys.some((s) => key.toLowerCase().includes(s.toLowerCase()))
+      ) {
         sanitized[key] = '***REDACTED***';
       }
     }

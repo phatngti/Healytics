@@ -1,5 +1,10 @@
 import { Get, Patch, Param, Query, Body, ParseUUIDPipe } from '@nestjs/common';
-import { ApiOperation, ApiOkResponse, ApiNotFoundResponse, ApiBadRequestResponse } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiOkResponse,
+  ApiNotFoundResponse,
+  ApiBadRequestResponse,
+} from '@nestjs/swagger';
 import { PartnerApi } from '@/common/decorators/api/partner-api.decorator';
 import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import { PartnerFinanceService } from './partner-finance.service';
@@ -38,17 +43,24 @@ export class PartnerTransactionsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List partner transactions with filters and pagination' })
+  @ApiOperation({
+    summary: 'List partner transactions with filters and pagination',
+  })
   @ApiOkResponse({ description: 'Paginated transaction list' })
   getTransactions(
     @CurrentUser('id') userId: string,
     @Query() query: PartnerFinancePageQueryDto,
-  ): Promise<{ data: PartnerTransactionRecordDto[]; meta: PartnerFinancePageMetaDto }> {
+  ): Promise<{
+    data: PartnerTransactionRecordDto[];
+    meta: PartnerFinancePageMetaDto;
+  }> {
     return this.financeService.listTransactions(userId, query);
   }
 
   @Get(':transactionId')
-  @ApiOperation({ summary: 'Get transaction detail with payout and refund cases' })
+  @ApiOperation({
+    summary: 'Get transaction detail with payout and refund cases',
+  })
   @ApiOkResponse({ type: PartnerTransactionDetailDto })
   @ApiNotFoundResponse({ description: 'Transaction not found' })
   getTransactionDetail(

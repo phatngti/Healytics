@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, Logger } from '@nestjs/common';
 import { APP_INTERCEPTOR, DiscoveryModule } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -34,6 +34,7 @@ import { PartnerFinanceModule } from './partner-finance/partner-finance.module';
 import { HealthModule } from './health/health.module';
 import { TestBackdoorModule } from './test-backdoor/test-backdoor.module';
 import { SearchModule } from './search/search.module';
+import { ObservabilityModule } from './observability/observability.module';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
 import rabbitmqConfig from './config/rabbitmq.config';
@@ -129,6 +130,7 @@ const envFilePath =
     ProfileModule,
     DashboardPartnerModule,
     PartnerFinanceModule,
+    ObservabilityModule,
     HealthModule,
     SearchModule,
     ...(process.env.NODE_ENV === 'test' ? [TestBackdoorModule] : []),
@@ -154,6 +156,12 @@ const envFilePath =
   ],
 })
 export class AppModule implements NestModule {
+  constructor() {
+    if (process.env.NODE_ENV === 'test') {
+      Logger.overrideLogger(['error']);
+    }
+  }
+
   configure(consumer: MiddlewareConsumer) {
     // Apply logging middleware to all routes
     consumer.apply(LoggingMiddleware).forRoutes('*');

@@ -1,5 +1,9 @@
 import { Get, Post, Param, Query, Body, ParseUUIDPipe } from '@nestjs/common';
-import { ApiOperation, ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiOkResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger';
 import { PartnerApi } from '@/common/decorators/api/partner-api.decorator';
 import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import { PartnerFinanceService } from './partner-finance.service';
@@ -18,7 +22,10 @@ export class PartnerPayoutsController {
   getPayouts(
     @CurrentUser('id') userId: string,
     @Query() query: PartnerFinancePageQueryDto,
-  ): Promise<{ data: PartnerPayoutRecordDto[]; meta: PartnerFinancePageMetaDto }> {
+  ): Promise<{
+    data: PartnerPayoutRecordDto[];
+    meta: PartnerFinancePageMetaDto;
+  }> {
     return this.financeService.listPayouts(userId, query);
   }
 

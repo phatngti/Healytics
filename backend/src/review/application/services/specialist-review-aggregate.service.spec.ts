@@ -52,15 +52,11 @@ describe('SpecialistReviewAggregateService', () => {
 
     expect(dataSource.query).toHaveBeenCalledTimes(4);
     expect(dataSource.query.mock.calls[0][1]).toEqual([['emp-1']]);
-    expect(dataSource.query.mock.calls[1][0]).toContain(
-      'pg_try_advisory_lock',
-    );
+    expect(dataSource.query.mock.calls[1][0]).toContain('pg_try_advisory_lock');
     expect(dataSource.query.mock.calls[2][0]).toContain(
       'WITH review_aggregates AS',
     );
-    expect(dataSource.query.mock.calls[3][0]).toContain(
-      'pg_advisory_unlock',
-    );
+    expect(dataSource.query.mock.calls[3][0]).toContain('pg_advisory_unlock');
   });
 
   it('skips full reconciliation when another worker holds the advisory lock', async () => {
@@ -74,8 +70,6 @@ describe('SpecialistReviewAggregateService', () => {
     await service.reconcileAllSpecialistAggregates();
 
     expect(dataSource.query).toHaveBeenCalledTimes(1);
-    expect(dataSource.query.mock.calls[0][0]).toContain(
-      'pg_try_advisory_lock',
-    );
+    expect(dataSource.query.mock.calls[0][0]).toContain('pg_try_advisory_lock');
   });
 });

@@ -13,6 +13,7 @@ class CreateDoctorDto(DtoModel):
     firstName: str
     lastName: str
     email: str
+    password: str
     emergencyContactName: str
     emergencyContactPhone: str
     employeeId: str
@@ -53,6 +54,7 @@ class CreateMassageTherapistDto(DtoModel):
     firstName: str
     lastName: str
     email: str
+    password: str
     emergencyContactName: str
     emergencyContactPhone: str
     employeeId: str
@@ -86,6 +88,7 @@ class CreateSpaTherapistDto(DtoModel):
     firstName: str
     lastName: str
     email: str
+    password: str
     emergencyContactName: str
     emergencyContactPhone: str
     employeeId: str
@@ -231,6 +234,7 @@ class UpdateEmployeeDto(DtoModel):
     employeeCode: str | None = None
     fullName: str | None = None
     email: str | None = None
+    password: str | None = None
     role: EmployeeRole | None = None
     status: EmployeeStatus | None = None
     firstName: str | None = None

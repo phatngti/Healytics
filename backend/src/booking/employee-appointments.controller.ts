@@ -1,11 +1,4 @@
-import {
-  Get,
-  Patch,
-  Param,
-  Query,
-  Body,
-  ParseUUIDPipe,
-} from '@nestjs/common';
+import { Get, Patch, Param, Query, Body, ParseUUIDPipe } from '@nestjs/common';
 import {
   ApiOperation,
   ApiOkResponse,

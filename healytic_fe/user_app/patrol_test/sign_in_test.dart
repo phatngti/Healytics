@@ -54,63 +54,54 @@ import 'common.dart';
 import 'config/test_config.dart';
 
 void main() {
-  patrolTest(
-    'sign in screen renders Google button',
-    ($) async {
-      await pumpApp($);
-      final config = TestConfig.instance;
+  patrolTest('sign in screen renders Google button', ($) async {
+    await pumpApp($);
+    final config = TestConfig.instance;
 
-      if (config.useMock) {
-        // Mock mode auto-lands on home; SingInScreen
-        // never renders. Nothing to assert here.
-        await $.pump(const Duration(seconds: 1));
-        return;
-      }
-
-      // Navigate from onboarding to the sign-in screen.
-      await $(OnboardScreen).waitUntilVisible();
-      await $(keys.onboardPage.signInButton).tap();
-      await $.pumpAndSettle();
-
-      await $(SingInScreen).waitUntilVisible();
-
-      expect(
-        $(keys.signInPage.googleButton),
-        findsOneWidget,
-      );
-    },
-  );
-
-  patrolTest(
-    'tapping Google sign in button does not '
-    'crash the sign in screen',
-    ($) async {
-      await pumpApp($);
-      final config = TestConfig.instance;
-
-      if (config.useMock) {
-        // Mock mode skips this flow entirely — see
-        // file header.
-        await $.pump(const Duration(seconds: 1));
-        return;
-      }
-
-      await $(OnboardScreen).waitUntilVisible();
-      await $(keys.onboardPage.signInButton).tap();
-      await $.pumpAndSettle();
-
-      await $(SingInScreen).waitUntilVisible();
-
-      // Tap the Google button. On a real device this
-      // hands off to the native Google account picker
-      // which Patrol cannot drive, so we only assert
-      // that the Flutter side did not crash and we are
-      // still on SingInScreen (the picker overlays
-      // the existing route rather than replacing it).
-      await $(keys.signInPage.googleButton).tap();
+    if (config.useMock) {
+      // Mock mode auto-lands on home; SingInScreen
+      // never renders. Nothing to assert here.
       await $.pump(const Duration(seconds: 1));
+      return;
+    }
 
-      expect($(SingInScreen), findsOneWidget);
-    },
-  );
+    // Navigate from onboarding to the sign-in screen.
+    await $(OnboardScreen).waitUntilVisible();
+    await $(keys.onboardPage.signInButton).tap();
+    await $.pump(const Duration(seconds: 1));
+
+    await $(SingInScreen).waitUntilVisible();
+
+    expect($(keys.signInPage.googleButton), findsOneWidget);
+  });
+
+  patrolTest('tapping Google sign in button does not '
+      'crash the sign in screen', ($) async {
+    await pumpApp($);
+    final config = TestConfig.instance;
+
+    if (config.useMock) {
+      // Mock mode skips this flow entirely — see
+      // file header.
+      await $.pump(const Duration(seconds: 1));
+      return;
+    }
+
+    await $(OnboardScreen).waitUntilVisible();
+    await $(keys.onboardPage.signInButton).tap();
+    await $.pump(const Duration(seconds: 1));
+
+    await $(SingInScreen).waitUntilVisible();
+
+    // Tap the Google button. On a real device this
+    // hands off to the native Google account picker
+    // which Patrol cannot drive, so we only assert
+    // that the Flutter side did not crash and we are
+    // still on SingInScreen (the picker overlays
+    // the existing route rather than replacing it).
+    await $(keys.signInPage.googleButton).tap();
+    await $.pump(const Duration(seconds: 1));
+
+    expect($(SingInScreen), findsOneWidget);
+  });
 }

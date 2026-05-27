@@ -22,6 +22,7 @@ import {
 } from '@/chat/ws/ws-jwt-auth.middleware';
 import { Role } from '@/account/enum/role.enum';
 import { WsNamespace } from '@/common/decorators/ws';
+import { ObservabilityMetricsService } from '@/observability/observability-metrics.service';
 
 /**
  * WebSocket gateway for real-time notification delivery.
@@ -72,6 +73,7 @@ export class NotificationGateway
   constructor(
     private readonly jwtService: JwtService,
     private readonly accountService: AccountService,
+    private readonly observabilityMetrics: ObservabilityMetricsService,
   ) {}
 
   // ── Lifecycle ────────────────────────────────────────────────
@@ -79,11 +81,18 @@ export class NotificationGateway
   afterInit(server: Namespace) {
     server.use(WsJwtAuthMiddleware(this.jwtService, this.accountService));
     server.use(WsRoleMiddleware([Role.USER]));
+    this.observabilityMetrics.registerWsNamespace('notifications', server);
     this.logger.log('NotificationGateway initialized on /notifications');
   }
 
   handleConnection(client: Socket) {
     const user = client.data.user;
+    this.observabilityMetrics.recordWsConnect(
+      client.id,
+      'notifications',
+      user.role,
+      user.id,
+    );
     this.logger.log(
       `[Notif WS Connected] user=${user.email} userId=${user.id} socketId=${client.id}`,
     );
@@ -101,6 +110,7 @@ export class NotificationGateway
 
   handleDisconnect(client: Socket) {
     const user = client.data.user;
+    this.observabilityMetrics.recordWsDisconnect(client.id, 'notifications');
     this.logger.log(
       `[Notif WS Disconnected] user=${user?.email ?? 'unknown'} socketId=${client.id}`,
     );

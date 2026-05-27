@@ -11,7 +11,9 @@ from locustfiles.booking_race_condition import BookingRaceUser, BookingVerifier 
 from locustfiles.current_new_api import (  # noqa: F401
     AdminDashboardCurrentApiUser,
     AdminFinanceReadApiUser,
+    AdminOperationsReadApiUser,
     PartnerCurrentApiUser,
+    PublicCatalogCurrentApiUser,
     UserCurrentNewApiUser,
 )
 from locustfiles.employee_api import EmployeeApiUser, EmployeeAppointmentMutationUser  # noqa: F401

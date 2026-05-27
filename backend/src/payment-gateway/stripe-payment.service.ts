@@ -569,15 +569,11 @@ export class StripePaymentService {
 
     switch (event.type) {
       case 'payment_intent.succeeded':
-        await this.handlePaymentIntentSucceeded(
-          event.data.object as StripeClient.PaymentIntent,
-        );
+        await this.handlePaymentIntentSucceeded(event.data.object);
         break;
 
       case 'payment_intent.payment_failed':
-        await this.handlePaymentIntentFailed(
-          event.data.object as StripeClient.PaymentIntent,
-        );
+        await this.handlePaymentIntentFailed(event.data.object);
         break;
 
       default:

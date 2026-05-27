@@ -6,7 +6,10 @@ import { IsOptional, IsString, MaxLength } from 'class-validator';
  * Reason is required for audit trail.
  */
 export class CancelEmployeeAppointmentDto {
-  @ApiPropertyOptional({ type: String, example: 'Patient requested cancellation' })
+  @ApiPropertyOptional({
+    type: String,
+    example: 'Patient requested cancellation',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(500)

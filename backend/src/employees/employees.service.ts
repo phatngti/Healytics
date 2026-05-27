@@ -761,11 +761,7 @@ export class EmployeesService {
     };
   }
 
-  private businessDateStartUtc(
-    year: string,
-    month: string,
-    day: string,
-  ): Date {
+  private businessDateStartUtc(year: string, month: string, day: string): Date {
     return new Date(
       Date.UTC(Number(year), Number(month) - 1, Number(day), -7, 0, 0, 0),
     );

@@ -66,7 +66,10 @@ describe('ProcessCheckoutHandler', () => {
         { provide: RedisService, useValue: redisService },
         { provide: WebhookService, useValue: webhookService },
         BookingStatusLogWriterService,
-        { provide: NotificationEventService, useValue: notificationEventService },
+        {
+          provide: NotificationEventService,
+          useValue: notificationEventService,
+        },
       ],
     }).compile();
 

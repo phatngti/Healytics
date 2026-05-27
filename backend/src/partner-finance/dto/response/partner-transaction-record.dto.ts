@@ -17,11 +17,17 @@ export class PartnerTransactionRecordDto {
   @Expose()
   createdAt: string;
 
-  @ApiProperty({ enum: PartnerTransactionType, enumName: 'PartnerTransactionType' })
+  @ApiProperty({
+    enum: PartnerTransactionType,
+    enumName: 'PartnerTransactionType',
+  })
   @Expose()
   type: PartnerTransactionType;
 
-  @ApiProperty({ enum: PartnerCommerceSourceType, enumName: 'PartnerCommerceSourceType' })
+  @ApiProperty({
+    enum: PartnerCommerceSourceType,
+    enumName: 'PartnerCommerceSourceType',
+  })
   @Expose()
   sourceType: PartnerCommerceSourceType;
 
@@ -49,11 +55,17 @@ export class PartnerTransactionRecordDto {
   @Expose()
   currency: string;
 
-  @ApiProperty({ enum: PartnerTransactionStatus, enumName: 'PartnerTransactionStatus' })
+  @ApiProperty({
+    enum: PartnerTransactionStatus,
+    enumName: 'PartnerTransactionStatus',
+  })
   @Expose()
   status: PartnerTransactionStatus;
 
-  @ApiProperty({ enum: PartnerSettlementStatus, enumName: 'PartnerSettlementStatus' })
+  @ApiProperty({
+    enum: PartnerSettlementStatus,
+    enumName: 'PartnerSettlementStatus',
+  })
   @Expose()
   settlementStatus: PartnerSettlementStatus;
 
@@ -90,7 +102,9 @@ export class PartnerTransactionRecordDto {
   @Expose()
   payoutId!: string | null;
 
-  static fromEntity(entity: PartnerLedgerTransaction): PartnerTransactionRecordDto {
+  static fromEntity(
+    entity: PartnerLedgerTransaction,
+  ): PartnerTransactionRecordDto {
     const dto = new PartnerTransactionRecordDto();
     dto.id = entity.id;
     dto.createdAt = entity.createdAt?.toISOString();
@@ -119,7 +133,9 @@ export class PartnerTransactionRecordDto {
     return dto;
   }
 
-  static fromEntities(entities: PartnerLedgerTransaction[]): PartnerTransactionRecordDto[] {
+  static fromEntities(
+    entities: PartnerLedgerTransaction[],
+  ): PartnerTransactionRecordDto[] {
     return entities.map((e) => PartnerTransactionRecordDto.fromEntity(e));
   }
 }

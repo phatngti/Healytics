@@ -18,7 +18,10 @@ export class ListPartnerTransactionsHandler {
   async execute(
     partnerId: string,
     query: PartnerFinancePageQueryDto,
-  ): Promise<{ data: PartnerTransactionRecordDto[]; meta: PartnerFinancePageMetaDto }> {
+  ): Promise<{
+    data: PartnerTransactionRecordDto[];
+    meta: PartnerFinancePageMetaDto;
+  }> {
     this.logger.log(`Listing transactions for partner: ${partnerId}`);
 
     const page = query.page ?? 1;
@@ -37,7 +40,9 @@ export class ListPartnerTransactionsHandler {
       );
     }
     if (query.startDate) {
-      qb.andWhere('txn.createdAt >= :startDate', { startDate: new Date(query.startDate) });
+      qb.andWhere('txn.createdAt >= :startDate', {
+        startDate: new Date(query.startDate),
+      });
     }
     if (query.endDate) {
       const end = new Date(query.endDate);
@@ -45,19 +50,29 @@ export class ListPartnerTransactionsHandler {
       qb.andWhere('txn.createdAt <= :endDate', { endDate: end });
     }
     if (query.sourceType) {
-      qb.andWhere('txn.sourceType = :sourceType', { sourceType: query.sourceType });
+      qb.andWhere('txn.sourceType = :sourceType', {
+        sourceType: query.sourceType,
+      });
     }
     if (query.transactionType) {
-      qb.andWhere('txn.type = :transactionType', { transactionType: query.transactionType });
+      qb.andWhere('txn.type = :transactionType', {
+        transactionType: query.transactionType,
+      });
     }
     if (query.transactionStatus) {
-      qb.andWhere('txn.status = :transactionStatus', { transactionStatus: query.transactionStatus });
+      qb.andWhere('txn.status = :transactionStatus', {
+        transactionStatus: query.transactionStatus,
+      });
     }
     if (query.settlementStatus) {
-      qb.andWhere('txn.settlementStatus = :settlementStatus', { settlementStatus: query.settlementStatus });
+      qb.andWhere('txn.settlementStatus = :settlementStatus', {
+        settlementStatus: query.settlementStatus,
+      });
     }
     if (query.payoutStatus) {
-      qb.andWhere('txn.payoutStatus = :payoutStatus', { payoutStatus: query.payoutStatus });
+      qb.andWhere('txn.payoutStatus = :payoutStatus', {
+        payoutStatus: query.payoutStatus,
+      });
     }
     if (query.currency) {
       qb.andWhere('txn.currency = :currency', { currency: query.currency });

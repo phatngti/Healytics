@@ -9,7 +9,6 @@ from common.auth import (
     login_employee,
     login_partner,
     login_user,
-    refresh_employee_tokens,
 )
 from common.config import (
     ADMIN_EMAIL,
@@ -31,9 +30,6 @@ class AuthApiUser(HttpUser):
     """Auth endpoint user covering the current login and email-check surface."""
 
     wait_time = between(MIN_WAIT, MAX_WAIT)
-
-    def on_start(self):
-        _, self.employee_refresh_token = login_employee(self.client)
 
     @task(4)
     def check_existing_user_email(self):
@@ -61,26 +57,7 @@ class AuthApiUser(HttpUser):
 
     @task(2)
     def employee_login(self):
-        access_token, refresh_token = login_employee(self.client)
-        if access_token and refresh_token:
-            self.employee_refresh_token = refresh_token
-
-    @task(1)
-    def employee_refresh(self):
-        if not self.employee_refresh_token:
-            return
-        access_token, refresh_token = refresh_employee_tokens(
-            self.client,
-            self.employee_refresh_token,
-        )
-        if access_token and refresh_token:
-            self.employee_refresh_token = refresh_token
-        else:
-            # Refresh failed (likely 401 race condition) — re-login
-            # to obtain a fresh token pair.
-            _, new_refresh = login_employee(self.client)
-            if new_refresh:
-                self.employee_refresh_token = new_refresh
+        login_employee(self.client)
 
     def _check_email(self, email: str):
         payload = CheckEmailDto(email=email)
@@ -89,4 +66,3 @@ class AuthApiUser(HttpUser):
             json=payload.to_dict(),
             name=f"{AUTH}/check-email",
         )
-

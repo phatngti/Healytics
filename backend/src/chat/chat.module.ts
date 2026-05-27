@@ -54,4 +54,3 @@ import { GetPartnerConversationsHandler } from './application/handlers/get-partn
   exports: [ChatService],
 })
 export class ChatModule {}
-

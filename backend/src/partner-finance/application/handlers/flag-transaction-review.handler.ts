@@ -41,8 +41,14 @@ export class FlagTransactionReviewHandler {
       const event = queryRunner.manager.create(PartnerTransactionTimeline, {
         transactionId: txn.id,
         partnerId,
-        title: dto.flaggedForReview ? 'Flagged for review' : 'Review flag removed',
-        description: dto.note ?? (dto.flaggedForReview ? 'Partner requested finance review' : 'Review flag cleared'),
+        title: dto.flaggedForReview
+          ? 'Flagged for review'
+          : 'Review flag removed',
+        description:
+          dto.note ??
+          (dto.flaggedForReview
+            ? 'Partner requested finance review'
+            : 'Review flag cleared'),
         occurredAt: new Date(),
         actorAccountId: accountId,
       });
@@ -50,10 +56,13 @@ export class FlagTransactionReviewHandler {
 
       await queryRunner.commitTransaction();
 
-      const updated = await this.dataSource.manager.findOne(PartnerLedgerTransaction, {
-        where: { id: transactionId },
-        relations: ['timelineEvents'],
-      });
+      const updated = await this.dataSource.manager.findOne(
+        PartnerLedgerTransaction,
+        {
+          where: { id: transactionId },
+          relations: ['timelineEvents'],
+        },
+      );
 
       return PartnerTransactionRecordDto.fromEntity(updated!);
     } catch (error) {

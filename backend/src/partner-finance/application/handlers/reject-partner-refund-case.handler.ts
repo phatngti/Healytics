@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { PartnerRefundCase } from '@/common/entities/partner-refund-case.entity';
 import { PartnerLedgerTransaction } from '@/common/entities/partner-ledger-transaction.entity';
@@ -48,18 +53,32 @@ export class RejectPartnerRefundCaseHandler {
       await queryRunner.manager.save(PartnerRefundCase, refundCase);
 
       // Check if there are other open refund cases on the same transaction
-      const openCasesCount = await queryRunner.manager.count(PartnerRefundCase, {
-        where: [
-          { transactionId: refundCase.transactionId, partnerId, status: PartnerRefundCaseStatus.PENDING },
-          { transactionId: refundCase.transactionId, partnerId, status: PartnerRefundCaseStatus.UNDER_REVIEW },
-        ],
-      });
+      const openCasesCount = await queryRunner.manager.count(
+        PartnerRefundCase,
+        {
+          where: [
+            {
+              transactionId: refundCase.transactionId,
+              partnerId,
+              status: PartnerRefundCaseStatus.PENDING,
+            },
+            {
+              transactionId: refundCase.transactionId,
+              partnerId,
+              status: PartnerRefundCaseStatus.UNDER_REVIEW,
+            },
+          ],
+        },
+      );
 
       // Release held settlement if no other open cases remain
       if (openCasesCount === 0) {
-        const txn = await queryRunner.manager.findOne(PartnerLedgerTransaction, {
-          where: { id: refundCase.transactionId, partnerId },
-        });
+        const txn = await queryRunner.manager.findOne(
+          PartnerLedgerTransaction,
+          {
+            where: { id: refundCase.transactionId, partnerId },
+          },
+        );
         if (txn && txn.settlementStatus === PartnerSettlementStatus.HELD) {
           txn.settlementStatus = PartnerSettlementStatus.SCHEDULED;
           await queryRunner.manager.save(PartnerLedgerTransaction, txn);
@@ -84,7 +103,11 @@ export class RejectPartnerRefundCaseHandler {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(`Reject failed: ${error.message}`, error.stack);
-      if (error instanceof NotFoundException || error instanceof ConflictException) throw error;
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ConflictException
+      )
+        throw error;
       throw error;
     } finally {
       await queryRunner.release();

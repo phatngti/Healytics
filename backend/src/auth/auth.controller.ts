@@ -44,6 +44,7 @@ import { PartnersService } from '@/partners/partners.service';
 import { RegisterPartnerDto } from '@/partners/dto/request/register-partner.dto';
 import { RegisterPartnerResponseDto } from '@/partners/dto/response/register-partner-response.dto';
 import { AccountService } from '@/account/account.service';
+import { ObservabilityMetricsService } from '@/observability/observability-metrics.service';
 
 /**
  * Controller for authentication endpoints.
@@ -61,6 +62,7 @@ export class AuthController {
     @Inject(forwardRef(() => PartnersService))
     private partnersService: PartnersService,
     private readonly accountService: AccountService,
+    private readonly observabilityMetrics: ObservabilityMetricsService,
   ) {}
 
   // ============================================================================
@@ -130,7 +132,12 @@ export class AuthController {
   })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginUser(@Req() req): Promise<AuthTokensDto> {
-    return this.authService.loginUser(req.user);
+    const tokens = await this.authService.loginUser(req.user);
+    await this.observabilityMetrics.recordLoginCcu(
+      req.user?.role,
+      req.user?.id,
+    );
+    return tokens;
   }
 
   /**
@@ -245,7 +252,12 @@ export class AuthController {
   })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginPartner(@Req() req): Promise<AuthTokensDto> {
-    return this.authService.loginPartner(req.user);
+    const tokens = await this.authService.loginPartner(req.user);
+    await this.observabilityMetrics.recordLoginCcu(
+      req.user?.role,
+      req.user?.id,
+    );
+    return tokens;
   }
 
   /**
@@ -285,7 +297,12 @@ export class AuthController {
   })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginAdmin(@Req() req): Promise<AuthTokensDto> {
-    return this.authService.loginAdmin(req.user);
+    const tokens = await this.authService.loginAdmin(req.user);
+    await this.observabilityMetrics.recordLoginCcu(
+      req.user?.role,
+      req.user?.id,
+    );
+    return tokens;
   }
 
   // ============================================================================
@@ -311,7 +328,12 @@ export class AuthController {
   })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials.' })
   async loginEmployee(@Req() req): Promise<AuthTokensDto> {
-    return this.authService.loginEmployee(req.user);
+    const tokens = await this.authService.loginEmployee(req.user);
+    await this.observabilityMetrics.recordLoginCcu(
+      req.user?.role,
+      req.user?.id,
+    );
+    return tokens;
   }
 
   /**

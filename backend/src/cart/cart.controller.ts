@@ -45,7 +45,9 @@ export class CartController {
   @Get()
   @ApiOperation({ summary: 'Get all cart items for current user' })
   @ApiOkResponse({ type: [CartItemResponseDto] })
-  async getItems(@CurrentUser('id') userId: string): Promise<CartItemResponseDto[]> {
+  async getItems(
+    @CurrentUser('id') userId: string,
+  ): Promise<CartItemResponseDto[]> {
     return this.cartService.getCartItems(userId);
   }
 
@@ -53,8 +55,12 @@ export class CartController {
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiOperation({ summary: 'Add service to cart' })
   @ApiCreatedResponse({ type: CartItemResponseDto })
-  @ApiBadRequestResponse({ description: 'Invalid service, employee, or inactive service.' })
-  @ApiConflictResponse({ description: 'Same service/employee/slot already in cart.' })
+  @ApiBadRequestResponse({
+    description: 'Invalid service, employee, or inactive service.',
+  })
+  @ApiConflictResponse({
+    description: 'Same service/employee/slot already in cart.',
+  })
   async addItem(
     @CurrentUser('id') userId: string,
     @Body() dto: AddToCartDto,

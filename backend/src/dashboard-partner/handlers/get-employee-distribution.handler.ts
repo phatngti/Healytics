@@ -17,9 +17,7 @@ export class GetEmployeeDistributionHandler {
   constructor(private readonly dataSource: DataSource) {}
 
   async execute(partnerId: string): Promise<EmployeeDistributionDto[]> {
-    this.logger.log(
-      `Getting employee distribution for partner: ${partnerId}`,
-    );
+    this.logger.log(`Getting employee distribution for partner: ${partnerId}`);
 
     const rows = await this.dataSource.query(
       `SELECT

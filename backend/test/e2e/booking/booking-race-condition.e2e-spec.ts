@@ -42,15 +42,11 @@ async function seedTestData(dataSource: DataSource): Promise<SeededData> {
     const startTime = futureDate.toISOString();
 
     // Find existing test data from seeders
-    const account = await queryRunner.query(
-      `SELECT id FROM account LIMIT 1`,
-    );
+    const account = await queryRunner.query(`SELECT id FROM account LIMIT 1`);
     const employee = await queryRunner.query(
       `SELECT id FROM employees LIMIT 1`,
     );
-    const product = await queryRunner.query(
-      `SELECT id FROM products LIMIT 1`,
-    );
+    const product = await queryRunner.query(`SELECT id FROM products LIMIT 1`);
 
     if (!account?.length || !employee?.length) {
       throw new Error(
@@ -167,9 +163,7 @@ describe('Booking Race Condition (e2e)', () => {
         )`,
       );
       // Remove stale test user accounts themselves
-      await qr.query(
-        `DELETE FROM account WHERE email LIKE 'race-cond%'`,
-      );
+      await qr.query(`DELETE FROM account WHERE email LIKE 'race-cond%'`);
     } catch {
       // Best-effort — tables may not exist yet on first run
     } finally {

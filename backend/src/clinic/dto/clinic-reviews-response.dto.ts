@@ -52,13 +52,21 @@ export class ClinicReviewDto {
   @ApiProperty({ type: Number, example: 5, minimum: 1, maximum: 5 })
   starCount: number;
 
-  @ApiPropertyOptional({ type: String, nullable: true, description: 'null for MVP' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'null for MVP',
+  })
   memberBadge: string | null;
 
   @ApiProperty({ type: String, example: '04-04-2026' })
   dateLabel: string;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: 'Salt Stone Massage (90 min)' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: 'Salt Stone Massage (90 min)',
+  })
   serviceName: string | null;
 
   @ApiPropertyOptional({ type: String, nullable: true, example: 'spa' })

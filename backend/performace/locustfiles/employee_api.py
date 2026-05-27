@@ -28,7 +28,14 @@ EMPLOYEE_REVENUE = f"{API_PREFIX}/employee/revenue"
 EMPLOYEE_APPOINTMENTS = f"{API_PREFIX}/employee/appointments"
 
 
-@tag("employee", "employee-revenue", "employee-appointments", "new-api", "target")
+@tag(
+    "current-new-api",
+    "employee",
+    "employee-revenue",
+    "employee-appointments",
+    "new-api",
+    "target",
+)
 class EmployeeApiUser(HttpUser):
     """Read-heavy employee app user for profile, revenue, and appointments."""
 
@@ -283,4 +290,3 @@ def _extract_items(payload):
         if isinstance(items, list):
             return items
     return []
-

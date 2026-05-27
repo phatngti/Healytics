@@ -27,7 +27,11 @@ class PublicClinicSpecialistPreviewDto {
   @ApiProperty({ type: String, example: 'Dermatologist' })
   role: string;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: 'https://example.com/avatar.jpg' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: 'https://example.com/avatar.jpg',
+  })
   imageUrl: string | null;
 
   @ApiPropertyOptional({ type: String, nullable: true, example: '10 Yrs Exp' })
@@ -49,7 +53,11 @@ class PublicClinicFeaturedServiceDto {
   @ApiProperty({ type: String, example: 'Relaxation Massage' })
   title: string;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: 'https://example.com/service.jpg' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: 'https://example.com/service.jpg',
+  })
   imageUrl: string | null;
 
   @ApiProperty({ type: String, example: '890,000₫' })
@@ -91,10 +99,18 @@ export class PublicClinicInfoResponseDto {
   @ApiProperty({ type: Boolean, example: true })
   isVerified: boolean;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: 'https://example.com/cover.jpg' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: 'https://example.com/cover.jpg',
+  })
   coverImageUrl: string | null;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: 'https://example.com/logo.jpg' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: 'https://example.com/logo.jpg',
+  })
   logoImageUrl: string | null;
 
   @ApiProperty({ type: [String] })
@@ -109,13 +125,25 @@ export class PublicClinicInfoResponseDto {
   @ApiProperty({ type: String, example: '15k' })
   followersLabel: string;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: '+84 28 1234 5678' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: '+84 28 1234 5678',
+  })
   phone: string | null;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: '10.7769,106.7009' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: '10.7769,106.7009',
+  })
   coordinates: string | null;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: 'a1b2c3d4-...' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: 'a1b2c3d4-...',
+  })
   chatPartnerId: string | null;
 
   @ApiPropertyOptional({ type: String, nullable: true })
@@ -155,7 +183,8 @@ export class PublicClinicInfoResponseDto {
     ].filter(Boolean);
     dto.address = addressParts.join(', ');
 
-    dto.isVerified = partner.verificationStatus === PartnerVerificationStatus.APPROVED;
+    dto.isVerified =
+      partner.verificationStatus === PartnerVerificationStatus.APPROVED;
     dto.coverImageUrl = partner.coverImageUrl ?? null;
     dto.logoImageUrl = partner.logoImageUrl ?? null;
     dto.gallery = partner.gallery ?? [];
@@ -170,9 +199,8 @@ export class PublicClinicInfoResponseDto {
       totalRating += data.rating * data.count;
       totalCount += data.count;
     }
-    dto.rating = totalCount > 0
-      ? Math.round((totalRating / totalCount) * 10) / 10
-      : 0;
+    dto.rating =
+      totalCount > 0 ? Math.round((totalRating / totalCount) * 10) / 10 : 0;
     dto.reviewCount = totalCount;
     dto.followersLabel = String(partner.followerCount ?? 0);
     dto.description = partner.description ?? null;
@@ -222,13 +250,8 @@ export class PublicClinicInfoResponseDto {
         id: p.id,
         title: p.name,
         imageUrl:
-          p.media?.find((m) => m.isThumbnail)?.url ??
-          p.media?.[0]?.url ??
-          null,
-        price:
-          new Intl.NumberFormat('vi-VN').format(
-            Number(price),
-          ) + '₫',
+          p.media?.find((m) => m.isThumbnail)?.url ?? p.media?.[0]?.url ?? null,
+        price: new Intl.NumberFormat('vi-VN').format(Number(price)) + '₫',
         rating: rd?.rating ?? 0,
         bookedLabel: `${rd?.count ?? 0} booked`,
       };

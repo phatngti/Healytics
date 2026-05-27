@@ -20,19 +20,31 @@ import { PartnerPayoutStatus } from '@/partner-finance/enums/partner-payout-stat
  * `period` defaults to `thirtyDays` when neither `startDate` nor `endDate` is provided.
  */
 export class PartnerFinanceQueryDto {
-  @ApiPropertyOptional({ type: String, description: 'Free-text search (max 120 chars)', example: 'BK-240408' })
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Free-text search (max 120 chars)',
+    example: 'BK-240408',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(120)
   @Transform(({ value }) => value?.trim())
   search?: string;
 
-  @ApiPropertyOptional({ type: String, description: 'Inclusive start date (ISO 8601)', example: '2026-04-01' })
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Inclusive start date (ISO 8601)',
+    example: '2026-04-01',
+  })
   @IsOptional()
   @IsDateString()
   startDate?: string;
 
-  @ApiPropertyOptional({ type: String, description: 'Inclusive end date (ISO 8601)', example: '2026-04-30' })
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Inclusive end date (ISO 8601)',
+    example: '2026-04-30',
+  })
   @IsOptional()
   @IsDateString()
   endDate?: string;
@@ -41,7 +53,8 @@ export class PartnerFinanceQueryDto {
     enum: PartnerFinancePeriod,
     enumName: 'PartnerFinancePeriod',
     default: PartnerFinancePeriod.THIRTY_DAYS,
-    description: 'Relative time window (ignored when both startDate and endDate are set)',
+    description:
+      'Relative time window (ignored when both startDate and endDate are set)',
   })
   @IsOptional()
   @IsEnum(PartnerFinancePeriod)
@@ -92,7 +105,11 @@ export class PartnerFinanceQueryDto {
   @IsEnum(PartnerPayoutStatus)
   payoutStatus?: PartnerPayoutStatus;
 
-  @ApiPropertyOptional({ type: String, description: 'ISO 4217 currency code', example: 'VND' })
+  @ApiPropertyOptional({
+    type: String,
+    description: 'ISO 4217 currency code',
+    example: 'VND',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(10)

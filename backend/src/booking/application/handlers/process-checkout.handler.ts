@@ -207,7 +207,9 @@ export class ProcessCheckoutHandler {
       await this.logWriter.write(queryRunner.manager, {
         bookingId: savedBooking.id,
         fromStatus: null,
-        toStatus: isPayLater ? BookingStatus.CONFIRMED : BookingStatus.PENDING_PAYMENT,
+        toStatus: isPayLater
+          ? BookingStatus.CONFIRMED
+          : BookingStatus.PENDING_PAYMENT,
         changedBy: 'system',
         reasonCode: isPayLater
           ? BookingStatusReasonCode.CHECKOUT_CREATED_CONFIRMED
@@ -224,9 +226,7 @@ export class ProcessCheckoutHandler {
       });
 
       await queryRunner.commitTransaction();
-      this.logger.log(
-        `Booking created: ${savedBooking.id} for ${msgContext}`,
-      );
+      this.logger.log(`Booking created: ${savedBooking.id} for ${msgContext}`);
 
       // Notify webhook (fire-and-forget, outside transaction)
       const webhookPayload: WebhookPayload = isPayLater
@@ -316,9 +316,7 @@ export class ProcessCheckoutHandler {
       );
     }
 
-    this.logger.warn(
-      `Checkout failed: ${msgContext}: ${errorMessage}`,
-    );
+    this.logger.warn(`Checkout failed: ${msgContext}: ${errorMessage}`);
 
     const webhookPayload: WebhookPayload = {
       ticket_id: data.ticketId,

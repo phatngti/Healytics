@@ -511,7 +511,10 @@ describe('StripePaymentService', () => {
         productId: 'prod-1',
         startTime: new Date('2025-10-25T14:00:00Z'),
       });
-      productRepo.findOne.mockResolvedValue({ id: 'prod-1', name: 'Dental Cleaning' });
+      productRepo.findOne.mockResolvedValue({
+        id: 'prod-1',
+        name: 'Dental Cleaning',
+      });
 
       const result = await service.handleWebhookEvent(
         Buffer.from('body'),

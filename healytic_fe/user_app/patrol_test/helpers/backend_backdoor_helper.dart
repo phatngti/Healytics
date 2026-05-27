@@ -21,7 +21,10 @@ Future<void> prepareBackendScenario([String? scenario]) async {
   _configureServiceIfNeeded(config);
 
   final scenarioName = scenario ?? config.defaultScenario;
-  final rawPayload = await config.loadScenarioPayload(scenarioName);
+  final rawPayload = _materializeScenarioPayload(
+    scenarioName,
+    await config.loadScenarioPayload(scenarioName),
+  );
 
   final api = BackdoorApiService.instance.backdoorApi;
 
@@ -29,6 +32,40 @@ Future<void> prepareBackendScenario([String? scenario]) async {
     await _prepare(api, scenarioName, rawPayload);
   } else {
     await _seed(api, scenarioName, rawPayload);
+  }
+}
+
+Map<String, dynamic> _materializeScenarioPayload(
+  String scenario,
+  Map<String, dynamic> payload,
+) {
+  final copy = jsonDecode(jsonEncode(payload)) as Map<String, dynamic>;
+  if (scenario == 'orders') {
+    _materializeOrdersPayload(copy);
+  }
+  return copy;
+}
+
+void _materializeOrdersPayload(Map<String, dynamic> payload) {
+  final bookings = payload['bookings'];
+  if (bookings is! List) return;
+
+  final now = DateTime.now().toUtc();
+  for (final item in bookings) {
+    if (item is! Map<String, dynamic>) continue;
+    switch (item['key']) {
+      case 'booking_pending':
+        item['startsAt'] = now.add(const Duration(hours: 3)).toIso8601String();
+        item['paymentExpiresAt'] = now
+            .add(const Duration(minutes: 45))
+            .toIso8601String();
+      case 'booking_confirmed':
+        item['startsAt'] = now.add(const Duration(days: 1)).toIso8601String();
+      case 'booking_completed':
+        item['startsAt'] = now
+            .subtract(const Duration(days: 2))
+            .toIso8601String();
+    }
   }
 }
 
