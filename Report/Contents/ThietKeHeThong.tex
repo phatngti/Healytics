@@ -408,7 +408,5 @@ Mô hình sử dụng kiến trúc hai tầng:
 
 \begin{enumerate}
     \item \textbf{Encoder:} SentenceTransformer mã hoá câu đầu vào thành vector biểu diễn ngữ nghĩa cố định chiều. Mô hình encoder được huấn luyện với \texttt{all-MiniLM-L6-v2} và lưu cục bộ cùng mã nguồn để đảm bảo hoạt động offline, chạy trên CPU khi suy luận.
-    \item \textbf{Bộ phân lớp:} Hồi quy logistic (scikit-learn) nhận vector từ encoder và dự đoán nhãn nhị phân (0: không cần gợi ý, 1: cần gợi ý). Trọng số được lưu dưới dạng tệp pickle và nạp theo cơ chế singleton để tránh tải lại nhiều lần trong vòng đời ứng dụng.
+    \item \textbf{Bộ phân lớp:} Hồi quy logistic (scikit-learn) nhận vector từ encoder và dự đoán nhãn nhị phân (0: không cần gợi ý, 1: cần gợi ý). Trọng số được lưu dưới dạng tệp pickle và nạp theo cơ chế singleton để tránh tải lại nhiều lần trong vòng đời ứng dụng. Mô hình được huấn luyện trên 1000 mẫu — dương tính: câu tìm kiếm/gợi ý/mô tả triệu chứng; âm tính: chào hỏi, hỏi thông tin y tế chung, quản lý lịch hẹn.
 \end{enumerate}
-
-Mô hình được huấn luyện trên tập dữ liệu 1000 samples, với các mẫu dương tính là các câu hỏi yêu cầu tìm kiếm, gợi ý dịch vụ hoặc mô tả triệu chứng, và các mẫu âm tính là các câu chào hỏi, hỏi thông tin y tế chung, hoặc yêu cầu quản lý lịch hẹn.

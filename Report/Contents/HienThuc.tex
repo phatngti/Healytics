@@ -656,8 +656,6 @@ Module \texttt{AuthModule} đóng vai trò trung tâm trong việc quản lý đ
     \item \textbf{Logout an toàn:} API \texttt{/auth/logout} thực hiện xóa \texttt{refreshTokenHash} trong DB, đảm bảo token cũ mất hiệu lực ngay lập tức.
 \end{itemize}
 
-% TODO: Hình sơ đồ luồng JWT (login → sign → refresh rotation → hash DB → logout)
-
 \subsubsection{Kiến trúc DTO và Validation}
 
 Hệ thống áp dụng chặt chẽ mô hình \textbf{Data Transfer Object (DTO)} để kiểm soát dữ liệu giao tiếp:
@@ -689,8 +687,6 @@ Module \texttt{NotificationModule} cung cấp hệ thống thông báo đa kênh
     \item \textbf{Bất đồng bộ:} Sự kiện thông báo phát qua RabbitMQ từ các module nghiệp vụ (\texttt{BookingModule}, \texttt{ChatModule}), không làm chậm luồng xử lý chính.
 \end{itemize}
 
-% TODO: Hình kiến trúc Notification đa kênh (3 source → RabbitMQ → NotificationService → WS + FCM + DB)
-
 \subsubsection{Module Tích hợp AI (\texttt{AiServiceModule})}
 
 Cầu nối giữa Backend NestJS và cụm microservices AI (Python/FastAPI). Luồng hoạt động:
@@ -719,8 +715,6 @@ Cung cấp kết nối Redis cho toàn bộ ứng dụng qua \texttt{RedisServic
     \item \textbf{Distributed Locking:} Khóa phân tán cho slot đặt lịch, ngăn double-booking.
     \item \textbf{Session/TTL:} Checkout ticket, OTP, dữ liệu tạm thời.
 \end{itemize}
-
-% TODO: Hình sơ đồ Redis multi-purpose (4 blocks: Cache, Distributed Lock, Pub/Sub, Session/TTL)
 
 \paragraph{Middleware, Interceptor và Guard}
 
