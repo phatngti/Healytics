@@ -1,6 +1,309 @@
-﻿\chapter{Hiện thực}
+\chapter{Hiện thực}
 \section{Các công nghệ liên quan}
 
+Nhằm đảm bảo tính khả thi và hiệu quả cho nền tảng Healytics, nhóm tiến hành khảo sát các công nghệ phổ biến cho từng tầng hệ thống, đánh giá dựa trên bộ tiêu chí thực tế: đơn ngôn ngữ (TypeScript/Python), quy mô nhóm nhỏ, tải trung bình và yêu cầu địa lý (geospatial). Phần~\ref{sec:tech_compare} trình bày kết quả so sánh và lý do quyết định cho từng công nghệ cốt lõi; các phần tiếp theo mô tả chi tiết đặc điểm và cách áp dụng của từng công nghệ.
+
+% =================================================================
+% SUBSECTION: SO SÁNH VÀ LỰA CHỌN CÔNG NGHỆ CỐT LÕI
+% =================================================================
+\subsection{So sánh và lựa chọn công nghệ cốt lõi}
+\label{sec:tech_compare}
+
+Mỗi bảng dưới đây đặt công nghệ được chọn (ký hiệu \checkmark) cạnh các phương án thay thế phổ biến, xét trên các tiêu chí quyết định trực tiếp đến kiến trúc Healytics. Phần nhận xét sau mỗi bảng rút ra lý do lựa chọn cụ thể gắn với bài toán thực tế.
+
+% ----------------------------------------------------------------
+% Flutter
+% ----------------------------------------------------------------
+\subsubsection{Nền tảng ứng dụng đa nền tảng: Flutter}
+
+Bảng~\ref{tab:cmp_flutter} so sánh Flutter với các giải pháp phát triển đa nền tảng và native phổ biến.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{|p{0.22\textwidth}|X|X|X|X|}
+\hline
+\textbf{Tiêu chí} & \textbf{Flutter \checkmark} & \textbf{React Native} & \textbf{Kotlin + Swift Native} & \textbf{Ionic} \\
+\hline
+Ngôn ngữ & Dart (type-safe) & JavaScript/TypeScript & Kotlin + Swift (riêng biệt) & HTML/JS/CSS \\
+\hline
+Codebase & Một codebase & Gần một codebase & Hai codebase riêng & Một codebase \\
+\hline
+Nền tảng phủ & Mobile + Web + Desktop & Mobile + Web & Mobile only & Mobile + Web \\
+\hline
+Rendering engine & Impeller (tự vẽ pixel) & Bridge sang native UI & Native 100\% & WebView \\
+\hline
+Hiệu năng UI & Rất cao, 60/120fps & Cao, bridge overhead & Cao nhất & Thấp (WebView) \\
+\hline
+Hot reload & Stateful reload & Fast refresh & Không & Có \\
+\hline
+Tái sử dụng code & Mobile + Web + Desktop & $\sim$80\% (mobile/web) & 0\% & $\sim$90\% \\
+\hline
+\end{tabularx}
+\caption{So sánh Flutter với các framework phát triển đa nền tảng}
+\label{tab:cmp_flutter}
+\end{table}
+
+\textbf{Lý do chọn Flutter:}
+\begin{itemize}
+    \item \textbf{Đáp ứng chính xác nhu cầu nghiệp vụ:} Healytics cần ba ứng dụng client (User App, Partner Portal, Admin Panel) hoạt động đồng nhất trên iOS, Android và Web. Flutter là giải pháp duy nhất cho phép \textit{một codebase} phủ đủ cả ba nền tảng với cùng rendering engine (Impeller), đảm bảo UI/UX nhất quán mà không qua WebView.
+    \item \textbf{So với React Native:} Dù có hệ sinh thái JS mạnh mẽ, React Native lại tiêu tốn bridge overhead khi xử lý các tương tác UI phức tạp và không hỗ trợ nền tảng Desktop ở mức nguyên bản tốt như Flutter.
+    \item \textbf{So với Native (Kotlin + Swift):} Việc phát triển native sẽ đòi hỏi hai đội ngũ và hai codebase hoàn toàn tách biệt cho iOS và Android, làm nhân đôi chi phí phát triển cũng như nỗ lực bảo trì.
+    \item \textbf{So với Ionic:} Ionic hoạt động dựa trên nền tảng WebView khiến cho hiệu năng render animation bị giới hạn, hoàn toàn không phù hợp cho các dashboard quản trị chứa lượng dữ liệu dày đặc.
+\end{itemize}
+
+% ----------------------------------------------------------------
+% NestJS
+% ----------------------------------------------------------------
+\subsubsection{Application Server: NestJS}
+
+Bảng~\ref{tab:cmp_nestjs} so sánh NestJS với bốn framework backend thường gặp trên các tiêu chí quyết định kiến trúc của Healytics.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{|p{0.20\textwidth}|X|X|X|X|X|}
+\hline
+\textbf{Tiêu chí} & \textbf{NestJS \checkmark} & \textbf{Express} & \textbf{Spring Boot} & \textbf{Django} & \textbf{Fastify} \\
+\hline
+Ngôn ngữ & TypeScript gốc & JS/TS add-on & Java & Python & JS/TS \\
+\hline
+Kiến trúc module & Module tích hợp (\texttt{@Module}) & Không có, tự tổ chức & Annotation Java & App-based (Python) & Không có gốc \\
+\hline
+Dependency Injection & DI phân cấp, type-safe & Cần Inversify & \texttt{@Autowired} (nặng XML) & Thủ công & Plugin, không DI thật \\
+\hline
+Microservices tích hợp & Có (\texttt{@nestjs/microservices}) & Tự cấu hình & Spring Cloud (phức tạp) & Celery (task only) & Không \\
+\hline
+Hiệu năng (req/s) & $\sim$30k (Fastify adapter) & $\sim$15k & Tốt nhưng latency cao & GIL giới hạn & $\sim$33k (thuần) \\
+\hline
+WebSocket tích hợp & Có (Gateway) & Cần thư viện ngoài & Có (STOMP) & Channels (thêm) & Plugin \\
+\hline
+Đồng nhất stack & TypeScript (khớp client) & JS & Java (khác stack) & Python (khác stack) & JS \\
+\hline
+\end{tabularx}
+\caption{So sánh NestJS với các framework backend}
+\label{tab:cmp_nestjs}
+\end{table}
+
+\textbf{Lý do chọn NestJS:}
+\begin{itemize}
+    \item \textbf{Đáp ứng chính xác nhu cầu nghiệp vụ:} NestJS hội tụ ba yếu tố cốt lõi của Healytics: TypeScript-first (đồng bộ kiểu tĩnh với Flutter/Dart), tích hợp sẵn Dependency Injection cùng cấu trúc module (giảm thiểu boilerplate cho nhóm nhỏ), và hỗ trợ phát triển microservices lẫn WebSocket nguyên bản không phụ thuộc thư viện ngoài.
+    \item \textbf{So với Express:} Mặc dù gọn nhẹ hơn, Express lại thiếu đi cấu trúc module và DI tích hợp, dễ dẫn đến tình trạng code thiếu tổ chức khi quy mô dự án ngày càng lớn.
+    \item \textbf{So với Spring Boot:} Spring Boot rất mạnh mẽ nhưng lại yêu cầu chuyển đổi sang ngôn ngữ Java, phá vỡ tính đồng nhất của stack TypeScript, đồng thời tiêu tốn nhiều tài nguyên hệ thống hơn.
+    \item \textbf{So với Django:} Là một framework thuần Python, Django rất tốt cho các pipeline ML nhưng lại không tương thích với định hướng sử dụng TypeScript xuyên suốt ở tầng backend của Healytics.
+    \item \textbf{So với Fastify:} Dù có hiệu năng xử lý thuần túy nhỉnh hơn, Fastify vẫn thiếu các module và cơ chế DI tích hợp sẵn, đòi hỏi đội ngũ phải tự thiết kế lại luồng tổ chức kiến trúc.
+\end{itemize}
+
+% ----------------------------------------------------------------
+% PostgreSQL
+% ----------------------------------------------------------------
+\subsubsection{Cơ sở dữ liệu chính: PostgreSQL + PostGIS}
+
+Bảng~\ref{tab:cmp_postgres} đánh giá PostgreSQL trên các tiêu chí quan trọng với bài toán đặt lịch và tìm kiếm địa lý.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{|p{0.21\textwidth}|X|X|X|X|}
+\hline
+\textbf{Tiêu chí} & \textbf{PostgreSQL \checkmark} & \textbf{MySQL} & \textbf{MongoDB} & \textbf{SQL Server} \\
+\hline
+Chuẩn ACID & Đầy đủ, WAL & Đầy đủ (InnoDB) & Từ v4.0, hạn chế & Đầy đủ \\
+\hline
+Geospatial & PostGIS --- tiêu chuẩn vàng & Spatial hạn chế & GeoJSON cơ bản & Geography type \\
+\hline
+JSONB (nhị phân) & Có, index sâu & Text JSON, chậm & Native (thế mạnh) & JSON (text) \\
+\hline
+Concurrency & MVCC, không block & Gap-locking, dễ deadlock & MVCC & Lock escalation \\
+\hline
+JOIN phức tạp & Mạnh (CTE, Window fn) & Tốt & Không hỗ trợ & Mạnh \\
+\hline
+Bản quyền & Miễn phí (OSS) & Miễn phí & Miễn phí & Đắt (Enterprise) \\
+\hline
+Mở rộng (extension) & PostGIS, pgvector, ... & Hạn chế & N/A & Hạn chế \\
+\hline
+\end{tabularx}
+\caption{So sánh PostgreSQL với các hệ quản trị cơ sở dữ liệu}
+\label{tab:cmp_postgres}
+\end{table}
+
+\textbf{Lý do chọn PostgreSQL + PostGIS:}
+\begin{itemize}
+    \item \textbf{Đáp ứng chính xác nhu cầu nghiệp vụ:} Healytics đòi hỏi \textit{đồng thời} hai năng lực trong cùng một hệ quản trị: tính toàn vẹn ACID transaction nghiêm ngặt cho quá trình booking và thanh toán (tránh double-booking) cùng khả năng truy vấn không gian địa lý (\texttt{ST\_DWithin}) để tìm dịch vụ ``gần đây''. PostgreSQL kết hợp cùng PostGIS là lựa chọn duy nhất đáp ứng trọn vẹn cả hai yêu cầu này mà không cần ghép nối thêm hệ thống bên ngoài.
+    \item \textbf{So với MySQL:} MySQL không có extension PostGIS chuyên dụng. Hỗ trợ dữ liệu Spatial của MySQL khá hạn chế và cơ chế gap-locking của nó dễ gây ra tình trạng deadlock khi hệ thống chịu tải cao.
+    \item \textbf{So với MongoDB:} Dù vượt trội về xử lý tài liệu JSON, MongoDB lại không hỗ trợ tốt các phép JOIN phức tạp. Khả năng truy vấn geospatial của nó yếu hơn PostGIS rất nhiều và thiếu đi các đảm bảo ACID toàn diện (trước phiên bản 4.0).
+    \item \textbf{So với SQL Server:} Chi phí duy trì bản quyền bản Enterprise là một rào cản quá lớn và hoàn toàn không phù hợp với định hướng ưu tiên sử dụng phần mềm mã nguồn mở của dự án.
+\end{itemize}
+
+% ----------------------------------------------------------------
+% RabbitMQ
+% ----------------------------------------------------------------
+\subsubsection{Message Broker: RabbitMQ}
+
+Bảng~\ref{tab:cmp_rabbitmq} so sánh ba phương án trên các tiêu chí vận hành thực tế của Healytics (checkout bất đồng bộ, push notification, nhóm phát triển nhỏ).
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{|p{0.22\textwidth}|X|X|X|}
+\hline
+\textbf{Tiêu chí} & \textbf{RabbitMQ \checkmark} & \textbf{Apache Kafka} & \textbf{Redis Streams} \\
+\hline
+Mô hình & Hàng đợi tác vụ (AMQP) & Log sự kiện phân tán & Stream nhẹ trong Redis \\
+\hline
+Per-message ACK & Có, Ack/Nack linh hoạt & Theo offset (không ack lẻ) & Có (\texttt{XACK}) \\
+\hline
+Routing linh hoạt & Direct / Topic / Fanout / Header & Theo partition/topic & Theo stream key \\
+\hline
+Độ trễ từng message & Rất thấp ($<$1ms) & Cao hơn (batching) & Thấp \\
+\hline
+Phát lại dài hạn & Hạn chế & Thế mạnh (log-based) & Hạn chế (RAM) \\
+\hline
+Chi phí vận hành & Thấp (single node) & Cao (cluster + KRaft) & Rất thấp (tái dùng Redis) \\
+\hline
+Tích hợp NestJS & Transport RMQ sẵn có & Có, nặng hơn & Tự xây \\
+\hline
+Giao diện quản lý & Web UI tích hợp & Cần công cụ ngoài & CLI only \\
+\hline
+\end{tabularx}
+\caption{So sánh RabbitMQ với Kafka và Redis Streams}
+\label{tab:cmp_rabbitmq}
+\end{table}
+
+\textbf{Lý do chọn RabbitMQ:}
+Bài toán cốt lõi của Healytics là một hệ thống \textit{task queue} xử lý tuần tự và đảm bảo không mất mát dữ liệu (checkout, thông báo, OTP). So với các giải pháp khác, RabbitMQ là lựa chọn tối ưu nhất vì:
+\begin{itemize}
+    \item \textbf{Đáp ứng chính xác nhu cầu nghiệp vụ:} RabbitMQ hỗ trợ \textit{per-message ACK} để không mất task ngay cả khi worker bị crash, cung cấp routing linh hoạt (Direct/Topic/Fanout) giúp phân phát đúng loại sự kiện, đồng thời có độ trễ cực thấp ($<$1ms) cùng chi phí vận hành single-node rất nhỏ.
+    \item \textbf{So với Apache Kafka:} Kafka vốn tối ưu cho bài toán Big Data streaming (cần thông lượng cực lớn, có khả năng phát lại log). Việc duy trì Kafka cluster (với KRaft) đòi hỏi chi phí vận hành và tài nguyên quá cồng kềnh, không hợp lý với quy mô \textit{message queue} hiện tại của hệ thống.
+    \item \textbf{So với Redis Streams:} Dù Redis Streams có ưu điểm cực kỳ gọn nhẹ và tận dụng được Redis sẵn có, giải pháp này lại thiếu vắng cơ chế routing exchange linh hoạt và không có sẵn transport nguyên bản (native) tích hợp sâu với NestJS như RabbitMQ, dẫn đến chi phí tự phát triển tích hợp cao.
+\end{itemize}
+
+% ----------------------------------------------------------------
+% Redis
+% ----------------------------------------------------------------
+\subsubsection{Cache \& In-Memory Store: Redis}
+
+Bảng~\ref{tab:cmp_redis} so sánh Redis trong vai trò đa năng (cache, session, distributed lock, Pub/Sub) mà Healytics khai thác.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{|p{0.22\textwidth}|X|X|X|}
+\hline
+\textbf{Tiêu chí} & \textbf{Redis \checkmark} & \textbf{Memcached} & \textbf{In-process Cache} \\
+\hline
+Cấu trúc dữ liệu & Hash, List, Set, Sorted Set, Bitmap & Key-Value chuỗi đơn & Phụ thuộc ngôn ngữ \\
+\hline
+TTL tự động & Có, từng giây & Có & Phải tự implement \\
+\hline
+Persistence (RDB/AOF) & Có & Không & Không \\
+\hline
+Distributed Locking & Redlock / \texttt{SET NX PX} nguyên tử & Không & Không (per-instance) \\
+\hline
+Chia sẻ đa instance & Có (mạng) & Có & Không \\
+\hline
+Pub/Sub & Có & Không & Không \\
+\hline
+Độ trễ & Sub-millisecond & Sub-millisecond & Nanosecond (local) \\
+\hline
+Chi phí triển khai & Trung bình & Thấp & Không có \\
+\hline
+\end{tabularx}
+\caption{So sánh Redis với các giải pháp cache/in-memory}
+\label{tab:cmp_redis}
+\end{table}
+
+\textbf{Lý do chọn Redis:}
+\begin{itemize}
+    \item \textbf{Đáp ứng chính xác nhu cầu nghiệp vụ:} Healytics cần một in-memory store đủ mạnh để gánh vác \textit{bốn vai trò} song song trong cùng một instance: (1)~cache dữ liệu API (\texttt{/account/me}, banner, dịch vụ), (2)~quản lý distributed lock hai tầng cho booking slot (thông qua lệnh \texttt{SET NX PX} nguyên tử), (3)~sử dụng Pub/Sub để đồng bộ vector store AI khi dịch vụ thay đổi, và (4)~lưu trữ session/TTL cho mã OTP, refresh token và checkout ticket.
+    \item \textbf{So với Memcached:} Memcached chỉ hỗ trợ lưu trữ Key-Value đơn giản, hoàn toàn thiếu đi cơ chế Pub/Sub, distributed locking và khả năng lưu trữ bền bỉ (RDB/AOF), do đó không đủ năng lực đảm nhận cả bốn vai trò nói trên.
+    \item \textbf{So với In-process Cache:} Dù có độ trễ cực thấp (tính bằng nanosecond), In-process Cache lại không thể chia sẻ dữ liệu giữa nhiều instance backend khi hệ thống scale ngang, đồng thời không hỗ trợ thiết lập TTL động hay cơ chế khóa nguyên tử.
+\end{itemize}
+
+% ----------------------------------------------------------------
+% FastAPI
+% ----------------------------------------------------------------
+\subsubsection{AI Service Framework: FastAPI}
+
+Bảng~\ref{tab:cmp_fastapi} đánh giá FastAPI là framework Python cho cụm microservices AI.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{|p{0.22\textwidth}|X|X|X|}
+\hline
+\textbf{Tiêu chí} & \textbf{FastAPI \checkmark} & \textbf{Flask} & \textbf{Django REST Framework} \\
+\hline
+Mô hình I/O & Async-native (ASGI) & Sync (WSGI), cần Gevent & Sync (WSGI) \\
+\hline
+Hiệu năng (req/s) & 15k--20k (Uvicorn) & $\sim$4--6k (Gunicorn) & $\sim$3--5k \\
+\hline
+Streaming (SSE) & \texttt{StreamingResponse} native & Extension ngoài & Không hỗ trợ tốt \\
+\hline
+Validation tự động & Pydantic (type hints) & Marshmallow thủ công & Serializers thủ công \\
+\hline
+Tài liệu API tự sinh & OpenAPI/Swagger tự động & Cần flask-swagger & Cần drf-spectacular \\
+\hline
+Phù hợp AI service & Rất cao (async + stream) & Trung bình & Thấp \\
+\hline
+\end{tabularx}
+\caption{So sánh FastAPI với các framework Python phổ biến}
+\label{tab:cmp_fastapi}
+\end{table}
+
+\textbf{Lý do chọn FastAPI:}
+\begin{itemize}
+    \item \textbf{Đáp ứng chính xác nhu cầu nghiệp vụ:} Các dịch vụ AI đặc thù luôn có cường độ I/O rất lớn (gọi LLM, truy vấn vector DB, embedding), do đó yêu cầu cơ chế xử lý bất đồng bộ (async) để chạy đồng thời mà không bị block. Thêm vào đó, chatbot cần tính năng streaming SSE để trả về kết quả từng token một. FastAPI là framework Python duy nhất hỗ trợ cả hai yêu cầu này một cách nguyên bản thông qua \texttt{async def} và \texttt{StreamingResponse}, đồng thời còn tự động sinh tài liệu chuẩn OpenAPI.
+    \item \textbf{So với Flask:} Flask thiết kế theo mô hình đồng bộ (WSGI), buộc phải dùng đến Gevent hoặc chạy nhiều Gunicorn worker để đạt được mức độ concurrency tương đương; và để hỗ trợ streaming SSE thì bắt buộc phải tích hợp thêm extension bên ngoài.
+    \item \textbf{So với Django REST Framework:} Framework này khá nặng nề, hoạt động theo mô hình đồng bộ và không có sự hỗ trợ tốt nhất cho luồng streaming ở mức core framework, phù hợp hơn với các web app truyền thống thay vì kiến trúc microservice AI.
+\end{itemize}
+
+% ----------------------------------------------------------------
+% LangChain
+% ----------------------------------------------------------------
+\subsubsection{LLM Orchestration: LangChain}
+
+Bảng~\ref{tab:cmp_langchain} so sánh LangChain với các framework orchestration LLM phổ biến.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{|p{0.22\textwidth}|X|X|X|}
+\hline
+\textbf{Tiêu chí} & \textbf{LangChain \checkmark} & \textbf{LlamaIndex} & \textbf{Semantic Kernel} \\
+\hline
+Trọng tâm & Pipeline \& chain đa bước & Indexing \& RAG chuyên sâu & Agent (Microsoft) \\
+\hline
+RAG pipeline & LCEL pipeline khai báo & Tốt (chuyên sâu) & Có, ít linh hoạt \\
+\hline
+Multi-provider LLM & HuggingFace, OpenAI, Gemini, ... & Có & Ít hơn \\
+\hline
+Vector store tích hợp & ChromaDB, FAISS, Pinecone, ... & Có & Ít hơn \\
+\hline
+Text splitter thông minh & \texttt{RecursiveCharacterTextSplitter} & Có & Không \\
+\hline
+Multi-agent (LangGraph) & Có (state graph, checkpoint) & Hạn chế & AutoGen (conversation) \\
+\hline
+Hệ sinh thái (GitHub sao) & $\sim$90k & $\sim$35k & Nhỏ hơn \\
+\hline
+\end{tabularx}
+\caption{So sánh LangChain với các framework LLM orchestration}
+\label{tab:cmp_langchain}
+\end{table}
+
+\textbf{Lý do chọn LangChain:}
+\begin{itemize}
+    \item \textbf{Đáp ứng chính xác nhu cầu nghiệp vụ:} Bài toán của Healytics yêu cầu kết nối trơn tru một chuỗi tác vụ: từ LLM $\rightarrow$ vector retriever $\rightarrow$ prompt template $\rightarrow$ parser thành một pipeline khai báo (LCEL). Hệ thống còn cần hỗ trợ chuyển đổi linh hoạt đa provider (HuggingFace cho Llama~3.1 local, Gemini API cho NER) và tích hợp native với ChromaDB. LangChain hoàn thành xuất sắc cả ba nhiệm vụ với cộng đồng hỗ trợ lớn nhất hiện nay ($\sim$90k GitHub sao).
+    \item \textbf{So với LlamaIndex:} Mặc dù LlamaIndex tối ưu và mạnh mẽ hơn trong việc indexing cũng như thiết lập RAG chuyên sâu, nhưng lại thiếu đi tính linh hoạt khi cấu thành các chuỗi chain đa bước; về tổng quan, nó không mạnh bằng LangChain trong việc điều phối pipeline (orchestration).
+    \item \textbf{So với Semantic Kernel:} Semantic Kernel thiên nhiều hơn về thiết kế hội thoại agent (như Microsoft AutoGen) và hỗ trợ khá ít provider LLM cũng như vector store; đồng thời hệ sinh thái cộng đồng nhỏ hơn đáng kể so với LangChain.
+\end{itemize}
+
+% =================================================================
+% SUBSECTION: MÔ TẢ CHI TIẾT CÔNG NGHỆ - FLUTTER
+% =================================================================
+% -----------------------------------------------------------------
+% PHẦN: MOBILE/WEB (Flutter)
+% -----------------------------------------------------------------
 \subsection{Mobile App Development (iOS/Android, Flutter)}
 \begin{itemize}
     \item \textbf{Lý do chọn Flutter:} Framework đa nền tảng cho iOS/Android với một codebase, giúp giảm chi phí phát triển - bảo trì và giữ trải nghiệm nhất quán.
@@ -15,9 +318,6 @@
     \end{itemize}
 \end{itemize}
 
-% -----------------------------------------------------------------
-% PHẦN 2: WEB/PORTAL
-% -----------------------------------------------------------------
 \subsection{Web/Portal Development (Partner Portal, Admin Dashboard)}
 \begin{itemize}
     \item \textbf{Lý do chọn Flutter (Web \& Desktop):} Tận dụng lại phần lớn business logic từ mobile, đảm bảo giao diện đồng nhất giữa các nền tảng và giảm chi phí bảo trì.
@@ -31,12 +331,16 @@
     \end{itemize}
 \end{itemize}
 
-% -----------------------------------------------------------------
-% PHẦN 3: CƠ SỞ HẠ TẦNG (GỘP BACKEND, DB, BROKER, CACHE)
-% -----------------------------------------------------------------
+
+
+% =================================================================
+% SUBSECTION: CƠ SỞ HẠ TẦNG BACKEND
+% =================================================================
 \subsection{Cơ sở hạ tầng Backend (Backend Infrastructure)}
 
 Phần Backend đóng vai trò cốt lõi trong việc xử lý nghiệp vụ, lưu trữ dữ liệu và đảm bảo hiệu năng cho toàn bộ hệ thống. Kiến trúc được chia thành các tầng chuyên biệt: Application Server, Database, Message Broker và Caching.
+
+
 
 \subsubsection{Application Server (NestJS)}
 \begin{itemize}
@@ -99,6 +403,13 @@ Phần Backend đóng vai trò cốt lõi trong việc xử lý nghiệp vụ, l
     \end{itemize}
 \end{itemize}
 
+\noindent\textbf{Ứng dụng trong luồng đặt lịch (Booking):} Bài toán đặt lịch chịu áp lực đồng thời cao nhất khi nhiều người cùng tranh một khung giờ. Hệ thống giải quyết bằng RabbitMQ kết hợp Redis distributed lock:
+\begin{itemize}
+    \item API đẩy thông điệp \texttt{checkout.process} vào hàng đợi \texttt{checkout\_queue} rồi trả lời client ngay (non-blocking); worker tiêu thụ thông điệp, tạo booking và ACK thủ công.
+    \item Redis distributed lock hai tầng: micro-lock \texttt{lock:intent:*} (TTL 120 s) giữ chỗ tạm, \texttt{lock:checkout:*} (TTL 600 s) giữ suốt quá trình xử lý; tính đúng đắn đảm bảo bởi \texttt{SET NX} nguyên tử, không phụ thuộc thứ tự broker.
+\end{itemize}
+
+
 \subsubsection{Caching \& In-Memory Store (Redis)}
 \begin{itemize}
     \item \textbf{Lý do chọn Redis:} Kho lưu trữ trong bộ nhớ với hiệu năng rất cao, dùng cho cache, session và dữ liệu tạm thời.
@@ -115,6 +426,7 @@ Phần Backend đóng vai trò cốt lõi trong việc xử lý nghiệp vụ, l
         \item \textbf{Distributed Locking}: Redis cung cấp cơ chế Redlock để xử lý khóa phân tán, ngăn chặn trường hợp 2 user cùng đặt 1 bác sĩ tại cùng 1 giờ (Race condition); ZooKeeper cũng làm được nhưng quá nặng nề để triển khai chỉ cho việc locking; Dùng Transaction của Database có thể gây chậm toàn hệ thống do giữ connection lâu.
     \end{itemize}
 \end{itemize}
+
 
 % -----------------------------------------------------------------
 % PHẦN 4: CÔNG NGHỆ AI/ML
@@ -201,7 +513,7 @@ Dựa trên nền tảng logic vững chắc của bản kiến trúc trừu tư
 \begin{figure}[H]
     % Căn giữa hình ảnh
     \centering
-    \includegraphics[width=1\textwidth]{Images/implement_arch.png}
+    \includegraphics[width=0.85\textwidth]{Images/implement_arch.png}
     \vspace{10pt}
     
     % Thêm chú thích cho hình ảnh
@@ -2605,7 +2917,7 @@ Quy trình CI/CD được tự động hóa từ lúc đẩy mã nguồn lên Gi
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\textwidth]{Images/Deploy_arch.jpg}
+    \includegraphics[width=0.85\textwidth]{Images/Deploy_arch.jpg}
     \vspace{10pt}
     \caption{Kiến trúc triển khai CI/CD của hệ thống}
     \label{fig:deploy_arch}
@@ -2725,3 +3037,4 @@ Kiến trúc triển khai tách biệt thành hai cụm độc lập giao tiếp
 \end{itemize}
 
 Thiết kế này cho phép scale từng phần linh hoạt: tăng GPU khi lượng truy vấn AI tăng mà không ảnh hưởng đến Backend, hoặc mở rộng Backend khi lượng booking tăng mà không tốn thêm chi phí GPU. Đồng thời, quy trình CI/CD tự động hóa hoàn toàn đảm bảo mọi thay đổi được kiểm thử kỹ lưỡng trước khi lên production, giảm thiểu rủi ro và tăng tốc chu kỳ phát triển.
+
