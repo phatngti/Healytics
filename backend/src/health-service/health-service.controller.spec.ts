@@ -27,7 +27,9 @@ describe('UserHealthServiceController', () => {
       ],
     }).compile();
 
-    controller = module.get<UserHealthServiceController>(UserHealthServiceController);
+    controller = module.get<UserHealthServiceController>(
+      UserHealthServiceController,
+    );
     healthServiceService = module.get(HealthServiceService);
   });
 

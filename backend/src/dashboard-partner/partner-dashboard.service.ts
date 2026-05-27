@@ -111,9 +111,7 @@ export class PartnerDashboardService {
     return this.listNotificationsHandler.execute(accountId, limit);
   }
 
-  async getInventoryAlerts(
-    accountId: string,
-  ): Promise<InventoryAlertDto[]> {
+  async getInventoryAlerts(accountId: string): Promise<InventoryAlertDto[]> {
     const partnerId = await this.resolvePartnerId(accountId);
     return this.getAlertsHandler.execute(partnerId);
   }

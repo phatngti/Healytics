@@ -104,10 +104,9 @@ export class EmployeeAppointmentResponseDto {
     const dto = new EmployeeAppointmentResponseDto();
     dto.id = booking.id;
     dto.serviceName = booking.product?.name ?? 'Unknown Service';
-    dto.customerName =
-      booking.user?.userProfile
-        ? `${booking.user.userProfile.firstName ?? ''} ${booking.user.userProfile.lastName ?? ''}`.trim()
-        : booking.user?.email ?? 'Customer';
+    dto.customerName = booking.user?.userProfile
+      ? `${booking.user.userProfile.firstName ?? ''} ${booking.user.userProfile.lastName ?? ''}`.trim()
+      : (booking.user?.email ?? 'Customer');
     dto.customerId = booking.userId;
     dto.imageUrl = null;
     dto.status = this.mapStatus(booking.status);

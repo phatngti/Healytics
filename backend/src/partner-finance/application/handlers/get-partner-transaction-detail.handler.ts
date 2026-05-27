@@ -29,7 +29,9 @@ export class GetPartnerTransactionDetailHandler {
     partnerId: string,
     transactionId: string,
   ): Promise<PartnerTransactionDetailDto> {
-    this.logger.log(`Getting transaction detail: ${transactionId} for partner: ${partnerId}`);
+    this.logger.log(
+      `Getting transaction detail: ${transactionId} for partner: ${partnerId}`,
+    );
 
     const txn = await this.txnRepo.findOne({
       where: { id: transactionId, partnerId },
@@ -37,13 +39,16 @@ export class GetPartnerTransactionDetailHandler {
     });
 
     if (!txn) {
-      throw new NotFoundException(`Transaction with ID ${transactionId} not found`);
+      throw new NotFoundException(
+        `Transaction with ID ${transactionId} not found`,
+      );
     }
 
     // Sort timeline events chronologically
     if (txn.timelineEvents) {
       txn.timelineEvents.sort(
-        (a, b) => new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime(),
+        (a, b) =>
+          new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime(),
       );
     }
 
@@ -70,7 +75,8 @@ export class GetPartnerTransactionDetailHandler {
     const dto = new PartnerTransactionDetailDto();
     dto.record = PartnerTransactionRecordDto.fromEntity(txn);
     dto.payoutRecord = payoutRecord;
-    dto.relatedRefundCases = PartnerRefundCaseRecordDto.fromEntities(refundCases);
+    dto.relatedRefundCases =
+      PartnerRefundCaseRecordDto.fromEntities(refundCases);
     dto.sourceSummaryTitle = txn.sourceTitleSnapshot ?? '';
     dto.sourceSummarySubtitle = txn.sourceSubtitleSnapshot ?? '';
 

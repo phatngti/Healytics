@@ -18,7 +18,10 @@ export class ListPartnerRefundCasesHandler {
   async execute(
     partnerId: string,
     query: PartnerFinancePageQueryDto,
-  ): Promise<{ data: PartnerRefundCaseRecordDto[]; meta: PartnerFinancePageMetaDto }> {
+  ): Promise<{
+    data: PartnerRefundCaseRecordDto[];
+    meta: PartnerFinancePageMetaDto;
+  }> {
     this.logger.log(`Listing refund cases for partner: ${partnerId}`);
 
     const page = query.page ?? 1;
@@ -38,7 +41,9 @@ export class ListPartnerRefundCasesHandler {
       qb.andWhere('rc.currency = :currency', { currency: query.currency });
     }
     if (query.startDate) {
-      qb.andWhere('rc.requestedAt >= :startDate', { startDate: new Date(query.startDate) });
+      qb.andWhere('rc.requestedAt >= :startDate', {
+        startDate: new Date(query.startDate),
+      });
     }
     if (query.endDate) {
       const end = new Date(query.endDate);

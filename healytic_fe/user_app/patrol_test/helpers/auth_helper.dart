@@ -3,6 +3,7 @@ import 'package:user_app/core/keys/integration_test_keys.dart';
 
 import '../config/test_config.dart';
 import 'navigation_helper.dart';
+import 'permission_helper.dart';
 
 /// Signs out by navigating to the Profile tab,
 /// tapping the Log Out button, and confirming.
@@ -34,6 +35,7 @@ Future<void> signOut(PatrolIntegrationTester $) async {
   // cleared and the redirect completes fully before
   // the sign-in flow begins.
   await $.pump(const Duration(seconds: 5));
+  await grantAllPermissions($);
 }
 
 /// Signs in using fixture credentials via key finders.
@@ -51,6 +53,7 @@ Future<void> signIn(
   // the router redirects straight to home.
   if (config.useMock) {
     await $.pump(const Duration(seconds: 2));
+    await grantAllPermissions($);
     return;
   }
 
@@ -80,5 +83,7 @@ Future<void> signIn(
 
   await $(keys.signInPage.signInButton).tap();
 
-  await $.pump(const Duration(seconds: 3));
+  await $.pump(const Duration(seconds: 1));
+  await grantAllPermissions($);
+  await $.pump(const Duration(seconds: 2));
 }

@@ -22,9 +22,7 @@ describe('PartnerDashboardService', () => {
 
   beforeEach(async () => {
     partnersService = {
-      getPartnerProfile: jest
-        .fn()
-        .mockResolvedValue({ id: PARTNER_ID }),
+      getPartnerProfile: jest.fn().mockResolvedValue({ id: PARTNER_ID }),
     };
 
     handlers = {

@@ -84,7 +84,10 @@ export class KycDocumentDto {
   @ApiProperty({ type: String, example: 'pending' })
   status: string;
 
-  @ApiPropertyOptional({ type: String, example: 'Additional review notes from admin' })
+  @ApiPropertyOptional({
+    type: String,
+    example: 'Additional review notes from admin',
+  })
   uploadedAt?: string;
 
   static fromEntity(doc: PartnerDocument): KycDocumentDto {
@@ -301,7 +304,6 @@ export class BusinessInfoDto {
   @ApiPropertyOptional({ type: AddressInfoDto })
   address?: AddressInfoDto;
 
-
   @ApiPropertyOptional({ type: VerifiedField })
   email?: VerifiedField<string>;
 
@@ -399,13 +401,20 @@ export class AdminPartnerDetailResponseDto {
   })
   status: PartnerVerificationStatus;
 
-  @ApiProperty({ enum: PartnerPriority, enumName: 'PartnerPriority', example: PartnerPriority.NORMAL })
+  @ApiProperty({
+    enum: PartnerPriority,
+    enumName: 'PartnerPriority',
+    example: PartnerPriority.NORMAL,
+  })
   priority: PartnerPriority;
 
   @ApiProperty({ type: Date, example: '2024-01-20T10:00:00Z' })
   submittedAt: Date;
 
-  @ApiPropertyOptional({ type: String, example: 'Additional review notes from admin' })
+  @ApiPropertyOptional({
+    type: String,
+    example: 'Additional review notes from admin',
+  })
   reviewNote?: string;
 
   static fromPartner(

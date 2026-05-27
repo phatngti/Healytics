@@ -100,22 +100,157 @@ const citySeeds = [
     };
   }),
   ...[
-    ['da-nang', 'Đà Nẵng', '48', '490', '20194', 'Quận Hải Châu', 16.0678, 108.2208],
-    ['hai-phong', 'Hải Phòng', '31', '303', '11311', 'Quận Hồng Bàng', 20.8449, 106.6881],
-    ['can-tho', 'Cần Thơ', '92', '916', '31117', 'Quận Ninh Kiều', 10.0452, 105.7469],
+    [
+      'da-nang',
+      'Đà Nẵng',
+      '48',
+      '490',
+      '20194',
+      'Quận Hải Châu',
+      16.0678,
+      108.2208,
+    ],
+    [
+      'hai-phong',
+      'Hải Phòng',
+      '31',
+      '303',
+      '11311',
+      'Quận Hồng Bàng',
+      20.8449,
+      106.6881,
+    ],
+    [
+      'can-tho',
+      'Cần Thơ',
+      '92',
+      '916',
+      '31117',
+      'Quận Ninh Kiều',
+      10.0452,
+      105.7469,
+    ],
     ['hue', 'Huế', '46', '474', '19804', 'Thành phố Huế', 16.4637, 107.5909],
-    ['khanh-hoa', 'Khánh Hòa', '56', '568', '22363', 'Thành phố Nha Trang', 12.2388, 109.1967],
-    ['lam-dong', 'Lâm Đồng', '68', '672', '24778', 'Thành phố Đà Lạt', 11.9404, 108.4583],
-    ['vung-tau', 'Bà Rịa - Vũng Tàu', '77', '747', '26506', 'Thành phố Vũng Tàu', 10.4114, 107.1362],
-    ['binh-duong', 'Bình Dương', '74', '718', '25741', 'Thành phố Thủ Dầu Một', 10.9804, 106.6519],
-    ['dong-nai', 'Đồng Nai', '75', '731', '25942', 'Thành phố Biên Hòa', 10.9574, 106.8426],
-    ['quang-ninh', 'Quảng Ninh', '22', '193', '06637', 'Thành phố Hạ Long', 20.9712, 107.0448],
-    ['nghe-an', 'Nghệ An', '40', '412', '16663', 'Thành phố Vinh', 18.6796, 105.6813],
-    ['dak-lak', 'Đắk Lắk', '66', '643', '24121', 'Thành phố Buôn Ma Thuột', 12.6662, 108.0378],
-    ['binh-dinh', 'Bình Định', '52', '540', '21595', 'Thành phố Quy Nhơn', 13.782, 109.219],
-    ['quang-nam', 'Quảng Nam', '49', '502', '20335', 'Thành phố Hội An', 15.8801, 108.338],
-    ['thanh-hoa', 'Thanh Hóa', '38', '380', '14725', 'Thành phố Thanh Hóa', 19.8067, 105.7852],
-    ['thai-nguyen', 'Thái Nguyên', '19', '164', '05830', 'Thành phố Thái Nguyên', 21.5942, 105.8482],
+    [
+      'khanh-hoa',
+      'Khánh Hòa',
+      '56',
+      '568',
+      '22363',
+      'Thành phố Nha Trang',
+      12.2388,
+      109.1967,
+    ],
+    [
+      'lam-dong',
+      'Lâm Đồng',
+      '68',
+      '672',
+      '24778',
+      'Thành phố Đà Lạt',
+      11.9404,
+      108.4583,
+    ],
+    [
+      'vung-tau',
+      'Bà Rịa - Vũng Tàu',
+      '77',
+      '747',
+      '26506',
+      'Thành phố Vũng Tàu',
+      10.4114,
+      107.1362,
+    ],
+    [
+      'binh-duong',
+      'Bình Dương',
+      '74',
+      '718',
+      '25741',
+      'Thành phố Thủ Dầu Một',
+      10.9804,
+      106.6519,
+    ],
+    [
+      'dong-nai',
+      'Đồng Nai',
+      '75',
+      '731',
+      '25942',
+      'Thành phố Biên Hòa',
+      10.9574,
+      106.8426,
+    ],
+    [
+      'quang-ninh',
+      'Quảng Ninh',
+      '22',
+      '193',
+      '06637',
+      'Thành phố Hạ Long',
+      20.9712,
+      107.0448,
+    ],
+    [
+      'nghe-an',
+      'Nghệ An',
+      '40',
+      '412',
+      '16663',
+      'Thành phố Vinh',
+      18.6796,
+      105.6813,
+    ],
+    [
+      'dak-lak',
+      'Đắk Lắk',
+      '66',
+      '643',
+      '24121',
+      'Thành phố Buôn Ma Thuột',
+      12.6662,
+      108.0378,
+    ],
+    [
+      'binh-dinh',
+      'Bình Định',
+      '52',
+      '540',
+      '21595',
+      'Thành phố Quy Nhơn',
+      13.782,
+      109.219,
+    ],
+    [
+      'quang-nam',
+      'Quảng Nam',
+      '49',
+      '502',
+      '20335',
+      'Thành phố Hội An',
+      15.8801,
+      108.338,
+    ],
+    [
+      'thanh-hoa',
+      'Thanh Hóa',
+      '38',
+      '380',
+      '14725',
+      'Thành phố Thanh Hóa',
+      19.8067,
+      105.7852,
+    ],
+    [
+      'thai-nguyen',
+      'Thái Nguyên',
+      '19',
+      '164',
+      '05830',
+      'Thành phố Thái Nguyên',
+      21.5942,
+      105.8482,
+    ],
   ].map(
     ([
       cityKey,
@@ -204,7 +339,12 @@ const wellnessDomains: WellnessDomain[] = [
     categorySlug: 'rehabilitation-massage',
     tags: ['Vật lý trị liệu', 'Giảm đau', 'Phục hồi chức năng'],
     businessTypes: [BusinessType.MASSAGE_REHABILITATION],
-    nameRoots: ['Mobility Restore', 'Neck Shoulder Care', 'Joint Ease', 'Posture Reset'],
+    nameRoots: [
+      'Mobility Restore',
+      'Neck Shoulder Care',
+      'Joint Ease',
+      'Posture Reset',
+    ],
     descriptions: [
       'Buổi trị liệu vận động nhẹ, kéo giãn và thư giãn cơ dành cho đau mỏi cơ xương khớp mức độ thông thường.',
       'Chuyên viên hướng dẫn bài tập phục hồi chức năng cơ bản, không thay thế chẩn đoán hay điều trị chuyên khoa.',
@@ -216,7 +356,10 @@ const wellnessDomains: WellnessDomain[] = [
     durations: [45, 60, 75],
     capacity: 1,
     staffAssignmentType: StaffAssignmentType.SPECIFIC,
-    employeeTitles: ['Kỹ thuật viên vật lý trị liệu', 'Chuyên viên phục hồi chức năng'],
+    employeeTitles: [
+      'Kỹ thuật viên vật lý trị liệu',
+      'Chuyên viên phục hồi chức năng',
+    ],
   },
   {
     key: 'phuc-hoi-chuc-nang',
@@ -224,7 +367,12 @@ const wellnessDomains: WellnessDomain[] = [
     categorySlug: 'rehabilitation-massage',
     tags: ['Phục hồi chức năng', 'Vật lý trị liệu', 'Giảm đau'],
     businessTypes: [BusinessType.MASSAGE_REHABILITATION, BusinessType.FITNESS],
-    nameRoots: ['Functional Recovery', 'Movement Reset', 'Balance Rehab', 'Active Recovery'],
+    nameRoots: [
+      'Functional Recovery',
+      'Movement Reset',
+      'Balance Rehab',
+      'Active Recovery',
+    ],
     descriptions: [
       'Chương trình phục hồi vận động nhẹ cho khách cần cải thiện linh hoạt, thăng bằng và sức bền cơ bản.',
       'Buổi tập có giám sát với bài tập cá nhân hóa ở mức wellness, phù hợp sau mệt mỏi hoặc ít vận động.',
@@ -236,7 +384,10 @@ const wellnessDomains: WellnessDomain[] = [
     durations: [60, 75, 90],
     capacity: 2,
     staffAssignmentType: StaffAssignmentType.SPECIFIC,
-    employeeTitles: ['Chuyên viên phục hồi chức năng', 'Huấn luyện viên phục hồi'],
+    employeeTitles: [
+      'Chuyên viên phục hồi chức năng',
+      'Huấn luyện viên phục hồi',
+    ],
   },
   {
     key: 'y-hoc-co-truyen',
@@ -244,7 +395,12 @@ const wellnessDomains: WellnessDomain[] = [
     categorySlug: 'traditional-medicine',
     tags: ['Y học cổ truyền', 'Giảm đau', 'Thư giãn'],
     businessTypes: [BusinessType.TRADITIONAL_MEDICINE],
-    nameRoots: ['Herbal Balance', 'Cupping Relax', 'Meridian Care', 'Warm Herbal Compress'],
+    nameRoots: [
+      'Herbal Balance',
+      'Cupping Relax',
+      'Meridian Care',
+      'Warm Herbal Compress',
+    ],
     descriptions: [
       'Liệu trình chăm sóc theo y học cổ truyền ở mức hỗ trợ wellness như xoa bóp bấm huyệt, chườm thảo dược và thư giãn.',
       'Dịch vụ tập trung vào cân bằng cơ thể và giảm căng mỏi thông thường, không bao gồm kê đơn hay điều trị chuyên sâu.',
@@ -264,7 +420,12 @@ const wellnessDomains: WellnessDomain[] = [
     categorySlug: 'acupuncture',
     tags: ['Y học cổ truyền', 'Giảm đau'],
     businessTypes: [BusinessType.TRADITIONAL_MEDICINE],
-    nameRoots: ['Meridian Relax', 'Acupressure Balance', 'Energy Flow', 'Point Release'],
+    nameRoots: [
+      'Meridian Relax',
+      'Acupressure Balance',
+      'Energy Flow',
+      'Point Release',
+    ],
     descriptions: [
       'Chăm sóc huyệt đạo bằng bấm huyệt và thư giãn kinh lạc, không dùng thủ thuật xâm lấn hoặc kê đơn.',
       'Liệu trình wellness giúp giảm căng mỏi thường gặp và hỗ trợ cảm giác thư giãn toàn thân.',
@@ -276,7 +437,10 @@ const wellnessDomains: WellnessDomain[] = [
     durations: [45, 60, 75],
     capacity: 1,
     staffAssignmentType: StaffAssignmentType.SPECIFIC,
-    employeeTitles: ['Chuyên viên bấm huyệt', 'Kỹ thuật viên chăm sóc kinh lạc'],
+    employeeTitles: [
+      'Chuyên viên bấm huyệt',
+      'Kỹ thuật viên chăm sóc kinh lạc',
+    ],
   },
   {
     key: 'tam-ly-tri-lieu',
@@ -284,7 +448,12 @@ const wellnessDomains: WellnessDomain[] = [
     categorySlug: 'psychology-therapy',
     tags: ['Sức khỏe tinh thần', 'Thư giãn'],
     businessTypes: [BusinessType.PSYCHOLOGY],
-    nameRoots: ['Stress Reset', 'Mindful Balance', 'Sleep Calm', 'Emotional Wellness'],
+    nameRoots: [
+      'Stress Reset',
+      'Mindful Balance',
+      'Sleep Calm',
+      'Emotional Wellness',
+    ],
     descriptions: [
       'Buổi tham vấn tâm lý định hướng wellness, tập trung vào quản lý căng thẳng, giấc ngủ và kỹ năng tự chăm sóc.',
       'Không gian riêng tư cho khách trao đổi mục tiêu cảm xúc và xây dựng kế hoạch coping ngắn hạn.',
@@ -296,7 +465,10 @@ const wellnessDomains: WellnessDomain[] = [
     durations: [50, 60, 75],
     capacity: 1,
     staffAssignmentType: StaffAssignmentType.SPECIFIC,
-    employeeTitles: ['Chuyên viên tham vấn tâm lý', 'Chuyên viên sức khỏe tinh thần'],
+    employeeTitles: [
+      'Chuyên viên tham vấn tâm lý',
+      'Chuyên viên sức khỏe tinh thần',
+    ],
   },
   {
     key: 'yoga-phuc-hoi',
@@ -304,7 +476,12 @@ const wellnessDomains: WellnessDomain[] = [
     categorySlug: 'yoga-recovery',
     tags: ['Yoga phục hồi', 'Phục hồi chức năng', 'Thư giãn'],
     businessTypes: [BusinessType.FITNESS, BusinessType.MASSAGE_REHABILITATION],
-    nameRoots: ['Restorative Yoga', 'Mobility Yoga', 'Breath Flow', 'Gentle Stretch'],
+    nameRoots: [
+      'Restorative Yoga',
+      'Mobility Yoga',
+      'Breath Flow',
+      'Gentle Stretch',
+    ],
     descriptions: [
       'Lớp yoga phục hồi nhịp chậm, kết hợp thở, kéo giãn và thư giãn sâu cho dân văn phòng hoặc người vận động nhiều.',
       'Buổi tập nhóm nhỏ giúp cải thiện linh hoạt, thả lỏng cơ và phục hồi năng lượng.',
@@ -316,7 +493,10 @@ const wellnessDomains: WellnessDomain[] = [
     durations: [45, 60, 75, 90],
     capacity: 8,
     staffAssignmentType: StaffAssignmentType.ANY,
-    employeeTitles: ['Huấn luyện viên yoga phục hồi', 'Chuyên viên vận động trị liệu'],
+    employeeTitles: [
+      'Huấn luyện viên yoga phục hồi',
+      'Chuyên viên vận động trị liệu',
+    ],
   },
   {
     key: 'dinh-duong-wellness',
@@ -324,7 +504,12 @@ const wellnessDomains: WellnessDomain[] = [
     categorySlug: 'nutrition-counseling',
     tags: ['Dinh dưỡng', 'Sức khỏe tinh thần'],
     businessTypes: [BusinessType.NUTRITION],
-    nameRoots: ['Balanced Meal Plan', 'Energy Nutrition', 'Lifestyle Nutrition', 'Healthy Habit'],
+    nameRoots: [
+      'Balanced Meal Plan',
+      'Energy Nutrition',
+      'Lifestyle Nutrition',
+      'Healthy Habit',
+    ],
     descriptions: [
       'Tư vấn dinh dưỡng wellness dựa trên thói quen ăn uống, mục tiêu năng lượng và lối sống hằng ngày.',
       'Chuyên viên xây dựng gợi ý thực đơn cân bằng, không kê đơn thuốc hoặc điều trị bệnh lý chuyên khoa.',
@@ -336,21 +521,64 @@ const wellnessDomains: WellnessDomain[] = [
     durations: [45, 60, 75],
     capacity: 1,
     staffAssignmentType: StaffAssignmentType.SPECIFIC,
-    employeeTitles: ['Chuyên viên dinh dưỡng wellness', 'Tư vấn viên lối sống lành mạnh'],
+    employeeTitles: [
+      'Chuyên viên dinh dưỡng wellness',
+      'Tư vấn viên lối sống lành mạnh',
+    ],
   },
 ];
 
 export const BULK_WELLNESS_TAGS = [
-  { name: 'Thư giãn', description: 'Dịch vụ thư giãn và phục hồi năng lượng', colorValue: '#FF2E7D32' },
-  { name: 'Giảm đau', description: 'Hỗ trợ giảm đau mỏi thông thường', colorValue: '#FFEF6C00' },
-  { name: 'Phục hồi chức năng', description: 'Hỗ trợ phục hồi vận động và chức năng cơ bản', colorValue: '#FF00838F' },
-  { name: 'Massage trị liệu', description: 'Massage trị liệu và chăm sóc cơ', colorValue: '#FF6D4C41' },
-  { name: 'Chăm sóc da', description: 'Chăm sóc da spa không xâm lấn', colorValue: '#FFC2185B' },
-  { name: 'Y học cổ truyền', description: 'Chăm sóc wellness theo y học cổ truyền', colorValue: '#FF795548' },
-  { name: 'Vật lý trị liệu', description: 'Vật lý trị liệu và vận động trị liệu cơ bản', colorValue: '#FF1565C0' },
-  { name: 'Sức khỏe tinh thần', description: 'Tham vấn và chăm sóc sức khỏe tinh thần', colorValue: '#FF546E7A' },
-  { name: 'Dinh dưỡng', description: 'Tư vấn dinh dưỡng và lối sống lành mạnh', colorValue: '#FF7CB342' },
-  { name: 'Yoga phục hồi', description: 'Yoga phục hồi, thở và kéo giãn', colorValue: '#FF00695C' },
+  {
+    name: 'Thư giãn',
+    description: 'Dịch vụ thư giãn và phục hồi năng lượng',
+    colorValue: '#FF2E7D32',
+  },
+  {
+    name: 'Giảm đau',
+    description: 'Hỗ trợ giảm đau mỏi thông thường',
+    colorValue: '#FFEF6C00',
+  },
+  {
+    name: 'Phục hồi chức năng',
+    description: 'Hỗ trợ phục hồi vận động và chức năng cơ bản',
+    colorValue: '#FF00838F',
+  },
+  {
+    name: 'Massage trị liệu',
+    description: 'Massage trị liệu và chăm sóc cơ',
+    colorValue: '#FF6D4C41',
+  },
+  {
+    name: 'Chăm sóc da',
+    description: 'Chăm sóc da spa không xâm lấn',
+    colorValue: '#FFC2185B',
+  },
+  {
+    name: 'Y học cổ truyền',
+    description: 'Chăm sóc wellness theo y học cổ truyền',
+    colorValue: '#FF795548',
+  },
+  {
+    name: 'Vật lý trị liệu',
+    description: 'Vật lý trị liệu và vận động trị liệu cơ bản',
+    colorValue: '#FF1565C0',
+  },
+  {
+    name: 'Sức khỏe tinh thần',
+    description: 'Tham vấn và chăm sóc sức khỏe tinh thần',
+    colorValue: '#FF546E7A',
+  },
+  {
+    name: 'Dinh dưỡng',
+    description: 'Tư vấn dinh dưỡng và lối sống lành mạnh',
+    colorValue: '#FF7CB342',
+  },
+  {
+    name: 'Yoga phục hồi',
+    description: 'Yoga phục hồi, thở và kéo giãn',
+    colorValue: '#FF00695C',
+  },
 ];
 
 const slugify = (input: string): string =>
@@ -506,7 +734,9 @@ const productForIndex = (index: number) => {
     10000,
   );
   const salePrice =
-    index % 4 === 0 ? roundTo(basePrice * (0.82 + (index % 3) * 0.03), 10000) : undefined;
+    index % 4 === 0
+      ? roundTo(basePrice * (0.82 + (index % 3) * 0.03), 10000)
+      : undefined;
   const slug = `${BULK_WELLNESS_PRODUCT_PREFIX}-${domain.key}-${city.cityKey}-${ordinal}`;
   const employeeOffset = (index % BULK_WELLNESS_PARTNERS.length) * 2;
   const primaryEmployee = BULK_WELLNESS_EMPLOYEES[employeeOffset];
@@ -536,10 +766,12 @@ const productForIndex = (index: number) => {
       minLeadTimeHours: 2 + (index % 6),
       staffAssignmentType: domain.staffAssignmentType,
     },
-    resourceRequirements: domain.resources.map((resourceTypeName, resourceIndex) => ({
-      resourceTypeName,
-      quantityRequired: resourceIndex === 0 ? 1 : domain.capacity > 1 ? 2 : 1,
-    })),
+    resourceRequirements: domain.resources.map(
+      (resourceTypeName, resourceIndex) => ({
+        resourceTypeName,
+        quantityRequired: resourceIndex === 0 ? 1 : domain.capacity > 1 ? 2 : 1,
+      }),
+    ),
     serviceManual: {
       preServiceGuidelines: [
         'Đến sớm 10 phút để hoàn tất tiếp nhận.',
@@ -550,19 +782,22 @@ const productForIndex = (index: number) => {
         {
           iconSlug: 'arrive-early',
           title: 'Đến sớm',
-          description: 'Vui lòng đến sớm để chuẩn bị và trao đổi nhu cầu chăm sóc.',
+          description:
+            'Vui lòng đến sớm để chuẩn bị và trao đổi nhu cầu chăm sóc.',
         },
         {
           iconSlug: 'communicate',
           title: 'Trao đổi rõ nhu cầu',
-          description: 'Chia sẻ mức độ thoải mái để chuyên viên điều chỉnh phù hợp.',
+          description:
+            'Chia sẻ mức độ thoải mái để chuyên viên điều chỉnh phù hợp.',
         },
       ],
       procedureSteps: [
         {
           stepNumber: 1,
           title: 'Tiếp nhận nhu cầu',
-          description: 'Chuyên viên ghi nhận mục tiêu wellness và tình trạng cơ bản.',
+          description:
+            'Chuyên viên ghi nhận mục tiêu wellness và tình trạng cơ bản.',
         },
         {
           stepNumber: 2,
@@ -572,7 +807,8 @@ const productForIndex = (index: number) => {
         {
           stepNumber: 3,
           title: 'Hướng dẫn sau buổi',
-          description: 'Nhận gợi ý tự chăm sóc, nghỉ ngơi và lịch hẹn tiếp theo nếu cần.',
+          description:
+            'Nhận gợi ý tự chăm sóc, nghỉ ngơi và lịch hẹn tiếp theo nếu cần.',
         },
       ],
     },
@@ -593,11 +829,7 @@ const productForIndex = (index: number) => {
       primaryStaffCode: primaryEmployee.employeeCode,
       secondaryStaffCode: secondaryEmployee.employeeCode,
       reviewCount:
-        index % 20 === 0
-          ? 30
-          : index % 10 === 0
-            ? 15
-            : 1 + (index % 5),
+        index % 20 === 0 ? 30 : index % 10 === 0 ? 15 : 1 + (index % 5),
       baseRatingPattern: [5, 5, 4, 5, 4, 3, 5, 4, 5, 4],
       paymentAmount: salePrice ?? basePrice,
     },
@@ -611,95 +843,96 @@ export const BULK_WELLNESS_PRODUCTS = Array.from(
 
 export const BULK_WELLNESS_APPOINTMENTS = BULK_WELLNESS_PRODUCTS.flatMap(
   (product, productIndex) =>
-    Array.from({ length: product.reviewProfile.reviewCount }, (_, reviewIndex) => {
-      const pattern = product.reviewProfile.baseRatingPattern;
-      const rating = pattern[(productIndex + reviewIndex) % pattern.length];
-      const staffCode =
-        reviewIndex % 3 === 0
-          ? product.reviewProfile.secondaryStaffCode
-          : product.reviewProfile.primaryStaffCode;
-      const startTime = daysAgo(
-        35 + ((productIndex * 11 + reviewIndex) % 330),
-        8 + (reviewIndex % 8),
-        (productIndex * 7 + reviewIndex * 11) % 50,
-      );
-      const endTime = new Date(
-        startTime.getTime() +
-          (product.serviceDefinition.durationMinutes + 10) * 60 * 1000,
-      );
-      const idempotencyKey = `BULK-SVC-${String(productIndex + 1).padStart(4, '0')}-${String(reviewIndex + 1).padStart(2, '0')}`;
+    Array.from(
+      { length: product.reviewProfile.reviewCount },
+      (_, reviewIndex) => {
+        const pattern = product.reviewProfile.baseRatingPattern;
+        const rating = pattern[(productIndex + reviewIndex) % pattern.length];
+        const staffCode =
+          reviewIndex % 3 === 0
+            ? product.reviewProfile.secondaryStaffCode
+            : product.reviewProfile.primaryStaffCode;
+        const startTime = daysAgo(
+          35 + ((productIndex * 11 + reviewIndex) % 330),
+          8 + (reviewIndex % 8),
+          (productIndex * 7 + reviewIndex * 11) % 50,
+        );
+        const endTime = new Date(
+          startTime.getTime() +
+            (product.serviceDefinition.durationMinutes + 10) * 60 * 1000,
+        );
+        const idempotencyKey = `BULK-SVC-${String(productIndex + 1).padStart(4, '0')}-${String(reviewIndex + 1).padStart(2, '0')}`;
 
-      return {
-        idempotencyKey,
-        userEmail:
-          product.reviewProfile.userEmails[
-            (productIndex + reviewIndex) % product.reviewProfile.userEmails.length
+        return {
+          idempotencyKey,
+          userEmail:
+            product.reviewProfile.userEmails[
+              (productIndex + reviewIndex) %
+                product.reviewProfile.userEmails.length
+            ],
+          staffCode,
+          productSlug: product.slug,
+          startTime,
+          endTime,
+          status: BookingStatus.COMPLETED,
+          isReviewed: true,
+          notes: `Bulk wellness completed booking ${idempotencyKey}`,
+          payment: {
+            method:
+              reviewIndex % 3 === 0
+                ? PaymentMethod.CASH
+                : reviewIndex % 3 === 1
+                  ? PaymentMethod.MOMO
+                  : PaymentMethod.VNPAY,
+            status: PaymentStatus.PAID,
+            amount: product.reviewProfile.paymentAmount,
+            paidAt: endTime,
+          },
+          statusLogs: [
+            {
+              fromStatus: null,
+              toStatus: BookingStatus.PENDING_PAYMENT,
+              changedBy: 'system',
+            },
+            {
+              fromStatus: BookingStatus.PENDING_PAYMENT,
+              toStatus: BookingStatus.CONFIRMED,
+              changedBy: 'system',
+            },
+            {
+              fromStatus: BookingStatus.CONFIRMED,
+              toStatus: BookingStatus.COMPLETED,
+              changedBy: `staff:${staffCode}`,
+            },
           ],
-        staffCode,
-        productSlug: product.slug,
-        startTime,
-        endTime,
-        status: BookingStatus.COMPLETED,
-        isReviewed: true,
-        notes: `Bulk wellness completed booking ${idempotencyKey}`,
-        payment: {
-          method:
-            reviewIndex % 3 === 0
-              ? PaymentMethod.CASH
-              : reviewIndex % 3 === 1
-                ? PaymentMethod.MOMO
-                : PaymentMethod.VNPAY,
-          status: PaymentStatus.PAID,
-          amount: product.reviewProfile.paymentAmount,
-          paidAt: endTime,
-        },
-        statusLogs: [
-          {
-            fromStatus: null,
-            toStatus: BookingStatus.PENDING_PAYMENT,
-            changedBy: 'system',
+          treatmentReview: {
+            rating,
+            comment:
+              rating >= 5
+                ? 'Dịch vụ rất tốt, chuyên viên chu đáo và không gian sạch sẽ.'
+                : rating === 4
+                  ? 'Trải nghiệm tốt, liệu trình rõ ràng và đúng thời lượng.'
+                  : 'Dịch vụ ổn, phù hợp nhu cầu thư giãn cơ bản.',
+            tags:
+              rating >= 5
+                ? ['Chuyên nghiệp', 'Sạch sẽ', 'Thư giãn']
+                : rating === 4
+                  ? ['Đúng giờ', 'Thân thiện']
+                  : ['Ổn định'],
+            photoUrls: [],
           },
-          {
-            fromStatus: BookingStatus.PENDING_PAYMENT,
-            toStatus: BookingStatus.CONFIRMED,
-            changedBy: 'system',
+          specialistReview: {
+            rating,
+            comment:
+              rating >= 4
+                ? 'Chuyên viên tư vấn rõ ràng, thao tác cẩn thận và theo sát cảm nhận của khách.'
+                : 'Chuyên viên hỗ trợ đầy đủ, cần cải thiện thêm phần hướng dẫn sau buổi.',
+            tags: rating >= 4 ? ['Tận tâm', 'Kỹ năng tốt'] : ['Thân thiện'],
+            wouldRecommend: rating >= 4,
           },
-          {
-            fromStatus: BookingStatus.CONFIRMED,
-            toStatus: BookingStatus.COMPLETED,
-            changedBy: `staff:${staffCode}`,
-          },
-        ],
-        treatmentReview: {
-          rating,
-          comment:
-            rating >= 5
-              ? 'Dịch vụ rất tốt, chuyên viên chu đáo và không gian sạch sẽ.'
-              : rating === 4
-                ? 'Trải nghiệm tốt, liệu trình rõ ràng và đúng thời lượng.'
-                : 'Dịch vụ ổn, phù hợp nhu cầu thư giãn cơ bản.',
-          tags:
-            rating >= 5
-              ? ['Chuyên nghiệp', 'Sạch sẽ', 'Thư giãn']
-              : rating === 4
-                ? ['Đúng giờ', 'Thân thiện']
-                : ['Ổn định'],
-          photoUrls: [],
-        },
-        specialistReview: {
-          rating,
-          comment:
-            rating >= 4
-              ? 'Chuyên viên tư vấn rõ ràng, thao tác cẩn thận và theo sát cảm nhận của khách.'
-              : 'Chuyên viên hỗ trợ đầy đủ, cần cải thiện thêm phần hướng dẫn sau buổi.',
-          tags:
-            rating >= 4
-              ? ['Tận tâm', 'Kỹ năng tốt']
-              : ['Thân thiện'],
-          wouldRecommend: rating >= 4,
-        },
-      };
-    }),
+        };
+      },
+    ),
 );
 
 if (BULK_WELLNESS_PRODUCTS.length !== BULK_WELLNESS_PRODUCT_COUNT) {

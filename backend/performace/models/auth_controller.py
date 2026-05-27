@@ -108,6 +108,14 @@ class RefreshTokenRequestDto(DtoModel):
 
 
 @dataclass(slots=True)
+class RegisterAddressDto(DtoModel):
+    streetAddress: str
+    provinceId: str
+    districtId: str
+    wardId: str
+
+
+@dataclass(slots=True)
 class RegisterDto(DtoModel):
     email: str
     password: str
@@ -140,6 +148,7 @@ class RegisterProfileDto(DtoModel):
     phone: str | None = None
     bio: str | None = None
     dateOfBirth: str | None = None
+    address: RegisterAddressDto | None = None
 
 
 @dataclass(slots=True)
@@ -176,6 +185,7 @@ __all__ = [
     "PartnerRequestDto",
     "PasswordResetResponseDto",
     "RefreshTokenRequestDto",
+    "RegisterAddressDto",
     "RegisterDto",
     "RegisterPartnerDto",
     "RegisterPartnerResponseDto",

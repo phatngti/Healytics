@@ -176,7 +176,7 @@ const MASTER_TABLES = new Set([
 
 @Injectable()
 export class TestBackdoorService {
-  constructor(private readonly dataSource: DataSource) { }
+  constructor(private readonly dataSource: DataSource) {}
 
   status() {
     this.assertTestOnly();
@@ -526,13 +526,13 @@ export class TestBackdoorService {
     const partner = await this.resolvePartner(manager, refs, input);
     const category = input.categoryName
       ? await this.createCategory(
-        manager,
-        {
-          key: input.categoryKey,
-          name: input.categoryName,
-        },
-        refs,
-      )
+          manager,
+          {
+            key: input.categoryKey,
+            name: input.categoryName,
+          },
+          refs,
+        )
       : null;
 
     const service = await manager.save(
@@ -687,9 +687,9 @@ export class TestBackdoorService {
     const sender =
       input.senderKey || input.senderEmail
         ? await this.resolveUser(manager, refs, {
-          userKey: input.senderKey,
-          userEmail: input.senderEmail,
-        })
+            userKey: input.senderKey,
+            userEmail: input.senderEmail,
+          })
         : null;
     const isRead = input.isRead ?? false;
 
@@ -736,8 +736,8 @@ export class TestBackdoorService {
       (input.partnerBrandName && refs.partners[input.partnerBrandName]) ||
       (input.partnerBrandName
         ? await manager.findOne(Partner, {
-          where: { brandName: input.partnerBrandName },
-        })
+            where: { brandName: input.partnerBrandName },
+          })
         : null);
     return partner;
   }
@@ -752,8 +752,8 @@ export class TestBackdoorService {
       (input.employeeEmail && refs.employees[input.employeeEmail]) ||
       (input.employeeEmail
         ? await manager.findOne(Employee, {
-          where: { email: input.employeeEmail },
-        })
+            where: { email: input.employeeEmail },
+          })
         : null);
     if (!employee) throw new BadRequestException('Unable to resolve employee');
     return employee;

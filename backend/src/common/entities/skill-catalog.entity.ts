@@ -17,11 +17,7 @@ import { Partner } from './partner.entity';
  * and shared; partner-created skills are scoped.
  */
 @Entity('skill_catalog')
-@Unique('UQ_SKILL_CATALOG_PARTNER_SLUG_TYPE', [
-  'partnerId',
-  'slug',
-  'type',
-])
+@Unique('UQ_SKILL_CATALOG_PARTNER_SLUG_TYPE', ['partnerId', 'slug', 'type'])
 export class SkillCatalog {
   @PrimaryGeneratedColumn('uuid')
   id: string;

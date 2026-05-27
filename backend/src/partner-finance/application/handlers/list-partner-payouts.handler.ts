@@ -21,7 +21,10 @@ export class ListPartnerPayoutsHandler {
   async execute(
     partnerId: string,
     query: PartnerFinancePageQueryDto,
-  ): Promise<{ data: PartnerPayoutRecordDto[]; meta: PartnerFinancePageMetaDto }> {
+  ): Promise<{
+    data: PartnerPayoutRecordDto[];
+    meta: PartnerFinancePageMetaDto;
+  }> {
     this.logger.log(`Listing payouts for partner: ${partnerId}`);
 
     const page = query.page ?? 1;
@@ -44,7 +47,9 @@ export class ListPartnerPayoutsHandler {
       qb.andWhere('p.currency = :currency', { currency: query.currency });
     }
     if (query.startDate) {
-      qb.andWhere('p.scheduledDate >= :startDate', { startDate: new Date(query.startDate) });
+      qb.andWhere('p.scheduledDate >= :startDate', {
+        startDate: new Date(query.startDate),
+      });
     }
     if (query.endDate) {
       const end = new Date(query.endDate);

@@ -114,15 +114,7 @@ function startOfQuarter(d: Date): Date {
 
 function endOfQuarter(d: Date): Date {
   const quarterStartMonth = Math.floor(d.getMonth() / 3) * 3;
-  return new Date(
-    d.getFullYear(),
-    quarterStartMonth + 3,
-    0,
-    23,
-    59,
-    59,
-    999,
-  );
+  return new Date(d.getFullYear(), quarterStartMonth + 3, 0, 23, 59, 59, 999);
 }
 
 function startOfYear(d: Date): Date {

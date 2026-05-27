@@ -12,10 +12,7 @@ import { Account } from './account.entity';
 import { Booking } from './booking.entity';
 import { Employee } from './employee.entity';
 
-@Index('IDX_SPECIALIST_REVIEWS_SPECIALIST_RATING', [
-  'specialistId',
-  'rating',
-])
+@Index('IDX_SPECIALIST_REVIEWS_SPECIALIST_RATING', ['specialistId', 'rating'])
 @Index('IDX_SPECIALIST_REVIEWS_SPECIALIST_CREATED_AT', [
   'specialistId',
   'createdAt',

@@ -6,7 +6,10 @@ export class PartnerTransactionTimelineEventDto {
   @Expose()
   title: string;
 
-  @ApiProperty({ type: String, example: 'Customer successfully paid through MoMo.' })
+  @ApiProperty({
+    type: String,
+    example: 'Customer successfully paid through MoMo.',
+  })
   @Expose()
   description: string;
 

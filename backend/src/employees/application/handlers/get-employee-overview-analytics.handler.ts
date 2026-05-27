@@ -70,9 +70,7 @@ export class GetEmployeeOverviewAnalyticsHandler {
 
     const utilizationRate =
       availableHours > 0
-        ? this.round1(
-            (currentWorkload.bookedHours / availableHours) * 100,
-          )
+        ? this.round1((currentWorkload.bookedHours / availableHours) * 100)
         : 0;
     const prevUtilization =
       prevAvailableHours > 0
@@ -116,9 +114,7 @@ export class GetEmployeeOverviewAnalyticsHandler {
 
   // ── Private query methods ──────────────────────────
 
-  private async getRosterStats(
-    partnerId: string,
-  ): Promise<{
+  private async getRosterStats(partnerId: string): Promise<{
     total: number;
     active: number;
     onLeave: number;
@@ -216,8 +212,7 @@ export class GetEmployeeOverviewAnalyticsHandler {
     );
     const row = result[0] || {};
     return {
-      avgRating:
-        Math.round((parseFloat(row.avg_rating) || 0) * 10) / 10,
+      avgRating: Math.round((parseFloat(row.avg_rating) || 0) * 10) / 10,
       count: parseInt(row.review_count) || 0,
     };
   }
@@ -268,12 +263,8 @@ export class GetEmployeeOverviewAnalyticsHandler {
       for (const row of rows) {
         const d = new Date(row.bucket);
         const dayOfMonth = d.getDate();
-        const weekIndex = Math.min(
-          Math.ceil(dayOfMonth / 7) - 1,
-          3,
-        );
-        aggregated[weekIndex].sessions +=
-          parseInt(row.sessions) || 0;
+        const weekIndex = Math.min(Math.ceil(dayOfMonth / 7) - 1, 3);
+        aggregated[weekIndex].sessions += parseInt(row.sessions) || 0;
         aggregated[weekIndex].contributionValue +=
           parseFloat(row.contribution_value) || 0;
       }
@@ -317,17 +308,12 @@ export class GetEmployeeOverviewAnalyticsHandler {
       const key = sqlBucketKey(row.bucket);
       dataMap.set(key, {
         sessions: parseInt(row.sessions) || 0,
-        contributionValue:
-          parseFloat(row.contribution_value) || 0,
+        contributionValue: parseFloat(row.contribution_value) || 0,
       });
     }
 
     // Generate complete time series with zero-fill
-    const allBuckets = this.generateTimeBuckets(
-      start,
-      end,
-      granularity,
-    );
+    const allBuckets = this.generateTimeBuckets(start, end, granularity);
 
     return allBuckets.map((bucketDate) => {
       const key = bucketKey(bucketDate);
@@ -447,14 +433,13 @@ export class GetEmployeeOverviewAnalyticsHandler {
 
     // Compute scores
     const maxContribution = Math.max(
-      ...rows.map(
-        (r: any) => parseFloat(r.contribution_value) || 0,
-      ),
+      ...rows.map((r: any) => parseFloat(r.contribution_value) || 0),
       1,
     );
 
     const scored = rows.map((row: any) => {
-      const rating = parseFloat(row.avg_rating) || parseFloat(row.cached_rating) || 0;
+      const rating =
+        parseFloat(row.avg_rating) || parseFloat(row.cached_rating) || 0;
       const contribution = parseFloat(row.contribution_value) || 0;
       const bookedHours = parseFloat(row.booked_hours) || 0;
       const schedule = row.schedule || [];
@@ -470,9 +455,7 @@ export class GetEmployeeOverviewAnalyticsHandler {
       const utilizationScore = Math.min(utilization, 100) / 100;
       const contributionScore = contribution / maxContribution;
       const compositeScore =
-        ratingScore * 0.45 +
-        utilizationScore * 0.3 +
-        contributionScore * 0.25;
+        ratingScore * 0.45 + utilizationScore * 0.3 + contributionScore * 0.25;
 
       return {
         fullName: row.full_name,
@@ -486,17 +469,12 @@ export class GetEmployeeOverviewAnalyticsHandler {
     });
 
     // Sort by composite score descending, take top 4
-    scored.sort(
-      (a: any, b: any) => b.compositeScore - a.compositeScore,
-    );
+    scored.sort((a: any, b: any) => b.compositeScore - a.compositeScore);
 
     return scored.slice(0, 4).map((item: any) => {
       const dto = new EmployeePerformanceSummaryDto();
       dto.employeeName = item.fullName;
-      dto.roleLabel = this.mapRoleLabel(
-        item.role,
-        item.therapistType,
-      );
+      dto.roleLabel = this.mapRoleLabel(item.role, item.therapistType);
       dto.rating = item.rating;
       dto.utilizationRate = item.utilizationRate;
       dto.contributionValue = item.contributionValue;
@@ -504,9 +482,7 @@ export class GetEmployeeOverviewAnalyticsHandler {
     });
   }
 
-  private async getComplianceStats(
-    partnerId: string,
-  ): Promise<{
+  private async getComplianceStats(partnerId: string): Promise<{
     missingDocs: number;
     missingEmergency: number;
     active: number;
@@ -555,8 +531,7 @@ export class GetEmployeeOverviewAnalyticsHandler {
     let totalAvailable = 0;
     for (const row of result) {
       const schedule = row.schedule || [];
-      const weeklyHours =
-        this.computeWeeklyAvailableHours(schedule);
+      const weeklyHours = this.computeWeeklyAvailableHours(schedule);
       const periodWeeks = this.countWeeksInPeriod(start, end);
       totalAvailable += weeklyHours * periodWeeks;
     }
@@ -577,12 +552,10 @@ export class GetEmployeeOverviewAnalyticsHandler {
     const docItem = new EmployeeComplianceItemDto();
     docItem.title = 'Verification coverage';
     if (stats.missingDocs === 0) {
-      docItem.detail =
-        'All visible profiles have supporting documents.';
+      docItem.detail = 'All visible profiles have supporting documents.';
       docItem.tone = 'positive';
     } else {
-      docItem.detail =
-        `${stats.missingDocs} employee(s) are missing verification documents.`;
+      docItem.detail = `${stats.missingDocs} employee(s) are missing verification documents.`;
       docItem.tone = 'warning';
     }
     items.push(docItem);
@@ -595,8 +568,7 @@ export class GetEmployeeOverviewAnalyticsHandler {
         'All employees have emergency contact information on file.';
       emergencyItem.tone = 'positive';
     } else {
-      emergencyItem.detail =
-        `${stats.missingEmergency} employee(s) are missing emergency contact information.`;
+      emergencyItem.detail = `${stats.missingEmergency} employee(s) are missing emergency contact information.`;
       emergencyItem.tone = 'critical';
     }
     items.push(emergencyItem);
@@ -604,19 +576,15 @@ export class GetEmployeeOverviewAnalyticsHandler {
     // 3. Active roster readiness
     const rosterItem = new EmployeeComplianceItemDto();
     rosterItem.title = 'Active roster readiness';
-    const activeRate =
-      stats.total > 0 ? (stats.active / stats.total) * 100 : 0;
+    const activeRate = stats.total > 0 ? (stats.active / stats.total) * 100 : 0;
     if (activeRate >= 80) {
-      rosterItem.detail =
-        `${stats.active} of ${stats.total} employees are active (${Math.round(activeRate)}%).`;
+      rosterItem.detail = `${stats.active} of ${stats.total} employees are active (${Math.round(activeRate)}%).`;
       rosterItem.tone = 'positive';
     } else if (activeRate >= 50) {
-      rosterItem.detail =
-        `Only ${stats.active} of ${stats.total} employees are active (${Math.round(activeRate)}%).`;
+      rosterItem.detail = `Only ${stats.active} of ${stats.total} employees are active (${Math.round(activeRate)}%).`;
       rosterItem.tone = 'warning';
     } else {
-      rosterItem.detail =
-        `Only ${stats.active} of ${stats.total} employees are active (${Math.round(activeRate)}%).`;
+      rosterItem.detail = `Only ${stats.active} of ${stats.total} employees are active (${Math.round(activeRate)}%).`;
       rosterItem.tone = 'critical';
     }
     items.push(rosterItem);
@@ -626,15 +594,11 @@ export class GetEmployeeOverviewAnalyticsHandler {
 
   // ── Helpers ────────────────────────────────────────
 
-  private mapRoleLabel(
-    role: string,
-    therapistType?: string | null,
-  ): string {
+  private mapRoleLabel(role: string, therapistType?: string | null): string {
     if (role === 'DOCTOR') return 'Doctor';
     if (role === 'THERAPIST') {
       if (therapistType === 'SPA') return 'Spa therapist';
-      if (therapistType === 'MASSAGE')
-        return 'Massage therapist';
+      if (therapistType === 'MASSAGE') return 'Massage therapist';
       return 'Therapist';
     }
     if (role === 'RECEPTIONIST') return 'Receptionist';
@@ -652,8 +616,7 @@ export class GetEmployeeOverviewAnalyticsHandler {
   ): number {
     let total = 0;
     for (const entry of schedule) {
-      if (!entry.isWorking || !entry.start || !entry.end)
-        continue;
+      if (!entry.isWorking || !entry.start || !entry.end) continue;
       const [sh, sm] = entry.start.split(':').map(Number);
       const [eh, em] = entry.end.split(':').map(Number);
       const hours = (eh * 60 + em - (sh * 60 + sm)) / 60;
@@ -671,11 +634,7 @@ export class GetEmployeeOverviewAnalyticsHandler {
   /** Computes % change between current and previous values. */
   private delta(current: number, previous: number): number {
     if (previous <= 0) return current > 0 ? 100 : 0;
-    return (
-      Math.round(
-        ((current - previous) / previous) * 100 * 10,
-      ) / 10
-    );
+    return Math.round(((current - previous) / previous) * 100 * 10) / 10;
   }
 
   /** Rounds to one decimal place. */
@@ -714,13 +673,20 @@ export class GetEmployeeOverviewAnalyticsHandler {
   }
 
   /** Formats a bucket date into a human-readable label. */
-  private formatBucketLabel(
-    date: Date,
-    period: DashboardTimePeriod,
-  ): string {
+  private formatBucketLabel(date: Date, period: DashboardTimePeriod): string {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
 
     switch (period) {
@@ -731,9 +697,7 @@ export class GetEmployeeOverviewAnalyticsHandler {
         return `${display}${suffix}`;
       }
       case DashboardTimePeriod.THIS_WEEK: {
-        const days = [
-          'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
-        ];
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         return days[date.getDay()];
       }
       case DashboardTimePeriod.THIS_MONTH:

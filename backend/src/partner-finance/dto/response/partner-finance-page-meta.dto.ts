@@ -18,7 +18,11 @@ export class PartnerFinancePageMetaDto {
   @Expose()
   totalPages: number;
 
-  static create(total: number, page: number, limit: number): PartnerFinancePageMetaDto {
+  static create(
+    total: number,
+    page: number,
+    limit: number,
+  ): PartnerFinancePageMetaDto {
     const dto = new PartnerFinancePageMetaDto();
     dto.page = page;
     dto.limit = limit;

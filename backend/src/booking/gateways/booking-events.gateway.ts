@@ -19,6 +19,7 @@ import { Namespace, Socket } from 'socket.io';
 import { AccountService } from '@/account/account.service';
 import { Role } from '@/account/enum/role.enum';
 import { WsNamespace } from '@/common/decorators/ws';
+import { ObservabilityMetricsService } from '@/observability/observability-metrics.service';
 import { REDIS_CLIENT } from '@/redis/redis.service';
 import {
   WsJwtAuthMiddleware,
@@ -69,11 +70,13 @@ export class BookingEventsGateway
     private readonly accountService: AccountService,
     private readonly bookingAccessService: BookingAccessService,
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
+    private readonly observabilityMetrics: ObservabilityMetricsService,
   ) {}
 
   afterInit(server: Namespace) {
     server.use(WsJwtAuthMiddleware(this.jwtService, this.accountService));
     server.use(WsRoleMiddleware([Role.USER, Role.HEALTH_PARTNER]));
+    this.observabilityMetrics.registerWsNamespace('booking-events', server);
     this.logger.log('BookingEventsGateway initialized on /booking-events');
   }
 
@@ -117,6 +120,12 @@ export class BookingEventsGateway
     if (user.role === Role.USER) {
       const room = bookingUserRoom(user.id);
       await client.join(room);
+      this.observabilityMetrics.recordWsConnect(
+        client.id,
+        'booking-events',
+        user.role,
+        user.id,
+      );
       this.logger.log(`Booking WS user=${user.id} joined ${room}`);
       return;
     }
@@ -133,12 +142,19 @@ export class BookingEventsGateway
       }
       const room = bookingPartnerRoom(partnerId);
       await client.join(room);
+      this.observabilityMetrics.recordWsConnect(
+        client.id,
+        'booking-events',
+        user.role,
+        user.id,
+      );
       this.logger.log(`Booking WS partner=${partnerId} joined ${room}`);
     }
   }
 
   handleDisconnect(client: Socket): void {
     const user = client.data.user;
+    this.observabilityMetrics.recordWsDisconnect(client.id, 'booking-events');
     this.logger.log(
       `Booking WS disconnected user=${user?.id ?? 'unknown'} socket=${client.id}`,
     );

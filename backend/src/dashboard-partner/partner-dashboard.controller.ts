@@ -19,9 +19,7 @@ import { LogResponse } from '@/common/interceptors/response.interceptor';
 
 @PartnerApi('dashboard')
 export class PartnerDashboardController {
-  constructor(
-    private readonly dashboardService: PartnerDashboardService,
-  ) {}
+  constructor(private readonly dashboardService: PartnerDashboardService) {}
 
   @Get('stats')
   @ApiOperation({ summary: 'Get aggregated KPI statistics' })
@@ -50,7 +48,10 @@ export class PartnerDashboardController {
     @CurrentUser('id') userId: string,
     @Query() query: DashboardLimitQueryDto,
   ): Promise<UpcomingAppointmentDto[]> {
-    return this.dashboardService.getUpcomingAppointments(userId, query.limit ?? 5);
+    return this.dashboardService.getUpcomingAppointments(
+      userId,
+      query.limit ?? 5,
+    );
   }
 
   @Get('services/performance')

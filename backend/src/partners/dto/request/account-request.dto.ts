@@ -9,7 +9,6 @@ import {
 } from 'class-validator';
 
 class AccountRequestDto {
-
   @ApiProperty({
     example: 'Password123',
     description: 'Password (min 8 characters)',

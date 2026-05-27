@@ -42,9 +42,7 @@ export class UpdatePartnerPublicProfileHandler {
     accountId: string,
     dto: UpdatePartnerPublicProfileDto,
   ): Promise<void> {
-    this.logger.log(
-      `Updating public profile for account: ${accountId}`,
-    );
+    this.logger.log(`Updating public profile for account: ${accountId}`);
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -114,9 +112,7 @@ export class UpdatePartnerPublicProfileHandler {
 
       // 5. Commit — no verification status change
       await queryRunner.commitTransaction();
-      this.logger.log(
-        `Public profile updated for account: ${accountId}`,
-      );
+      this.logger.log(`Public profile updated for account: ${accountId}`);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(
@@ -162,9 +158,7 @@ export class UpdatePartnerPublicProfileHandler {
       }
 
       const entity =
-        (certification.id
-          ? existingById.get(certification.id)
-          : undefined) ??
+        (certification.id ? existingById.get(certification.id) : undefined) ??
         manager.create(PartnerCertification, { partnerId });
 
       entity.partnerId = partnerId;

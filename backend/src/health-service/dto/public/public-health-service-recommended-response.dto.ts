@@ -4,7 +4,9 @@ import { Product } from '@/common/entities/product.entity';
 export class PublicHealthServiceRecommendedResponseDto {
   @ApiProperty({ type: String }) id: string;
   @ApiProperty({ type: String }) title: string;
-  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) imageUrl:
+    | string
+    | null;
   @ApiProperty({ type: Number, example: 4.9 }) rating: number;
   @ApiProperty({ type: String, example: '(500+ Reviews)' }) reviewLabel: string;
   @ApiProperty({ type: String, example: '1.2k+ Booked' }) bookedLabel: string;

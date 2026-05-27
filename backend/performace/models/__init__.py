@@ -40,8 +40,6 @@ from .locations_controller import *
 from .locations_controller import __all__ as _locations_controller_all
 from .mapbox_controller import *
 from .mapbox_controller import __all__ as _mapbox_controller_all
-from .mo_mo_controller import *
-from .mo_mo_controller import __all__ as _mo_mo_controller_all
 from .partner_bookings_controller import *
 from .partner_bookings_controller import __all__ as _partner_bookings_controller_all
 from .partner_chat_controller import *
@@ -111,7 +109,6 @@ __all__ = [
     *_employee_revenue_controller_all,
     *_locations_controller_all,
     *_mapbox_controller_all,
-    *_mo_mo_controller_all,
     *_partner_bookings_controller_all,
     *_partner_chat_controller_all,
     *_partner_dashboard_controller_all,

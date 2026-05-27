@@ -34,7 +34,9 @@ export class GetEmployeeRevenueTrendHandler {
       select: ['id'],
     });
     if (!employee) {
-      throw new NotFoundException('Employee profile not found for this account');
+      throw new NotFoundException(
+        'Employee profile not found for this account',
+      );
     }
 
     const period = query.period ?? EmployeeRevenuePeriod.MONTH;
@@ -61,11 +63,7 @@ export class GetEmployeeRevenueTrendHandler {
     for (let i = 6; i >= 0; i--) {
       const day = new Date(refDate);
       day.setDate(day.getDate() - i);
-      const start = new Date(
-        day.getFullYear(),
-        day.getMonth(),
-        day.getDate(),
-      );
+      const start = new Date(day.getFullYear(), day.getMonth(), day.getDate());
       const end = new Date(
         day.getFullYear(),
         day.getMonth(),
@@ -107,15 +105,7 @@ export class GetEmployeeRevenueTrendHandler {
     const points: EmployeeRevenueTrendPointDto[] = [];
     for (let m = 0; m < 12; m++) {
       const start = new Date(refDate.getFullYear(), m, 1);
-      const end = new Date(
-        refDate.getFullYear(),
-        m + 1,
-        0,
-        23,
-        59,
-        59,
-        999,
-      );
+      const end = new Date(refDate.getFullYear(), m + 1, 0, 23, 59, 59, 999);
       const amount = await this.sumRevenue(employeeId, start, end);
       const dto = new EmployeeRevenueTrendPointDto();
       dto.date = start;

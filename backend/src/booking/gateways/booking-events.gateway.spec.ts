@@ -10,8 +10,15 @@ import {
 } from '../constants/booking-realtime.constants';
 import { BookingAccessService } from '../services/booking-access.service';
 import { BookingEventsGateway } from './booking-events.gateway';
+import { ObservabilityMetricsService } from '@/observability/observability-metrics.service';
 
 describe('BookingEventsGateway', () => {
+  const observabilityMetrics = {
+    recordWsConnect: jest.fn(),
+    recordWsDisconnect: jest.fn(),
+    registerWsNamespace: jest.fn(),
+  } as unknown as ObservabilityMetricsService;
+
   it('fans status events out to user and partner rooms', () => {
     const to = jest.fn().mockReturnThis();
     const emit = jest.fn();
@@ -20,6 +27,7 @@ describe('BookingEventsGateway', () => {
       {} as AccountService,
       {} as BookingAccessService,
       { duplicate: jest.fn() } as any,
+      observabilityMetrics,
     );
     (gateway as any).server = { to, emit };
 
@@ -56,6 +64,7 @@ describe('BookingEventsGateway', () => {
       {} as AccountService,
       access as unknown as BookingAccessService,
       { duplicate: jest.fn() } as any,
+      observabilityMetrics,
     );
     const client = {
       data: { user: { id: 'account-1', role: Role.HEALTH_PARTNER } },

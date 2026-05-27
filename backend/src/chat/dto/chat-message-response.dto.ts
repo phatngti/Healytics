@@ -87,8 +87,7 @@ export class ChatMessageResponseDto {
     // Sender info from joined relation
     if (entity.sender) {
       const profile = (entity.sender as any).userProfile;
-      dto.senderName =
-        profile?.fullName ?? entity.sender.email;
+      dto.senderName = profile?.fullName ?? entity.sender.email;
       dto.senderAvatar = profile?.avatarUrl ?? undefined;
     }
 

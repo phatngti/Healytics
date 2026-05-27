@@ -6,7 +6,8 @@ export class LoggingMiddleware implements NestMiddleware {
   private readonly logger = new Logger('HTTP');
   private readonly accessLogEnabled =
     process.env.HTTP_ACCESS_LOG_ENABLED === 'true';
-  private readonly bodyLogEnabled = process.env.HTTP_BODY_LOG_ENABLED === 'true';
+  private readonly bodyLogEnabled =
+    process.env.HTTP_BODY_LOG_ENABLED === 'true';
   private readonly sampleRate = this.parseSampleRate(
     process.env.HTTP_LOG_SAMPLE_RATE,
   );

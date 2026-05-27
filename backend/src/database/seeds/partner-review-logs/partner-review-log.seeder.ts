@@ -58,10 +58,7 @@ const SEED_PARTNER_REVIEW_LOGS: SeedPartnerReviewLog[] = [
     partnerTaxCode: '6677889900',
     verdict: PartnerVerificationStatus.PENDING,
     reviewerEmail: process.env.DEFAULT_ADMIN_EMAIL || 'admin@healytics.vn',
-    generalComment: seedKey(
-      SEED_MARKERS.partnerReviewComment,
-      'PENDING_002',
-    ),
+    generalComment: seedKey(SEED_MARKERS.partnerReviewComment, 'PENDING_002'),
   },
 ];
 

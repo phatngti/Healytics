@@ -22,7 +22,7 @@ export class SubmitFacilityReviewHandler {
   constructor(
     private readonly dataSource: DataSource,
     private readonly s3Service: S3Service,
-  ) { }
+  ) {}
 
   async execute(
     userId: string,
@@ -65,7 +65,10 @@ export class SubmitFacilityReviewHandler {
         );
       }
 
-      if (facilityId !== dto.facilityId && facilityAccountId !== dto.facilityId) {
+      if (
+        facilityId !== dto.facilityId &&
+        facilityAccountId !== dto.facilityId
+      ) {
         throw new BadRequestException(
           'Facility not found for this appointment',
         );

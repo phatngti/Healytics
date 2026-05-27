@@ -9,6 +9,19 @@ from .base import DtoModel, dto_field
 
 
 @dataclass(slots=True)
+class AccountAddressDto(DtoModel):
+    street: str
+    ward: str
+    district: str
+    cityOrProvince: str
+    provinceId: dict[str, Any] | None = None
+    districtId: dict[str, Any] | None = None
+    wardId: dict[str, Any] | None = None
+    latitude: dict[str, Any] | None = None
+    longitude: dict[str, Any] | None = None
+
+
+@dataclass(slots=True)
 class AccountMeResponseDto(DtoModel):
     id: str
     email: str
@@ -30,6 +43,21 @@ class SurveyResponseDto(DtoModel):
 
 
 @dataclass(slots=True)
+class UpdateAccountAddressDto(DtoModel):
+    streetAddress: str
+    provinceId: str
+    districtId: str
+    wardId: str
+
+
+@dataclass(slots=True)
+class UpdateAccountProfileDto(DtoModel):
+    firstName: dict[str, Any] | None = None
+    lastName: dict[str, Any] | None = None
+    phone: dict[str, Any] | None = None
+
+
+@dataclass(slots=True)
 class UpdateAvatarDto(DtoModel):
     avatarUrl: str
 
@@ -38,18 +66,22 @@ class UpdateAvatarDto(DtoModel):
 class UserProfileDto(DtoModel):
     id: str
     profileCompleted: bool
-    firstName: str | None = None
-    lastName: str | None = None
-    phone: str | None = None
+    firstName: dict[str, Any] | None = None
+    lastName: dict[str, Any] | None = None
+    phone: dict[str, Any] | None = None
     bio: dict[str, Any] | None = None
     dateOfBirth: str | None = None
     avatarUrl: dict[str, Any] | None = None
+    address: AccountAddressDto | None = None
 
 
 __all__ = [
+    "AccountAddressDto",
     "AccountMeResponseDto",
     "SurveyDto",
     "SurveyResponseDto",
+    "UpdateAccountAddressDto",
+    "UpdateAccountProfileDto",
     "UpdateAvatarDto",
     "UserProfileDto",
 ]

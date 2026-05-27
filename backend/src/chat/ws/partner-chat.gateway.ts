@@ -36,6 +36,7 @@ import {
 import { ChatNotificationGateway } from './chat-notification.gateway';
 import { NotificationEventService } from '@/notification/services/notification-event.service';
 import { NotificationType } from '@/notification/enums/notification-type.enum';
+import { ObservabilityMetricsService } from '@/observability/observability-metrics.service';
 
 /**
  * WebSocket gateway for the **Health Partner** side of the chat.
@@ -71,6 +72,7 @@ export class PartnerChatGateway
     private readonly accountService: AccountService,
     private readonly chatNotificationGateway: ChatNotificationGateway,
     private readonly notificationEventService: NotificationEventService,
+    private readonly observabilityMetrics: ObservabilityMetricsService,
   ) {}
 
   // ── Lifecycle ────────────────────────────────────────────────
@@ -78,6 +80,7 @@ export class PartnerChatGateway
   afterInit(server: Namespace) {
     server.use(WsJwtAuthMiddleware(this.jwtService, this.accountService));
     server.use(WsRoleMiddleware([Role.HEALTH_PARTNER, Role.EMPLOYEE]));
+    this.observabilityMetrics.registerWsNamespace('partner-chat', server);
 
     // Register this gateway's server instance for cross-gateway communication
     this.chatService.setPartnerServer(server);
@@ -86,6 +89,12 @@ export class PartnerChatGateway
 
   async handleConnection(client: Socket) {
     const user = client.data.user;
+    this.observabilityMetrics.recordWsConnect(
+      client.id,
+      'partner-chat',
+      user.role,
+      user.id,
+    );
     this.logger.log(
       `[WS Connected] partner=${user.email} userId=${user.id} role=${user.role} socketId=${client.id} transport=${client.conn?.transport?.name ?? 'unknown'}`,
     );
@@ -127,6 +136,7 @@ export class PartnerChatGateway
 
   handleDisconnect(client: Socket) {
     const user = client.data.user;
+    this.observabilityMetrics.recordWsDisconnect(client.id, 'partner-chat');
     this.logger.log(
       `[WS Disconnected] partner=${user?.email ?? 'unknown'} userId=${user?.id ?? 'N/A'} socketId=${client.id}`,
     );

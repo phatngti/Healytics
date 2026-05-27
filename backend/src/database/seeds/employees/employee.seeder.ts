@@ -665,8 +665,7 @@ export class EmployeeSeeder implements ISeeder {
 
     for (const empData of SEED_EMPLOYEES) {
       const rawEmployeeData = empData as any;
-      const { partnerTaxCode, accountEmail, ...employeeData } =
-        rawEmployeeData;
+      const { partnerTaxCode, accountEmail, ...employeeData } = rawEmployeeData;
       const partner =
         partnerMap.get(rawEmployeeData.partnerTaxCode ?? '0123456789') ?? null;
       const exists = await this.employeeRepo.findOne({
@@ -724,7 +723,7 @@ export class EmployeeSeeder implements ISeeder {
         reviewCount: 0,
         partnerId: partner?.id ?? null,
         accountId,
-      } as Partial<Employee>) as Employee;
+      } as Partial<Employee>);
 
       await this.employeeRepo.save(employee);
       this.logger.log(

@@ -33,7 +33,9 @@ export class GetEmployeeAppointmentHandler {
       select: ['id', 'partnerId'],
     });
     if (!employee) {
-      throw new NotFoundException('Employee profile not found for this account');
+      throw new NotFoundException(
+        'Employee profile not found for this account',
+      );
     }
 
     // 2. Load booking with ownership check

@@ -24,12 +24,30 @@ from common.config import API_PREFIX, MAX_WAIT, MIN_WAIT
 ACCOUNT = f"{API_PREFIX}/account"
 ADMIN_DASHBOARD = f"{API_PREFIX}/admin/dashboard"
 ADMIN_FINANCE = f"{API_PREFIX}/admin/finance"
+ADMIN_AUDIT_LOGS = f"{API_PREFIX}/admin/audit-logs"
+ADMIN_CATEGORIES = f"{API_PREFIX}/admin/categories"
+ADMIN_NOTIFICATIONS = f"{API_PREFIX}/admin/notifications"
+ADMIN_PARTNERS = f"{API_PREFIX}/admin/partners"
+CART = f"{API_PREFIX}/cart"
+CATEGORIES = f"{API_PREFIX}/categories"
+LOCATIONS = f"{API_PREFIX}/locations"
+MAPBOX = f"{API_PREFIX}/mapbox"
 PARTNER_BOOKINGS = f"{API_PREFIX}/partner/bookings"
+PARTNER_DASHBOARD = f"{API_PREFIX}/partner/dashboard"
 PARTNER_EMPLOYEES = f"{API_PREFIX}/partner/employees"
+PARTNER_HEALTH_SERVICES = f"{API_PREFIX}/partner/health-services"
+PARTNER_PARTNERS = f"{API_PREFIX}/partner/partners"
+PARTNER_SERVICE_TAGS = f"{API_PREFIX}/partner/service-tags"
+PARTNERS = f"{API_PREFIX}/partners"
 USER_APPOINTMENTS = f"{API_PREFIX}/user/appointments"
+USER_BOOKINGS = f"{API_PREFIX}/user/bookings"
 USER_BOOKING_SEARCH = f"{API_PREFIX}/user/booking-search"
+USER_CATEGORIES = f"{API_PREFIX}/user/categories"
+USER_CHAT = f"{API_PREFIX}/user/chat"
 USER_CLINICS = f"{API_PREFIX}/user/clinics"
+USER_EMPLOYEES = f"{API_PREFIX}/user/employees"
 USER_HEALTH_SERVICES = f"{API_PREFIX}/user/health-services"
+USER_NOTIFICATIONS = f"{API_PREFIX}/user/notifications"
 USER_PAYMENTS = f"{API_PREFIX}/user/payments"
 USER_PROFILE = f"{API_PREFIX}/user/profile"
 USER_WISHLIST = f"{API_PREFIX}/user/wishlist"
@@ -37,6 +55,12 @@ USER_WISHLIST = f"{API_PREFIX}/user/wishlist"
 ADMIN_DASHBOARD_PERIODS = ["7d", "30d", "90d"]
 ADMIN_FINANCE_PERIODS = ["sevenDays", "thirtyDays", "ninetyDays"]
 ADMIN_FINANCE_STATUSES = ["pending", "paid", "refunded", "failed", "canceled"]
+ADMIN_PARTNER_VERIFICATION_STATUSES = [
+    "PENDING",
+    "APPROVED",
+    "REJECTED",
+    "REQUIRED_RESUBMIT",
+]
 APPOINTMENT_STATUSES = [
     "pending_payment",
     "upcoming",
@@ -45,9 +69,126 @@ APPOINTMENT_STATUSES = [
     "canceled",
 ]
 BOOKING_SEARCH_TERMS = ["massage", "spa", "doctor", "facial", "therapy", "clinic"]
+CATEGORY_SORTS = ["name", "createdAt"]
+EMPLOYEE_SORTS = ["rating", "experience", "name"]
 UUID_RE = re.compile(
     r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 )
+
+
+@tag("current-new-api", "new-api", "public-read", "safe-read", "target")
+class PublicCatalogCurrentApiUser(HttpUser):
+    """Public read mix for catalog, location, partner taxonomy, and map helpers."""
+
+    wait_time = between(MIN_WAIT, MAX_WAIT)
+    weight = 2
+
+    def on_start(self):
+        self.headers: dict[str, str] = {}
+        self.category_ids: list[str] = []
+        self.category_slugs: list[str] = []
+        self.province_ids: list[str] = []
+        self.district_ids: list[str] = []
+        self._discover_public_context()
+
+    @task(5)
+    def list_categories(self):
+        self.client.get(CATEGORIES, name=CATEGORIES)
+
+    @task(2)
+    def get_category_detail(self):
+        category_id = _choose(self.category_ids)
+        if not category_id:
+            return
+        self.client.get(
+            f"{CATEGORIES}/{category_id}",
+            name=f"{CATEGORIES}/:id",
+        )
+
+    @task(2)
+    def get_category_by_slug(self):
+        slug = _choose(self.category_slugs)
+        if not slug:
+            return
+        self.client.get(
+            f"{CATEGORIES}/slug/{slug}",
+            name=f"{CATEGORIES}/slug/:slug",
+        )
+
+    @task(4)
+    def list_business_services(self):
+        self.client.get(
+            f"{PARTNERS}/business-services",
+            name=f"{PARTNERS}/business-services",
+        )
+
+    @task(4)
+    def list_provinces(self):
+        self.client.get(
+            f"{LOCATIONS}/provinces",
+            name=f"{LOCATIONS}/provinces",
+        )
+
+    @task(3)
+    def list_districts(self):
+        province_id = _choose(self.province_ids)
+        if not province_id:
+            return
+        self.client.get(
+            f"{LOCATIONS}/provinces/{province_id}/districts",
+            name=f"{LOCATIONS}/provinces/:provinceId/districts",
+        )
+
+    @task(3)
+    def list_wards(self):
+        district_id = _choose(self.district_ids)
+        if not district_id:
+            return
+        self.client.get(
+            f"{LOCATIONS}/districts/{district_id}/wards",
+            name=f"{LOCATIONS}/districts/:districtId/wards",
+        )
+
+    @task(2)
+    def get_mapbox_client_key(self):
+        self.client.get(
+            f"{MAPBOX}/client-key",
+            name=f"{MAPBOX}/client-key",
+        )
+
+    def _discover_public_context(self):
+        categories = _safe_json_get(
+            self.client,
+            CATEGORIES,
+            self.headers,
+            f"{CATEGORIES} [discovery]",
+            optional=True,
+        )
+        for item in _extract_items(categories):
+            _append_unique(self.category_ids, _id_from(item))
+            _append_unique_slug(self.category_slugs, _string_value(item, "slug"))
+
+        provinces = _safe_json_get(
+            self.client,
+            f"{LOCATIONS}/provinces",
+            self.headers,
+            f"{LOCATIONS}/provinces [discovery]",
+            optional=True,
+        )
+        for item in _extract_items(provinces):
+            _append_unique(self.province_ids, _id_from(item))
+
+        province_id = _choose(self.province_ids)
+        if province_id:
+            districts = _safe_json_get(
+                self.client,
+                f"{LOCATIONS}/provinces/{province_id}/districts",
+                self.headers,
+                f"{LOCATIONS}/provinces/:provinceId/districts [discovery]",
+                optional=True,
+            )
+            for item in _extract_items(districts):
+                _append_unique(self.district_ids, _id_from(item))
 
 
 @tag("current-new-api", "new-api", "user-current", "safe-read", "target")
@@ -72,6 +213,10 @@ class UserCurrentNewApiUser(HttpUser):
         self.appointment_ids: list[str] = []
         self.service_ids: list[str] = []
         self.clinic_ids: list[str] = []
+        self.category_ids: list[str] = []
+        self.employee_ids: list[str] = []
+        self.booking_ids: list[str] = []
+        self.conversation_ids: list[str] = []
         self._discover_user_read_context()
 
     @task(5)
@@ -88,6 +233,14 @@ class UserCurrentNewApiUser(HttpUser):
             f"{USER_PROFILE}/summary",
             headers=self.headers,
             name=f"{USER_PROFILE}/summary",
+        )
+
+    @task(3)
+    def get_account_survey(self):
+        self.client.get(
+            f"{ACCOUNT}/survey",
+            headers=self.headers,
+            name=f"{ACCOUNT}/survey",
         )
 
     @task(5)
@@ -160,6 +313,28 @@ class UserCurrentNewApiUser(HttpUser):
         )
 
     @task(3)
+    def list_bookings(self):
+        query = urlencode(
+            {"page": random.randint(1, 3), "limit": random.choice([10, 20])}
+        )
+        self.client.get(
+            f"{USER_BOOKINGS}?{query}",
+            headers=self.headers,
+            name=USER_BOOKINGS,
+        )
+
+    @task(2)
+    def get_booking_detail(self):
+        booking_id = _choose(self.booking_ids)
+        if not booking_id:
+            return
+        self.client.get(
+            f"{USER_BOOKINGS}/{booking_id}",
+            headers=self.headers,
+            name=f"{USER_BOOKINGS}/:id",
+        )
+
+    @task(3)
     def list_saved_cards(self):
         self.client.get(
             f"{USER_PAYMENTS}/cards",
@@ -173,6 +348,14 @@ class UserCurrentNewApiUser(HttpUser):
             USER_WISHLIST,
             headers=self.headers,
             name=USER_WISHLIST,
+        )
+
+    @task(3)
+    def get_cart_items(self):
+        self.client.get(
+            CART,
+            headers=self.headers,
+            name=CART,
         )
 
     @task(4)
@@ -266,6 +449,115 @@ class UserCurrentNewApiUser(HttpUser):
             name=f"{USER_CLINICS}/:id/reviews",
         )
 
+    @task(3)
+    def list_featured_specialists(self):
+        query = urlencode({"limit": random.choice([5, 10, 20])})
+        self.client.get(
+            f"{USER_EMPLOYEES}/featured-specialists?{query}",
+            headers=self.headers,
+            name=f"{USER_EMPLOYEES}/featured-specialists",
+        )
+
+    @task(4)
+    def list_specialists(self):
+        query = urlencode(
+            {
+                "page": random.randint(1, 3),
+                "limit": random.choice([10, 20]),
+                "sortBy": random.choice(EMPLOYEE_SORTS),
+            }
+        )
+        self.client.get(
+            f"{USER_EMPLOYEES}?{query}",
+            headers=self.headers,
+            name=USER_EMPLOYEES,
+        )
+
+    @task(2)
+    def get_specialist_detail(self):
+        employee_id = _choose(self.employee_ids)
+        if not employee_id:
+            return
+        self.client.get(
+            f"{USER_EMPLOYEES}/{employee_id}",
+            headers=self.headers,
+            name=f"{USER_EMPLOYEES}/:id",
+        )
+
+    @task(2)
+    def get_specialist_related_reads(self):
+        employee_id = _choose(self.employee_ids)
+        if not employee_id:
+            return
+        suffix = random.choice(["reviews", "time-slots"])
+        query = ""
+        if suffix == "time-slots":
+            query = f"?{urlencode({'date': date.today().isoformat(), 'days': 7})}"
+        self.client.get(
+            f"{USER_EMPLOYEES}/{employee_id}/{suffix}{query}",
+            headers=self.headers,
+            name=f"{USER_EMPLOYEES}/:id/{suffix}",
+        )
+
+    @task(3)
+    def list_category_services(self):
+        category_id = _choose(self.category_ids)
+        if not category_id:
+            return
+        self.client.get(
+            f"{USER_CATEGORIES}/{category_id}/services",
+            headers=self.headers,
+            name=f"{USER_CATEGORIES}/:categoryId/services",
+        )
+
+    @task(3)
+    def list_category_specialists(self):
+        category_id = _choose(self.category_ids)
+        if not category_id:
+            return
+        self.client.get(
+            f"{USER_CATEGORIES}/{category_id}/specialists",
+            headers=self.headers,
+            name=f"{USER_CATEGORIES}/:categoryId/specialists",
+        )
+
+    @task(3)
+    def list_notifications(self):
+        query = urlencode({"page": 1, "limit": random.choice([10, 20])})
+        self.client.get(
+            f"{USER_NOTIFICATIONS}?{query}",
+            headers=self.headers,
+            name=USER_NOTIFICATIONS,
+        )
+
+    @task(3)
+    def get_unread_notification_count(self):
+        self.client.get(
+            f"{USER_NOTIFICATIONS}/unread-count",
+            headers=self.headers,
+            name=f"{USER_NOTIFICATIONS}/unread-count",
+        )
+
+    @task(2)
+    def list_chat_conversations(self):
+        self.client.get(
+            f"{USER_CHAT}/conversations",
+            headers=self.headers,
+            name=f"{USER_CHAT}/conversations",
+        )
+
+    @task(1)
+    def list_chat_messages(self):
+        conversation_id = _choose(self.conversation_ids)
+        if not conversation_id:
+            return
+        query = urlencode({"page": 1, "limit": random.choice([20, 50])})
+        self.client.get(
+            f"{USER_CHAT}/conversations/{conversation_id}/messages?{query}",
+            headers=self.headers,
+            name=f"{USER_CHAT}/conversations/:id/messages",
+        )
+
     def _discover_user_read_context(self):
         appointments = _safe_json_get(
             self.client,
@@ -309,6 +601,46 @@ class UserCurrentNewApiUser(HttpUser):
         )
         for item in _extract_items(wishlist):
             _append_unique(self.service_ids, _string_value(item, "productId"))
+
+        categories = _safe_json_get(
+            self.client,
+            CATEGORIES,
+            self.headers,
+            f"{CATEGORIES} [user discovery]",
+            optional=True,
+        )
+        for item in _extract_items(categories):
+            _append_unique(self.category_ids, _id_from(item))
+
+        employees = _safe_json_get(
+            self.client,
+            f"{USER_EMPLOYEES}?{urlencode({'page': 1, 'limit': 50})}",
+            self.headers,
+            f"{USER_EMPLOYEES} [discovery]",
+            optional=True,
+        )
+        for item in _extract_items(employees):
+            _append_unique(self.employee_ids, _id_from(item))
+
+        bookings = _safe_json_get(
+            self.client,
+            f"{USER_BOOKINGS}?{urlencode({'page': 1, 'limit': 50})}",
+            self.headers,
+            f"{USER_BOOKINGS} [discovery]",
+            optional=True,
+        )
+        for item in _extract_items(bookings):
+            _append_unique(self.booking_ids, _id_from(item))
+
+        conversations = _safe_json_get(
+            self.client,
+            f"{USER_CHAT}/conversations",
+            self.headers,
+            f"{USER_CHAT}/conversations [discovery]",
+            optional=True,
+        )
+        for item in _extract_items(conversations):
+            _append_unique(self.conversation_ids, _id_from(item))
 
 
 @tag("current-new-api", "new-api", "admin-dashboard", "safe-read")
@@ -539,7 +871,37 @@ class PartnerCurrentApiUser(HttpUser):
         self.headers = auth_headers(token)
         self.booking_ids: list[str] = []
         self.employee_ids: list[str] = []
+        self.service_ids: list[str] = []
+        self.service_slugs: list[str] = []
+        self.service_tag_ids: list[str] = []
+        self.public_profile_ready = False
         self._discover_partner_context()
+
+    @task(4)
+    def get_my_profile(self):
+        self.client.get(
+            f"{PARTNER_PARTNERS}/me",
+            headers=self.headers,
+            name=f"{PARTNER_PARTNERS}/me",
+        )
+
+    @task(3)
+    def get_my_profile_completion(self):
+        self.client.get(
+            f"{PARTNER_PARTNERS}/me/completion",
+            headers=self.headers,
+            name=f"{PARTNER_PARTNERS}/me/completion",
+        )
+
+    @task(3)
+    def get_public_profile(self):
+        if not self.public_profile_ready:
+            return
+        self.client.get(
+            f"{PARTNER_PARTNERS}/public-profile",
+            headers=self.headers,
+            name=f"{PARTNER_PARTNERS}/public-profile",
+        )
 
     @task(5)
     def list_bookings(self):
@@ -562,7 +924,9 @@ class PartnerCurrentApiUser(HttpUser):
 
     @task(3)
     def list_employees(self):
-        query = urlencode({"page": random.randint(1, 3), "limit": random.choice([10, 20, 50])})
+        query = urlencode(
+            {"page": random.randint(1, 3), "limit": random.choice([10, 20, 50])}
+        )
         self.client.get(
             f"{PARTNER_EMPLOYEES}?{query}",
             headers=self.headers,
@@ -581,6 +945,36 @@ class PartnerCurrentApiUser(HttpUser):
         )
 
     @task(2)
+    def get_employee_detail(self):
+        employee_id = _choose(self.employee_ids)
+        if not employee_id:
+            return
+        self.client.get(
+            f"{PARTNER_EMPLOYEES}/{employee_id}",
+            headers=self.headers,
+            name=f"{PARTNER_EMPLOYEES}/:id",
+        )
+
+    @task(2)
+    def get_employee_overview_analytics(self):
+        self.client.get(
+            f"{PARTNER_EMPLOYEES}/analytics/overview",
+            headers=self.headers,
+            name=f"{PARTNER_EMPLOYEES}/analytics/overview",
+        )
+
+    @task(2)
+    def get_employee_detail_analytics(self):
+        employee_id = _choose(self.employee_ids)
+        if not employee_id:
+            return
+        self.client.get(
+            f"{PARTNER_EMPLOYEES}/analytics/{employee_id}",
+            headers=self.headers,
+            name=f"{PARTNER_EMPLOYEES}/analytics/:employeeId",
+        )
+
+    @task(2)
     def list_massage_skills(self):
         self.client.get(
             f"{PARTNER_EMPLOYEES}/massage-skills",
@@ -596,24 +990,188 @@ class PartnerCurrentApiUser(HttpUser):
             name=f"{PARTNER_EMPLOYEES}/spa-skills",
         )
 
+    @task(4)
+    def list_health_services(self):
+        query = urlencode(
+            {"page": random.randint(1, 3), "limit": random.choice([10, 20, 50])}
+        )
+        self.client.get(
+            f"{PARTNER_HEALTH_SERVICES}?{query}",
+            headers=self.headers,
+            name=PARTNER_HEALTH_SERVICES,
+        )
+
+    @task(2)
+    def get_health_service_by_slug(self):
+        slug = _choose(self.service_slugs)
+        if not slug:
+            return
+        self.client.get(
+            f"{PARTNER_HEALTH_SERVICES}/slug/{slug}",
+            headers=self.headers,
+            name=f"{PARTNER_HEALTH_SERVICES}/slug/:slug",
+        )
+
+    @task(2)
+    def get_health_service_details_by_slug(self):
+        slug = _choose(self.service_slugs)
+        if not slug:
+            return
+        self.client.get(
+            f"{PARTNER_HEALTH_SERVICES}/slug/{slug}/details",
+            headers=self.headers,
+            name=f"{PARTNER_HEALTH_SERVICES}/slug/:slug/details",
+        )
+
+    @task(2)
+    def get_health_service_overview_analytics(self):
+        self.client.get(
+            f"{PARTNER_HEALTH_SERVICES}/analytics/overview",
+            headers=self.headers,
+            name=f"{PARTNER_HEALTH_SERVICES}/analytics/overview",
+        )
+
+    @task(2)
+    def get_health_service_detail_analytics(self):
+        service_id = _choose(self.service_ids)
+        if not service_id:
+            return
+        self.client.get(
+            f"{PARTNER_HEALTH_SERVICES}/analytics/{service_id}",
+            headers=self.headers,
+            name=f"{PARTNER_HEALTH_SERVICES}/analytics/:productId",
+        )
+
+    @task(3)
+    def list_service_tags(self):
+        self.client.get(
+            PARTNER_SERVICE_TAGS,
+            headers=self.headers,
+            name=PARTNER_SERVICE_TAGS,
+        )
+
+    @task(3)
+    def list_active_service_tags(self):
+        self.client.get(
+            f"{PARTNER_SERVICE_TAGS}/active",
+            headers=self.headers,
+            name=f"{PARTNER_SERVICE_TAGS}/active",
+        )
+
+    @task(2)
+    def get_service_tag_detail(self):
+        tag_id = _choose(self.service_tag_ids)
+        if not tag_id:
+            return
+        self.client.get(
+            f"{PARTNER_SERVICE_TAGS}/{tag_id}",
+            headers=self.headers,
+            name=f"{PARTNER_SERVICE_TAGS}/:id",
+        )
+
+    @task(2)
+    def get_service_tags_for_product(self):
+        service_id = _choose(self.service_ids)
+        if not service_id:
+            return
+        self.client.get(
+            f"{PARTNER_SERVICE_TAGS}/products/{service_id}",
+            headers=self.headers,
+            name=f"{PARTNER_SERVICE_TAGS}/products/:productId",
+        )
+
+    @task(3)
+    def get_partner_dashboard_stats(self):
+        query = urlencode(
+            {"period": random.choice(["today", "this_week", "this_month"])}
+        )
+        self.client.get(
+            f"{PARTNER_DASHBOARD}/stats?{query}",
+            headers=self.headers,
+            name=f"{PARTNER_DASHBOARD}/stats",
+        )
+
+    @task(3)
+    def get_partner_dashboard_revenue(self):
+        query = urlencode(
+            {"period": random.choice(["this_week", "this_month", "this_year"])}
+        )
+        self.client.get(
+            f"{PARTNER_DASHBOARD}/revenue?{query}",
+            headers=self.headers,
+            name=f"{PARTNER_DASHBOARD}/revenue",
+        )
+
+    @task(2)
+    def get_partner_dashboard_upcoming_appointments(self):
+        self.client.get(
+            f"{PARTNER_DASHBOARD}/appointments/upcoming",
+            headers=self.headers,
+            name=f"{PARTNER_DASHBOARD}/appointments/upcoming",
+        )
+
     @task(2)
     def get_partner_dashboard_services(self):
         self.client.get(
-            f"{API_PREFIX}/partner/dashboard/services/performance",
+            f"{PARTNER_DASHBOARD}/services/performance",
             headers=self.headers,
-            name=f"{API_PREFIX}/partner/dashboard/services/performance",
+            name=f"{PARTNER_DASHBOARD}/services/performance",
+        )
+
+    @task(2)
+    def get_partner_dashboard_employee_distribution(self):
+        self.client.get(
+            f"{PARTNER_DASHBOARD}/employees/distribution",
+            headers=self.headers,
+            name=f"{PARTNER_DASHBOARD}/employees/distribution",
+        )
+
+    @task(2)
+    def get_partner_dashboard_recent_reviews(self):
+        self.client.get(
+            f"{PARTNER_DASHBOARD}/reviews/recent",
+            headers=self.headers,
+            name=f"{PARTNER_DASHBOARD}/reviews/recent",
         )
 
     @task(2)
     def get_partner_dashboard_schedule(self):
         query = urlencode({"date": date.today().isoformat()})
         self.client.get(
-            f"{API_PREFIX}/partner/dashboard/staff/schedule?{query}",
+            f"{PARTNER_DASHBOARD}/staff/schedule?{query}",
             headers=self.headers,
-            name=f"{API_PREFIX}/partner/dashboard/staff/schedule",
+            name=f"{PARTNER_DASHBOARD}/staff/schedule",
+        )
+
+    @task(2)
+    def get_partner_dashboard_notifications(self):
+        query = urlencode({"limit": random.choice([5, 10, 20])})
+        self.client.get(
+            f"{PARTNER_DASHBOARD}/notifications?{query}",
+            headers=self.headers,
+            name=f"{PARTNER_DASHBOARD}/notifications",
+        )
+
+    @task(2)
+    def get_partner_dashboard_inventory_alerts(self):
+        self.client.get(
+            f"{PARTNER_DASHBOARD}/inventory/alerts",
+            headers=self.headers,
+            name=f"{PARTNER_DASHBOARD}/inventory/alerts",
         )
 
     def _discover_partner_context(self):
+        completion = _safe_json_get(
+            self.client,
+            f"{PARTNER_PARTNERS}/me/completion",
+            self.headers,
+            f"{PARTNER_PARTNERS}/me/completion [discovery]",
+            optional=True,
+        )
+        self.public_profile_ready = (
+            isinstance(completion, dict) and completion.get("isCompleted") is True
+        )
+
         bookings = _safe_json_get(
             self.client,
             PARTNER_BOOKINGS,
@@ -633,6 +1191,151 @@ class PartnerCurrentApiUser(HttpUser):
         )
         for item in _extract_items(employees):
             _append_unique(self.employee_ids, _id_from(item))
+
+        services = _safe_json_get(
+            self.client,
+            f"{PARTNER_HEALTH_SERVICES}?{urlencode({'page': 1, 'limit': 50})}",
+            self.headers,
+            f"{PARTNER_HEALTH_SERVICES} [discovery]",
+            optional=True,
+        )
+        for item in _extract_items(services):
+            _append_unique(self.service_ids, _id_from(item))
+            _append_unique_slug(self.service_slugs, _string_value(item, "slug"))
+
+        tags = _safe_json_get(
+            self.client,
+            PARTNER_SERVICE_TAGS,
+            self.headers,
+            f"{PARTNER_SERVICE_TAGS} [discovery]",
+            optional=True,
+        )
+        for item in _extract_items(tags):
+            _append_unique(self.service_tag_ids, _id_from(item))
+
+
+@tag("current-new-api", "new-api", "admin-ops", "safe-read")
+class AdminOperationsReadApiUser(HttpUser):
+    """ADMIN read mix for partners, categories, audit logs, and notification history."""
+
+    wait_time = between(MIN_WAIT, MAX_WAIT)
+    weight = 2
+
+    def on_start(self):
+        token = None
+        for attempt in range(3):
+            token, _ = login_admin(self.client)
+            if token:
+                break
+            time.sleep(2 * (attempt + 1))
+
+        if not token:
+            raise StopUser("Admin login failed after retries")
+
+        self.headers = auth_headers(token)
+        self.partner_ids: list[str] = []
+        self.category_ids: list[str] = []
+        self._discover_admin_ops_context()
+
+    @task(5)
+    def list_partners(self):
+        self.client.get(
+            f"{ADMIN_PARTNERS}?{urlencode(_admin_partner_query())}",
+            headers=self.headers,
+            name=ADMIN_PARTNERS,
+        )
+
+    @task(3)
+    def get_partner_stats(self):
+        self.client.get(
+            f"{ADMIN_PARTNERS}/stats",
+            headers=self.headers,
+            name=f"{ADMIN_PARTNERS}/stats",
+        )
+
+    @task(3)
+    def get_total_partners(self):
+        self.client.get(
+            f"{ADMIN_PARTNERS}/total",
+            headers=self.headers,
+            name=f"{ADMIN_PARTNERS}/total",
+        )
+
+    @task(2)
+    def get_partner_detail(self):
+        partner_id = _choose(self.partner_ids)
+        if not partner_id:
+            return
+        self.client.get(
+            f"{ADMIN_PARTNERS}/{partner_id}",
+            headers=self.headers,
+            name=f"{ADMIN_PARTNERS}/:id",
+        )
+
+    @task(4)
+    def list_categories(self):
+        query = urlencode(
+            {
+                "page": random.randint(1, 3),
+                "limit": random.choice([10, 20, 50]),
+                "sortBy": random.choice(CATEGORY_SORTS),
+            }
+        )
+        self.client.get(
+            f"{ADMIN_CATEGORIES}?{query}",
+            headers=self.headers,
+            name=ADMIN_CATEGORIES,
+        )
+
+    @task(2)
+    def get_category_detail(self):
+        category_id = _choose(self.category_ids)
+        if not category_id:
+            return
+        self.client.get(
+            f"{ADMIN_CATEGORIES}/{category_id}",
+            headers=self.headers,
+            name=f"{ADMIN_CATEGORIES}/:id",
+        )
+
+    @task(3)
+    def list_audit_logs(self):
+        query = urlencode({"page": 1, "limit": random.choice([10, 20, 50])})
+        self.client.get(
+            f"{ADMIN_AUDIT_LOGS}?{query}",
+            headers=self.headers,
+            name=ADMIN_AUDIT_LOGS,
+        )
+
+    @task(3)
+    def list_notification_broadcasts(self):
+        query = urlencode({"page": 1, "limit": random.choice([10, 20])})
+        self.client.get(
+            f"{ADMIN_NOTIFICATIONS}/broadcasts?{query}",
+            headers=self.headers,
+            name=f"{ADMIN_NOTIFICATIONS}/broadcasts",
+        )
+
+    def _discover_admin_ops_context(self):
+        partners = _safe_json_get(
+            self.client,
+            f"{ADMIN_PARTNERS}?{urlencode({'page': 1, 'limit': 50})}",
+            self.headers,
+            f"{ADMIN_PARTNERS} [discovery]",
+            optional=True,
+        )
+        for item in _extract_items(partners):
+            _append_unique(self.partner_ids, _id_from(item))
+
+        categories = _safe_json_get(
+            self.client,
+            f"{ADMIN_CATEGORIES}?{urlencode({'page': 1, 'limit': 50})}",
+            self.headers,
+            f"{ADMIN_CATEGORIES} [discovery]",
+            optional=True,
+        )
+        for item in _extract_items(categories):
+            _append_unique(self.category_ids, _id_from(item))
 
 
 def _appointment_query() -> dict[str, str]:
@@ -654,6 +1357,18 @@ def _finance_page_query() -> dict[str, str | int]:
     }
     if random.random() < 0.3:
         query["transactionStatus"] = random.choice(ADMIN_FINANCE_STATUSES)
+    return query
+
+
+def _admin_partner_query() -> dict[str, str | int]:
+    query: dict[str, str | int] = {
+        "page": random.randint(1, 3),
+        "limit": random.choice([10, 20, 50]),
+    }
+    if random.random() < 0.4:
+        query["scope"] = random.choice(["VERIFICATION_QUEUE", "ALL_PROVIDERS"])
+    if random.random() < 0.4:
+        query["verificationStatus"] = random.choice(ADMIN_PARTNER_VERIFICATION_STATUSES)
     return query
 
 
@@ -694,6 +1409,12 @@ def _extract_items(payload: Any) -> list[Any]:
         products = payload.get("products")
         if isinstance(products, list):
             return products
+        notifications = payload.get("notifications")
+        if isinstance(notifications, list):
+            return notifications
+        conversations = payload.get("conversations")
+        if isinstance(conversations, list):
+            return conversations
         results = payload.get("results")
         if isinstance(results, list):
             return results
@@ -706,6 +1427,11 @@ def _choose(values: list[str]) -> str | None:
 
 def _append_unique(values: list[str], value: str | None):
     if value and UUID_RE.match(value) and value not in values:
+        values.append(value)
+
+
+def _append_unique_slug(values: list[str], value: str | None):
+    if value and value not in values:
         values.append(value)
 
 

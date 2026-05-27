@@ -36,7 +36,9 @@ export class GetEmployeeRevenueSummaryHandler {
       select: ['id'],
     });
     if (!employee) {
-      throw new NotFoundException('Employee profile not found for this account');
+      throw new NotFoundException(
+        'Employee profile not found for this account',
+      );
     }
 
     // 2. Compute period range

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from enum import Enum
 from datetime import datetime
-from typing import Any
+from typing import Any, TypeAlias
 from dataclasses import dataclass
 from .base import DtoModel, dto_field
 
@@ -344,6 +344,9 @@ class WorkScheduleEntryDto(DtoModel):
     end: str | None = None
 
 
+MoMoIPNDto: TypeAlias = dict[str, Any]
+
+
 __all__ = [
     "BookingStatus",
     "BusinessType",
@@ -382,4 +385,5 @@ __all__ = [
     "VerifiedField",
     "WorkHistoryEntryDto",
     "WorkScheduleEntryDto",
+    "MoMoIPNDto",
 ]

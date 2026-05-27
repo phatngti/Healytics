@@ -13,6 +13,7 @@ import { Role } from '@/account/enum/role.enum';
 import { ChatNotificationEvent } from './chat-notification-event.enum';
 import { WsNewMessageNotificationDto } from '@/chat/dto/ws-docs.dto';
 import { WsNamespace } from '@/common/decorators/ws';
+import { ObservabilityMetricsService } from '@/observability/observability-metrics.service';
 import {
   WsJwtAuthMiddleware,
   WsRoleMiddleware,
@@ -67,6 +68,7 @@ export class ChatNotificationGateway
   constructor(
     private readonly jwtService: JwtService,
     private readonly accountService: AccountService,
+    private readonly observabilityMetrics: ObservabilityMetricsService,
   ) {}
 
   // ── Lifecycle ────────────────────────────────────────────────
@@ -76,6 +78,7 @@ export class ChatNotificationGateway
     server.use(
       WsRoleMiddleware([Role.USER, Role.HEALTH_PARTNER, Role.EMPLOYEE]),
     );
+    this.observabilityMetrics.registerWsNamespace('chat-notifications', server);
     this.logger.log(
       'ChatNotificationGateway initialized on /chat-notifications',
     );
@@ -83,6 +86,12 @@ export class ChatNotificationGateway
 
   handleConnection(client: Socket) {
     const user = client.data.user;
+    this.observabilityMetrics.recordWsConnect(
+      client.id,
+      'chat-notifications',
+      user.role,
+      user.id,
+    );
     this.logger.log(
       `[ChatNotif WS Connected] user=${user.email} role=${user.role} userId=${user.id} socketId=${client.id}`,
     );
@@ -97,6 +106,10 @@ export class ChatNotificationGateway
 
   handleDisconnect(client: Socket) {
     const user = client.data.user;
+    this.observabilityMetrics.recordWsDisconnect(
+      client.id,
+      'chat-notifications',
+    );
     this.logger.log(
       `[ChatNotif WS Disconnected] user=${user?.email ?? 'unknown'} socketId=${client.id}`,
     );

@@ -39,9 +39,7 @@ const DAY_NAME_TO_ISO: Record<string, number> = {
 
 @Injectable()
 export class GetEmployeeDetailAnalyticsHandler {
-  private readonly logger = new Logger(
-    GetEmployeeDetailAnalyticsHandler.name,
-  );
+  private readonly logger = new Logger(GetEmployeeDetailAnalyticsHandler.name);
 
   constructor(private readonly dataSource: DataSource) {}
 
@@ -56,10 +54,7 @@ export class GetEmployeeDetailAnalyticsHandler {
     );
 
     // 1. Verify ownership + load employee profile
-    const employee = await this.loadEmployee(
-      employeeId,
-      partnerId,
-    );
+    const employee = await this.loadEmployee(employeeId, partnerId);
 
     const { startDate, endDate, prevStartDate, prevEndDate } =
       resolveDateRange(period);
@@ -75,47 +70,25 @@ export class GetEmployeeDetailAnalyticsHandler {
       recommendStats,
     ] = await Promise.all([
       this.getSessionStats(employeeId, startDate, endDate),
-      this.getSessionStats(
-        employeeId,
-        prevStartDate,
-        prevEndDate,
-      ),
+      this.getSessionStats(employeeId, prevStartDate, prevEndDate),
       this.getReviewStats(employeeId, startDate, endDate),
       this.getTrendData(employeeId, period, startDate, endDate),
       this.getMixMetrics(employeeId, startDate, endDate, employee),
-      this.getScheduleLoad(
-        employee,
-        employeeId,
-        startDate,
-        endDate,
-      ),
-      this.getRecommendationStats(
-        employeeId,
-        startDate,
-        endDate,
-      ),
+      this.getScheduleLoad(employee, employeeId, startDate, endDate),
+      this.getRecommendationStats(employeeId, startDate, endDate),
     ]);
 
     // Compute utilization
     const schedule = employee.schedule || [];
-    const weeklyHours =
-      this.computeWeeklyAvailableHours(schedule);
-    const periodWeeks = this.countWeeksInPeriod(
-      startDate,
-      endDate,
-    );
+    const weeklyHours = this.computeWeeklyAvailableHours(schedule);
+    const periodWeeks = this.countWeeksInPeriod(startDate, endDate);
     const availableHours = weeklyHours * periodWeeks;
-    const prevPeriodWeeks = this.countWeeksInPeriod(
-      prevStartDate,
-      prevEndDate,
-    );
+    const prevPeriodWeeks = this.countWeeksInPeriod(prevStartDate, prevEndDate);
     const prevAvailableHours = weeklyHours * prevPeriodWeeks;
 
     const utilizationRate =
       availableHours > 0
-        ? this.round1(
-            (currentStats.bookedHours / availableHours) * 100,
-          )
+        ? this.round1((currentStats.bookedHours / availableHours) * 100)
         : 0;
     const prevUtilization =
       prevAvailableHours > 0
@@ -140,10 +113,7 @@ export class GetEmployeeDetailAnalyticsHandler {
 
     // ── Utilization ───────────────────────────────
     dto.utilizationRate = utilizationRate;
-    dto.utilizationDelta = this.delta(
-      utilizationRate,
-      prevUtilization,
-    );
+    dto.utilizationDelta = this.delta(utilizationRate, prevUtilization);
 
     // ── Rating ────────────────────────────────────
     dto.averageRating = reviewStats.avgRating;
@@ -250,8 +220,7 @@ export class GetEmployeeDetailAnalyticsHandler {
     const row = result[0] || {};
     return {
       completedSessions: parseInt(row.completed_sessions) || 0,
-      contributionValue:
-        parseFloat(row.contribution_value) || 0,
+      contributionValue: parseFloat(row.contribution_value) || 0,
       bookedHours: parseFloat(row.booked_hours) || 0,
     };
   }
@@ -275,8 +244,7 @@ export class GetEmployeeDetailAnalyticsHandler {
     );
     const row = result[0] || {};
     return {
-      avgRating:
-        Math.round((parseFloat(row.avg_rating) || 0) * 10) / 10,
+      avgRating: Math.round((parseFloat(row.avg_rating) || 0) * 10) / 10,
       count: parseInt(row.review_count) || 0,
     };
   }
@@ -349,12 +317,8 @@ export class GetEmployeeDetailAnalyticsHandler {
       for (const row of rows) {
         const d = new Date(row.bucket);
         const dayOfMonth = d.getDate();
-        const weekIndex = Math.min(
-          Math.ceil(dayOfMonth / 7) - 1,
-          3,
-        );
-        aggregated[weekIndex].sessions +=
-          parseInt(row.sessions) || 0;
+        const weekIndex = Math.min(Math.ceil(dayOfMonth / 7) - 1, 3);
+        aggregated[weekIndex].sessions += parseInt(row.sessions) || 0;
         aggregated[weekIndex].contributionValue +=
           parseFloat(row.contribution_value) || 0;
       }
@@ -396,16 +360,11 @@ export class GetEmployeeDetailAnalyticsHandler {
       const key = sqlBucketKey(row.bucket);
       dataMap.set(key, {
         sessions: parseInt(row.sessions) || 0,
-        contributionValue:
-          parseFloat(row.contribution_value) || 0,
+        contributionValue: parseFloat(row.contribution_value) || 0,
       });
     }
 
-    const allBuckets = this.generateTimeBuckets(
-      start,
-      end,
-      granularity,
-    );
+    const allBuckets = this.generateTimeBuckets(start, end, granularity);
 
     return allBuckets.map((bucketDate) => {
       const key = bucketKey(bucketDate);
@@ -450,10 +409,7 @@ export class GetEmployeeDetailAnalyticsHandler {
         const dto = new EmployeeMixMetricDto();
         dto.label = row.label;
         dto.value = parseInt(row.value) || 0;
-        dto.share =
-          total > 0
-            ? Math.round((dto.value / total) * 100) / 100
-            : 0;
+        dto.share = total > 0 ? Math.round((dto.value / total) * 100) / 100 : 0;
         return dto;
       });
     }
@@ -462,15 +418,11 @@ export class GetEmployeeDetailAnalyticsHandler {
     return this.getMixMetricsFallback(employee);
   }
 
-  private getMixMetricsFallback(
-    employee: any,
-  ): EmployeeMixMetricDto[] {
+  private getMixMetricsFallback(employee: any): EmployeeMixMetricDto[] {
     const role = employee.role;
 
     if (role === 'DOCTOR' && employee.specializations) {
-      const specs: string[] = Array.isArray(
-        employee.specializations,
-      )
+      const specs: string[] = Array.isArray(employee.specializations)
         ? employee.specializations
         : [];
       return specs.map((spec) => {
@@ -513,18 +465,14 @@ export class GetEmployeeDetailAnalyticsHandler {
       // Convert JS day (0=Sun) to ISO day (7=Sun)
       const jsDay = current.getDay();
       const isoDow = jsDay === 0 ? 7 : jsDay;
-      weekdayCounts.set(
-        isoDow,
-        (weekdayCounts.get(isoDow) || 0) + 1,
-      );
+      weekdayCounts.set(isoDow, (weekdayCounts.get(isoDow) || 0) + 1);
       current.setDate(current.getDate() + 1);
     }
 
     // Parse schedule → available hours per ISO weekday
     const scheduleByIsoDow = new Map<number, number>();
     for (const entry of schedule) {
-      if (!entry.isWorking || !entry.start || !entry.end)
-        continue;
+      if (!entry.isWorking || !entry.start || !entry.end) continue;
       const isoDow = DAY_NAME_TO_ISO[entry.day];
       if (!isoDow) continue;
       const [sh, sm] = entry.start.split(':').map(Number);
@@ -557,10 +505,7 @@ export class GetEmployeeDetailAnalyticsHandler {
 
     const bookedByDow = new Map<number, number>();
     for (const row of bookedRows) {
-      bookedByDow.set(
-        parseInt(row.iso_dow),
-        parseFloat(row.booked_hours) || 0,
-      );
+      bookedByDow.set(parseInt(row.iso_dow), parseFloat(row.booked_hours) || 0);
     }
 
     // Build 7-element result
@@ -571,9 +516,7 @@ export class GetEmployeeDetailAnalyticsHandler {
       const dayCount = weekdayCounts.get(isoDow) || 0;
       const dailyHours = scheduleByIsoDow.get(isoDow) || 0;
       dto.availableHours = this.round1(dailyHours * dayCount);
-      dto.bookedHours = this.round1(
-        bookedByDow.get(isoDow) || 0,
-      );
+      dto.bookedHours = this.round1(bookedByDow.get(isoDow) || 0);
       result.push(dto);
     }
 
@@ -594,8 +537,7 @@ export class GetEmployeeDetailAnalyticsHandler {
     sentiment.label = 'Client sentiment';
     sentiment.value = reviewStats.avgRating.toFixed(1);
     sentiment.detail = `${reviewStats.count} reviews across recent services`;
-    sentiment.tone =
-      reviewStats.avgRating >= 4.5 ? 'positive' : 'warning';
+    sentiment.tone = reviewStats.avgRating >= 4.5 ? 'positive' : 'warning';
     metrics.push(sentiment);
 
     // 2. Recommendation rate
@@ -604,9 +546,7 @@ export class GetEmployeeDetailAnalyticsHandler {
     const recRate =
       recommendStats.total > 0
         ? Math.round(
-            (recommendStats.recommendCount /
-              recommendStats.total) *
-              100,
+            (recommendStats.recommendCount / recommendStats.total) * 100,
           )
         : 0;
     recommendation.value = `${recRate}%`;
@@ -623,11 +563,9 @@ export class GetEmployeeDetailAnalyticsHandler {
     // 3. Documentation
     const docs = new EmployeeQualityMetricDto();
     docs.label = 'Documentation';
-    const verificationDocs =
-      employee.verification_documents || [];
+    const verificationDocs = employee.verification_documents || [];
     const hasDocs =
-      Array.isArray(verificationDocs) &&
-      verificationDocs.length > 0;
+      Array.isArray(verificationDocs) && verificationDocs.length > 0;
     docs.value = hasDocs ? 'Complete' : 'Missing';
     docs.detail = hasDocs
       ? 'Verification documents are on file.'
@@ -640,14 +578,9 @@ export class GetEmployeeDetailAnalyticsHandler {
 
   // ── Compliance builder ────────────────────────────
 
-  private buildComplianceItems(
-    employee: any,
-  ): EmployeeComplianceItemDto[] {
+  private buildComplianceItems(employee: any): EmployeeComplianceItemDto[] {
     const items: EmployeeComplianceItemDto[] = [];
-    const roleLabel = this.mapRoleLabel(
-      employee.role,
-      employee.therapist_type,
-    );
+    const roleLabel = this.mapRoleLabel(employee.role, employee.therapist_type);
 
     // 1. Profile status
     const profileItem = new EmployeeComplianceItemDto();
@@ -665,15 +598,12 @@ export class GetEmployeeDetailAnalyticsHandler {
     const verItem = new EmployeeComplianceItemDto();
     verItem.title = 'Verification posture';
     const verDocs = employee.verification_documents || [];
-    const hasDocs =
-      Array.isArray(verDocs) && verDocs.length > 0;
+    const hasDocs = Array.isArray(verDocs) && verDocs.length > 0;
     if (hasDocs) {
-      verItem.detail =
-        'Verification documents are on file.';
+      verItem.detail = 'Verification documents are on file.';
       verItem.tone = 'positive';
     } else {
-      verItem.detail =
-        'No verification documents uploaded.';
+      verItem.detail = 'No verification documents uploaded.';
       verItem.tone = 'critical';
     }
     items.push(verItem);
@@ -685,12 +615,10 @@ export class GetEmployeeDetailAnalyticsHandler {
       employee.emergency_contact_phone &&
       employee.emergency_contact_phone.trim() !== '';
     if (hasEmergency) {
-      emergencyItem.detail =
-        'Emergency contact information is on file.';
+      emergencyItem.detail = 'Emergency contact information is on file.';
       emergencyItem.tone = 'positive';
     } else {
-      emergencyItem.detail =
-        'No emergency contact information available.';
+      emergencyItem.detail = 'No emergency contact information available.';
       emergencyItem.tone = 'warning';
     }
     items.push(emergencyItem);
@@ -700,15 +628,11 @@ export class GetEmployeeDetailAnalyticsHandler {
 
   // ── Helpers ────────────────────────────────────────
 
-  private mapRoleLabel(
-    role: string,
-    therapistType?: string | null,
-  ): string {
+  private mapRoleLabel(role: string, therapistType?: string | null): string {
     if (role === 'DOCTOR') return 'Doctor';
     if (role === 'THERAPIST') {
       if (therapistType === 'SPA') return 'Spa therapist';
-      if (therapistType === 'MASSAGE')
-        return 'Massage therapist';
+      if (therapistType === 'MASSAGE') return 'Massage therapist';
       return 'Therapist';
     }
     if (role === 'RECEPTIONIST') return 'Receptionist';
@@ -726,8 +650,7 @@ export class GetEmployeeDetailAnalyticsHandler {
   ): number {
     let total = 0;
     for (const entry of schedule) {
-      if (!entry.isWorking || !entry.start || !entry.end)
-        continue;
+      if (!entry.isWorking || !entry.start || !entry.end) continue;
       const [sh, sm] = entry.start.split(':').map(Number);
       const [eh, em] = entry.end.split(':').map(Number);
       const hours = (eh * 60 + em - (sh * 60 + sm)) / 60;
@@ -744,11 +667,7 @@ export class GetEmployeeDetailAnalyticsHandler {
 
   private delta(current: number, previous: number): number {
     if (previous <= 0) return current > 0 ? 100 : 0;
-    return (
-      Math.round(
-        ((current - previous) / previous) * 100 * 10,
-      ) / 10
-    );
+    return Math.round(((current - previous) / previous) * 100 * 10) / 10;
   }
 
   private round1(value: number): number {
@@ -782,13 +701,20 @@ export class GetEmployeeDetailAnalyticsHandler {
     return buckets;
   }
 
-  private formatBucketLabel(
-    date: Date,
-    period: DashboardTimePeriod,
-  ): string {
+  private formatBucketLabel(date: Date, period: DashboardTimePeriod): string {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     switch (period) {
       case DashboardTimePeriod.TODAY: {
@@ -798,9 +724,7 @@ export class GetEmployeeDetailAnalyticsHandler {
         return `${display}${suffix}`;
       }
       case DashboardTimePeriod.THIS_WEEK: {
-        const days = [
-          'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
-        ];
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         return days[date.getDay()];
       }
       case DashboardTimePeriod.THIS_MONTH:

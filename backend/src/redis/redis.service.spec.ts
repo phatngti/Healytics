@@ -13,6 +13,7 @@ describe('RedisService', () => {
       ttl: jest.fn(),
       eval: jest.fn(),
       publish: jest.fn(),
+      scan: jest.fn(),
       quit: jest.fn(),
     };
 
@@ -144,12 +145,7 @@ describe('RedisService', () => {
     it('should set value with TTL', async () => {
       await service.set('key', 'value', 3600);
 
-      expect(redisClient.set).toHaveBeenCalledWith(
-        'key',
-        'value',
-        'EX',
-        3600,
-      );
+      expect(redisClient.set).toHaveBeenCalledWith('key', 'value', 'EX', 3600);
     });
 
     it('should set value without TTL', async () => {
@@ -166,6 +162,37 @@ describe('RedisService', () => {
       const result = await service.del('key');
 
       expect(result).toBe(1);
+    });
+  });
+
+  describe('scanKeys', () => {
+    it('should scan matching keys until the cursor is exhausted', async () => {
+      redisClient.scan
+        .mockResolvedValueOnce(['2', ['metrics:login-ccu:user:1']])
+        .mockResolvedValueOnce(['0', ['metrics:login-ccu:admin:2']]);
+
+      const result = await service.scanKeys('metrics:login-ccu:*', 50);
+
+      expect(result).toEqual([
+        'metrics:login-ccu:user:1',
+        'metrics:login-ccu:admin:2',
+      ]);
+      expect(redisClient.scan).toHaveBeenNthCalledWith(
+        1,
+        '0',
+        'MATCH',
+        'metrics:login-ccu:*',
+        'COUNT',
+        50,
+      );
+      expect(redisClient.scan).toHaveBeenNthCalledWith(
+        2,
+        '2',
+        'MATCH',
+        'metrics:login-ccu:*',
+        'COUNT',
+        50,
+      );
     });
   });
 

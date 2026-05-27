@@ -45,11 +45,19 @@ export class CategoryResponseDto {
   slug: string;
 
   @Expose()
-  @ApiPropertyOptional({ type: String, nullable: true, description: 'Category description' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Category description',
+  })
   description: string | null;
 
   @Expose()
-  @ApiPropertyOptional({ type: String, nullable: true, description: 'Category image URL' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Category image URL',
+  })
   imageUrl: string | null;
 
   @Expose()

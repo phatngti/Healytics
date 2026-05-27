@@ -43,7 +43,11 @@ export class CreatePartnerHealthServiceMediaDto {
 }
 
 export class CreatePartnerHealthServiceDefinitionDto {
-  @ApiProperty({ type: Number, example: 60, description: 'Duration in minutes' })
+  @ApiProperty({
+    type: Number,
+    example: 60,
+    description: 'Duration in minutes',
+  })
   @IsNumber()
   @IsNotEmpty()
   @Min(1)
@@ -106,7 +110,10 @@ export class ServiceRuleInputDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ type: String, example: 'Avoid eating 2 hours before the service' })
+  @ApiProperty({
+    type: String,
+    example: 'Avoid eating 2 hours before the service',
+  })
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -122,7 +129,10 @@ export class ProcedureStepInputDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ type: String, example: 'Arrive at the reception and complete registration' })
+  @ApiProperty({
+    type: String,
+    example: 'Arrive at the reception and complete registration',
+  })
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -155,7 +165,11 @@ export class ServiceManualInputDto {
 
 // Main DTO
 export class CreatePartnerHealthServiceDto {
-  @ApiPropertyOptional({ type: String, format: 'uuid', example: 'uuid-category-id' })
+  @ApiPropertyOptional({
+    type: String,
+    format: 'uuid',
+    example: 'uuid-category-id',
+  })
   @IsUUID()
   @IsOptional()
   categoryId?: string;
@@ -182,12 +196,19 @@ export class CreatePartnerHealthServiceDto {
   @MaxLength(255)
   slug?: string;
 
-  @ApiPropertyOptional({ type: String, example: 'A relaxing Thai massage service' })
+  @ApiPropertyOptional({
+    type: String,
+    example: 'A relaxing Thai massage service',
+  })
   @IsString()
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ enum: HealthServiceType, enumName: 'HealthServiceType', example: HealthServiceType.SERVICE })
+  @ApiProperty({
+    enum: HealthServiceType,
+    enumName: 'HealthServiceType',
+    example: HealthServiceType.SERVICE,
+  })
   @IsEnum(HealthServiceType)
   @IsNotEmpty()
   type: HealthServiceType;
@@ -229,7 +250,11 @@ export class CreatePartnerHealthServiceDto {
   @IsOptional()
   employeeIds?: string[];
 
-  @ApiPropertyOptional({ type: [String], example: ['uuid-tag-1', 'uuid-tag-2'], description: 'Feature tag IDs to associate with this service' })
+  @ApiPropertyOptional({
+    type: [String],
+    example: ['uuid-tag-1', 'uuid-tag-2'],
+    description: 'Feature tag IDs to associate with this service',
+  })
   @IsArray()
   @IsUUID(undefined, { each: true })
   @IsOptional()

@@ -14,9 +14,7 @@ import { AnalyticsAlertDto } from '../../dto/partner/analytics/analytics-alert.d
 
 @Injectable()
 export class GetDetailAnalyticsHandler {
-  private readonly logger = new Logger(
-    GetDetailAnalyticsHandler.name,
-  );
+  private readonly logger = new Logger(GetDetailAnalyticsHandler.name);
 
   constructor(private readonly dataSource: DataSource) {}
 
@@ -27,13 +25,11 @@ export class GetDetailAnalyticsHandler {
   ): Promise<HealthServiceDetailAnalyticsResponseDto> {
     this.logger.log(
       `Getting detail analytics for product: ${productId}, ` +
-      `partner: ${partnerId}, period: ${period}`,
+        `partner: ${partnerId}, period: ${period}`,
     );
 
     // Verify product belongs to partner
-    const product = await this.loadProduct(
-      partnerId, productId,
-    );
+    const product = await this.loadProduct(partnerId, productId);
 
     const { startDate, endDate, prevStartDate, prevEndDate } =
       resolveDateRange(period);
@@ -49,19 +45,13 @@ export class GetDetailAnalyticsHandler {
       peerRows,
     ] = await Promise.all([
       this.getBookingStats(productId, startDate, endDate),
-      this.getBookingStats(
-        productId, prevStartDate, prevEndDate,
-      ),
+      this.getBookingStats(productId, prevStartDate, prevEndDate),
       this.getRevenue(productId, startDate, endDate),
       this.getRevenue(productId, prevStartDate, prevEndDate),
       this.getReviewDistribution(productId),
       this.getEligibleStaffCount(productId),
-      this.getTrendData(
-        productId, partnerId, period, startDate, endDate,
-      ),
-      this.getPeerRanking(
-        partnerId, startDate, endDate,
-      ),
+      this.getTrendData(productId, partnerId, period, startDate, endDate),
+      this.getPeerRanking(partnerId, startDate, endDate),
     ]);
 
     const dto = new HealthServiceDetailAnalyticsResponseDto();
@@ -74,33 +64,32 @@ export class GetDetailAnalyticsHandler {
       previousBookings.completed,
     );
     dto.revenue = currentRevenue;
-    dto.revenueDelta = this.delta(
-      currentRevenue, previousRevenue,
-    );
+    dto.revenueDelta = this.delta(currentRevenue, previousRevenue);
 
-    const currentCompletionRate = currentBookings.total > 0
-      ? (currentBookings.completed / currentBookings.total) * 100
-      : 0;
-    const previousCompletionRate = previousBookings.total > 0
-      ? (previousBookings.completed / previousBookings.total)
-        * 100
-      : 0;
-    dto.completionRate =
-      Math.round(currentCompletionRate * 10) / 10;
+    const currentCompletionRate =
+      currentBookings.total > 0
+        ? (currentBookings.completed / currentBookings.total) * 100
+        : 0;
+    const previousCompletionRate =
+      previousBookings.total > 0
+        ? (previousBookings.completed / previousBookings.total) * 100
+        : 0;
+    dto.completionRate = Math.round(currentCompletionRate * 10) / 10;
     dto.completionRateDelta = this.delta(
       currentCompletionRate,
       previousCompletionRate,
     );
 
     const totalReviews = reviewDistribution.reduce(
-      (sum, bucket) => sum + bucket.count, 0,
+      (sum, bucket) => sum + bucket.count,
+      0,
     );
     const ratingSum = reviewDistribution.reduce(
-      (sum, bucket) => sum + bucket.stars * bucket.count, 0,
+      (sum, bucket) => sum + bucket.stars * bucket.count,
+      0,
     );
-    dto.averageRating = totalReviews > 0
-      ? Math.round((ratingSum / totalReviews) * 10) / 10
-      : 0;
+    dto.averageRating =
+      totalReviews > 0 ? Math.round((ratingSum / totalReviews) * 10) / 10 : 0;
     dto.reviewCount = totalReviews;
 
     // ── Trend ──────────────────────────────────────
@@ -111,16 +100,15 @@ export class GetDetailAnalyticsHandler {
 
     // ── Operational Readiness ──────────────────────
     dto.operationalMetrics = this.buildOperationalMetrics(
-      product, eligibilityCount,
+      product,
+      eligibilityCount,
     );
 
     // ── Peer Ranking ───────────────────────────────
     dto.peerRanking = peerRows;
 
     // ── Alerts ─────────────────────────────────────
-    dto.alerts = this.buildAlerts(
-      product, eligibilityCount,
-    );
+    dto.alerts = this.buildAlerts(product, eligibilityCount);
 
     return dto;
   }
@@ -172,10 +160,8 @@ export class GetDetailAnalyticsHandler {
       durationMinutes: parseInt(row.duration_minutes) || 0,
       bufferMinutes: parseInt(row.buffer_minutes) || 0,
       maxCapacity: parseInt(row.max_capacity) || 1,
-      minLeadTimeHours:
-        parseInt(row.min_lead_time_hours) || 0,
-      staffAssignmentType:
-        row.staff_assignment_type || 'any',
+      minLeadTimeHours: parseInt(row.min_lead_time_hours) || 0,
+      staffAssignmentType: row.staff_assignment_type || 'any',
       mediaCount: parseInt(row.media_count) || 0,
     };
   }
@@ -238,10 +224,7 @@ export class GetDetailAnalyticsHandler {
     // Ensure all 5 star levels are present
     const bucketMap = new Map<number, number>();
     for (const row of rows) {
-      bucketMap.set(
-        parseInt(row.stars),
-        parseInt(row.count) || 0,
-      );
+      bucketMap.set(parseInt(row.stars), parseInt(row.count) || 0);
     }
 
     return [5, 4, 3, 2, 1].map((stars) => {
@@ -252,9 +235,7 @@ export class GetDetailAnalyticsHandler {
     });
   }
 
-  private async getEligibleStaffCount(
-    productId: string,
-  ): Promise<number> {
+  private async getEligibleStaffCount(productId: string): Promise<number> {
     const result = await this.dataSource.query(
       `SELECT COUNT(*) AS cnt
       FROM product_employee_eligibility
@@ -297,10 +278,13 @@ export class GetDetailAnalyticsHandler {
       [granularity, productId, start, end],
     );
 
-    const dataMap = new Map<string, {
-      bookings: number;
-      revenue: number;
-    }>();
+    const dataMap = new Map<
+      string,
+      {
+        bookings: number;
+        revenue: number;
+      }
+    >();
     for (const row of rows) {
       const key = new Date(row.bucket).toISOString();
       dataMap.set(key, {
@@ -309,9 +293,7 @@ export class GetDetailAnalyticsHandler {
       });
     }
 
-    const allBuckets = this.generateTimeBuckets(
-      start, end, granularity,
-    );
+    const allBuckets = this.generateTimeBuckets(start, end, granularity);
 
     return allBuckets.map((bucketDate) => {
       const key = bucketDate.toISOString();
@@ -365,9 +347,7 @@ export class GetDetailAnalyticsHandler {
       dto.bookings = parseInt(row.bookings) || 0;
       dto.revenue = parseFloat(row.revenue) || 0;
       dto.averageRating =
-        Math.round(
-          (parseFloat(row.avg_rating) || 0) * 10,
-        ) / 10;
+        Math.round((parseFloat(row.avg_rating) || 0) * 10) / 10;
       return dto;
     });
   }
@@ -383,32 +363,24 @@ export class GetDetailAnalyticsHandler {
     // Visibility
     const visibility = new AnalyticsOperationalMetricDto();
     visibility.label = 'Visibility';
-    visibility.value = product.isVisibleOnline
-      ? 'Public'
-      : 'Internal';
+    visibility.value = product.isVisibleOnline ? 'Public' : 'Internal';
     visibility.detail = product.isVisibleOnline
       ? 'Eligible for online discovery'
       : 'Hidden from public booking';
-    visibility.tone = product.isVisibleOnline
-      ? 'positive'
-      : 'warning';
+    visibility.tone = product.isVisibleOnline ? 'positive' : 'warning';
     metrics.push(visibility);
 
     // Staff coverage
     const staffCoverage = new AnalyticsOperationalMetricDto();
     staffCoverage.label = 'Staff coverage';
-    const isSpecific =
-      product.staffAssignmentType === 'specific';
+    const isSpecific = product.staffAssignmentType === 'specific';
     if (isSpecific) {
       staffCoverage.value = `${eligibilityCount} assigned`;
-      staffCoverage.detail =
-        'Named staff required for fulfillment';
-      staffCoverage.tone =
-        eligibilityCount === 0 ? 'critical' : 'positive';
+      staffCoverage.detail = 'Named staff required for fulfillment';
+      staffCoverage.tone = eligibilityCount === 0 ? 'critical' : 'positive';
     } else {
       staffCoverage.value = 'Flexible';
-      staffCoverage.detail =
-        'Any qualified employee can deliver';
+      staffCoverage.detail = 'Any qualified employee can deliver';
       staffCoverage.tone = 'positive';
     }
     metrics.push(staffCoverage);
@@ -417,36 +389,29 @@ export class GetDetailAnalyticsHandler {
     const scheduling = new AnalyticsOperationalMetricDto();
     scheduling.label = 'Scheduling';
     scheduling.value =
-      `${product.durationMinutes}m / ` +
-      `${product.bufferMinutes}m buffer`;
+      `${product.durationMinutes}m / ` + `${product.bufferMinutes}m buffer`;
     scheduling.detail =
-      `Capacity ${product.maxCapacity}, ` +
-      `lead ${product.minLeadTimeHours}h`;
-    scheduling.tone = product.durationMinutes > 0
-      ? 'neutral'
-      : 'warning';
+      `Capacity ${product.maxCapacity}, ` + `lead ${product.minLeadTimeHours}h`;
+    scheduling.tone = product.durationMinutes > 0 ? 'neutral' : 'warning';
     metrics.push(scheduling);
 
     // Content completeness
     const completenessChecks = [
-      product.description !== null &&
-        product.description !== '',
+      product.description !== null && product.description !== '',
       product.mediaCount > 0,
       product.serviceManual !== null,
     ];
-    const completeness = completenessChecks.filter(
-      Boolean,
-    ).length;
+    const completeness = completenessChecks.filter(Boolean).length;
     const contentMetric = new AnalyticsOperationalMetricDto();
     contentMetric.label = 'Content completeness';
     contentMetric.value = `${completeness} / 3`;
-    contentMetric.detail =
-      'Description, gallery, and service manual readiness';
-    contentMetric.tone = completeness === 3
-      ? 'positive'
-      : completeness === 2
-        ? 'warning'
-        : 'critical';
+    contentMetric.detail = 'Description, gallery, and service manual readiness';
+    contentMetric.tone =
+      completeness === 3
+        ? 'positive'
+        : completeness === 2
+          ? 'warning'
+          : 'critical';
     metrics.push(contentMetric);
 
     return metrics;
@@ -462,8 +427,7 @@ export class GetDetailAnalyticsHandler {
       const alert = new AnalyticsAlertDto();
       alert.title = 'Online visibility disabled';
       alert.detail =
-        'This service is hidden from the public ' +
-        'booking experience.';
+        'This service is hidden from the public ' + 'booking experience.';
       alert.tone = 'warning';
       alerts.push(alert);
     }
@@ -472,21 +436,16 @@ export class GetDetailAnalyticsHandler {
       const alert = new AnalyticsAlertDto();
       alert.title = 'Service manual is incomplete';
       alert.detail =
-        'Document treatment steps and ' +
-        'contraindications for staff.';
+        'Document treatment steps and ' + 'contraindications for staff.';
       alert.tone = 'critical';
       alerts.push(alert);
     }
 
-    if (
-      product.staffAssignmentType === 'specific' &&
-      eligibilityCount === 0
-    ) {
+    if (product.staffAssignmentType === 'specific' && eligibilityCount === 0) {
       const alert = new AnalyticsAlertDto();
       alert.title = 'No assigned staff';
       alert.detail =
-        'Bookings may fail when a service ' +
-        'requires named staff.';
+        'Bookings may fail when a service ' + 'requires named staff.';
       alert.tone = 'critical';
       alerts.push(alert);
     }
@@ -496,11 +455,7 @@ export class GetDetailAnalyticsHandler {
 
   private delta(current: number, previous: number): number {
     if (previous <= 0) return 0;
-    return (
-      Math.round(
-        ((current - previous) / previous) * 100 * 10,
-      ) / 10
-    );
+    return Math.round(((current - previous) / previous) * 100 * 10) / 10;
   }
 
   private generateTimeBuckets(
@@ -532,10 +487,7 @@ export class GetDetailAnalyticsHandler {
     return buckets;
   }
 
-  private formatBucketLabel(
-    date: Date,
-    period: DashboardTimePeriod,
-  ): string {
+  private formatBucketLabel(date: Date, period: DashboardTimePeriod): string {
     switch (period) {
       case DashboardTimePeriod.TODAY: {
         const hours = date.getHours();
@@ -544,10 +496,7 @@ export class GetDetailAnalyticsHandler {
         return `${display}${suffix}`;
       }
       case DashboardTimePeriod.THIS_WEEK: {
-        const days = [
-          'Sun', 'Mon', 'Tue', 'Wed',
-          'Thu', 'Fri', 'Sat',
-        ];
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         return days[date.getDay()];
       }
       case DashboardTimePeriod.THIS_MONTH: {
@@ -558,8 +507,18 @@ export class GetDetailAnalyticsHandler {
       case DashboardTimePeriod.THIS_QUARTER:
       case DashboardTimePeriod.THIS_YEAR: {
         const months = [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
         ];
         return months[date.getMonth()];
       }

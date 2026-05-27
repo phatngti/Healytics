@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { PartnerRefundCase } from '@/common/entities/partner-refund-case.entity';
 import { PartnerLedgerTransaction } from '@/common/entities/partner-ledger-transaction.entity';
@@ -74,7 +79,11 @@ export class ApprovePartnerRefundCaseHandler {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(`Approve failed: ${error.message}`, error.stack);
-      if (error instanceof NotFoundException || error instanceof ConflictException) throw error;
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ConflictException
+      )
+        throw error;
       throw error;
     } finally {
       await queryRunner.release();

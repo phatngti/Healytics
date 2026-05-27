@@ -6,16 +6,20 @@ import { AccountService } from '@/account/account.service';
 import { RegisterDto } from './dto/request/register.dto';
 import { RefreshTokenRequestDto } from './dto/request/refresh-token-request.dto';
 import { MockType } from '../../test/mocks/mock-types';
+import { ObservabilityMetricsService } from '@/observability/observability-metrics.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
   let authService: MockType<AuthService>;
+  let observabilityMetrics: MockType<ObservabilityMetricsService>;
 
   beforeEach(async () => {
     const mockAuthService: MockType<AuthService> = {
       register: jest.fn(),
       loginUser: jest.fn(),
       loginAdmin: jest.fn(),
+      loginPartner: jest.fn(),
+      loginEmployee: jest.fn(),
       refresh: jest.fn(),
       logout: jest.fn(),
       requestUserPasswordReset: jest.fn(),
@@ -31,17 +35,26 @@ describe('AuthController', () => {
       checkEmailExists: jest.fn(),
     };
 
+    const mockObservabilityMetrics: MockType<ObservabilityMetricsService> = {
+      recordLoginCcu: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
         { provide: AuthService, useValue: mockAuthService },
         { provide: PartnersService, useValue: mockPartnersService },
         { provide: AccountService, useValue: mockAccountService },
+        {
+          provide: ObservabilityMetricsService,
+          useValue: mockObservabilityMetrics,
+        },
       ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
     authService = module.get(AuthService);
+    observabilityMetrics = module.get(ObservabilityMetricsService);
   });
 
   afterEach(() => {
@@ -73,7 +86,9 @@ describe('AuthController', () => {
   describe('loginUser', () => {
     it('should call authService.loginUser with validated user', async () => {
       // Arrange
-      const mockReq = { user: { id: 'uuid-1', email: 'test@example.com' } };
+      const mockReq = {
+        user: { id: 'uuid-1', email: 'test@example.com', role: 'USER' },
+      };
       const expectedTokens = {
         access_token: 'access-token',
         refresh_token: 'refresh-token',
@@ -86,6 +101,10 @@ describe('AuthController', () => {
       // Assert
       expect(result).toEqual(expectedTokens);
       expect(authService.loginUser).toHaveBeenCalledWith(mockReq.user);
+      expect(observabilityMetrics.recordLoginCcu).toHaveBeenCalledWith(
+        'USER',
+        'uuid-1',
+      );
     });
   });
 
@@ -141,7 +160,9 @@ describe('AuthController', () => {
   describe('loginAdmin', () => {
     it('should call authService.loginAdmin with validated user', async () => {
       // Arrange
-      const mockReq = { user: { id: 'uuid-1', email: 'admin@example.com' } };
+      const mockReq = {
+        user: { id: 'uuid-1', email: 'admin@example.com', role: 'ADMIN' },
+      };
       const expectedTokens = {
         access_token: 'access-token',
         refresh_token: 'refresh-token',
@@ -154,6 +175,10 @@ describe('AuthController', () => {
       // Assert
       expect(result).toEqual(expectedTokens);
       expect(authService.loginAdmin).toHaveBeenCalledWith(mockReq.user);
+      expect(observabilityMetrics.recordLoginCcu).toHaveBeenCalledWith(
+        'ADMIN',
+        'uuid-1',
+      );
     });
   });
 

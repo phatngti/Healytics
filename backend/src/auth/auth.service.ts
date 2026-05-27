@@ -761,7 +761,7 @@ export class AuthService {
 
   private verifyPasswordResetToken(token: string): PasswordResetJwtPayload {
     try {
-      return this.jwtService.verify(token) as PasswordResetJwtPayload;
+      return this.jwtService.verify(token);
     } catch {
       throw new BadRequestException('Invalid or expired password reset token');
     }

@@ -530,10 +530,7 @@ export class PartnerSeeder implements ISeeder {
       'district',
     );
     if (!districtId && provinceId) {
-      districtId = await this.resolveFirstChildLocation(
-        provinceId,
-        'district',
-      );
+      districtId = await this.resolveFirstChildLocation(provinceId, 'district');
     }
 
     let wardId = await this.resolveLocationByCode(address.wardCode, 'ward');

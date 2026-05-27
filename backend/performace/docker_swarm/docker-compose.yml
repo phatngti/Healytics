@@ -1,0 +1,195 @@
+name: ${COMPOSE_PROJECT_NAME:-healytics_perf}
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: healytics-perf-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin@123}
+      POSTGRES_DB: ${POSTGRES_DB:-healytics_perf}
+    ports:
+      - "${PERF_POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - perf_pgdata:/var/lib/postgresql/data
+    networks:
+      - services
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: healytics-perf-redis
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --save
+      - "20 1"
+      - --loglevel
+      - warning
+      - --requirepass
+      - ${REDIS_PASSWORD:-redispass!@#123}
+    ports:
+      - "${PERF_REDIS_PORT:-56379}:6379"
+    volumes:
+      - perf_redisdata:/data
+    networks:
+      - services
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" --no-auth-warning ping | grep PONG"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redispass!@#123}
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: healytics-perf-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-perf}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-perf_rmq123}
+    ports:
+      - "${PERF_RABBITMQ_PORT:-55672}:5672"
+      - "${PERF_RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - perf_rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - services
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION:-8.17.0}
+    container_name: healytics-perf-elasticsearch
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: ${ES_JAVA_OPTS:--Xms512m -Xmx512m}
+      xpack.security.enabled: "true"
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-elastic@123}
+      xpack.security.enrollment.enabled: "false"
+      xpack.security.http.ssl.enabled: "false"
+      xpack.security.transport.ssl.enabled: "false"
+    ports:
+      - "${PERF_ELASTICSEARCH_PORT:-59200}:9200"
+    volumes:
+      - perf_esdata:/usr/share/elasticsearch/data
+    networks:
+      - services
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS -u elastic:${ELASTIC_PASSWORD:-elastic@123} http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"'"
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 45s
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  backend-migrate:
+    image: ${PERF_BACKEND_MIGRATION_IMAGE:-healytics-perf-backend-migrate:local}
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: migrate
+    profiles: ["jobs"]
+    env_file:
+      - ${PERF_BACKEND_ENV_FILE:-./backend.env.example}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - services
+    restart: "no"
+
+  backend-seed:
+    image: ${PERF_BACKEND_IMAGE:-healytics-perf-backend:local}
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: runtime
+    profiles: ["jobs"]
+    command: ["node", "dist/src/database/seeds/seed.js"]
+    env_file:
+      - ${PERF_BACKEND_ENV_FILE:-./backend.env.example}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - services
+    restart: "no"
+
+  backend:
+    image: ${PERF_BACKEND_IMAGE:-healytics-perf-backend:local}
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: healytics-perf-backend
+    restart: unless-stopped
+    cpus: "${BACKEND_LIMIT_CPUS:-2.0}"
+    mem_limit: "${BACKEND_LIMIT_MEMORY:-4G}"
+    env_file:
+      - ${PERF_BACKEND_ENV_FILE:-./backend.env.example}
+    ports:
+      - "${PERF_BACKEND_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - services
+    deploy:
+      resources:
+        limits:
+          cpus: "${BACKEND_LIMIT_CPUS:-2.0}"
+          memory: "${BACKEND_LIMIT_MEMORY:-4G}"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+networks:
+  services:
+    name: ${PERF_COMPOSE_NETWORK_NAME:-healytics_perf_services}
+    driver: bridge
+
+volumes:
+  perf_pgdata:
+  perf_redisdata:
+  perf_rabbitmq_data:
+  perf_esdata:

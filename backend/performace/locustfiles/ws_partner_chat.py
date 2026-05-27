@@ -66,13 +66,13 @@ class WsPartnerChatUser(HealyticsSocketIOUser):
     @task(5)
     def send_message(self):
         """Send a chat message with emit latency measurement."""
-        payload = generate_send_message()
+        payload = generate_send_message(sender_role="partner")
         self.ws_emit_measured("send_message", payload)
 
     @task(3)
     def typing_flow(self):
         """Simulate typing → pause → stop_typing."""
-        payload = generate_typing()
+        payload = generate_typing(sender_role="partner")
         self.ws_emit_measured("typing", payload)
         gevent.sleep(1 + gevent.time.time() % 2)
         self.ws_emit_measured("stop_typing", payload)
@@ -80,7 +80,7 @@ class WsPartnerChatUser(HealyticsSocketIOUser):
     @task(2)
     def mark_read(self):
         """Mark messages in a conversation as read."""
-        payload = generate_mark_read()
+        payload = generate_mark_read(sender_role="partner")
         self.ws_emit_measured("mark_read", payload)
 
     @task(1)

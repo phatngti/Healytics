@@ -1,15 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsOptional,
-  IsEnum,
-  IsString,
-  IsInt,
-  Min,
-} from 'class-validator';
+import { IsOptional, IsEnum, IsString, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-import {
-  PartnerVerificationStatus,
-} from '@/partners/enum/partner-verification-status.enum';
+import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 
 /**
  * Scope for the admin partner manager tabs.
@@ -71,8 +63,7 @@ export class AdminPartnersQueryDto {
     enum: AdminPartnerScope,
     enumName: 'AdminPartnerScope',
     example: AdminPartnerScope.VERIFICATION_QUEUE,
-    description:
-      'Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS',
+    description: 'Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS',
   })
   @IsOptional()
   @IsEnum(AdminPartnerScope)
@@ -90,8 +81,7 @@ export class AdminPartnersQueryDto {
 
   @ApiPropertyOptional({
     example: 'spa',
-    description:
-      'Search by tax code, brand name, legal name, or email',
+    description: 'Search by tax code, brand name, legal name, or email',
   })
   @IsOptional()
   @IsString()

@@ -15,9 +15,7 @@ import { NotificationService } from '@/notification/notification.service';
 export class NotificationProcessorService {
   private readonly logger = new Logger(NotificationProcessorService.name);
 
-  constructor(
-    private readonly notificationService: NotificationService,
-  ) {}
+  constructor(private readonly notificationService: NotificationService) {}
 
   @EventPattern('notification.event')
   async handleNotificationEvent(

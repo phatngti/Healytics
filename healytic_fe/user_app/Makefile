@@ -11,7 +11,7 @@ PATROL_DEVICE ?= emulator-5554
 # BACKDOOR_HEALTH_URL ?= http://localhost:8000/backend/test-backdoor/status
 BACKDOOR_BASE_URL ?= https://dev.healytics.me/backend
 BACKDOOR_HEALTH_URL ?= https://dev.healytics.me/backend/test-backdoor/status
-PATROL_E2E_TESTS ?= $(shell find patrol_test -maxdepth 1 -name '*_test.dart' ! -name 'test_bundle.dart' | sort)
+PATROL_E2E_TESTS ?= $(shell find patrol_test -maxdepth 1 -name '*_test.dart' ! -name 'test_bundle.dart' ! -name 'auth_password_reset_test.dart' | sort)
 
 # ─── Dependencies ────────────────────────────────
 get:

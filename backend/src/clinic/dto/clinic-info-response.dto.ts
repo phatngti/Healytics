@@ -29,7 +29,11 @@ export class ClinicCertificationDto {
   @ApiProperty({ type: String, example: 'ISO 9001:2015' })
   title: string;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: 'Quality Management' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: 'Quality Management',
+  })
   subtitle: string | null;
 
   @ApiProperty({ type: String, example: 'workspace_premium' })

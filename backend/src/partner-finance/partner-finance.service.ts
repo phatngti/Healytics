@@ -77,14 +77,32 @@ export class PartnerFinanceService {
 
   // ── Mutations ────────────────────────────────────────────────
 
-  async markSettled(accountId: string, transactionId: string, dto: MarkSettlementDto) {
+  async markSettled(
+    accountId: string,
+    transactionId: string,
+    dto: MarkSettlementDto,
+  ) {
     const partnerId = await this.resolvePartnerId(accountId);
-    return this.markSettledHandler.execute(partnerId, transactionId, accountId, dto);
+    return this.markSettledHandler.execute(
+      partnerId,
+      transactionId,
+      accountId,
+      dto,
+    );
   }
 
-  async flagReview(accountId: string, transactionId: string, dto: FlagReviewDto) {
+  async flagReview(
+    accountId: string,
+    transactionId: string,
+    dto: FlagReviewDto,
+  ) {
     const partnerId = await this.resolvePartnerId(accountId);
-    return this.flagReviewHandler.execute(partnerId, transactionId, accountId, dto);
+    return this.flagReviewHandler.execute(
+      partnerId,
+      transactionId,
+      accountId,
+      dto,
+    );
   }
 
   async retryPayout(accountId: string, payoutId: string, dto: RetryPayoutDto) {
@@ -92,12 +110,20 @@ export class PartnerFinanceService {
     return this.retryPayoutHandler.execute(partnerId, payoutId, dto);
   }
 
-  async approveRefundCase(accountId: string, caseId: string, dto: RefundCaseActionDto) {
+  async approveRefundCase(
+    accountId: string,
+    caseId: string,
+    dto: RefundCaseActionDto,
+  ) {
     const partnerId = await this.resolvePartnerId(accountId);
     return this.approveRefundHandler.execute(partnerId, caseId, accountId, dto);
   }
 
-  async rejectRefundCase(accountId: string, caseId: string, dto: RefundCaseActionDto) {
+  async rejectRefundCase(
+    accountId: string,
+    caseId: string,
+    dto: RefundCaseActionDto,
+  ) {
     const partnerId = await this.resolvePartnerId(accountId);
     return this.rejectRefundHandler.execute(partnerId, caseId, accountId, dto);
   }

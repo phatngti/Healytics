@@ -19,7 +19,7 @@ export class UserClinicController {
   constructor(private readonly clinicService: ClinicService) {}
 
   @Get(':id/info')
-    @LogResponse()
+  @LogResponse()
   @ApiOperation({
     operationId: 'userClinicControllerGetClinicInfo',
     summary: 'Get public clinic profile',
@@ -62,7 +62,7 @@ export class UserClinicController {
   }
 
   @Get(':id/products')
-    @LogResponse()
+  @LogResponse()
   @ApiOperation({
     operationId: 'userClinicControllerGetClinicProducts',
     summary: 'Get clinic products/services catalog',
