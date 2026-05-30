@@ -48,9 +48,9 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **limit** | **num**| Number of notifications to return | [optional] [default to 20]
- **cursor** | **String**| Cursor: fetch notifications before this ID (for pagination) | [optional] 
- **type** | **String**| Filter by notification type | [optional] 
- **isRead** | **bool**| Filter by read status | [optional] 
+ **cursor** | **String**| Cursor: fetch notifications before this ID (for pagination) | [optional]
+ **type** | **String**| Filter by notification type | [optional]
+ **isRead** | **bool**| Filter by read status | [optional]
 
 ### Return type
 
@@ -167,7 +167,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserNotificationsApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     api_instance.userNotificationControllerMarkRead(id);
@@ -180,7 +180,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 

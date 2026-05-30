@@ -21,6 +21,7 @@ class UserProfileDto {
     this.dateOfBirth,
     this.avatarUrl,
     required this.profileCompleted,
+    this.address,
   });
 
 
@@ -34,7 +35,7 @@ class UserProfileDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? firstName;
+  Object? firstName;
 
   /// Last name
   ///
@@ -43,7 +44,7 @@ class UserProfileDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? lastName;
+  Object? lastName;
 
   /// Phone number
   ///
@@ -52,7 +53,7 @@ class UserProfileDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? phone;
+  Object? phone;
 
   /// Bio
   ///
@@ -84,6 +85,15 @@ class UserProfileDto {
   /// Whether the profile is completed
   bool profileCompleted;
 
+  /// Address provided during registration
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  AccountAddressDto? address;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is UserProfileDto &&
     other.id == id &&
@@ -93,7 +103,8 @@ class UserProfileDto {
     other.bio == bio &&
     other.dateOfBirth == dateOfBirth &&
     other.avatarUrl == avatarUrl &&
-    other.profileCompleted == profileCompleted;
+    other.profileCompleted == profileCompleted &&
+    other.address == address;
 
   @override
   int get hashCode =>
@@ -105,10 +116,11 @@ class UserProfileDto {
     (bio == null ? 0 : bio!.hashCode) +
     (dateOfBirth == null ? 0 : dateOfBirth!.hashCode) +
     (avatarUrl == null ? 0 : avatarUrl!.hashCode) +
-    (profileCompleted.hashCode);
+    (profileCompleted.hashCode) +
+    (address == null ? 0 : address!.hashCode);
 
   @override
-  String toString() => 'UserProfileDto[id=$id, firstName=$firstName, lastName=$lastName, phone=$phone, bio=$bio, dateOfBirth=$dateOfBirth, avatarUrl=$avatarUrl, profileCompleted=$profileCompleted]';
+  String toString() => 'UserProfileDto[id=$id, firstName=$firstName, lastName=$lastName, phone=$phone, bio=$bio, dateOfBirth=$dateOfBirth, avatarUrl=$avatarUrl, profileCompleted=$profileCompleted, address=$address]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -144,6 +156,11 @@ class UserProfileDto {
       json[r'avatarUrl'] = null;
     }
       json[r'profileCompleted'] = this.profileCompleted;
+    if (this.address != null) {
+      json[r'address'] = this.address;
+    } else {
+      json[r'address'] = null;
+    }
     return json;
   }
 
@@ -167,13 +184,14 @@ class UserProfileDto {
 
       return UserProfileDto(
         id: mapValueOfType<String>(json, r'id')!,
-        firstName: mapValueOfType<String>(json, r'firstName'),
-        lastName: mapValueOfType<String>(json, r'lastName'),
-        phone: mapValueOfType<String>(json, r'phone'),
+        firstName: mapValueOfType<Object>(json, r'firstName'),
+        lastName: mapValueOfType<Object>(json, r'lastName'),
+        phone: mapValueOfType<Object>(json, r'phone'),
         bio: mapValueOfType<Object>(json, r'bio'),
         dateOfBirth: mapValueOfType<String>(json, r'dateOfBirth'),
         avatarUrl: mapValueOfType<Object>(json, r'avatarUrl'),
         profileCompleted: mapValueOfType<bool>(json, r'profileCompleted')!,
+        address: AccountAddressDto.fromJson(json[r'address']),
       );
     }
     return null;

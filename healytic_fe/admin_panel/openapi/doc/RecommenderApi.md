@@ -25,7 +25,7 @@ Chatbot recommender (non-stream).
 import 'package:admin_openapi/api.dart';
 
 final api_instance = RecommenderApi();
-final chatbotRecommenderRequest = ChatbotRecommenderRequest(); // ChatbotRecommenderRequest | 
+final chatbotRecommenderRequest = ChatbotRecommenderRequest(); // ChatbotRecommenderRequest |
 
 try {
     final result = api_instance.recommendChatbotRecommenderChatbotPost(chatbotRecommenderRequest);
@@ -39,7 +39,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **chatbotRecommenderRequest** | [**ChatbotRecommenderRequest**](ChatbotRecommenderRequest.md)|  | 
+ **chatbotRecommenderRequest** | [**ChatbotRecommenderRequest**](ChatbotRecommenderRequest.md)|  |
 
 ### Return type
 
@@ -68,7 +68,7 @@ Home recommender (non-stream).
 import 'package:admin_openapi/api.dart';
 
 final api_instance = RecommenderApi();
-final homeRecommenderRequest = HomeRecommenderRequest(); // HomeRecommenderRequest | 
+final homeRecommenderRequest = HomeRecommenderRequest(); // HomeRecommenderRequest |
 
 try {
     final result = api_instance.recommendHomeRecommenderHomePost(homeRecommenderRequest);
@@ -82,7 +82,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **homeRecommenderRequest** | [**HomeRecommenderRequest**](HomeRecommenderRequest.md)|  | 
+ **homeRecommenderRequest** | [**HomeRecommenderRequest**](HomeRecommenderRequest.md)|  |
 
 ### Return type
 

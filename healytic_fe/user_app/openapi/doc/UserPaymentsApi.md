@@ -9,6 +9,7 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**userPaymentControllerConfirmMoMoReturn**](UserPaymentsApi.md#userpaymentcontrollerconfirmmomoreturn) | **POST** /user/payments/momo/{bookingId}/return | Confirm signed MoMo return payload for booking
 [**userPaymentControllerConfirmStripeSetupIntent**](UserPaymentsApi.md#userpaymentcontrollerconfirmstripesetupintent) | **POST** /user/payments/stripe/setup-intents/{setupIntentId}/confirm | Confirm and persist a saved Stripe card
 [**userPaymentControllerCreateMoMoPayment**](UserPaymentsApi.md#userpaymentcontrollercreatemomopayment) | **POST** /user/payments/momo/{bookingId} | Create MoMo payment for booking
 [**userPaymentControllerCreateStripePayment**](UserPaymentsApi.md#userpaymentcontrollercreatestripepayment) | **POST** /user/payments/stripe/{bookingId} | Create Stripe payment for booking (card)
@@ -19,6 +20,54 @@ Method | HTTP request | Description
 [**userPaymentControllerRefundStripePayment**](UserPaymentsApi.md#userpaymentcontrollerrefundstripepayment) | **POST** /user/payments/stripe/{bookingId}/refund | Request Stripe refund for booking
 [**userPaymentControllerSetDefaultCard**](UserPaymentsApi.md#userpaymentcontrollersetdefaultcard) | **PATCH** /user/payments/cards/{cardId}/default | Set a saved card as the default card
 
+
+# **userPaymentControllerConfirmMoMoReturn**
+> userPaymentControllerConfirmMoMoReturn(bookingId, body)
+
+Confirm signed MoMo return payload for booking
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = UserPaymentsApi();
+final bookingId = bookingId_example; // String |
+final body = Object(); // Object |
+
+try {
+    api_instance.userPaymentControllerConfirmMoMoReturn(bookingId, body);
+} catch (e) {
+    print('Exception when calling UserPaymentsApi->userPaymentControllerConfirmMoMoReturn: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **bookingId** | **String**|  |
+ **body** | **Object**|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **userPaymentControllerConfirmStripeSetupIntent**
 > SavedPaymentCardDto userPaymentControllerConfirmStripeSetupIntent(setupIntentId, confirmStripeSetupIntentDto)
@@ -36,8 +85,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final setupIntentId = setupIntentId_example; // String | 
-final confirmStripeSetupIntentDto = ConfirmStripeSetupIntentDto(); // ConfirmStripeSetupIntentDto | 
+final setupIntentId = setupIntentId_example; // String |
+final confirmStripeSetupIntentDto = ConfirmStripeSetupIntentDto(); // ConfirmStripeSetupIntentDto |
 
 try {
     final result = api_instance.userPaymentControllerConfirmStripeSetupIntent(setupIntentId, confirmStripeSetupIntentDto);
@@ -51,8 +100,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **setupIntentId** | **String**|  | 
- **confirmStripeSetupIntentDto** | [**ConfirmStripeSetupIntentDto**](ConfirmStripeSetupIntentDto.md)|  | 
+ **setupIntentId** | **String**|  |
+ **confirmStripeSetupIntentDto** | [**ConfirmStripeSetupIntentDto**](ConfirmStripeSetupIntentDto.md)|  |
 
 ### Return type
 
@@ -85,8 +134,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final bookingId = bookingId_example; // String | 
-final createMoMoPaymentDto = CreateMoMoPaymentDto(); // CreateMoMoPaymentDto | 
+final bookingId = bookingId_example; // String |
+final createMoMoPaymentDto = CreateMoMoPaymentDto(); // CreateMoMoPaymentDto |
 
 try {
     final result = api_instance.userPaymentControllerCreateMoMoPayment(bookingId, createMoMoPaymentDto);
@@ -100,8 +149,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **bookingId** | **String**|  | 
- **createMoMoPaymentDto** | [**CreateMoMoPaymentDto**](CreateMoMoPaymentDto.md)|  | 
+ **bookingId** | **String**|  |
+ **createMoMoPaymentDto** | [**CreateMoMoPaymentDto**](CreateMoMoPaymentDto.md)|  |
 
 ### Return type
 
@@ -134,8 +183,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final bookingId = bookingId_example; // String | 
-final createStripePaymentDto = CreateStripePaymentDto(); // CreateStripePaymentDto | 
+final bookingId = bookingId_example; // String |
+final createStripePaymentDto = CreateStripePaymentDto(); // CreateStripePaymentDto |
 
 try {
     final result = api_instance.userPaymentControllerCreateStripePayment(bookingId, createStripePaymentDto);
@@ -149,8 +198,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **bookingId** | **String**|  | 
- **createStripePaymentDto** | [**CreateStripePaymentDto**](CreateStripePaymentDto.md)|  | 
+ **bookingId** | **String**|  |
+ **createStripePaymentDto** | [**CreateStripePaymentDto**](CreateStripePaymentDto.md)|  |
 
 ### Return type
 
@@ -226,7 +275,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final cardId = cardId_example; // String | 
+final cardId = cardId_example; // String |
 
 try {
     final result = api_instance.userPaymentControllerDeleteCard(cardId);
@@ -240,7 +289,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **cardId** | **String**|  | 
+ **cardId** | **String**|  |
 
 ### Return type
 
@@ -316,8 +365,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final bookingId = bookingId_example; // String | 
-final createMoMoRefundDto = CreateMoMoRefundDto(); // CreateMoMoRefundDto | 
+final bookingId = bookingId_example; // String |
+final createMoMoRefundDto = CreateMoMoRefundDto(); // CreateMoMoRefundDto |
 
 try {
     final result = api_instance.userPaymentControllerRefundMoMoPayment(bookingId, createMoMoRefundDto);
@@ -331,8 +380,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **bookingId** | **String**|  | 
- **createMoMoRefundDto** | [**CreateMoMoRefundDto**](CreateMoMoRefundDto.md)|  | 
+ **bookingId** | **String**|  |
+ **createMoMoRefundDto** | [**CreateMoMoRefundDto**](CreateMoMoRefundDto.md)|  |
 
 ### Return type
 
@@ -365,7 +414,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final bookingId = bookingId_example; // String | 
+final bookingId = bookingId_example; // String |
 
 try {
     final result = api_instance.userPaymentControllerRefundStripePayment(bookingId);
@@ -379,7 +428,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **bookingId** | **String**|  | 
+ **bookingId** | **String**|  |
 
 ### Return type
 
@@ -412,7 +461,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final cardId = cardId_example; // String | 
+final cardId = cardId_example; // String |
 
 try {
     final result = api_instance.userPaymentControllerSetDefaultCard(cardId);
@@ -426,7 +475,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **cardId** | **String**|  | 
+ **cardId** | **String**|  |
 
 ### Return type
 

@@ -22,7 +22,7 @@ void main() {
       // TODO
     });
 
-    // Staff/employee UUID
+    // Staff/employee UUID. Optional when autoAssignStaff is true.
     // String staffId
     test('to test the property `staffId`', () async {
       // TODO
@@ -55,6 +55,12 @@ void main() {
     // If true, booking is immediately CONFIRMED without requiring payment. The booking has no payment URL or expiry — suitable for in-person pay-later scenarios.
     // bool payLater (default value: false)
     test('to test the property `payLater`', () async {
+      // TODO
+    });
+
+    // If true, backend selects the best eligible available specialist for the service and start time.
+    // bool autoAssignStaff (default value: false)
+    test('to test the property `autoAssignStaff`', () async {
       // TODO
     });
 

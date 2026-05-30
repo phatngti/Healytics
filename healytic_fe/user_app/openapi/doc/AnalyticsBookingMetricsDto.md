@@ -8,11 +8,11 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**totalBookings** | **num** |  | 
-**delayedBookings** | **num** | Bookings exceeding delay threshold | 
-**delayThresholdMinutes** | **num** | Delay threshold in minutes | 
-**pendingBookings** | **num** | PENDING_PAYMENT + CONFIRMED bookings | 
-**completedBookings** | **num** |  | 
+**totalBookings** | **num** |  |
+**delayedBookings** | **num** | Bookings exceeding delay threshold |
+**delayThresholdMinutes** | **num** | Delay threshold in minutes |
+**pendingBookings** | **num** | PENDING_PAYMENT + CONFIRMED bookings |
+**completedBookings** | **num** |  |
 **statusBreakdown** | [**List<BookingStatusBreakdownDto>**](BookingStatusBreakdownDto.md) | Per-status counts | [default to const []]
 **alerts** | [**List<AnalyticsAlertDto>**](AnalyticsAlertDto.md) | Operational alerts for booking health | [default to const []]
 

@@ -51,7 +51,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final adminFinanceCreateNoteDto = AdminFinanceCreateNoteDto(); // AdminFinanceCreateNoteDto | 
+final adminFinanceCreateNoteDto = AdminFinanceCreateNoteDto(); // AdminFinanceCreateNoteDto |
 
 try {
     final result = api_instance.adminFinanceControllerAddNote(adminFinanceCreateNoteDto);
@@ -65,7 +65,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **adminFinanceCreateNoteDto** | [**AdminFinanceCreateNoteDto**](AdminFinanceCreateNoteDto.md)|  | 
+ **adminFinanceCreateNoteDto** | [**AdminFinanceCreateNoteDto**](AdminFinanceCreateNoteDto.md)|  |
 
 ### Return type
 
@@ -98,8 +98,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
-final adminFinanceNoteActionDto = AdminFinanceNoteActionDto(); // AdminFinanceNoteActionDto | 
+final id = id_example; // String |
+final adminFinanceNoteActionDto = AdminFinanceNoteActionDto(); // AdminFinanceNoteActionDto |
 
 try {
     final result = api_instance.adminFinanceControllerApproveRefundCase(id, adminFinanceNoteActionDto);
@@ -113,8 +113,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **adminFinanceNoteActionDto** | [**AdminFinanceNoteActionDto**](AdminFinanceNoteActionDto.md)|  | 
+ **id** | **String**|  |
+ **adminFinanceNoteActionDto** | [**AdminFinanceNoteActionDto**](AdminFinanceNoteActionDto.md)|  |
 
 ### Return type
 
@@ -147,7 +147,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final adminFinanceCreateExportDto = AdminFinanceCreateExportDto(); // AdminFinanceCreateExportDto | 
+final adminFinanceCreateExportDto = AdminFinanceCreateExportDto(); // AdminFinanceCreateExportDto |
 
 try {
     final result = api_instance.adminFinanceControllerCreateExport(adminFinanceCreateExportDto);
@@ -161,7 +161,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **adminFinanceCreateExportDto** | [**AdminFinanceCreateExportDto**](AdminFinanceCreateExportDto.md)|  | 
+ **adminFinanceCreateExportDto** | [**AdminFinanceCreateExportDto**](AdminFinanceCreateExportDto.md)|  |
 
 ### Return type
 
@@ -194,8 +194,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
-final adminFinanceReviewFlagActionDto = AdminFinanceReviewFlagActionDto(); // AdminFinanceReviewFlagActionDto | 
+final id = id_example; // String |
+final adminFinanceReviewFlagActionDto = AdminFinanceReviewFlagActionDto(); // AdminFinanceReviewFlagActionDto |
 
 try {
     final result = api_instance.adminFinanceControllerFlagTransaction(id, adminFinanceReviewFlagActionDto);
@@ -209,8 +209,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **adminFinanceReviewFlagActionDto** | [**AdminFinanceReviewFlagActionDto**](AdminFinanceReviewFlagActionDto.md)|  | 
+ **id** | **String**|  |
+ **adminFinanceReviewFlagActionDto** | [**AdminFinanceReviewFlagActionDto**](AdminFinanceReviewFlagActionDto.md)|  |
 
 ### Return type
 
@@ -243,28 +243,28 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final search = search_example; // String | 
-final period = ; // AdminFinancePeriod | 
-final startDate = 2013-10-20; // DateTime | 
-final endDate = 2013-10-20; // DateTime | 
-final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final sourceType = ; // PartnerCommerceSourceType | 
-final transactionType = ; // PartnerTransactionType | 
-final transactionStatus = ; // PartnerTransactionStatus | 
-final settlementStatus = ; // PartnerSettlementStatus | 
-final payoutStatus = ; // PartnerPayoutStatus | 
-final refundCaseStatus = ; // PartnerRefundCaseStatus | 
-final refundCaseType = ; // PartnerRefundCaseType | 
-final reconciliationStatus = ; // AdminFinanceReconciliationStatus | 
-final provider = ; // AdminFinanceProvider | 
-final currency = VND; // String | 
-final minAmount = 8.14; // num | 
-final maxAmount = 8.14; // num | 
-final onlyFlagged = true; // bool | 
-final onlySlaBreached = true; // bool | 
-final page = 8.14; // num | 
-final limit = 8.14; // num | 
+final search = search_example; // String |
+final period = ; // AdminFinancePeriod |
+final startDate = 2013-10-20; // DateTime |
+final endDate = 2013-10-20; // DateTime |
+final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final sourceType = ; // PartnerCommerceSourceType |
+final transactionType = ; // PartnerTransactionType |
+final transactionStatus = ; // PartnerTransactionStatus |
+final settlementStatus = ; // PartnerSettlementStatus |
+final payoutStatus = ; // PartnerPayoutStatus |
+final refundCaseStatus = ; // PartnerRefundCaseStatus |
+final refundCaseType = ; // PartnerRefundCaseType |
+final reconciliationStatus = ; // AdminFinanceReconciliationStatus |
+final provider = ; // AdminFinanceProvider |
+final currency = VND; // String |
+final minAmount = 8.14; // num |
+final maxAmount = 8.14; // num |
+final onlyFlagged = true; // bool |
+final onlySlaBreached = true; // bool |
+final page = 8.14; // num |
+final limit = 8.14; // num |
 
 try {
     final result = api_instance.adminFinanceControllerGetAlerts(search, period, startDate, endDate, partnerId, customerId, sourceType, transactionType, transactionStatus, settlementStatus, payoutStatus, refundCaseStatus, refundCaseType, reconciliationStatus, provider, currency, minAmount, maxAmount, onlyFlagged, onlySlaBreached, page, limit);
@@ -278,26 +278,26 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **search** | **String**|  | [optional] 
- **period** | [**AdminFinancePeriod**](.md)|  | [optional] 
- **startDate** | **DateTime**|  | [optional] 
- **endDate** | **DateTime**|  | [optional] 
- **partnerId** | **String**|  | [optional] 
- **customerId** | **String**|  | [optional] 
- **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional] 
- **transactionType** | [**PartnerTransactionType**](.md)|  | [optional] 
- **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional] 
- **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional] 
- **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional] 
- **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional] 
- **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional] 
- **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional] 
- **provider** | [**AdminFinanceProvider**](.md)|  | [optional] 
- **currency** | **String**|  | [optional] 
- **minAmount** | **num**|  | [optional] 
- **maxAmount** | **num**|  | [optional] 
- **onlyFlagged** | **bool**|  | [optional] 
- **onlySlaBreached** | **bool**|  | [optional] 
+ **search** | **String**|  | [optional]
+ **period** | [**AdminFinancePeriod**](.md)|  | [optional]
+ **startDate** | **DateTime**|  | [optional]
+ **endDate** | **DateTime**|  | [optional]
+ **partnerId** | **String**|  | [optional]
+ **customerId** | **String**|  | [optional]
+ **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional]
+ **transactionType** | [**PartnerTransactionType**](.md)|  | [optional]
+ **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional]
+ **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional]
+ **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional]
+ **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional]
+ **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional]
+ **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional]
+ **provider** | [**AdminFinanceProvider**](.md)|  | [optional]
+ **currency** | **String**|  | [optional]
+ **minAmount** | **num**|  | [optional]
+ **maxAmount** | **num**|  | [optional]
+ **onlyFlagged** | **bool**|  | [optional]
+ **onlySlaBreached** | **bool**|  | [optional]
  **page** | **num**|  | [optional] [default to 1]
  **limit** | **num**|  | [optional] [default to 50]
 
@@ -375,28 +375,28 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final search = search_example; // String | 
-final period = ; // AdminFinancePeriod | 
-final startDate = 2013-10-20; // DateTime | 
-final endDate = 2013-10-20; // DateTime | 
-final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final sourceType = ; // PartnerCommerceSourceType | 
-final transactionType = ; // PartnerTransactionType | 
-final transactionStatus = ; // PartnerTransactionStatus | 
-final settlementStatus = ; // PartnerSettlementStatus | 
-final payoutStatus = ; // PartnerPayoutStatus | 
-final refundCaseStatus = ; // PartnerRefundCaseStatus | 
-final refundCaseType = ; // PartnerRefundCaseType | 
-final reconciliationStatus = ; // AdminFinanceReconciliationStatus | 
-final provider = ; // AdminFinanceProvider | 
-final currency = VND; // String | 
-final minAmount = 8.14; // num | 
-final maxAmount = 8.14; // num | 
-final onlyFlagged = true; // bool | 
-final onlySlaBreached = true; // bool | 
-final page = 8.14; // num | 
-final limit = 8.14; // num | 
+final search = search_example; // String |
+final period = ; // AdminFinancePeriod |
+final startDate = 2013-10-20; // DateTime |
+final endDate = 2013-10-20; // DateTime |
+final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final sourceType = ; // PartnerCommerceSourceType |
+final transactionType = ; // PartnerTransactionType |
+final transactionStatus = ; // PartnerTransactionStatus |
+final settlementStatus = ; // PartnerSettlementStatus |
+final payoutStatus = ; // PartnerPayoutStatus |
+final refundCaseStatus = ; // PartnerRefundCaseStatus |
+final refundCaseType = ; // PartnerRefundCaseType |
+final reconciliationStatus = ; // AdminFinanceReconciliationStatus |
+final provider = ; // AdminFinanceProvider |
+final currency = VND; // String |
+final minAmount = 8.14; // num |
+final maxAmount = 8.14; // num |
+final onlyFlagged = true; // bool |
+final onlySlaBreached = true; // bool |
+final page = 8.14; // num |
+final limit = 8.14; // num |
 
 try {
     final result = api_instance.adminFinanceControllerGetPartnerExposure(search, period, startDate, endDate, partnerId, customerId, sourceType, transactionType, transactionStatus, settlementStatus, payoutStatus, refundCaseStatus, refundCaseType, reconciliationStatus, provider, currency, minAmount, maxAmount, onlyFlagged, onlySlaBreached, page, limit);
@@ -410,26 +410,26 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **search** | **String**|  | [optional] 
- **period** | [**AdminFinancePeriod**](.md)|  | [optional] 
- **startDate** | **DateTime**|  | [optional] 
- **endDate** | **DateTime**|  | [optional] 
- **partnerId** | **String**|  | [optional] 
- **customerId** | **String**|  | [optional] 
- **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional] 
- **transactionType** | [**PartnerTransactionType**](.md)|  | [optional] 
- **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional] 
- **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional] 
- **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional] 
- **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional] 
- **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional] 
- **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional] 
- **provider** | [**AdminFinanceProvider**](.md)|  | [optional] 
- **currency** | **String**|  | [optional] 
- **minAmount** | **num**|  | [optional] 
- **maxAmount** | **num**|  | [optional] 
- **onlyFlagged** | **bool**|  | [optional] 
- **onlySlaBreached** | **bool**|  | [optional] 
+ **search** | **String**|  | [optional]
+ **period** | [**AdminFinancePeriod**](.md)|  | [optional]
+ **startDate** | **DateTime**|  | [optional]
+ **endDate** | **DateTime**|  | [optional]
+ **partnerId** | **String**|  | [optional]
+ **customerId** | **String**|  | [optional]
+ **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional]
+ **transactionType** | [**PartnerTransactionType**](.md)|  | [optional]
+ **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional]
+ **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional]
+ **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional]
+ **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional]
+ **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional]
+ **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional]
+ **provider** | [**AdminFinanceProvider**](.md)|  | [optional]
+ **currency** | **String**|  | [optional]
+ **minAmount** | **num**|  | [optional]
+ **maxAmount** | **num**|  | [optional]
+ **onlyFlagged** | **bool**|  | [optional]
+ **onlySlaBreached** | **bool**|  | [optional]
  **page** | **num**|  | [optional] [default to 1]
  **limit** | **num**|  | [optional] [default to 50]
 
@@ -464,7 +464,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     final result = api_instance.adminFinanceControllerGetPayoutDetail(id);
@@ -478,7 +478,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 
@@ -511,28 +511,28 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final search = search_example; // String | 
-final period = ; // AdminFinancePeriod | 
-final startDate = 2013-10-20; // DateTime | 
-final endDate = 2013-10-20; // DateTime | 
-final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final sourceType = ; // PartnerCommerceSourceType | 
-final transactionType = ; // PartnerTransactionType | 
-final transactionStatus = ; // PartnerTransactionStatus | 
-final settlementStatus = ; // PartnerSettlementStatus | 
-final payoutStatus = ; // PartnerPayoutStatus | 
-final refundCaseStatus = ; // PartnerRefundCaseStatus | 
-final refundCaseType = ; // PartnerRefundCaseType | 
-final reconciliationStatus = ; // AdminFinanceReconciliationStatus | 
-final provider = ; // AdminFinanceProvider | 
-final currency = VND; // String | 
-final minAmount = 8.14; // num | 
-final maxAmount = 8.14; // num | 
-final onlyFlagged = true; // bool | 
-final onlySlaBreached = true; // bool | 
-final page = 8.14; // num | 
-final limit = 8.14; // num | 
+final search = search_example; // String |
+final period = ; // AdminFinancePeriod |
+final startDate = 2013-10-20; // DateTime |
+final endDate = 2013-10-20; // DateTime |
+final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final sourceType = ; // PartnerCommerceSourceType |
+final transactionType = ; // PartnerTransactionType |
+final transactionStatus = ; // PartnerTransactionStatus |
+final settlementStatus = ; // PartnerSettlementStatus |
+final payoutStatus = ; // PartnerPayoutStatus |
+final refundCaseStatus = ; // PartnerRefundCaseStatus |
+final refundCaseType = ; // PartnerRefundCaseType |
+final reconciliationStatus = ; // AdminFinanceReconciliationStatus |
+final provider = ; // AdminFinanceProvider |
+final currency = VND; // String |
+final minAmount = 8.14; // num |
+final maxAmount = 8.14; // num |
+final onlyFlagged = true; // bool |
+final onlySlaBreached = true; // bool |
+final page = 8.14; // num |
+final limit = 8.14; // num |
 
 try {
     final result = api_instance.adminFinanceControllerGetPayouts(search, period, startDate, endDate, partnerId, customerId, sourceType, transactionType, transactionStatus, settlementStatus, payoutStatus, refundCaseStatus, refundCaseType, reconciliationStatus, provider, currency, minAmount, maxAmount, onlyFlagged, onlySlaBreached, page, limit);
@@ -546,26 +546,26 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **search** | **String**|  | [optional] 
- **period** | [**AdminFinancePeriod**](.md)|  | [optional] 
- **startDate** | **DateTime**|  | [optional] 
- **endDate** | **DateTime**|  | [optional] 
- **partnerId** | **String**|  | [optional] 
- **customerId** | **String**|  | [optional] 
- **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional] 
- **transactionType** | [**PartnerTransactionType**](.md)|  | [optional] 
- **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional] 
- **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional] 
- **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional] 
- **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional] 
- **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional] 
- **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional] 
- **provider** | [**AdminFinanceProvider**](.md)|  | [optional] 
- **currency** | **String**|  | [optional] 
- **minAmount** | **num**|  | [optional] 
- **maxAmount** | **num**|  | [optional] 
- **onlyFlagged** | **bool**|  | [optional] 
- **onlySlaBreached** | **bool**|  | [optional] 
+ **search** | **String**|  | [optional]
+ **period** | [**AdminFinancePeriod**](.md)|  | [optional]
+ **startDate** | **DateTime**|  | [optional]
+ **endDate** | **DateTime**|  | [optional]
+ **partnerId** | **String**|  | [optional]
+ **customerId** | **String**|  | [optional]
+ **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional]
+ **transactionType** | [**PartnerTransactionType**](.md)|  | [optional]
+ **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional]
+ **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional]
+ **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional]
+ **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional]
+ **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional]
+ **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional]
+ **provider** | [**AdminFinanceProvider**](.md)|  | [optional]
+ **currency** | **String**|  | [optional]
+ **minAmount** | **num**|  | [optional]
+ **maxAmount** | **num**|  | [optional]
+ **onlyFlagged** | **bool**|  | [optional]
+ **onlySlaBreached** | **bool**|  | [optional]
  **page** | **num**|  | [optional] [default to 1]
  **limit** | **num**|  | [optional] [default to 50]
 
@@ -600,28 +600,28 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final search = search_example; // String | 
-final period = ; // AdminFinancePeriod | 
-final startDate = 2013-10-20; // DateTime | 
-final endDate = 2013-10-20; // DateTime | 
-final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final sourceType = ; // PartnerCommerceSourceType | 
-final transactionType = ; // PartnerTransactionType | 
-final transactionStatus = ; // PartnerTransactionStatus | 
-final settlementStatus = ; // PartnerSettlementStatus | 
-final payoutStatus = ; // PartnerPayoutStatus | 
-final refundCaseStatus = ; // PartnerRefundCaseStatus | 
-final refundCaseType = ; // PartnerRefundCaseType | 
-final reconciliationStatus = ; // AdminFinanceReconciliationStatus | 
-final provider = ; // AdminFinanceProvider | 
-final currency = VND; // String | 
-final minAmount = 8.14; // num | 
-final maxAmount = 8.14; // num | 
-final onlyFlagged = true; // bool | 
-final onlySlaBreached = true; // bool | 
-final page = 8.14; // num | 
-final limit = 8.14; // num | 
+final search = search_example; // String |
+final period = ; // AdminFinancePeriod |
+final startDate = 2013-10-20; // DateTime |
+final endDate = 2013-10-20; // DateTime |
+final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final sourceType = ; // PartnerCommerceSourceType |
+final transactionType = ; // PartnerTransactionType |
+final transactionStatus = ; // PartnerTransactionStatus |
+final settlementStatus = ; // PartnerSettlementStatus |
+final payoutStatus = ; // PartnerPayoutStatus |
+final refundCaseStatus = ; // PartnerRefundCaseStatus |
+final refundCaseType = ; // PartnerRefundCaseType |
+final reconciliationStatus = ; // AdminFinanceReconciliationStatus |
+final provider = ; // AdminFinanceProvider |
+final currency = VND; // String |
+final minAmount = 8.14; // num |
+final maxAmount = 8.14; // num |
+final onlyFlagged = true; // bool |
+final onlySlaBreached = true; // bool |
+final page = 8.14; // num |
+final limit = 8.14; // num |
 
 try {
     final result = api_instance.adminFinanceControllerGetReconciliation(search, period, startDate, endDate, partnerId, customerId, sourceType, transactionType, transactionStatus, settlementStatus, payoutStatus, refundCaseStatus, refundCaseType, reconciliationStatus, provider, currency, minAmount, maxAmount, onlyFlagged, onlySlaBreached, page, limit);
@@ -635,26 +635,26 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **search** | **String**|  | [optional] 
- **period** | [**AdminFinancePeriod**](.md)|  | [optional] 
- **startDate** | **DateTime**|  | [optional] 
- **endDate** | **DateTime**|  | [optional] 
- **partnerId** | **String**|  | [optional] 
- **customerId** | **String**|  | [optional] 
- **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional] 
- **transactionType** | [**PartnerTransactionType**](.md)|  | [optional] 
- **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional] 
- **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional] 
- **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional] 
- **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional] 
- **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional] 
- **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional] 
- **provider** | [**AdminFinanceProvider**](.md)|  | [optional] 
- **currency** | **String**|  | [optional] 
- **minAmount** | **num**|  | [optional] 
- **maxAmount** | **num**|  | [optional] 
- **onlyFlagged** | **bool**|  | [optional] 
- **onlySlaBreached** | **bool**|  | [optional] 
+ **search** | **String**|  | [optional]
+ **period** | [**AdminFinancePeriod**](.md)|  | [optional]
+ **startDate** | **DateTime**|  | [optional]
+ **endDate** | **DateTime**|  | [optional]
+ **partnerId** | **String**|  | [optional]
+ **customerId** | **String**|  | [optional]
+ **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional]
+ **transactionType** | [**PartnerTransactionType**](.md)|  | [optional]
+ **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional]
+ **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional]
+ **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional]
+ **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional]
+ **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional]
+ **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional]
+ **provider** | [**AdminFinanceProvider**](.md)|  | [optional]
+ **currency** | **String**|  | [optional]
+ **minAmount** | **num**|  | [optional]
+ **maxAmount** | **num**|  | [optional]
+ **onlyFlagged** | **bool**|  | [optional]
+ **onlySlaBreached** | **bool**|  | [optional]
  **page** | **num**|  | [optional] [default to 1]
  **limit** | **num**|  | [optional] [default to 50]
 
@@ -689,7 +689,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     final result = api_instance.adminFinanceControllerGetReconciliationDetail(id);
@@ -703,7 +703,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 
@@ -736,7 +736,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     final result = api_instance.adminFinanceControllerGetRefundCaseDetail(id);
@@ -750,7 +750,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 
@@ -783,28 +783,28 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final search = search_example; // String | 
-final period = ; // AdminFinancePeriod | 
-final startDate = 2013-10-20; // DateTime | 
-final endDate = 2013-10-20; // DateTime | 
-final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final sourceType = ; // PartnerCommerceSourceType | 
-final transactionType = ; // PartnerTransactionType | 
-final transactionStatus = ; // PartnerTransactionStatus | 
-final settlementStatus = ; // PartnerSettlementStatus | 
-final payoutStatus = ; // PartnerPayoutStatus | 
-final refundCaseStatus = ; // PartnerRefundCaseStatus | 
-final refundCaseType = ; // PartnerRefundCaseType | 
-final reconciliationStatus = ; // AdminFinanceReconciliationStatus | 
-final provider = ; // AdminFinanceProvider | 
-final currency = VND; // String | 
-final minAmount = 8.14; // num | 
-final maxAmount = 8.14; // num | 
-final onlyFlagged = true; // bool | 
-final onlySlaBreached = true; // bool | 
-final page = 8.14; // num | 
-final limit = 8.14; // num | 
+final search = search_example; // String |
+final period = ; // AdminFinancePeriod |
+final startDate = 2013-10-20; // DateTime |
+final endDate = 2013-10-20; // DateTime |
+final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final sourceType = ; // PartnerCommerceSourceType |
+final transactionType = ; // PartnerTransactionType |
+final transactionStatus = ; // PartnerTransactionStatus |
+final settlementStatus = ; // PartnerSettlementStatus |
+final payoutStatus = ; // PartnerPayoutStatus |
+final refundCaseStatus = ; // PartnerRefundCaseStatus |
+final refundCaseType = ; // PartnerRefundCaseType |
+final reconciliationStatus = ; // AdminFinanceReconciliationStatus |
+final provider = ; // AdminFinanceProvider |
+final currency = VND; // String |
+final minAmount = 8.14; // num |
+final maxAmount = 8.14; // num |
+final onlyFlagged = true; // bool |
+final onlySlaBreached = true; // bool |
+final page = 8.14; // num |
+final limit = 8.14; // num |
 
 try {
     final result = api_instance.adminFinanceControllerGetRefundCases(search, period, startDate, endDate, partnerId, customerId, sourceType, transactionType, transactionStatus, settlementStatus, payoutStatus, refundCaseStatus, refundCaseType, reconciliationStatus, provider, currency, minAmount, maxAmount, onlyFlagged, onlySlaBreached, page, limit);
@@ -818,26 +818,26 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **search** | **String**|  | [optional] 
- **period** | [**AdminFinancePeriod**](.md)|  | [optional] 
- **startDate** | **DateTime**|  | [optional] 
- **endDate** | **DateTime**|  | [optional] 
- **partnerId** | **String**|  | [optional] 
- **customerId** | **String**|  | [optional] 
- **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional] 
- **transactionType** | [**PartnerTransactionType**](.md)|  | [optional] 
- **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional] 
- **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional] 
- **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional] 
- **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional] 
- **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional] 
- **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional] 
- **provider** | [**AdminFinanceProvider**](.md)|  | [optional] 
- **currency** | **String**|  | [optional] 
- **minAmount** | **num**|  | [optional] 
- **maxAmount** | **num**|  | [optional] 
- **onlyFlagged** | **bool**|  | [optional] 
- **onlySlaBreached** | **bool**|  | [optional] 
+ **search** | **String**|  | [optional]
+ **period** | [**AdminFinancePeriod**](.md)|  | [optional]
+ **startDate** | **DateTime**|  | [optional]
+ **endDate** | **DateTime**|  | [optional]
+ **partnerId** | **String**|  | [optional]
+ **customerId** | **String**|  | [optional]
+ **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional]
+ **transactionType** | [**PartnerTransactionType**](.md)|  | [optional]
+ **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional]
+ **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional]
+ **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional]
+ **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional]
+ **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional]
+ **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional]
+ **provider** | [**AdminFinanceProvider**](.md)|  | [optional]
+ **currency** | **String**|  | [optional]
+ **minAmount** | **num**|  | [optional]
+ **maxAmount** | **num**|  | [optional]
+ **onlyFlagged** | **bool**|  | [optional]
+ **onlySlaBreached** | **bool**|  | [optional]
  **page** | **num**|  | [optional] [default to 1]
  **limit** | **num**|  | [optional] [default to 50]
 
@@ -872,28 +872,28 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final search = search_example; // String | 
-final period = ; // AdminFinancePeriod | 
-final startDate = 2013-10-20; // DateTime | 
-final endDate = 2013-10-20; // DateTime | 
-final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final sourceType = ; // PartnerCommerceSourceType | 
-final transactionType = ; // PartnerTransactionType | 
-final transactionStatus = ; // PartnerTransactionStatus | 
-final settlementStatus = ; // PartnerSettlementStatus | 
-final payoutStatus = ; // PartnerPayoutStatus | 
-final refundCaseStatus = ; // PartnerRefundCaseStatus | 
-final refundCaseType = ; // PartnerRefundCaseType | 
-final reconciliationStatus = ; // AdminFinanceReconciliationStatus | 
-final provider = ; // AdminFinanceProvider | 
-final currency = VND; // String | 
-final minAmount = 8.14; // num | 
-final maxAmount = 8.14; // num | 
-final onlyFlagged = true; // bool | 
-final onlySlaBreached = true; // bool | 
-final page = 8.14; // num | 
-final limit = 8.14; // num | 
+final search = search_example; // String |
+final period = ; // AdminFinancePeriod |
+final startDate = 2013-10-20; // DateTime |
+final endDate = 2013-10-20; // DateTime |
+final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final sourceType = ; // PartnerCommerceSourceType |
+final transactionType = ; // PartnerTransactionType |
+final transactionStatus = ; // PartnerTransactionStatus |
+final settlementStatus = ; // PartnerSettlementStatus |
+final payoutStatus = ; // PartnerPayoutStatus |
+final refundCaseStatus = ; // PartnerRefundCaseStatus |
+final refundCaseType = ; // PartnerRefundCaseType |
+final reconciliationStatus = ; // AdminFinanceReconciliationStatus |
+final provider = ; // AdminFinanceProvider |
+final currency = VND; // String |
+final minAmount = 8.14; // num |
+final maxAmount = 8.14; // num |
+final onlyFlagged = true; // bool |
+final onlySlaBreached = true; // bool |
+final page = 8.14; // num |
+final limit = 8.14; // num |
 
 try {
     final result = api_instance.adminFinanceControllerGetSummary(search, period, startDate, endDate, partnerId, customerId, sourceType, transactionType, transactionStatus, settlementStatus, payoutStatus, refundCaseStatus, refundCaseType, reconciliationStatus, provider, currency, minAmount, maxAmount, onlyFlagged, onlySlaBreached, page, limit);
@@ -907,26 +907,26 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **search** | **String**|  | [optional] 
- **period** | [**AdminFinancePeriod**](.md)|  | [optional] 
- **startDate** | **DateTime**|  | [optional] 
- **endDate** | **DateTime**|  | [optional] 
- **partnerId** | **String**|  | [optional] 
- **customerId** | **String**|  | [optional] 
- **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional] 
- **transactionType** | [**PartnerTransactionType**](.md)|  | [optional] 
- **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional] 
- **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional] 
- **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional] 
- **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional] 
- **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional] 
- **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional] 
- **provider** | [**AdminFinanceProvider**](.md)|  | [optional] 
- **currency** | **String**|  | [optional] 
- **minAmount** | **num**|  | [optional] 
- **maxAmount** | **num**|  | [optional] 
- **onlyFlagged** | **bool**|  | [optional] 
- **onlySlaBreached** | **bool**|  | [optional] 
+ **search** | **String**|  | [optional]
+ **period** | [**AdminFinancePeriod**](.md)|  | [optional]
+ **startDate** | **DateTime**|  | [optional]
+ **endDate** | **DateTime**|  | [optional]
+ **partnerId** | **String**|  | [optional]
+ **customerId** | **String**|  | [optional]
+ **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional]
+ **transactionType** | [**PartnerTransactionType**](.md)|  | [optional]
+ **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional]
+ **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional]
+ **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional]
+ **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional]
+ **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional]
+ **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional]
+ **provider** | [**AdminFinanceProvider**](.md)|  | [optional]
+ **currency** | **String**|  | [optional]
+ **minAmount** | **num**|  | [optional]
+ **maxAmount** | **num**|  | [optional]
+ **onlyFlagged** | **bool**|  | [optional]
+ **onlySlaBreached** | **bool**|  | [optional]
  **page** | **num**|  | [optional] [default to 1]
  **limit** | **num**|  | [optional] [default to 50]
 
@@ -961,7 +961,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     final result = api_instance.adminFinanceControllerGetTransactionDetail(id);
@@ -975,7 +975,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 
@@ -1008,28 +1008,28 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final search = search_example; // String | 
-final period = ; // AdminFinancePeriod | 
-final startDate = 2013-10-20; // DateTime | 
-final endDate = 2013-10-20; // DateTime | 
-final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final sourceType = ; // PartnerCommerceSourceType | 
-final transactionType = ; // PartnerTransactionType | 
-final transactionStatus = ; // PartnerTransactionStatus | 
-final settlementStatus = ; // PartnerSettlementStatus | 
-final payoutStatus = ; // PartnerPayoutStatus | 
-final refundCaseStatus = ; // PartnerRefundCaseStatus | 
-final refundCaseType = ; // PartnerRefundCaseType | 
-final reconciliationStatus = ; // AdminFinanceReconciliationStatus | 
-final provider = ; // AdminFinanceProvider | 
-final currency = VND; // String | 
-final minAmount = 8.14; // num | 
-final maxAmount = 8.14; // num | 
-final onlyFlagged = true; // bool | 
-final onlySlaBreached = true; // bool | 
-final page = 8.14; // num | 
-final limit = 8.14; // num | 
+final search = search_example; // String |
+final period = ; // AdminFinancePeriod |
+final startDate = 2013-10-20; // DateTime |
+final endDate = 2013-10-20; // DateTime |
+final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final sourceType = ; // PartnerCommerceSourceType |
+final transactionType = ; // PartnerTransactionType |
+final transactionStatus = ; // PartnerTransactionStatus |
+final settlementStatus = ; // PartnerSettlementStatus |
+final payoutStatus = ; // PartnerPayoutStatus |
+final refundCaseStatus = ; // PartnerRefundCaseStatus |
+final refundCaseType = ; // PartnerRefundCaseType |
+final reconciliationStatus = ; // AdminFinanceReconciliationStatus |
+final provider = ; // AdminFinanceProvider |
+final currency = VND; // String |
+final minAmount = 8.14; // num |
+final maxAmount = 8.14; // num |
+final onlyFlagged = true; // bool |
+final onlySlaBreached = true; // bool |
+final page = 8.14; // num |
+final limit = 8.14; // num |
 
 try {
     final result = api_instance.adminFinanceControllerGetTransactions(search, period, startDate, endDate, partnerId, customerId, sourceType, transactionType, transactionStatus, settlementStatus, payoutStatus, refundCaseStatus, refundCaseType, reconciliationStatus, provider, currency, minAmount, maxAmount, onlyFlagged, onlySlaBreached, page, limit);
@@ -1043,26 +1043,26 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **search** | **String**|  | [optional] 
- **period** | [**AdminFinancePeriod**](.md)|  | [optional] 
- **startDate** | **DateTime**|  | [optional] 
- **endDate** | **DateTime**|  | [optional] 
- **partnerId** | **String**|  | [optional] 
- **customerId** | **String**|  | [optional] 
- **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional] 
- **transactionType** | [**PartnerTransactionType**](.md)|  | [optional] 
- **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional] 
- **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional] 
- **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional] 
- **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional] 
- **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional] 
- **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional] 
- **provider** | [**AdminFinanceProvider**](.md)|  | [optional] 
- **currency** | **String**|  | [optional] 
- **minAmount** | **num**|  | [optional] 
- **maxAmount** | **num**|  | [optional] 
- **onlyFlagged** | **bool**|  | [optional] 
- **onlySlaBreached** | **bool**|  | [optional] 
+ **search** | **String**|  | [optional]
+ **period** | [**AdminFinancePeriod**](.md)|  | [optional]
+ **startDate** | **DateTime**|  | [optional]
+ **endDate** | **DateTime**|  | [optional]
+ **partnerId** | **String**|  | [optional]
+ **customerId** | **String**|  | [optional]
+ **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional]
+ **transactionType** | [**PartnerTransactionType**](.md)|  | [optional]
+ **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional]
+ **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional]
+ **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional]
+ **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional]
+ **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional]
+ **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional]
+ **provider** | [**AdminFinanceProvider**](.md)|  | [optional]
+ **currency** | **String**|  | [optional]
+ **minAmount** | **num**|  | [optional]
+ **maxAmount** | **num**|  | [optional]
+ **onlyFlagged** | **bool**|  | [optional]
+ **onlySlaBreached** | **bool**|  | [optional]
  **page** | **num**|  | [optional] [default to 1]
  **limit** | **num**|  | [optional] [default to 50]
 
@@ -1097,28 +1097,28 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final search = search_example; // String | 
-final period = ; // AdminFinancePeriod | 
-final startDate = 2013-10-20; // DateTime | 
-final endDate = 2013-10-20; // DateTime | 
-final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
-final sourceType = ; // PartnerCommerceSourceType | 
-final transactionType = ; // PartnerTransactionType | 
-final transactionStatus = ; // PartnerTransactionStatus | 
-final settlementStatus = ; // PartnerSettlementStatus | 
-final payoutStatus = ; // PartnerPayoutStatus | 
-final refundCaseStatus = ; // PartnerRefundCaseStatus | 
-final refundCaseType = ; // PartnerRefundCaseType | 
-final reconciliationStatus = ; // AdminFinanceReconciliationStatus | 
-final provider = ; // AdminFinanceProvider | 
-final currency = VND; // String | 
-final minAmount = 8.14; // num | 
-final maxAmount = 8.14; // num | 
-final onlyFlagged = true; // bool | 
-final onlySlaBreached = true; // bool | 
-final page = 8.14; // num | 
-final limit = 8.14; // num | 
+final search = search_example; // String |
+final period = ; // AdminFinancePeriod |
+final startDate = 2013-10-20; // DateTime |
+final endDate = 2013-10-20; // DateTime |
+final partnerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final customerId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final sourceType = ; // PartnerCommerceSourceType |
+final transactionType = ; // PartnerTransactionType |
+final transactionStatus = ; // PartnerTransactionStatus |
+final settlementStatus = ; // PartnerSettlementStatus |
+final payoutStatus = ; // PartnerPayoutStatus |
+final refundCaseStatus = ; // PartnerRefundCaseStatus |
+final refundCaseType = ; // PartnerRefundCaseType |
+final reconciliationStatus = ; // AdminFinanceReconciliationStatus |
+final provider = ; // AdminFinanceProvider |
+final currency = VND; // String |
+final minAmount = 8.14; // num |
+final maxAmount = 8.14; // num |
+final onlyFlagged = true; // bool |
+final onlySlaBreached = true; // bool |
+final page = 8.14; // num |
+final limit = 8.14; // num |
 
 try {
     final result = api_instance.adminFinanceControllerGetTrend(search, period, startDate, endDate, partnerId, customerId, sourceType, transactionType, transactionStatus, settlementStatus, payoutStatus, refundCaseStatus, refundCaseType, reconciliationStatus, provider, currency, minAmount, maxAmount, onlyFlagged, onlySlaBreached, page, limit);
@@ -1132,26 +1132,26 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **search** | **String**|  | [optional] 
- **period** | [**AdminFinancePeriod**](.md)|  | [optional] 
- **startDate** | **DateTime**|  | [optional] 
- **endDate** | **DateTime**|  | [optional] 
- **partnerId** | **String**|  | [optional] 
- **customerId** | **String**|  | [optional] 
- **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional] 
- **transactionType** | [**PartnerTransactionType**](.md)|  | [optional] 
- **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional] 
- **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional] 
- **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional] 
- **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional] 
- **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional] 
- **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional] 
- **provider** | [**AdminFinanceProvider**](.md)|  | [optional] 
- **currency** | **String**|  | [optional] 
- **minAmount** | **num**|  | [optional] 
- **maxAmount** | **num**|  | [optional] 
- **onlyFlagged** | **bool**|  | [optional] 
- **onlySlaBreached** | **bool**|  | [optional] 
+ **search** | **String**|  | [optional]
+ **period** | [**AdminFinancePeriod**](.md)|  | [optional]
+ **startDate** | **DateTime**|  | [optional]
+ **endDate** | **DateTime**|  | [optional]
+ **partnerId** | **String**|  | [optional]
+ **customerId** | **String**|  | [optional]
+ **sourceType** | [**PartnerCommerceSourceType**](.md)|  | [optional]
+ **transactionType** | [**PartnerTransactionType**](.md)|  | [optional]
+ **transactionStatus** | [**PartnerTransactionStatus**](.md)|  | [optional]
+ **settlementStatus** | [**PartnerSettlementStatus**](.md)|  | [optional]
+ **payoutStatus** | [**PartnerPayoutStatus**](.md)|  | [optional]
+ **refundCaseStatus** | [**PartnerRefundCaseStatus**](.md)|  | [optional]
+ **refundCaseType** | [**PartnerRefundCaseType**](.md)|  | [optional]
+ **reconciliationStatus** | [**AdminFinanceReconciliationStatus**](.md)|  | [optional]
+ **provider** | [**AdminFinanceProvider**](.md)|  | [optional]
+ **currency** | **String**|  | [optional]
+ **minAmount** | **num**|  | [optional]
+ **maxAmount** | **num**|  | [optional]
+ **onlyFlagged** | **bool**|  | [optional]
+ **onlySlaBreached** | **bool**|  | [optional]
  **page** | **num**|  | [optional] [default to 1]
  **limit** | **num**|  | [optional] [default to 50]
 
@@ -1186,8 +1186,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
-final adminFinanceRequiredNoteActionDto = AdminFinanceRequiredNoteActionDto(); // AdminFinanceRequiredNoteActionDto | 
+final id = id_example; // String |
+final adminFinanceRequiredNoteActionDto = AdminFinanceRequiredNoteActionDto(); // AdminFinanceRequiredNoteActionDto |
 
 try {
     final result = api_instance.adminFinanceControllerHoldPayout(id, adminFinanceRequiredNoteActionDto);
@@ -1201,8 +1201,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **adminFinanceRequiredNoteActionDto** | [**AdminFinanceRequiredNoteActionDto**](AdminFinanceRequiredNoteActionDto.md)|  | 
+ **id** | **String**|  |
+ **adminFinanceRequiredNoteActionDto** | [**AdminFinanceRequiredNoteActionDto**](AdminFinanceRequiredNoteActionDto.md)|  |
 
 ### Return type
 
@@ -1235,8 +1235,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
-final adminFinanceSettlementActionDto = AdminFinanceSettlementActionDto(); // AdminFinanceSettlementActionDto | 
+final id = id_example; // String |
+final adminFinanceSettlementActionDto = AdminFinanceSettlementActionDto(); // AdminFinanceSettlementActionDto |
 
 try {
     final result = api_instance.adminFinanceControllerMarkSettlement(id, adminFinanceSettlementActionDto);
@@ -1250,8 +1250,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **adminFinanceSettlementActionDto** | [**AdminFinanceSettlementActionDto**](AdminFinanceSettlementActionDto.md)|  | 
+ **id** | **String**|  |
+ **adminFinanceSettlementActionDto** | [**AdminFinanceSettlementActionDto**](AdminFinanceSettlementActionDto.md)|  |
 
 ### Return type
 
@@ -1284,8 +1284,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
-final adminFinanceRequiredNoteActionDto = AdminFinanceRequiredNoteActionDto(); // AdminFinanceRequiredNoteActionDto | 
+final id = id_example; // String |
+final adminFinanceRequiredNoteActionDto = AdminFinanceRequiredNoteActionDto(); // AdminFinanceRequiredNoteActionDto |
 
 try {
     final result = api_instance.adminFinanceControllerRejectRefundCase(id, adminFinanceRequiredNoteActionDto);
@@ -1299,8 +1299,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **adminFinanceRequiredNoteActionDto** | [**AdminFinanceRequiredNoteActionDto**](AdminFinanceRequiredNoteActionDto.md)|  | 
+ **id** | **String**|  |
+ **adminFinanceRequiredNoteActionDto** | [**AdminFinanceRequiredNoteActionDto**](AdminFinanceRequiredNoteActionDto.md)|  |
 
 ### Return type
 
@@ -1333,8 +1333,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
-final adminFinanceNoteActionDto = AdminFinanceNoteActionDto(); // AdminFinanceNoteActionDto | 
+final id = id_example; // String |
+final adminFinanceNoteActionDto = AdminFinanceNoteActionDto(); // AdminFinanceNoteActionDto |
 
 try {
     final result = api_instance.adminFinanceControllerReleasePayoutHold(id, adminFinanceNoteActionDto);
@@ -1348,8 +1348,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **adminFinanceNoteActionDto** | [**AdminFinanceNoteActionDto**](AdminFinanceNoteActionDto.md)|  | 
+ **id** | **String**|  |
+ **adminFinanceNoteActionDto** | [**AdminFinanceNoteActionDto**](AdminFinanceNoteActionDto.md)|  |
 
 ### Return type
 
@@ -1382,8 +1382,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
-final adminFinanceNoteActionDto = AdminFinanceNoteActionDto(); // AdminFinanceNoteActionDto | 
+final id = id_example; // String |
+final adminFinanceNoteActionDto = AdminFinanceNoteActionDto(); // AdminFinanceNoteActionDto |
 
 try {
     final result = api_instance.adminFinanceControllerReopenReconciliation(id, adminFinanceNoteActionDto);
@@ -1397,8 +1397,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **adminFinanceNoteActionDto** | [**AdminFinanceNoteActionDto**](AdminFinanceNoteActionDto.md)|  | 
+ **id** | **String**|  |
+ **adminFinanceNoteActionDto** | [**AdminFinanceNoteActionDto**](AdminFinanceNoteActionDto.md)|  |
 
 ### Return type
 
@@ -1431,8 +1431,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
-final adminFinanceRequiredNoteActionDto = AdminFinanceRequiredNoteActionDto(); // AdminFinanceRequiredNoteActionDto | 
+final id = id_example; // String |
+final adminFinanceRequiredNoteActionDto = AdminFinanceRequiredNoteActionDto(); // AdminFinanceRequiredNoteActionDto |
 
 try {
     final result = api_instance.adminFinanceControllerResolveReconciliation(id, adminFinanceRequiredNoteActionDto);
@@ -1446,8 +1446,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **adminFinanceRequiredNoteActionDto** | [**AdminFinanceRequiredNoteActionDto**](AdminFinanceRequiredNoteActionDto.md)|  | 
+ **id** | **String**|  |
+ **adminFinanceRequiredNoteActionDto** | [**AdminFinanceRequiredNoteActionDto**](AdminFinanceRequiredNoteActionDto.md)|  |
 
 ### Return type
 
@@ -1480,8 +1480,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminFinanceApi();
-final id = id_example; // String | 
-final adminFinanceNoteActionDto = AdminFinanceNoteActionDto(); // AdminFinanceNoteActionDto | 
+final id = id_example; // String |
+final adminFinanceNoteActionDto = AdminFinanceNoteActionDto(); // AdminFinanceNoteActionDto |
 
 try {
     final result = api_instance.adminFinanceControllerRetryPayout(id, adminFinanceNoteActionDto);
@@ -1495,8 +1495,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **adminFinanceNoteActionDto** | [**AdminFinanceNoteActionDto**](AdminFinanceNoteActionDto.md)|  | 
+ **id** | **String**|  |
+ **adminFinanceNoteActionDto** | [**AdminFinanceNoteActionDto**](AdminFinanceNoteActionDto.md)|  |
 
 ### Return type
 

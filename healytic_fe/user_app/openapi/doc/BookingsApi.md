@@ -28,8 +28,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = BookingsApi();
-final id = id_example; // String | 
-final updateBookingStatusDto = UpdateBookingStatusDto(); // UpdateBookingStatusDto | 
+final id = id_example; // String |
+final updateBookingStatusDto = UpdateBookingStatusDto(); // UpdateBookingStatusDto |
 
 try {
     final result = api_instance.bookingStatusControllerUpdateStatus(id, updateBookingStatusDto);
@@ -43,8 +43,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **updateBookingStatusDto** | [**UpdateBookingStatusDto**](UpdateBookingStatusDto.md)|  | 
+ **id** | **String**|  |
+ **updateBookingStatusDto** | [**UpdateBookingStatusDto**](UpdateBookingStatusDto.md)|  |
 
 ### Return type
 

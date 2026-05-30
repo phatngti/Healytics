@@ -32,7 +32,10 @@ class ProductOrganizationCard extends ConsumerStatefulWidget {
 
 class _ProductOrganizationCardState
     extends ConsumerState<ProductOrganizationCard> {
+  static const _rootCategoryFieldKey = 'root_category';
+
   late String? _category;
+  String? _rootCategory;
 
   /// Holds the currently selected **tag IDs** (UUIDs).
   late List<String> _selectedTagIds;
@@ -55,6 +58,7 @@ class _ProductOrganizationCardState
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialCategory != widget.initialCategory) {
       _category = widget.initialCategory;
+      _rootCategory = null;
     }
 
     if (!_sameStringList(oldWidget.initialTagIds, widget.initialTagIds)) {
@@ -104,7 +108,7 @@ class _ProductOrganizationCardState
             ),
           ),
           AppDimens.verticalMedium,
-          _buildCategoryDropdown(),
+          _buildCategoryFields(),
           AppDimens.verticalMedium,
           _buildTagsField(),
         ],
@@ -112,7 +116,7 @@ class _ProductOrganizationCardState
     );
   }
 
-  Widget _buildCategoryDropdown() {
+  Widget _buildCategoryFields() {
     return FutureBuilder<List<CategoryEntity>>(
       future: _categoriesFuture,
       builder: (context, snapshot) {
@@ -124,30 +128,86 @@ class _ProductOrganizationCardState
           return Text('Error: ${snapshot.error}');
         }
 
-        final categories = snapshot.data ?? [];
+        final categories = _uniqueCategoriesById(snapshot.data ?? []);
+        final roots = categories.where((category) => category.isRoot).toList();
+        final selectedCategory = _findCategory(categories, _category);
+        final selectedRootId =
+            _rootCategory ?? selectedCategory?.parentId ?? selectedCategory?.id;
+        final subCategories = categories
+            .where((category) => category.parentId == selectedRootId)
+            .toList();
+        final selectedSubCategoryId =
+            subCategories.any((category) => category.id == _category)
+            ? _category
+            : null;
 
-        return FormFieldBuilders.buildCustomDropdownField<String>(
-          context,
-          fieldKey: ProductFormField.category.key,
-          hintText: 'Select category...',
-          initialValue: _category,
-          label: 'Category',
-          isRequired: true,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Category is required';
-            }
-            return null;
-          },
-          items: categories
-              .map(
-                (cat) => DropdownMenuItem(value: cat.id, child: Text(cat.name)),
-              )
-              .toList(),
-          onChanged: (val) {
-            setState(() => _category = val);
-            widget.onCategoryChanged?.call(val);
-          },
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FormFieldBuilders.buildCustomDropdownField<String>(
+              context,
+              fieldKey: _rootCategoryFieldKey,
+              hintText: 'Select root category...',
+              initialValue: selectedRootId,
+              label: 'Category',
+              isRequired: true,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Category is required';
+                }
+                return null;
+              },
+              items: roots
+                  .map(
+                    (category) => DropdownMenuItem(
+                      value: category.id,
+                      child: Text(category.name),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (val) {
+                setState(() {
+                  _rootCategory = val;
+                  _category = null;
+                });
+                _syncCategoryField(null);
+                widget.onCategoryChanged?.call(null);
+              },
+            ),
+            AppDimens.verticalMedium,
+            FormFieldBuilders.buildCustomDropdownField<String>(
+              context,
+              widgetKey: ValueKey<String?>(
+                selectedRootId == null
+                    ? 'subcategory-empty'
+                    : 'subcategory-$selectedRootId',
+              ),
+              fieldKey: ProductFormField.category.key,
+              hintText: 'Select sub-category...',
+              initialValue: selectedSubCategoryId,
+              label: 'Sub-category',
+              enabled: selectedRootId != null,
+              isRequired: true,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Sub-category is required';
+                }
+                return null;
+              },
+              items: subCategories
+                  .map(
+                    (category) => DropdownMenuItem(
+                      value: category.id,
+                      child: Text(category.name),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (val) {
+                setState(() => _category = val);
+                widget.onCategoryChanged?.call(val);
+              },
+            ),
+          ],
         );
       },
     );
@@ -210,6 +270,27 @@ class _ProductOrganizationCardState
   void _syncFormField(List<String> ids) {
     final formState = FormBuilder.of(context);
     formState?.fields[ProductFormField.tags.key]?.didChange(ids);
+  }
+
+  void _syncCategoryField(String? categoryId) {
+    final formState = FormBuilder.of(context);
+    formState?.fields[ProductFormField.category.key]?.didChange(categoryId);
+  }
+
+  CategoryEntity? _findCategory(List<CategoryEntity> categories, String? id) {
+    if (id == null) return null;
+    for (final category in categories) {
+      if (category.id == id) return category;
+    }
+    return null;
+  }
+
+  List<CategoryEntity> _uniqueCategoriesById(List<CategoryEntity> categories) {
+    final categoriesById = <String, CategoryEntity>{};
+    for (final category in categories) {
+      categoriesById.putIfAbsent(category.id, () => category);
+    }
+    return categoriesById.values.toList(growable: false);
   }
 
   /// Shows a dialog for selecting tags.

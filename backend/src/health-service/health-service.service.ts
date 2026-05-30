@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository, In } from 'typeorm';
+import { Not, Repository, In, SelectQueryBuilder } from 'typeorm';
 import { CreatePartnerHealthServiceDto } from './dto/partner/create-partner-health-service.dto';
 import { UpdatePartnerHealthServiceDto } from './dto/partner/update-partner-health-service.dto';
 import { Product } from '@/common/entities/product.entity';
@@ -29,6 +29,10 @@ import { PublicHealthServiceRecommendedResponseDto } from './dto/public/public-h
 import { PublicHealthServiceCardResponseDto } from './dto/public/public-health-service-card-response.dto';
 import { PublicClinicInfoResponseDto } from './dto/public/public-clinic-info-response.dto';
 import { UserEligibilityDetailResponseDto } from './dto/public/user-eligibility-detail-response.dto';
+import {
+  PublicServiceListQueryDto,
+  PublicServiceListSort,
+} from './dto/public/service-list-query.dto';
 import { PartnersService } from '@/partners/partners.service';
 import { HealthServiceStatus } from './enums/health-service-status.enum';
 import { HealthServiceType } from './enums/health-service-type.enum';
@@ -118,6 +122,7 @@ export class HealthServiceService {
       },
       relations: [
         'category',
+        'category.parent',
         'media',
         'productDefinition',
         'productEmployeeEligibilities',
@@ -134,6 +139,7 @@ export class HealthServiceService {
       where: { id },
       relations: [
         'category',
+        'category.parent',
         'media',
         'productDefinition',
         'productEmployeeEligibilities',
@@ -156,6 +162,7 @@ export class HealthServiceService {
       where: { slug },
       relations: [
         'category',
+        'category.parent',
         'media',
         'productDefinition',
         'productEmployeeEligibilities',
@@ -184,6 +191,7 @@ export class HealthServiceService {
       where: { slug },
       relations: [
         'category',
+        'category.parent',
         'media',
         'productDefinition',
         'productEmployeeEligibilities',
@@ -283,6 +291,7 @@ export class HealthServiceService {
       where: { id },
       relations: [
         'category',
+        'category.parent',
         'media',
         'productTags',
         'productTags.tag',
@@ -511,6 +520,7 @@ export class HealthServiceService {
       relations: [
         'product',
         'product.category',
+        'product.category.parent',
         'product.media',
         'product.productDefinition',
         'employee',
@@ -535,8 +545,13 @@ export class HealthServiceService {
   /** Common relations needed for card DTO mapping. */
   private readonly cardRelations = [
     'category',
+    'category.parent',
     'media',
     'productDefinition',
+    'partner',
+    'partner.province',
+    'partner.district',
+    'partner.ward',
     'productEmployeeEligibilities',
     'productEmployeeEligibilities.employee',
   ];
@@ -544,24 +559,18 @@ export class HealthServiceService {
   /**
    * Returns premium treatment services (active, visible, highest rated).
    */
-  async getPremiumTreatments(): Promise<PublicHealthServiceCardResponseDto[]> {
-    const products = await this.productRepository.find({
-      where: {
-        status: HealthServiceStatus.ACTIVE,
-        isVisibleOnline: true,
-      },
-      relations: this.cardRelations,
-      take: 10,
-      order: { createdAt: 'DESC' },
-    });
+  async getPremiumTreatments(
+    query: PublicServiceListQueryDto = {},
+  ): Promise<PublicHealthServiceCardResponseDto[]> {
+    const products = await this.findPublicServiceCards(query);
 
-    const [partner, ratingsMap] = await Promise.all([
-      this.partnersService.getFirstHealthPartner(),
+    const [ratingsMap] = await Promise.all([
       this.buildRatingsMap(products.map((p) => p.id)),
     ]);
+    const sorted = this.sortPublicServiceCards(products, ratingsMap, query);
     return PublicHealthServiceCardResponseDto.fromEntities(
-      products,
-      partner,
+      sorted,
+      null,
       ratingsMap,
     );
   }
@@ -580,15 +589,136 @@ export class HealthServiceService {
       order: { createdAt: 'DESC' },
     });
 
-    const [partner, ratingsMap] = await Promise.all([
-      this.partnersService.getFirstHealthPartner(),
+    const [ratingsMap] = await Promise.all([
       this.buildRatingsMap(products.map((p) => p.id)),
     ]);
     return PublicHealthServiceCardResponseDto.fromEntities(
       products,
-      partner,
+      null,
       ratingsMap,
     );
+  }
+
+  private async findPublicServiceCards(
+    query: PublicServiceListQueryDto,
+  ): Promise<Product[]> {
+    const qb = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('category.parent', 'parentCategory')
+      .leftJoinAndSelect('product.media', 'media')
+      .leftJoinAndSelect('product.productDefinition', 'productDefinition')
+      .leftJoinAndSelect(
+        'product.productEmployeeEligibilities',
+        'productEmployeeEligibilities',
+      )
+      .leftJoinAndSelect(
+        'productEmployeeEligibilities.employee',
+        'eligibilityEmployee',
+      )
+      .leftJoinAndSelect('product.partner', 'partner')
+      .leftJoinAndSelect('partner.province', 'province')
+      .leftJoinAndSelect('partner.district', 'district')
+      .leftJoinAndSelect('partner.ward', 'ward')
+      .addSelect(
+        'COALESCE(product.sale_price, product.base_price)',
+        'sort_price',
+      )
+      .where('product.status = :status', {
+        status: HealthServiceStatus.ACTIVE,
+      })
+      .andWhere('product.is_visible_online = :isVisibleOnline', {
+        isVisibleOnline: true,
+      });
+
+    this.applyPublicServiceFilters(qb, query);
+
+    const sort = query.sort ?? PublicServiceListSort.DEFAULT;
+    if (sort === PublicServiceListSort.PRICE_ASC) {
+      qb.orderBy('sort_price', 'ASC');
+    } else if (sort === PublicServiceListSort.PRICE_DESC) {
+      qb.orderBy('sort_price', 'DESC');
+    } else {
+      qb.orderBy('product.createdAt', 'DESC');
+    }
+
+    return qb.take(50).getMany();
+  }
+
+  private applyPublicServiceFilters(
+    qb: SelectQueryBuilder<Product>,
+    query: PublicServiceListQueryDto,
+  ) {
+    if (query.categoryId) {
+      qb.andWhere(
+        `product.category_id IN (
+          SELECT category_filter.id
+          FROM categories category_filter
+          WHERE category_filter.deleted_at IS NULL
+            AND category_filter.is_active = true
+            AND (
+              category_filter.id = :categoryId
+              OR category_filter.parent_id = :categoryId
+            )
+        )`,
+        {
+        categoryId: query.categoryId,
+        },
+      );
+    }
+    if (query.clinicId) {
+      qb.andWhere('product.partner_id = :clinicId', {
+        clinicId: query.clinicId,
+      });
+    }
+    if (query.provinceId) {
+      qb.andWhere('partner.province_id = :provinceId', {
+        provinceId: query.provinceId,
+      });
+    }
+    if (query.districtId) {
+      qb.andWhere('partner.district_id = :districtId', {
+        districtId: query.districtId,
+      });
+    }
+    if (query.wardId) {
+      qb.andWhere('partner.ward_id = :wardId', { wardId: query.wardId });
+    }
+    if (query.minPrice != null) {
+      qb.andWhere(
+        'COALESCE(product.sale_price, product.base_price) >= :minPrice',
+        {
+          minPrice: query.minPrice,
+        },
+      );
+    }
+    if (query.maxPrice != null) {
+      qb.andWhere(
+        'COALESCE(product.sale_price, product.base_price) <= :maxPrice',
+        {
+          maxPrice: query.maxPrice,
+        },
+      );
+    }
+  }
+
+  private sortPublicServiceCards(
+    products: Product[],
+    ratingsMap: Map<string, { rating: number; count: number }>,
+    query: PublicServiceListQueryDto,
+  ): Product[] {
+    if (query.sort !== PublicServiceListSort.RATING_DESC) {
+      return products.slice(0, 10);
+    }
+    return [...products]
+      .sort((a, b) => {
+        const ratingDiff =
+          (ratingsMap.get(b.id)?.rating ?? 0) -
+          (ratingsMap.get(a.id)?.rating ?? 0);
+        if (ratingDiff !== 0) return ratingDiff;
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      })
+      .slice(0, 10);
   }
 
   /**

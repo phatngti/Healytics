@@ -30,6 +30,7 @@ abstract class CategoryRepository {
   /// Update an existing category
   Future<void> updateCategory({
     required CategoryId id,
+    String? parentId,
     String? name,
     String? description,
     String? iconName,

@@ -348,7 +348,8 @@ export class GetOverviewAnalyticsHandler {
   ): Promise<AnalyticsCategoryPerformanceDto[]> {
     const rows = await this.dataSource.query(
       `SELECT
-        c.name                                    AS category_name,
+        COALESCE(parent_c.name, c.name, 'Uncategorized')
+                                                  AS category_name,
         COUNT(*) FILTER (
           WHERE b.status = '${BookingStatus.COMPLETED}')           AS bookings,
         COALESCE(SUM(
@@ -358,7 +359,8 @@ export class GetOverviewAnalyticsHandler {
         ), 0)                                     AS revenue,
         COALESCE(AVG(tr.rating), 0)               AS avg_rating
       FROM products p
-      JOIN categories c ON c.id = p.category_id
+      LEFT JOIN categories c ON c.id = p.category_id
+      LEFT JOIN categories parent_c ON parent_c.id = c.parent_id
       LEFT JOIN bookings b ON b.product_id = p.id
           AND b.start_time BETWEEN $2 AND $3
           AND b.deleted_at IS NULL
@@ -367,7 +369,9 @@ export class GetOverviewAnalyticsHandler {
           ON tr.appointment_id = b.id
       WHERE p.partner_id = $1
         AND p.deleted_at IS NULL
-      GROUP BY c.id, c.name
+      GROUP BY
+        COALESCE(parent_c.id, c.id),
+        COALESCE(parent_c.name, c.name, 'Uncategorized')
       ORDER BY revenue DESC`,
       [partnerId, start, end],
     );
@@ -391,7 +395,8 @@ export class GetOverviewAnalyticsHandler {
     const rows = await this.dataSource.query(
       `SELECT
         p.name                                    AS service_name,
-        COALESCE(c.name, 'Uncategorized')         AS category_name,
+        COALESCE(parent_c.name, c.name, 'Uncategorized')
+                                                  AS category_name,
         COUNT(*) FILTER (
           WHERE b.status = '${BookingStatus.COMPLETED}')           AS bookings,
         COALESCE(SUM(
@@ -402,6 +407,7 @@ export class GetOverviewAnalyticsHandler {
         COALESCE(AVG(tr.rating), 0)               AS avg_rating
       FROM products p
       LEFT JOIN categories c ON c.id = p.category_id
+      LEFT JOIN categories parent_c ON parent_c.id = c.parent_id
       LEFT JOIN bookings b ON b.product_id = p.id
           AND b.start_time BETWEEN $2 AND $3
           AND b.deleted_at IS NULL
@@ -411,7 +417,7 @@ export class GetOverviewAnalyticsHandler {
       WHERE p.partner_id = $1
         AND p.deleted_at IS NULL
         AND p.status = '${HealthServiceStatus.ACTIVE}'
-      GROUP BY p.id, p.name, c.name
+      GROUP BY p.id, p.name, COALESCE(parent_c.name, c.name, 'Uncategorized')
       ORDER BY revenue DESC
       LIMIT 5`,
       [partnerId, start, end],

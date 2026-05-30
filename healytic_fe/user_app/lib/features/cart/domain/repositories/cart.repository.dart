@@ -15,8 +15,9 @@ abstract class CartRepository {
   /// backend response.
   Future<CartItemEntity> addItem({
     required String serviceId,
-    required String employeeId,
+    String? employeeId,
     required DateTime timeSlot,
+    bool autoAssignStaff = false,
   });
 
   /// Removes an item by its cart item ID.

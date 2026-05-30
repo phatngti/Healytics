@@ -12,10 +12,11 @@ class BookingParams {
     required this.clinicName,
     required this.clinicAddress,
     required this.clinicImageUrl,
-    required this.employeeId,
-    required this.employeeName,
+    this.employeeId,
+    this.employeeName,
     required this.selectedDate,
     required this.selectedTimeSlot,
+    this.autoAssignSpecialist = false,
   });
 
   /// Source cart item identifier when checkout is
@@ -45,14 +46,26 @@ class BookingParams {
   final String clinicImageUrl;
 
   /// Selected specialist employee ID.
-  final String employeeId;
+  ///
+  /// Null when the booking asks the backend to
+  /// assign the best available specialist.
+  final String? employeeId;
 
   /// Selected specialist display name.
-  final String employeeName;
+  ///
+  /// Null until the backend creates an auto-assigned
+  /// booking.
+  final String? employeeName;
 
   /// The date the user picked for the appointment.
   final DateTime selectedDate;
 
   /// The time-slot label, e.g. "09:00 AM".
   final String selectedTimeSlot;
+
+  /// Whether backend should assign the specialist.
+  final bool autoAssignSpecialist;
+
+  bool get hasExplicitSpecialist =>
+      employeeId != null && employeeId!.isNotEmpty;
 }

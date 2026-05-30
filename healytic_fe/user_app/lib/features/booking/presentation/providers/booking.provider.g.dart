@@ -373,7 +373,7 @@ final class ServicesByCategoryProvider
 }
 
 String _$servicesByCategoryHash() =>
-    r'3ac4d67b1cc5dc05dc0b557224da021a9bfdde4b';
+    r'0b5075a9fbbdc8082c4e184c7dcdf253adba28f8';
 
 /// Fetches services for the given [categoryId].
 ///

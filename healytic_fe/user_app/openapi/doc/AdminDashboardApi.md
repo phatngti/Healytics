@@ -35,7 +35,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminDashboardApi();
-final period = period_example; // String | 
+final period = period_example; // String |
 
 try {
     final result = api_instance.adminDashboardControllerGetBookingOutcomeSummary(period);
@@ -125,7 +125,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminDashboardApi();
-final limit = 8.14; // num | 
+final limit = 8.14; // num |
 
 try {
     final result = api_instance.adminDashboardControllerGetNotifications(limit);
@@ -172,7 +172,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminDashboardApi();
-final period = period_example; // String | 
+final period = period_example; // String |
 
 try {
     final result = api_instance.adminDashboardControllerGetOverview(period);
@@ -219,7 +219,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminDashboardApi();
-final period = period_example; // String | 
+final period = period_example; // String |
 
 try {
     final result = api_instance.adminDashboardControllerGetRevenueTrend(period);
@@ -266,8 +266,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminDashboardApi();
-final period = period_example; // String | 
-final limit = 8.14; // num | 
+final period = period_example; // String |
+final limit = 8.14; // num |
 
 try {
     final result = api_instance.adminDashboardControllerGetTopPartners(period, limit);
@@ -315,8 +315,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminDashboardApi();
-final period = period_example; // String | 
-final limit = 8.14; // num | 
+final period = period_example; // String |
+final limit = 8.14; // num |
 
 try {
     final result = api_instance.adminDashboardControllerGetTopServices(period, limit);
@@ -364,7 +364,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminDashboardApi();
-final period = period_example; // String | 
+final period = period_example; // String |
 
 try {
     final result = api_instance.adminDashboardControllerGetTransactionHealth(period);

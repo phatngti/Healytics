@@ -4,6 +4,7 @@ import 'package:user_app/features/home/data/provider/home.provider.dart';
 import 'package:user_app/features/home/domain/entities/'
     'ai_recommendation.entity.dart';
 import 'package:user_app/features/home/domain/entities/home.entity.dart';
+import 'package:user_app/features/home/presentation/providers/list_filter.provider.dart';
 import 'package:user_app/features/orders/domain/entities/'
     'appointment.entity.dart';
 
@@ -40,6 +41,17 @@ Future<List<AiRecommendation>> allRecommendedProducts(Ref ref) async {
 @riverpod
 Future<List<HomeProduct>> premiumTreatments(Ref ref) async {
   final repository = ref.read(homeRepositoryProvider);
+  final filter = ref.watch(premiumTreatmentFilterProvider);
+  return repository.getPremiumTreatments(filter: filter);
+}
+
+/// Provider for the home preview of premium treatments.
+///
+/// The home dashboard should not inherit filters from the full
+/// Premium Treatments list screen.
+@riverpod
+Future<List<HomeProduct>> premiumTreatmentPreview(Ref ref) async {
+  final repository = ref.read(homeRepositoryProvider);
   return repository.getPremiumTreatments();
 }
 
@@ -69,5 +81,6 @@ Future<List<AppointmentEntity>> recentActivity(Ref ref) async {
 @riverpod
 Future<List<AppointmentEntity>> allRecentActivity(Ref ref) async {
   final repository = ref.read(homeRepositoryProvider);
-  return repository.getRecentActivity(limit: 20);
+  final filter = ref.watch(recentActivityFilterProvider);
+  return repository.getRecentActivity(limit: 20, filter: filter);
 }

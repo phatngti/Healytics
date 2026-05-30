@@ -28,7 +28,7 @@ abstract class RegisterRemoteDatasource {
 
   Future<void> completeSurvey({required Map<String, dynamic> jsonSurveys});
 
-  /// Completes the authenticated user's profile via PATCH /auth/user/profile.
+  /// Completes the authenticated user's profile through the account endpoints.
   ///
   /// Returns a fresh [AuthTokensEntity] when the backend issues new tokens
   /// in the success body. Returns `null` when the body has no token pair so
@@ -142,24 +142,17 @@ class RegisterRemoteDatasourceImpl implements RegisterRemoteDatasource {
     }
     await apiService.setAccessToken(accessToken);
 
-    Future<dynamic> sendRequest() async {
+    Future<dynamic> sendJsonPatch(
+      String path,
+      Map<String, dynamic> body,
+    ) async {
       try {
         return await apiService.apiClient
             .invokeAPI(
-              '/auth/user/profile',
+              path,
               'PATCH',
               const [],
-              {
-                'firstName': profile.firstName,
-                'lastName': profile.lastName,
-                'dateOfBirth': profile.dateOfBirth,
-                if (profile.address case final address?) ...{
-                  'streetAddress': address.streetAddress,
-                  'provinceId': address.provinceId,
-                  'districtId': address.districtId,
-                  'wardId': address.wardId,
-                },
-              },
+              body,
               {'Content-Type': 'application/json'},
               {},
               'application/json',
@@ -175,14 +168,43 @@ class RegisterRemoteDatasourceImpl implements RegisterRemoteDatasource {
       }
     }
 
-    final response = await sendRequest();
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(
-        response.statusCode,
-        _messageFromResponse(response.body, 'Unable to complete profile'),
-      );
+    void assertSuccess(dynamic response, String fallback) {
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw ApiException(
+          response.statusCode,
+          _messageFromResponse(response.body, fallback),
+        );
+      }
     }
+
+    Map<String, dynamic> profileBody({required bool markCompleted}) => {
+      'firstName': profile.firstName,
+      'lastName': profile.lastName,
+      'dateOfBirth': profile.dateOfBirth,
+      if (markCompleted) 'profileCompleted': true,
+    };
+
+    if (profile.address case final address?) {
+      final identityResponse = await sendJsonPatch(
+        '/account/me/profile',
+        profileBody(markCompleted: false),
+      );
+      assertSuccess(identityResponse, 'Unable to update profile');
+
+      final addressResponse = await sendJsonPatch('/account/me/address', {
+        'streetAddress': address.streetAddress,
+        'provinceId': address.provinceId,
+        'districtId': address.districtId,
+        'wardId': address.wardId,
+      });
+      assertSuccess(addressResponse, 'Unable to update address');
+    }
+
+    final response = await sendJsonPatch(
+      '/account/me/profile',
+      profileBody(markCompleted: true),
+    );
+    assertSuccess(response, 'Unable to complete profile');
 
     if (response.body.isEmpty) {
       return null;

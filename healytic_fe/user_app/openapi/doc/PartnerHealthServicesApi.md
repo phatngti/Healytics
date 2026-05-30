@@ -35,7 +35,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerHealthServicesApi();
-final createPartnerHealthServiceDto = CreatePartnerHealthServiceDto(); // CreatePartnerHealthServiceDto | 
+final createPartnerHealthServiceDto = CreatePartnerHealthServiceDto(); // CreatePartnerHealthServiceDto |
 
 try {
     final result = api_instance.partnerHealthServiceControllerCreate(createPartnerHealthServiceDto);
@@ -49,7 +49,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createPartnerHealthServiceDto** | [**CreatePartnerHealthServiceDto**](CreatePartnerHealthServiceDto.md)|  | 
+ **createPartnerHealthServiceDto** | [**CreatePartnerHealthServiceDto**](CreatePartnerHealthServiceDto.md)|  |
 
 ### Return type
 
@@ -125,7 +125,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerHealthServicesApi();
-final slug = slug_example; // String | 
+final slug = slug_example; // String |
 
 try {
     final result = api_instance.partnerHealthServiceControllerFindBySlug(slug);
@@ -139,7 +139,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **slug** | **String**|  | 
+ **slug** | **String**|  |
 
 ### Return type
 
@@ -172,7 +172,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerHealthServicesApi();
-final productId = productId_example; // String | 
+final productId = productId_example; // String |
 final period = period_example; // String | Time period for analytics aggregation
 
 try {
@@ -187,7 +187,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **productId** | **String**|  | 
+ **productId** | **String**|  |
  **period** | **String**| Time period for analytics aggregation | [optional] [default to 'this_month']
 
 ### Return type
@@ -221,7 +221,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerHealthServicesApi();
-final slug = slug_example; // String | 
+final slug = slug_example; // String |
 
 try {
     final result = api_instance.partnerHealthServiceControllerGetDetails(slug);
@@ -235,7 +235,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **slug** | **String**|  | 
+ **slug** | **String**|  |
 
 ### Return type
 
@@ -315,7 +315,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerHealthServicesApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     api_instance.partnerHealthServiceControllerRemove(id);
@@ -328,7 +328,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 
@@ -361,8 +361,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerHealthServicesApi();
-final id = id_example; // String | 
-final updatePartnerHealthServiceDto = UpdatePartnerHealthServiceDto(); // UpdatePartnerHealthServiceDto | 
+final id = id_example; // String |
+final updatePartnerHealthServiceDto = UpdatePartnerHealthServiceDto(); // UpdatePartnerHealthServiceDto |
 
 try {
     final result = api_instance.partnerHealthServiceControllerUpdate(id, updatePartnerHealthServiceDto);
@@ -376,8 +376,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **updatePartnerHealthServiceDto** | [**UpdatePartnerHealthServiceDto**](UpdatePartnerHealthServiceDto.md)|  | 
+ **id** | **String**|  |
+ **updatePartnerHealthServiceDto** | [**UpdatePartnerHealthServiceDto**](UpdatePartnerHealthServiceDto.md)|  |
 
 ### Return type
 

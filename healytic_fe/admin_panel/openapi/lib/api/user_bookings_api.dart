@@ -63,7 +63,7 @@ class UserBookingsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AsyncCheckoutResponseDto',) as AsyncCheckoutResponseDto;
-    
+
     }
     return null;
   }
@@ -116,7 +116,7 @@ class UserBookingsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'BookingResponseDto',) as BookingResponseDto;
-    
+
     }
     return null;
   }
@@ -169,7 +169,7 @@ class UserBookingsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CheckoutTicketResponseDto',) as CheckoutTicketResponseDto;
-    
+
     }
     return null;
   }

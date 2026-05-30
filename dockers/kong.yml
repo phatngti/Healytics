@@ -27,7 +27,7 @@ services:
           - http
           - https
   - name: ai-service
-    url: https://ghhz8o0ol8c5jb-9000.proxy.runpod.net
+    url: https://ai.healytics.me
     connect_timeout: 600000
     write_timeout: 600000
     read_timeout: 600000

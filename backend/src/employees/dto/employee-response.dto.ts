@@ -330,6 +330,38 @@ export class EmployeeResponseDto {
   partnerId: string | null;
 
   @Expose()
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Public clinic ID the employee belongs to',
+  })
+  clinicId?: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Public clinic name the employee belongs to',
+  })
+  clinicName?: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Clinic location label',
+  })
+  location?: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({
+    type: Number,
+    nullable: true,
+    description: 'Normalized years of professional experience',
+  })
+  experienceYears?: number | null;
+
+  @Expose()
   @ApiProperty({ type: Date, description: 'Creation timestamp' })
   createdAt: Date;
 

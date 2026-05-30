@@ -280,6 +280,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       firstName: request.firstName,
       lastName: request.lastName,
       email: request.email,
+      password: request.password,
       employeeId: request.employeeId,
       phone: request.phone,
       avatar: request.avatar,
@@ -311,7 +312,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
     final response = await _postEmployee(
       '/partner/employees/doctors',
-      <String, dynamic>{...dto.toJson(), 'password': request.password},
+      dto.toJson(),
     );
 
     developer.log(
@@ -331,6 +332,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       firstName: request.firstName,
       lastName: request.lastName,
       email: request.email,
+      password: request.password,
       employeeId: request.employeeId,
       phone: request.phone,
       avatar: request.avatar,
@@ -360,7 +362,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
     final response = await _postEmployee(
       '/partner/employees/spa-therapists',
-      <String, dynamic>{...dto.toJson(), 'password': request.password},
+      dto.toJson(),
     );
 
     developer.log(
@@ -380,6 +382,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       firstName: request.firstName,
       lastName: request.lastName,
       email: request.email,
+      password: request.password,
       employeeId: request.employeeId,
       phone: request.phone,
       avatar: request.avatar,
@@ -411,7 +414,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
     final response = await _postEmployee(
       '/partner/employees/massage-therapists',
-      <String, dynamic>{...dto.toJson(), 'password': request.password},
+      dto.toJson(),
     );
 
     developer.log(

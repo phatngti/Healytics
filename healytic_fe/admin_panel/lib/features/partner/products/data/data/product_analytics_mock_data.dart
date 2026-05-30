@@ -376,7 +376,9 @@ List<ProductCategoryPerformance> _buildCategoryPerformance(
 ) {
   final buckets = <String, List<Product>>{};
   for (final product in products) {
-    buckets.putIfAbsent(product.category.name, () => <Product>[]).add(product);
+    buckets
+        .putIfAbsent(_rootCategoryName(product), () => <Product>[])
+        .add(product);
   }
 
   return buckets.entries.map((entry) {
@@ -417,11 +419,19 @@ ProductServicePerformance _servicePerformance(Product product, double scale) {
 
   return ProductServicePerformance(
     name: product.name,
-    categoryName: product.category.name,
+    categoryName: _rootCategoryName(product),
     bookings: bookings,
     revenue: revenue,
     averageRating: _serviceRating(product),
   );
+}
+
+String _rootCategoryName(Product product) {
+  final parentName = product.category.parentName?.trim();
+  if (parentName != null && parentName.isNotEmpty) {
+    return parentName;
+  }
+  return product.category.name;
 }
 
 // ─── Review Distribution ────────────────────────

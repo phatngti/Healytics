@@ -68,7 +68,7 @@ class PartnerTransactionsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerTransactionRecordDto',) as PartnerTransactionRecordDto;
-    
+
     }
     return null;
   }
@@ -207,7 +207,7 @@ class PartnerTransactionsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerFinanceSummaryDto',) as PartnerFinanceSummaryDto;
-    
+
     }
     return null;
   }
@@ -260,7 +260,7 @@ class PartnerTransactionsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerTransactionDetailDto',) as PartnerTransactionDetailDto;
-    
+
     }
     return null;
   }
@@ -608,7 +608,7 @@ class PartnerTransactionsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerTransactionRecordDto',) as PartnerTransactionRecordDto;
-    
+
     }
     return null;
   }

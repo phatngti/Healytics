@@ -30,8 +30,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerRefundCasesApi();
-final caseId = caseId_example; // String | 
-final refundCaseActionDto = RefundCaseActionDto(); // RefundCaseActionDto | 
+final caseId = caseId_example; // String |
+final refundCaseActionDto = RefundCaseActionDto(); // RefundCaseActionDto |
 
 try {
     final result = api_instance.partnerRefundCasesControllerApprove(caseId, refundCaseActionDto);
@@ -45,8 +45,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **caseId** | **String**|  | 
- **refundCaseActionDto** | [**RefundCaseActionDto**](RefundCaseActionDto.md)|  | 
+ **caseId** | **String**|  |
+ **refundCaseActionDto** | [**RefundCaseActionDto**](RefundCaseActionDto.md)|  |
 
 ### Return type
 
@@ -103,16 +103,16 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **search** | **String**| Free-text search (max 120 chars) | [optional] 
- **startDate** | **String**| Inclusive start date (ISO 8601) | [optional] 
- **endDate** | **String**| Inclusive end date (ISO 8601) | [optional] 
- **period** | [**PartnerFinancePeriod**](.md)| Relative time window (ignored when both startDate and endDate are set) | [optional] 
- **sourceType** | [**PartnerCommerceSourceType**](.md)| Filter by commerce source | [optional] 
- **transactionType** | [**PartnerTransactionType**](.md)| Filter by transaction type | [optional] 
- **transactionStatus** | [**PartnerTransactionStatus**](.md)| Filter by transaction status | [optional] 
- **settlementStatus** | [**PartnerSettlementStatus**](.md)| Filter by settlement status | [optional] 
- **payoutStatus** | [**PartnerPayoutStatus**](.md)| Filter by payout status | [optional] 
- **currency** | **String**| ISO 4217 currency code | [optional] 
+ **search** | **String**| Free-text search (max 120 chars) | [optional]
+ **startDate** | **String**| Inclusive start date (ISO 8601) | [optional]
+ **endDate** | **String**| Inclusive end date (ISO 8601) | [optional]
+ **period** | [**PartnerFinancePeriod**](.md)| Relative time window (ignored when both startDate and endDate are set) | [optional]
+ **sourceType** | [**PartnerCommerceSourceType**](.md)| Filter by commerce source | [optional]
+ **transactionType** | [**PartnerTransactionType**](.md)| Filter by transaction type | [optional]
+ **transactionStatus** | [**PartnerTransactionStatus**](.md)| Filter by transaction status | [optional]
+ **settlementStatus** | [**PartnerSettlementStatus**](.md)| Filter by settlement status | [optional]
+ **payoutStatus** | [**PartnerPayoutStatus**](.md)| Filter by payout status | [optional]
+ **currency** | **String**| ISO 4217 currency code | [optional]
  **page** | **num**| Page number (1-indexed) | [optional] [default to 1]
  **limit** | **num**| Items per page (1-100) | [optional] [default to 10]
 
@@ -147,8 +147,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerRefundCasesApi();
-final caseId = caseId_example; // String | 
-final refundCaseActionDto = RefundCaseActionDto(); // RefundCaseActionDto | 
+final caseId = caseId_example; // String |
+final refundCaseActionDto = RefundCaseActionDto(); // RefundCaseActionDto |
 
 try {
     final result = api_instance.partnerRefundCasesControllerReject(caseId, refundCaseActionDto);
@@ -162,8 +162,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **caseId** | **String**|  | 
- **refundCaseActionDto** | [**RefundCaseActionDto**](RefundCaseActionDto.md)|  | 
+ **caseId** | **String**|  |
+ **refundCaseActionDto** | [**RefundCaseActionDto**](RefundCaseActionDto.md)|  |
 
 ### Return type
 

@@ -67,7 +67,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CheckEmailResponseDto',) as CheckEmailResponseDto;
-    
+
     }
     return null;
   }
@@ -123,7 +123,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PasswordResetResponseDto',) as PasswordResetResponseDto;
-    
+
     }
     return null;
   }
@@ -175,7 +175,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
-    
+
     }
     return null;
   }
@@ -227,7 +227,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
-    
+
     }
     return null;
   }
@@ -279,7 +279,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
-    
+
     }
     return null;
   }
@@ -331,7 +331,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
-    
+
     }
     return null;
   }
@@ -375,7 +375,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'LogoutResponseDto',) as LogoutResponseDto;
-    
+
     }
     return null;
   }
@@ -427,7 +427,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
-    
+
     }
     return null;
   }
@@ -479,7 +479,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
-    
+
     }
     return null;
   }
@@ -531,7 +531,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
-    
+
     }
     return null;
   }
@@ -587,7 +587,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'RegisterPartnerResponseDto',) as RegisterPartnerResponseDto;
-    
+
     }
     return null;
   }
@@ -639,7 +639,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AuthTokensDto',) as AuthTokensDto;
-    
+
     }
     return null;
   }
@@ -691,7 +691,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PasswordResetResponseDto',) as PasswordResetResponseDto;
-    
+
     }
     return null;
   }
@@ -743,7 +743,7 @@ class AuthenticationApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ValidatePasswordResetCodeResponseDto',) as ValidatePasswordResetCodeResponseDto;
-    
+
     }
     return null;
   }

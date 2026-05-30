@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:common/widgets/card/error_card.dart';
 import 'package:common/widgets/staggered_grid_view/'
     'staggered_grid_view.dart';
 
@@ -25,7 +26,7 @@ class PremiumTreatmentsSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final titleGap = AppDimens.titleGap(context);
     final contentPad = AppDimens.contentPadding(context);
-    final productsAsync = ref.watch(premiumTreatmentsProvider);
+    final productsAsync = ref.watch(premiumTreatmentPreviewProvider);
 
     return Column(
       children: [
@@ -39,7 +40,15 @@ class PremiumTreatmentsSection extends ConsumerWidget {
         SizedBox(height: titleGap),
         productsAsync.when(
           loading: () => _LoadingGrid(contentPad: contentPad),
-          error: (_, __) => const _EmptyState(),
+          error: (error, stackTrace) => Padding(
+            padding: EdgeInsets.symmetric(vertical: AppDimens.spaceMd),
+            child: ErrorCard(
+              title: 'Could not load premium treatments',
+              error: error,
+              stackTrace: stackTrace,
+              onRetry: () => ref.invalidate(premiumTreatmentPreviewProvider),
+            ),
+          ),
           data: (products) {
             if (products.isEmpty) {
               return const _EmptyState();

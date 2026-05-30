@@ -1,4 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart' show addTearDown;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:patrol/patrol.dart';
 import 'package:timezone/data/latest_all.dart';
@@ -17,7 +18,8 @@ import 'helpers/permission_helper.dart';
 /// - No `FlutterError.onError` override
 Future<void> pumpApp(PatrolIntegrationTester $, {String? scenario}) async {
   await TestConfig.load();
-  await prepareBackendScenario(scenario);
+  final seedResponse = await prepareBackendScenario(scenario);
+  addTearDown(() => cleanupBackendScenario(seedResponse));
 
   final db = Bootstrap.db;
   await Bootstrap.initDomain(db);

@@ -21,8 +21,18 @@ void main() {
       // TODO
     });
 
+    // Object parentCategoryId
+    test('to test the property `parentCategoryId`', () async {
+      // TODO
+    });
+
     // String name
     test('to test the property `name`', () async {
+      // TODO
+    });
+
+    // Object parentCategoryName
+    test('to test the property `parentCategoryName`', () async {
       // TODO
     });
 

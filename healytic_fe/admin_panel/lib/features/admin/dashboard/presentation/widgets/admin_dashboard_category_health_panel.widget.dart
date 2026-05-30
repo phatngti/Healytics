@@ -29,7 +29,7 @@ class AdminDashboardCategoryHealthPanel extends StatelessWidget {
           ),
           const SizedBox(height: AppDimens.spaceSm),
           Text(
-            'Category coverage and service mapping quality across the marketplace.',
+            'Root category coverage and sub-category service mapping quality.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -40,8 +40,16 @@ class AdminDashboardCategoryHealthPanel extends StatelessWidget {
             runSpacing: AppDimens.spaceMd,
             children: [
               _TinyMetric(
-                label: 'Total',
+                label: 'Categories',
                 value: categoryHealth.totalCategories.toString(),
+              ),
+              _TinyMetric(
+                label: 'Root',
+                value: categoryHealth.rootCategories.toString(),
+              ),
+              _TinyMetric(
+                label: 'Sub-categories',
+                value: categoryHealth.subCategories.toString(),
               ),
               _TinyMetric(
                 label: 'Active',
@@ -52,7 +60,7 @@ class AdminDashboardCategoryHealthPanel extends StatelessWidget {
                 value: categoryHealth.inactiveCategories.toString(),
               ),
               _TinyMetric(
-                label: 'Empty',
+                label: 'Empty Sub-cats',
                 value: categoryHealth.emptyCategories.toString(),
               ),
               _TinyMetric(
@@ -79,6 +87,15 @@ class AdminDashboardCategoryHealthPanel extends StatelessWidget {
                     '${item.serviceCount} services',
                     style: theme.textTheme.labelLarge,
                   ),
+                  if (item.subCategoryCount > 0) ...[
+                    AppDimens.horizontalMediumSmall,
+                    Text(
+                      '${item.subCategoryCount} sub-cats',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                   AppDimens.horizontalMediumSmall,
                   Icon(
                     item.isActive ? Icons.check_circle : Icons.pause_circle,

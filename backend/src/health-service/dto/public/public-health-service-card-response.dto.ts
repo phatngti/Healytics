@@ -22,17 +22,32 @@ export class PublicHealthServiceCardResponseDto {
   @ApiProperty({ example: 'Massage' })
   category: string;
 
+  @ApiPropertyOptional({ example: 'e2a7d9b7-...' })
+  categoryId: string | null;
+
+  @ApiPropertyOptional({ example: 'f7c8b2d1-...' })
+  parentCategoryId: string | null;
+
+  @ApiPropertyOptional({ example: 'Spa & Beauty' })
+  parentCategoryName: string | null;
+
   @ApiProperty({ example: '60 min' })
   duration: string;
 
   @ApiProperty({ example: '₫500,000' })
   price: string;
 
+  @ApiProperty({ example: 500000 })
+  priceAmount: number;
+
   @ApiProperty({ example: '4.9' })
   rating: string;
 
   @ApiProperty({ example: 'Healytics Spa' })
   vendorName: string;
+
+  @ApiPropertyOptional({ example: 'b2519c94-...' })
+  clinicId: string | null;
 
   @ApiProperty({ example: 'District 1, HCMC' })
   location: string;
@@ -49,6 +64,7 @@ export class PublicHealthServiceCardResponseDto {
     ratingAvg?: number,
   ): PublicHealthServiceCardResponseDto {
     const dto = new PublicHealthServiceCardResponseDto();
+    const resolvedPartner = product.partner ?? partner ?? null;
 
     dto.id = product.id;
     dto.name = product.name;
@@ -62,6 +78,9 @@ export class PublicHealthServiceCardResponseDto {
 
     // Category label
     dto.category = product.category?.name ?? 'Uncategorized';
+    dto.categoryId = product.categoryId ?? product.category?.id ?? null;
+    dto.parentCategoryId = product.category?.parent?.id ?? null;
+    dto.parentCategoryName = product.category?.parent?.name ?? null;
 
     // Duration from product definition
     const minutes = product.productDefinition?.durationMinutes;
@@ -69,6 +88,7 @@ export class PublicHealthServiceCardResponseDto {
 
     // Price formatting (Vietnamese đồng)
     const price = product.salePrice ?? product.basePrice;
+    dto.priceAmount = Number(price) || 0;
     dto.price = '₫' + new Intl.NumberFormat('vi-VN').format(Number(price));
 
     // Average rating — pre-computed from TreatmentReview aggregate
@@ -76,13 +96,14 @@ export class PublicHealthServiceCardResponseDto {
     dto.rating = (Math.round(avg * 10) / 10).toString();
 
     // Vendor name: prefer product-level, fall back to partner brand
-    dto.vendorName = product.vendorName ?? partner?.brandName ?? '';
+    dto.vendorName = product.vendorName ?? resolvedPartner?.brandName ?? '';
+    dto.clinicId = resolvedPartner?.id ?? product.partnerId ?? null;
 
     // Location from partner address hierarchy
-    if (partner) {
+    if (resolvedPartner) {
       const parts = [
-        partner.district?.fullName,
-        partner.province?.fullName,
+        resolvedPartner.district?.fullName,
+        resolvedPartner.province?.fullName,
       ].filter(Boolean);
       dto.location = parts.join(', ');
     } else {

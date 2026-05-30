@@ -184,6 +184,14 @@ export class AccountService {
       userProfile.firstName = this.normalizeProfileField(dto.firstName);
       userProfile.lastName = this.normalizeProfileField(dto.lastName);
       userProfile.phone = this.normalizeProfileField(dto.phone);
+      if (dto.dateOfBirth !== undefined) {
+        userProfile.dateOfBirth = dto.dateOfBirth
+          ? new Date(dto.dateOfBirth)
+          : null;
+      }
+      if (dto.profileCompleted !== undefined) {
+        userProfile.profileCompleted = dto.profileCompleted;
+      }
 
       await manager.save(UserProfile, userProfile);
     });
@@ -285,11 +293,13 @@ export class AccountService {
       if (!account) {
         throw new NotFoundException('Account not found');
       }
-      if (!account.userProfile) {
-        throw new NotFoundException('User profile not found');
-      }
+      const userProfile =
+        account.userProfile ??
+        manager.create(UserProfile, {
+          accountId: account.id,
+        });
 
-      const address = account.userProfile.address ?? manager.create(Address);
+      const address = userProfile.address ?? manager.create(Address);
       address.street = preparedAddress.street;
       address.ward = preparedAddress.ward;
       address.district = preparedAddress.district;
@@ -300,9 +310,9 @@ export class AccountService {
       address.coordinates = preparedAddress.coordinates;
 
       const savedAddress = await manager.save(Address, address);
-      if (account.userProfile.addressId !== savedAddress.id) {
-        account.userProfile.addressId = savedAddress.id;
-        await manager.save(UserProfile, account.userProfile);
+      if (userProfile.addressId !== savedAddress.id) {
+        userProfile.addressId = savedAddress.id;
+        await manager.save(UserProfile, userProfile);
       }
       await this.writeAddressLocation(
         manager,

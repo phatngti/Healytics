@@ -29,7 +29,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserSlotsApi();
-final checkDuplicateSlotDto = CheckDuplicateSlotDto(); // CheckDuplicateSlotDto | 
+final checkDuplicateSlotDto = CheckDuplicateSlotDto(); // CheckDuplicateSlotDto |
 
 try {
     final result = api_instance.slotsControllerCheckDuplicateSlot(checkDuplicateSlotDto);
@@ -43,7 +43,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **checkDuplicateSlotDto** | [**CheckDuplicateSlotDto**](CheckDuplicateSlotDto.md)|  | 
+ **checkDuplicateSlotDto** | [**CheckDuplicateSlotDto**](CheckDuplicateSlotDto.md)|  |
 
 ### Return type
 
@@ -76,7 +76,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserSlotsApi();
-final microLockDto = MicroLockDto(); // MicroLockDto | 
+final microLockDto = MicroLockDto(); // MicroLockDto |
 
 try {
     final result = api_instance.slotsControllerMicroLock(microLockDto);
@@ -90,7 +90,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **microLockDto** | [**MicroLockDto**](MicroLockDto.md)|  | 
+ **microLockDto** | [**MicroLockDto**](MicroLockDto.md)|  |
 
 ### Return type
 

@@ -14,20 +14,27 @@ class AsyncCheckoutDto {
   /// Returns a new [AsyncCheckoutDto] instance.
   AsyncCheckoutDto({
     required this.userId,
-    required this.staffId,
+    this.staffId,
     required this.startTime,
     required this.productId,
     required this.idempotencyKey,
     this.webhookUrl,
     this.payLater = false,
+    this.autoAssignStaff = false,
   });
 
 
   /// User account UUID
   String userId;
 
-  /// Staff/employee UUID
-  String staffId;
+  /// Staff/employee UUID. Optional when autoAssignStaff is true.
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? staffId;
 
   /// Desired slot start time (ISO 8601)
   String startTime;
@@ -50,6 +57,9 @@ class AsyncCheckoutDto {
   /// If true, booking is immediately CONFIRMED without requiring payment. The booking has no payment URL or expiry — suitable for in-person pay-later scenarios.
   bool payLater;
 
+  /// If true, backend selects the best eligible available specialist for the service and start time.
+  bool autoAssignStaff;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is AsyncCheckoutDto &&
     other.userId == userId &&
@@ -58,26 +68,32 @@ class AsyncCheckoutDto {
     other.productId == productId &&
     other.idempotencyKey == idempotencyKey &&
     other.webhookUrl == webhookUrl &&
-    other.payLater == payLater;
+    other.payLater == payLater &&
+    other.autoAssignStaff == autoAssignStaff;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (userId.hashCode) +
-    (staffId.hashCode) +
+    (staffId == null ? 0 : staffId!.hashCode) +
     (startTime.hashCode) +
     (productId.hashCode) +
     (idempotencyKey.hashCode) +
     (webhookUrl == null ? 0 : webhookUrl!.hashCode) +
-    (payLater.hashCode);
+    (payLater.hashCode) +
+    (autoAssignStaff.hashCode);
 
   @override
-  String toString() => 'AsyncCheckoutDto[userId=$userId, staffId=$staffId, startTime=$startTime, productId=$productId, idempotencyKey=$idempotencyKey, webhookUrl=$webhookUrl, payLater=$payLater]';
+  String toString() => 'AsyncCheckoutDto[userId=$userId, staffId=$staffId, startTime=$startTime, productId=$productId, idempotencyKey=$idempotencyKey, webhookUrl=$webhookUrl, payLater=$payLater, autoAssignStaff=$autoAssignStaff]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'userId'] = this.userId;
+    if (this.staffId != null) {
       json[r'staffId'] = this.staffId;
+    } else {
+      json[r'staffId'] = null;
+    }
       json[r'startTime'] = this.startTime;
       json[r'productId'] = this.productId;
       json[r'idempotencyKey'] = this.idempotencyKey;
@@ -87,6 +103,7 @@ class AsyncCheckoutDto {
       json[r'webhookUrl'] = null;
     }
       json[r'payLater'] = this.payLater;
+      json[r'autoAssignStaff'] = this.autoAssignStaff;
     return json;
   }
 
@@ -110,12 +127,13 @@ class AsyncCheckoutDto {
 
       return AsyncCheckoutDto(
         userId: mapValueOfType<String>(json, r'userId')!,
-        staffId: mapValueOfType<String>(json, r'staffId')!,
+        staffId: mapValueOfType<String>(json, r'staffId'),
         startTime: mapValueOfType<String>(json, r'startTime')!,
         productId: mapValueOfType<String>(json, r'productId')!,
         idempotencyKey: mapValueOfType<String>(json, r'idempotencyKey')!,
         webhookUrl: mapValueOfType<String>(json, r'webhookUrl'),
         payLater: mapValueOfType<bool>(json, r'payLater') ?? false,
+        autoAssignStaff: mapValueOfType<bool>(json, r'autoAssignStaff') ?? false,
       );
     }
     return null;
@@ -164,7 +182,6 @@ class AsyncCheckoutDto {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'userId',
-    'staffId',
     'startTime',
     'productId',
     'idempotencyKey',

@@ -32,8 +32,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = EmployeeAppointmentsApi();
-final id = id_example; // String | 
-final cancelEmployeeAppointmentDto = CancelEmployeeAppointmentDto(); // CancelEmployeeAppointmentDto | 
+final id = id_example; // String |
+final cancelEmployeeAppointmentDto = CancelEmployeeAppointmentDto(); // CancelEmployeeAppointmentDto |
 
 try {
     final result = api_instance.employeeAppointmentsControllerCancelAppointment(id, cancelEmployeeAppointmentDto);
@@ -47,8 +47,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **cancelEmployeeAppointmentDto** | [**CancelEmployeeAppointmentDto**](CancelEmployeeAppointmentDto.md)|  | 
+ **id** | **String**|  |
+ **cancelEmployeeAppointmentDto** | [**CancelEmployeeAppointmentDto**](CancelEmployeeAppointmentDto.md)|  |
 
 ### Return type
 
@@ -81,7 +81,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = EmployeeAppointmentsApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     final result = api_instance.employeeAppointmentsControllerCompleteService(id);
@@ -95,7 +95,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 
@@ -128,7 +128,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = EmployeeAppointmentsApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     final result = api_instance.employeeAppointmentsControllerGetAppointment(id);
@@ -142,7 +142,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 
@@ -191,7 +191,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **status** | [**EmployeeBookingStatusFilter**](.md)| Filter appointments by status | [optional] 
+ **status** | [**EmployeeBookingStatusFilter**](.md)| Filter appointments by status | [optional]
  **page** | **num**| Page number | [optional] [default to 1]
  **limit** | **num**| Items per page | [optional] [default to 20]
 
@@ -226,7 +226,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = EmployeeAppointmentsApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     final result = api_instance.employeeAppointmentsControllerStartService(id);
@@ -240,7 +240,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 

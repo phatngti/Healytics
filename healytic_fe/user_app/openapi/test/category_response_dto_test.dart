@@ -52,6 +52,24 @@ void main() {
       // TODO
     });
 
+    // Parent category ID. Null for root categories.
+    // String parentId
+    test('to test the property `parentId`', () async {
+      // TODO
+    });
+
+    // Whether this category is a root category.
+    // bool isRoot
+    test('to test the property `isRoot`', () async {
+      // TODO
+    });
+
+    // Number of direct child sub-categories.
+    // num subCategoryCount
+    test('to test the property `subCategoryCount`', () async {
+      // TODO
+    });
+
     // Category type for UI grouping
     // String categoryType (default value: 'primary')
     test('to test the property `categoryType`', () async {

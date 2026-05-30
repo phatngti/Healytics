@@ -1650,6 +1650,66 @@
               ],
               "type": "string"
             }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "default",
+              "enum": [
+                "default",
+                "rating_desc",
+                "experience_desc",
+                "reviews_desc"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "clinicId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "provinceId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "districtId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "wardId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minExperienceYears",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -1892,6 +1952,66 @@
                 "MANAGER"
               ],
               "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "default",
+              "enum": [
+                "default",
+                "rating_desc",
+                "experience_desc",
+                "reviews_desc"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "clinicId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "provinceId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "districtId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "wardId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minExperienceYears",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
             }
           }
         ],
@@ -2493,6 +2613,85 @@
             }
           },
           {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "default",
+              "enum": [
+                "default",
+                "price_asc",
+                "price_desc",
+                "rating_desc",
+                "latest"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "minPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "clinicId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "provinceId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "districtId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "wardId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
             "name": "lat",
             "required": false,
             "in": "query",
@@ -3089,7 +3288,105 @@
       "get": {
         "operationId": "UserHealthServiceController_getPremiumTreatments",
         "summary": "Get premium treatments",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "default",
+              "enum": [
+                "default",
+                "price_asc",
+                "price_desc",
+                "rating_desc",
+                "latest"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "minPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "clinicId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "provinceId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "districtId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "wardId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "lat",
+            "required": false,
+            "in": "query",
+            "description": "User latitude",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": false,
+            "in": "query",
+            "description": "User longitude",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Return list of premium treatments.",
@@ -7988,6 +8285,65 @@
               "example": 0,
               "type": "number"
             }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "completed",
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "clinicId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fromDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-05-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "toDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-05-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "default",
+              "enum": [
+                "default",
+                "date_asc",
+                "date_desc"
+              ],
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -10893,6 +11249,402 @@
           "Health"
         ]
       }
+    },
+    "/test-backdoor/status": {
+      "get": {
+        "operationId": "TestBackdoorController_status",
+        "summary": "Check if backdoor is available",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackdoorStatusResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/reset-db": {
+      "post": {
+        "operationId": "TestBackdoorController_resetDb",
+        "summary": "Truncate all non-master tables",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetDbResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/prepare": {
+      "post": {
+        "operationId": "TestBackdoorController_prepare",
+        "summary": "Reset DB then seed a scenario",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackdoorPrepareDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/cleanup": {
+      "post": {
+        "operationId": "TestBackdoorController_cleanup",
+        "summary": "Delete only rows returned by a seed response",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupSeedDataDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CleanupSeedDataResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed": {
+      "post": {
+        "operationId": "TestBackdoorController_seed",
+        "summary": "Seed multiple entity types at once",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedPayloadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-user": {
+      "post": {
+        "operationId": "TestBackdoorController_seedUser",
+        "summary": "Seed a single user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-category": {
+      "post": {
+        "operationId": "TestBackdoorController_seedCategory",
+        "summary": "Seed a single category",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-partner": {
+      "post": {
+        "operationId": "TestBackdoorController_seedPartner",
+        "summary": "Seed a single partner",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedPartnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-employee": {
+      "post": {
+        "operationId": "TestBackdoorController_seedEmployee",
+        "summary": "Seed a single employee",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedEmployeeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-service": {
+      "post": {
+        "operationId": "TestBackdoorController_seedService",
+        "summary": "Seed a single health service",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedServiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-cart": {
+      "post": {
+        "operationId": "TestBackdoorController_seedCart",
+        "summary": "Seed a single cart item",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedCartItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-coupon": {
+      "post": {
+        "operationId": "TestBackdoorController_seedCoupon",
+        "summary": "Seed a single coupon",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedCouponDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-booking": {
+      "post": {
+        "operationId": "TestBackdoorController_seedBooking",
+        "summary": "Seed a single booking",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedBookingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
     }
   },
   "info": {
@@ -11717,6 +12469,17 @@
             "type": "object",
             "example": "0901234567",
             "nullable": true
+          },
+          "dateOfBirth": {
+            "type": "object",
+            "example": "1990-01-01",
+            "description": "Date of birth in ISO format",
+            "nullable": true
+          },
+          "profileCompleted": {
+            "type": "boolean",
+            "example": true,
+            "description": "Marks the first-time user profile flow as completed"
           }
         }
       },
@@ -11829,7 +12592,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-27T08:00:18.147Z"
+              "submittedAt": "2026-05-30T07:33:23.835Z"
             }
           }
         },
@@ -14206,6 +14969,26 @@
             "nullable": true,
             "description": "Partner ID the employee belongs to"
           },
+          "clinicId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Public clinic ID the employee belongs to"
+          },
+          "clinicName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Public clinic name the employee belongs to"
+          },
+          "location": {
+            "type": "string",
+            "nullable": true,
+            "description": "Clinic location label"
+          },
+          "experienceYears": {
+            "type": "number",
+            "nullable": true,
+            "description": "Normalized years of professional experience"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string",
@@ -15259,9 +16042,19 @@
             "description": "Clinic or facility name",
             "nullable": true
           },
+          "clinicId": {
+            "type": "object",
+            "description": "Clinic or facility ID",
+            "nullable": true
+          },
           "clinicAddress": {
             "type": "object",
             "description": "Clinic street address",
+            "nullable": true
+          },
+          "location": {
+            "type": "object",
+            "description": "Clinic location label",
             "nullable": true
           },
           "distance": {
@@ -15278,6 +16071,26 @@
             "type": "object",
             "description": "Raw price in VND",
             "example": 850000
+          },
+          "categoryId": {
+            "type": "object",
+            "description": "Sub-category ID",
+            "nullable": true
+          },
+          "categoryName": {
+            "type": "object",
+            "description": "Sub-category name",
+            "nullable": true
+          },
+          "parentCategoryId": {
+            "type": "object",
+            "description": "Root category ID",
+            "nullable": true
+          },
+          "parentCategoryName": {
+            "type": "object",
+            "description": "Root category name",
+            "nullable": true
           }
         },
         "required": [
@@ -15476,6 +16289,10 @@
           "id": {
             "type": "string"
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true
+          },
           "name": {
             "type": "string"
           },
@@ -15518,6 +16335,19 @@
             "type": "boolean",
             "description": "Whether category is active"
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Parent category ID. Null for root categories."
+          },
+          "isRoot": {
+            "type": "boolean",
+            "description": "Whether this category is a root category."
+          },
+          "subCategoryCount": {
+            "type": "number",
+            "description": "Number of direct child sub-categories."
+          },
           "categoryType": {
             "type": "string",
             "description": "Category type for UI grouping",
@@ -15554,6 +16384,8 @@
           "name",
           "slug",
           "isActive",
+          "isRoot",
+          "subCategoryCount",
           "createdAt",
           "updatedAt"
         ]
@@ -15587,6 +16419,15 @@
             "type": "boolean",
             "description": "Whether category is active"
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Parent category ID. Null for root categories."
+          },
+          "isRoot": {
+            "type": "boolean",
+            "description": "Whether this category is a root category."
+          },
           "iconName": {
             "type": "string",
             "nullable": true,
@@ -15604,6 +16445,10 @@
           "serviceCount": {
             "type": "number",
             "description": "Number of health services in this category"
+          },
+          "subCategoryCount": {
+            "type": "number",
+            "description": "Number of direct child sub-categories"
           },
           "createdAt": {
             "format": "date-time",
@@ -15636,8 +16481,10 @@
           "name",
           "slug",
           "isActive",
+          "isRoot",
           "sortOrder",
           "serviceCount",
+          "subCategoryCount",
           "createdAt",
           "updatedAt"
         ]
@@ -16176,11 +17023,23 @@
           "id": {
             "type": "string"
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true
+          },
           "name": {
             "type": "string"
           },
           "slug": {
             "type": "string"
+          },
+          "parent": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerCategorySummaryDto"
+              }
+            ]
           }
         },
         "required": [
@@ -17302,6 +18161,18 @@
             "type": "string",
             "example": "Massage"
           },
+          "categoryId": {
+            "type": "object",
+            "example": "e2a7d9b7-..."
+          },
+          "parentCategoryId": {
+            "type": "object",
+            "example": "f7c8b2d1-..."
+          },
+          "parentCategoryName": {
+            "type": "object",
+            "example": "Spa & Beauty"
+          },
           "duration": {
             "type": "string",
             "example": "60 min"
@@ -17310,6 +18181,10 @@
             "type": "string",
             "example": "₫500,000"
           },
+          "priceAmount": {
+            "type": "number",
+            "example": 500000
+          },
           "rating": {
             "type": "string",
             "example": "4.9"
@@ -17317,6 +18192,10 @@
           "vendorName": {
             "type": "string",
             "example": "Healytics Spa"
+          },
+          "clinicId": {
+            "type": "object",
+            "example": "b2519c94-..."
           },
           "location": {
             "type": "string",
@@ -17343,6 +18222,7 @@
           "category",
           "duration",
           "price",
+          "priceAmount",
           "rating",
           "vendorName",
           "location",
@@ -17425,9 +18305,19 @@
             "type": "string",
             "example": "cat-555"
           },
+          "parentCategoryId": {
+            "type": "object",
+            "example": "root-cat-111",
+            "nullable": true
+          },
           "name": {
             "type": "string",
             "example": "Dermatology"
+          },
+          "parentCategoryName": {
+            "type": "object",
+            "example": "Spa & Beauty",
+            "nullable": true
           }
         },
         "required": [
@@ -17780,6 +18670,10 @@
             "type": "string",
             "example": "a1b2c3d4-..."
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true
+          },
           "name": {
             "type": "string",
             "example": "Spa & Massage"
@@ -17792,6 +18686,14 @@
             "type": "string",
             "nullable": true,
             "example": "https://example.com/category.jpg"
+          },
+          "parent": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicCategoryDto"
+              }
+            ]
           }
         },
         "required": [
@@ -18178,11 +19080,23 @@
           "id": {
             "type": "string"
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true
+          },
           "name": {
             "type": "string"
           },
           "slug": {
             "type": "string"
+          },
+          "parent": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicCategorySummaryDto"
+              }
+            ]
           }
         },
         "required": [
@@ -19160,6 +20074,12 @@
           "serviceCount": {
             "type": "number"
           },
+          "subCategoryCount": {
+            "type": "number"
+          },
+          "isRoot": {
+            "type": "boolean"
+          },
           "isActive": {
             "type": "boolean"
           }
@@ -19168,6 +20088,8 @@
           "id",
           "name",
           "serviceCount",
+          "subCategoryCount",
+          "isRoot",
           "isActive"
         ]
       },
@@ -19181,6 +20103,12 @@
             "type": "number"
           },
           "inactiveCategories": {
+            "type": "number"
+          },
+          "rootCategories": {
+            "type": "number"
+          },
+          "subCategories": {
             "type": "number"
           },
           "emptyCategories": {
@@ -19200,6 +20128,8 @@
           "totalCategories",
           "activeCategories",
           "inactiveCategories",
+          "rootCategories",
+          "subCategories",
           "emptyCategories",
           "totalMappedServices",
           "topCategories"
@@ -20256,7 +21186,7 @@
           },
           "staffId": {
             "type": "string",
-            "description": "Staff/employee UUID"
+            "description": "Staff/employee UUID. Optional when autoAssignStaff is true."
           },
           "startTime": {
             "type": "string",
@@ -20282,11 +21212,16 @@
             "description": "If true, booking is immediately CONFIRMED without requiring payment. The booking has no payment URL or expiry — suitable for in-person pay-later scenarios.",
             "example": false,
             "default": false
+          },
+          "autoAssignStaff": {
+            "type": "boolean",
+            "description": "If true, backend selects the best eligible available specialist for the service and start time.",
+            "example": true,
+            "default": false
           }
         },
         "required": [
           "userId",
-          "staffId",
           "startTime",
           "productId",
           "idempotencyKey"
@@ -22092,11 +23027,15 @@
             "type": "string",
             "description": "Desired time slot in ISO 8601 datetime format",
             "example": "2026-04-10T09:00:00.000Z"
+          },
+          "autoAssignStaff": {
+            "type": "boolean",
+            "description": "If true, backend selects the best eligible available specialist for this service and time slot.",
+            "default": false
           }
         },
         "required": [
           "serviceId",
-          "employeeId",
           "timeSlot"
         ]
       },
@@ -23395,6 +24334,702 @@
             "example": "Approved from partner transaction manager."
           }
         }
+      },
+      "BackdoorStatusResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "database": {
+            "type": "string",
+            "example": "healytics_test"
+          },
+          "nodeEnv": {
+            "type": "string",
+            "example": "test"
+          }
+        },
+        "required": [
+          "ok",
+          "database",
+          "nodeEnv"
+        ]
+      },
+      "ResetDbResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "truncatedTables": {
+            "type": "number",
+            "example": 12
+          }
+        },
+        "required": [
+          "ok",
+          "truncatedTables"
+        ]
+      },
+      "SeedUserDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key for this seeded user"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@test.healytics.vn"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123!"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Nguyen"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Van A"
+          },
+          "phone": {
+            "type": "string",
+            "example": "0901234567"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "SeedCategoryDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "name": {
+            "type": "string",
+            "example": "Spa & Beauty"
+          },
+          "slug": {
+            "type": "string",
+            "example": "spa-beauty"
+          },
+          "description": {
+            "type": "string"
+          },
+          "iconName": {
+            "type": "string",
+            "example": "spa"
+          },
+          "colorValue": {
+            "type": "string",
+            "example": "#FF6B6B"
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "SeedPartnerDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "email": {
+            "type": "string",
+            "example": "partner@test.healytics.vn"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123!"
+          },
+          "taxCode": {
+            "type": "string",
+            "example": "TAX-12345"
+          },
+          "legalName": {
+            "type": "string",
+            "example": "Healytics Spa LLC"
+          },
+          "brandName": {
+            "type": "string",
+            "example": "Healytics Spa"
+          },
+          "businessTypes": {
+            "description": "Business type categories",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "streetAddress": {
+            "type": "string",
+            "example": "District 1, Ho Chi Minh City"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "0901234567"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "REQUIRED_RESUBMIT"
+            ],
+            "description": "Verification status"
+          }
+        },
+        "required": [
+          "brandName"
+        ]
+      },
+      "SeedEmployeeDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "partnerKey": {
+            "type": "string",
+            "description": "Key of a previously seeded partner"
+          },
+          "partnerBrandName": {
+            "type": "string",
+            "description": "Brand name to look up the partner"
+          },
+          "email": {
+            "type": "string",
+            "example": "emp@test.healytics.vn"
+          },
+          "employeeCode": {
+            "type": "string",
+            "example": "EMP-001"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Nguyen"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Van B"
+          },
+          "displayName": {
+            "type": "string",
+            "example": "Dr. Nguyen Van B"
+          },
+          "phone": {
+            "type": "string",
+            "example": "0912345678"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "DOCTOR",
+              "THERAPIST",
+              "RECEPTIONIST",
+              "MANAGER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "ON_LEAVE"
+            ]
+          },
+          "schedule": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkScheduleEntryDto"
+            }
+          }
+        },
+        "required": [
+          "displayName"
+        ]
+      },
+      "SeedServiceDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "partnerKey": {
+            "type": "string",
+            "description": "Key of a previously seeded partner"
+          },
+          "partnerBrandName": {
+            "type": "string",
+            "description": "Brand name to look up the partner"
+          },
+          "employeeKeys": {
+            "description": "Keys of previously seeded employees",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "categoryKey": {
+            "type": "string",
+            "description": "Key of a previously seeded category"
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "Category name (auto-created if missing)"
+          },
+          "name": {
+            "type": "string",
+            "example": "Deep Tissue Massage"
+          },
+          "slug": {
+            "type": "string",
+            "example": "deep-tissue-massage"
+          },
+          "description": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "example": 500000
+          },
+          "durationMinutes": {
+            "type": "number",
+            "example": 60
+          },
+          "vendorName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "SeedCouponDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "code": {
+            "type": "string",
+            "example": "SUMMER20"
+          },
+          "discountPercent": {
+            "type": "number",
+            "example": 20
+          },
+          "maxDiscountAmount": {
+            "type": "number",
+            "example": 100000
+          },
+          "usageLimit": {
+            "type": "number",
+            "example": 50
+          },
+          "serviceKey": {
+            "type": "string",
+            "description": "Key of a previously seeded service"
+          },
+          "serviceSlug": {
+            "type": "string",
+            "description": "Slug to look up the service"
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "Category name (auto-created if missing)"
+          },
+          "expiresAt": {
+            "type": "string",
+            "example": "2026-12-31T23:59:59Z",
+            "description": "ISO 8601 expiry"
+          }
+        },
+        "required": [
+          "code",
+          "discountPercent"
+        ]
+      },
+      "SeedCartItemDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "userKey": {
+            "type": "string",
+            "description": "Key of a previously seeded user"
+          },
+          "userEmail": {
+            "type": "string",
+            "description": "Email to look up the user"
+          },
+          "serviceKey": {
+            "type": "string",
+            "description": "Key of a previously seeded service"
+          },
+          "serviceSlug": {
+            "type": "string",
+            "description": "Slug to look up the service"
+          },
+          "employeeKey": {
+            "type": "string",
+            "description": "Key of a previously seeded employee"
+          },
+          "employeeEmail": {
+            "type": "string",
+            "description": "Email to look up the employee"
+          },
+          "startsAt": {
+            "type": "string",
+            "example": "2026-06-01T10:00:00Z",
+            "description": "ISO 8601 start time"
+          }
+        },
+        "required": [
+          "startsAt"
+        ]
+      },
+      "SeedBookingDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "userKey": {
+            "type": "string",
+            "description": "Key of a previously seeded user"
+          },
+          "userEmail": {
+            "type": "string",
+            "description": "Email to look up the user"
+          },
+          "serviceKey": {
+            "type": "string",
+            "description": "Key of a previously seeded service"
+          },
+          "serviceSlug": {
+            "type": "string",
+            "description": "Slug to look up the service"
+          },
+          "employeeKey": {
+            "type": "string",
+            "description": "Key of a previously seeded employee"
+          },
+          "employeeEmail": {
+            "type": "string",
+            "description": "Email to look up the employee"
+          },
+          "startsAt": {
+            "type": "string",
+            "example": "2026-06-01T10:00:00Z",
+            "description": "ISO 8601 start time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING_PAYMENT",
+              "CONFIRMED",
+              "IN_PROGRESS",
+              "CANCELLED",
+              "COMPLETED",
+              "NO_SHOW"
+            ]
+          },
+          "endsAt": {
+            "type": "string",
+            "example": "2026-06-01T11:00:00Z",
+            "description": "ISO 8601 end time"
+          },
+          "paymentUrl": {
+            "type": "string",
+            "example": "https://pay.stripe.com/xxx"
+          },
+          "paymentExpiresAt": {
+            "type": "string",
+            "example": "2026-06-01T10:30:00Z"
+          }
+        },
+        "required": [
+          "startsAt"
+        ]
+      },
+      "SeedNotificationDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "userKey": {
+            "type": "string",
+            "description": "Key of a previously seeded user"
+          },
+          "userEmail": {
+            "type": "string",
+            "description": "Email to look up the recipient user"
+          },
+          "senderKey": {
+            "type": "string",
+            "description": "Key of a previously seeded sender account"
+          },
+          "senderEmail": {
+            "type": "string",
+            "description": "Email to look up the sender account"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "booking_confirmed",
+              "booking_cancelled",
+              "booking_completed",
+              "appointment_reminder",
+              "appointment_updated",
+              "new_chat_message",
+              "payment_success",
+              "payment_failed",
+              "system_broadcast",
+              "system_maintenance",
+              "partner_verified",
+              "partner_rejected"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "example": "Booking confirmed"
+          },
+          "body": {
+            "type": "string",
+            "example": "Your appointment is confirmed."
+          },
+          "data": {
+            "type": "object"
+          },
+          "isRead": {
+            "type": "boolean",
+            "default": false
+          },
+          "isBroadcast": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "body"
+        ]
+      },
+      "SeedPayloadDto": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedUserDto"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedCategoryDto"
+            }
+          },
+          "partners": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedPartnerDto"
+            }
+          },
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedEmployeeDto"
+            }
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedServiceDto"
+            }
+          },
+          "coupons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedCouponDto"
+            }
+          },
+          "cartItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedCartItemDto"
+            }
+          },
+          "bookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedBookingDto"
+            }
+          },
+          "notifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedNotificationDto"
+            }
+          }
+        }
+      },
+      "BackdoorPrepareDto": {
+        "type": "object",
+        "properties": {
+          "scenario": {
+            "type": "string",
+            "example": "login-flow",
+            "description": "Scenario name"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/SeedPayloadDto"
+          }
+        }
+      },
+      "SeedIdsMapDto": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "user@test.healytics.vn": "a1b2c3d4-..."
+            },
+            "description": "user key → account UUID"
+          },
+          "categories": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "partners": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "employees": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "services": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "cartItems": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "bookings": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "coupons": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "notifications": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SeedResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "scenario": {
+            "type": "string",
+            "example": "inline"
+          },
+          "ids": {
+            "$ref": "#/components/schemas/SeedIdsMapDto"
+          }
+        },
+        "required": [
+          "ok",
+          "scenario",
+          "ids"
+        ]
+      },
+      "CleanupSeedDataDto": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "$ref": "#/components/schemas/SeedIdsMapDto"
+          }
+        },
+        "required": [
+          "ids"
+        ]
+      },
+      "CleanupSeedDataResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "deleted": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            },
+            "example": {
+              "users": 1,
+              "bookings": 2
+            }
+          }
+        },
+        "required": [
+          "ok",
+          "deleted"
+        ]
       }
     }
   }

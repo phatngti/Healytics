@@ -22,7 +22,7 @@ MoMo IPN callback (server-to-server)
 import 'package:user_openapi/api.dart';
 
 final api_instance = MomoApi();
-final body = Object(); // Object | 
+final body = Object(); // Object |
 
 try {
     api_instance.moMoControllerHandleMoMoIPN(body);
@@ -35,7 +35,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | **Object**|  | 
+ **body** | **Object**|  |
 
 ### Return type
 

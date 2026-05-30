@@ -14,7 +14,7 @@ Method | HTTP request | Description
 
 
 # **userCategoriesControllerFindServicesByCategory**
-> List<BookingServiceResponseDto> userCategoriesControllerFindServicesByCategory(categoryId, lat, lng)
+> List<BookingServiceResponseDto> userCategoriesControllerFindServicesByCategory(categoryId, sort, minPrice, maxPrice, categoryId2, clinicId, provinceId, districtId, wardId, lat, lng)
 
 Get services for a category
 
@@ -29,12 +29,20 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserCategoriesApi();
-final categoryId = categoryId_example; // String | 
+final categoryId = categoryId_example; // String |
+final sort = sort_example; // String |
+final minPrice = 8.14; // num |
+final maxPrice = 8.14; // num |
+final categoryId2 = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final clinicId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final provinceId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final districtId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final wardId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
 final lat = 8.14; // num | User latitude for distance calc
 final lng = 8.14; // num | User longitude for distance calc
 
 try {
-    final result = api_instance.userCategoriesControllerFindServicesByCategory(categoryId, lat, lng);
+    final result = api_instance.userCategoriesControllerFindServicesByCategory(categoryId, sort, minPrice, maxPrice, categoryId2, clinicId, provinceId, districtId, wardId, lat, lng);
     print(result);
 } catch (e) {
     print('Exception when calling UserCategoriesApi->userCategoriesControllerFindServicesByCategory: $e\n');
@@ -45,9 +53,17 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **categoryId** | **String**|  | 
- **lat** | **num**| User latitude for distance calc | [optional] 
- **lng** | **num**| User longitude for distance calc | [optional] 
+ **categoryId** | **String**|  |
+ **sort** | **String**|  | [optional] [default to 'default']
+ **minPrice** | **num**|  | [optional]
+ **maxPrice** | **num**|  | [optional]
+ **categoryId2** | **String**|  | [optional]
+ **clinicId** | **String**|  | [optional]
+ **provinceId** | **String**|  | [optional]
+ **districtId** | **String**|  | [optional]
+ **wardId** | **String**|  | [optional]
+ **lat** | **num**| User latitude for distance calc | [optional]
+ **lng** | **num**| User longitude for distance calc | [optional]
 
 ### Return type
 
@@ -80,7 +96,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserCategoriesApi();
-final categoryId = categoryId_example; // String | 
+final categoryId = categoryId_example; // String |
 
 try {
     final result = api_instance.userCategoriesControllerFindSpecialistsByCategory(categoryId);
@@ -94,7 +110,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **categoryId** | **String**|  | 
+ **categoryId** | **String**|  |
 
 ### Return type
 

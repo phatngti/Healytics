@@ -88,6 +88,14 @@ type CategoryHealthRow = {
   name?: string | null;
   isActive?: boolean | string | number | null;
   serviceCount?: string | number;
+  subCategoryCount?: string | number;
+  totalCategories?: string | number;
+  activeCategories?: string | number;
+  inactiveCategories?: string | number;
+  rootCategories?: string | number;
+  subCategories?: string | number;
+  emptyCategories?: string | number;
+  totalMappedServices?: string | number;
 };
 
 @Injectable()
@@ -383,7 +391,8 @@ export class AdminDashboardService {
             AS "serviceId",
           COALESCE(product.name, txn.source_title_snapshot, 'Unknown Service')
             AS "serviceName",
-          COALESCE(category.name, 'General') AS "categoryName",
+          COALESCE(parent_category.name, category.name, 'General')
+            AS "categoryName",
           COALESCE(partner.brand_name, 'Unknown') AS "partnerName",
           COALESCE(SUM(txn.gross_amount), 0) AS "grossRevenue",
           COUNT(*) AS "bookingCount"
@@ -394,6 +403,8 @@ export class AdminDashboardService {
           ON product.id = booking.product_id
         LEFT JOIN categories category
           ON category.id = product.category_id
+        LEFT JOIN categories parent_category
+          ON parent_category.id = category.parent_id
         LEFT JOIN health_partner_profile partner
           ON partner.id = txn.partner_id
         WHERE txn.created_at BETWEEN $1 AND $2
@@ -403,7 +414,7 @@ export class AdminDashboardService {
         GROUP BY
           COALESCE(product.id::text, txn.source_id::text, txn.reference),
           COALESCE(product.name, txn.source_title_snapshot, 'Unknown Service'),
-          COALESCE(category.name, 'General'),
+          COALESCE(parent_category.name, category.name, 'General'),
           COALESCE(partner.brand_name, 'Unknown')
         ORDER BY "grossRevenue" DESC, "bookingCount" DESC
         LIMIT $5
@@ -479,18 +490,64 @@ export class AdminDashboardService {
 
   async getCategoryHealth(): Promise<AdminCategoryHealthDto> {
     const rows = await this.manager().query(`
+      WITH all_categories AS (
+        SELECT id, name, is_active, parent_id
+        FROM categories
+        WHERE deleted_at IS NULL
+      ),
+      root_rows AS (
+        SELECT
+          root.id,
+          root.name,
+          root.is_active AS "isActive",
+          COUNT(DISTINCT child.id)::int AS "subCategoryCount",
+          COUNT(DISTINCT product.id)::int AS "serviceCount"
+        FROM all_categories root
+        LEFT JOIN all_categories child
+          ON child.parent_id = root.id
+          AND child.is_active = true
+        LEFT JOIN products product
+          ON product.category_id = child.id
+          AND product.deleted_at IS NULL
+        WHERE root.parent_id IS NULL
+        GROUP BY root.id, root.name, root.is_active
+      ),
+      active_subcategory_counts AS (
+        SELECT
+          sub.id,
+          COUNT(DISTINCT product.id)::int AS "serviceCount"
+        FROM all_categories sub
+        LEFT JOIN products product
+          ON product.category_id = sub.id
+          AND product.deleted_at IS NULL
+        WHERE sub.parent_id IS NOT NULL
+          AND sub.is_active = true
+        GROUP BY sub.id
+      )
       SELECT
-        category.id,
-        category.name,
-        category.is_active AS "isActive",
-        COUNT(DISTINCT product.id) AS "serviceCount"
-      FROM categories category
-      LEFT JOIN products product
-        ON product.category_id = category.id
-        AND product.deleted_at IS NULL
-      WHERE category.deleted_at IS NULL
-      GROUP BY category.id, category.name, category.is_active
-      ORDER BY "serviceCount" DESC, category.name ASC
+        root_rows.id,
+        root_rows.name,
+        root_rows."isActive",
+        root_rows."subCategoryCount",
+        root_rows."serviceCount",
+        (SELECT COUNT(*) FROM all_categories)::int AS "totalCategories",
+        (SELECT COUNT(*) FROM all_categories WHERE is_active = true)::int
+          AS "activeCategories",
+        (SELECT COUNT(*) FROM all_categories WHERE is_active = false)::int
+          AS "inactiveCategories",
+        (SELECT COUNT(*) FROM all_categories WHERE parent_id IS NULL)::int
+          AS "rootCategories",
+        (SELECT COUNT(*) FROM all_categories WHERE parent_id IS NOT NULL)::int
+          AS "subCategories",
+        (
+          SELECT COUNT(*)
+          FROM active_subcategory_counts
+          WHERE "serviceCount" = 0
+        )::int AS "emptyCategories",
+        (SELECT COALESCE(SUM("serviceCount"), 0) FROM root_rows)::int
+          AS "totalMappedServices"
+      FROM root_rows
+      ORDER BY root_rows."serviceCount" DESC, root_rows.name ASC
     `);
 
     const categories = (rows as CategoryHealthRow[]).map((row) => {
@@ -498,22 +555,22 @@ export class AdminDashboardService {
       snapshot.id = row.id;
       snapshot.name = row.name ?? '';
       snapshot.serviceCount = this.toInt(row.serviceCount);
+      snapshot.subCategoryCount = this.toInt(row.subCategoryCount);
+      snapshot.isRoot = true;
       snapshot.isActive =
         row.isActive === true || row.isActive === 'true' || row.isActive === 1;
       return snapshot;
     });
 
+    const aggregate = (rows as CategoryHealthRow[])[0];
     const dto = new AdminCategoryHealthDto();
-    dto.totalCategories = categories.length;
-    dto.activeCategories = categories.filter((item) => item.isActive).length;
-    dto.inactiveCategories = dto.totalCategories - dto.activeCategories;
-    dto.emptyCategories = categories.filter(
-      (item) => item.serviceCount === 0,
-    ).length;
-    dto.totalMappedServices = categories.reduce(
-      (sum, item) => sum + item.serviceCount,
-      0,
-    );
+    dto.totalCategories = this.toInt(aggregate?.totalCategories);
+    dto.activeCategories = this.toInt(aggregate?.activeCategories);
+    dto.inactiveCategories = this.toInt(aggregate?.inactiveCategories);
+    dto.rootCategories = this.toInt(aggregate?.rootCategories);
+    dto.subCategories = this.toInt(aggregate?.subCategories);
+    dto.emptyCategories = this.toInt(aggregate?.emptyCategories);
+    dto.totalMappedServices = this.toInt(aggregate?.totalMappedServices);
     dto.topCategories = categories.slice(0, 5);
     return dto;
   }

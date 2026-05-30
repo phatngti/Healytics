@@ -234,7 +234,19 @@ export class ClinicService {
       qb = qb.andWhere('p.name ILIKE :search', { search: `%${search}%` });
     }
     if (categoryId) {
-      qb = qb.andWhere('p.category_id = :categoryId', { categoryId });
+      qb = qb.andWhere(
+        `p.category_id IN (
+          SELECT category_filter.id
+          FROM categories category_filter
+          WHERE category_filter.deleted_at IS NULL
+            AND category_filter.is_active = true
+            AND (
+              category_filter.id = :categoryId
+              OR category_filter.parent_id = :categoryId
+            )
+        )`,
+        { categoryId },
+      );
     }
     if (minPrice != null) {
       qb = qb.andWhere('COALESCE(p.sale_price, p.base_price) >= :minPrice', {

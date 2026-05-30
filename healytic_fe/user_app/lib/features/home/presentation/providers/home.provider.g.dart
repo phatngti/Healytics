@@ -195,7 +195,63 @@ final class PremiumTreatmentsProvider
   }
 }
 
-String _$premiumTreatmentsHash() => r'78722723dd21212290a60a3de021ddbeb0de8190';
+String _$premiumTreatmentsHash() => r'6c8cebdb94282e56b44d9827ab91115558c36de7';
+
+/// Provider for the home preview of premium treatments.
+///
+/// The home dashboard should not inherit filters from the full
+/// Premium Treatments list screen.
+
+@ProviderFor(premiumTreatmentPreview)
+const premiumTreatmentPreviewProvider = PremiumTreatmentPreviewProvider._();
+
+/// Provider for the home preview of premium treatments.
+///
+/// The home dashboard should not inherit filters from the full
+/// Premium Treatments list screen.
+
+final class PremiumTreatmentPreviewProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<HomeProduct>>,
+          List<HomeProduct>,
+          FutureOr<List<HomeProduct>>
+        >
+    with
+        $FutureModifier<List<HomeProduct>>,
+        $FutureProvider<List<HomeProduct>> {
+  /// Provider for the home preview of premium treatments.
+  ///
+  /// The home dashboard should not inherit filters from the full
+  /// Premium Treatments list screen.
+  const PremiumTreatmentPreviewProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'premiumTreatmentPreviewProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$premiumTreatmentPreviewHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<HomeProduct>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<HomeProduct>> create(Ref ref) {
+    return premiumTreatmentPreview(ref);
+  }
+}
+
+String _$premiumTreatmentPreviewHash() =>
+    r'decd4bd95e831e44a2b1df4ca00c01f3c5bf8ad6';
 
 /// Provider for fetching service tags.
 
@@ -381,4 +437,4 @@ final class AllRecentActivityProvider
   }
 }
 
-String _$allRecentActivityHash() => r'fc7e0a36a444a2d49ecdaaaa47c4ece1deb3dbe3';
+String _$allRecentActivityHash() => r'0ee0d2171d93667d00c6399b7f896a80af066f31';

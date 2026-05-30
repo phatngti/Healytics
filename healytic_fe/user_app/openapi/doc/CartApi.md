@@ -31,7 +31,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = CartApi();
-final addToCartDto = AddToCartDto(); // AddToCartDto | 
+final addToCartDto = AddToCartDto(); // AddToCartDto |
 
 try {
     final result = api_instance.cartControllerAddItem(addToCartDto);
@@ -45,7 +45,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **addToCartDto** | [**AddToCartDto**](AddToCartDto.md)|  | 
+ **addToCartDto** | [**AddToCartDto**](AddToCartDto.md)|  |
 
 ### Return type
 
@@ -163,7 +163,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = CartApi();
-final cartItemId = cartItemId_example; // String | 
+final cartItemId = cartItemId_example; // String |
 
 try {
     api_instance.cartControllerRemoveItem(cartItemId);
@@ -176,7 +176,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **cartItemId** | **String**|  | 
+ **cartItemId** | **String**|  |
 
 ### Return type
 

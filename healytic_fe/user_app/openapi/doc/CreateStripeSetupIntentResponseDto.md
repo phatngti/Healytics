@@ -8,8 +8,8 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**setupIntentId** | **String** | Stripe SetupIntent ID | 
-**clientSecret** | **String** | Client secret used by Stripe PaymentSheet to add a card | 
+**setupIntentId** | **String** | Stripe SetupIntent ID |
+**clientSecret** | **String** | Client secret used by Stripe PaymentSheet to add a card |
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -69,7 +69,7 @@ class PartnerServiceTagsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AttachTagResponseDto',) as AttachTagResponseDto;
-    
+
     }
     return null;
   }
@@ -121,7 +121,7 @@ class PartnerServiceTagsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ServiceTagResponseDto',) as ServiceTagResponseDto;
-    
+
     }
     return null;
   }
@@ -318,7 +318,7 @@ class PartnerServiceTagsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ServiceTagResponseDto',) as ServiceTagResponseDto;
-    
+
     }
     return null;
   }
@@ -476,7 +476,7 @@ class PartnerServiceTagsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ServiceTagResponseDto',) as ServiceTagResponseDto;
-    
+
     }
     return null;
   }

@@ -9,10 +9,10 @@ import 'package:user_openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **route** | [**List<DirectionsCoordinateDto>**](DirectionsCoordinateDto.md) |  | [default to const []]
-**distanceText** | **String** |  | 
-**distanceValue** | **num** |  | 
-**durationText** | **String** |  | 
-**durationValue** | **num** |  | 
+**distanceText** | **String** |  |
+**distanceValue** | **num** |  |
+**durationText** | **String** |  |
+**durationValue** | **num** |  |
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

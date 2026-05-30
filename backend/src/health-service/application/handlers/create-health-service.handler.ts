@@ -102,12 +102,17 @@ export class CreateHealthServiceHandler {
       if (baseData.categoryId) {
         const category = await queryRunner.manager.findOne(Category, {
           where: { id: baseData.categoryId, isActive: true },
-          select: ['id'],
+          select: ['id', 'parentId'],
         });
 
         if (!category) {
           throw new NotFoundException(
             `Category with ID ${baseData.categoryId} not found`,
+          );
+        }
+        if (category.parentId == null) {
+          throw new ConflictException(
+            'Services must be assigned to a sub-category',
           );
         }
       }
@@ -258,6 +263,7 @@ export class CreateHealthServiceHandler {
         where: { id: savedProduct.id },
         relations: [
           'category',
+          'category.parent',
           'media',
           'productDefinition',
           'productEmployeeEligibilities',

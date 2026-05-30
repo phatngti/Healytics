@@ -8,15 +8,15 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**employeeId** | **String** |  | 
-**completedSessions** | **num** |  | 
-**sessionsDelta** | **num** | % change vs previous period | 
-**contributionValue** | **num** | Contribution value in VND | 
-**contributionDelta** | **num** |  | 
-**utilizationRate** | **num** |  | 
-**utilizationDelta** | **num** |  | 
-**averageRating** | **num** |  | 
-**reviewCount** | **num** |  | 
+**employeeId** | **String** |  |
+**completedSessions** | **num** |  |
+**sessionsDelta** | **num** | % change vs previous period |
+**contributionValue** | **num** | Contribution value in VND |
+**contributionDelta** | **num** |  |
+**utilizationRate** | **num** |  |
+**utilizationDelta** | **num** |  |
+**averageRating** | **num** |  |
+**reviewCount** | **num** |  |
 **trendPoints** | [**List<EmployeeTrendPointDto>**](EmployeeTrendPointDto.md) |  | [default to const []]
 **mixMetrics** | [**List<EmployeeMixMetricDto>**](EmployeeMixMetricDto.md) |  | [default to const []]
 **scheduleLoad** | [**List<EmployeeScheduleLoadDto>**](EmployeeScheduleLoadDto.md) |  | [default to const []]

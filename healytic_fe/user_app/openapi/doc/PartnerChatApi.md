@@ -31,7 +31,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerChatApi();
-final createConversationDto = CreateConversationDto(); // CreateConversationDto | 
+final createConversationDto = CreateConversationDto(); // CreateConversationDto |
 
 try {
     final result = api_instance.partnerChatControllerCreateConversation(createConversationDto);
@@ -45,7 +45,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createConversationDto** | [**CreateConversationDto**](CreateConversationDto.md)|  | 
+ **createConversationDto** | [**CreateConversationDto**](CreateConversationDto.md)|  |
 
 ### Return type
 
@@ -121,7 +121,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerChatApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 final beforeId = beforeId_example; // String | Fetch messages older than this message ID (cursor)
 final limit = 8.14; // num | Number of messages to return (max 50)
 
@@ -136,8 +136,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
- **beforeId** | **String**| Fetch messages older than this message ID (cursor) | [optional] 
+ **id** | **String**|  |
+ **beforeId** | **String**| Fetch messages older than this message ID (cursor) | [optional]
  **limit** | **num**| Number of messages to return (max 50) | [optional] [default to 50]
 
 ### Return type
@@ -171,7 +171,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerChatApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     api_instance.partnerChatControllerMarkRead(id);
@@ -184,7 +184,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 

@@ -46,7 +46,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**| Partner ID | 
+ **id** | **String**| Partner ID |
 
 ### Return type
 
@@ -101,11 +101,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **page** | **num**| Page number (1-indexed) | [optional] [default to 1]
  **limit** | **num**| Items per page | [optional] [default to 10]
- **scope** | [**AdminPartnerScope**](.md)| Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS | [optional] 
- **verificationStatus** | [**PartnerVerificationStatus**](.md)| Explicit status filter | [optional] 
- **search** | **String**| Search by tax code, brand name, legal name, or email | [optional] 
- **sortBy** | [**AdminPartnerSortBy**](.md)| Column to sort by | [optional] 
- **sortDirection** | [**AdminPartnerSortDirection**](.md)| Sort direction | [optional] 
+ **scope** | [**AdminPartnerScope**](.md)| Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS | [optional]
+ **verificationStatus** | [**PartnerVerificationStatus**](.md)| Explicit status filter | [optional]
+ **search** | **String**| Search by tax code, brand name, legal name, or email | [optional]
+ **sortBy** | [**AdminPartnerSortBy**](.md)| Column to sort by | [optional]
+ **sortDirection** | [**AdminPartnerSortDirection**](.md)| Sort direction | [optional]
 
 ### Return type
 
@@ -160,11 +160,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **page** | **num**| Page number (1-indexed) | [optional] [default to 1]
  **limit** | **num**| Items per page | [optional] [default to 10]
- **scope** | [**AdminPartnerScope**](.md)| Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS | [optional] 
- **verificationStatus** | [**PartnerVerificationStatus**](.md)| Explicit status filter | [optional] 
- **search** | **String**| Search by tax code, brand name, legal name, or email | [optional] 
- **sortBy** | [**AdminPartnerSortBy**](.md)| Column to sort by | [optional] 
- **sortDirection** | [**AdminPartnerSortDirection**](.md)| Sort direction | [optional] 
+ **scope** | [**AdminPartnerScope**](.md)| Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS | [optional]
+ **verificationStatus** | [**PartnerVerificationStatus**](.md)| Explicit status filter | [optional]
+ **search** | **String**| Search by tax code, brand name, legal name, or email | [optional]
+ **sortBy** | [**AdminPartnerSortBy**](.md)| Column to sort by | [optional]
+ **sortDirection** | [**AdminPartnerSortDirection**](.md)| Sort direction | [optional]
 
 ### Return type
 
@@ -219,11 +219,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **page** | **num**| Page number (1-indexed) | [optional] [default to 1]
  **limit** | **num**| Items per page | [optional] [default to 10]
- **scope** | [**AdminPartnerScope**](.md)| Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS | [optional] 
- **verificationStatus** | [**PartnerVerificationStatus**](.md)| Explicit status filter | [optional] 
- **search** | **String**| Search by tax code, brand name, legal name, or email | [optional] 
- **sortBy** | [**AdminPartnerSortBy**](.md)| Column to sort by | [optional] 
- **sortDirection** | [**AdminPartnerSortDirection**](.md)| Sort direction | [optional] 
+ **scope** | [**AdminPartnerScope**](.md)| Tab scope: VERIFICATION_QUEUE or ALL_PROVIDERS | [optional]
+ **verificationStatus** | [**PartnerVerificationStatus**](.md)| Explicit status filter | [optional]
+ **search** | **String**| Search by tax code, brand name, legal name, or email | [optional]
+ **sortBy** | [**AdminPartnerSortBy**](.md)| Column to sort by | [optional]
+ **sortDirection** | [**AdminPartnerSortDirection**](.md)| Sort direction | [optional]
 
 ### Return type
 
@@ -257,7 +257,7 @@ import 'package:user_openapi/api.dart';
 
 final api_instance = AdminPartnersApi();
 final id = id_example; // String | Partner ID
-final reviewPartnerProfileDto = ReviewPartnerProfileDto(); // ReviewPartnerProfileDto | 
+final reviewPartnerProfileDto = ReviewPartnerProfileDto(); // ReviewPartnerProfileDto |
 
 try {
     final result = api_instance.adminPartnersControllerReviewPartner(id, reviewPartnerProfileDto);
@@ -271,8 +271,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**| Partner ID | 
- **reviewPartnerProfileDto** | [**ReviewPartnerProfileDto**](ReviewPartnerProfileDto.md)|  | 
+ **id** | **String**| Partner ID |
+ **reviewPartnerProfileDto** | [**ReviewPartnerProfileDto**](ReviewPartnerProfileDto.md)|  |
 
 ### Return type
 

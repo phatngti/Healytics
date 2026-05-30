@@ -481,7 +481,8 @@ describe('HealthServiceService', () => {
           productEmployeeEligibilities: [],
         },
       ];
-      productRepository.find.mockResolvedValue(mockProducts);
+      const qb = productRepository.createQueryBuilder();
+      qb.getMany.mockResolvedValue(mockProducts);
 
       // Act
       const result = await service.getPremiumTreatments();
@@ -489,17 +490,20 @@ describe('HealthServiceService', () => {
       // Assert
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
-      expect(productRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { status: 'active', isVisibleOnline: true },
-          take: 10,
-        }),
+      expect(productRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'product',
       );
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        'product.is_visible_online = :isVisibleOnline',
+        { isVisibleOnline: true },
+      );
+      expect(qb.take).toHaveBeenCalledWith(50);
     });
 
     it('should return empty array when no products exist', async () => {
       // Arrange
-      productRepository.find.mockResolvedValue([]);
+      const qb = productRepository.createQueryBuilder();
+      qb.getMany.mockResolvedValue([]);
 
       // Act
       const result = await service.getPremiumTreatments();

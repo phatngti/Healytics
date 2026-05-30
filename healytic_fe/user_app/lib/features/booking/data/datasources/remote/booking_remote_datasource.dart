@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/providers/api.provider.dart';
 import 'package:user_app/core/services/api.service.dart';
+import 'package:user_app/features/home/domain/entities/filter_sort.entity.dart';
 import 'package:user_openapi/api.dart';
 
 import '../../../domain/entities/booking.entity.dart';
@@ -31,7 +32,10 @@ abstract class BookingRemoteDatasource {
 
   /// Returns services available under the given
   /// [categoryId].
-  Future<List<BookingService>> getServicesByCategory(String categoryId);
+  Future<List<BookingService>> getServicesByCategory(
+    String categoryId, {
+    ServiceListFilter? filter,
+  });
 
   /// Searches services and specialists matching
   /// [query] via full-text search.
@@ -147,10 +151,22 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
   }
 
   @override
-  Future<List<BookingService>> getServicesByCategory(String categoryId) async {
+  Future<List<BookingService>> getServicesByCategory(
+    String categoryId, {
+    ServiceListFilter? filter,
+  }) async {
     try {
       final response = await _apiService.userCategoriesApi
-          .userCategoriesControllerFindServicesByCategory(categoryId);
+          .userCategoriesControllerFindServicesByCategory(
+            categoryId,
+            sort: filter?.sort.apiValue,
+            minPrice: filter?.minPrice,
+            maxPrice: filter?.maxPrice,
+            clinicId: filter?.clinicId,
+            provinceId: filter?.provinceId,
+            districtId: filter?.districtId,
+            wardId: filter?.wardId,
+          );
 
       if (response == null) return [];
 
@@ -280,8 +296,15 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
       title: dto.title,
       duration: dto.duration,
       price: dto.price,
+      priceAmount: _numFrom(dto.priceVnd),
       clinicName: dto.clinicName?.toString(),
+      categoryId: dto.categoryId?.toString(),
+      categoryName: dto.categoryName?.toString(),
+      parentCategoryId: dto.parentCategoryId?.toString(),
+      parentCategoryName: dto.parentCategoryName?.toString(),
+      clinicId: dto.clinicId?.toString(),
       clinicAddress: dto.clinicAddress?.toString(),
+      location: dto.location?.toString(),
       distance: dto.distance?.toString(),
     );
   }
@@ -482,6 +505,12 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
     if (value is String) return double.tryParse(value.trim());
     return null;
   }
+
+  num _numFrom(Object? value) {
+    if (value is num) return value;
+    if (value is String) return num.tryParse(value.trim()) ?? 0;
+    return 0;
+  }
 }
 
 // ─── Mock implementation ──────────────────────────
@@ -514,7 +543,10 @@ class BookingRemoteDatasourceMock implements BookingRemoteDatasource {
   }
 
   @override
-  Future<List<BookingService>> getServicesByCategory(String categoryId) async {
+  Future<List<BookingService>> getServicesByCategory(
+    String categoryId, {
+    ServiceListFilter? filter,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 400));
     return kMockServicesByCategory[categoryId] ?? [];
   }

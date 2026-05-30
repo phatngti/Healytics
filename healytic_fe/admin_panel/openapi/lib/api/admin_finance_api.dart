@@ -63,7 +63,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceNoteDto',) as AdminFinanceNoteDto;
-    
+
     }
     return null;
   }
@@ -120,7 +120,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceRefundCaseDetailDto',) as AdminFinanceRefundCaseDetailDto;
-    
+
     }
     return null;
   }
@@ -172,7 +172,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceExportJobDto',) as AdminFinanceExportJobDto;
-    
+
     }
     return null;
   }
@@ -229,7 +229,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceTransactionRecordDto',) as AdminFinanceTransactionRecordDto;
-    
+
     }
     return null;
   }
@@ -741,7 +741,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinancePayoutDetailDto',) as AdminFinancePayoutDetailDto;
-    
+
     }
     return null;
   }
@@ -944,7 +944,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinancePayoutPageDto',) as AdminFinancePayoutPageDto;
-    
+
     }
     return null;
   }
@@ -1147,7 +1147,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceReconciliationPageDto',) as AdminFinanceReconciliationPageDto;
-    
+
     }
     return null;
   }
@@ -1200,7 +1200,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceReconciliationDetailDto',) as AdminFinanceReconciliationDetailDto;
-    
+
     }
     return null;
   }
@@ -1253,7 +1253,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceRefundCaseDetailDto',) as AdminFinanceRefundCaseDetailDto;
-    
+
     }
     return null;
   }
@@ -1456,7 +1456,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceRefundCasePageDto',) as AdminFinanceRefundCasePageDto;
-    
+
     }
     return null;
   }
@@ -1659,7 +1659,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceOverviewDto',) as AdminFinanceOverviewDto;
-    
+
     }
     return null;
   }
@@ -1712,7 +1712,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceTransactionDetailDto',) as AdminFinanceTransactionDetailDto;
-    
+
     }
     return null;
   }
@@ -1915,7 +1915,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceTransactionPageDto',) as AdminFinanceTransactionPageDto;
-    
+
     }
     return null;
   }
@@ -2178,7 +2178,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinancePayoutDetailDto',) as AdminFinancePayoutDetailDto;
-    
+
     }
     return null;
   }
@@ -2235,7 +2235,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceTransactionRecordDto',) as AdminFinanceTransactionRecordDto;
-    
+
     }
     return null;
   }
@@ -2292,7 +2292,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceRefundCaseDetailDto',) as AdminFinanceRefundCaseDetailDto;
-    
+
     }
     return null;
   }
@@ -2349,7 +2349,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinancePayoutDetailDto',) as AdminFinancePayoutDetailDto;
-    
+
     }
     return null;
   }
@@ -2406,7 +2406,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceReconciliationDetailDto',) as AdminFinanceReconciliationDetailDto;
-    
+
     }
     return null;
   }
@@ -2463,7 +2463,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinanceReconciliationDetailDto',) as AdminFinanceReconciliationDetailDto;
-    
+
     }
     return null;
   }
@@ -2520,7 +2520,7 @@ class AdminFinanceApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminFinancePayoutDetailDto',) as AdminFinancePayoutDetailDto;
-    
+
     }
     return null;
   }

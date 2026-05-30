@@ -9,6 +9,8 @@ import 'package:user_app/features/orders/domain/entities/'
 import 'home_mock_data.dart';
 import 'package:user_app/features/home/domain/entities/'
     'ai_recommendation.entity.dart';
+import 'package:user_app/features/home/domain/entities/filter_sort.entity.dart';
+import 'package:user_app/features/home/domain/entities/filter_sort_helpers.dart';
 import 'package:user_app/features/home/domain/entities/home.entity.dart';
 import 'package:user_openapi/api.dart';
 import 'dart:convert';
@@ -23,7 +25,7 @@ abstract class HomeRemoteDatasource {
     int topK,
   });
 
-  Future<List<HomeProduct>> getPremiumTreatments();
+  Future<List<HomeProduct>> getPremiumTreatments({ServiceListFilter? filter});
   Future<List<ServiceTag>> getServiceTags();
   Future<List<HomeSpecialist>> getFeaturedSpecialists();
 
@@ -33,7 +35,10 @@ abstract class HomeRemoteDatasource {
 
   /// Fetches recent appointment activity for the
   /// home dashboard.
-  Future<List<AppointmentEntity>> getRecentActivity({int limit});
+  Future<List<AppointmentEntity>> getRecentActivity({
+    int limit,
+    RecentActivityFilter? filter,
+  });
 }
 
 class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
@@ -59,6 +64,21 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
           slug: slug,
           icon: _getIconForCategory(slug),
           categoryType: _getCategoryType(slug),
+          parentId: category.parent?.id,
+          parentName: category.parent?.name,
+          children: category.children
+              .map(
+                (child) => HomeCategory(
+                  id: child.id,
+                  name: child.name,
+                  slug: child.slug,
+                  parentId: category.id,
+                  parentName: category.name,
+                  icon: _getIconForCategory(child.slug),
+                  categoryType: _getCategoryType(child.slug),
+                ),
+              )
+              .toList(),
         );
       }).toList();
     } catch (e) {
@@ -73,31 +93,21 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
     int topK = 5,
   }) async {
     try {
-      final request = HomeRecommenderRequest(
-        userId: userId,
-        topK: topK,
-      );
+      final request = HomeRecommenderRequest(userId: userId, topK: topK);
       final response = await _apiService.recommenderApi
           .recommendHomeRecommenderHomePost(request);
       if (response == null) return [];
-      return response.recommendations
-          .map(_mapDtoToEntity)
-          .toList();
+      return response.recommendations.map(_mapDtoToEntity).toList();
     } catch (e) {
-      debugPrint(
-        'Error fetching recommended products: $e',
-      );
+      debugPrint('Error fetching recommended products: $e');
       return [];
     }
   }
 
   /// Maps an [AiRecommendationItemDto] from the
   /// Recommender API to [AiRecommendation].
-  AiRecommendation _mapDtoToEntity(
-    AiRecommendationItemDto dto,
-  ) {
-    final priceAmount =
-        double.tryParse(dto.price ?? '') ?? 0;
+  AiRecommendation _mapDtoToEntity(AiRecommendationItemDto dto) {
+    final priceAmount = double.tryParse(dto.price ?? '') ?? 0;
 
     return AiRecommendation(
       serviceId: dto.serviceId ?? '',
@@ -105,24 +115,31 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
       imageUrl: dto.imageUrl ?? '',
       price: dto.price ?? '',
       priceAmount: priceAmount,
-      rating:
-          double.tryParse(dto.rating ?? '') ?? 0,
+      rating: double.tryParse(dto.rating ?? '') ?? 0,
       location: dto.location ?? '',
+      category: dto.category ?? '',
+      vendorName: dto.vendorName ?? '',
     );
   }
 
   @override
-  Future<List<HomeProduct>> getPremiumTreatments() async {
-    try {
-      final response = await _apiService.userHealthServicesApi
-          .userHealthServiceControllerGetPremiumTreatments();
+  Future<List<HomeProduct>> getPremiumTreatments({
+    ServiceListFilter? filter,
+  }) async {
+    final response = await _apiService.userHealthServicesApi
+        .userHealthServiceControllerGetPremiumTreatments(
+          sort: filter?.sort.apiValue,
+          minPrice: filter?.minPrice,
+          maxPrice: filter?.maxPrice,
+          categoryId: filter?.categoryId,
+          clinicId: filter?.clinicId,
+          provinceId: filter?.provinceId,
+          districtId: filter?.districtId,
+          wardId: filter?.wardId,
+        );
 
-      if (response == null) return [];
-      return response.map(_mapDtoToProduct).toList();
-    } catch (e) {
-      debugPrint('Error fetching premium treatments: $e');
-      return [];
-    }
+    if (response == null) return [];
+    return response.map(_mapDtoToProduct).toList();
   }
 
   /// Maps a [PublicHealthServiceCardResponseDto] to a
@@ -134,10 +151,13 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
       slug: dto.slug,
       imageUrl: dto.imageUrl?.toString() ?? '',
       category: dto.category,
+      categoryId: dto.categoryId?.toString(),
       duration: dto.duration,
       price: dto.price,
+      priceAmount: dto.priceAmount,
       rating: dto.rating,
       vendorName: dto.vendorName,
+      clinicId: dto.clinicId?.toString(),
       location: dto.location,
       staffAvatars: dto.staffAvatars,
       type: dto.type,
@@ -231,13 +251,9 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
         filteredIds: serviceIds,
       );
       final response = await _apiService.recommenderApi
-          .recommendChatbotRecommenderChatbotPost(
-        request,
-      );
+          .recommendChatbotRecommenderChatbotPost(request);
       if (response == null) return [];
-      return response.recommendations
-          .map(_mapDtoToEntity)
-          .toList();
+      return response.recommendations.map(_mapDtoToEntity).toList();
     } catch (e) {
       debugPrint('Error fetching AI recommendations: $e');
       return [];
@@ -245,11 +261,20 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   }
 
   @override
-  Future<List<AppointmentEntity>> getRecentActivity({int limit = 5}) async {
+  Future<List<AppointmentEntity>> getRecentActivity({
+    int limit = 5,
+    RecentActivityFilter? filter,
+  }) async {
     try {
       final response = await _apiService.userAppointmentsApi
           .userAppointmentControllerListRecentActivityWithHttpInfo(
             limit: limit,
+            status: filter?.status,
+            categoryId: filter?.categoryId,
+            clinicId: filter?.clinicId,
+            fromDate: _dateQuery(filter?.fromDate),
+            toDate: _dateQuery(filter?.toDate),
+            sort: filter?.sort.apiValue,
           );
       if (response.statusCode >= 200 &&
           response.statusCode < 300 &&
@@ -325,6 +350,13 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
     if (raw is String) return double.tryParse(raw);
     return null;
   }
+
+  String? _dateQuery(DateTime? value) {
+    if (value == null) return null;
+    final month = value.month.toString().padLeft(2, '0');
+    final day = value.day.toString().padLeft(2, '0');
+    return '${value.year}-$month-$day';
+  }
 }
 
 /// Mock implementation that returns fake data after a
@@ -346,9 +378,11 @@ class HomeRemoteDatasourceMock implements HomeRemoteDatasource {
   }
 
   @override
-  Future<List<HomeProduct>> getPremiumTreatments() async {
+  Future<List<HomeProduct>> getPremiumTreatments({
+    ServiceListFilter? filter,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return kMockPremiumTreatments;
+    return filterServiceProducts(kMockPremiumTreatments, filter);
   }
 
   @override
@@ -372,9 +406,15 @@ class HomeRemoteDatasourceMock implements HomeRemoteDatasource {
   }
 
   @override
-  Future<List<AppointmentEntity>> getRecentActivity({int limit = 5}) async {
+  Future<List<AppointmentEntity>> getRecentActivity({
+    int limit = 5,
+    RecentActivityFilter? filter,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return kMockRecentActivities;
+    final items = filter == null
+        ? kMockRecentActivities
+        : filterRecentActivitiesLocally(kMockRecentActivities, filter);
+    return items.take(limit).toList();
   }
 }
 

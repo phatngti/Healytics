@@ -19,10 +19,13 @@ class AdminCategoryResponseDto {
     this.description,
     this.imageUrl,
     required this.isActive,
+    this.parentId,
+    required this.isRoot,
     this.iconName,
     this.colorValue,
     required this.sortOrder,
     required this.serviceCount,
+    required this.subCategoryCount,
     required this.createdAt,
     required this.updatedAt,
     this.parent,
@@ -48,6 +51,12 @@ class AdminCategoryResponseDto {
   /// Whether category is active
   bool isActive;
 
+  /// Parent category ID. Null for root categories.
+  String? parentId;
+
+  /// Whether this category is a root category.
+  bool isRoot;
+
   /// Icon identifier for frontend rendering
   String? iconName;
 
@@ -59,6 +68,9 @@ class AdminCategoryResponseDto {
 
   /// Number of health services in this category
   num serviceCount;
+
+  /// Number of direct child sub-categories
+  num subCategoryCount;
 
   /// Creation timestamp
   DateTime createdAt;
@@ -86,10 +98,13 @@ class AdminCategoryResponseDto {
     other.description == description &&
     other.imageUrl == imageUrl &&
     other.isActive == isActive &&
+    other.parentId == parentId &&
+    other.isRoot == isRoot &&
     other.iconName == iconName &&
     other.colorValue == colorValue &&
     other.sortOrder == sortOrder &&
     other.serviceCount == serviceCount &&
+    other.subCategoryCount == subCategoryCount &&
     other.createdAt == createdAt &&
     other.updatedAt == updatedAt &&
     other.parent == parent &&
@@ -104,17 +119,20 @@ class AdminCategoryResponseDto {
     (description == null ? 0 : description!.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (isActive.hashCode) +
+    (parentId == null ? 0 : parentId!.hashCode) +
+    (isRoot.hashCode) +
     (iconName == null ? 0 : iconName!.hashCode) +
     (colorValue == null ? 0 : colorValue!.hashCode) +
     (sortOrder.hashCode) +
     (serviceCount.hashCode) +
+    (subCategoryCount.hashCode) +
     (createdAt.hashCode) +
     (updatedAt.hashCode) +
     (parent == null ? 0 : parent!.hashCode) +
     (children.hashCode);
 
   @override
-  String toString() => 'AdminCategoryResponseDto[id=$id, name=$name, slug=$slug, description=$description, imageUrl=$imageUrl, isActive=$isActive, iconName=$iconName, colorValue=$colorValue, sortOrder=$sortOrder, serviceCount=$serviceCount, createdAt=$createdAt, updatedAt=$updatedAt, parent=$parent, children=$children]';
+  String toString() => 'AdminCategoryResponseDto[id=$id, name=$name, slug=$slug, description=$description, imageUrl=$imageUrl, isActive=$isActive, parentId=$parentId, isRoot=$isRoot, iconName=$iconName, colorValue=$colorValue, sortOrder=$sortOrder, serviceCount=$serviceCount, subCategoryCount=$subCategoryCount, createdAt=$createdAt, updatedAt=$updatedAt, parent=$parent, children=$children]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -132,6 +150,12 @@ class AdminCategoryResponseDto {
       json[r'imageUrl'] = null;
     }
       json[r'isActive'] = this.isActive;
+    if (this.parentId != null) {
+      json[r'parentId'] = this.parentId;
+    } else {
+      json[r'parentId'] = null;
+    }
+      json[r'isRoot'] = this.isRoot;
     if (this.iconName != null) {
       json[r'iconName'] = this.iconName;
     } else {
@@ -144,6 +168,7 @@ class AdminCategoryResponseDto {
     }
       json[r'sortOrder'] = this.sortOrder;
       json[r'serviceCount'] = this.serviceCount;
+      json[r'subCategoryCount'] = this.subCategoryCount;
       json[r'createdAt'] = this.createdAt.toUtc().toIso8601String();
       json[r'updatedAt'] = this.updatedAt.toUtc().toIso8601String();
     if (this.parent != null) {
@@ -180,10 +205,13 @@ class AdminCategoryResponseDto {
         description: mapValueOfType<String>(json, r'description'),
         imageUrl: mapValueOfType<String>(json, r'imageUrl'),
         isActive: mapValueOfType<bool>(json, r'isActive')!,
+        parentId: mapValueOfType<String>(json, r'parentId'),
+        isRoot: mapValueOfType<bool>(json, r'isRoot')!,
         iconName: mapValueOfType<String>(json, r'iconName'),
         colorValue: mapValueOfType<String>(json, r'colorValue'),
         sortOrder: num.parse('${json[r'sortOrder']}'),
         serviceCount: num.parse('${json[r'serviceCount']}'),
+        subCategoryCount: num.parse('${json[r'subCategoryCount']}'),
         createdAt: mapDateTime(json, r'createdAt', r'')!,
         updatedAt: mapDateTime(json, r'updatedAt', r'')!,
         parent: CategorySummaryDto.fromJson(json[r'parent']),
@@ -239,8 +267,10 @@ class AdminCategoryResponseDto {
     'name',
     'slug',
     'isActive',
+    'isRoot',
     'sortOrder',
     'serviceCount',
+    'subCategoryCount',
     'createdAt',
     'updatedAt',
   };

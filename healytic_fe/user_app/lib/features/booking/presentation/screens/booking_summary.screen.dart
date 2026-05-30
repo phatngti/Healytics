@@ -73,7 +73,7 @@ class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
       detail: detail,
     );
     if (bookingParams == null) {
-      AppToast.error(context, 'Select a specialist and time slot first');
+      AppToast.error(context, 'Select a date and time slot first');
       return;
     }
 
@@ -89,6 +89,7 @@ class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
             serviceId: bookingParams.serviceId,
             employeeId: bookingParams.employeeId,
             timeSlot: timeSlot,
+            autoAssignStaff: bookingParams.autoAssignSpecialist,
           );
       if (!mounted) return;
       AppToast.success(context, 'Added to cart');
@@ -130,7 +131,7 @@ class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
         const SnackBar(
           content: Text(
             'Missing booking data. Please select a '
-            'service, specialist, date and time again.',
+            'service, date and time again.',
           ),
         ),
       );
@@ -154,11 +155,12 @@ class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
     final serviceName = detail?.service.title ?? service?.title;
     final employeeId = detail?.specialist.id ?? specialist?.id;
     final employeeName = detail?.specialist.name ?? specialist?.name;
+    final autoAssignSpecialist = flowState.autoAssignSpecialist;
 
     if (serviceId == null ||
         serviceName == null ||
-        employeeId == null ||
-        employeeName == null ||
+        (!autoAssignSpecialist &&
+            (employeeId == null || employeeName == null)) ||
         selectedDate == null ||
         selectedTimeSlot == null ||
         selectedTimeSlot.isEmpty) {
@@ -181,6 +183,7 @@ class _BookingSummaryScreenState extends ConsumerState<BookingSummaryScreen> {
       employeeName: employeeName,
       selectedDate: selectedDate,
       selectedTimeSlot: selectedTimeSlot,
+      autoAssignSpecialist: autoAssignSpecialist,
     );
   }
 
@@ -394,17 +397,22 @@ class _FallbackBody extends StatelessWidget {
             ),
             SizedBox(height: sectionGap),
             SpecialistServiceCard(
-              specialistName: flowState.selectedSpecialist?.name ?? '—',
+              specialistName: flowState.autoAssignSpecialist
+                  ? 'Assigned automatically'
+                  : flowState.selectedSpecialist?.name ?? '—',
               formattedDate: _formatDate(flowState.selectedDate),
               formattedTime: flowState.selectedTimeSlotLabel ?? '—',
               avatarUrl: flowState.selectedSpecialist?.avatarUrl,
-              specialty: flowState.selectedSpecialist?.specialty,
+              specialty: flowState.autoAssignSpecialist
+                  ? 'Best available specialist'
+                  : flowState.selectedSpecialist?.specialty,
             ),
             SizedBox(height: sectionGap),
 
             if (hasCategory) ...[
               CategoryServiceInfo(
                 categoryName: flowState.selectedCategory?.name ?? '—',
+                subCategoryName: flowState.selectedSubCategory?.name,
                 serviceTitle: flowState.selectedService?.title ?? '—',
                 serviceSubtitle: flowState.selectedService?.subtitle,
                 serviceImageUrl: flowState.selectedService?.imageUrl,

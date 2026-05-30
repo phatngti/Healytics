@@ -146,6 +146,7 @@ class CategoryNotifier extends _$CategoryNotifier {
   /// Update an existing category
   Future<void> updateCategory({
     required CategoryId id,
+    String? parentId,
     String? name,
     String? description,
     String? iconName,
@@ -156,6 +157,7 @@ class CategoryNotifier extends _$CategoryNotifier {
     final repo = ref.read(categoryRepositoryProvider);
     await repo.updateCategory(
       id: id,
+      parentId: parentId,
       name: name,
       description: description,
       iconName: iconName,
@@ -247,7 +249,9 @@ class CategoryNotifier extends _$CategoryNotifier {
       final matchesSearch =
           normalizedSearch.isEmpty ||
           category.name.toLowerCase().contains(normalizedSearch) ||
-          category.description.toLowerCase().contains(normalizedSearch);
+          category.description.toLowerCase().contains(normalizedSearch) ||
+          (category.parentName?.toLowerCase().contains(normalizedSearch) ??
+              false);
 
       final matchesVisibility = switch (query.visibilityFilter) {
         CategoryVisibilityFilter.all => true,

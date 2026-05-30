@@ -64,7 +64,7 @@ class UserAppointmentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AppointmentResponseDto',) as AppointmentResponseDto;
-    
+
     }
     return null;
   }
@@ -117,7 +117,7 @@ class UserAppointmentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ServiceManualResponseDto',) as ServiceManualResponseDto;
-    
+
     }
     return null;
   }
@@ -277,7 +277,19 @@ class UserAppointmentsApi {
   ///
   /// * [num] offset:
   ///   Number of items to skip
-  Future<Response> userAppointmentControllerListRecentActivityWithHttpInfo({ num? limit, num? offset, }) async {
+  ///
+  /// * [String] status:
+  ///
+  /// * [String] categoryId:
+  ///
+  /// * [String] clinicId:
+  ///
+  /// * [String] fromDate:
+  ///
+  /// * [String] toDate:
+  ///
+  /// * [String] sort:
+  Future<Response> userAppointmentControllerListRecentActivityWithHttpInfo({ num? limit, num? offset, String? status, String? categoryId, String? clinicId, String? fromDate, String? toDate, String? sort, }) async {
     // ignore: prefer_const_declarations
     final path = r'/user/appointments/recent-activity';
 
@@ -293,6 +305,24 @@ class UserAppointmentsApi {
     }
     if (offset != null) {
       queryParams.addAll(_queryParams('', 'offset', offset));
+    }
+    if (status != null) {
+      queryParams.addAll(_queryParams('', 'status', status));
+    }
+    if (categoryId != null) {
+      queryParams.addAll(_queryParams('', 'categoryId', categoryId));
+    }
+    if (clinicId != null) {
+      queryParams.addAll(_queryParams('', 'clinicId', clinicId));
+    }
+    if (fromDate != null) {
+      queryParams.addAll(_queryParams('', 'fromDate', fromDate));
+    }
+    if (toDate != null) {
+      queryParams.addAll(_queryParams('', 'toDate', toDate));
+    }
+    if (sort != null) {
+      queryParams.addAll(_queryParams('', 'sort', sort));
     }
 
     const contentTypes = <String>[];
@@ -318,8 +348,20 @@ class UserAppointmentsApi {
   ///
   /// * [num] offset:
   ///   Number of items to skip
-  Future<void> userAppointmentControllerListRecentActivity({ num? limit, num? offset, }) async {
-    final response = await userAppointmentControllerListRecentActivityWithHttpInfo( limit: limit, offset: offset, );
+  ///
+  /// * [String] status:
+  ///
+  /// * [String] categoryId:
+  ///
+  /// * [String] clinicId:
+  ///
+  /// * [String] fromDate:
+  ///
+  /// * [String] toDate:
+  ///
+  /// * [String] sort:
+  Future<void> userAppointmentControllerListRecentActivity({ num? limit, num? offset, String? status, String? categoryId, String? clinicId, String? fromDate, String? toDate, String? sort, }) async {
+    final response = await userAppointmentControllerListRecentActivityWithHttpInfo( limit: limit, offset: offset, status: status, categoryId: categoryId, clinicId: clinicId, fromDate: fromDate, toDate: toDate, sort: sort, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

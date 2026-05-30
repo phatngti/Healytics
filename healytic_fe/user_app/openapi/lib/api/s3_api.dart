@@ -66,7 +66,7 @@ class S3Api {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'DeleteFileResponseDto',) as DeleteFileResponseDto;
-    
+
     }
     return null;
   }
@@ -121,7 +121,7 @@ class S3Api {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'FileUrlResponseDto',) as FileUrlResponseDto;
-    
+
     }
     return null;
   }
@@ -173,7 +173,7 @@ class S3Api {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PresignResponseDto',) as PresignResponseDto;
-    
+
     }
     return null;
   }

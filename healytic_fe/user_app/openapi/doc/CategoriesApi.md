@@ -38,7 +38,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **rootsOnly** | **bool**| Return only root categories (without parent) | [optional] 
+ **rootsOnly** | **bool**| Return only root categories (without parent) | [optional]
 
 ### Return type
 
@@ -65,7 +65,7 @@ Get a category by slug
 import 'package:user_openapi/api.dart';
 
 final api_instance = CategoriesApi();
-final slug = slug_example; // String | 
+final slug = slug_example; // String |
 
 try {
     final result = api_instance.categoriesControllerFindBySlug(slug);
@@ -79,7 +79,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **slug** | **String**|  | 
+ **slug** | **String**|  |
 
 ### Return type
 
@@ -106,7 +106,7 @@ Get a category by id
 import 'package:user_openapi/api.dart';
 
 final api_instance = CategoriesApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     final result = api_instance.categoriesControllerFindOne(id);
@@ -120,7 +120,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 

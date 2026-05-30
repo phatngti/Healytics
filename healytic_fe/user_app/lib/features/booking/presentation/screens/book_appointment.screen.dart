@@ -10,7 +10,9 @@ import 'package:user_app/features/employee/'
     'employee_preview_cache.provider.dart';
 import '../../../../router/routes.dart';
 import '../../domain/entities/booking.entity.dart';
+import 'package:user_app/features/home/domain/entities/filter_sort.entity.dart';
 import 'package:user_app/features/home/domain/entities/home.entity.dart';
+import 'package:user_app/features/home/presentation/providers/list_filter.provider.dart';
 import '../providers/booking.provider.dart';
 import '../providers/booking_flow.provider.dart';
 import 'package:user_app/features/home/presentation/providers/home.provider.dart';
@@ -19,6 +21,8 @@ import '../widgets/book_appointment/booking_step_indicator.widget.dart';
 import '../widgets/book_appointment/category_filter_row.widget.dart';
 import '../widgets/book_appointment/booking_search_bar.widget.dart';
 import '../widgets/book_appointment/service_radio_list.widget.dart';
+import 'package:user_app/features/home/presentation/widgets/'
+    'filter_sort_controls.widget.dart';
 
 /// Step 1 of the booking flow: Select Category
 /// and Service.
@@ -39,12 +43,15 @@ class BookAppointmentScreen extends ConsumerStatefulWidget {
 
 class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
   int _selectedCategoryIdx = -1;
+  int _selectedSubCategoryIdx = -1;
   int _selectedServiceIdx = -1;
 
   List<HomeCategory> _categories = [];
 
   bool get _canContinue =>
-      _selectedCategoryIdx >= 0 && _selectedServiceIdx >= 0;
+      _selectedCategoryIdx >= 0 &&
+      _selectedSubCategoryIdx >= 0 &&
+      _selectedServiceIdx >= 0;
 
   void _handleBack() {
     // Reset flow state when leaving Step 1.
@@ -57,9 +64,11 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
 
     // Persist selections to shared flow state.
     final category = _categories[_selectedCategoryIdx];
+    final subCategory = category.children[_selectedSubCategoryIdx];
     ref.read(bookingFlowProvider.notifier).selectCategory(category);
+    ref.read(bookingFlowProvider.notifier).selectSubCategory(subCategory);
 
-    final servicesAsync = ref.read(servicesByCategoryProvider(category.id));
+    final servicesAsync = ref.read(servicesByCategoryProvider(subCategory.id));
     servicesAsync.whenData((services) {
       if (_selectedServiceIdx < services.length) {
         ref
@@ -68,12 +77,20 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
       }
     });
 
-    SelectSpecialistRoute(categoryId: category.id).push(context);
+    SelectSpecialistRoute(categoryId: subCategory.id).push(context);
   }
 
   void _onCategorySelected(int index) {
     setState(() {
       _selectedCategoryIdx = index;
+      _selectedSubCategoryIdx = -1;
+      _selectedServiceIdx = -1;
+    });
+  }
+
+  void _onSubCategorySelected(int index) {
+    setState(() {
+      _selectedSubCategoryIdx = index;
       _selectedServiceIdx = -1;
     });
   }
@@ -86,23 +103,49 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
   /// popup by matching it to a category and
   /// service index.
   void _onSearchServiceSelected(BookingService service) {
-    for (var ci = 0; ci < _categories.length; ci++) {
+    final resolved = _resolveServiceCategorySelection(service);
+    if (resolved != null) {
+      final categoryIndex = resolved.key;
+      final subCategoryIndex = resolved.value;
+      final subCategory = _categories[categoryIndex].children[subCategoryIndex];
       final asyncServices = ref.read(
-        servicesByCategoryProvider(_categories[ci].id),
+        servicesByCategoryProvider(subCategory.id),
       );
-      asyncServices.whenData((services) {
-        final si = services.indexWhere((s) => s.id == service.id);
-        if (si >= 0) {
-          setState(() {
-            _selectedCategoryIdx = ci;
-            _selectedServiceIdx = si;
-          });
-        }
+      final serviceIndex = asyncServices.maybeWhen(
+        data: (services) => services.indexWhere((s) => s.id == service.id),
+        orElse: () => -1,
+      );
+
+      setState(() {
+        _selectedCategoryIdx = categoryIndex;
+        _selectedSubCategoryIdx = subCategoryIndex;
+        _selectedServiceIdx = serviceIndex;
       });
     }
 
     // Immediately route to the service details screen
     ServiceDetailsRoute(serviceId: service.id).push(context);
+  }
+
+  MapEntry<int, int>? _resolveServiceCategorySelection(BookingService service) {
+    final subCategoryId = service.categoryId;
+    final parentCategoryId = service.parentCategoryId;
+
+    for (var ci = 0; ci < _categories.length; ci++) {
+      final category = _categories[ci];
+      if (parentCategoryId != null && category.id != parentCategoryId) {
+        continue;
+      }
+
+      final si = category.children.indexWhere(
+        (child) => child.id == subCategoryId,
+      );
+      if (si >= 0) {
+        return MapEntry(ci, si);
+      }
+    }
+
+    return null;
   }
 
   /// Handles tapping a specialist from the
@@ -148,8 +191,10 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
             sectionGap: sectionGap,
             categories: categories,
             selectedCategoryIdx: _selectedCategoryIdx,
+            selectedSubCategoryIdx: _selectedSubCategoryIdx,
             selectedServiceIdx: _selectedServiceIdx,
             onCategorySelected: _onCategorySelected,
+            onSubCategorySelected: _onSubCategorySelected,
             onServiceSelected: _onServiceSelected,
             onSearchServiceSelected: _onSearchServiceSelected,
             onSearchSpecialistSelected: _onSearchSpecialistSelected,
@@ -171,33 +216,163 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
       return const SizedBox.shrink();
     }
 
-    final categoryId = _categories[_selectedCategoryIdx].id;
-    final servicesAsync = ref.watch(servicesByCategoryProvider(categoryId));
+    final subCategories = _categories[_selectedCategoryIdx].children;
+    if (_selectedSubCategoryIdx < 0 ||
+        _selectedSubCategoryIdx >= subCategories.length) {
+      return const SizedBox.shrink();
+    }
 
-    return servicesAsync.when(
-      loading: () => Padding(
-        padding: EdgeInsets.only(top: sectionGap),
-        child: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (e, _) => Padding(
-        padding: EdgeInsets.only(top: sectionGap),
-        child: Text('Error: $e'),
-      ),
-      data: (services) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: sectionGap),
-            _SectionTitle(title: 'Select Service'),
-            SizedBox(height: AppDimens.spaceMd),
-            ServiceRadioList(
-              services: services,
-              selectedIndex: _selectedServiceIdx,
-              onSelected: _onServiceSelected,
-            ),
-          ],
-        );
+    final categoryId = subCategories[_selectedSubCategoryIdx].id;
+    return _ServiceSection(
+      categoryId: categoryId,
+      sectionGap: sectionGap,
+      selectedServiceIdx: _selectedServiceIdx,
+      onSelected: _onServiceSelected,
+      onSelectionInvalidated: () {
+        setState(() => _selectedServiceIdx = -1);
       },
+    );
+  }
+}
+
+class _ServiceSection extends ConsumerWidget {
+  const _ServiceSection({
+    required this.categoryId,
+    required this.sectionGap,
+    required this.selectedServiceIdx,
+    required this.onSelected,
+    required this.onSelectionInvalidated,
+  });
+
+  final String categoryId;
+  final double sectionGap;
+  final int selectedServiceIdx;
+  final ValueChanged<int> onSelected;
+  final VoidCallback onSelectionInvalidated;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filter = ref.watch(bookingServiceFilterProvider);
+    final servicesAsync = ref.watch(servicesByCategoryProvider(categoryId));
+    final services = servicesAsync.value;
+
+    if (services != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: sectionGap),
+          _SectionTitle(title: 'Select Service'),
+          SizedBox(height: AppDimens.spaceMd),
+          FilterSortBar<ServiceListSort>(
+            options: ServiceListSort.values
+                .map((sort) => SortOption(value: sort, label: sort.label))
+                .toList(),
+            selected: filter.sort,
+            filtersActive: filter.hasFilters,
+            onFilterTap: () async {
+              final next = await showServiceFilterSheet(context, filter);
+              if (next == null) return;
+              ref.read(bookingServiceFilterProvider.notifier).state = next;
+              onSelectionInvalidated();
+            },
+            onSelected: (sort) {
+              ref.read(bookingServiceFilterProvider.notifier).state = filter
+                  .withSort(sort);
+              onSelectionInvalidated();
+            },
+          ),
+          SizedBox(height: AppDimens.spaceMd),
+          _RefreshingStack(
+            isRefreshing: servicesAsync.isLoading,
+            child: services.isEmpty
+                ? _NoResultsState(
+                    filtersActive: filter.isActive,
+                    onReset: () {
+                      ref.read(bookingServiceFilterProvider.notifier).state =
+                          const ServiceListFilter();
+                      onSelectionInvalidated();
+                    },
+                  )
+                : ServiceRadioList(
+                    services: services,
+                    selectedIndex: selectedServiceIdx,
+                    onSelected: onSelected,
+                  ),
+          ),
+        ],
+      );
+    }
+
+    if (servicesAsync.hasError) {
+      return Padding(
+        padding: EdgeInsets.only(top: sectionGap),
+        child: Text('Error: ${servicesAsync.error}'),
+      );
+    }
+
+    return Padding(
+      padding: EdgeInsets.only(top: sectionGap),
+      child: const Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+
+class _NoResultsState extends StatelessWidget {
+  const _NoResultsState({required this.filtersActive, required this.onReset});
+
+  final bool filtersActive;
+  final VoidCallback onReset;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: AppDimens.paddingAllLarge,
+        child: Column(
+          children: [
+            Text(
+              filtersActive
+                  ? 'No services match these filters'
+                  : 'No services in this category yet',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (filtersActive) ...[
+              AppDimens.verticalSmall,
+              TextButton(
+                onPressed: onReset,
+                child: const Text('Reset filters'),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RefreshingStack extends StatelessWidget {
+  const _RefreshingStack({required this.isRefreshing, required this.child});
+
+  final bool isRefreshing;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        child,
+        if (isRefreshing)
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: LinearProgressIndicator(minHeight: 2),
+          ),
+      ],
     );
   }
 }
@@ -209,8 +384,10 @@ class _Step1Body extends StatelessWidget {
     required this.sectionGap,
     required this.categories,
     required this.selectedCategoryIdx,
+    required this.selectedSubCategoryIdx,
     required this.selectedServiceIdx,
     required this.onCategorySelected,
+    required this.onSubCategorySelected,
     required this.onServiceSelected,
     required this.serviceSection,
     this.onSearchServiceSelected,
@@ -221,8 +398,10 @@ class _Step1Body extends StatelessWidget {
   final double sectionGap;
   final List<HomeCategory> categories;
   final int selectedCategoryIdx;
+  final int selectedSubCategoryIdx;
   final int selectedServiceIdx;
   final ValueChanged<int> onCategorySelected;
+  final ValueChanged<int> onSubCategorySelected;
   final ValueChanged<int> onServiceSelected;
   final Widget serviceSection;
 
@@ -271,7 +450,18 @@ class _Step1Body extends StatelessWidget {
               categories: categories,
               selectedIndex: selectedCategoryIdx,
               onSelected: onCategorySelected,
+              style: CategoryFilterRowStyle.showcase,
             ),
+            if (selectedCategoryIdx >= 0 &&
+                selectedCategoryIdx < categories.length) ...[
+              SizedBox(height: sectionGap),
+              _SectionTitle(title: 'Select Sub-category'),
+              CategoryFilterRow(
+                categories: categories[selectedCategoryIdx].children,
+                selectedIndex: selectedSubCategoryIdx,
+                onSelected: onSubCategorySelected,
+              ),
+            ],
 
             // Select Service (cascading)
             serviceSection,

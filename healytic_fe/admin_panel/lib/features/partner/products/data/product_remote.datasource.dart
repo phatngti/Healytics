@@ -61,9 +61,40 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       return [];
     }
 
-    return response.map((e) {
-      return CategoryEntity(id: e.id, name: e.name, slug: e.slug);
-    }).toList();
+    final categoriesById = <String, CategoryEntity>{};
+    for (final category in response) {
+      _putCategory(
+        categoriesById,
+        CategoryEntity(
+          id: category.id,
+          name: category.name,
+          slug: category.slug,
+          description: category.description,
+          imageUrl: category.imageUrl,
+          isActive: category.isActive,
+          parentId: category.parentId ?? category.parent?.id,
+          parentName: category.parent?.name,
+          isRoot: category.isRoot,
+        ),
+      );
+
+      for (final child in category.children) {
+        _putCategory(
+          categoriesById,
+          CategoryEntity(
+            id: child.id,
+            name: child.name,
+            slug: child.slug,
+            parentId: child.parentId ?? category.id,
+            parentName: category.name,
+            isRoot: false,
+          ),
+          preferExisting: true,
+        );
+      }
+    }
+
+    return categoriesById.values.toList(growable: false);
   }
 
   @override
@@ -330,6 +361,9 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
         id: category?.id ?? '',
         name: category?.name ?? '',
         slug: category?.slug ?? '',
+        parentId: category?.parentId ?? category?.parent?.id,
+        parentName: category?.parent?.name,
+        isRoot: category?.parentId == null && category?.parent == null,
       ),
       onlineStore: dto.isVisibleOnline,
       images: dto.media.map((m) => m.url).where((s) => s.isNotEmpty).toList(),
@@ -754,6 +788,17 @@ class ProductRemoteDataSourceMock implements ProductRemoteDataSource {
       ),
     ];
   }
+}
+
+void _putCategory(
+  Map<String, CategoryEntity> categoriesById,
+  CategoryEntity category, {
+  bool preferExisting = false,
+}) {
+  if (preferExisting && categoriesById.containsKey(category.id)) {
+    return;
+  }
+  categoriesById[category.id] = category;
 }
 
 @riverpod

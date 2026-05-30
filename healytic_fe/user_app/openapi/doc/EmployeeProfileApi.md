@@ -72,7 +72,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = EmployeeProfileApi();
-final updateEmployeeProfileDto = UpdateEmployeeProfileDto(); // UpdateEmployeeProfileDto | 
+final updateEmployeeProfileDto = UpdateEmployeeProfileDto(); // UpdateEmployeeProfileDto |
 
 try {
     final result = api_instance.employeeProfileControllerUpdateMyProfile(updateEmployeeProfileDto);
@@ -86,7 +86,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **updateEmployeeProfileDto** | [**UpdateEmployeeProfileDto**](UpdateEmployeeProfileDto.md)|  | 
+ **updateEmployeeProfileDto** | [**UpdateEmployeeProfileDto**](UpdateEmployeeProfileDto.md)|  |
 
 ### Return type
 

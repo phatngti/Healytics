@@ -51,8 +51,14 @@ export class CategoryInfoDto {
   @ApiProperty({ example: 'cat-555' })
   id: string;
 
+  @ApiPropertyOptional({ example: 'root-cat-111', nullable: true })
+  parentCategoryId: string | null;
+
   @ApiProperty({ example: 'Dermatology' })
   name: string;
+
+  @ApiPropertyOptional({ example: 'Spa & Beauty', nullable: true })
+  parentCategoryName: string | null;
 }
 
 export class LocationInfoDto {
@@ -150,7 +156,9 @@ export class UserEligibilityDetailResponseDto {
     // ── Category ─────────────────────────────────────────────
     dto.category = {
       id: product?.category?.id ?? '',
+      parentCategoryId: product?.category?.parent?.id ?? null,
       name: product?.category?.name ?? 'Uncategorized',
+      parentCategoryName: product?.category?.parent?.name ?? null,
     };
 
     // ── Location ─────────────────────────────────────────────

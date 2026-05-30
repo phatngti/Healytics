@@ -63,7 +63,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
-    
+
     }
     return null;
   }
@@ -115,7 +115,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SkillCatalogResponseDto',) as SkillCatalogResponseDto;
-    
+
     }
     return null;
   }
@@ -167,7 +167,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
-    
+
     }
     return null;
   }
@@ -219,7 +219,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SkillCatalogResponseDto',) as SkillCatalogResponseDto;
-    
+
     }
     return null;
   }
@@ -271,7 +271,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
-    
+
     }
     return null;
   }
@@ -283,7 +283,19 @@ class PartnerEmployeesApi {
   /// Parameters:
   ///
   /// * [String] role:
-  Future<Response> partnerEmployeesControllerFindAllWithHttpInfo({ String? role, }) async {
+  ///
+  /// * [String] sort:
+  ///
+  /// * [String] clinicId:
+  ///
+  /// * [String] provinceId:
+  ///
+  /// * [String] districtId:
+  ///
+  /// * [String] wardId:
+  ///
+  /// * [num] minExperienceYears:
+  Future<Response> partnerEmployeesControllerFindAllWithHttpInfo({ String? role, String? sort, String? clinicId, String? provinceId, String? districtId, String? wardId, num? minExperienceYears, }) async {
     // ignore: prefer_const_declarations
     final path = r'/partner/employees';
 
@@ -296,6 +308,24 @@ class PartnerEmployeesApi {
 
     if (role != null) {
       queryParams.addAll(_queryParams('', 'role', role));
+    }
+    if (sort != null) {
+      queryParams.addAll(_queryParams('', 'sort', sort));
+    }
+    if (clinicId != null) {
+      queryParams.addAll(_queryParams('', 'clinicId', clinicId));
+    }
+    if (provinceId != null) {
+      queryParams.addAll(_queryParams('', 'provinceId', provinceId));
+    }
+    if (districtId != null) {
+      queryParams.addAll(_queryParams('', 'districtId', districtId));
+    }
+    if (wardId != null) {
+      queryParams.addAll(_queryParams('', 'wardId', wardId));
+    }
+    if (minExperienceYears != null) {
+      queryParams.addAll(_queryParams('', 'minExperienceYears', minExperienceYears));
     }
 
     const contentTypes = <String>[];
@@ -317,8 +347,20 @@ class PartnerEmployeesApi {
   /// Parameters:
   ///
   /// * [String] role:
-  Future<List<EmployeeResponseDto>?> partnerEmployeesControllerFindAll({ String? role, }) async {
-    final response = await partnerEmployeesControllerFindAllWithHttpInfo( role: role, );
+  ///
+  /// * [String] sort:
+  ///
+  /// * [String] clinicId:
+  ///
+  /// * [String] provinceId:
+  ///
+  /// * [String] districtId:
+  ///
+  /// * [String] wardId:
+  ///
+  /// * [num] minExperienceYears:
+  Future<List<EmployeeResponseDto>?> partnerEmployeesControllerFindAll({ String? role, String? sort, String? clinicId, String? provinceId, String? districtId, String? wardId, num? minExperienceYears, }) async {
+    final response = await partnerEmployeesControllerFindAllWithHttpInfo( role: role, sort: sort, clinicId: clinicId, provinceId: provinceId, districtId: districtId, wardId: wardId, minExperienceYears: minExperienceYears, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
@@ -439,7 +481,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
-    
+
     }
     return null;
   }
@@ -502,7 +544,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeDetailAnalyticsResponseDto',) as EmployeeDetailAnalyticsResponseDto;
-    
+
     }
     return null;
   }
@@ -607,7 +649,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeOverviewAnalyticsResponseDto',) as EmployeeOverviewAnalyticsResponseDto;
-    
+
     }
     return null;
   }
@@ -756,7 +798,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
-    
+
     }
     return null;
   }

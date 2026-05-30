@@ -68,7 +68,7 @@ class EmployeeAppointmentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeAppointmentResponseDto',) as EmployeeAppointmentResponseDto;
-    
+
     }
     return null;
   }
@@ -121,7 +121,7 @@ class EmployeeAppointmentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeAppointmentResponseDto',) as EmployeeAppointmentResponseDto;
-    
+
     }
     return null;
   }
@@ -174,7 +174,7 @@ class EmployeeAppointmentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeAppointmentResponseDto',) as EmployeeAppointmentResponseDto;
-    
+
     }
     return null;
   }
@@ -250,7 +250,7 @@ class EmployeeAppointmentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PaginatedEmployeeAppointmentsResponseDto',) as PaginatedEmployeeAppointmentsResponseDto;
-    
+
     }
     return null;
   }
@@ -303,7 +303,7 @@ class EmployeeAppointmentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeAppointmentResponseDto',) as EmployeeAppointmentResponseDto;
-    
+
     }
     return null;
   }

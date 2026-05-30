@@ -8,9 +8,9 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**coverImageUrl** | [**Object**](.md) |  | [optional] 
-**logoImageUrl** | [**Object**](.md) |  | [optional] 
-**description** | [**Object**](.md) |  | [optional] 
+**coverImageUrl** | [**Object**](.md) |  | [optional]
+**logoImageUrl** | [**Object**](.md) |  | [optional]
+**description** | [**Object**](.md) |  | [optional]
 **gallery** | **List<String>** |  | [default to const []]
 **certifications** | [**List<PublicProfileCertificationDto>**](PublicProfileCertificationDto.md) |  | [default to const []]
 

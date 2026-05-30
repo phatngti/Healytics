@@ -16,6 +16,8 @@ class AdminCategorySnapshotDto {
     required this.id,
     required this.name,
     required this.serviceCount,
+    required this.subCategoryCount,
+    required this.isRoot,
     required this.isActive,
   });
 
@@ -26,6 +28,10 @@ class AdminCategorySnapshotDto {
 
   num serviceCount;
 
+  num subCategoryCount;
+
+  bool isRoot;
+
   bool isActive;
 
   @override
@@ -33,6 +39,8 @@ class AdminCategorySnapshotDto {
     other.id == id &&
     other.name == name &&
     other.serviceCount == serviceCount &&
+    other.subCategoryCount == subCategoryCount &&
+    other.isRoot == isRoot &&
     other.isActive == isActive;
 
   @override
@@ -41,16 +49,20 @@ class AdminCategorySnapshotDto {
     (id.hashCode) +
     (name.hashCode) +
     (serviceCount.hashCode) +
+    (subCategoryCount.hashCode) +
+    (isRoot.hashCode) +
     (isActive.hashCode);
 
   @override
-  String toString() => 'AdminCategorySnapshotDto[id=$id, name=$name, serviceCount=$serviceCount, isActive=$isActive]';
+  String toString() => 'AdminCategorySnapshotDto[id=$id, name=$name, serviceCount=$serviceCount, subCategoryCount=$subCategoryCount, isRoot=$isRoot, isActive=$isActive]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
       json[r'name'] = this.name;
       json[r'serviceCount'] = this.serviceCount;
+      json[r'subCategoryCount'] = this.subCategoryCount;
+      json[r'isRoot'] = this.isRoot;
       json[r'isActive'] = this.isActive;
     return json;
   }
@@ -77,6 +89,8 @@ class AdminCategorySnapshotDto {
         id: mapValueOfType<String>(json, r'id')!,
         name: mapValueOfType<String>(json, r'name')!,
         serviceCount: num.parse('${json[r'serviceCount']}'),
+        subCategoryCount: num.parse('${json[r'subCategoryCount']}'),
+        isRoot: mapValueOfType<bool>(json, r'isRoot')!,
         isActive: mapValueOfType<bool>(json, r'isActive')!,
       );
     }
@@ -128,6 +142,8 @@ class AdminCategorySnapshotDto {
     'id',
     'name',
     'serviceCount',
+    'subCategoryCount',
+    'isRoot',
     'isActive',
   };
 }

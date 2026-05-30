@@ -31,7 +31,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserBookingsApi();
-final asyncCheckoutDto = AsyncCheckoutDto(); // AsyncCheckoutDto | 
+final asyncCheckoutDto = AsyncCheckoutDto(); // AsyncCheckoutDto |
 
 try {
     final result = api_instance.bookingControllerAsyncCheckout(asyncCheckoutDto);
@@ -45,7 +45,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **asyncCheckoutDto** | [**AsyncCheckoutDto**](AsyncCheckoutDto.md)|  | 
+ **asyncCheckoutDto** | [**AsyncCheckoutDto**](AsyncCheckoutDto.md)|  |
 
 ### Return type
 
@@ -78,7 +78,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserBookingsApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     final result = api_instance.bookingControllerGetBooking(id);
@@ -92,7 +92,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 
@@ -125,7 +125,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserBookingsApi();
-final id = id_example; // String | 
+final id = id_example; // String |
 
 try {
     final result = api_instance.bookingControllerGetTicketStatus(id);
@@ -139,7 +139,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  | 
+ **id** | **String**|  |
 
 ### Return type
 

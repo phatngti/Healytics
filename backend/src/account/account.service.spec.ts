@@ -288,6 +288,8 @@ describe('AccountService', () => {
         firstName: ' Test ',
         lastName: ' New ',
         phone: '0901234567',
+        dateOfBirth: '1990-01-15',
+        profileCompleted: true,
       });
 
       expect(result).toEqual({ id: 'account-uuid' });
@@ -298,6 +300,8 @@ describe('AccountService', () => {
           firstName: 'Test',
           lastName: 'New',
           phone: '0901234567',
+          dateOfBirth: new Date('1990-01-15'),
+          profileCompleted: true,
         }),
       );
     });

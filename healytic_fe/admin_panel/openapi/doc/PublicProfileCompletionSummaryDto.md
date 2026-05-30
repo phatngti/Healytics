@@ -9,8 +9,8 @@ import 'package:admin_openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **checklist** | [**List<PublicProfileChecklistItemDto>**](PublicProfileChecklistItemDto.md) |  | [default to const []]
-**completionPercent** | **num** |  | 
-**isCompleted** | **bool** |  | 
+**completionPercent** | **num** |  |
+**isCompleted** | **bool** |  |
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

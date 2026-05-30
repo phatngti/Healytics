@@ -13,6 +13,10 @@ import { BookingServiceResponseDto } from '@/employees/dto/booking-service-respo
 import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
 import { EmployeeStatus } from '@/employees/enum/employee-status.enum';
 import { PartnersService } from '@/partners/partners.service';
+import {
+  PublicServiceListQueryDto,
+  PublicServiceListSort,
+} from '@/health-service/dto/public/service-list-query.dto';
 import { CreateCategoryHandler } from './application/handlers/create-category.handler';
 import { UpdateCategoryHandler } from './application/handlers/update-category.handler';
 import { RemoveCategoryHandler } from './application/handlers/remove-category.handler';
@@ -76,8 +80,27 @@ export class CategoriesService {
     return this.categoryRepository.find({
       where: { parentId: IsNull() },
       relations: ['children'],
-      order: { name: 'ASC' },
+      order: { sortOrder: 'ASC', name: 'ASC' },
     });
+  }
+
+  async resolveBookableCategoryIds(categoryId: string): Promise<string[]> {
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+      relations: ['children'],
+    });
+    if (!category) {
+      this.logger.warn(`Category not found: ${categoryId}`);
+      throw new NotFoundException(`Category with ID ${categoryId} not found`);
+    }
+
+    if (category.parentId == null) {
+      return (category.children ?? [])
+        .filter((child) => child.isActive && child.deletedAt == null)
+        .map((child) => child.id);
+    }
+
+    return [category.id];
   }
 
   /**
@@ -145,21 +168,15 @@ export class CategoriesService {
   async findSpecialistsByCategory(
     categoryId: string,
   ): Promise<BookingSpecialistResponseDto[]> {
-    // Verify category exists
-    const category = await this.categoryRepository.findOne({
-      where: { id: categoryId },
-    });
-    if (!category) {
-      this.logger.warn(`Category not found: ${categoryId}`);
-      throw new NotFoundException(`Category with ID ${categoryId} not found`);
-    }
+    const categoryIds = await this.resolveBookableCategoryIds(categoryId);
+    if (categoryIds.length === 0) return [];
 
     // Query eligible employees via the join chain, retaining the eligibility record
     const eligibilities = await this.eligibilityRepository
       .createQueryBuilder('elig')
       .innerJoinAndSelect('elig.employee', 'emp')
       .innerJoin('elig.product', 'prod')
-      .where('prod.category_id = :categoryId', { categoryId })
+      .where('prod.category_id IN (:...categoryIds)', { categoryIds })
       .andWhere('prod.status = :activeStatus', {
         activeStatus: HealthServiceStatus.ACTIVE,
       })
@@ -188,36 +205,83 @@ export class CategoriesService {
    */
   async findServicesByCategory(
     categoryId: string,
-    userLat?: number,
-    userLng?: number,
+    query: PublicServiceListQueryDto = {},
   ): Promise<BookingServiceResponseDto[]> {
-    // Verify category exists
-    const category = await this.categoryRepository.findOne({
-      where: { id: categoryId },
-    });
-    if (!category) {
-      this.logger.warn(`Category not found: ${categoryId}`);
-      throw new NotFoundException(`Category with ID ${categoryId} not found`);
+    const categoryIds = await this.resolveBookableCategoryIds(categoryId);
+    if (categoryIds.length === 0) return [];
+
+    const qb = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('category.parent', 'parentCategory')
+      .leftJoinAndSelect('product.media', 'media')
+      .leftJoinAndSelect('product.productDefinition', 'productDefinition')
+      .leftJoinAndSelect('product.partner', 'partner')
+      .leftJoinAndSelect('partner.province', 'province')
+      .leftJoinAndSelect('partner.district', 'district')
+      .leftJoinAndSelect('partner.ward', 'ward')
+      .where('product.category_id IN (:...categoryIds)', { categoryIds })
+      .andWhere('product.status = :activeStatus', {
+        activeStatus: HealthServiceStatus.ACTIVE,
+      });
+
+    if (query.clinicId) {
+      qb.andWhere('product.partner_id = :clinicId', {
+        clinicId: query.clinicId,
+      });
+    }
+    if (query.provinceId) {
+      qb.andWhere('partner.province_id = :provinceId', {
+        provinceId: query.provinceId,
+      });
+    }
+    if (query.districtId) {
+      qb.andWhere('partner.district_id = :districtId', {
+        districtId: query.districtId,
+      });
+    }
+    if (query.wardId) {
+      qb.andWhere('partner.ward_id = :wardId', { wardId: query.wardId });
+    }
+    if (query.minPrice != null) {
+      qb.andWhere(
+        'COALESCE(product.sale_price, product.base_price) >= :minPrice',
+        {
+          minPrice: query.minPrice,
+        },
+      );
+    }
+    if (query.maxPrice != null) {
+      qb.andWhere(
+        'COALESCE(product.sale_price, product.base_price) <= :maxPrice',
+        {
+          maxPrice: query.maxPrice,
+        },
+      );
     }
 
-    // Query active products in this category with media + definition
-    const products = await this.productRepository.find({
-      where: {
-        categoryId,
-        status: HealthServiceStatus.ACTIVE,
-      },
-      relations: ['media', 'productDefinition'],
-      order: { createdAt: 'DESC' },
-    });
+    switch (query.sort) {
+      case PublicServiceListSort.PRICE_ASC:
+        qb.orderBy('COALESCE(product.sale_price, product.base_price)', 'ASC');
+        break;
+      case PublicServiceListSort.PRICE_DESC:
+        qb.orderBy('COALESCE(product.sale_price, product.base_price)', 'DESC');
+        break;
+      case PublicServiceListSort.LATEST:
+      case PublicServiceListSort.RATING_DESC:
+      case PublicServiceListSort.DEFAULT:
+      default:
+        qb.orderBy('product.created_at', 'DESC');
+        break;
+    }
 
-    // Load partner for clinic info
-    const partner = await this.partnersService.getFirstHealthPartner();
+    const products = await qb.getMany();
 
     return BookingServiceResponseDto.fromEntities(
       products,
-      partner,
-      userLat,
-      userLng,
+      null,
+      query.lat,
+      query.lng,
     );
   }
 
@@ -234,7 +298,6 @@ export class CategoriesService {
       .createQueryBuilder('cat')
       .leftJoinAndSelect('cat.parent', 'parent')
       .leftJoinAndSelect('cat.children', 'children')
-      .loadRelationCountAndMap('cat.serviceCount', 'cat.products')
       .orderBy('cat.sortOrder', 'ASC')
       .addOrderBy('cat.name', 'ASC')
       .withDeleted()
@@ -242,7 +305,7 @@ export class CategoriesService {
       .getMany();
 
     return AdminCategoryResponseDto.fromEntities(
-      categories as (Category & { serviceCount: number })[],
+      await this.withAdminServiceCounts(categories),
     );
   }
 
@@ -254,7 +317,6 @@ export class CategoriesService {
       .createQueryBuilder('cat')
       .leftJoinAndSelect('cat.parent', 'parent')
       .leftJoinAndSelect('cat.children', 'children')
-      .loadRelationCountAndMap('cat.serviceCount', 'cat.products')
       .where('cat.id = :id', { id })
       .getOne();
 
@@ -263,9 +325,8 @@ export class CategoriesService {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
 
-    return AdminCategoryResponseDto.fromEntity(
-      category as Category & { serviceCount: number },
-    );
+    const [withCounts] = await this.withAdminServiceCounts([category]);
+    return AdminCategoryResponseDto.fromEntity(withCounts);
   }
 
   /**
@@ -287,5 +348,42 @@ export class CategoriesService {
   ): Promise<AdminCategoryResponseDto> {
     await this.updateCategoryHandler.execute(id, updateCategoryDto);
     return this.findOneForAdmin(id);
+  }
+
+  private async withAdminServiceCounts(
+    categories: Category[],
+  ): Promise<(Category & { serviceCount: number })[]> {
+    if (categories.length === 0) return [];
+
+    const rows = await this.categoryRepository.query(`
+      SELECT
+        cat.id,
+        COUNT(product.id)::int AS "serviceCount"
+      FROM categories cat
+      LEFT JOIN categories child
+        ON child.parent_id = cat.id
+        AND child.deleted_at IS NULL
+        AND child.is_active = true
+      LEFT JOIN products product
+        ON (
+          (cat.parent_id IS NULL AND product.category_id = child.id)
+          OR (cat.parent_id IS NOT NULL AND product.category_id = cat.id)
+        )
+        AND product.deleted_at IS NULL
+      WHERE cat.deleted_at IS NULL
+      GROUP BY cat.id
+    `);
+    const counts = new Map<string, number>(
+      rows.map((row: { id: string; serviceCount: number | string }) => [
+        row.id,
+        Number(row.serviceCount) || 0,
+      ]),
+    );
+
+    return categories.map((category) =>
+      Object.assign(category, {
+        serviceCount: counts.get(category.id) ?? 0,
+      }),
+    ) as (Category & { serviceCount: number })[];
   }
 }

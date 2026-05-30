@@ -3,7 +3,14 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { DataSource, EntityManager } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  EntityTarget,
+  In,
+  IsNull,
+  ObjectLiteral,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Account } from '@/common/entities/account.entity';
 import { UserProfile } from '@/common/entities/user-profile.entity';
@@ -14,7 +21,9 @@ import { Product } from '@/common/entities/product.entity';
 import { ProductDefinition } from '@/common/entities/product-definition.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { Booking } from '@/common/entities/booking.entity';
+import { BookingStatusLog } from '@/common/entities/booking-status-log.entity';
 import { Notification } from '@/common/entities/notification.entity';
+import { Payment } from '@/common/entities/payment.entity';
 import { CartItem } from '@/cart/entities/cart-item.entity';
 import { Coupon } from '@/cart/entities/coupon.entity';
 import { Role } from '@/account/enum/role.enum';
@@ -157,7 +166,11 @@ export interface BackdoorPrepareBody {
   payload?: SeedPayload;
 }
 
-interface SeedRefs {
+export type SeedIdsMap = Partial<
+  Record<keyof SeedEntityRefs, Record<string, string>>
+>;
+
+interface SeedEntityRefs {
   users: Record<string, Account>;
   categories: Record<string, Category>;
   partners: Record<string, Partner>;
@@ -167,6 +180,10 @@ interface SeedRefs {
   bookings: Record<string, Booking>;
   coupons: Record<string, Coupon>;
   notifications: Record<string, Notification>;
+}
+
+interface SeedRefs extends SeedEntityRefs {
+  created: SeedEntityRefs;
 }
 
 const MASTER_TABLES = new Set([
@@ -323,10 +340,127 @@ export class TestBackdoorService {
     return this.serializeRefs(refs, 'seed-booking');
   }
 
+  async cleanupSeedData(ids: SeedIdsMap = {}) {
+    this.assertTestOnly();
+
+    const uniqueIds = (key: keyof SeedEntityRefs) => [
+      ...new Set(Object.values(ids[key] ?? {}).filter(Boolean)),
+    ];
+
+    const deleted: Record<string, number> = {};
+    await this.dataSource.transaction(async (manager) => {
+      const bookingIds = uniqueIds('bookings');
+      const cartItemIds = uniqueIds('cartItems');
+      const notificationIds = uniqueIds('notifications');
+      const couponIds = uniqueIds('coupons');
+      const serviceIds = uniqueIds('services');
+      const employeeIds = uniqueIds('employees');
+      const partnerIds = uniqueIds('partners');
+      const categoryIds = uniqueIds('categories');
+      const userIds = uniqueIds('users');
+
+      await this.safeDelete(
+        manager,
+        deleted,
+        'notifications',
+        Notification,
+        notificationIds,
+      );
+      await this.safeDelete(
+        manager,
+        deleted,
+        'cartItems',
+        CartItem,
+        cartItemIds,
+      );
+      if (bookingIds.length) {
+        await this.safeDeleteBy(
+          manager,
+          deleted,
+          'bookingStatusLogs',
+          BookingStatusLog,
+          { bookingId: In(bookingIds) },
+        );
+        await this.safeDeleteBy(manager, deleted, 'payments', Payment, {
+          bookingId: In(bookingIds),
+        });
+      }
+      await this.safeDelete(manager, deleted, 'bookings', Booking, bookingIds);
+      await this.safeDelete(manager, deleted, 'coupons', Coupon, couponIds);
+      if (serviceIds.length) {
+        await this.safeDeleteBy(
+          manager,
+          deleted,
+          'productEmployeeEligibility',
+          ProductEmployeeEligibility,
+          { productId: In(serviceIds) },
+        );
+        await this.safeDelete(
+          manager,
+          deleted,
+          'productDefinitions',
+          ProductDefinition,
+          serviceIds,
+        );
+      }
+      await this.safeDelete(manager, deleted, 'services', Product, serviceIds);
+      await this.safeDelete(
+        manager,
+        deleted,
+        'employees',
+        Employee,
+        employeeIds,
+      );
+      await this.safeDelete(manager, deleted, 'partners', Partner, partnerIds);
+      await this.safeDelete(
+        manager,
+        deleted,
+        'categories',
+        Category,
+        categoryIds,
+      );
+      await this.safeDelete(manager, deleted, 'accounts', Account, userIds);
+    });
+
+    return { ok: true, deleted };
+  }
+
   private assertTestOnly() {
+    if (process.env.ENABLE_TEST_BACKDOOR === 'true') {
+      return;
+    }
     const dbName = String(this.dataSource.options.database ?? '');
     if (process.env.NODE_ENV !== 'test') {
       throw new ForbiddenException('Test backdoor is disabled');
+    }
+    if (!/test/i.test(dbName)) {
+      throw new ForbiddenException('Test backdoor requires a test database');
+    }
+  }
+
+  private async safeDelete<T extends ObjectLiteral>(
+    manager: EntityManager,
+    deleted: Record<string, number>,
+    label: string,
+    entity: EntityTarget<T>,
+    ids: string[],
+  ) {
+    if (ids.length === 0) return;
+    await this.safeDeleteBy(manager, deleted, label, entity, { id: In(ids) });
+  }
+
+  private async safeDeleteBy<T extends ObjectLiteral>(
+    manager: EntityManager,
+    deleted: Record<string, number>,
+    label: string,
+    entity: EntityTarget<T>,
+    criteria: object,
+  ) {
+    try {
+      const result = await manager.delete(entity, criteria);
+      deleted[label] = (deleted[label] ?? 0) + (result.affected ?? 0);
+    } catch {
+      deleted[label] = deleted[label] ?? 0;
     }
   }
 
@@ -361,27 +495,57 @@ export class TestBackdoorService {
     this.require(input.email, 'users.email');
     this.require(input.password, 'users.password');
 
-    const account = await manager.save(
-      manager.create(Account, {
-        email: input.email,
-        passwordHash: await bcrypt.hash(input.password, 10),
-        role: Role.USER,
-        isActive: true,
-      }),
-    );
+    let account = await manager.findOne(Account, {
+      where: { email: input.email },
+      withDeleted: true,
+    });
+    const accountCreated = !account || account.deletedAt != null;
+    if (account) {
+      account.passwordHash = await bcrypt.hash(input.password, 10);
+      account.role = Role.USER;
+      account.isActive = true;
+      account.deletedAt = null;
+      account = await manager.save(account);
+    } else {
+      account = await manager.save(
+        manager.create(Account, {
+          email: input.email,
+          passwordHash: await bcrypt.hash(input.password, 10),
+          role: Role.USER,
+          isActive: true,
+        }),
+      );
+    }
 
-    await manager.save(
-      manager.create(UserProfile, {
-        firstName: input.firstName ?? 'Test',
-        lastName: input.lastName ?? 'User',
-        phone: input.phone,
-        accountId: account.id,
-        profileCompleted: true,
-      }),
-    );
+    const existingProfile = await manager.findOne(UserProfile, {
+      where: { accountId: account.id },
+      withDeleted: true,
+    });
+    if (existingProfile) {
+      existingProfile.firstName = input.firstName ?? existingProfile.firstName;
+      existingProfile.lastName = input.lastName ?? existingProfile.lastName;
+      existingProfile.phone = input.phone ?? existingProfile.phone;
+      existingProfile.profileCompleted = true;
+      existingProfile.deletedAt = null;
+      await manager.save(existingProfile);
+    } else {
+      await manager.save(
+        manager.create(UserProfile, {
+          firstName: input.firstName ?? 'Test',
+          lastName: input.lastName ?? 'User',
+          phone: input.phone,
+          accountId: account.id,
+          profileCompleted: true,
+        }),
+      );
+    }
 
     refs.users[input.key ?? input.email] = account;
     refs.users[input.email] = account;
+    if (accountCreated) {
+      refs.created.users[input.key ?? input.email] = account;
+      refs.created.users[input.email] = account;
+    }
     return account;
   }
 
@@ -392,9 +556,22 @@ export class TestBackdoorService {
   ) {
     this.require(input.name, 'categories.name');
     const slug = input.slug ?? this.slugify(input.name);
-    let category = await manager.findOne(Category, { where: { slug } });
+    let category = await manager.findOne(Category, {
+      where: { slug },
+      withDeleted: true,
+    });
+    const categoryCreated = !category || category.deletedAt != null;
 
-    if (!category) {
+    if (category) {
+      category.name = input.name;
+      category.description = input.description ?? category.description;
+      category.iconName = input.iconName ?? category.iconName;
+      category.colorValue = input.colorValue ?? category.colorValue;
+      category.sortOrder = input.sortOrder ?? category.sortOrder;
+      category.isActive = true;
+      category.deletedAt = null;
+      category = await manager.save(category);
+    } else {
       category = await manager.save(
         manager.create(Category, {
           name: input.name,
@@ -413,6 +590,11 @@ export class TestBackdoorService {
     refs.categories[input.key ?? input.name] = category;
     refs.categories[input.name] = category;
     refs.categories[slug] = category;
+    if (categoryCreated) {
+      refs.created.categories[input.key ?? input.name] = category;
+      refs.created.categories[input.name] = category;
+      refs.created.categories[slug] = category;
+    }
     return category;
   }
 
@@ -425,37 +607,81 @@ export class TestBackdoorService {
     const key = input.key ?? this.slugify(input.brandName);
     const email = input.email ?? `${key}@partner.test.healytics.vn`;
     const password = input.password ?? 'Password123!';
+    const taxCode = input.taxCode ?? `TAX-${key}`.slice(0, 20);
 
-    const account = await manager.save(
-      manager.create(Account, {
-        email,
-        passwordHash: await bcrypt.hash(password, 10),
-        role: Role.HEALTH_PARTNER,
-        isActive: true,
-      }),
-    );
+    let account = await manager.findOne(Account, {
+      where: { email },
+      withDeleted: true,
+    });
+    const accountCreated = !account || account.deletedAt != null;
+    if (account) {
+      account.passwordHash = await bcrypt.hash(password, 10);
+      account.role = Role.HEALTH_PARTNER;
+      account.isActive = true;
+      account.deletedAt = null;
+      account = await manager.save(account);
+    } else {
+      account = await manager.save(
+        manager.create(Account, {
+          email,
+          passwordHash: await bcrypt.hash(password, 10),
+          role: Role.HEALTH_PARTNER,
+          isActive: true,
+        }),
+      );
+    }
 
-    const partner = await manager.save(
-      manager.create(Partner, {
-        accountId: account.id,
-        taxCode: input.taxCode ?? `TAX-${key}`.slice(0, 20),
-        legalName: input.legalName ?? input.brandName,
-        brandName: input.brandName,
-        businessType: input.businessTypes ?? [BusinessType.SPA_BEAUTY],
-        streetAddress: input.streetAddress ?? 'District 1, Ho Chi Minh City',
-        phoneNumber: input.phoneNumber ?? null,
-        coordinates: null,
-        location: null,
-        gallery: [],
-        description: null,
-        followerCount: 0,
-        verificationStatus: input.status ?? PartnerVerificationStatus.APPROVED,
-        verificationCompletedAt: new Date(),
-      }),
-    );
+    let partner = await manager.findOne(Partner, {
+      where: [{ taxCode }, { accountId: account.id }],
+      withDeleted: true,
+    });
+    const partnerCreated = !partner || partner.deletedAt != null;
+    if (partner) {
+      partner.accountId = account.id;
+      partner.taxCode = taxCode;
+      partner.legalName = input.legalName ?? input.brandName;
+      partner.brandName = input.brandName;
+      partner.businessType = input.businessTypes ?? [BusinessType.SPA_BEAUTY];
+      partner.streetAddress =
+        input.streetAddress ?? 'District 1, Ho Chi Minh City';
+      partner.phoneNumber = input.phoneNumber ?? partner.phoneNumber;
+      partner.verificationStatus =
+        input.status ?? PartnerVerificationStatus.APPROVED;
+      partner.verificationCompletedAt = new Date();
+      partner.deletedAt = null;
+      partner = await manager.save(partner);
+    } else {
+      partner = await manager.save(
+        manager.create(Partner, {
+          accountId: account.id,
+          taxCode,
+          legalName: input.legalName ?? input.brandName,
+          brandName: input.brandName,
+          businessType: input.businessTypes ?? [BusinessType.SPA_BEAUTY],
+          streetAddress: input.streetAddress ?? 'District 1, Ho Chi Minh City',
+          phoneNumber: input.phoneNumber ?? null,
+          coordinates: null,
+          location: null,
+          gallery: [],
+          description: null,
+          followerCount: 0,
+          verificationStatus:
+            input.status ?? PartnerVerificationStatus.APPROVED,
+          verificationCompletedAt: new Date(),
+        }),
+      );
+    }
 
     refs.partners[key] = partner;
     refs.partners[input.brandName] = partner;
+    if (accountCreated) {
+      refs.created.users[`${key}:account`] = account;
+      refs.created.users[email] = account;
+    }
+    if (partnerCreated) {
+      refs.created.partners[key] = partner;
+      refs.created.partners[input.brandName] = partner;
+    }
     return partner;
   }
 
@@ -468,50 +694,81 @@ export class TestBackdoorService {
     const key = input.key ?? this.slugify(input.displayName);
     const partner = await this.resolvePartner(manager, refs, input);
     const email = input.email ?? `${key}@employee.test.healytics.vn`;
+    const employeeCode = input.employeeCode ?? `EMP-${key}`.slice(0, 50);
 
-    const account = await manager.save(
-      manager.create(Account, {
-        email,
-        passwordHash: await bcrypt.hash('Password123!', 10),
-        role: Role.EMPLOYEE,
-        isActive: true,
-      }),
-    );
+    let account = await manager.findOne(Account, {
+      where: { email },
+      withDeleted: true,
+    });
+    const accountCreated = !account || account.deletedAt != null;
+    if (account) {
+      account.passwordHash = await bcrypt.hash('Password123!', 10);
+      account.role = Role.EMPLOYEE;
+      account.isActive = true;
+      account.deletedAt = null;
+      account = await manager.save(account);
+    } else {
+      account = await manager.save(
+        manager.create(Account, {
+          email,
+          passwordHash: await bcrypt.hash('Password123!', 10),
+          role: Role.EMPLOYEE,
+          isActive: true,
+        }),
+      );
+    }
 
     const names = input.displayName.split(' ');
-    const employee = await manager.save(
-      manager.create(Employee, {
-        employeeCode: input.employeeCode ?? `EMP-${key}`.slice(0, 50),
-        firstName:
-          (input.firstName ?? names.slice(0, -1).join(' ')) || names[0],
-        lastName: input.lastName ?? names.slice(-1).join(' '),
-        fullName: input.displayName,
-        email,
-        phone: input.phone,
-        avatarUrl: undefined,
-        jobTitle: input.role ?? EmployeeRole.DOCTOR,
-        startDate: undefined,
-        employmentType: undefined,
-        emergencyContactName: undefined,
-        emergencyContactPhone: undefined,
-        verificationDocuments: [],
-        description: undefined,
-        schedule: input.schedule,
-        workHistory: undefined,
-        dob: undefined,
-        gender: undefined,
-        role: input.role ?? EmployeeRole.DOCTOR,
-        status: input.status ?? EmployeeStatus.ACTIVE,
-        rating: 0,
-        reviewCount: 0,
-        partnerId: partner?.id ?? null,
-        accountId: account.id,
-      }),
-    );
+    let employee = await manager.findOne(Employee, {
+      where: [{ email }, { employeeCode }],
+      withDeleted: true,
+    });
+    const employeeCreated = !employee || employee.deletedAt != null;
+    const employeeFields = {
+      employeeCode,
+      firstName: (input.firstName ?? names.slice(0, -1).join(' ')) || names[0],
+      lastName: input.lastName ?? names.slice(-1).join(' '),
+      fullName: input.displayName,
+      email,
+      phone: input.phone,
+      avatarUrl: undefined,
+      jobTitle: input.role ?? EmployeeRole.DOCTOR,
+      startDate: undefined,
+      employmentType: undefined,
+      emergencyContactName: undefined,
+      emergencyContactPhone: undefined,
+      verificationDocuments: [],
+      description: undefined,
+      schedule: input.schedule,
+      workHistory: undefined,
+      dob: undefined,
+      gender: undefined,
+      role: input.role ?? EmployeeRole.DOCTOR,
+      status: input.status ?? EmployeeStatus.ACTIVE,
+      rating: 0,
+      reviewCount: 0,
+      partnerId: partner?.id ?? null,
+      accountId: account.id,
+    };
+    if (employee) {
+      Object.assign(employee, employeeFields, { deletedAt: null });
+      employee = await manager.save(employee);
+    } else {
+      employee = await manager.save(manager.create(Employee, employeeFields));
+    }
 
     refs.employees[key] = employee;
     refs.employees[email] = employee;
     refs.employees[input.displayName] = employee;
+    if (accountCreated) {
+      refs.created.users[`${key}:account`] = account;
+      refs.created.users[email] = account;
+    }
+    if (employeeCreated) {
+      refs.created.employees[key] = employee;
+      refs.created.employees[email] = employee;
+      refs.created.employees[input.displayName] = employee;
+    }
     return employee;
   }
 
@@ -535,51 +792,88 @@ export class TestBackdoorService {
         )
       : null;
 
-    const service = await manager.save(
-      manager.create(Product, {
-        partnerId: partner?.id ?? null,
-        categoryId: category?.id ?? null,
-        name: input.name,
-        slug,
-        description: input.description ?? null,
-        type: HealthServiceType.SERVICE,
-        basePrice: input.price ?? 500000,
-        salePrice: null,
-        currency: 'VND',
-        status: HealthServiceStatus.ACTIVE,
-        isVisibleOnline: true,
-        serviceManual: null,
-        vendorName: input.vendorName ?? partner?.brandName ?? null,
-      }),
-    );
+    let service = await manager.findOne(Product, {
+      where: { partnerId: partner?.id ?? IsNull(), slug },
+      withDeleted: true,
+    });
+    const serviceCreated = !service || service.deletedAt != null;
+    const serviceFields = {
+      partnerId: partner?.id ?? null,
+      categoryId: category?.id ?? null,
+      name: input.name,
+      slug,
+      description: input.description ?? null,
+      type: HealthServiceType.SERVICE,
+      basePrice: input.price ?? 500000,
+      salePrice: null,
+      currency: 'VND',
+      status: HealthServiceStatus.ACTIVE,
+      isVisibleOnline: true,
+      serviceManual: null,
+      vendorName: input.vendorName ?? partner?.brandName ?? null,
+    };
+    if (service) {
+      Object.assign(service, serviceFields, { deletedAt: null });
+      service = await manager.save(service);
+    } else {
+      service = await manager.save(manager.create(Product, serviceFields));
+    }
 
-    await manager.save(
-      manager.create(ProductDefinition, {
-        productId: service.id,
-        durationMinutes: input.durationMinutes ?? 60,
-        bufferMinutes: 0,
-        maxCapacity: 1,
-        minLeadTimeHours: 0,
-        staffAssignmentType: StaffAssignmentType.ANY,
-      }),
-    );
+    const existingDefinition = await manager.findOne(ProductDefinition, {
+      where: { productId: service.id },
+    });
+    if (existingDefinition) {
+      existingDefinition.durationMinutes = input.durationMinutes ?? 60;
+      existingDefinition.bufferMinutes = 0;
+      existingDefinition.maxCapacity = 1;
+      existingDefinition.minLeadTimeHours = 0;
+      existingDefinition.staffAssignmentType = StaffAssignmentType.ANY;
+      await manager.save(existingDefinition);
+    } else {
+      await manager.save(
+        manager.create(ProductDefinition, {
+          productId: service.id,
+          durationMinutes: input.durationMinutes ?? 60,
+          bufferMinutes: 0,
+          maxCapacity: 1,
+          minLeadTimeHours: 0,
+          staffAssignmentType: StaffAssignmentType.ANY,
+        }),
+      );
+    }
 
     for (const employeeKey of input.employeeKeys ?? []) {
       const employee = await this.resolveEmployee(manager, refs, {
         employeeKey,
       });
-      await manager.save(
-        manager.create(ProductEmployeeEligibility, {
-          productId: service.id,
-          employeeId: employee.id,
-          isPrimary: true,
-        }),
+      const existingEligibility = await manager.findOne(
+        ProductEmployeeEligibility,
+        {
+          where: { productId: service.id, employeeId: employee.id },
+        },
       );
+      if (existingEligibility) {
+        existingEligibility.isPrimary = true;
+        await manager.save(existingEligibility);
+      } else {
+        await manager.save(
+          manager.create(ProductEmployeeEligibility, {
+            productId: service.id,
+            employeeId: employee.id,
+            isPrimary: true,
+          }),
+        );
+      }
     }
 
     refs.services[key] = service;
     refs.services[slug] = service;
     refs.services[input.name] = service;
+    if (serviceCreated) {
+      refs.created.services[key] = service;
+      refs.created.services[slug] = service;
+      refs.created.services[input.name] = service;
+    }
     return service;
   }
 
@@ -596,21 +890,30 @@ export class TestBackdoorService {
       ? await this.createCategory(manager, { name: input.categoryName }, refs)
       : null;
 
-    const coupon = await manager.save(
-      manager.create(Coupon, {
-        code: input.code,
-        discountPercent: input.discountPercent,
-        maxDiscountAmount: input.maxDiscountAmount ?? null,
-        usageLimit: input.usageLimit ?? null,
-        usedCount: 0,
-        isActive: true,
-        expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
-        serviceId: service?.id ?? null,
-        categoryId: category?.id ?? null,
-      }),
-    );
+    let coupon = await manager.findOne(Coupon, { where: { code: input.code } });
+    const couponCreated = !coupon;
+    const couponFields = {
+      code: input.code,
+      discountPercent: input.discountPercent,
+      maxDiscountAmount: input.maxDiscountAmount ?? null,
+      usageLimit: input.usageLimit ?? null,
+      usedCount: 0,
+      isActive: true,
+      expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
+      serviceId: service?.id ?? null,
+      categoryId: category?.id ?? null,
+    };
+    if (coupon) {
+      Object.assign(coupon, couponFields);
+      coupon = await manager.save(coupon);
+    } else {
+      coupon = await manager.save(manager.create(Coupon, couponFields));
+    }
 
     refs.coupons[input.key ?? input.code] = coupon;
+    if (couponCreated) {
+      refs.created.coupons[input.key ?? input.code] = coupon;
+    }
     return coupon;
   }
 
@@ -622,18 +925,36 @@ export class TestBackdoorService {
     const user = await this.resolveUser(manager, refs, input);
     const service = await this.resolveService(manager, refs, input);
     const employee = await this.resolveEmployee(manager, refs, input);
+    const timeSlot = new Date(input.startsAt);
 
-    const item = await manager.save(
-      manager.create(CartItem, {
+    let item = await manager.findOne(CartItem, {
+      where: {
         userId: user.id,
         serviceId: service.id,
         employeeId: employee.id,
-        timeSlot: new Date(input.startsAt),
-        status: CartItemStatus.ACTIVE,
-      }),
-    );
+        timeSlot,
+      },
+    });
+    const itemCreated = !item;
+    if (item) {
+      item.status = CartItemStatus.ACTIVE;
+      item = await manager.save(item);
+    } else {
+      item = await manager.save(
+        manager.create(CartItem, {
+          userId: user.id,
+          serviceId: service.id,
+          employeeId: employee.id,
+          timeSlot,
+          status: CartItemStatus.ACTIVE,
+        }),
+      );
+    }
 
     refs.cartItems[input.key ?? item.id] = item;
+    if (itemCreated) {
+      refs.created.cartItems[input.key ?? item.id] = item;
+    }
     return item;
   }
 
@@ -650,25 +971,41 @@ export class TestBackdoorService {
       ? new Date(input.endsAt)
       : new Date(start.getTime() + 60 * 60 * 1000);
 
-    const booking = await manager.save(
-      manager.create(Booking, {
-        userId: user.id,
+    let booking = await manager.findOne(Booking, {
+      where: {
         staffId: employee.id,
-        productId: service.id,
         startTime: start,
-        endTime: end,
-        status: input.status ?? BookingStatus.CONFIRMED,
-        paymentUrl: input.paymentUrl ?? null,
-        paymentDeeplink: null,
-        paymentExpiresAt: input.paymentExpiresAt
-          ? new Date(input.paymentExpiresAt)
-          : null,
-        notes: null,
-        isReviewed: false,
-      }),
-    );
+        status: In([BookingStatus.PENDING_PAYMENT, BookingStatus.CONFIRMED]),
+      },
+      withDeleted: true,
+    });
+    const bookingCreated = !booking || booking.deletedAt != null;
+    const bookingFields = {
+      userId: user.id,
+      staffId: employee.id,
+      productId: service.id,
+      startTime: start,
+      endTime: end,
+      status: input.status ?? BookingStatus.CONFIRMED,
+      paymentUrl: input.paymentUrl ?? null,
+      paymentDeeplink: null,
+      paymentExpiresAt: input.paymentExpiresAt
+        ? new Date(input.paymentExpiresAt)
+        : null,
+      notes: null,
+      isReviewed: false,
+    };
+    if (booking) {
+      Object.assign(booking, bookingFields, { deletedAt: null });
+      booking = await manager.save(booking);
+    } else {
+      booking = await manager.save(manager.create(Booking, bookingFields));
+    }
 
     refs.bookings[input.key ?? booking.id] = booking;
+    if (bookingCreated) {
+      refs.created.bookings[input.key ?? booking.id] = booking;
+    }
     return booking;
   }
 
@@ -708,6 +1045,7 @@ export class TestBackdoorService {
     );
 
     refs.notifications[input.key ?? notification.id] = notification;
+    refs.created.notifications[input.key ?? notification.id] = notification;
     return notification;
   }
 
@@ -785,6 +1123,17 @@ export class TestBackdoorService {
       bookings: {},
       coupons: {},
       notifications: {},
+      created: {
+        users: {},
+        categories: {},
+        partners: {},
+        employees: {},
+        services: {},
+        cartItems: {},
+        bookings: {},
+        coupons: {},
+        notifications: {},
+      },
     };
   }
 
@@ -798,15 +1147,15 @@ export class TestBackdoorService {
       ok: true,
       scenario,
       ids: {
-        users: toRecord(refs.users),
-        categories: toRecord(refs.categories),
-        partners: toRecord(refs.partners),
-        employees: toRecord(refs.employees),
-        services: toRecord(refs.services),
-        cartItems: toRecord(refs.cartItems),
-        bookings: toRecord(refs.bookings),
-        coupons: toRecord(refs.coupons),
-        notifications: toRecord(refs.notifications),
+        users: toRecord(refs.created.users),
+        categories: toRecord(refs.created.categories),
+        partners: toRecord(refs.created.partners),
+        employees: toRecord(refs.created.employees),
+        services: toRecord(refs.created.services),
+        cartItems: toRecord(refs.created.cartItems),
+        bookings: toRecord(refs.created.bookings),
+        coupons: toRecord(refs.created.coupons),
+        notifications: toRecord(refs.created.notifications),
       },
     };
   }

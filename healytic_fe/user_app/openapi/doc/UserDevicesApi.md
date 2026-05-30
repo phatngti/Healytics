@@ -29,7 +29,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserDevicesApi();
-final registerDeviceDto = RegisterDeviceDto(); // RegisterDeviceDto | 
+final registerDeviceDto = RegisterDeviceDto(); // RegisterDeviceDto |
 
 try {
     api_instance.userDeviceControllerRegisterDevice(registerDeviceDto);
@@ -42,7 +42,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **registerDeviceDto** | [**RegisterDeviceDto**](RegisterDeviceDto.md)|  | 
+ **registerDeviceDto** | [**RegisterDeviceDto**](RegisterDeviceDto.md)|  |
 
 ### Return type
 
@@ -75,7 +75,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserDevicesApi();
-final token = token_example; // String | 
+final token = token_example; // String |
 
 try {
     api_instance.userDeviceControllerUnregisterDevice(token);
@@ -88,7 +88,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **token** | **String**|  | 
+ **token** | **String**|  |
 
 ### Return type
 

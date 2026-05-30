@@ -8,10 +8,10 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**exception** | [**AdminFinanceReconciliationExceptionDto**](AdminFinanceReconciliationExceptionDto.md) |  | 
-**providerEventContext** | **String** |  | 
-**ledgerContext** | **String** |  | 
-**resolutionNotes** | **String** |  | 
+**exception** | [**AdminFinanceReconciliationExceptionDto**](AdminFinanceReconciliationExceptionDto.md) |  |
+**providerEventContext** | **String** |  |
+**ledgerContext** | **String** |  |
+**resolutionNotes** | **String** |  |
 **auditTrail** | [**List<AdminFinanceAuditEventDto>**](AdminFinanceAuditEventDto.md) |  | [default to const []]
 **notes** | [**List<AdminFinanceNoteDto>**](AdminFinanceNoteDto.md) |  | [default to const []]
 

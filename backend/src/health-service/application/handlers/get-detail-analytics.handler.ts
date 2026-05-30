@@ -314,7 +314,8 @@ export class GetDetailAnalyticsHandler {
     const rows = await this.dataSource.query(
       `SELECT
         p.name                                   AS service_name,
-        COALESCE(c.name, 'Uncategorized')        AS category_name,
+        COALESCE(parent_c.name, c.name, 'Uncategorized')
+                                                 AS category_name,
         COUNT(*) FILTER (
           WHERE b.status = 'COMPLETED')          AS bookings,
         COALESCE(SUM(
@@ -325,6 +326,7 @@ export class GetDetailAnalyticsHandler {
         COALESCE(AVG(tr.rating), 0)              AS avg_rating
       FROM products p
       LEFT JOIN categories c ON c.id = p.category_id
+      LEFT JOIN categories parent_c ON parent_c.id = c.parent_id
       LEFT JOIN bookings b ON b.product_id = p.id
           AND b.start_time BETWEEN $2 AND $3
           AND b.deleted_at IS NULL
@@ -334,7 +336,7 @@ export class GetDetailAnalyticsHandler {
       WHERE p.partner_id = $1
         AND p.deleted_at IS NULL
         AND p.status = 'active'
-      GROUP BY p.id, p.name, c.name
+      GROUP BY p.id, p.name, COALESCE(parent_c.name, c.name, 'Uncategorized')
       ORDER BY avg_rating DESC
       LIMIT 4`,
       [partnerId, start, end],

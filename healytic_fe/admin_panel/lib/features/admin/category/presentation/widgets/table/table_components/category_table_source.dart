@@ -65,6 +65,15 @@ class CategoryTableSource {
               ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
+          DataCell(_buildTypeBadge(context, category.isRoot)),
+          DataCell(
+            Text(
+              category.parentName ?? '-',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
           // Description
           DataCell(
             ConstrainedBox(
@@ -76,6 +85,16 @@ class CategoryTableSource {
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+          DataCell(
+            Center(
+              child: Text(
+                category.isRoot ? '${category.subCategoryCount}' : '-',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -192,6 +211,29 @@ class CategoryTableSource {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  static Widget _buildTypeBadge(BuildContext context, bool isRoot) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final color = isRoot ? colorScheme.primary : colorScheme.tertiary;
+
+    return Container(
+      padding: AppDimens.paddingHorizontalSmall.add(
+        AppDimens.paddingVerticalExtraSmall,
+      ),
+      decoration: BoxDecoration(
+        color: color.withAlpha(24),
+        borderRadius: AppDimens.radiusMedium,
+        border: Border.all(color: color.withAlpha(64)),
+      ),
+      child: Text(
+        isRoot ? 'Root' : 'Sub-category',
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

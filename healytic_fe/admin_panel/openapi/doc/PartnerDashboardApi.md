@@ -320,7 +320,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **date** | **String**| Target date for schedule lookup (ISO 8601 date) | 
+ **date** | **String**| Target date for schedule lookup (ISO 8601 date) |
 
 ### Return type
 

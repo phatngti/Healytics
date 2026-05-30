@@ -8,7 +8,7 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**record** | [**AdminFinanceTransactionRecordDto**](AdminFinanceTransactionRecordDto.md) |  | 
+**record** | [**AdminFinanceTransactionRecordDto**](AdminFinanceTransactionRecordDto.md) |  |
 **providerEvents** | [**List<AdminFinanceProviderEventDto>**](AdminFinanceProviderEventDto.md) |  | [default to const []]
 **auditTrail** | [**List<AdminFinanceAuditEventDto>**](AdminFinanceAuditEventDto.md) |  | [default to const []]
 **notes** | [**List<AdminFinanceNoteDto>**](AdminFinanceNoteDto.md) |  | [default to const []]

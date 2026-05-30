@@ -77,7 +77,9 @@ COPY --chown=node:node package.json ./
 COPY --chown=node:node --chmod=755 docker-entrypoint.sh ./
 
 # Runtime configuration
-ENV NODE_ENV=production
+# ENV NODE_ENV=production
+ENV NODE_ENV=test
+
 ENV SERVE_TEST_REPORT=false
 EXPOSE 8080
 

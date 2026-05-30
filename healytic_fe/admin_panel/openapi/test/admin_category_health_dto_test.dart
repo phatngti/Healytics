@@ -31,6 +31,16 @@ void main() {
       // TODO
     });
 
+    // num rootCategories
+    test('to test the property `rootCategories`', () async {
+      // TODO
+    });
+
+    // num subCategories
+    test('to test the property `subCategories`', () async {
+      // TODO
+    });
+
     // num emptyCategories
     test('to test the property `emptyCategories`', () async {
       // TODO

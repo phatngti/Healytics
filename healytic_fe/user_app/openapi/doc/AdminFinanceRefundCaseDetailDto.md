@@ -8,11 +8,11 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**record** | [**AdminFinanceRefundCaseRecordDto**](AdminFinanceRefundCaseRecordDto.md) |  | 
-**customerRequest** | **String** |  | 
-**partnerResponse** | **String** |  | 
+**record** | [**AdminFinanceRefundCaseRecordDto**](AdminFinanceRefundCaseRecordDto.md) |  |
+**customerRequest** | **String** |  |
+**partnerResponse** | **String** |  |
 **evidenceLinks** | **List<String>** |  | [default to const []]
-**decisionNote** | **String** |  | 
+**decisionNote** | **String** |  |
 **auditTrail** | [**List<AdminFinanceAuditEventDto>**](AdminFinanceAuditEventDto.md) |  | [default to const []]
 **notes** | [**List<AdminFinanceNoteDto>**](AdminFinanceNoteDto.md) |  | [default to const []]
 

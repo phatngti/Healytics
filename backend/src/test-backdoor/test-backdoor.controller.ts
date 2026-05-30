@@ -5,6 +5,8 @@ import { TestBackdoorService } from './test-backdoor.service';
 import {
   BackdoorPrepareDto,
   BackdoorStatusResponseDto,
+  CleanupSeedDataDto,
+  CleanupSeedDataResponseDto,
   ResetDbResponseDto,
   SeedBookingDto,
   SeedCartItemDto,
@@ -43,6 +45,13 @@ export class TestBackdoorController {
   @ApiOkResponse({ type: SeedResponseDto })
   prepare(@Body() body: BackdoorPrepareDto) {
     return this.service.prepare(body);
+  }
+
+  @Post('cleanup')
+  @ApiOperation({ summary: 'Delete only rows returned by a seed response' })
+  @ApiOkResponse({ type: CleanupSeedDataResponseDto })
+  cleanup(@Body() body: CleanupSeedDataDto) {
+    return this.service.cleanupSeedData(body.ids);
   }
 
   @Post('seed')

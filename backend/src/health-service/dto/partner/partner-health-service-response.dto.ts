@@ -67,12 +67,21 @@ class PartnerCategorySummaryDto {
   id: string;
 
   @Expose()
+  @ApiPropertyOptional({ type: String, nullable: true })
+  parentId: string | null;
+
+  @Expose()
   @ApiProperty({ type: String })
   name: string;
 
   @Expose()
   @ApiProperty({ type: String })
   slug: string;
+
+  @Expose()
+  @Type(() => PartnerCategorySummaryDto)
+  @ApiPropertyOptional({ type: PartnerCategorySummaryDto, nullable: true })
+  parent: PartnerCategorySummaryDto | null;
 }
 
 /**

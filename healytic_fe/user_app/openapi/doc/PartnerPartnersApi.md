@@ -170,7 +170,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerPartnersApi();
-final updatePartnerDto = UpdatePartnerDto(); // UpdatePartnerDto | 
+final updatePartnerDto = UpdatePartnerDto(); // UpdatePartnerDto |
 
 try {
     final result = api_instance.partnerSelfControllerUpdateMyProfile(updatePartnerDto);
@@ -184,7 +184,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **updatePartnerDto** | [**UpdatePartnerDto**](UpdatePartnerDto.md)|  | 
+ **updatePartnerDto** | [**UpdatePartnerDto**](UpdatePartnerDto.md)|  |
 
 ### Return type
 
@@ -219,7 +219,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerPartnersApi();
-final updatePartnerProfileCompletionDto = UpdatePartnerProfileCompletionDto(); // UpdatePartnerProfileCompletionDto | 
+final updatePartnerProfileCompletionDto = UpdatePartnerProfileCompletionDto(); // UpdatePartnerProfileCompletionDto |
 
 try {
     final result = api_instance.partnerSelfControllerUpdateMyProfileCompletion(updatePartnerProfileCompletionDto);
@@ -233,7 +233,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **updatePartnerProfileCompletionDto** | [**UpdatePartnerProfileCompletionDto**](UpdatePartnerProfileCompletionDto.md)|  | 
+ **updatePartnerProfileCompletionDto** | [**UpdatePartnerProfileCompletionDto**](UpdatePartnerProfileCompletionDto.md)|  |
 
 ### Return type
 
@@ -268,7 +268,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerPartnersApi();
-final updatePartnerPublicProfileDto = UpdatePartnerPublicProfileDto(); // UpdatePartnerPublicProfileDto | 
+final updatePartnerPublicProfileDto = UpdatePartnerPublicProfileDto(); // UpdatePartnerPublicProfileDto |
 
 try {
     final result = api_instance.partnerSelfControllerUpdatePublicProfile(updatePartnerPublicProfileDto);
@@ -282,7 +282,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **updatePartnerPublicProfileDto** | [**UpdatePartnerPublicProfileDto**](UpdatePartnerPublicProfileDto.md)|  | 
+ **updatePartnerPublicProfileDto** | [**UpdatePartnerPublicProfileDto**](UpdatePartnerPublicProfileDto.md)|  |
 
 ### Return type
 

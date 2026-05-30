@@ -39,6 +39,7 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
   bool _isLoading = true;
   String? _error;
   Map<String, dynamic> _initialValues = const {};
+  List<CategoryEntity> _parentCategories = const [];
 
   @override
   void initState() {
@@ -61,6 +62,9 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
       final entity = await ref
           .read(categoryProvider.notifier)
           .getCategoryById(CategoryId(widget.categoryId));
+      final categories = await ref
+          .read(categoryProvider.notifier)
+          .getVisibleCategories();
 
       if (!mounted) return;
 
@@ -72,6 +76,12 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
         _initialValues = shouldAutofill
             ? _buildAutofillValues()
             : _mapEntityToFormValues(entity);
+        _parentCategories = categories
+            .where(
+              (category) =>
+                  category.isRoot && category.id.value != widget.categoryId,
+            )
+            .toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -100,6 +110,9 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
       final iconName = values[CategoryFormField.iconName.key]
           ?.toString()
           .trim();
+      final parentId = values[CategoryFormField.parentCategory.key]
+          ?.toString()
+          .trim();
       final colorValue = _parseColorHex(
         values[CategoryFormField.colorHex.key]?.toString(),
       );
@@ -108,6 +121,7 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
           .read(categoryProvider.notifier)
           .updateCategory(
             id: CategoryId(widget.categoryId),
+            parentId: parentId == null || parentId.isEmpty ? null : parentId,
             name: categoryName,
             description: description,
             iconName: iconName?.isEmpty ?? true ? 'category' : iconName!,
@@ -176,6 +190,7 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
         onSubmit: _handleSubmit,
         initialValue: _initialValues,
         isLoadingData: _isLoading,
+        parentCategories: _parentCategories,
       ),
     );
   }
@@ -193,6 +208,7 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
   static Map<String, dynamic> _mapEntityToFormValues(CategoryEntity entity) {
     return {
       CategoryFormField.categoryName.key: entity.name,
+      CategoryFormField.parentCategory.key: entity.parentId ?? '',
       CategoryFormField.description.key: entity.description,
       CategoryFormField.status.key: entity.isVisible
           ? CategoryStatus.active.displayName

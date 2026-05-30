@@ -21,6 +21,11 @@ void main() {
       // TODO
     });
 
+    // String parentId
+    test('to test the property `parentId`', () async {
+      // TODO
+    });
+
     // String name
     test('to test the property `name`', () async {
       // TODO
@@ -33,6 +38,11 @@ void main() {
 
     // String imageUrl
     test('to test the property `imageUrl`', () async {
+      // TODO
+    });
+
+    // PublicCategoryDto parent
+    test('to test the property `parent`', () async {
       // TODO
     });
 

@@ -8,18 +8,18 @@ import 'package:admin_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **String** |  | 
-**title** | **String** |  | 
-**category** | [**PublicCategoryDto**](PublicCategoryDto.md) |  | 
+**id** | **String** |  |
+**title** | **String** |  |
+**category** | [**PublicCategoryDto**](PublicCategoryDto.md) |  |
 **images** | **List<String>** |  | [default to const []]
-**rating** | **num** |  | 
-**reviewCount** | **num** |  | 
-**price** | **String** |  | 
-**isVerified** | **bool** |  | 
-**isWishlisted** | **bool** |  | 
-**description** | **String** |  | [optional] 
+**rating** | **num** |  |
+**reviewCount** | **num** |  |
+**price** | **String** |  |
+**isVerified** | **bool** |  |
+**isWishlisted** | **bool** |  |
+**description** | **String** |  | [optional]
 **featureTags** | [**List<PublicFeatureTagDto>**](PublicFeatureTagDto.md) |  | [default to const []]
-**clinic** | [**PublicClinicDto**](PublicClinicDto.md) |  | 
+**clinic** | [**PublicClinicDto**](PublicClinicDto.md) |  |
 **facilityImages** | [**List<PublicFacilityImageDto>**](PublicFacilityImageDto.md) |  | [default to const []]
 **serviceTags** | [**List<PublicServiceTagDto>**](PublicServiceTagDto.md) |  | [default to const []]
 

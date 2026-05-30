@@ -12,6 +12,7 @@ import { Employee } from '@/common/entities/employee.entity';
 import { Product } from '@/common/entities/product.entity';
 import { Partner } from '@/common/entities/partner.entity';
 import { PartnerStatistics } from '@/common/entities/partner-statistics.entity';
+import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { AccountModule } from '@/account/account.module';
 import { NotificationModule } from '@/notification/notification.module';
 import { BookingController } from './booking.controller';
@@ -41,6 +42,7 @@ import { BookingStatusLifecycleService } from './services/booking-status-lifecyc
 import { BookingStatusLogWriterService } from './services/booking-status-log-writer.service';
 import { BookingStatusRealtimePublisher } from './services/booking-status-realtime.publisher';
 import { PartnerStatisticsRefreshService } from './services/partner-statistics-refresh.service';
+import { AutoStaffAssignmentService } from './services/auto-staff-assignment.service';
 import { BookingOwnershipGuard } from './guards/booking-ownership.guard';
 import { BookingEventsGateway } from './gateways/booking-events.gateway';
 
@@ -53,6 +55,7 @@ import { BookingEventsGateway } from './gateways/booking-events.gateway';
       Account,
       Employee,
       Product,
+      ProductEmployeeEligibility,
       Partner,
       PartnerStatistics,
     ]),
@@ -99,6 +102,7 @@ import { BookingEventsGateway } from './gateways/booking-events.gateway';
     BookingStatusRealtimePublisher,
     BookingEventsGateway,
     PartnerStatisticsRefreshService,
+    AutoStaffAssignmentService,
   ],
   exports: [BookingService],
 })

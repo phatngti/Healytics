@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:user_app/core/config/app_environment.dart';
 import 'package:user_app/core/providers/api.provider.dart';
+import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/cart/domain/entities/cart_item.entity.dart';
 import 'package:user_app/features/cart/domain/entities/voucher.entity.dart';
 import 'package:user_openapi/api.dart';
@@ -20,8 +23,9 @@ abstract class CartRemoteDataSource {
   /// Adds a scheduled service to the cart.
   Future<CartItemEntity> addItem({
     required String serviceId,
-    required String employeeId,
+    String? employeeId,
     required DateTime timeSlot,
+    bool autoAssignStaff = false,
   });
 
   /// Removes an item by its cart item ID.
@@ -52,65 +56,67 @@ abstract class CartRemoteDataSource {
 // ────────────────────────────────────────────────────
 
 /// Real API implementation backed by the generated
-/// [CartApi] OpenAPI client.
-class CartRemoteDataSourceImpl
-    implements CartRemoteDataSource {
-  static final _log =
-      Logger('CartRemoteDataSourceImpl');
+/// [ApiService] OpenAPI client.
+class CartRemoteDataSourceImpl implements CartRemoteDataSource {
+  static final _log = Logger('CartRemoteDataSourceImpl');
 
-  final CartApi _cartApi;
+  final ApiService _apiService;
 
-  const CartRemoteDataSourceImpl(this._cartApi);
+  const CartRemoteDataSourceImpl(this._apiService);
 
   @override
   Future<List<CartItemEntity>> getCartItems() async {
-    final dtos =
-        await _cartApi.cartControllerGetItems();
+    final dtos = await _apiService.cartApi.cartControllerGetItems();
     return dtos?.map(_mapDto).toList() ?? [];
   }
 
   @override
   Future<CartItemEntity> addItem({
     required String serviceId,
-    required String employeeId,
+    String? employeeId,
     required DateTime timeSlot,
+    bool autoAssignStaff = false,
   }) async {
-    final dto = await _cartApi.cartControllerAddItem(
-      AddToCartDto(
-        serviceId: serviceId,
-        employeeId: employeeId,
-        timeSlot: timeSlot.toUtc().toIso8601String(),
-      ),
+    final response = await _apiService.apiClient.invokeAPI(
+      '/cart',
+      'POST',
+      const [],
+      {
+        'serviceId': serviceId,
+        if (employeeId != null && employeeId.isNotEmpty)
+          'employeeId': employeeId,
+        'timeSlot': timeSlot.toUtc().toIso8601String(),
+        'autoAssignStaff': autoAssignStaff,
+      },
+      {},
+      {},
+      'application/json',
+    );
+    if (response.statusCode >= 400 || response.body.isEmpty) {
+      throw ApiException(response.statusCode, 'Empty response from POST /cart');
+    }
+    final dto = CartItemResponseDto.fromJson(
+      jsonDecode(response.body) as Map<String, dynamic>,
     );
     if (dto == null) {
-      throw ApiException(
-        500,
-        'Empty response from POST /cart',
-      );
+      throw ApiException(500, 'Invalid response from POST /cart');
     }
     return _mapDto(dto);
   }
 
   @override
   Future<void> removeItem(String cartItemId) =>
-      _cartApi.cartControllerRemoveItem(cartItemId);
+      _apiService.cartApi.cartControllerRemoveItem(cartItemId);
 
   @override
   Future<CartItemEntity> applyCoupon({
     required String cartItemId,
     required String couponCode,
-  }) => _returnUnchangedItem(
-    cartItemId,
-    action: 'apply coupon',
-  );
+  }) => _returnUnchangedItem(cartItemId, action: 'apply coupon');
 
   @override
-  Future<CartItemEntity> removeCoupon(
-    String cartItemId,
-  ) => _returnUnchangedItem(
-    cartItemId,
-    action: 'remove coupon',
-  );
+  Future<CartItemEntity> removeCoupon(String cartItemId) =>
+      _returnUnchangedItem(cartItemId, action: 'remove coupon');
 
   /// Voucher listing is not yet part of the backend
   /// OpenAPI spec. Returns an empty list so the UI
@@ -128,14 +134,11 @@ class CartRemoteDataSourceImpl
   }
 
   @override
-  Future<void> clearCart() =>
-      _cartApi.cartControllerClearCart();
+  Future<void> clearCart() => _apiService.cartApi.cartControllerClearCart();
 
   // ── DTO → Entity mapping ────────────────────────
 
-  static CartItemEntity _mapDto(
-    CartItemResponseDto dto,
-  ) {
+  static CartItemEntity _mapDto(CartItemResponseDto dto) {
     return CartItemEntity(
       id: dto.id,
       serviceId: dto.serviceId,
@@ -146,20 +149,16 @@ class CartRemoteDataSourceImpl
       clinicId: dto.clinicId,
       clinicName: dto.clinicName,
       clinicAddress: dto.clinicAddress,
-      clinicImageUrl:
-          dto.clinicImageUrl?.toString() ?? '',
+      clinicImageUrl: dto.clinicImageUrl?.toString() ?? '',
       specialistId: dto.employeeId,
       specialistName: dto.employeeName,
-      specialistPosition:
-          _formatEmployeeRole(dto.employeeRole),
+      specialistPosition: _formatEmployeeRole(dto.employeeRole),
       slotTime: dto.timeSlot.toLocal(),
       createdAt: dto.createdAt.toLocal(),
     );
   }
 
-  static String _formatEmployeeRole(
-    CartItemResponseDtoEmployeeRoleEnum role,
-  ) {
+  static String _formatEmployeeRole(CartItemResponseDtoEmployeeRoleEnum role) {
     if (role == CartItemResponseDtoEmployeeRoleEnum.DOCTOR) {
       return 'Doctor';
     }
@@ -183,10 +182,7 @@ class CartRemoteDataSourceImpl
     try {
       return items.firstWhere((item) => item.id == cartItemId);
     } on StateError {
-      throw ApiException(
-        404,
-        'Cart item not found: $cartItemId',
-      );
+      throw ApiException(404, 'Cart item not found: $cartItemId');
     }
   }
 }
@@ -214,8 +210,9 @@ class CartRemoteDataSourceMock implements CartRemoteDataSource {
   @override
   Future<CartItemEntity> addItem({
     required String serviceId,
-    required String employeeId,
+    String? employeeId,
     required DateTime timeSlot,
+    bool autoAssignStaff = false,
   }) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
@@ -232,8 +229,10 @@ class CartRemoteDataSourceMock implements CartRemoteDataSource {
       clinicName: 'Healytics Clinic',
       clinicAddress: '456 Nguyen Hue, Q1, HCM',
       clinicImageUrl: 'https://picsum.photos/seed/clinic/100',
-      specialistId: employeeId,
-      specialistName: 'Specialist $employeeId',
+      specialistId: employeeId ?? 'auto-specialist',
+      specialistName: employeeId == null
+          ? 'Assigned automatically'
+          : 'Specialist $employeeId',
       specialistPosition: 'Therapist',
       slotTime: timeSlot,
       createdAt: DateTime.now(),
@@ -339,11 +338,10 @@ class CartRemoteDataSourceMock implements CartRemoteDataSource {
 
 /// Switches between real and mock implementations
 /// using [AppEnvironment.useMock].
-final cartRemoteDatasourceProvider =
-    Provider<CartRemoteDataSource>((ref) {
+final cartRemoteDatasourceProvider = Provider<CartRemoteDataSource>((ref) {
   if (AppEnvironment.current.useMock) {
     return CartRemoteDataSourceMock();
   }
   final api = ref.read(apiServiceProvider);
-  return CartRemoteDataSourceImpl(api.cartApi);
+  return CartRemoteDataSourceImpl(api);
 });

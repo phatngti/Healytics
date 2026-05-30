@@ -73,7 +73,7 @@ final class EmployeeListProvider
   }
 }
 
-String _$employeeListHash() => r'8492525681e8ff33a4fbc2c2b18951089be13ecd';
+String _$employeeListHash() => r'5dd8cc568a52ffb2d3d5db821aea3f348bcd529b';
 
 /// Fetches all employees, optionally filtered
 /// by [role] (e.g. "DOCTOR", "THERAPIST").

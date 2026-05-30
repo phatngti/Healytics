@@ -14,6 +14,7 @@ Method | HTTP request | Description
 [**accountControllerPostSurvey**](AccountApi.md#accountcontrollerpostsurvey) | **POST** /account/survey | Create one-shot survey for current user
 [**accountControllerUpdateAddress**](AccountApi.md#accountcontrollerupdateaddress) | **PATCH** /account/me/address | Update current user address
 [**accountControllerUpdateAvatar**](AccountApi.md#accountcontrollerupdateavatar) | **PATCH** /account/me/avatar | Update current user avatar
+[**accountControllerUpdateProfile**](AccountApi.md#accountcontrollerupdateprofile) | **PATCH** /account/me/profile | Update current user profile identity
 
 
 # **accountControllerGetMe**
@@ -118,7 +119,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AccountApi();
-final surveyDto = SurveyDto(); // SurveyDto | 
+final surveyDto = SurveyDto(); // SurveyDto |
 
 try {
     final result = api_instance.accountControllerPostSurvey(surveyDto);
@@ -132,7 +133,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **surveyDto** | [**SurveyDto**](SurveyDto.md)|  | 
+ **surveyDto** | [**SurveyDto**](SurveyDto.md)|  |
 
 ### Return type
 
@@ -165,7 +166,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AccountApi();
-final updateAccountAddressDto = UpdateAccountAddressDto(); // UpdateAccountAddressDto | 
+final updateAccountAddressDto = UpdateAccountAddressDto(); // UpdateAccountAddressDto |
 
 try {
     final result = api_instance.accountControllerUpdateAddress(updateAccountAddressDto);
@@ -179,7 +180,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **updateAccountAddressDto** | [**UpdateAccountAddressDto**](UpdateAccountAddressDto.md)|  | 
+ **updateAccountAddressDto** | [**UpdateAccountAddressDto**](UpdateAccountAddressDto.md)|  |
 
 ### Return type
 
@@ -212,7 +213,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AccountApi();
-final updateAvatarDto = UpdateAvatarDto(); // UpdateAvatarDto | 
+final updateAvatarDto = UpdateAvatarDto(); // UpdateAvatarDto |
 
 try {
     final result = api_instance.accountControllerUpdateAvatar(updateAvatarDto);
@@ -226,7 +227,54 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **updateAvatarDto** | [**UpdateAvatarDto**](UpdateAvatarDto.md)|  | 
+ **updateAvatarDto** | [**UpdateAvatarDto**](UpdateAvatarDto.md)|  |
+
+### Return type
+
+[**AccountMeResponseDto**](AccountMeResponseDto.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **accountControllerUpdateProfile**
+> AccountMeResponseDto accountControllerUpdateProfile(updateAccountProfileDto)
+
+Update current user profile identity
+
+### Example
+```dart
+import 'package:user_openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: bearer
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = AccountApi();
+final updateAccountProfileDto = UpdateAccountProfileDto(); // UpdateAccountProfileDto |
+
+try {
+    final result = api_instance.accountControllerUpdateProfile(updateAccountProfileDto);
+    print(result);
+} catch (e) {
+    print('Exception when calling AccountApi->accountControllerUpdateProfile: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **updateAccountProfileDto** | [**UpdateAccountProfileDto**](UpdateAccountProfileDto.md)|  |
 
 ### Return type
 

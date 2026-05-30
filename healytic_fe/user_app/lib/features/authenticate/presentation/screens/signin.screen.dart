@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -76,7 +77,7 @@ class SingInScreen extends HookConsumerWidget {
         DeviceUtils.getStatusBarHeight(context) -
         DeviceUtils.getAppBarHeight();
 
-    final isLoading = ref.watch(authenticateProvider).isLoading;
+    final isGoogleSubmitting = useState(false);
 
     // Auth state listener: branches on success
     // (profile-completed vs first-time) and surfaces
@@ -108,6 +109,7 @@ class SingInScreen extends HookConsumerWidget {
           }
         },
         error: (err, _) {
+          if (!isGoogleSubmitting.value) return;
           if (!context.mounted) return;
           AppToast.error(context, _googleErrorToast(err));
         },
@@ -174,12 +176,19 @@ class SingInScreen extends HookConsumerWidget {
                       widthFactor: 0.8,
                       child: AppButton(
                         key: keys.signInPage.googleButton,
-                        onPressed: isLoading
+                        onPressed: isGoogleSubmitting.value
                             ? null
-                            : () {
-                                ref
-                                    .read(authenticateProvider.notifier)
-                                    .signInWithGoogle();
+                            : () async {
+                                isGoogleSubmitting.value = true;
+                                try {
+                                  await ref
+                                      .read(authenticateProvider.notifier)
+                                      .signInWithGoogle();
+                                } finally {
+                                  if (context.mounted) {
+                                    isGoogleSubmitting.value = false;
+                                  }
+                                }
                               },
                         buttonType: ButtonType.outline,
                         customStyle: OutlinedButton.styleFrom(
@@ -188,7 +197,7 @@ class SingInScreen extends HookConsumerWidget {
                             borderRadius: AppDimens.radiusSmall,
                           ),
                         ),
-                        isLoading: isLoading,
+                        isLoading: isGoogleSubmitting.value,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

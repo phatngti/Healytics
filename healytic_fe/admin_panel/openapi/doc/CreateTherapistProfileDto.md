@@ -8,11 +8,11 @@ import 'package:admin_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**level** | **String** | Therapist level | [optional] 
-**type** | **String** | Type of therapist | [optional] 
-**strengthLevel** | **String** | Therapist strength level | [optional] 
-**commissionRate** | **num** | Commission rate percentage | [optional] 
-**healthCheckDate** | **String** | Last health check date | [optional] 
+**level** | **String** | Therapist level | [optional]
+**type** | **String** | Type of therapist | [optional]
+**strengthLevel** | **String** | Therapist strength level | [optional]
+**commissionRate** | **num** | Commission rate percentage | [optional]
+**healthCheckDate** | **String** | Last health check date | [optional]
 **skills** | **List<String>** | Therapist skills | [optional] [default to const []]
 **deviceProficiency** | **List<String>** | Device proficiency list | [optional] [default to const []]
 

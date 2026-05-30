@@ -13,6 +13,8 @@ abstract class CategoryEntity with _$CategoryEntity {
     String? imageUrl,
     @Default(true) bool isActive,
     String? parentId,
+    String? parentName,
+    @Default(true) bool isRoot,
   }) = _CategoryEntity;
 
   factory CategoryEntity.fromJson(Map<String, dynamic> json) =>
