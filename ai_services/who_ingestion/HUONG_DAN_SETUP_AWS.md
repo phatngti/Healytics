@@ -253,44 +253,11 @@ MISTRAL_API_KEY=...            # dịch query VI→EN cho BM25
 
 Restart chatbot service.
 
----
+## Phần D - Cách hiển thị dashboard ElasticSearch
+```bash
 
-## Phần D — Checklist thông tin cần gửi cho team / agent
+cd ai_services
+python who_ingestion/scripts/generate_es_report.py
+open who_ingestion/reports/es_preview.html
 
-Sau khi làm xong, bạn có thể cung cấp (không gửi public chat nếu là production):
-
-| # | Thông tin | Ví dụ |
-|---|-----------|-------|
-| 1 | `S3_BUCKET` | `healytics-who-docs` |
-| 2 | `AWS_REGION` | `ap-southeast-1` |
-| 3 | `AWS_ACCESS_KEY_ID` | `AKIA...` |
-| 4 | `AWS_SECRET_ACCESS_KEY` | (bí mật) |
-| 5 | `ELASTICSEARCH_URL` | `https://search-...es.amazonaws.com` |
-| 6 | `ELASTICSEARCH_USERNAME` | `healytics_admin` |
-| 7 | `ELASTICSEARCH_PASSWORD` | (bí mật) |
-| 8 | `ELASTICSEARCH_INDEX` | `healytics_who_chunks` |
-
----
-
-## Chi phí ước tính (tham khảo)
-
-| Dịch vụ | Dev/testing |
-|---------|-------------|
-| S3 (~200 PDF, vài GB) | ~$0.1–1/tháng |
-| OpenSearch `t3.small.search` 1 node | ~$25–35/tháng |
-| Data transfer | tuỳ lượng crawl |
-
-**Tiết kiệm:** sau khi ingest xong, có thể **tắt OpenSearch domain** khi không eval; bật lại khi cần. S3 giữ PDF làm backup.
-
----
-
-## Lỗi thường gặp
-
-| Lỗi | Cách xử lý |
-|-----|------------|
-| `Access Denied` S3 | Kiểm tra IAM policy đúng tên bucket |
-| `401 Unauthorized` | Sai master username/password; hoặc URL có `/_dashboards`; đừng dùng tên IAM user làm `ELASTICSEARCH_USERNAME` |
-| `403 security_exception` IAM | IAM đã vào cluster nhưng **chưa map FGAC role** → Bước B7 |
-| `AccessDenied DescribeDomain` | IAM thiếu `es:DescribeDomain` → gắn policy file `aws/iam-healytics-who-ingestion-policy.json` |
-| Crawl WHO ít kết quả | Tăng `WHO_CRAWL_DELAY_SECONDS`, thử lại; WHO có thể đổi HTML |
-| `dense_vector` lỗi | OpenSearch version ≥ 2.11 |
+```
