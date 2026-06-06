@@ -29,17 +29,49 @@ def build_retriever(
     top_k: int,
     vectorstore_backend: str = "chroma",
     embedding_device: str = "cuda",
+    rag_mode: str | None = None,
 ):
     from langchain_community.embeddings import HuggingFaceEmbeddings
     from langchain_chroma import Chroma
     from langchain_community.vectorstores import FAISS
 
+    lc_docs = _make_langchain_documents(documents)
+
+    # Ưu tiên retriever_factory — hỗ trợ RAG_MODE=standard|advanced để so sánh eval
+    try:
+        from src.rag.retriever_factory import build_retriever as build_rag_retriever  # type: ignore
+        from src.rag.settings import RagSettings, load_rag_settings  # type: ignore
+
+        base_settings = load_rag_settings()
+        resolved_mode = (rag_mode or os.getenv("RAG_MODE", base_settings.mode)).strip().lower()
+        settings = RagSettings(
+            mode=resolved_mode,
+            top_k=int(top_k),
+            rerank_top_n=base_settings.rerank_top_n,
+            hybrid_dense_weight=base_settings.hybrid_dense_weight,
+            hybrid_sparse_weight=base_settings.hybrid_sparse_weight,
+            query_translation_enabled=base_settings.query_translation_enabled,
+            translation_model=base_settings.translation_model,
+            embedding_model=base_settings.embedding_model,
+            reranker_model=base_settings.reranker_model,
+            data_dir=base_settings.data_dir,
+            chunk_size=base_settings.chunk_size,
+            chunk_overlap=base_settings.chunk_overlap,
+            elasticsearch_url=base_settings.elasticsearch_url,
+            elasticsearch_index=base_settings.elasticsearch_index,
+            elasticsearch_api_key=base_settings.elasticsearch_api_key,
+            elasticsearch_username=base_settings.elasticsearch_username,
+            elasticsearch_password=base_settings.elasticsearch_password,
+            elasticsearch_verify_certs=base_settings.elasticsearch_verify_certs,
+        )
+        return build_rag_retriever(documents=lc_docs, settings=settings)
+    except Exception:
+        pass
+
     embedding = HuggingFaceEmbeddings(model_kwargs={"device": embedding_device})
     backend = Chroma if vectorstore_backend == "chroma" else FAISS
 
-    lc_docs = _make_langchain_documents(documents)
-    # Prefer using existing VectorDB wrapper from src (current pipeline).
-    # If src import fails (e.g. missing optional deps like torch), fall back to backend directly.
+    # Fallback if advanced deps are unavailable.
     try:
         from src.rag.vectorstore import VectorDB  # type: ignore
 

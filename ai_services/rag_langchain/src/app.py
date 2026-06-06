@@ -11,6 +11,7 @@ from pydantic import BaseModel
 
 from src.base.llm_model import get_hf_llm
 from src.rag.main import build_rag_chain, InputQA, OutputQA
+from src.rag.settings import load_rag_settings
 from langchain_core.messages import AIMessage
 
 
@@ -20,7 +21,14 @@ from langchain_core.messages import AIMessage
 
 llm = get_hf_llm(temperature=0.2)
 
-genai_docs = "./data_source/generative_ai"
+# Log cấu hình RAG lúc khởi động — giúp xác nhận đang chạy standard hay advanced
+_rag_settings = load_rag_settings()
+print(
+    f"RAG configuration: mode={_rag_settings.mode}, top_k={_rag_settings.top_k}, "
+    f"elasticsearch={'enabled' if _rag_settings.elasticsearch_enabled else 'disabled'}"
+)
+
+genai_docs = _rag_settings.data_dir
 
 genai_chain = build_rag_chain(
     llm=llm,

@@ -38,10 +38,23 @@ def _resolve_embedding_device() -> str:
     return configured_device
 
 
-def _build_embedding_model():
+def _build_embedding_model(model_name: str | None = None):
+    """
+    Tạo model embedding HuggingFace.
+
+    Trước đây dùng default all-mpnet; giờ đọc RAG_EMBEDDING_MODEL từ .env
+    để đồng bộ với corpus WHO (768 chiều, đa ngôn ngữ).
+    """
+    from src.rag.settings import load_rag_settings
+
     device = _resolve_embedding_device()
+    resolved_model = model_name or load_rag_settings().embedding_model
     print("Embedding device:", device)
-    return HuggingFaceEmbeddings(model_kwargs={"device": device})
+    print("Embedding model:", resolved_model)
+    return HuggingFaceEmbeddings(
+        model_name=resolved_model,
+        model_kwargs={"device": device},
+    )
 
 
 class  VectorDB:
