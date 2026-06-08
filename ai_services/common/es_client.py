@@ -89,6 +89,13 @@ def build_elasticsearch_client(
             "Cần opensearch-py cho AWS OpenSearch. Chạy: pip install opensearch-py"
         ) from exc
 
+    class _NoProxyRequestsHttpConnection(RequestsHttpConnection):
+        """Tránh proxy Cursor/IDE làm fail kết nối OpenSearch."""
+
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+            self.session.trust_env = False
+
     normalized_url = normalize_elasticsearch_url(url)
     if not normalized_url:
         raise ValueError("ELASTICSEARCH_URL is empty.")
@@ -99,7 +106,7 @@ def build_elasticsearch_client(
         "hosts": hosts,
         "use_ssl": use_ssl,
         "verify_certs": verify_certs,
-        "connection_class": RequestsHttpConnection,
+        "connection_class": _NoProxyRequestsHttpConnection,
         "timeout": 60,
     }
 

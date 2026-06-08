@@ -44,8 +44,14 @@ class WhoIngestionSettings:
     who_publications_url: str = "https://www.who.int/publications/m"
     docs_per_domain: int = 50  # 50 × 4 domain = 200 tài liệu mục tiêu
     crawl_delay_seconds: float = 1.0  # Tránh bị WHO rate-limit
-    crawl_timeout_seconds: float = 30.0
+    crawl_timeout_seconds: float = 45.0
+    crawl_retries: int = 3
+    crawl_retry_backoff_seconds: float = 2.0
+    crawl_max_pages_per_query: int = 15  # Số trang pagination mỗi nguồn/query
     crawl_user_agent: str = "HealyticsResearchBot/1.0 (+https://healytics.me)"
+    who_hubs_api: str = "https://www.who.int/api/hubs/publications"
+    who_iris_d7_api: str = "https://iris.who.int/server/api"
+    who_iris_legacy_api: str = "https://apps.who.int/iris/rest"
 
     # --- Thư mục tạm trên máy chạy pipeline (PDF trước khi upload S3) ---
     staging_dir: str = "./data/staging/who"
@@ -100,11 +106,19 @@ def load_settings() -> WhoIngestionSettings:
         ).strip(),
         docs_per_domain=_env_int("WHO_DOCS_PER_DOMAIN", 50),
         crawl_delay_seconds=float(os.getenv("WHO_CRAWL_DELAY_SECONDS", "1.0")),
-        crawl_timeout_seconds=float(os.getenv("WHO_CRAWL_TIMEOUT_SECONDS", "30")),
+        crawl_timeout_seconds=float(os.getenv("WHO_CRAWL_TIMEOUT_SECONDS", "45")),
+        crawl_retries=_env_int("WHO_CRAWL_RETRIES", 3),
+        crawl_retry_backoff_seconds=float(os.getenv("WHO_CRAWL_RETRY_BACKOFF_SECONDS", "2.0")),
+        crawl_max_pages_per_query=_env_int("WHO_CRAWL_MAX_PAGES_PER_QUERY", 15),
         crawl_user_agent=os.getenv(
             "WHO_CRAWL_USER_AGENT",
             "HealyticsResearchBot/1.0 (+https://healytics.me)",
         ),
+        who_hubs_api=os.getenv("WHO_HUBS_API", "https://www.who.int/api/hubs/publications").strip(),
+        who_iris_d7_api=os.getenv("WHO_IRIS_D7_API", "https://iris.who.int/server/api").strip(),
+        who_iris_legacy_api=os.getenv(
+            "WHO_IRIS_LEGACY_API", "https://apps.who.int/iris/rest"
+        ).strip(),
         staging_dir=os.getenv("WHO_STAGING_DIR", "./data/staging/who"),
         delete_local_after_ingest=_env_bool("WHO_DELETE_LOCAL_AFTER_INGEST", True),
         s3_bucket=os.getenv("S3_BUCKET", "").strip(),

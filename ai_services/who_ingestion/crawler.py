@@ -1,187 +1,199 @@
 """
-crawler.py — Crawl tài liệu WHO theo keyword từng domain.
+crawler.py — Crawl đa nguồn WHO, dedup toàn cục, mục tiêu 50 PDF/domain (200 unique).
 
-Luồng crawl 1 publication:
-  1. Search WHO bằng keyword (nutrition, mental health, ...)
-  2. Thu thập link trang chi tiết /publications/i/item/...
-  3. Vào trang chi tiết → tìm link PDF (iris, bitstream, .pdf)
-  4. Lưu metadata vào WhoPublication
-  5. download_pdf() tải file về staging_dir trước khi upload S3
-
-Lưu ý:
-  - Trang WHO có thể đổi HTML → nếu crawl thiếu, xem log và cân nhắc Playwright.
-  - crawl_delay_seconds tránh gửi request quá nhanh.
-  - manifest.json lưu kết quả crawl để ingest lại không cần crawl (--from-manifest).
+Nguồn: WHO Hubs API, IRIS DSpace 7, IRIS legacy, who.int HTML (search + năm).
+Mỗi PDF chỉ thuộc MỘT domain — không index trùng.
 """
 
 from __future__ import annotations
 
-import hashlib
 import json
-import re
-import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Set
-from urllib.parse import quote_plus, urljoin, urlparse
-
-import requests
-from bs4 import BeautifulSoup
+from typing import Dict, List, Set
 
 from who_ingestion.config import WhoIngestionSettings
+from who_ingestion.dedup import (
+    GlobalDedupRegistry,
+    extract_who_item_code,
+    is_valid_who_item_url,
+    publication_id_from_keys,
+)
 from who_ingestion.domains import WHO_DOMAINS, WhoDomain
+from who_ingestion.who_sources import (
+    IrisDspace7Source,
+    IrisLegacyRestSource,
+    PdfResolver,
+    RawPublication,
+    WhoHttpClient,
+    WhoHubsApiSource,
+    WhoIntHtmlSource,
+    relevance_score,
+)
 
 
 @dataclass
 class WhoPublication:
-    """Metadata một tài liệu WHO sau khi crawl (chưa cần đã tải PDF)."""
-
-    domain: str  # nutrition, mental_health, ...
-    keyword: str  # Keyword đã match được link này
+    domain: str
+    keyword: str
     title: str
-    source_url: str  # URL trang publication trên who.int
-    pdf_url: str  # URL tải PDF trực tiếp
-    publication_id: str  # Hash ngắn từ source_url — dùng làm doc_id
+    source_url: str
+    pdf_url: str
+    publication_id: str
+    iris_handle: str = ""
+    source_name: str = ""
 
     def to_dict(self) -> dict:
         return asdict(self)
 
 
-def _slug(value: str) -> str:
-    cleaned = re.sub(r"[^a-zA-Z0-9_-]+", "-", value.strip().lower())
-    return cleaned.strip("-") or "unknown"
-
-
-def _publication_id(url: str) -> str:
-    return hashlib.sha1(url.encode("utf-8")).hexdigest()[:16]
-
-
 class WhoPublicationCrawler:
     def __init__(self, settings: WhoIngestionSettings) -> None:
         self.settings = settings
-        self.session = requests.Session()
-        self.session.headers.update({"User-Agent": settings.crawl_user_agent})
-
-    def _get(self, url: str) -> requests.Response:
-        response = self.session.get(url, timeout=self.settings.crawl_timeout_seconds)
-        response.raise_for_status()
-        time.sleep(self.settings.crawl_delay_seconds)
-        return response
-
-    def _search_publication_links(self, keyword: str, limit: int) -> List[str]:
-        """
-        Query WHO publications listing/search and collect detail page URLs.
-        """
-        links: List[str] = []
-        seen: Set[str] = set()
-
-        search_urls = [
-            f"{self.settings.who_base_url}/publications/i?query={quote_plus(keyword)}",
-            f"{self.settings.who_publications_url}?query={quote_plus(keyword)}",
-            f"{self.settings.who_base_url}/publications/i/item?query={quote_plus(keyword)}",
-        ]
-
-        for search_url in search_urls:
-            try:
-                html = self._get(search_url).text
-            except Exception as exc:
-                print(f"⚠️ Search failed for '{keyword}' at {search_url}: {exc}")
-                continue
-
-            soup = BeautifulSoup(html, "html.parser")
-            for anchor in soup.find_all("a", href=True):
-                href = anchor["href"].strip()
-                full = urljoin(self.settings.who_base_url, href)
-                if "/publications/i/item/" in full and full not in seen:
-                    seen.add(full)
-                    links.append(full)
-                if len(links) >= limit:
-                    return links
-
-        return links[:limit]
-
-    def _extract_pdf_url(self, detail_url: str) -> tuple[str, str]:
-        html = self._get(detail_url).text
-        soup = BeautifulSoup(html, "html.parser")
-
-        title = ""
-        h1 = soup.find("h1")
-        if h1:
-            title = h1.get_text(" ", strip=True)
-        if not title:
-            title_tag = soup.find("title")
-            title = title_tag.get_text(" ", strip=True) if title_tag else detail_url
-
-        pdf_candidates: List[str] = []
-        for anchor in soup.find_all("a", href=True):
-            href = anchor["href"].strip()
-            full = urljoin(self.settings.who_base_url, href)
-            lower = full.lower()
-            if lower.endswith(".pdf") or "/iris/" in lower or "bitstream" in lower:
-                pdf_candidates.append(full)
-
-        if not pdf_candidates:
-            for tag in soup.find_all(["a", "button", "link"], href=True):
-                href = tag.get("href", "")
-                if "download" in href.lower() or "pdf" in tag.get_text(" ", strip=True).lower():
-                    pdf_candidates.append(urljoin(self.settings.who_base_url, href))
-
-        pdf_url = pdf_candidates[0] if pdf_candidates else ""
-        return title, pdf_url
+        self.http = WhoHttpClient(settings)
+        self.pdf_resolver = PdfResolver(self.http, settings)
+        self.hubs = WhoHubsApiSource(self.http, settings)
+        self.iris_d7 = IrisDspace7Source(self.http, settings)
+        self.iris_legacy = IrisLegacyRestSource(self.http, settings)
+        self.who_html = WhoIntHtmlSource(self.http, settings)
 
     def crawl_domain(
         self,
         domain: WhoDomain,
         *,
         limit: int | None = None,
+        registry: GlobalDedupRegistry | None = None,
     ) -> List[WhoPublication]:
         target = limit or self.settings.docs_per_domain
-        publications: List[WhoPublication] = []
-        seen_urls: Set[str] = set()
+        registry = registry or GlobalDedupRegistry()
+        print(f"   → Bắt đầu crawl {domain.key}, mục tiêu {target} PDF…", flush=True)
+        collected: List[WhoPublication] = []
+        seen_in_domain: Set[str] = set()
+        min_relevance = 1.0
 
-        for keyword in domain.keywords:
-            if len(publications) >= target:
-                break
+        def try_add(raw: RawPublication, *, relax_relevance: bool = False) -> bool:
+            if len(collected) >= target:
+                return False
 
-            remaining = target - len(publications)
-            detail_links = self._search_publication_links(keyword, remaining * 3)
+            score = relevance_score(raw, domain.keywords + domain.iris_queries)
+            if not relax_relevance and score < min_relevance:
+                return False
 
-            for detail_url in detail_links:
-                if len(publications) >= target:
-                    break
-                if detail_url in seen_urls:
-                    continue
-                seen_urls.add(detail_url)
-
-                try:
-                    title, pdf_url = self._extract_pdf_url(detail_url)
-                except Exception as exc:
-                    print(f"⚠️ Skip detail page {detail_url}: {exc}")
-                    continue
-
-                if not pdf_url:
-                    print(f"⚠️ No PDF found for {detail_url}")
-                    continue
-
-                publications.append(
-                    WhoPublication(
-                        domain=domain.key,
-                        keyword=keyword,
-                        title=title,
-                        source_url=detail_url,
-                        pdf_url=pdf_url,
-                        publication_id=_publication_id(detail_url),
-                    )
+            pdf_url = raw.pdf_url
+            title = raw.title
+            if not pdf_url:
+                resolved_pdf, resolved_title = self.pdf_resolver.resolve(
+                    raw.source_url,
+                    raw.pdf_url,
+                    title_hint=raw.title,
+                    iris_handle=raw.iris_handle,
                 )
+                pdf_url = resolved_pdf
+                title = title or resolved_title
+            elif not title and is_valid_who_item_url(raw.source_url):
+                _, resolved_title = self.pdf_resolver.resolve(
+                    raw.source_url, pdf_url, title_hint="", iris_handle=raw.iris_handle
+                )
+                title = resolved_title or raw.title
 
-        return publications
+            if not pdf_url:
+                return False
+            if not title:
+                title = extract_who_item_code(raw.source_url) or raw.source_url
+
+            pub_id = publication_id_from_keys(
+                pdf_url=pdf_url,
+                source_url=raw.source_url,
+                iris_handle=raw.iris_handle,
+            )
+            if pub_id in seen_in_domain:
+                return False
+            if registry.is_duplicate(
+                pdf_url=pdf_url,
+                source_url=raw.source_url,
+                iris_handle=raw.iris_handle,
+                publication_id=pub_id,
+            ):
+                return False
+
+            registry.register(
+                pdf_url=pdf_url,
+                source_url=raw.source_url,
+                iris_handle=raw.iris_handle,
+                publication_id=pub_id,
+            )
+            seen_in_domain.add(pub_id)
+            collected.append(
+                WhoPublication(
+                    domain=domain.key,
+                    keyword=raw.keyword,
+                    title=title,
+                    source_url=raw.source_url,
+                    pdf_url=pdf_url,
+                    publication_id=pub_id,
+                    iris_handle=raw.iris_handle,
+                    source_name=raw.source_name,
+                )
+            )
+            return True
+
+        # ── Phase 1: search terms chuyên biệt từng domain ──
+        for term in domain.all_search_terms():
+            if len(collected) >= target:
+                break
+            before = len(collected)
+            self._collect_from_all_sources(term, try_add)
+            added = len(collected) - before
+            if added:
+                print(f"   +{added} từ query '{term}' (tổng {len(collected)}/{target})")
+
+        # ── Phase 2: duyệt theo năm, gán theo relevance ──
+        if len(collected) < target:
+            print(f"   ↻ Bổ sung từ browse năm ({len(collected)}/{target})…")
+            years = list(range(2026, 1997, -1))
+            for raw in self.who_html.browse_years(years):
+                if len(collected) >= target:
+                    break
+                try_add(raw, relax_relevance=False)
+
+        # ── Phase 3: nới relevance nếu vẫn thiếu ──
+        if len(collected) < target:
+            print(f"   ↻ Nới lọc relevance ({len(collected)}/{target})…")
+            for term in domain.keywords[:5]:
+                if len(collected) >= target:
+                    break
+                for raw in self._iter_sources(term):
+                    try_add(raw, relax_relevance=True)
+
+        return collected
+
+    def _source_order(self, term: str, max_pages: int):
+        """IRIS trước (có PDF sẵn, không 404); HTML item links; Hubs API cuối."""
+        yield from self.iris_d7.search(term, max_pages=max_pages)
+        yield from self.iris_legacy.search(term, max_pages=max_pages)
+        yield from self.who_html.search_keyword(term, max_pages=max_pages)
+        yield from self.hubs.search(term, max_pages=max_pages)
+
+    def _collect_from_all_sources(self, term: str, try_add) -> None:
+        max_pages = self.settings.crawl_max_pages_per_query
+        for raw in self._source_order(term, max_pages):
+            try_add(raw)
+
+    def _iter_sources(self, term: str):
+        max_pages = self.settings.crawl_max_pages_per_query
+        yield from self._source_order(term, max_pages)
 
     def crawl_all(self) -> Dict[str, List[WhoPublication]]:
+        registry = GlobalDedupRegistry()
         results: Dict[str, List[WhoPublication]] = {}
+        total = 0
         for key, domain in WHO_DOMAINS.items():
             print(f"📚 Crawling domain={domain.label_vi} ({key}), target={self.settings.docs_per_domain}")
-            results[key] = self.crawl_domain(domain)
-            print(f"   → collected {len(results[key])} publications")
+            pubs = self.crawl_domain(domain, registry=registry)
+            results[key] = pubs
+            total += len(pubs)
+            print(f"   → collected {len(pubs)} unique publications (global unique so far: {registry.total_unique})")
+        print(f"📊 Tổng unique toàn corpus: {registry.total_unique} (mục tiêu {len(WHO_DOMAINS) * self.settings.docs_per_domain})")
         return results
 
     def download_pdf(self, publication: WhoPublication, output_dir: Path) -> Path:
@@ -189,23 +201,26 @@ class WhoPublicationCrawler:
         filename = f"{publication.domain}_{publication.publication_id}.pdf"
         output_path = output_dir / filename
 
-        if output_path.exists() and output_path.stat().st_size > 0:
+        if output_path.exists() and output_path.stat().st_size > 1024:
             return output_path
 
-        response = self.session.get(
-            publication.pdf_url,
-            timeout=self.settings.crawl_timeout_seconds,
-            stream=True,
-        )
-        response.raise_for_status()
-
-        with output_path.open("wb") as handle:
-            for chunk in response.iter_content(chunk_size=1024 * 64):
-                if chunk:
-                    handle.write(chunk)
-
-        time.sleep(self.settings.crawl_delay_seconds)
-        return output_path
+        last_exc: Exception | None = None
+        for attempt in range(self.settings.crawl_retries):
+            try:
+                response = self.http.get(publication.pdf_url, stream=True)
+                with output_path.open("wb") as handle:
+                    for chunk in response.iter_content(chunk_size=1024 * 64):
+                        if chunk:
+                            handle.write(chunk)
+                if output_path.stat().st_size < 1024:
+                    output_path.unlink(missing_ok=True)
+                    raise ValueError("PDF quá nhỏ — có thể không phải file hợp lệ")
+                return output_path
+            except Exception as exc:
+                last_exc = exc
+                output_path.unlink(missing_ok=True)
+                print(f"⚠️  Download retry {attempt + 1} {publication.pdf_url[:70]}…")
+        raise last_exc  # type: ignore[misc]
 
     def save_manifest(self, publications: Dict[str, List[WhoPublication]], path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -214,3 +229,28 @@ class WhoPublicationCrawler:
             for domain, pubs in publications.items()
         }
         path.write_text(json.dumps(serializable, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    @staticmethod
+    def merge_manifest(
+        existing: Dict[str, list[dict]],
+        new_batch: Dict[str, List[WhoPublication]],
+    ) -> Dict[str, list[dict]]:
+        """Gộp manifest cũ + batch mới (theo publication_id)."""
+        merged: Dict[str, list[dict]] = {k: list(v) for k, v in existing.items()}
+        seen = {
+            item.get("publication_id")
+            for pubs in merged.values()
+            for item in pubs
+            if item.get("publication_id")
+        }
+        added = 0
+        for domain, pubs in new_batch.items():
+            merged.setdefault(domain, [])
+            for pub in pubs:
+                if pub.publication_id in seen:
+                    continue
+                merged[domain].append(pub.to_dict())
+                seen.add(pub.publication_id)
+                added += 1
+        print(f"📄 Manifest: +{added} mới, tổng {len(seen)} publication")
+        return merged

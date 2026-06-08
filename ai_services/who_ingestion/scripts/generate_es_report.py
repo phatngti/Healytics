@@ -29,6 +29,8 @@ from common.es_client import build_elasticsearch_client
 
 REPORT_PATH = AI_SERVICES / "who_ingestion" / "reports" / "es_preview.html"
 _SOURCE = ["title", "domain", "doc_id", "chunk_id", "chunk_index", "content_en", "source_url", "token_count"]
+_PREVIEW_CHARS = 500  # HTML chỉ cần preview — tránh giữ full text trong RAM
+_PAGE_SIZE = 25  # Batch nhỏ — OpenSearch managed heap thấp dễ 429 nếu scroll lớn
 
 
 def _client():
@@ -40,32 +42,37 @@ def _client():
     )
 
 
+def _normalize_chunk_source(src: dict) -> dict:
+    """Chỉ giữ preview text — giảm RAM client và tải scroll."""
+    text = (src.get("content_en") or "")[: _PREVIEW_CHARS]
+    return {**src, "content_en": text}
+
+
 def _fetch_all_chunks(es, index: str) -> list[dict]:
-    """Lấy mọi chunk bằng scroll API."""
+    """Lấy mọi chunk bằng search_after (nhẹ hơn scroll trên cluster heap nhỏ)."""
     all_chunks: list[dict] = []
-    page_size = 500
-    resp = es.search(
-        index=index,
-        scroll="5m",
-        size=page_size,
-        body={
+    search_after: list | None = None
+    page = 0
+    while True:
+        body: dict = {
             "_source": _SOURCE,
             "query": {"match_all": {}},
             "sort": [{"doc_id": "asc"}, {"chunk_index": "asc"}],
-        },
-    )
-    scroll_id = resp.get("_scroll_id")
-    hits = resp["hits"]["hits"]
-    while hits:
-        all_chunks.extend(h["_source"] for h in hits)
-        resp = es.scroll(scroll_id=scroll_id, scroll="5m")
-        scroll_id = resp.get("_scroll_id")
+            "size": _PAGE_SIZE,
+            "track_total_hits": False,
+        }
+        if search_after:
+            body["search_after"] = search_after
+        resp = es.search(index=index, body=body, request_timeout=120)
         hits = resp["hits"]["hits"]
-    if scroll_id:
-        try:
-            es.clear_scroll(scroll_id=scroll_id)
-        except Exception:
-            pass
+        if not hits:
+            break
+        for h in hits:
+            all_chunks.append(_normalize_chunk_source(h["_source"]))
+        search_after = hits[-1]["sort"]
+        page += 1
+        if page % 40 == 0:
+            print(f"   … đã tải {len(all_chunks):,} chunks", flush=True)
     return all_chunks
 
 
@@ -107,7 +114,7 @@ def _render_pub(pub: dict, idx: int) -> str:
     doc_id = html.escape(pub["doc_id"])
     chunk_rows = ""
     for ch in pub["chunks"]:
-        preview = html.escape((ch.get("content_en") or "")[:400].replace("\n", " "))
+        preview = html.escape((ch.get("content_en") or "")[:400].replace("\n", " ").strip())
         chunk_id = html.escape(ch.get("chunk_id") or "—")
         chunk_idx = ch.get("chunk_index", 0)
         tokens = ch.get("token_count", "—")

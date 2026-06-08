@@ -236,6 +236,9 @@ cp who_ingestion/.env.example who_ingestion/.env
 pip install -r requirements.txt
 python -m who_ingestion.pipeline --domain nutrition --limit 5   # test nhỏ trước
 python -m who_ingestion.pipeline --all                           # crawl đủ 200 docs
+
+PYTHONUNBUFFERED=1 python -m who_ingestion.scripts.auto_ingest_all    # Lệnh chính tránh proxy cursor
+PYTHONUNBUFFERED=1 python -m who_ingestion.scripts.auto_ingest_all --append  # Chạy mỗi khi muốn thêm
 ```
 
 ### Bước C1: Bật Advanced RAG đọc từ OpenSearch

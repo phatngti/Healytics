@@ -10,6 +10,7 @@ S3 là tuỳ chọn (chỉ bật khi có S3_BUCKET). Mặc định chỉ cần O
 Cách chạy:
   cd ai_services
   python -m who_ingestion.pipeline --all
+  python -m who_ingestion.pipeline --all --append          # thêm 200 doc, giữ ES cũ
   python -m who_ingestion.pipeline --domain nutrition --limit 5
   python -m who_ingestion.pipeline --from-manifest data/staging/who/manifest.json
 """
@@ -23,6 +24,7 @@ from pathlib import Path
 from who_ingestion.chunker import chunk_text_by_tokens
 from who_ingestion.config import WhoIngestionSettings, load_settings
 from who_ingestion.crawler import WhoPublication, WhoPublicationCrawler
+from who_ingestion.dedup import GlobalDedupRegistry
 from who_ingestion.domains import WHO_DOMAINS, all_domain_keys
 from who_ingestion.elasticsearch_ingest import WhoElasticsearchIngestor
 from who_ingestion.pdf_extractor import extract_pdf_text
@@ -129,6 +131,7 @@ def run_pipeline(
     domain: str | None = None,
     limit: int | None = None,
     manifest_path: Path | None = None,
+    append: bool = False,
     settings: WhoIngestionSettings | None = None,
 ) -> dict:
     """Entry point chính — gọi từ CLI hoặc script test."""
@@ -155,6 +158,11 @@ def run_pipeline(
         print("ℹ️  WHO_DELETE_LOCAL_AFTER_INGEST=true — xóa PDF tạm sau mỗi doc thành công")
 
     publications: list[WhoPublication] = []
+    default_manifest = staging_dir / "manifest.json"
+    existing_manifest: dict[str, list[dict]] = {}
+    if append and default_manifest.exists():
+        existing_manifest = json.loads(default_manifest.read_text(encoding="utf-8"))
+        print(f"ℹ️  Append mode: bỏ qua {sum(len(v) for v in existing_manifest.values())} doc trong manifest cũ")
 
     if manifest_path and manifest_path.exists():
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -164,15 +172,45 @@ def run_pipeline(
             for item in pubs:
                 publications.append(_publication_from_dict(item))
     else:
+        registry = (
+            GlobalDedupRegistry.seed_from_manifest(existing_manifest)
+            if append and existing_manifest
+            else GlobalDedupRegistry()
+        )
+        if append and registry.total_unique:
+            print(f"   → Dedup seed: {registry.total_unique} publication đã có (sẽ crawl thêm doc mới)")
+
         if domain:
-            publications = crawler.crawl_domain(WHO_DOMAINS[domain], limit=limit)
+            target = limit or settings.docs_per_domain
+            print(f"📚 Crawling domain={WHO_DOMAINS[domain].label_vi} ({domain}), target={target}")
+            publications = crawler.crawl_domain(
+                WHO_DOMAINS[domain], limit=limit, registry=registry
+            )
+            if append:
+                merged = crawler.merge_manifest(existing_manifest, {domain: publications})
+                default_manifest.parent.mkdir(parents=True, exist_ok=True)
+                default_manifest.write_text(
+                    json.dumps(merged, ensure_ascii=False, indent=2), encoding="utf-8"
+                )
+            print(f"📊 Batch mới: {len(publications)} doc")
         else:
-            crawled = crawler.crawl_all()
-            crawler.save_manifest(crawled, staging_dir / "manifest.json")
+            crawled: dict[str, list[WhoPublication]] = {}
+            for key, dom in WHO_DOMAINS.items():
+                print(f"📚 Crawling domain={dom.label_vi} ({key}), target={limit or settings.docs_per_domain}")
+                crawled[key] = crawler.crawl_domain(dom, limit=limit, registry=registry)
+            if append:
+                merged = crawler.merge_manifest(existing_manifest, crawled)
+                default_manifest.parent.mkdir(parents=True, exist_ok=True)
+                default_manifest.write_text(
+                    json.dumps(merged, ensure_ascii=False, indent=2), encoding="utf-8"
+                )
+            else:
+                crawler.save_manifest(crawled, default_manifest)
             for pubs in crawled.values():
                 publications.extend(pubs)
+            print(f"📊 Batch mới: {len(publications)} doc | Tổng corpus (manifest): {registry.total_unique}")
 
-    if limit:
+    if limit and manifest_path:
         publications = publications[:limit]
 
     total_chunks = 0
@@ -194,8 +232,10 @@ def run_pipeline(
         except Exception as exc:
             print(f"⚠️ Failed publication {publication.source_url}: {exc}")
 
+    unique_ids = {p.publication_id for p in publications}
     summary = {
         "publications_processed": len(publications),
+        "unique_publications": len(unique_ids),
         "chunks_indexed": total_chunks,
         "elasticsearch_index": settings.elasticsearch_index,
         "s3_enabled": settings.s3_enabled,
@@ -217,6 +257,11 @@ def main() -> None:
         type=str,
         help="Dùng manifest.json đã crawl, không gọi WHO lại",
     )
+    parser.add_argument(
+        "--append",
+        action="store_true",
+        help="Crawl thêm doc mới (bỏ qua manifest cũ), merge manifest + append ES",
+    )
     args = parser.parse_args()
 
     if not args.all and not args.domain and not args.from_manifest:
@@ -226,6 +271,7 @@ def main() -> None:
         domain=args.domain,
         limit=args.limit,
         manifest_path=Path(args.from_manifest) if args.from_manifest else None,
+        append=args.append,
     )
 
 
