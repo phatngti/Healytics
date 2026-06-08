@@ -774,7 +774,7 @@ Cơ chế sao lưu được triển khai hoàn toàn tự động, không yêu c
 Phần này trình bày phương pháp, tiêu chí và kết quả đánh giá cho các thành phần cốt lõi của hệ thống AI:
 \begin{itemize}
     \item Standard RAG --- đánh giá truy xuất theo embedding.
-    \item Advanced RAG --- đánh giá truy xuất lai trên OpenSearch.
+    \item Advanced RAG --- đánh giá multi-query fusion trên OpenSearch.
     \item Mô hình LLM (Llama-3.1-8B-Instruct).
     \item Mô hình phân loại ý định (Intent Classifier).
     \item Dịch vụ trích xuất thực thể (NER Service).
@@ -877,9 +877,9 @@ MRR & 0.8101 \\
 \label{tab:rag_eval_results}
 \end{table}
 
-\subsection{Advanced RAG --- đánh giá truy xuất (hybrid OpenSearch)}
+\subsection{Advanced RAG --- đánh giá truy xuất (multi-query fusion)}
 
-Advanced RAG được đánh giá trên cùng bộ metric (Hit@K, Recall@K, MRR) với cấu hình hybrid BM25 + kNN, RRF fusion và CrossEncoder reranking trên kho WHO 44.615 chunk (OpenSearch). Bảng~\ref{tab:rag_advanced_results} tổng hợp kết quả và đối chiếu với Standard RAG.
+Advanced RAG được đánh giá trên cùng bộ metric (Hit@K, Recall@K, MRR) với cấu hình multi-query fusion (Llama-3.1-8B sinh 4 truy vấn thay thế), hybrid BM25 + kNN trên từng truy vấn, RRF hai tầng và CrossEncoder reranking trên kho WHO 44.615 chunk (OpenSearch). Bảng~\ref{tab:rag_advanced_results} tổng hợp kết quả và đối chiếu với Standard RAG.
 
 \begin{table}[H]
 \centering
@@ -898,7 +898,7 @@ MRR & 0.8101 & 0.8292 \\
 \label{tab:rag_advanced_results}
 \end{table}
 
-Nhánh BM25 giúp bắt đúng thuật ngữ và tên guideline WHO; nhánh kNN xử lý câu hỏi diễn đạt khác từ ngữ tài liệu. RRF và reranking lọc chunk nhiễu trước khi đưa vào LLM, nên các chỉ số Hit@K, Recall@K và MRR đều cao hơn Standard RAG.
+Multi-query expansion giúp bao phủ nhiều cách diễn đạt của cùng một chủ đề; nhánh BM25 bắt đúng thuật ngữ WHO, nhánh kNN xử lý câu hỏi tự nhiên. RRF hai tầng và reranking lọc chunk nhiễu trước khi đưa vào LLM, nên các chỉ số Hit@K, Recall@K và MRR đều cao hơn Standard RAG.
 
 \subsection{Mô hình LLM (Llama-3.1-8B-Instruct)}
 
@@ -1884,7 +1884,7 @@ Streaming Time   & 5.10  & 3.67   & 3.67  & 9.04   & 11.44  & 15.51  \\
 \label{tab:sys_latency_overall}
 \end{table}
 
-Advanced RAG thêm hai lượt tìm kiếm trên OpenSearch, bước RRF và reranking nên độ trễ tăng so với Standard RAG. Bảng~\ref{tab:sys_latency_advanced} đối chiếu hai cấu hình trên cùng bộ 500 truy vấn.
+Advanced RAG thêm bước sinh multi-query, nhiều lượt hybrid search trên OpenSearch, RRF hai tầng và reranking nên độ trễ tăng so với Standard RAG. Bảng~\ref{tab:sys_latency_advanced} đối chiếu hai cấu hình trên cùng bộ 500 truy vấn.
 
 \begin{table}[H]
 \centering

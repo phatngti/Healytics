@@ -5,11 +5,12 @@ Dùng khi:
   - RAG_MODE=advanced
   - Đã ingest corpus WHO qua who_ingestion pipeline
 
-Kiến trúc retrieval (trong index healytics_who_chunks):
+Kiến trúc retrieval cho MỘT truy vấn (trong index healytics_who_chunks):
   1. Dense search: kNN trên field `embedding` (768 chiều, cosine)
   2. Sparse search: BM25 multi_match trên content_en, title, content
   3. Fusion: Reciprocal Rank Fusion (RRF) gộp 2 danh sách
-  4. (Bước sau ở retriever_factory) CrossEncoder rerank
+
+Multi-query fusion và CrossEncoder rerank nằm ở retriever_factory.py.
 
 Lưu ý:
   - sparse_query thường là bản dịch EN (do ElasticsearchQueryAwareRetriever set)

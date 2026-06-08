@@ -374,9 +374,37 @@ Dịch vụ RAG nhận payload từ Gateway gồm ba thành phần: lịch sử 
 
 Đây là phương án baseline đã dùng trong giai đoạn đánh giá ban đầu. Câu hỏi được chuyển thành vector embedding qua \texttt{HuggingFaceEmbeddings}; hệ thống tìm trong vector store \textbf{ChromaDB} hoặc \textbf{FAISS} theo chế độ \textit{similarity} với $k = 10$, chọn các chunk có vector gần nhất về ngữ nghĩa. Standard RAG \textbf{không} dùng tìm kiếm từ khóa (BM25); toàn bộ truy xuất dựa trên độ tương đồng embedding.
 
-\paragraph{Advanced RAG (tìm kiếm lai trên OpenSearch)}
+\paragraph{Advanced RAG (multi-query fusion trên OpenSearch)}
 
-Đây là phương án nâng cấp dùng kho tri thức WHO trên OpenSearch. Khi người dùng đặt câu hỏi, hệ thống chạy song song hai nhánh: BM25 (từ khóa, thuật ngữ) và kNN (embedding). Hai danh sách kết quả được gộp bằng RRF (Reciprocal Rank Fusion), sau đó CrossEncoder reranker chọn ra các chunk liên quan nhất trước khi đưa vào LLM. Advanced RAG bổ sung khả năng bắt đúng thuật ngữ chuyên ngành và tên guideline WHO, trong khi nhánh embedding vẫn xử lý tốt câu hỏi diễn đạt tự nhiên.
+Đây là phương án nâng cấp dùng kho tri thức WHO trên OpenSearch, kết hợp ba kỹ thuật retrieval hiện đại: \textbf{multi-query expansion}, \textbf{hybrid search} và \textbf{rank fusion}.
+
+\textbf{Multi-query expansion.} Một câu hỏi người dùng thường chỉ phản ánh một góc nhìn, trong khi tài liệu WHO có thể dùng từ ngữ khác (thuật ngữ y khoa, tên guideline, cách diễn đạt phòng ngừa/điều trị). Hệ thống dùng \textbf{Llama-3.1-8B-Instruct} sinh $N = 4$ truy vấn thay thế từ câu hỏi gốc; mỗi truy vấn tiếp cận cùng chủ đề nhưng nhấn mạnh khía cạnh khác nhau (triệu chứng, phòng ngừa, khuyến nghị WHO, thuật ngữ đồng nghĩa). Câu hỏi gốc luôn được giữ trong tập truy vấn để không mất ý định ban đầu.
+
+\textbf{Hybrid search (trên từng truy vấn).} Với mỗi truy vấn (gốc hoặc sinh thêm), hệ thống chạy song song hai nhánh trên OpenSearch:
+\begin{itemize}
+    \item \textbf{Dense (kNN):} embedding đa ngôn ngữ, bắt được câu hỏi diễn đạt tự nhiên.
+    \item \textbf{Sparse (BM25):} tìm theo từ khóa; truy vấn tiếng Việt được dịch sang tiếng Anh trước khi vào nhánh này vì corpus WHO chủ yếu là tiếng Anh.
+\end{itemize}
+Hai danh sách kết quả của \emph{một} truy vấn được gộp bằng RRF (Reciprocal Rank Fusion, $k = 60$).
+
+\textbf{Multi-query fusion.} Sau khi mỗi truy vấn cho ra một danh sách chunk đã hybrid, hệ thống áp dụng RRF lần thứ hai trên toàn bộ danh sách (câu hỏi gốc + 4 biến thể). Chunk xuất hiện cao ở nhiều truy vấn khác nhau được ưu tiên --- dấu hiệu nội dung thật sự liên quan, không phải trùng hợp từ khóa đơn lẻ.
+
+\textbf{Reranking.} CrossEncoder (\texttt{ms-marco-MiniLM-L-6-v2}) chấm lại cặp (câu hỏi gốc, chunk) trên top ứng viên và giữ $5$ chunk tốt nhất trước khi đưa vào LLM.
+
+Luồng tổng thể:
+\begin{center}
+\begin{tabular}{c}
+User Query \\
+$\downarrow$ \\
+Llama-3.1-8B sinh $N$ truy vấn \\
+$\downarrow$ \\
+Mỗi truy vấn $\rightarrow$ BM25 $\parallel$ kNN $\rightarrow$ RRF (intra-query) \\
+$\downarrow$ \\
+RRF (inter-query) gộp mọi danh sách \\
+$\downarrow$ \\
+CrossEncoder rerank $\rightarrow$ prompt LLM \\
+\end{tabular}
+\end{center}
 
 \paragraph{Các bước chung sau truy xuất}
 

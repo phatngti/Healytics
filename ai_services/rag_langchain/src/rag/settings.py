@@ -4,7 +4,7 @@ settings.py — Cấu hình tập trung cho pipeline RAG.
 Đọc biến môi trường từ rag_langchain/.env để chọn chế độ retrieval:
 
   RAG_MODE=standard  → RAG cũ (Chroma + similarity), mặc định, KHÔNG đổi hành vi production.
-  RAG_MODE=advanced  → Hybrid (dense + BM25) + Fusion (RRF) + Reranker (CrossEncoder).
+  RAG_MODE=advanced  → Multi-query + Hybrid (dense + BM25) + Fusion (RRF) + Reranker.
 
 Khi advanced + có ELASTICSEARCH_URL: đọc corpus WHO từ OpenSearch/Elasticsearch.
 Khi advanced + không có ES: fallback hybrid trên PDF local (Chroma + BM25 in-memory).
@@ -71,6 +71,12 @@ class RagSettings:
     hybrid_dense_weight: float = 0.5  # Trọng số nhánh embedding (local EnsembleRetriever)
     hybrid_sparse_weight: float = 0.5  # Trọng số nhánh BM25
 
+    # --- Multi-query fusion (LLM sinh N truy vấn, retrieve riêng từng cái) ---
+    multi_query_enabled: bool = True
+    multi_query_count: int = 4  # Số truy vấn LLM sinh thêm (không tính câu hỏi gốc)
+    multi_query_model: str = "mistral-small-latest"
+    multi_query_include_original: bool = True
+
     # --- Dịch query (cho BM25 trên tài liệu WHO tiếng Anh) ---
     query_translation_enabled: bool = True
     translation_model: str = "mistral-small-latest"  # Model nhỏ, rẻ, đủ cho dịch câu hỏi
@@ -111,6 +117,10 @@ def load_rag_settings() -> RagSettings:
         rerank_top_n=_env_int("RAG_RERANK_TOP_N", 5),
         hybrid_dense_weight=_env_float("RAG_HYBRID_DENSE_WEIGHT", 0.5),
         hybrid_sparse_weight=_env_float("RAG_HYBRID_SPARSE_WEIGHT", 0.5),
+        multi_query_enabled=_env_bool("RAG_MULTI_QUERY_ENABLED", True),
+        multi_query_count=_env_int("RAG_MULTI_QUERY_COUNT", 4),
+        multi_query_model=os.getenv("RAG_MULTI_QUERY_MODEL", "mistral-small-latest"),
+        multi_query_include_original=_env_bool("RAG_MULTI_QUERY_INCLUDE_ORIGINAL", True),
         query_translation_enabled=_env_bool("RAG_QUERY_TRANSLATION_ENABLED", True),
         translation_model=os.getenv("RAG_TRANSLATION_MODEL", "mistral-small-latest"),
         embedding_model=os.getenv(

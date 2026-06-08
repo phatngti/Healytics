@@ -4,15 +4,19 @@ retriever_factory.py — Factory chọn retriever theo RAG_MODE.
 Đây là điểm duy nhất quyết định dùng RAG cũ hay RAG mới.
 offline_rag.py KHÔNG cần sửa — vẫn nhận retriever và gọi retriever.invoke(question).
 
-Sơ đồ Advanced RAG:
+Sơ đồ Advanced RAG (multi-query fusion):
   User question
        │
-       ├─► [Dense]  embedding search (VI hoặc EN)
+       ▼
+  LLM sinh N truy vấn thay thế (Mistral API)
        │
-       └─► [Sparse] BM25 search (query EN sau dịch Mistral)
+       ├─► Query 1 ──► hybrid (dense kNN + sparse BM25) ──► list 1
+       ├─► Query 2 ──► hybrid ──► list 2
+       ├─► ...
+       └─► Query N ──► hybrid ──► list N
                 │
                 ▼
-           RRF Fusion (gộp 2 list, lấy top_k)
+           RRF Fusion (gộp mọi list, lấy top_k)
                 │
                 ▼
            CrossEncoder Reranker (lấy rerank_top_n chunk tốt nhất)
@@ -134,6 +138,46 @@ class LocalHybridRetriever(BaseRetriever):
         )
 
 
+class MultiQueryFusionRetriever(BaseRetriever):
+    """
+    Bọc retriever hybrid: sinh nhiều truy vấn, retrieve riêng từng cái, gộp bằng RRF.
+
+    Mỗi truy vấn con vẫn chạy đủ nhánh dense + sparse (trong inner retriever).
+    """
+
+    settings: RagSettings = Field(...)
+    inner: BaseRetriever = Field(...)
+
+    def _get_relevant_documents(
+        self,
+        query: str,
+        *,
+        run_manager: CallbackManagerForRetrieverRun | None = None,
+    ) -> List[Document]:
+        from src.rag.multi_query_generator import generate_multi_queries
+
+        if not self.settings.multi_query_enabled:
+            return list(self.inner.invoke(query))
+
+        queries = generate_multi_queries(query, settings=self.settings)
+        ranked_lists: List[List[Document]] = []
+
+        for expanded_query in queries:
+            docs = list(self.inner.invoke(expanded_query))
+            if docs:
+                ranked_lists.append(docs)
+
+        if not ranked_lists:
+            return []
+        if len(ranked_lists) == 1:
+            return ranked_lists[0][: self.settings.top_k]
+
+        return _rrf_fuse_doc_lists(
+            ranked_lists,
+            top_n=self.settings.top_k,
+        )
+
+
 class ElasticsearchQueryAwareRetriever(BaseRetriever):
     """
     Wrapper ES hybrid + dịch query cho nhánh sparse.
@@ -194,22 +238,24 @@ def build_retriever(
         print(f"✅ RAG mode: standard (top_k={settings.top_k})")
         return retriever
 
-    # ── ADVANCED: hybrid + fusion + rerank ──
+    # ── ADVANCED: multi-query + hybrid + fusion + rerank ──
     print(
-        "✅ RAG mode: advanced "
+        "RAG mode: advanced "
         f"(top_k={settings.top_k}, rerank_top_n={settings.rerank_top_n}, "
+        f"multi_query={'on' if settings.multi_query_enabled else 'off'}, "
         f"es={'on' if settings.elasticsearch_enabled else 'off'})"
     )
 
     if settings.elasticsearch_enabled:
         # Corpus WHO đã ingest vào OpenSearch
-        base = ElasticsearchQueryAwareRetriever(settings=settings)
+        hybrid = ElasticsearchQueryAwareRetriever(settings=settings)
     else:
         # Dev local: PDF trong data_source/generative_ai
         if not documents:
             raise ValueError(
                 "Advanced RAG without Elasticsearch requires local PDF documents."
             )
-        base = LocalHybridRetriever(settings=settings, documents=list(documents))
+        hybrid = LocalHybridRetriever(settings=settings, documents=list(documents))
 
+    base = MultiQueryFusionRetriever(settings=settings, inner=hybrid)
     return _wrap_with_reranker(base, settings)

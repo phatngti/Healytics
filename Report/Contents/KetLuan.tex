@@ -24,7 +24,7 @@ Phần này đối chiếu trực tiếp các chức năng và yêu cầu phi ch
 \hline
 1 & Onboarding \& Cá nhân hóa hồ sơ: đăng ký, khảo sát sở thích, khởi tạo hồ sơ tức thì & Hoàn thiện đầy đủ: đăng ký username/password, khảo sát nhu cầu sức khỏe, gợi ý dịch vụ ngay sau onboarding & Đầy đủ \\
 \hline
-2 & Chatbot AI tư vấn \& gợi ý dịch vụ qua hội thoại tự nhiên & Pipeline RAG hai chế độ (Standard embedding / Advanced hybrid trên OpenSearch), kho WHO 564 tài liệu (44.615 chunk), phân loại ý định, NER lọc địa điểm, streaming SSE & Đầy đủ \\
+2 & Chatbot AI tư vấn \& gợi ý dịch vụ qua hội thoại tự nhiên & Pipeline RAG hai chế độ (Standard embedding / Advanced multi-query fusion + hybrid OpenSearch), kho WHO 564 tài liệu (44.615 chunk), phân loại ý định, NER lọc địa điểm, streaming SSE & Đầy đủ \\
 \hline
 3 & Tìm kiếm \& lọc nâng cao theo từ khóa, giá, vị trí, đánh giá & Tìm kiếm full-text kết hợp NER Service, lọc đa chiều, hiển thị bản đồ Mapbox & Đầy đủ \\
 \hline
@@ -120,7 +120,7 @@ Bên cạnh việc đáp ứng các yêu cầu chức năng và phi chức năng
 \begin{itemize}
     \item \textbf{Kiến trúc Async Checkout Queue chống race condition:} Thiết kế cơ chế đặt lịch bất đồng bộ kết hợp Redis Distributed Lock (Redlock) + RabbitMQ Worker + Database Transaction đảm bảo không có hai người dùng đặt trùng một slot, được xác thực bằng 4 kịch bản kiểm thử race condition (50 người dùng đồng thời, 0\% lỗi) và bộ test đơn vị 408 ca pass 100\%.
     \item \textbf{Hệ thống Hybrid NER cho tiếng Việt:} Pipeline kết hợp 4 lớp --- LLM (Gemini), Rule-based, Dictionary fallback (Aho-Corasick), Semantic matching (MPNet) --- cho phép trích xuất thực thể ổn định ngay cả khi LLM lỗi hoặc timeout.
-    \item \textbf{RAG Chatbot y tế đa ngôn ngữ chi phí thấp:} Xây dựng pipeline thu thập WHO (564 PDF, 44.615 chunk) trên Amazon OpenSearch, hỗ trợ Standard RAG (embedding) và Advanced RAG (BM25 + kNN + RRF + rerank). Self-hosted Llama-3.1-8B-Instruct đạt 4.2/5 với Standard RAG và 4.28--4.48/5 với Advanced RAG trên 498 mẫu; chi phí suy luận từ \$0.00151 đến \$0.00180/request.
+    \item \textbf{RAG Chatbot y tế đa ngôn ngữ chi phí thấp:} Xây dựng pipeline thu thập WHO (564 PDF, 44.615 chunk) trên Amazon OpenSearch, hỗ trợ Standard RAG (embedding) và Advanced RAG (multi-query fusion với Llama-3.1-8B sinh truy vấn, hybrid BM25 + kNN, RRF hai tầng, rerank). Self-hosted Llama-3.1-8B-Instruct đạt 4.2/5 với Standard RAG và 4.28--4.48/5 với Advanced RAG trên 498 mẫu; chi phí suy luận từ \$0.00151 đến \$0.00180/request.
     \item \textbf{Cơ chế đồng bộ vector store thời gian thực qua Redis Pub/Sub:} Đảm bảo Recommender Service luôn cập nhật ngay khi backend tạo/sửa/xóa dịch vụ, tránh tình trạng dữ liệu nghiệp vụ và chỉ mục vector lệch nhau --- một vấn đề phổ biến của các hệ RAG tự dựng.
     \item \textbf{Pipeline NER kết hợp truy vấn không gian PostGIS:} Trích xuất địa điểm từ ngôn ngữ tự nhiên rồi ánh xạ sang truy vấn \texttt{ST\_DWithin} cho phép trả về kết quả ưu tiên theo khoảng cách thực, không chỉ theo từ khóa --- nâng cao đáng kể độ liên quan của gợi ý so với cách lọc bằng từ khóa truyền thống.
     \item \textbf{Hệ thống tài chính 2 lớp Ledger + Refund:} Mô hình \texttt{PartnerLedgerTransaction} kết hợp \texttt{PartnerPayoutRequest} và \texttt{PartnerRefundCase} đảm bảo dòng tiền giữa Người dùng, Partner và nền tảng được ghi nhận đầy đủ, có khả năng đối soát và truy vết.
