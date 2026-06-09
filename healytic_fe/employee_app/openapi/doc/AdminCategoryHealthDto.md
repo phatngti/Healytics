@@ -11,6 +11,8 @@ Name | Type | Description | Notes
 **totalCategories** | **num** |  | 
 **activeCategories** | **num** |  | 
 **inactiveCategories** | **num** |  | 
+**rootCategories** | **num** |  | 
+**subCategories** | **num** |  | 
 **emptyCategories** | **num** |  | 
 **totalMappedServices** | **num** |  | 
 **topCategories** | [**List<AdminCategorySnapshotDto>**](AdminCategorySnapshotDto.md) |  | [default to const []]

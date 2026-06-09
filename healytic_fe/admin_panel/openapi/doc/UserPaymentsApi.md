@@ -37,8 +37,8 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final bookingId = bookingId_example; // String |
-final body = Object(); // Object |
+final bookingId = bookingId_example; // String | 
+final body = Object(); // Object | 
 
 try {
     api_instance.userPaymentControllerConfirmMoMoReturn(bookingId, body);
@@ -51,8 +51,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **bookingId** | **String**|  |
- **body** | **Object**|  |
+ **bookingId** | **String**|  | 
+ **body** | **Object**|  | 
 
 ### Return type
 
@@ -85,8 +85,8 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final setupIntentId = setupIntentId_example; // String |
-final confirmStripeSetupIntentDto = ConfirmStripeSetupIntentDto(); // ConfirmStripeSetupIntentDto |
+final setupIntentId = setupIntentId_example; // String | 
+final confirmStripeSetupIntentDto = ConfirmStripeSetupIntentDto(); // ConfirmStripeSetupIntentDto | 
 
 try {
     final result = api_instance.userPaymentControllerConfirmStripeSetupIntent(setupIntentId, confirmStripeSetupIntentDto);
@@ -100,8 +100,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **setupIntentId** | **String**|  |
- **confirmStripeSetupIntentDto** | [**ConfirmStripeSetupIntentDto**](ConfirmStripeSetupIntentDto.md)|  |
+ **setupIntentId** | **String**|  | 
+ **confirmStripeSetupIntentDto** | [**ConfirmStripeSetupIntentDto**](ConfirmStripeSetupIntentDto.md)|  | 
 
 ### Return type
 
@@ -134,8 +134,8 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final bookingId = bookingId_example; // String |
-final createMoMoPaymentDto = CreateMoMoPaymentDto(); // CreateMoMoPaymentDto |
+final bookingId = bookingId_example; // String | 
+final createMoMoPaymentDto = CreateMoMoPaymentDto(); // CreateMoMoPaymentDto | 
 
 try {
     final result = api_instance.userPaymentControllerCreateMoMoPayment(bookingId, createMoMoPaymentDto);
@@ -149,8 +149,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **bookingId** | **String**|  |
- **createMoMoPaymentDto** | [**CreateMoMoPaymentDto**](CreateMoMoPaymentDto.md)|  |
+ **bookingId** | **String**|  | 
+ **createMoMoPaymentDto** | [**CreateMoMoPaymentDto**](CreateMoMoPaymentDto.md)|  | 
 
 ### Return type
 
@@ -183,8 +183,8 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final bookingId = bookingId_example; // String |
-final createStripePaymentDto = CreateStripePaymentDto(); // CreateStripePaymentDto |
+final bookingId = bookingId_example; // String | 
+final createStripePaymentDto = CreateStripePaymentDto(); // CreateStripePaymentDto | 
 
 try {
     final result = api_instance.userPaymentControllerCreateStripePayment(bookingId, createStripePaymentDto);
@@ -198,8 +198,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **bookingId** | **String**|  |
- **createStripePaymentDto** | [**CreateStripePaymentDto**](CreateStripePaymentDto.md)|  |
+ **bookingId** | **String**|  | 
+ **createStripePaymentDto** | [**CreateStripePaymentDto**](CreateStripePaymentDto.md)|  | 
 
 ### Return type
 
@@ -275,7 +275,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final cardId = cardId_example; // String |
+final cardId = cardId_example; // String | 
 
 try {
     final result = api_instance.userPaymentControllerDeleteCard(cardId);
@@ -289,7 +289,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **cardId** | **String**|  |
+ **cardId** | **String**|  | 
 
 ### Return type
 
@@ -365,8 +365,8 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final bookingId = bookingId_example; // String |
-final createMoMoRefundDto = CreateMoMoRefundDto(); // CreateMoMoRefundDto |
+final bookingId = bookingId_example; // String | 
+final createMoMoRefundDto = CreateMoMoRefundDto(); // CreateMoMoRefundDto | 
 
 try {
     final result = api_instance.userPaymentControllerRefundMoMoPayment(bookingId, createMoMoRefundDto);
@@ -380,8 +380,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **bookingId** | **String**|  |
- **createMoMoRefundDto** | [**CreateMoMoRefundDto**](CreateMoMoRefundDto.md)|  |
+ **bookingId** | **String**|  | 
+ **createMoMoRefundDto** | [**CreateMoMoRefundDto**](CreateMoMoRefundDto.md)|  | 
 
 ### Return type
 
@@ -414,7 +414,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final bookingId = bookingId_example; // String |
+final bookingId = bookingId_example; // String | 
 
 try {
     final result = api_instance.userPaymentControllerRefundStripePayment(bookingId);
@@ -428,7 +428,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **bookingId** | **String**|  |
+ **bookingId** | **String**|  | 
 
 ### Return type
 
@@ -461,7 +461,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserPaymentsApi();
-final cardId = cardId_example; // String |
+final cardId = cardId_example; // String | 
 
 try {
     final result = api_instance.userPaymentControllerSetDefaultCard(cardId);
@@ -475,7 +475,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **cardId** | **String**|  |
+ **cardId** | **String**|  | 
 
 ### Return type
 

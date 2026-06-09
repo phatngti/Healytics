@@ -31,6 +31,16 @@ void main() {
       // TODO
     });
 
+    // num subCategoryCount
+    test('to test the property `subCategoryCount`', () async {
+      // TODO
+    });
+
+    // bool isRoot
+    test('to test the property `isRoot`', () async {
+      // TODO
+    });
+
     // bool isActive
     test('to test the property `isActive`', () async {
       // TODO

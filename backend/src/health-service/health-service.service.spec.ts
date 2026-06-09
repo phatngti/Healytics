@@ -14,6 +14,7 @@ import { UpdateHealthServiceHandler } from './application/handlers/update-health
 import { RemoveHealthServiceHandler } from './application/handlers/remove-health-service.handler';
 import { GetOverviewAnalyticsHandler } from './application/handlers/get-overview-analytics.handler';
 import { GetDetailAnalyticsHandler } from './application/handlers/get-detail-analytics.handler';
+import { PublicServiceListQueryDto } from './dto/public/service-list-query.dto';
 import { PartnersService } from '@/partners/partners.service';
 import { ElasticsearchBookingService } from '@/search/services/elasticsearch-booking.service';
 import {
@@ -511,6 +512,59 @@ describe('HealthServiceService', () => {
         { isVisibleOnline: true },
       );
       expect(qb.take).toHaveBeenCalledWith(50);
+    });
+
+    it('should not clamp paginated premium treatment results to ten items', async () => {
+      // Arrange
+      const mockProducts = Array.from({ length: 13 }, (_, index) => ({
+        id: `uuid-${index + 1}`,
+        name: `Product ${index + 1}`,
+        slug: `product-${index + 1}`,
+        type: 'service',
+        basePrice: 500000,
+        media: [],
+        reviews: [],
+        productEmployeeEligibilities: [],
+      }));
+      const qb = productRepository.createQueryBuilder();
+      qb.getMany.mockResolvedValue(mockProducts);
+
+      // Act
+      const result = await service.getPremiumTreatments({
+        limit: 13,
+        offset: 12,
+      });
+
+      // Assert
+      expect(qb.skip).toHaveBeenCalledWith(12);
+      expect(qb.take).toHaveBeenCalledWith(13);
+      expect(result).toHaveLength(13);
+    });
+
+    it('should normalize pagination query params received as strings', async () => {
+      // Arrange
+      const mockProducts = Array.from({ length: 13 }, (_, index) => ({
+        id: `uuid-${index + 1}`,
+        name: `Product ${index + 1}`,
+        slug: `product-${index + 1}`,
+        type: 'service',
+        basePrice: 500000,
+        media: [],
+        reviews: [],
+        productEmployeeEligibilities: [],
+      }));
+      const qb = productRepository.createQueryBuilder();
+      qb.getMany.mockResolvedValue(mockProducts);
+
+      // Act
+      await service.getPremiumTreatments({
+        limit: '13',
+        offset: '12',
+      } as unknown as PublicServiceListQueryDto);
+
+      // Assert
+      expect(qb.skip).toHaveBeenCalledWith(12);
+      expect(qb.take).toHaveBeenCalledWith(13);
     });
 
     it('should return empty array when no products exist', async () => {

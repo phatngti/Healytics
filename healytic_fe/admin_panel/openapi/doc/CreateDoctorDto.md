@@ -8,32 +8,32 @@ import 'package:admin_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**firstName** | **String** | First name |
-**lastName** | **String** | Last name |
-**email** | **String** | Email address |
-**password** | **String** | Initial employee account password |
-**phone** | **String** | Phone number | [optional]
-**dateOfBirth** | **String** | Date of birth | [optional]
-**gender** | **String** | Gender | [optional]
-**emergencyContactName** | **String** | Emergency contact name |
-**emergencyContactPhone** | **String** | Emergency contact phone |
-**employeeId** | **String** | Unique employee identifier code |
-**employmentType** | **String** | Employment type | [optional]
-**startDate** | **String** | Start date |
+**firstName** | **String** | First name | 
+**lastName** | **String** | Last name | 
+**email** | **String** | Email address | 
+**password** | **String** | Initial employee account password | 
+**phone** | **String** | Phone number | [optional] 
+**dateOfBirth** | **String** | Date of birth | [optional] 
+**gender** | **String** | Gender | [optional] 
+**emergencyContactName** | **String** | Emergency contact name | 
+**emergencyContactPhone** | **String** | Emergency contact phone | 
+**employeeId** | **String** | Unique employee identifier code | 
+**employmentType** | **String** | Employment type | [optional] 
+**startDate** | **String** | Start date | 
 **schedule** | [**List<WorkScheduleEntryDto>**](WorkScheduleEntryDto.md) | Weekly work schedule | [default to const []]
 **workHistory** | [**List<WorkHistoryEntryDto>**](WorkHistoryEntryDto.md) | Work history entries | [optional] [default to const []]
-**avatar** | **String** | Avatar URL | [optional]
+**avatar** | **String** | Avatar URL | [optional] 
 **verificationDocuments** | [**List<VerificationDocumentEntryDto>**](VerificationDocumentEntryDto.md) | Verification documents (ID card, licenses, etc.) | [optional] [default to const []]
-**status** | **String** | Employee status | [optional]
-**description** | **String** | Bio / description |
-**jobTitle** | **String** | Job title | [optional]
+**status** | **String** | Employee status | [optional] 
+**description** | **String** | Bio / description | 
+**jobTitle** | **String** | Job title | [optional] 
 **medicalCredentials** | [**List<MedicalCredentialResponseDto>**](MedicalCredentialResponseDto.md) | Medical credentials (titles + licenses) | [optional] [default to const []]
-**experienceYears** | **num** | Years of experience | [optional]
-**consultationFee** | **num** | Consultation fee | [optional]
+**experienceYears** | **num** | Years of experience | [optional] 
+**consultationFee** | **num** | Consultation fee | [optional] 
 **specializations** | **List<String>** | Specializations | [optional] [default to const []]
 **education** | **List<String>** | Education history | [optional] [default to const []]
 **certifications** | **List<String>** | Certifications | [optional] [default to const []]
-**partnerId** | **String** | Partner ID (auto-injected) | [optional]
+**partnerId** | **String** | Partner ID (auto-injected) | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

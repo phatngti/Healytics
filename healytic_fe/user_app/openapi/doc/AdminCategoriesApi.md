@@ -32,7 +32,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminCategoriesApi();
-final createCategoryDto = CreateCategoryDto(); // CreateCategoryDto |
+final createCategoryDto = CreateCategoryDto(); // CreateCategoryDto | 
 
 try {
     final result = api_instance.adminCategoriesControllerCreate(createCategoryDto);
@@ -46,7 +46,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createCategoryDto** | [**CreateCategoryDto**](CreateCategoryDto.md)|  |
+ **createCategoryDto** | [**CreateCategoryDto**](CreateCategoryDto.md)|  | 
 
 ### Return type
 
@@ -122,7 +122,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminCategoriesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.adminCategoriesControllerFindOne(id);
@@ -136,7 +136,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -169,7 +169,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminCategoriesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     api_instance.adminCategoriesControllerRemove(id);
@@ -182,7 +182,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -215,8 +215,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminCategoriesApi();
-final id = id_example; // String |
-final updateCategoryDto = UpdateCategoryDto(); // UpdateCategoryDto |
+final id = id_example; // String | 
+final updateCategoryDto = UpdateCategoryDto(); // UpdateCategoryDto | 
 
 try {
     final result = api_instance.adminCategoriesControllerUpdate(id, updateCategoryDto);
@@ -230,8 +230,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
- **updateCategoryDto** | [**UpdateCategoryDto**](UpdateCategoryDto.md)|  |
+ **id** | **String**|  | 
+ **updateCategoryDto** | [**UpdateCategoryDto**](UpdateCategoryDto.md)|  | 
 
 ### Return type
 

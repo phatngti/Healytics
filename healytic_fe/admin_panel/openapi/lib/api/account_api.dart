@@ -55,7 +55,7 @@ class AccountApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AccountMeResponseDto',) as AccountMeResponseDto;
-
+    
     }
     return null;
   }
@@ -99,7 +99,7 @@ class AccountApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SurveyResponseDto',) as SurveyResponseDto;
-
+    
     }
     return null;
   }
@@ -151,7 +151,7 @@ class AccountApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SurveyResponseDto',) as SurveyResponseDto;
-
+    
     }
     return null;
   }
@@ -203,7 +203,7 @@ class AccountApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AccountMeResponseDto',) as AccountMeResponseDto;
-
+    
     }
     return null;
   }
@@ -255,7 +255,7 @@ class AccountApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AccountMeResponseDto',) as AccountMeResponseDto;
-
+    
     }
     return null;
   }
@@ -307,7 +307,7 @@ class AccountApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AccountMeResponseDto',) as AccountMeResponseDto;
-
+    
     }
     return null;
   }

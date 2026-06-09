@@ -38,7 +38,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **key** | **String**| File key |
+ **key** | **String**| File key | 
 
 ### Return type
 
@@ -79,7 +79,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **key** | **String**| File key |
+ **key** | **String**| File key | 
 
 ### Return type
 
@@ -106,7 +106,7 @@ Get presigned upload URL
 import 'package:user_openapi/api.dart';
 
 final api_instance = S3Api();
-final presignRequestDto = PresignRequestDto(); // PresignRequestDto |
+final presignRequestDto = PresignRequestDto(); // PresignRequestDto | 
 
 try {
     final result = api_instance.s3ControllerPreSign(presignRequestDto);
@@ -120,7 +120,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **presignRequestDto** | [**PresignRequestDto**](PresignRequestDto.md)|  |
+ **presignRequestDto** | [**PresignRequestDto**](PresignRequestDto.md)|  | 
 
 ### Return type
 

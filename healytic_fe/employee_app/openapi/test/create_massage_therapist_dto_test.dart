@@ -34,6 +34,12 @@ void main() {
       // TODO
     });
 
+    // Initial employee account password
+    // String password
+    test('to test the property `password`', () async {
+      // TODO
+    });
+
     // Phone number
     // String phone
     test('to test the property `phone`', () async {

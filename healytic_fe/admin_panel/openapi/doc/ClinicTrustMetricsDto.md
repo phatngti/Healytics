@@ -8,10 +8,10 @@ import 'package:admin_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**rating** | **num** |  |
-**reviewCount** | **num** |  |
-**experienceLabel** | **String** |  |
-**clientsLabel** | **String** |  |
+**rating** | **num** |  | 
+**reviewCount** | **num** |  | 
+**experienceLabel** | **String** |  | 
+**clientsLabel** | **String** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

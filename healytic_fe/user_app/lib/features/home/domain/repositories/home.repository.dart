@@ -15,7 +15,11 @@ abstract class HomeRepository {
     int topK,
   });
 
-  Future<List<HomeProduct>> getPremiumTreatments({ServiceListFilter? filter});
+  Future<List<HomeProduct>> getPremiumTreatments({
+    ServiceListFilter? filter,
+    int? limit,
+    int? offset,
+  });
   Future<List<ServiceTag>> getServiceTags();
   Future<List<HomeSpecialist>> getFeaturedSpecialists();
 

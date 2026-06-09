@@ -30,7 +30,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserWishlistApi();
-final productId = productId_example; // String |
+final productId = productId_example; // String | 
 
 try {
     final result = api_instance.userWishlistControllerAddItem(productId);
@@ -44,7 +44,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **productId** | **String**|  |
+ **productId** | **String**|  | 
 
 ### Return type
 
@@ -120,7 +120,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserWishlistApi();
-final productId = productId_example; // String |
+final productId = productId_example; // String | 
 
 try {
     api_instance.userWishlistControllerRemoveItem(productId);
@@ -133,7 +133,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **productId** | **String**|  |
+ **productId** | **String**|  | 
 
 ### Return type
 

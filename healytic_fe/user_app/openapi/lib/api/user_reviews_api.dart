@@ -63,7 +63,7 @@ class UserReviewsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'FacilityReviewResponseDto',) as FacilityReviewResponseDto;
-
+    
     }
     return null;
   }
@@ -115,7 +115,7 @@ class UserReviewsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SpecialistReviewResponseDto',) as SpecialistReviewResponseDto;
-
+    
     }
     return null;
   }
@@ -167,7 +167,7 @@ class UserReviewsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'TreatmentReviewResponseDto',) as TreatmentReviewResponseDto;
-
+    
     }
     return null;
   }

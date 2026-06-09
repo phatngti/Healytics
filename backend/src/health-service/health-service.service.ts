@@ -39,6 +39,9 @@ import { HealthServiceType } from './enums/health-service-type.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { ElasticsearchBookingService } from '@/search/services/elasticsearch-booking.service';
 
+const PUBLIC_SERVICE_LIST_DEFAULT_LIMIT = 50;
+const PUBLIC_SERVICE_LIST_MAX_LIMIT = 50;
+
 @Injectable()
 export class HealthServiceService {
   private readonly logger = new Logger(HealthServiceService.name);
@@ -604,6 +607,7 @@ export class HealthServiceService {
   private async findPublicServiceCards(
     query: PublicServiceListQueryDto,
   ): Promise<Product[]> {
+    const { limit, offset } = this.publicServicePagination(query);
     const qb = this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category')
@@ -644,7 +648,37 @@ export class HealthServiceService {
       qb.orderBy('product.createdAt', 'DESC').addOrderBy('product.id', 'DESC');
     }
 
-    return qb.take(50).getMany();
+    if (sort === PublicServiceListSort.RATING_DESC) {
+      return qb.getMany();
+    }
+
+    return qb.skip(offset).take(limit).getMany();
+  }
+
+  private publicServicePagination(query: PublicServiceListQueryDto): {
+    limit: number;
+    offset: number;
+  } {
+    return {
+      limit: this.clampedInteger(
+        query.limit,
+        PUBLIC_SERVICE_LIST_DEFAULT_LIMIT,
+        1,
+        PUBLIC_SERVICE_LIST_MAX_LIMIT,
+      ),
+      offset: this.clampedInteger(query.offset, 0, 0, Number.MAX_SAFE_INTEGER),
+    };
+  }
+
+  private clampedInteger(
+    value: unknown,
+    fallback: number,
+    min: number,
+    max: number,
+  ): number {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return fallback;
+    return Math.min(Math.max(Math.trunc(numeric), min), max);
   }
 
   private async applyPublicServiceFilters(
@@ -808,8 +842,10 @@ export class HealthServiceService {
     query: PublicServiceListQueryDto,
   ): Product[] {
     if (query.sort !== PublicServiceListSort.RATING_DESC) {
-      return products.slice(0, 10);
+      return products;
     }
+
+    const { offset, limit } = this.publicServicePagination(query);
     return [...products]
       .sort((a, b) => {
         const ratingDiff =
@@ -818,7 +854,7 @@ export class HealthServiceService {
         if (ratingDiff !== 0) return ratingDiff;
         return b.createdAt.getTime() - a.createdAt.getTime();
       })
-      .slice(0, 10);
+      .slice(offset, offset + limit);
   }
 
   /**

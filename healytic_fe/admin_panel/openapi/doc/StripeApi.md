@@ -22,7 +22,7 @@ Stripe webhook callback (server-to-server)
 import 'package:admin_openapi/api.dart';
 
 final api_instance = StripeApi();
-final stripeSignature = stripeSignature_example; // String |
+final stripeSignature = stripeSignature_example; // String | 
 
 try {
     api_instance.stripeWebhookControllerHandleStripeWebhook(stripeSignature);
@@ -35,7 +35,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **stripeSignature** | **String**|  |
+ **stripeSignature** | **String**|  | 
 
 ### Return type
 

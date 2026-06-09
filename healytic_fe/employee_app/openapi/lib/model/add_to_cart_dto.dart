@@ -14,8 +14,9 @@ class AddToCartDto {
   /// Returns a new [AddToCartDto] instance.
   AddToCartDto({
     required this.serviceId,
-    required this.employeeId,
+    this.employeeId,
     required this.timeSlot,
+    this.autoAssignStaff = false,
   });
 
 
@@ -23,32 +24,48 @@ class AddToCartDto {
   String serviceId;
 
   /// UUID of the assigned employee (doctor or therapist)
-  String employeeId;
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? employeeId;
 
   /// Desired time slot in ISO 8601 datetime format
   String timeSlot;
+
+  /// If true, backend selects the best eligible available specialist for this service and time slot.
+  bool autoAssignStaff;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is AddToCartDto &&
     other.serviceId == serviceId &&
     other.employeeId == employeeId &&
-    other.timeSlot == timeSlot;
+    other.timeSlot == timeSlot &&
+    other.autoAssignStaff == autoAssignStaff;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (serviceId.hashCode) +
-    (employeeId.hashCode) +
-    (timeSlot.hashCode);
+    (employeeId == null ? 0 : employeeId!.hashCode) +
+    (timeSlot.hashCode) +
+    (autoAssignStaff.hashCode);
 
   @override
-  String toString() => 'AddToCartDto[serviceId=$serviceId, employeeId=$employeeId, timeSlot=$timeSlot]';
+  String toString() => 'AddToCartDto[serviceId=$serviceId, employeeId=$employeeId, timeSlot=$timeSlot, autoAssignStaff=$autoAssignStaff]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'serviceId'] = this.serviceId;
+    if (this.employeeId != null) {
       json[r'employeeId'] = this.employeeId;
+    } else {
+      json[r'employeeId'] = null;
+    }
       json[r'timeSlot'] = this.timeSlot;
+      json[r'autoAssignStaff'] = this.autoAssignStaff;
     return json;
   }
 
@@ -72,8 +89,9 @@ class AddToCartDto {
 
       return AddToCartDto(
         serviceId: mapValueOfType<String>(json, r'serviceId')!,
-        employeeId: mapValueOfType<String>(json, r'employeeId')!,
+        employeeId: mapValueOfType<String>(json, r'employeeId'),
         timeSlot: mapValueOfType<String>(json, r'timeSlot')!,
+        autoAssignStaff: mapValueOfType<bool>(json, r'autoAssignStaff') ?? false,
       );
     }
     return null;
@@ -122,7 +140,6 @@ class AddToCartDto {
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
     'serviceId',
-    'employeeId',
     'timeSlot',
   };
 }

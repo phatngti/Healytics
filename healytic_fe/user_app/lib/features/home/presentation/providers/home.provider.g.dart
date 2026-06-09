@@ -197,6 +197,72 @@ final class PremiumTreatmentsProvider
 
 String _$premiumTreatmentsHash() => r'6c8cebdb94282e56b44d9827ab91115558c36de7';
 
+/// Accumulates the full Premium Treatments screen as pages are loaded.
+
+@ProviderFor(PremiumTreatmentsPaginated)
+const premiumTreatmentsPaginatedProvider =
+    PremiumTreatmentsPaginatedProvider._();
+
+/// Accumulates the full Premium Treatments screen as pages are loaded.
+final class PremiumTreatmentsPaginatedProvider
+    extends
+        $AsyncNotifierProvider<
+          PremiumTreatmentsPaginated,
+          PremiumTreatmentsAccumulated
+        > {
+  /// Accumulates the full Premium Treatments screen as pages are loaded.
+  const PremiumTreatmentsPaginatedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'premiumTreatmentsPaginatedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$premiumTreatmentsPaginatedHash();
+
+  @$internal
+  @override
+  PremiumTreatmentsPaginated create() => PremiumTreatmentsPaginated();
+}
+
+String _$premiumTreatmentsPaginatedHash() =>
+    r'758081715b299bde6d93436473b54f791da10cd0';
+
+/// Accumulates the full Premium Treatments screen as pages are loaded.
+
+abstract class _$PremiumTreatmentsPaginated
+    extends $AsyncNotifier<PremiumTreatmentsAccumulated> {
+  FutureOr<PremiumTreatmentsAccumulated> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<PremiumTreatmentsAccumulated>,
+              PremiumTreatmentsAccumulated
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<PremiumTreatmentsAccumulated>,
+                PremiumTreatmentsAccumulated
+              >,
+              AsyncValue<PremiumTreatmentsAccumulated>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
 /// Provider for the home preview of premium treatments.
 ///
 /// The home dashboard should not inherit filters from the full
@@ -251,7 +317,7 @@ final class PremiumTreatmentPreviewProvider
 }
 
 String _$premiumTreatmentPreviewHash() =>
-    r'decd4bd95e831e44a2b1df4ca00c01f3c5bf8ad6';
+    r'eccb3570f598ef3f1cda67f73f15ac0730a7b5ac';
 
 /// Provider for fetching service tags.
 

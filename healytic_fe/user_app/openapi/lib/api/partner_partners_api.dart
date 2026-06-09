@@ -59,7 +59,7 @@ class PartnerPartnersApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'MyProfileResponseDto',) as MyProfileResponseDto;
-
+    
     }
     return null;
   }
@@ -107,7 +107,7 @@ class PartnerPartnersApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'MyProfileCompletionResponseDto',) as MyProfileCompletionResponseDto;
-
+    
     }
     return null;
   }
@@ -155,7 +155,7 @@ class PartnerPartnersApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerPublicProfileResponseDto',) as PartnerPublicProfileResponseDto;
-
+    
     }
     return null;
   }
@@ -211,7 +211,7 @@ class PartnerPartnersApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'MyProfileResponseDto',) as MyProfileResponseDto;
-
+    
     }
     return null;
   }
@@ -267,7 +267,7 @@ class PartnerPartnersApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'MyProfileCompletionResponseDto',) as MyProfileCompletionResponseDto;
-
+    
     }
     return null;
   }
@@ -323,7 +323,7 @@ class PartnerPartnersApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerPublicProfileResponseDto',) as PartnerPublicProfileResponseDto;
-
+    
     }
     return null;
   }

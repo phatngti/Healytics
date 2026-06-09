@@ -34,8 +34,14 @@ class HomeImplementRepository implements HomeRepository {
   @override
   Future<List<HomeProduct>> getPremiumTreatments({
     ServiceListFilter? filter,
+    int? limit,
+    int? offset,
   }) async {
-    return await remoteDatasource.getPremiumTreatments(filter: filter);
+    return await remoteDatasource.getPremiumTreatments(
+      filter: filter,
+      limit: limit,
+      offset: offset,
+    );
   }
 
   @override

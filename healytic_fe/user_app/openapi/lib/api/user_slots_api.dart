@@ -63,7 +63,7 @@ class UserSlotsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CheckDuplicateSlotResponseDto',) as CheckDuplicateSlotResponseDto;
-
+    
     }
     return null;
   }
@@ -115,7 +115,7 @@ class UserSlotsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'MicroLockResponseDto',) as MicroLockResponseDto;
-
+    
     }
     return null;
   }

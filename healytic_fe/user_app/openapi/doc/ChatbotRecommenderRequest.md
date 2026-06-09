@@ -8,8 +8,8 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**conversationId** | **String** |  |
-**query** | **String** |  |
+**conversationId** | **String** |  | 
+**query** | **String** |  | 
 **topK** | **int** |  | [optional] [default to 3]
 **filteredIds** | **List<String>** |  | [optional] [default to const []]
 

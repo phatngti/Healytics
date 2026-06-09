@@ -34,7 +34,7 @@ Delete only rows returned by a seed response
 import 'package:user_openapi/api.dart';
 
 final api_instance = TestBackdoorApi();
-final cleanupSeedDataDto = CleanupSeedDataDto(); // CleanupSeedDataDto |
+final cleanupSeedDataDto = CleanupSeedDataDto(); // CleanupSeedDataDto | 
 
 try {
     final result = api_instance.testBackdoorControllerCleanup(cleanupSeedDataDto);
@@ -48,7 +48,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **cleanupSeedDataDto** | [**CleanupSeedDataDto**](CleanupSeedDataDto.md)|  |
+ **cleanupSeedDataDto** | [**CleanupSeedDataDto**](CleanupSeedDataDto.md)|  | 
 
 ### Return type
 
@@ -75,7 +75,7 @@ Reset DB then seed a scenario
 import 'package:user_openapi/api.dart';
 
 final api_instance = TestBackdoorApi();
-final backdoorPrepareDto = BackdoorPrepareDto(); // BackdoorPrepareDto |
+final backdoorPrepareDto = BackdoorPrepareDto(); // BackdoorPrepareDto | 
 
 try {
     final result = api_instance.testBackdoorControllerPrepare(backdoorPrepareDto);
@@ -89,7 +89,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **backdoorPrepareDto** | [**BackdoorPrepareDto**](BackdoorPrepareDto.md)|  |
+ **backdoorPrepareDto** | [**BackdoorPrepareDto**](BackdoorPrepareDto.md)|  | 
 
 ### Return type
 
@@ -153,7 +153,7 @@ Seed multiple entity types at once
 import 'package:user_openapi/api.dart';
 
 final api_instance = TestBackdoorApi();
-final seedPayloadDto = SeedPayloadDto(); // SeedPayloadDto |
+final seedPayloadDto = SeedPayloadDto(); // SeedPayloadDto | 
 
 try {
     final result = api_instance.testBackdoorControllerSeed(seedPayloadDto);
@@ -167,7 +167,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **seedPayloadDto** | [**SeedPayloadDto**](SeedPayloadDto.md)|  |
+ **seedPayloadDto** | [**SeedPayloadDto**](SeedPayloadDto.md)|  | 
 
 ### Return type
 
@@ -194,7 +194,7 @@ Seed a single booking
 import 'package:user_openapi/api.dart';
 
 final api_instance = TestBackdoorApi();
-final seedBookingDto = SeedBookingDto(); // SeedBookingDto |
+final seedBookingDto = SeedBookingDto(); // SeedBookingDto | 
 
 try {
     final result = api_instance.testBackdoorControllerSeedBooking(seedBookingDto);
@@ -208,7 +208,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **seedBookingDto** | [**SeedBookingDto**](SeedBookingDto.md)|  |
+ **seedBookingDto** | [**SeedBookingDto**](SeedBookingDto.md)|  | 
 
 ### Return type
 
@@ -235,7 +235,7 @@ Seed a single cart item
 import 'package:user_openapi/api.dart';
 
 final api_instance = TestBackdoorApi();
-final seedCartItemDto = SeedCartItemDto(); // SeedCartItemDto |
+final seedCartItemDto = SeedCartItemDto(); // SeedCartItemDto | 
 
 try {
     final result = api_instance.testBackdoorControllerSeedCart(seedCartItemDto);
@@ -249,7 +249,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **seedCartItemDto** | [**SeedCartItemDto**](SeedCartItemDto.md)|  |
+ **seedCartItemDto** | [**SeedCartItemDto**](SeedCartItemDto.md)|  | 
 
 ### Return type
 
@@ -276,7 +276,7 @@ Seed a single category
 import 'package:user_openapi/api.dart';
 
 final api_instance = TestBackdoorApi();
-final seedCategoryDto = SeedCategoryDto(); // SeedCategoryDto |
+final seedCategoryDto = SeedCategoryDto(); // SeedCategoryDto | 
 
 try {
     final result = api_instance.testBackdoorControllerSeedCategory(seedCategoryDto);
@@ -290,7 +290,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **seedCategoryDto** | [**SeedCategoryDto**](SeedCategoryDto.md)|  |
+ **seedCategoryDto** | [**SeedCategoryDto**](SeedCategoryDto.md)|  | 
 
 ### Return type
 
@@ -317,7 +317,7 @@ Seed a single coupon
 import 'package:user_openapi/api.dart';
 
 final api_instance = TestBackdoorApi();
-final seedCouponDto = SeedCouponDto(); // SeedCouponDto |
+final seedCouponDto = SeedCouponDto(); // SeedCouponDto | 
 
 try {
     final result = api_instance.testBackdoorControllerSeedCoupon(seedCouponDto);
@@ -331,7 +331,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **seedCouponDto** | [**SeedCouponDto**](SeedCouponDto.md)|  |
+ **seedCouponDto** | [**SeedCouponDto**](SeedCouponDto.md)|  | 
 
 ### Return type
 
@@ -358,7 +358,7 @@ Seed a single employee
 import 'package:user_openapi/api.dart';
 
 final api_instance = TestBackdoorApi();
-final seedEmployeeDto = SeedEmployeeDto(); // SeedEmployeeDto |
+final seedEmployeeDto = SeedEmployeeDto(); // SeedEmployeeDto | 
 
 try {
     final result = api_instance.testBackdoorControllerSeedEmployee(seedEmployeeDto);
@@ -372,7 +372,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **seedEmployeeDto** | [**SeedEmployeeDto**](SeedEmployeeDto.md)|  |
+ **seedEmployeeDto** | [**SeedEmployeeDto**](SeedEmployeeDto.md)|  | 
 
 ### Return type
 
@@ -399,7 +399,7 @@ Seed a single partner
 import 'package:user_openapi/api.dart';
 
 final api_instance = TestBackdoorApi();
-final seedPartnerDto = SeedPartnerDto(); // SeedPartnerDto |
+final seedPartnerDto = SeedPartnerDto(); // SeedPartnerDto | 
 
 try {
     final result = api_instance.testBackdoorControllerSeedPartner(seedPartnerDto);
@@ -413,7 +413,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **seedPartnerDto** | [**SeedPartnerDto**](SeedPartnerDto.md)|  |
+ **seedPartnerDto** | [**SeedPartnerDto**](SeedPartnerDto.md)|  | 
 
 ### Return type
 
@@ -440,7 +440,7 @@ Seed a single health service
 import 'package:user_openapi/api.dart';
 
 final api_instance = TestBackdoorApi();
-final seedServiceDto = SeedServiceDto(); // SeedServiceDto |
+final seedServiceDto = SeedServiceDto(); // SeedServiceDto | 
 
 try {
     final result = api_instance.testBackdoorControllerSeedService(seedServiceDto);
@@ -454,7 +454,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **seedServiceDto** | [**SeedServiceDto**](SeedServiceDto.md)|  |
+ **seedServiceDto** | [**SeedServiceDto**](SeedServiceDto.md)|  | 
 
 ### Return type
 
@@ -481,7 +481,7 @@ Seed a single user
 import 'package:user_openapi/api.dart';
 
 final api_instance = TestBackdoorApi();
-final seedUserDto = SeedUserDto(); // SeedUserDto |
+final seedUserDto = SeedUserDto(); // SeedUserDto | 
 
 try {
     final result = api_instance.testBackdoorControllerSeedUser(seedUserDto);
@@ -495,7 +495,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **seedUserDto** | [**SeedUserDto**](SeedUserDto.md)|  |
+ **seedUserDto** | [**SeedUserDto**](SeedUserDto.md)|  | 
 
 ### Return type
 

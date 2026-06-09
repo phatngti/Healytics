@@ -43,8 +43,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **q** | **String**| Search text. Minimum 2 characters. |
- **limit** | **String**| Maximum results per group. Default 5, max 20. | [optional]
+ **q** | **String**| Search text. Minimum 2 characters. | 
+ **limit** | **String**| Maximum results per group. Default 5, max 20. | [optional] 
 
 ### Return type
 

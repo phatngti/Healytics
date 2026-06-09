@@ -63,7 +63,7 @@ class PartnerHealthServicesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerHealthServiceResponseDto',) as PartnerHealthServiceResponseDto;
-
+    
     }
     return null;
   }
@@ -163,7 +163,7 @@ class PartnerHealthServicesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerHealthServiceResponseDto',) as PartnerHealthServiceResponseDto;
-
+    
     }
     return null;
   }
@@ -226,7 +226,7 @@ class PartnerHealthServicesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'HealthServiceDetailAnalyticsResponseDto',) as HealthServiceDetailAnalyticsResponseDto;
-
+    
     }
     return null;
   }
@@ -279,7 +279,7 @@ class PartnerHealthServicesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerHealthServiceDetailResponseDto',) as PartnerHealthServiceDetailResponseDto;
-
+    
     }
     return null;
   }
@@ -337,7 +337,7 @@ class PartnerHealthServicesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'HealthServiceOverviewAnalyticsResponseDto',) as HealthServiceOverviewAnalyticsResponseDto;
-
+    
     }
     return null;
   }
@@ -439,7 +439,7 @@ class PartnerHealthServicesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerHealthServiceResponseDto',) as PartnerHealthServiceResponseDto;
-
+    
     }
     return null;
   }

@@ -24,7 +24,7 @@ Get all districts in a province
 import 'package:admin_openapi/api.dart';
 
 final api_instance = LocationsApi();
-final provinceId = provinceId_example; // String |
+final provinceId = provinceId_example; // String | 
 
 try {
     final result = api_instance.locationsControllerGetDistricts(provinceId);
@@ -38,7 +38,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **provinceId** | **String**|  |
+ **provinceId** | **String**|  | 
 
 ### Return type
 
@@ -102,7 +102,7 @@ Get all wards in a district
 import 'package:admin_openapi/api.dart';
 
 final api_instance = LocationsApi();
-final districtId = districtId_example; // String |
+final districtId = districtId_example; // String | 
 
 try {
     final result = api_instance.locationsControllerGetWards(districtId);
@@ -116,7 +116,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **districtId** | **String**|  |
+ **districtId** | **String**|  | 
 
 ### Return type
 

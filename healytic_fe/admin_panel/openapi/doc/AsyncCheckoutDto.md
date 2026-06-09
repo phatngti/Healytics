@@ -8,12 +8,12 @@ import 'package:admin_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**userId** | **String** | User account UUID |
-**staffId** | **String** | Staff/employee UUID. Optional when autoAssignStaff is true. | [optional]
-**startTime** | **String** | Desired slot start time (ISO 8601) |
-**productId** | **String** | Product/service UUID |
-**idempotencyKey** | **String** | Idempotency key to prevent duplicate requests from AI retry |
-**webhookUrl** | **String** | Webhook URL to receive checkout result | [optional]
+**userId** | **String** | User account UUID | 
+**staffId** | **String** | Staff/employee UUID. Optional when autoAssignStaff is true. | [optional] 
+**startTime** | **String** | Desired slot start time (ISO 8601) | 
+**productId** | **String** | Product/service UUID | 
+**idempotencyKey** | **String** | Idempotency key to prevent duplicate requests from AI retry | 
+**webhookUrl** | **String** | Webhook URL to receive checkout result | [optional] 
 **payLater** | **bool** | If true, booking is immediately CONFIRMED without requiring payment. The booking has no payment URL or expiry — suitable for in-person pay-later scenarios. | [optional] [default to false]
 **autoAssignStaff** | **bool** | If true, backend selects the best eligible available specialist for the service and start time. | [optional] [default to false]
 

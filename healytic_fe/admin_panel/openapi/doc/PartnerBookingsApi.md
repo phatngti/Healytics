@@ -29,7 +29,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerBookingsApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.partnerBookingsControllerGetBooking(id);
@@ -43,7 +43,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 

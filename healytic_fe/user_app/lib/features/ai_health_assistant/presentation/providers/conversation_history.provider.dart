@@ -8,6 +8,8 @@ import 'package:user_app/features/ai_health_assistant/domain/entities/chat_conve
 import 'package:user_app/features/partner_chat/domain/entities/partner_conversation.entity.dart';
 import 'package:user_app/features/partner_chat/presentation/providers/partner_chat.provider.dart';
 
+const Object _unset = Object();
+
 /// Immutable state for the conversation history page.
 ///
 /// Holds both AI and partner conversation lists
@@ -48,25 +50,23 @@ class ConversationHistoryState {
 
   ConversationHistoryState copyWith({
     bool? isLoading,
-    String? error,
+    Object? error = _unset,
     List<ChatConversation>? conversations,
     bool? isLoadingPartner,
-    String? partnerError,
+    Object? partnerError = _unset,
     List<PartnerConversation>? partnerConversations,
     String? searchQuery,
   }) {
     return ConversationHistoryState(
       isLoading: isLoading ?? this.isLoading,
-      error: error,
-      conversations:
-          conversations ?? this.conversations,
-      isLoadingPartner:
-          isLoadingPartner ?? this.isLoadingPartner,
-      partnerError: partnerError,
-      partnerConversations: partnerConversations ??
-          this.partnerConversations,
-      searchQuery:
-          searchQuery ?? this.searchQuery,
+      error: identical(error, _unset) ? this.error : error as String?,
+      conversations: conversations ?? this.conversations,
+      isLoadingPartner: isLoadingPartner ?? this.isLoadingPartner,
+      partnerError: identical(partnerError, _unset)
+          ? this.partnerError
+          : partnerError as String?,
+      partnerConversations: partnerConversations ?? this.partnerConversations,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 
@@ -79,9 +79,7 @@ class ConversationHistoryState {
         .where(
           (c) =>
               c.title.toLowerCase().contains(q) ||
-              c.lastMessage
-                  .toLowerCase()
-                  .contains(q),
+              c.lastMessage.toLowerCase().contains(q),
         )
         .toList();
   }
@@ -97,12 +95,8 @@ class ConversationHistoryState {
     return partnerConversations
         .where(
           (c) =>
-              c.otherParticipant.name
-                  .toLowerCase()
-                  .contains(q) ||
-              (c.lastMessage.text ?? '')
-                  .toLowerCase()
-                  .contains(q),
+              c.otherParticipant.name.toLowerCase().contains(q) ||
+              (c.lastMessage.text ?? '').toLowerCase().contains(q),
         )
         .toList();
   }
@@ -110,32 +104,29 @@ class ConversationHistoryState {
 
 /// Manages the conversation list and search filtering
 /// for both AI and partner chat types.
-class ConversationHistoryNotifier
-    extends Notifier<ConversationHistoryState> {
+class ConversationHistoryNotifier extends Notifier<ConversationHistoryState> {
   late final ChatRepository _repository;
 
   @override
   ConversationHistoryState build() {
     _repository = ref.read(chatRepositoryProvider);
-    Future.microtask(loadConversations);
-    Future.microtask(loadPartnerConversations);
     return const ConversationHistoryState();
+  }
+
+  /// Refreshes both chat-history sources when the
+  /// history page is accessed.
+  Future<void> refresh() async {
+    await loadConversations();
+    await loadPartnerConversations();
   }
 
   /// Fetches all AI conversations from the repository.
   Future<void> loadConversations() async {
-    state = state.copyWith(
-      isLoading: true,
-      error: null,
-    );
+    state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final conversations =
-          await _repository.getConversations();
-      state = state.copyWith(
-        isLoading: false,
-        conversations: conversations,
-      );
+      final conversations = await _repository.getConversations();
+      state = state.copyWith(isLoading: false, conversations: conversations);
     } catch (e, st) {
       log(
         'Error loading conversations: $e',
@@ -151,16 +142,11 @@ class ConversationHistoryNotifier
 
   /// Fetches all partner conversations.
   Future<void> loadPartnerConversations() async {
-    state = state.copyWith(
-      isLoadingPartner: true,
-      partnerError: null,
-    );
+    state = state.copyWith(isLoadingPartner: true, partnerError: null);
 
     try {
-      final partnerRepo =
-          ref.read(partnerChatRepositoryProvider);
-      final conversations =
-          await partnerRepo.getConversations();
+      final partnerRepo = ref.read(partnerChatRepositoryProvider);
+      final conversations = await partnerRepo.getConversations();
       state = state.copyWith(
         isLoadingPartner: false,
         partnerConversations: conversations,
@@ -173,8 +159,7 @@ class ConversationHistoryNotifier
       );
       state = state.copyWith(
         isLoadingPartner: false,
-        partnerError:
-            'Failed to load partner conversations.',
+        partnerError: 'Failed to load partner conversations.',
       );
     }
   }
@@ -187,8 +172,7 @@ class ConversationHistoryNotifier
 }
 
 /// Provider for the conversation history state.
-final conversationHistoryProvider = NotifierProvider<
-    ConversationHistoryNotifier,
-    ConversationHistoryState>(
-  ConversationHistoryNotifier.new,
-);
+final conversationHistoryProvider =
+    NotifierProvider<ConversationHistoryNotifier, ConversationHistoryState>(
+      ConversationHistoryNotifier.new,
+    );

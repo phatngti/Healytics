@@ -33,13 +33,13 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserEmployeesApi();
-final role = role_example; // String |
-final sort = sort_example; // String |
-final clinicId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final provinceId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final districtId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final wardId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final minExperienceYears = 8.14; // num |
+final role = role_example; // String | 
+final sort = sort_example; // String | 
+final clinicId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final provinceId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final districtId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final wardId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final minExperienceYears = 8.14; // num | 
 
 try {
     final result = api_instance.userEmployeesControllerFindAll(role, sort, clinicId, provinceId, districtId, wardId, minExperienceYears);
@@ -53,13 +53,13 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **role** | **String**|  | [optional]
+ **role** | **String**|  | [optional] 
  **sort** | **String**|  | [optional] [default to 'default']
- **clinicId** | **String**|  | [optional]
- **provinceId** | **String**|  | [optional]
- **districtId** | **String**|  | [optional]
- **wardId** | **String**|  | [optional]
- **minExperienceYears** | **num**|  | [optional]
+ **clinicId** | **String**|  | [optional] 
+ **provinceId** | **String**|  | [optional] 
+ **districtId** | **String**|  | [optional] 
+ **wardId** | **String**|  | [optional] 
+ **minExperienceYears** | **num**|  | [optional] 
 
 ### Return type
 
@@ -92,7 +92,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserEmployeesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userEmployeesControllerFindOne(id);
@@ -106,7 +106,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -139,7 +139,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserEmployeesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userEmployeesControllerFindReviews(id);
@@ -153,7 +153,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -186,7 +186,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserEmployeesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userEmployeesControllerFindServices(id);
@@ -200,7 +200,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -247,7 +247,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **limit** | **num**| Max specialists to return (default 10) | [optional]
+ **limit** | **num**| Max specialists to return (default 10) | [optional] 
 
 ### Return type
 
@@ -280,7 +280,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserEmployeesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 final date = 2026-03-26; // String | Start date for the schedule range (YYYY-MM-DD). Defaults to today.
 final days = 7; // num | Number of days to return from the start date. Default 7, max 30.
 
@@ -296,9 +296,9 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
- **date** | **String**| Start date for the schedule range (YYYY-MM-DD). Defaults to today. | [optional]
- **days** | **num**| Number of days to return from the start date. Default 7, max 30. | [optional]
+ **id** | **String**|  | 
+ **date** | **String**| Start date for the schedule range (YYYY-MM-DD). Defaults to today. | [optional] 
+ **days** | **num**| Number of days to return from the start date. Default 7, max 30. | [optional] 
 
 ### Return type
 

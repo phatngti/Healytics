@@ -17,6 +17,8 @@ import 'package:user_app/features/home/presentation/'
 import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/router/routes.dart';
 
+const _previewProductCount = 4;
+
 /// Displays a 2-column grid of premium treatment cards
 /// fetched via [productsProvider].
 class PremiumTreatmentsSection extends ConsumerWidget {
@@ -50,10 +52,16 @@ class PremiumTreatmentsSection extends ConsumerWidget {
             ),
           ),
           data: (products) {
-            if (products.isEmpty) {
+            final previewProducts = products
+                .take(_previewProductCount)
+                .toList(growable: false);
+            if (previewProducts.isEmpty) {
               return const _EmptyState();
             }
-            return _ProductGrid(products: products, contentPad: contentPad);
+            return _ProductGrid(
+              products: previewProducts,
+              contentPad: contentPad,
+            );
           },
         ),
       ],

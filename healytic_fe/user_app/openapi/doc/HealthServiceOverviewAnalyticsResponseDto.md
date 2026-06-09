@@ -8,16 +8,16 @@ import 'package:user_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**totalProducts** | **num** |  |
-**activeProducts** | **num** |  |
-**bookings** | **num** | Completed bookings in the selected period |
-**bookingsDelta** | **num** | % change vs previous period |
-**revenue** | **num** | Revenue in VND |
-**revenueDelta** | **num** |  |
-**averageRating** | **num** |  |
-**ratingDelta** | **num** |  |
-**reviewCount** | **num** |  |
-**bookingMetrics** | [**AnalyticsBookingMetricsDto**](AnalyticsBookingMetricsDto.md) |  |
+**totalProducts** | **num** |  | 
+**activeProducts** | **num** |  | 
+**bookings** | **num** | Completed bookings in the selected period | 
+**bookingsDelta** | **num** | % change vs previous period | 
+**revenue** | **num** | Revenue in VND | 
+**revenueDelta** | **num** |  | 
+**averageRating** | **num** |  | 
+**ratingDelta** | **num** |  | 
+**reviewCount** | **num** |  | 
+**bookingMetrics** | [**AnalyticsBookingMetricsDto**](AnalyticsBookingMetricsDto.md) |  | 
 **trendPoints** | [**List<AnalyticsTrendPointDto>**](AnalyticsTrendPointDto.md) |  | [default to const []]
 **categoryPerformance** | [**List<AnalyticsCategoryPerformanceDto>**](AnalyticsCategoryPerformanceDto.md) |  | [default to const []]
 **topServices** | [**List<AnalyticsServicePerformanceDto>**](AnalyticsServicePerformanceDto.md) |  | [default to const []]

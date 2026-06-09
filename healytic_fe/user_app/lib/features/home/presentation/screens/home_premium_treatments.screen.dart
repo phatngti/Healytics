@@ -79,18 +79,23 @@ class _PremiumTreatmentList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final treatmentsAsync = ref.watch(premiumTreatmentsProvider);
+    final treatmentsAsync = ref.watch(premiumTreatmentsPaginatedProvider);
     final filterActive = ref.watch(
       premiumTreatmentFilterProvider.select((value) => value.isActive),
     );
-    final products = treatmentsAsync.value;
+    final data = treatmentsAsync.value;
 
-    if (products != null) {
+    if (data != null) {
       return _RefreshingStack(
         isRefreshing: treatmentsAsync.isLoading,
         child: _TreatmentGrid(
-          products: products,
+          products: data.products,
           filtersActive: filterActive,
+          hasMore: data.hasMore,
+          isLoadingMore: data.isLoadingMore,
+          loadMoreError: data.loadMoreError,
+          onLoadMore: () =>
+              ref.read(premiumTreatmentsPaginatedProvider.notifier).loadMore(),
           onReset: () {
             ref.read(premiumTreatmentFilterProvider.notifier).state =
                 const ServiceListFilter();
@@ -107,7 +112,7 @@ class _PremiumTreatmentList extends ConsumerWidget {
             title: 'Could not load premium treatments',
             error: treatmentsAsync.error!,
             stackTrace: treatmentsAsync.stackTrace,
-            onRetry: () => ref.invalidate(premiumTreatmentsProvider),
+            onRetry: () => ref.invalidate(premiumTreatmentsPaginatedProvider),
           ),
         ),
       );
@@ -117,21 +122,98 @@ class _PremiumTreatmentList extends ConsumerWidget {
   }
 }
 
-class _TreatmentGrid extends StatelessWidget {
+const _loadMoreScrollThreshold = 260.0;
+
+class _TreatmentGrid extends StatefulWidget {
   const _TreatmentGrid({
     required this.products,
     required this.filtersActive,
+    required this.hasMore,
+    required this.isLoadingMore,
+    required this.loadMoreError,
+    required this.onLoadMore,
     required this.onReset,
   });
 
   final List<HomeProduct> products;
   final bool filtersActive;
+  final bool hasMore;
+  final bool isLoadingMore;
+  final Object? loadMoreError;
+  final Future<void> Function() onLoadMore;
   final VoidCallback onReset;
 
   @override
+  State<_TreatmentGrid> createState() => _TreatmentGridState();
+}
+
+class _TreatmentGridState extends State<_TreatmentGrid> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    _scheduleLoadAfterLayout();
+  }
+
+  @override
+  void didUpdateWidget(covariant _TreatmentGrid oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.products.length != widget.products.length ||
+        oldWidget.hasMore != widget.hasMore) {
+      _scheduleLoadAfterLayout();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    _loadIfNearBottom();
+  }
+
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification.metrics.axis == Axis.vertical) {
+      _loadIfNearBottom(notification.metrics);
+    }
+    return false;
+  }
+
+  void _scheduleLoadAfterLayout() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _loadIfNearBottom();
+    });
+  }
+
+  void _loadIfNearBottom([ScrollMetrics? metrics]) {
+    if (!widget.hasMore || widget.isLoadingMore) {
+      return;
+    }
+
+    final position =
+        metrics ??
+        (_scrollController.hasClients ? _scrollController.position : null);
+    if (position == null) return;
+
+    final distanceToBottom = position.maxScrollExtent - position.pixels;
+    if (distanceToBottom <= _loadMoreScrollThreshold) {
+      widget.onLoadMore();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (products.isEmpty) {
-      return _EmptyState(filtersActive: filtersActive, onReset: onReset);
+    if (widget.products.isEmpty) {
+      return _EmptyState(
+        filtersActive: widget.filtersActive,
+        onReset: widget.onReset,
+      );
     }
 
     final hPad = AppDimens.horizontalPadding(context);
@@ -143,20 +225,93 @@ class _TreatmentGrid extends StatelessWidget {
       web: 4,
     );
 
-    return MasonryGridView.count(
-      padding: EdgeInsets.fromLTRB(
-        hPad,
-        AppDimens.spaceLg,
-        hPad,
-        AppDimens.bottomScrollPadding(context),
+    return Stack(
+      children: [
+        NotificationListener<ScrollNotification>(
+          onNotification: _onScrollNotification,
+          child: MasonryGridView.count(
+            controller: _scrollController,
+            padding: EdgeInsets.fromLTRB(
+              hPad,
+              AppDimens.spaceLg,
+              hPad,
+              AppDimens.bottomScrollPadding(context),
+            ),
+            crossAxisCount: columns,
+            mainAxisSpacing: gap,
+            crossAxisSpacing: gap,
+            itemCount: widget.products.length,
+            itemBuilder: (context, index) {
+              return TreatmentCard(product: widget.products[index]);
+            },
+          ),
+        ),
+        if (widget.isLoadingMore)
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: AppDimens.spaceMd,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        if (!widget.isLoadingMore && widget.loadMoreError != null)
+          Positioned(
+            left: hPad,
+            right: hPad,
+            bottom: AppDimens.spaceMd,
+            child: _LoadMoreErrorBar(onRetry: widget.onLoadMore),
+          ),
+      ],
+    );
+  }
+}
+
+class _LoadMoreErrorBar extends StatelessWidget {
+  const _LoadMoreErrorBar({required this.onRetry});
+
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Material(
+      elevation: 4,
+      color: colorScheme.errorContainer,
+      borderRadius: AppDimens.radiusSmall,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppDimens.spaceMd,
+          vertical: AppDimens.spaceXs,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: colorScheme.onErrorContainer,
+              size: AppDimens.iconSm,
+            ),
+            SizedBox(width: AppDimens.spaceXs),
+            Expanded(
+              child: Text(
+                'Could not load more treatments',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onErrorContainer,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => onRetry(),
+              style: TextButton.styleFrom(
+                foregroundColor: colorScheme.onErrorContainer,
+              ),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
       ),
-      crossAxisCount: columns,
-      mainAxisSpacing: gap,
-      crossAxisSpacing: gap,
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return TreatmentCard(product: products[index]);
-      },
     );
   }
 }

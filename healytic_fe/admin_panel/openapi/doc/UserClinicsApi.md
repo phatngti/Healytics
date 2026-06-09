@@ -32,7 +32,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserClinicsApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userClinicControllerFollowClinic(id);
@@ -46,7 +46,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -79,7 +79,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserClinicsApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userClinicControllerGetClinicInfo(id);
@@ -93,7 +93,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -126,7 +126,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserClinicsApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 final categoryId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | Filter products by category ID
 final sort = sort_example; // String | Sort order for products
 final search = search_example; // String | Case-insensitive service name search
@@ -135,8 +135,8 @@ final maxPrice = 8.14; // num | Maximum current price
 final minDuration = 8.14; // num | Minimum service duration in minutes
 final maxDuration = 8.14; // num | Maximum service duration in minutes
 final discountOnly = true; // bool | Only discounted products
-final page = 8.14; // num |
-final limit = 8.14; // num |
+final page = 8.14; // num | 
+final limit = 8.14; // num | 
 
 try {
     final result = api_instance.userClinicControllerGetClinicProducts(id, categoryId, sort, search, minPrice, maxPrice, minDuration, maxDuration, discountOnly, page, limit);
@@ -150,15 +150,15 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
- **categoryId** | **String**| Filter products by category ID | [optional]
+ **id** | **String**|  | 
+ **categoryId** | **String**| Filter products by category ID | [optional] 
  **sort** | **String**| Sort order for products | [optional] [default to 'popular']
- **search** | **String**| Case-insensitive service name search | [optional]
- **minPrice** | **num**| Minimum current price | [optional]
- **maxPrice** | **num**| Maximum current price | [optional]
- **minDuration** | **num**| Minimum service duration in minutes | [optional]
- **maxDuration** | **num**| Maximum service duration in minutes | [optional]
- **discountOnly** | **bool**| Only discounted products | [optional]
+ **search** | **String**| Case-insensitive service name search | [optional] 
+ **minPrice** | **num**| Minimum current price | [optional] 
+ **maxPrice** | **num**| Maximum current price | [optional] 
+ **minDuration** | **num**| Minimum service duration in minutes | [optional] 
+ **maxDuration** | **num**| Maximum service duration in minutes | [optional] 
+ **discountOnly** | **bool**| Only discounted products | [optional] 
  **page** | **num**|  | [optional] [default to 1]
  **limit** | **num**|  | [optional] [default to 20]
 
@@ -193,9 +193,9 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserClinicsApi();
-final id = id_example; // String |
-final page = 8.14; // num |
-final limit = 8.14; // num |
+final id = id_example; // String | 
+final page = 8.14; // num | 
+final limit = 8.14; // num | 
 final starCount = 8.14; // num | Filter: only reviews with this rating (1–5)
 final hasMedia = true; // bool | Filter: only reviews with photos
 
@@ -211,11 +211,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
  **page** | **num**|  | [optional] [default to 1]
  **limit** | **num**|  | [optional] [default to 10]
- **starCount** | **num**| Filter: only reviews with this rating (1–5) | [optional]
- **hasMedia** | **bool**| Filter: only reviews with photos | [optional]
+ **starCount** | **num**| Filter: only reviews with this rating (1–5) | [optional] 
+ **hasMedia** | **bool**| Filter: only reviews with photos | [optional] 
 
 ### Return type
 
@@ -248,7 +248,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserClinicsApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userClinicControllerUnfollowClinic(id);
@@ -262,7 +262,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 

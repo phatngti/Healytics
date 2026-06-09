@@ -160,7 +160,7 @@ Class | Method | HTTP request | Description
 *MapboxApi* | [**mapboxControllerGetClientKey**](doc//MapboxApi.md#mapboxcontrollergetclientkey) | **GET** /mapbox/client-key | Get public access token for frontend/mobile SDKs
 *MapboxApi* | [**mapboxControllerReverseGeocode**](doc//MapboxApi.md#mapboxcontrollerreversegeocode) | **GET** /mapbox/reverse-geocode | Reverse geocode lat/lng to address
 *MomoApi* | [**moMoControllerHandleMoMoIPN**](doc//MomoApi.md#momocontrollerhandlemomoipn) | **POST** /momo/ipn | MoMo IPN callback (server-to-server)
-*ObservabilityApi* | [**metricsControllerCollect**](doc//ObservabilityApi.md#metricscontrollercollect) | **GET** /metrics |
+*ObservabilityApi* | [**metricsControllerCollect**](doc//ObservabilityApi.md#metricscontrollercollect) | **GET** /metrics | 
 *PartnerBookingsApi* | [**partnerBookingsControllerGetBooking**](doc//PartnerBookingsApi.md#partnerbookingscontrollergetbooking) | **GET** /partner/bookings/{id} | Get partner booking detail
 *PartnerBookingsApi* | [**partnerBookingsControllerListBookings**](doc//PartnerBookingsApi.md#partnerbookingscontrollerlistbookings) | **GET** /partner/bookings | List bookings for the authenticated partner
 *PartnerChatApi* | [**partnerChatControllerCreateConversation**](doc//PartnerChatApi.md#partnerchatcontrollercreateconversation) | **POST** /partner/chat/conversations | Create a new conversation with a user

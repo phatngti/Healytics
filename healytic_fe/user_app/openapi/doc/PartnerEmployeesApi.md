@@ -41,7 +41,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final createDoctorDto = CreateDoctorDto(); // CreateDoctorDto |
+final createDoctorDto = CreateDoctorDto(); // CreateDoctorDto | 
 
 try {
     final result = api_instance.partnerEmployeesControllerCreateDoctor(createDoctorDto);
@@ -55,7 +55,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createDoctorDto** | [**CreateDoctorDto**](CreateDoctorDto.md)|  |
+ **createDoctorDto** | [**CreateDoctorDto**](CreateDoctorDto.md)|  | 
 
 ### Return type
 
@@ -88,7 +88,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final createSkillDto = CreateSkillDto(); // CreateSkillDto |
+final createSkillDto = CreateSkillDto(); // CreateSkillDto | 
 
 try {
     final result = api_instance.partnerEmployeesControllerCreateMassageSkill(createSkillDto);
@@ -102,7 +102,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createSkillDto** | [**CreateSkillDto**](CreateSkillDto.md)|  |
+ **createSkillDto** | [**CreateSkillDto**](CreateSkillDto.md)|  | 
 
 ### Return type
 
@@ -135,7 +135,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final createMassageTherapistDto = CreateMassageTherapistDto(); // CreateMassageTherapistDto |
+final createMassageTherapistDto = CreateMassageTherapistDto(); // CreateMassageTherapistDto | 
 
 try {
     final result = api_instance.partnerEmployeesControllerCreateMassageTherapist(createMassageTherapistDto);
@@ -149,7 +149,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createMassageTherapistDto** | [**CreateMassageTherapistDto**](CreateMassageTherapistDto.md)|  |
+ **createMassageTherapistDto** | [**CreateMassageTherapistDto**](CreateMassageTherapistDto.md)|  | 
 
 ### Return type
 
@@ -182,7 +182,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final createSkillDto = CreateSkillDto(); // CreateSkillDto |
+final createSkillDto = CreateSkillDto(); // CreateSkillDto | 
 
 try {
     final result = api_instance.partnerEmployeesControllerCreateSpaSkill(createSkillDto);
@@ -196,7 +196,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createSkillDto** | [**CreateSkillDto**](CreateSkillDto.md)|  |
+ **createSkillDto** | [**CreateSkillDto**](CreateSkillDto.md)|  | 
 
 ### Return type
 
@@ -229,7 +229,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final createSpaTherapistDto = CreateSpaTherapistDto(); // CreateSpaTherapistDto |
+final createSpaTherapistDto = CreateSpaTherapistDto(); // CreateSpaTherapistDto | 
 
 try {
     final result = api_instance.partnerEmployeesControllerCreateSpaTherapist(createSpaTherapistDto);
@@ -243,7 +243,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createSpaTherapistDto** | [**CreateSpaTherapistDto**](CreateSpaTherapistDto.md)|  |
+ **createSpaTherapistDto** | [**CreateSpaTherapistDto**](CreateSpaTherapistDto.md)|  | 
 
 ### Return type
 
@@ -276,13 +276,13 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final role = role_example; // String |
-final sort = sort_example; // String |
-final clinicId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final provinceId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final districtId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final wardId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final minExperienceYears = 8.14; // num |
+final role = role_example; // String | 
+final sort = sort_example; // String | 
+final clinicId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final provinceId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final districtId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final wardId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final minExperienceYears = 8.14; // num | 
 
 try {
     final result = api_instance.partnerEmployeesControllerFindAll(role, sort, clinicId, provinceId, districtId, wardId, minExperienceYears);
@@ -296,13 +296,13 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **role** | **String**|  | [optional]
+ **role** | **String**|  | [optional] 
  **sort** | **String**|  | [optional] [default to 'default']
- **clinicId** | **String**|  | [optional]
- **provinceId** | **String**|  | [optional]
- **districtId** | **String**|  | [optional]
- **wardId** | **String**|  | [optional]
- **minExperienceYears** | **num**|  | [optional]
+ **clinicId** | **String**|  | [optional] 
+ **provinceId** | **String**|  | [optional] 
+ **districtId** | **String**|  | [optional] 
+ **wardId** | **String**|  | [optional] 
+ **minExperienceYears** | **num**|  | [optional] 
 
 ### Return type
 
@@ -335,7 +335,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.partnerEmployeesControllerFindAssignedServices(id);
@@ -349,7 +349,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -382,7 +382,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.partnerEmployeesControllerFindOne(id);
@@ -396,7 +396,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -429,7 +429,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final employeeId = employeeId_example; // String |
+final employeeId = employeeId_example; // String | 
 final period = ; // DashboardTimePeriod | Time period for employee analytics aggregation
 
 try {
@@ -444,8 +444,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **employeeId** | **String**|  |
- **period** | [**DashboardTimePeriod**](.md)| Time period for employee analytics aggregation | [optional]
+ **employeeId** | **String**|  | 
+ **period** | [**DashboardTimePeriod**](.md)| Time period for employee analytics aggregation | [optional] 
 
 ### Return type
 
@@ -535,7 +535,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **period** | [**DashboardTimePeriod**](.md)| Time period for employee analytics aggregation | [optional]
+ **period** | [**DashboardTimePeriod**](.md)| Time period for employee analytics aggregation | [optional] 
 
 ### Return type
 
@@ -611,7 +611,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     api_instance.partnerEmployeesControllerRemove(id);
@@ -624,7 +624,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -657,8 +657,8 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerEmployeesApi();
-final id = id_example; // String |
-final updateEmployeeDto = UpdateEmployeeDto(); // UpdateEmployeeDto |
+final id = id_example; // String | 
+final updateEmployeeDto = UpdateEmployeeDto(); // UpdateEmployeeDto | 
 
 try {
     final result = api_instance.partnerEmployeesControllerUpdate(id, updateEmployeeDto);
@@ -672,8 +672,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
- **updateEmployeeDto** | [**UpdateEmployeeDto**](UpdateEmployeeDto.md)|  |
+ **id** | **String**|  | 
+ **updateEmployeeDto** | [**UpdateEmployeeDto**](UpdateEmployeeDto.md)|  | 
 
 ### Return type
 

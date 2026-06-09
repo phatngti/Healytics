@@ -8,10 +8,10 @@ import 'package:admin_openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**record** | [**AdminFinancePayoutRecordDto**](AdminFinancePayoutRecordDto.md) |  |
+**record** | [**AdminFinancePayoutRecordDto**](AdminFinancePayoutRecordDto.md) |  | 
 **includedTransactions** | [**List<AdminFinanceTransactionRecordDto>**](AdminFinanceTransactionRecordDto.md) |  | [default to const []]
 **attempts** | [**List<AdminFinancePayoutAttemptDto>**](AdminFinancePayoutAttemptDto.md) |  | [default to const []]
-**maskedDestination** | **String** |  |
+**maskedDestination** | **String** |  | 
 **auditTrail** | [**List<AdminFinanceAuditEventDto>**](AdminFinanceAuditEventDto.md) |  | [default to const []]
 **notes** | [**List<AdminFinanceNoteDto>**](AdminFinanceNoteDto.md) |  | [default to const []]
 

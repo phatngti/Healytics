@@ -9,7 +9,7 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**metricsControllerCollect**](ObservabilityApi.md#metricscontrollercollect) | **GET** /metrics |
+[**metricsControllerCollect**](ObservabilityApi.md#metricscontrollercollect) | **GET** /metrics | 
 
 
 # **metricsControllerCollect**

@@ -64,7 +64,7 @@ class UserAppointmentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AppointmentResponseDto',) as AppointmentResponseDto;
-
+    
     }
     return null;
   }
@@ -117,7 +117,7 @@ class UserAppointmentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ServiceManualResponseDto',) as ServiceManualResponseDto;
-
+    
     }
     return null;
   }

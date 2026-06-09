@@ -24,7 +24,7 @@ Generative Ai Stream
 import 'package:admin_openapi/api.dart';
 
 final api_instance = ChatbotApi();
-final chatbotRequest = ChatbotRequest(); // ChatbotRequest |
+final chatbotRequest = ChatbotRequest(); // ChatbotRequest | 
 
 try {
     final result = api_instance.generativeAiStreamGenerativeAiStreamPost(chatbotRequest);
@@ -38,7 +38,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **chatbotRequest** | [**ChatbotRequest**](ChatbotRequest.md)|  |
+ **chatbotRequest** | [**ChatbotRequest**](ChatbotRequest.md)|  | 
 
 ### Return type
 
@@ -66,8 +66,8 @@ import 'package:admin_openapi/api.dart';
 
 final api_instance = ChatbotApi();
 final userId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | Account / user UUID
-final page = 56; // int |
-final limit = 56; // int |
+final page = 56; // int | 
+final limit = 56; // int | 
 
 try {
     final result = api_instance.getConversationsChatbotConversationsGet(userId, page, limit);
@@ -81,7 +81,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **userId** | **String**| Account / user UUID |
+ **userId** | **String**| Account / user UUID | 
  **page** | **int**|  | [optional] [default to 1]
  **limit** | **int**|  | [optional] [default to 10]
 
@@ -110,10 +110,10 @@ Get Messages
 import 'package:admin_openapi/api.dart';
 
 final api_instance = ChatbotApi();
-final conversationId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final conversationId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
 final userId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | Must match conversation owner
-final page = 56; // int |
-final limit = 56; // int |
+final page = 56; // int | 
+final limit = 56; // int | 
 
 try {
     final result = api_instance.getMessagesChatbotConversationsConversationIdMessagesGet(conversationId, userId, page, limit);
@@ -127,8 +127,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **conversationId** | **String**|  |
- **userId** | **String**| Must match conversation owner | [optional]
+ **conversationId** | **String**|  | 
+ **userId** | **String**| Must match conversation owner | [optional] 
  **page** | **int**|  | [optional] [default to 1]
  **limit** | **int**|  | [optional] [default to 20]
 

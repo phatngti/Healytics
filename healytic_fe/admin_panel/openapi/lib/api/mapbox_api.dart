@@ -74,7 +74,7 @@ class MapboxApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'DirectionsResponseDto',) as DirectionsResponseDto;
-
+    
     }
     return null;
   }
@@ -137,7 +137,7 @@ class MapboxApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'DistanceMatrixResponseDto',) as DistanceMatrixResponseDto;
-
+    
     }
     return null;
   }
@@ -193,7 +193,7 @@ class MapboxApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GeocodeResponseDto',) as GeocodeResponseDto;
-
+    
     }
     return null;
   }
@@ -237,7 +237,7 @@ class MapboxApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ClientKeyResponseDto',) as ClientKeyResponseDto;
-
+    
     }
     return null;
   }
@@ -300,7 +300,7 @@ class MapboxApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'GeocodeResponseDto',) as GeocodeResponseDto;
-
+    
     }
     return null;
   }

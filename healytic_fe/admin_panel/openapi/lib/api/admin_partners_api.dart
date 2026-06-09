@@ -66,7 +66,7 @@ class AdminPartnersApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminPartnerDetailResponseDto',) as AdminPartnerDetailResponseDto;
-
+    
     }
     return null;
   }
@@ -178,7 +178,7 @@ class AdminPartnersApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminPartnerStatsResponseDto',) as AdminPartnerStatsResponseDto;
-
+    
     }
     return null;
   }
@@ -290,7 +290,7 @@ class AdminPartnersApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'AdminPartnersResponseDto',) as AdminPartnersResponseDto;
-
+    
     }
     return null;
   }
@@ -402,7 +402,7 @@ class AdminPartnersApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'TotalPartnersResponseDto',) as TotalPartnersResponseDto;
-
+    
     }
     return null;
   }
@@ -461,7 +461,7 @@ class AdminPartnersApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'ReviewPartnerResponseDto',) as ReviewPartnerResponseDto;
-
+    
     }
     return null;
   }

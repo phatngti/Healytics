@@ -117,7 +117,7 @@ class UserPaymentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SavedPaymentCardDto',) as SavedPaymentCardDto;
-
+    
     }
     return null;
   }
@@ -174,7 +174,7 @@ class UserPaymentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
-
+    
     }
     return null;
   }
@@ -231,7 +231,7 @@ class UserPaymentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'StripePaymentResponseDto',) as StripePaymentResponseDto;
-
+    
     }
     return null;
   }
@@ -275,7 +275,7 @@ class UserPaymentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CreateStripeSetupIntentResponseDto',) as CreateStripeSetupIntentResponseDto;
-
+    
     }
     return null;
   }
@@ -435,7 +435,7 @@ class UserPaymentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Object',) as Object;
-
+    
     }
     return null;
   }
@@ -488,7 +488,7 @@ class UserPaymentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'StripeRefundResponseDto',) as StripeRefundResponseDto;
-
+    
     }
     return null;
   }
@@ -541,7 +541,7 @@ class UserPaymentsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SavedPaymentCardDto',) as SavedPaymentCardDto;
-
+    
     }
     return null;
   }

@@ -37,7 +37,7 @@ Public endpoint for pre-registration email uniqueness validation.
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final checkEmailDto = CheckEmailDto(); // CheckEmailDto |
+final checkEmailDto = CheckEmailDto(); // CheckEmailDto | 
 
 try {
     final result = api_instance.authControllerCheckEmail(checkEmailDto);
@@ -51,7 +51,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **checkEmailDto** | [**CheckEmailDto**](CheckEmailDto.md)|  |
+ **checkEmailDto** | [**CheckEmailDto**](CheckEmailDto.md)|  | 
 
 ### Return type
 
@@ -80,7 +80,7 @@ Returns a generic success response to avoid exposing whether an email is registe
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final forgotPasswordDto = ForgotPasswordDto(); // ForgotPasswordDto |
+final forgotPasswordDto = ForgotPasswordDto(); // ForgotPasswordDto | 
 
 try {
     final result = api_instance.authControllerForgotUserPassword(forgotPasswordDto);
@@ -94,7 +94,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **forgotPasswordDto** | [**ForgotPasswordDto**](ForgotPasswordDto.md)|  |
+ **forgotPasswordDto** | [**ForgotPasswordDto**](ForgotPasswordDto.md)|  | 
 
 ### Return type
 
@@ -121,7 +121,7 @@ Login as admin
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final adminLoginDto = AdminLoginDto(); // AdminLoginDto |
+final adminLoginDto = AdminLoginDto(); // AdminLoginDto | 
 
 try {
     final result = api_instance.authControllerLoginAdmin(adminLoginDto);
@@ -135,7 +135,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **adminLoginDto** | [**AdminLoginDto**](AdminLoginDto.md)|  |
+ **adminLoginDto** | [**AdminLoginDto**](AdminLoginDto.md)|  | 
 
 ### Return type
 
@@ -162,7 +162,7 @@ Login as an employee
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final employeeLoginDto = EmployeeLoginDto(); // EmployeeLoginDto |
+final employeeLoginDto = EmployeeLoginDto(); // EmployeeLoginDto | 
 
 try {
     final result = api_instance.authControllerLoginEmployee(employeeLoginDto);
@@ -176,7 +176,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **employeeLoginDto** | [**EmployeeLoginDto**](EmployeeLoginDto.md)|  |
+ **employeeLoginDto** | [**EmployeeLoginDto**](EmployeeLoginDto.md)|  | 
 
 ### Return type
 
@@ -203,7 +203,7 @@ Login as a partner
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final partnerLoginDto = PartnerLoginDto(); // PartnerLoginDto |
+final partnerLoginDto = PartnerLoginDto(); // PartnerLoginDto | 
 
 try {
     final result = api_instance.authControllerLoginPartner(partnerLoginDto);
@@ -217,7 +217,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **partnerLoginDto** | [**PartnerLoginDto**](PartnerLoginDto.md)|  |
+ **partnerLoginDto** | [**PartnerLoginDto**](PartnerLoginDto.md)|  | 
 
 ### Return type
 
@@ -244,7 +244,7 @@ Login as a user
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final loginDto = LoginDto(); // LoginDto |
+final loginDto = LoginDto(); // LoginDto | 
 
 try {
     final result = api_instance.authControllerLoginUser(loginDto);
@@ -258,7 +258,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **loginDto** | [**LoginDto**](LoginDto.md)|  |
+ **loginDto** | [**LoginDto**](LoginDto.md)|  | 
 
 ### Return type
 
@@ -322,7 +322,7 @@ Refresh authentication tokens
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final refreshTokenRequestDto = RefreshTokenRequestDto(); // RefreshTokenRequestDto |
+final refreshTokenRequestDto = RefreshTokenRequestDto(); // RefreshTokenRequestDto | 
 
 try {
     final result = api_instance.authControllerRefresh(refreshTokenRequestDto);
@@ -336,7 +336,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **refreshTokenRequestDto** | [**RefreshTokenRequestDto**](RefreshTokenRequestDto.md)|  |
+ **refreshTokenRequestDto** | [**RefreshTokenRequestDto**](RefreshTokenRequestDto.md)|  | 
 
 ### Return type
 
@@ -363,7 +363,7 @@ Refresh employee tokens
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final refreshTokenRequestDto = RefreshTokenRequestDto(); // RefreshTokenRequestDto |
+final refreshTokenRequestDto = RefreshTokenRequestDto(); // RefreshTokenRequestDto | 
 
 try {
     final result = api_instance.authControllerRefreshEmployee(refreshTokenRequestDto);
@@ -377,7 +377,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **refreshTokenRequestDto** | [**RefreshTokenRequestDto**](RefreshTokenRequestDto.md)|  |
+ **refreshTokenRequestDto** | [**RefreshTokenRequestDto**](RefreshTokenRequestDto.md)|  | 
 
 ### Return type
 
@@ -404,7 +404,7 @@ Refresh partner tokens with verification info
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final refreshTokenRequestDto = RefreshTokenRequestDto(); // RefreshTokenRequestDto |
+final refreshTokenRequestDto = RefreshTokenRequestDto(); // RefreshTokenRequestDto | 
 
 try {
     final result = api_instance.authControllerRefreshPartner(refreshTokenRequestDto);
@@ -418,7 +418,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **refreshTokenRequestDto** | [**RefreshTokenRequestDto**](RefreshTokenRequestDto.md)|  |
+ **refreshTokenRequestDto** | [**RefreshTokenRequestDto**](RefreshTokenRequestDto.md)|  | 
 
 ### Return type
 
@@ -447,7 +447,7 @@ Creates business entity, legal representative, and returns auth tokens immediate
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final registerPartnerDto = RegisterPartnerDto(); // RegisterPartnerDto |
+final registerPartnerDto = RegisterPartnerDto(); // RegisterPartnerDto | 
 
 try {
     final result = api_instance.authControllerRegisterPartner(registerPartnerDto);
@@ -461,7 +461,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **registerPartnerDto** | [**RegisterPartnerDto**](RegisterPartnerDto.md)|  |
+ **registerPartnerDto** | [**RegisterPartnerDto**](RegisterPartnerDto.md)|  | 
 
 ### Return type
 
@@ -488,7 +488,7 @@ Register a new user
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final registerDto = RegisterDto(); // RegisterDto |
+final registerDto = RegisterDto(); // RegisterDto | 
 
 try {
     final result = api_instance.authControllerRegisterUser(registerDto);
@@ -502,7 +502,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **registerDto** | [**RegisterDto**](RegisterDto.md)|  |
+ **registerDto** | [**RegisterDto**](RegisterDto.md)|  | 
 
 ### Return type
 
@@ -529,7 +529,7 @@ Reset a user password with validated reset token
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final resetPasswordDto = ResetPasswordDto(); // ResetPasswordDto |
+final resetPasswordDto = ResetPasswordDto(); // ResetPasswordDto | 
 
 try {
     final result = api_instance.authControllerResetUserPassword(resetPasswordDto);
@@ -543,7 +543,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **resetPasswordDto** | [**ResetPasswordDto**](ResetPasswordDto.md)|  |
+ **resetPasswordDto** | [**ResetPasswordDto**](ResetPasswordDto.md)|  | 
 
 ### Return type
 
@@ -570,7 +570,7 @@ Validate a user password reset code
 import 'package:admin_openapi/api.dart';
 
 final api_instance = AuthenticationApi();
-final validatePasswordResetCodeDto = ValidatePasswordResetCodeDto(); // ValidatePasswordResetCodeDto |
+final validatePasswordResetCodeDto = ValidatePasswordResetCodeDto(); // ValidatePasswordResetCodeDto | 
 
 try {
     final result = api_instance.authControllerValidateUserPasswordResetCode(validatePasswordResetCodeDto);
@@ -584,7 +584,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **validatePasswordResetCodeDto** | [**ValidatePasswordResetCodeDto**](ValidatePasswordResetCodeDto.md)|  |
+ **validatePasswordResetCodeDto** | [**ValidatePasswordResetCodeDto**](ValidatePasswordResetCodeDto.md)|  | 
 
 ### Return type
 

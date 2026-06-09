@@ -45,8 +45,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **period** | [**EmployeeRevenuePeriod**](.md)| Time period for revenue aggregation | [optional]
- **date** | **String**| Reference date for the period (defaults to today) | [optional]
+ **period** | [**EmployeeRevenuePeriod**](.md)| Time period for revenue aggregation | [optional] 
+ **date** | **String**| Reference date for the period (defaults to today) | [optional] 
 
 ### Return type
 
@@ -94,8 +94,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **period** | [**EmployeeRevenuePeriod**](.md)| Time period for revenue aggregation | [optional]
- **date** | **String**| Reference date for the period (defaults to today) | [optional]
+ **period** | [**EmployeeRevenuePeriod**](.md)| Time period for revenue aggregation | [optional] 
+ **date** | **String**| Reference date for the period (defaults to today) | [optional] 
 
 ### Return type
 
@@ -143,8 +143,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **period** | [**EmployeeRevenuePeriod**](.md)| Time period for revenue aggregation | [optional]
- **date** | **String**| Reference date for the period (defaults to today) | [optional]
+ **period** | [**EmployeeRevenuePeriod**](.md)| Time period for revenue aggregation | [optional] 
+ **date** | **String**| Reference date for the period (defaults to today) | [optional] 
 
 ### Return type
 

@@ -36,8 +36,8 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerServiceTagsApi();
-final id = id_example; // String |
-final productId = productId_example; // String |
+final id = id_example; // String | 
+final productId = productId_example; // String | 
 
 try {
     final result = api_instance.serviceTagsControllerAttachToProduct(id, productId);
@@ -51,8 +51,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
- **productId** | **String**|  |
+ **id** | **String**|  | 
+ **productId** | **String**|  | 
 
 ### Return type
 
@@ -85,7 +85,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerServiceTagsApi();
-final createServiceTagDto = CreateServiceTagDto(); // CreateServiceTagDto |
+final createServiceTagDto = CreateServiceTagDto(); // CreateServiceTagDto | 
 
 try {
     final result = api_instance.serviceTagsControllerCreate(createServiceTagDto);
@@ -99,7 +99,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createServiceTagDto** | [**CreateServiceTagDto**](CreateServiceTagDto.md)|  |
+ **createServiceTagDto** | [**CreateServiceTagDto**](CreateServiceTagDto.md)|  | 
 
 ### Return type
 
@@ -132,8 +132,8 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerServiceTagsApi();
-final id = id_example; // String |
-final productId = productId_example; // String |
+final id = id_example; // String | 
+final productId = productId_example; // String | 
 
 try {
     api_instance.serviceTagsControllerDetachFromProduct(id, productId);
@@ -146,8 +146,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
- **productId** | **String**|  |
+ **id** | **String**|  | 
+ **productId** | **String**|  | 
 
 ### Return type
 
@@ -266,7 +266,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerServiceTagsApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.serviceTagsControllerFindOne(id);
@@ -280,7 +280,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -313,7 +313,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerServiceTagsApi();
-final productId = productId_example; // String |
+final productId = productId_example; // String | 
 
 try {
     final result = api_instance.serviceTagsControllerGetTagsForProduct(productId);
@@ -327,7 +327,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **productId** | **String**|  |
+ **productId** | **String**|  | 
 
 ### Return type
 
@@ -360,7 +360,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerServiceTagsApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     api_instance.serviceTagsControllerRemove(id);
@@ -373,7 +373,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -406,8 +406,8 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = PartnerServiceTagsApi();
-final id = id_example; // String |
-final updateServiceTagDto = UpdateServiceTagDto(); // UpdateServiceTagDto |
+final id = id_example; // String | 
+final updateServiceTagDto = UpdateServiceTagDto(); // UpdateServiceTagDto | 
 
 try {
     final result = api_instance.serviceTagsControllerUpdate(id, updateServiceTagDto);
@@ -421,8 +421,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
- **updateServiceTagDto** | [**UpdateServiceTagDto**](UpdateServiceTagDto.md)|  |
+ **id** | **String**|  | 
+ **updateServiceTagDto** | [**UpdateServiceTagDto**](UpdateServiceTagDto.md)|  | 
 
 ### Return type
 

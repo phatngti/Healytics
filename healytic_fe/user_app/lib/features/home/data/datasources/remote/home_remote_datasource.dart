@@ -25,7 +25,11 @@ abstract class HomeRemoteDatasource {
     int topK,
   });
 
-  Future<List<HomeProduct>> getPremiumTreatments({ServiceListFilter? filter});
+  Future<List<HomeProduct>> getPremiumTreatments({
+    ServiceListFilter? filter,
+    int? limit,
+    int? offset,
+  });
   Future<List<ServiceTag>> getServiceTags();
   Future<List<HomeSpecialist>> getFeaturedSpecialists();
 
@@ -125,20 +129,33 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   @override
   Future<List<HomeProduct>> getPremiumTreatments({
     ServiceListFilter? filter,
+    int? limit,
+    int? offset,
   }) async {
-    final response = await _getPremiumTreatmentDtos(filter);
+    final response = await _getPremiumTreatmentDtos(
+      filter,
+      limit: limit,
+      offset: offset,
+    );
 
     if (response == null) return [];
     return response.map(_mapDtoToProduct).toList();
   }
 
   Future<List<PublicHealthServiceCardResponseDto>?> _getPremiumTreatmentDtos(
-    ServiceListFilter? filter,
-  ) async {
+    ServiceListFilter? filter, {
+    int? limit,
+    int? offset,
+  }) async {
     final response = await _apiService.apiClient.invokeAPI(
       '/user/health-services/premium-treatments',
       'GET',
-      _serviceFilterQueryParams(filter, includeCategory: true),
+      _serviceFilterQueryParams(
+        filter,
+        includeCategory: true,
+        limit: limit,
+        offset: offset,
+      ),
       null,
       <String, String>{},
       <String, String>{},
@@ -151,9 +168,10 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
 
     final responseBody = utf8.decode(response.bodyBytes);
     return (await _apiService.apiClient.deserializeAsync(
-      responseBody,
-      'List<PublicHealthServiceCardResponseDto>',
-    ) as List)
+              responseBody,
+              'List<PublicHealthServiceCardResponseDto>',
+            )
+            as List)
         .cast<PublicHealthServiceCardResponseDto>()
         .toList(growable: false);
   }
@@ -378,6 +396,8 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
 List<QueryParam> _serviceFilterQueryParams(
   ServiceListFilter? filter, {
   required bool includeCategory,
+  int? limit,
+  int? offset,
 }) {
   final queryParams = <QueryParam>[];
   void add(String name, Object? value) {
@@ -395,6 +415,8 @@ List<QueryParam> _serviceFilterQueryParams(
   add('province', filter?.province);
   add('district', filter?.district);
   add('ward', filter?.ward);
+  add('limit', limit);
+  add('offset', offset);
   return queryParams;
 }
 
@@ -419,9 +441,16 @@ class HomeRemoteDatasourceMock implements HomeRemoteDatasource {
   @override
   Future<List<HomeProduct>> getPremiumTreatments({
     ServiceListFilter? filter,
+    int? limit,
+    int? offset,
   }) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return filterServiceProducts(kMockPremiumTreatments, filter);
+    final products = filterServiceProducts(kMockPremiumTreatments, filter);
+    if (limit == null && offset == null) return products;
+    final start = offset ?? 0;
+    if (start >= products.length) return [];
+    final end = limit == null ? products.length : start + limit;
+    return products.sublist(start, end.clamp(start, products.length));
   }
 
   @override

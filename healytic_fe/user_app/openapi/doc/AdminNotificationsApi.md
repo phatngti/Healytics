@@ -29,7 +29,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AdminNotificationsApi();
-final createBroadcastDto = CreateBroadcastDto(); // CreateBroadcastDto |
+final createBroadcastDto = CreateBroadcastDto(); // CreateBroadcastDto | 
 
 try {
     final result = api_instance.adminNotificationControllerCreateBroadcast(createBroadcastDto);
@@ -43,7 +43,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createBroadcastDto** | [**CreateBroadcastDto**](CreateBroadcastDto.md)|  |
+ **createBroadcastDto** | [**CreateBroadcastDto**](CreateBroadcastDto.md)|  | 
 
 ### Return type
 

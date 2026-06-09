@@ -1,10 +1,12 @@
 import { Type } from 'class-transformer';
 import {
   IsEnum,
+  IsInt,
   IsNumber,
   IsOptional,
   IsString,
   IsUUID,
+  Max,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -114,4 +116,30 @@ export class PublicServiceListQueryDto {
   @Type(() => Number)
   @IsNumber()
   lng?: number;
+
+  @ApiPropertyOptional({
+    type: Number,
+    minimum: 1,
+    maximum: 50,
+    default: 50,
+    description: 'Maximum number of services to return',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  limit?: number = 50;
+
+  @ApiPropertyOptional({
+    type: Number,
+    minimum: 0,
+    default: 0,
+    description: 'Number of services to skip',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  offset?: number = 0;
 }

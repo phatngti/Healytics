@@ -30,7 +30,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserReviewsApi();
-final createFacilityReviewDto = CreateFacilityReviewDto(); // CreateFacilityReviewDto |
+final createFacilityReviewDto = CreateFacilityReviewDto(); // CreateFacilityReviewDto | 
 
 try {
     final result = api_instance.userReviewControllerSubmitFacilityReview(createFacilityReviewDto);
@@ -44,7 +44,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createFacilityReviewDto** | [**CreateFacilityReviewDto**](CreateFacilityReviewDto.md)|  |
+ **createFacilityReviewDto** | [**CreateFacilityReviewDto**](CreateFacilityReviewDto.md)|  | 
 
 ### Return type
 
@@ -77,7 +77,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserReviewsApi();
-final createSpecialistReviewDto = CreateSpecialistReviewDto(); // CreateSpecialistReviewDto |
+final createSpecialistReviewDto = CreateSpecialistReviewDto(); // CreateSpecialistReviewDto | 
 
 try {
     final result = api_instance.userReviewControllerSubmitSpecialistReview(createSpecialistReviewDto);
@@ -91,7 +91,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createSpecialistReviewDto** | [**CreateSpecialistReviewDto**](CreateSpecialistReviewDto.md)|  |
+ **createSpecialistReviewDto** | [**CreateSpecialistReviewDto**](CreateSpecialistReviewDto.md)|  | 
 
 ### Return type
 
@@ -124,7 +124,7 @@ import 'package:admin_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserReviewsApi();
-final createTreatmentReviewDto = CreateTreatmentReviewDto(); // CreateTreatmentReviewDto |
+final createTreatmentReviewDto = CreateTreatmentReviewDto(); // CreateTreatmentReviewDto | 
 
 try {
     final result = api_instance.userReviewControllerSubmitTreatmentReview(createTreatmentReviewDto);
@@ -138,7 +138,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **createTreatmentReviewDto** | [**CreateTreatmentReviewDto**](CreateTreatmentReviewDto.md)|  |
+ **createTreatmentReviewDto** | [**CreateTreatmentReviewDto**](CreateTreatmentReviewDto.md)|  | 
 
 ### Return type
 

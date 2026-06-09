@@ -44,9 +44,9 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **targetId** | **String**| Filter by Target ID | [optional]
- **actorId** | **String**| Filter by Actor ID | [optional]
- **action** | **String**| Filter by Action type | [optional]
+ **targetId** | **String**| Filter by Target ID | [optional] 
+ **actorId** | **String**| Filter by Actor ID | [optional] 
+ **action** | **String**| Filter by Action type | [optional] 
 
 ### Return type
 

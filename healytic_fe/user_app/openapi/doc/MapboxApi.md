@@ -41,8 +41,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **origin** | **String**| Origin coordinate in lat,lng format |
- **destination** | **String**| Destination coordinate in lat,lng format |
+ **origin** | **String**| Origin coordinate in lat,lng format | 
+ **destination** | **String**| Destination coordinate in lat,lng format | 
 
 ### Return type
 
@@ -84,8 +84,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **origins** | **String**| Origins — pipe-separated coordinates or addresses (e.g. \"10.762,106.660|10.823,106.629\") |
- **destinations** | **String**| Destinations — pipe-separated coordinates or addresses (e.g. \"10.823,106.629|10.800,106.700\") |
+ **origins** | **String**| Origins — pipe-separated coordinates or addresses (e.g. \"10.762,106.660|10.823,106.629\") | 
+ **destinations** | **String**| Destinations — pipe-separated coordinates or addresses (e.g. \"10.823,106.629|10.800,106.700\") | 
 
 ### Return type
 
@@ -126,7 +126,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **address** | **String**| Address to geocode |
+ **address** | **String**| Address to geocode | 
 
 ### Return type
 
@@ -205,8 +205,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **lat** | **num**| Latitude |
- **lng** | **num**| Longitude |
+ **lat** | **num**| Latitude | 
+ **lng** | **num**| Longitude | 
 
 ### Return type
 

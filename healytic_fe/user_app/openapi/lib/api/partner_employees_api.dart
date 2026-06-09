@@ -63,7 +63,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
-
+    
     }
     return null;
   }
@@ -115,7 +115,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SkillCatalogResponseDto',) as SkillCatalogResponseDto;
-
+    
     }
     return null;
   }
@@ -167,7 +167,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
-
+    
     }
     return null;
   }
@@ -219,7 +219,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'SkillCatalogResponseDto',) as SkillCatalogResponseDto;
-
+    
     }
     return null;
   }
@@ -271,7 +271,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
-
+    
     }
     return null;
   }
@@ -481,7 +481,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
-
+    
     }
     return null;
   }
@@ -544,7 +544,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeDetailAnalyticsResponseDto',) as EmployeeDetailAnalyticsResponseDto;
-
+    
     }
     return null;
   }
@@ -649,7 +649,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeOverviewAnalyticsResponseDto',) as EmployeeOverviewAnalyticsResponseDto;
-
+    
     }
     return null;
   }
@@ -798,7 +798,7 @@ class PartnerEmployeesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'EmployeeResponseDto',) as EmployeeResponseDto;
-
+    
     }
     return null;
   }

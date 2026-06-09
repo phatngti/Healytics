@@ -217,7 +217,7 @@ class PartnerPayoutsApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PartnerPayoutRecordDto',) as PartnerPayoutRecordDto;
-
+    
     }
     return null;
   }

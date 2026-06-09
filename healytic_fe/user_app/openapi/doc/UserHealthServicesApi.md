@@ -36,7 +36,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserHealthServicesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userHealthServiceControllerFindOne(id);
@@ -50,7 +50,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -83,7 +83,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserHealthServicesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userHealthServiceControllerGetClinicInfo(id);
@@ -97,7 +97,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -132,7 +132,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserHealthServicesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userHealthServiceControllerGetEligibilityDetail(id);
@@ -146,7 +146,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -222,14 +222,14 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserHealthServicesApi();
-final sort = sort_example; // String |
-final minPrice = 8.14; // num |
-final maxPrice = 8.14; // num |
-final categoryId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final clinicId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final provinceId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final districtId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
-final wardId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final sort = sort_example; // String | 
+final minPrice = 8.14; // num | 
+final maxPrice = 8.14; // num | 
+final categoryId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final clinicId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final provinceId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final districtId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final wardId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
 final lat = 8.14; // num | User latitude
 final lng = 8.14; // num | User longitude
 
@@ -246,15 +246,15 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **sort** | **String**|  | [optional] [default to 'default']
- **minPrice** | **num**|  | [optional]
- **maxPrice** | **num**|  | [optional]
- **categoryId** | **String**|  | [optional]
- **clinicId** | **String**|  | [optional]
- **provinceId** | **String**|  | [optional]
- **districtId** | **String**|  | [optional]
- **wardId** | **String**|  | [optional]
- **lat** | **num**| User latitude | [optional]
- **lng** | **num**| User longitude | [optional]
+ **minPrice** | **num**|  | [optional] 
+ **maxPrice** | **num**|  | [optional] 
+ **categoryId** | **String**|  | [optional] 
+ **clinicId** | **String**|  | [optional] 
+ **provinceId** | **String**|  | [optional] 
+ **districtId** | **String**|  | [optional] 
+ **wardId** | **String**|  | [optional] 
+ **lat** | **num**| User latitude | [optional] 
+ **lng** | **num**| User longitude | [optional] 
 
 ### Return type
 
@@ -287,7 +287,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserHealthServicesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userHealthServiceControllerGetProductEmployees(id);
@@ -301,7 +301,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -334,7 +334,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserHealthServicesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userHealthServiceControllerGetProductInfo(id);
@@ -348,7 +348,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -381,7 +381,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserHealthServicesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userHealthServiceControllerGetProductReviews(id);
@@ -395,7 +395,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 
@@ -428,7 +428,7 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserHealthServicesApi();
-final id = id_example; // String |
+final id = id_example; // String | 
 
 try {
     final result = api_instance.userHealthServiceControllerGetRecommendedProducts(id);
@@ -442,7 +442,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**|  |
+ **id** | **String**|  | 
 
 ### Return type
 

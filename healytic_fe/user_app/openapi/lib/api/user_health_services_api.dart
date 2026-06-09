@@ -64,7 +64,7 @@ class UserHealthServicesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PublicHealthServiceResponseDto',) as PublicHealthServiceResponseDto;
-
+    
     }
     return null;
   }
@@ -117,7 +117,7 @@ class UserHealthServicesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PublicClinicInfoResponseDto',) as PublicClinicInfoResponseDto;
-
+    
     }
     return null;
   }
@@ -174,7 +174,7 @@ class UserHealthServicesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'UserEligibilityDetailResponseDto',) as UserEligibilityDetailResponseDto;
-
+    
     }
     return null;
   }
@@ -456,7 +456,7 @@ class UserHealthServicesApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'PublicHealthServiceInfoResponseDto',) as PublicHealthServiceInfoResponseDto;
-
+    
     }
     return null;
   }
