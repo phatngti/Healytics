@@ -9,7 +9,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'employee.provider.freezed.dart';
 part 'employee.provider.g.dart';
 
-enum EmployeeTableSort { name, position, rating, reviewCount, status }
+enum EmployeeTableSort {
+  name,
+  position,
+  rating,
+  reviewCount,
+  status,
+  createdAt,
+}
 
 enum EmployeeRoleFilter { all, doctor, therapist, receptionist, manager }
 
@@ -96,7 +103,7 @@ class EmployeeNotifier extends _$EmployeeNotifier {
     final current = _currentState;
     final nextAscending = current.sortBy == sortBy
         ? !current.sortAscending
-        : true;
+        : _defaultSortAscending(sortBy);
     _setTableState(
       current.copyWith(
         sortBy: sortBy,
@@ -333,6 +340,10 @@ class EmployeeNotifier extends _$EmployeeNotifier {
         EmployeeTableSort.rating => a.rating.compareTo(b.rating),
         EmployeeTableSort.reviewCount => a.reviewCount.compareTo(b.reviewCount),
         EmployeeTableSort.status => _compareText(a.status, b.status),
+        EmployeeTableSort.createdAt => _compareNullableDateTime(
+          a.createdAt,
+          b.createdAt,
+        ),
       };
       return query.sortAscending ? comparison : -comparison;
     });
@@ -364,5 +375,19 @@ class EmployeeNotifier extends _$EmployeeNotifier {
 
   int _compareText(String a, String b) {
     return a.toLowerCase().compareTo(b.toLowerCase());
+  }
+
+  bool _defaultSortAscending(EmployeeTableSort sortBy) {
+    return switch (sortBy) {
+      EmployeeTableSort.createdAt => false,
+      _ => true,
+    };
+  }
+
+  int _compareNullableDateTime(DateTime? a, DateTime? b) {
+    if (a == null && b == null) return 0;
+    if (a == null) return -1;
+    if (b == null) return 1;
+    return a.compareTo(b);
   }
 }

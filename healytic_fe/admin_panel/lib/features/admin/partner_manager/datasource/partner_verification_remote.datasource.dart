@@ -973,6 +973,7 @@ class PartnerVerificationRemoteDataSourceMock
           return sortedAsc == true ? cmp : -cmp;
         });
       case 'submittedAt':
+      case 'createdAt':
       default:
         filtered.sort(
           (a, b) => sortedAsc == true

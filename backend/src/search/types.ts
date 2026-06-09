@@ -16,6 +16,12 @@ export interface BookingSearchDocument {
   priceVnd?: number | null;
   clinicName?: string | null;
   clinicAddress?: string | null;
+  clinicNameSearch?: string | null;
+  clinicAddressSearch?: string | null;
+  provinceName?: string | null;
+  districtName?: string | null;
+  wardName?: string | null;
+  locationText?: string | null;
   specialistId?: string;
   eligibilityId?: string | null;
   avatarUrl?: string | null;

@@ -126,20 +126,36 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
   Future<List<HomeProduct>> getPremiumTreatments({
     ServiceListFilter? filter,
   }) async {
-    final response = await _apiService.userHealthServicesApi
-        .userHealthServiceControllerGetPremiumTreatments(
-          sort: filter?.sort.apiValue,
-          minPrice: filter?.minPrice,
-          maxPrice: filter?.maxPrice,
-          categoryId: filter?.categoryId,
-          clinicId: filter?.clinicId,
-          provinceId: filter?.provinceId,
-          districtId: filter?.districtId,
-          wardId: filter?.wardId,
-        );
+    final response = await _getPremiumTreatmentDtos(filter);
 
     if (response == null) return [];
     return response.map(_mapDtoToProduct).toList();
+  }
+
+  Future<List<PublicHealthServiceCardResponseDto>?> _getPremiumTreatmentDtos(
+    ServiceListFilter? filter,
+  ) async {
+    final response = await _apiService.apiClient.invokeAPI(
+      '/user/health-services/premium-treatments',
+      'GET',
+      _serviceFilterQueryParams(filter, includeCategory: true),
+      null,
+      <String, String>{},
+      <String, String>{},
+      null,
+    );
+    if (response.statusCode >= 400) {
+      throw ApiException(response.statusCode, response.body);
+    }
+    if (response.body.isEmpty) return null;
+
+    final responseBody = utf8.decode(response.bodyBytes);
+    return (await _apiService.apiClient.deserializeAsync(
+      responseBody,
+      'List<PublicHealthServiceCardResponseDto>',
+    ) as List)
+        .cast<PublicHealthServiceCardResponseDto>()
+        .toList(growable: false);
   }
 
   /// Maps a [PublicHealthServiceCardResponseDto] to a
@@ -357,6 +373,29 @@ class HomeRemoteDatasourceImpl implements HomeRemoteDatasource {
     final day = value.day.toString().padLeft(2, '0');
     return '${value.year}-$month-$day';
   }
+}
+
+List<QueryParam> _serviceFilterQueryParams(
+  ServiceListFilter? filter, {
+  required bool includeCategory,
+}) {
+  final queryParams = <QueryParam>[];
+  void add(String name, Object? value) {
+    if (value == null) return;
+    final text = value.toString().trim();
+    if (text.isEmpty) return;
+    queryParams.add(QueryParam(name, text));
+  }
+
+  add('sort', filter?.sort.apiValue);
+  add('minPrice', filter?.minPrice);
+  add('maxPrice', filter?.maxPrice);
+  if (includeCategory) add('categoryId', filter?.categoryId);
+  add('clinic', filter?.clinic);
+  add('province', filter?.province);
+  add('district', filter?.district);
+  add('ward', filter?.ward);
+  return queryParams;
 }
 
 /// Mock implementation that returns fake data after a

@@ -10,6 +10,12 @@ _Product _$ProductFromJson(Map<String, dynamic> json) => _Product(
   id: ProductId.fromJson(json['id']),
   name: json['name'] as String,
   description: json['description'] as String,
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
   productType: json['productType'] as String? ?? 'service',
   basePrice: (json['basePrice'] as num).toDouble(),
   salePrice: (json['salePrice'] as num?)?.toDouble(),
@@ -50,6 +56,8 @@ Map<String, dynamic> _$ProductToJson(_Product instance) => <String, dynamic>{
   'id': instance.id.toJson(),
   'name': instance.name,
   'description': instance.description,
+  'createdAt': instance.createdAt?.toIso8601String(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
   'productType': instance.productType,
   'basePrice': instance.basePrice,
   'salePrice': instance.salePrice,

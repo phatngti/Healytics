@@ -39,15 +39,15 @@ class PartnerFunctionButtons {
             mainAxisSize: MainAxisSize.min,
             children: [
               _sortOption(
-                label: 'Date Submitted (Newest)',
-                sortBy: 'submittedAt',
+                label: 'Created At (Newest)',
+                sortBy: 'createdAt',
                 sortAsc: false,
                 state: state,
                 onTap: notifier.setSort,
               ),
               _sortOption(
-                label: 'Date Submitted (Oldest)',
-                sortBy: 'submittedAt',
+                label: 'Created At (Oldest)',
+                sortBy: 'createdAt',
                 sortAsc: true,
                 state: state,
                 onTap: notifier.setSort,

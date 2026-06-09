@@ -15,6 +15,7 @@ import { RemoveHealthServiceHandler } from './application/handlers/remove-health
 import { GetOverviewAnalyticsHandler } from './application/handlers/get-overview-analytics.handler';
 import { GetDetailAnalyticsHandler } from './application/handlers/get-detail-analytics.handler';
 import { PartnersService } from '@/partners/partners.service';
+import { ElasticsearchBookingService } from '@/search/services/elasticsearch-booking.service';
 import {
   MockRepository,
   MockHandler,
@@ -36,6 +37,10 @@ describe('HealthServiceService', () => {
   let overviewAnalyticsHandler: MockHandler;
   let detailAnalyticsHandler: MockHandler;
   let partnersService: MockType<PartnersService>;
+  let elasticsearchBookingService: {
+    isAvailable: boolean;
+    searchServiceIds: jest.Mock;
+  };
 
   beforeEach(async () => {
     // Arrange - Create fresh mocks for each test
@@ -49,6 +54,10 @@ describe('HealthServiceService', () => {
     removeHandler = createMockHandler();
     overviewAnalyticsHandler = createMockHandler();
     detailAnalyticsHandler = createMockHandler();
+    elasticsearchBookingService = {
+      isAvailable: false,
+      searchServiceIds: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -101,6 +110,10 @@ describe('HealthServiceService', () => {
               .mockResolvedValue({ id: 'partner-uuid' }),
             getFirstHealthPartner: jest.fn().mockResolvedValue(null),
           },
+        },
+        {
+          provide: ElasticsearchBookingService,
+          useValue: elasticsearchBookingService,
         },
       ],
     }).compile();
@@ -181,7 +194,7 @@ describe('HealthServiceService', () => {
   });
 
   describe('findAll', () => {
-    it('should return all products with relations ordered by createdAt DESC', async () => {
+    it('should return all products with relations ordered by createdAt DESC and id DESC', async () => {
       // Arrange
       const expectedProducts = [
         { id: 'uuid-1', name: 'Product 1' },
@@ -197,7 +210,7 @@ describe('HealthServiceService', () => {
       expect(productRepository.find).toHaveBeenCalledWith(
         expect.objectContaining({
           relations: expect.any(Array),
-          order: { createdAt: 'DESC' },
+          order: { createdAt: 'DESC', id: 'DESC' },
         }),
       );
     });
@@ -510,6 +523,36 @@ describe('HealthServiceService', () => {
 
       // Assert
       expect(result).toEqual([]);
+    });
+
+    it('should narrow clinic and location text filters through Elasticsearch', async () => {
+      // Arrange
+      elasticsearchBookingService.isAvailable = true;
+      elasticsearchBookingService.searchServiceIds
+        .mockResolvedValueOnce(['service-1', 'service-2'])
+        .mockResolvedValueOnce(['service-2', 'service-3']);
+      const qb = productRepository.createQueryBuilder();
+      qb.getMany.mockResolvedValue([]);
+
+      // Act
+      await service.getPremiumTreatments({
+        clinic: 'Healytics',
+        district: 'District 1',
+      });
+
+      // Assert
+      expect(elasticsearchBookingService.searchServiceIds).toHaveBeenCalledWith(
+        'Healytics',
+        ['clinicNameSearch', 'clinicAddressSearch'],
+      );
+      expect(elasticsearchBookingService.searchServiceIds).toHaveBeenCalledWith(
+        'District 1',
+        ['districtName', 'locationText'],
+      );
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        'product.id IN (:...textFilteredServiceIds)',
+        { textFilteredServiceIds: ['service-2'] },
+      );
     });
   });
 

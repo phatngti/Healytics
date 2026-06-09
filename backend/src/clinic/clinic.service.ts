@@ -287,24 +287,27 @@ export class ClinicService {
             .andWhere('b.status = :completedStatus');
         }, 'sold_count')
         .setParameter('completedStatus', BookingStatus.COMPLETED)
-        .orderBy('sold_count', 'DESC');
+        .orderBy('sold_count', 'DESC')
+        .addOrderBy('p.id', 'DESC');
     } else {
       switch (sort) {
         case 'latest':
-          qb = qb.orderBy('p.createdAt', 'DESC');
+          qb = qb.orderBy('p.createdAt', 'DESC').addOrderBy('p.id', 'DESC');
           break;
         case 'price_asc':
           qb = qb
             .addSelect('COALESCE(p.sale_price, p.base_price)', 'price')
-            .orderBy('price', 'ASC');
+            .orderBy('price', 'ASC')
+            .addOrderBy('p.id', 'ASC');
           break;
         case 'price_desc':
           qb = qb
             .addSelect('COALESCE(p.sale_price, p.base_price)', 'price')
-            .orderBy('price', 'DESC');
+            .orderBy('price', 'DESC')
+            .addOrderBy('p.id', 'DESC');
           break;
         default:
-          qb = qb.orderBy('p.createdAt', 'DESC');
+          qb = qb.orderBy('p.createdAt', 'DESC').addOrderBy('p.id', 'DESC');
       }
     }
 

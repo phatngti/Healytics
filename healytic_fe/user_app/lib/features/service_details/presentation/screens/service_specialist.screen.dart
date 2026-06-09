@@ -226,6 +226,13 @@ class _ServiceSpecialistBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasSelectedSpecialist =
+        selectedSpecialistIdx >= 0 &&
+        selectedSpecialistIdx < bookingSpecialists.length;
+    final selectedSpecialist = hasSelectedSpecialist
+        ? bookingSpecialists[selectedSpecialistIdx]
+        : null;
+
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
         textScaler: MediaQuery.of(
@@ -248,7 +255,9 @@ class _ServiceSpecialistBody extends StatelessWidget {
             else
               SpecialistCardList(
                 specialists: bookingSpecialists,
-                selectedIndex: selectedSpecialistIdx,
+                selectedIndex: hasSelectedSpecialist
+                    ? selectedSpecialistIdx
+                    : -1,
                 onSelected: onSpecialistSelected,
                 title: 'Select Specialist (Optional)',
               ),
@@ -265,9 +274,9 @@ class _ServiceSpecialistBody extends StatelessWidget {
               SizedBox(height: sectionGap),
               _SectionTitle(title: 'Available Time Slots'),
               SizedBox(height: AppDimens.spaceMd),
-              if (selectedSpecialistIdx >= 0)
+              if (selectedSpecialist != null)
                 TimeSlotSection(
-                  employeeId: bookingSpecialists[selectedSpecialistIdx].id,
+                  employeeId: selectedSpecialist.id,
                   currentServiceId: serviceId,
                   selectedDate: DateTime.now().add(
                     Duration(days: selectedDateIdx),
@@ -288,12 +297,12 @@ class _ServiceSpecialistBody extends StatelessWidget {
 
             SizedBox(height: sectionGap),
 
-            if (selectedSpecialistIdx >= 0 && bookingSpecialists.isNotEmpty)
+            if (selectedSpecialist != null)
               ReviewsSectionLoader(
-                employeeId: bookingSpecialists[selectedSpecialistIdx].id,
+                employeeId: selectedSpecialist.id,
                 onViewMoreTap: (context) => EmployeeReviewsRoute(
-                  employeeId: bookingSpecialists[selectedSpecialistIdx].id,
-                  employeeName: bookingSpecialists[selectedSpecialistIdx].name,
+                  employeeId: selectedSpecialist.id,
+                  employeeName: selectedSpecialist.name,
                 ).push(context),
               ),
 

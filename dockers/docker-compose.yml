@@ -207,30 +207,6 @@ services:
       retries: 6
       start_period: 5s
 
-  # =============================================================================
-  # Healytics Landing Page (static HTML/CSS/JS — served by Nginx)
-  # Routed publicly through Cloudflare Tunnel at app.healytics.me/demo.
-  # =============================================================================
-
-  home:
-    image: nginx:1.27-alpine
-    container_name: healytics-home
-    profiles: ["prod"]
-    restart: unless-stopped
-    volumes:
-      - ./landing-page:/usr/share/nginx/html:ro
-      - ./landing-page/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    networks:
-      services:
-        aliases:
-          - healytics-home
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/demo"]
-      interval: 10s
-      timeout: 5s
-      retries: 6
-      start_period: 5s
-
   kong-bootstrap:
     image: "${GW_IMAGE:-kong/kong-gateway:3.12.0.2}"
     container_name: kong-bootstrap

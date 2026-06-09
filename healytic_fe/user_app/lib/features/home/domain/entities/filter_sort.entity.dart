@@ -40,29 +40,29 @@ class ServiceListFilter {
     this.minPrice,
     this.maxPrice,
     this.categoryId,
-    this.clinicId,
-    this.provinceId,
-    this.districtId,
-    this.wardId,
+    this.clinic,
+    this.province,
+    this.district,
+    this.ward,
   });
 
   final ServiceListSort sort;
   final num? minPrice;
   final num? maxPrice;
   final String? categoryId;
-  final String? clinicId;
-  final String? provinceId;
-  final String? districtId;
-  final String? wardId;
+  final String? clinic;
+  final String? province;
+  final String? district;
+  final String? ward;
 
   bool get hasFilters =>
       minPrice != null ||
       maxPrice != null ||
       _hasText(categoryId) ||
-      _hasText(clinicId) ||
-      _hasText(provinceId) ||
-      _hasText(districtId) ||
-      _hasText(wardId);
+      _hasText(clinic) ||
+      _hasText(province) ||
+      _hasText(district) ||
+      _hasText(ward);
 
   bool get isActive => hasFilters || sort != ServiceListSort.defaultOrder;
 
@@ -72,10 +72,10 @@ class ServiceListFilter {
       minPrice: minPrice,
       maxPrice: maxPrice,
       categoryId: categoryId,
-      clinicId: clinicId,
-      provinceId: provinceId,
-      districtId: districtId,
-      wardId: wardId,
+      clinic: clinic,
+      province: province,
+      district: district,
+      ward: ward,
     );
   }
 }

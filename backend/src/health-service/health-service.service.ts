@@ -37,6 +37,7 @@ import { PartnersService } from '@/partners/partners.service';
 import { HealthServiceStatus } from './enums/health-service-status.enum';
 import { HealthServiceType } from './enums/health-service-type.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { ElasticsearchBookingService } from '@/search/services/elasticsearch-booking.service';
 
 @Injectable()
 export class HealthServiceService {
@@ -64,6 +65,7 @@ export class HealthServiceService {
     private readonly getOverviewAnalyticsHandler: GetOverviewAnalyticsHandler,
     private readonly getDetailAnalyticsHandler: GetDetailAnalyticsHandler,
     private readonly partnersService: PartnersService,
+    private readonly elasticsearchBookingService: ElasticsearchBookingService,
   ) {}
 
   // ─── Analytics Facades ────────────────────────────────────
@@ -130,7 +132,7 @@ export class HealthServiceService {
         'productTags',
         'productTags.tag',
       ],
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'DESC', id: 'DESC' },
     });
   }
 
@@ -218,7 +220,7 @@ export class HealthServiceService {
         },
         relations: ['media'],
         take: 3,
-        order: { createdAt: 'DESC' },
+        order: { createdAt: 'DESC', id: 'DESC' },
       });
     }
 
@@ -457,7 +459,7 @@ export class HealthServiceService {
       },
       relations: ['media'],
       take: 5,
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'DESC', id: 'DESC' },
     });
 
     const ratingsMap = await this.buildRatingsMap(recommended.map((p) => p.id));
@@ -485,7 +487,7 @@ export class HealthServiceService {
     const products = await this.productRepository.find({
       where: { partnerId: partner.id },
       relations: ['media', 'facilityImages'],
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'DESC', id: 'DESC' },
       take: 10,
     });
 
@@ -586,7 +588,7 @@ export class HealthServiceService {
       },
       relations: this.cardRelations,
       take: 10,
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'DESC', id: 'DESC' },
     });
 
     const [ratingsMap] = await Promise.all([
@@ -631,24 +633,24 @@ export class HealthServiceService {
         isVisibleOnline: true,
       });
 
-    this.applyPublicServiceFilters(qb, query);
+    await this.applyPublicServiceFilters(qb, query);
 
     const sort = query.sort ?? PublicServiceListSort.DEFAULT;
     if (sort === PublicServiceListSort.PRICE_ASC) {
-      qb.orderBy('sort_price', 'ASC');
+      qb.orderBy('sort_price', 'ASC').addOrderBy('product.id', 'ASC');
     } else if (sort === PublicServiceListSort.PRICE_DESC) {
-      qb.orderBy('sort_price', 'DESC');
+      qb.orderBy('sort_price', 'DESC').addOrderBy('product.id', 'DESC');
     } else {
-      qb.orderBy('product.createdAt', 'DESC');
+      qb.orderBy('product.createdAt', 'DESC').addOrderBy('product.id', 'DESC');
     }
 
     return qb.take(50).getMany();
   }
 
-  private applyPublicServiceFilters(
+  private async applyPublicServiceFilters(
     qb: SelectQueryBuilder<Product>,
     query: PublicServiceListQueryDto,
-  ) {
+  ): Promise<void> {
     if (query.categoryId) {
       qb.andWhere(
         `product.category_id IN (
@@ -662,28 +664,24 @@ export class HealthServiceService {
             )
         )`,
         {
-        categoryId: query.categoryId,
+          categoryId: query.categoryId,
         },
       );
     }
-    if (query.clinicId) {
-      qb.andWhere('product.partner_id = :clinicId', {
-        clinicId: query.clinicId,
-      });
+
+    const serviceIds = await this.resolveTextFilteredServiceIds(query);
+    if (serviceIds) {
+      if (serviceIds.length === 0) {
+        qb.andWhere('1 = 0');
+      } else {
+        qb.andWhere('product.id IN (:...textFilteredServiceIds)', {
+          textFilteredServiceIds: serviceIds,
+        });
+      }
+    } else {
+      this.applySqlTextFilters(qb, query);
     }
-    if (query.provinceId) {
-      qb.andWhere('partner.province_id = :provinceId', {
-        provinceId: query.provinceId,
-      });
-    }
-    if (query.districtId) {
-      qb.andWhere('partner.district_id = :districtId', {
-        districtId: query.districtId,
-      });
-    }
-    if (query.wardId) {
-      qb.andWhere('partner.ward_id = :wardId', { wardId: query.wardId });
-    }
+
     if (query.minPrice != null) {
       qb.andWhere(
         'COALESCE(product.sale_price, product.base_price) >= :minPrice',
@@ -700,6 +698,108 @@ export class HealthServiceService {
         },
       );
     }
+  }
+
+  private async resolveTextFilteredServiceIds(
+    query: PublicServiceListQueryDto,
+  ): Promise<string[] | null> {
+    if (!this.elasticsearchBookingService.isAvailable) return null;
+
+    const filters = this.serviceTextFilters(query);
+    if (filters.length === 0) return null;
+
+    let intersection: Set<string> | null = null;
+    for (const filter of filters) {
+      const ids = await this.elasticsearchBookingService.searchServiceIds(
+        filter.value,
+        filter.fields,
+      );
+      const current = new Set(ids);
+      intersection =
+        intersection == null
+          ? current
+          : new Set([...intersection].filter((id) => current.has(id)));
+
+      if (intersection.size === 0) return [];
+    }
+
+    return intersection ? [...intersection] : null;
+  }
+
+  private applySqlTextFilters(
+    qb: SelectQueryBuilder<Product>,
+    query: PublicServiceListQueryDto,
+  ): void {
+    const clinic = textQuery(query.clinic, query.clinicId);
+    if (clinic) {
+      qb.andWhere(
+        `(
+          partner.brandName ILIKE :clinicText
+          OR partner.legalName ILIKE :clinicText
+          OR partner.streetAddress ILIKE :clinicText
+        )`,
+        { clinicText: `%${clinic}%` },
+      );
+    }
+
+    const province = textQuery(query.province, query.provinceId);
+    if (province) {
+      qb.andWhere(
+        `(
+          province.fullName ILIKE :provinceText
+          OR province.name ILIKE :provinceText
+          OR province.nameEn ILIKE :provinceText
+        )`,
+        { provinceText: `%${province}%` },
+      );
+    }
+
+    const district = textQuery(query.district, query.districtId);
+    if (district) {
+      qb.andWhere(
+        `(
+          district.fullName ILIKE :districtText
+          OR district.name ILIKE :districtText
+          OR district.nameEn ILIKE :districtText
+        )`,
+        { districtText: `%${district}%` },
+      );
+    }
+
+    const ward = textQuery(query.ward, query.wardId);
+    if (ward) {
+      qb.andWhere(
+        `(
+          ward.fullName ILIKE :wardText
+          OR ward.name ILIKE :wardText
+          OR ward.nameEn ILIKE :wardText
+        )`,
+        { wardText: `%${ward}%` },
+      );
+    }
+  }
+
+  private serviceTextFilters(query: PublicServiceListQueryDto) {
+    return [
+      {
+        value: textQuery(query.clinic, query.clinicId),
+        fields: ['clinicNameSearch', 'clinicAddressSearch'],
+      },
+      {
+        value: textQuery(query.province, query.provinceId),
+        fields: ['provinceName', 'locationText'],
+      },
+      {
+        value: textQuery(query.district, query.districtId),
+        fields: ['districtName', 'locationText'],
+      },
+      {
+        value: textQuery(query.ward, query.wardId),
+        fields: ['wardName', 'locationText'],
+      },
+    ].filter((filter): filter is { value: string; fields: string[] } =>
+      Boolean(filter.value),
+    );
   }
 
   private sortPublicServiceCards(
@@ -890,4 +990,9 @@ export class HealthServiceService {
     const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
     return `${String(h12).padStart(2, '0')}:${String(minute).padStart(2, '0')} ${period}`;
   }
+}
+
+function textQuery(primary?: string, alias?: string): string | null {
+  const value = (primary ?? alias)?.trim();
+  return value && value.length >= 2 ? value : null;
 }

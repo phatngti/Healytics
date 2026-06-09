@@ -20,3 +20,35 @@ abstract class CategoryEntity with _$CategoryEntity {
   factory CategoryEntity.fromJson(Map<String, dynamic> json) =>
       _$CategoryEntityFromJson(json);
 }
+
+extension CategoryEntityDisplay on CategoryEntity {
+  String get categoryDisplayName {
+    final parent = parentName?.trim();
+    if (parent != null && parent.isNotEmpty) {
+      return parent;
+    }
+
+    if (hasParentCategory) {
+      return '';
+    }
+
+    return name.trim();
+  }
+
+  String get subCategoryDisplayName {
+    final value = name.trim();
+    if (value.isEmpty || !hasParentCategory) {
+      return '';
+    }
+
+    return value;
+  }
+
+  bool get hasParentCategory {
+    final parent = parentName?.trim();
+    final parentCategoryId = parentId?.trim();
+    return !isRoot ||
+        (parent != null && parent.isNotEmpty) ||
+        (parentCategoryId != null && parentCategoryId.isNotEmpty);
+  }
+}

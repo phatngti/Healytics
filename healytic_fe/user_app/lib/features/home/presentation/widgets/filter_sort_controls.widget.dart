@@ -238,10 +238,10 @@ class _ServiceFilterSheetState extends State<_ServiceFilterSheet> {
   late final TextEditingController _minPrice;
   late final TextEditingController _maxPrice;
   late final TextEditingController _categoryId;
-  late final TextEditingController _clinicId;
-  late final TextEditingController _provinceId;
-  late final TextEditingController _districtId;
-  late final TextEditingController _wardId;
+  late final TextEditingController _clinic;
+  late final TextEditingController _province;
+  late final TextEditingController _district;
+  late final TextEditingController _ward;
 
   @override
   void initState() {
@@ -253,10 +253,10 @@ class _ServiceFilterSheetState extends State<_ServiceFilterSheet> {
       text: widget.initial.maxPrice?.toString() ?? '',
     );
     _categoryId = TextEditingController(text: widget.initial.categoryId ?? '');
-    _clinicId = TextEditingController(text: widget.initial.clinicId ?? '');
-    _provinceId = TextEditingController(text: widget.initial.provinceId ?? '');
-    _districtId = TextEditingController(text: widget.initial.districtId ?? '');
-    _wardId = TextEditingController(text: widget.initial.wardId ?? '');
+    _clinic = TextEditingController(text: widget.initial.clinic ?? '');
+    _province = TextEditingController(text: widget.initial.province ?? '');
+    _district = TextEditingController(text: widget.initial.district ?? '');
+    _ward = TextEditingController(text: widget.initial.ward ?? '');
   }
 
   @override
@@ -264,10 +264,10 @@ class _ServiceFilterSheetState extends State<_ServiceFilterSheet> {
     _minPrice.dispose();
     _maxPrice.dispose();
     _categoryId.dispose();
-    _clinicId.dispose();
-    _provinceId.dispose();
-    _districtId.dispose();
-    _wardId.dispose();
+    _clinic.dispose();
+    _province.dispose();
+    _district.dispose();
+    _ward.dispose();
     super.dispose();
   }
 
@@ -288,10 +288,10 @@ class _ServiceFilterSheetState extends State<_ServiceFilterSheet> {
             categoryId: widget.includeCategory
                 ? _textOrNull(_categoryId)
                 : null,
-            clinicId: _textOrNull(_clinicId),
-            provinceId: _textOrNull(_provinceId),
-            districtId: _textOrNull(_districtId),
-            wardId: _textOrNull(_wardId),
+            clinic: _textOrNull(_clinic),
+            province: _textOrNull(_province),
+            district: _textOrNull(_district),
+            ward: _textOrNull(_ward),
           ),
         );
       },
@@ -358,10 +358,11 @@ class _ServiceFilterSheetState extends State<_ServiceFilterSheet> {
             ),
           ),
         _LocationSection(
-          clinicController: _clinicId,
-          provinceController: _provinceId,
-          districtController: _districtId,
-          wardController: _wardId,
+          clinicController: _clinic,
+          provinceController: _province,
+          districtController: _district,
+          wardController: _ward,
+          acceptsText: true,
         ),
       ],
     );
@@ -643,12 +644,14 @@ class _LocationSection extends StatelessWidget {
     required this.provinceController,
     required this.districtController,
     required this.wardController,
+    this.acceptsText = false,
   });
 
   final TextEditingController clinicController;
   final TextEditingController provinceController;
   final TextEditingController districtController;
   final TextEditingController wardController;
+  final bool acceptsText;
 
   @override
   Widget build(BuildContext context) {
@@ -662,7 +665,7 @@ class _LocationSection extends StatelessWidget {
         children: [
           _TextField(
             label: 'Clinic',
-            hint: 'Paste clinic ID',
+            hint: acceptsText ? 'Clinic name' : 'Paste clinic ID',
             controller: clinicController,
             leadingIcon: Symbols.local_hospital,
           ),
@@ -672,7 +675,7 @@ class _LocationSection extends StatelessWidget {
               Expanded(
                 child: _TextField(
                   label: 'Province',
-                  hint: 'ID',
+                  hint: acceptsText ? 'Province' : 'ID',
                   controller: provinceController,
                 ),
               ),
@@ -680,7 +683,7 @@ class _LocationSection extends StatelessWidget {
               Expanded(
                 child: _TextField(
                   label: 'District',
-                  hint: 'ID',
+                  hint: acceptsText ? 'District' : 'ID',
                   controller: districtController,
                 ),
               ),
@@ -689,12 +692,14 @@ class _LocationSection extends StatelessWidget {
           const SizedBox(height: 12),
           _TextField(
             label: 'Ward',
-            hint: 'Optional ID',
+            hint: acceptsText ? 'Ward' : 'Optional ID',
             controller: wardController,
           ),
           const SizedBox(height: 10),
           Text(
-            'Clinic and location directory pickers are not available yet, so this field accepts IDs from the selected clinic or location.',
+            acceptsText
+                ? 'Search by clinic name or location text. Partial names are supported.'
+                : 'Clinic and location directory pickers are not available yet, so this field accepts IDs from the selected clinic or location.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

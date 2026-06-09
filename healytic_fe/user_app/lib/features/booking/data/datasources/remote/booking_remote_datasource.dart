@@ -156,17 +156,7 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
     ServiceListFilter? filter,
   }) async {
     try {
-      final response = await _apiService.userCategoriesApi
-          .userCategoriesControllerFindServicesByCategory(
-            categoryId,
-            sort: filter?.sort.apiValue,
-            minPrice: filter?.minPrice,
-            maxPrice: filter?.maxPrice,
-            clinicId: filter?.clinicId,
-            provinceId: filter?.provinceId,
-            districtId: filter?.districtId,
-            wardId: filter?.wardId,
-          );
+      final response = await _getCategoryServiceDtos(categoryId, filter);
 
       if (response == null) return [];
 
@@ -175,6 +165,33 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
       log('Error fetching services by category', error: e, stackTrace: st);
       rethrow;
     }
+  }
+
+  Future<List<BookingServiceResponseDto>?> _getCategoryServiceDtos(
+    String categoryId,
+    ServiceListFilter? filter,
+  ) async {
+    final response = await _apiService.apiClient.invokeAPI(
+      '/user/categories/${Uri.encodeComponent(categoryId)}/services',
+      'GET',
+      _serviceFilterQueryParams(filter),
+      null,
+      <String, String>{},
+      <String, String>{},
+      null,
+    );
+    if (response.statusCode >= 400) {
+      throw ApiException(response.statusCode, response.body);
+    }
+    if (response.body.isEmpty) return null;
+
+    final responseBody = utf8.decode(response.bodyBytes);
+    return (await _apiService.apiClient.deserializeAsync(
+      responseBody,
+      'List<BookingServiceResponseDto>',
+    ) as List)
+        .cast<BookingServiceResponseDto>()
+        .toList(growable: false);
   }
 
   @override
@@ -511,6 +528,25 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
     if (value is String) return num.tryParse(value.trim()) ?? 0;
     return 0;
   }
+}
+
+List<QueryParam> _serviceFilterQueryParams(ServiceListFilter? filter) {
+  final queryParams = <QueryParam>[];
+  void add(String name, Object? value) {
+    if (value == null) return;
+    final text = value.toString().trim();
+    if (text.isEmpty) return;
+    queryParams.add(QueryParam(name, text));
+  }
+
+  add('sort', filter?.sort.apiValue);
+  add('minPrice', filter?.minPrice);
+  add('maxPrice', filter?.maxPrice);
+  add('clinic', filter?.clinic);
+  add('province', filter?.province);
+  add('district', filter?.district);
+  add('ward', filter?.ward);
+  return queryParams;
 }
 
 // ─── Mock implementation ──────────────────────────

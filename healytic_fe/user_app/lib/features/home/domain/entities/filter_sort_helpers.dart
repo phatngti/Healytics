@@ -20,14 +20,14 @@ List<HomeProduct> filterServiceProducts(
         !_matches(active.categoryId, item.category)) {
       return false;
     }
-    if (!_matches(active.clinicId, item.clinicId) &&
-        !_matches(active.clinicId, item.vendorName)) {
+    if (!_matches(active.clinic, item.clinicId) &&
+        !_matches(active.clinic, item.vendorName)) {
       return false;
     }
     if (!_matchesAny([
-      active.provinceId,
-      active.districtId,
-      active.wardId,
+      active.province,
+      active.district,
+      active.ward,
     ], item.location)) {
       return false;
     }
@@ -53,11 +53,11 @@ List<AiRecommendation> filterRecommendations(
       return false;
     }
     if (!_matches(filter.categoryId, item.category)) return false;
-    if (!_matches(filter.clinicId, item.vendorName)) return false;
+    if (!_matches(filter.clinic, item.vendorName)) return false;
     if (!_matchesAny([
-      filter.provinceId,
-      filter.districtId,
-      filter.wardId,
+      filter.province,
+      filter.district,
+      filter.ward,
     ], item.location)) {
       return false;
     }

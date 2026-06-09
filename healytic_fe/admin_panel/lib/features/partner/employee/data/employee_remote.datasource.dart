@@ -528,6 +528,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
         startDate: common.startDate,
         emergencyContactName: common.emergencyContactName,
         emergencyContactPhone: common.emergencyContactPhone,
+        createdAt: dto.createdAt,
         jobTitle: dto.jobTitle?.toString() ?? '',
 
         medicalLicenses: profile.medicalCredentials
@@ -579,6 +580,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
           startDate: common.startDate,
           emergencyContactName: common.emergencyContactName,
           emergencyContactPhone: common.emergencyContactPhone,
+          createdAt: dto.createdAt,
           jobTitle: TherapistType.spa.displayName,
           therapistLevel: profile.level,
           commissionRate: profile.commissionRate?.toDouble() ?? 0.0,
@@ -616,6 +618,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
           startDate: common.startDate,
           emergencyContactName: common.emergencyContactName,
           emergencyContactPhone: common.emergencyContactPhone,
+          createdAt: dto.createdAt,
           jobTitle: TherapistType.massage.displayName,
           therapistLevel: profile.level,
           commissionRate: profile.commissionRate?.toDouble() ?? 0.0,
@@ -655,6 +658,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       startDate: common.startDate,
       emergencyContactName: common.emergencyContactName,
       emergencyContactPhone: common.emergencyContactPhone,
+      createdAt: dto.createdAt,
     );
   }
 
@@ -1063,6 +1067,7 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       gender: request.gender,
       employmentType: EmploymentType.fullTime.displayName,
       startDate: DateTime.now().toIso8601String(),
+      createdAt: DateTime.now(),
     );
     _employees.insert(0, employee);
     return employee;
@@ -1108,6 +1113,7 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       gender: request.gender,
       employmentType: EmploymentType.partTime.displayName,
       startDate: DateTime.now().toIso8601String(),
+      createdAt: DateTime.now(),
     );
     _employees.insert(0, employee);
     return employee;
@@ -1153,6 +1159,7 @@ class EmployeeRemoteDataSourceMock implements EmployeeRemoteDataSource {
       gender: request.gender,
       employmentType: EmploymentType.contractor.displayName,
       startDate: DateTime.now().toIso8601String(),
+      createdAt: DateTime.now(),
     );
     _employees.insert(0, employee);
     return employee;

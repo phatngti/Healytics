@@ -24,7 +24,7 @@ export class ListRecommendedServicesHandler {
       },
       relations: ['media', 'productDefinition'],
       take: 10,
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'DESC', id: 'DESC' },
     });
 
     this.logger.log(`Found ${products.length} recommended services`);

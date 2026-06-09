@@ -1,6 +1,14 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsUUID, Min } from 'class-validator';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  Min,
+} from 'class-validator';
+import { ApiHideProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum PublicServiceListSort {
   DEFAULT = 'default',
@@ -35,24 +43,64 @@ export class PublicServiceListQueryDto {
   @IsUUID()
   categoryId?: string;
 
-  @ApiPropertyOptional({ format: 'uuid' })
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Clinic name or partial clinic text',
+  })
   @IsOptional()
-  @IsUUID()
+  @IsString()
+  @MaxLength(120)
+  clinic?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Province/city name or partial text',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  province?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    description: 'District name or partial text',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  district?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Ward name or partial text',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  ward?: string;
+
+  @ApiHideProperty()
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
   clinicId?: string;
 
-  @ApiPropertyOptional({ format: 'uuid' })
+  @ApiHideProperty()
   @IsOptional()
-  @IsUUID()
+  @IsString()
+  @MaxLength(120)
   provinceId?: string;
 
-  @ApiPropertyOptional({ format: 'uuid' })
+  @ApiHideProperty()
   @IsOptional()
-  @IsUUID()
+  @IsString()
+  @MaxLength(120)
   districtId?: string;
 
-  @ApiPropertyOptional({ format: 'uuid' })
+  @ApiHideProperty()
   @IsOptional()
-  @IsUUID()
+  @IsString()
+  @MaxLength(120)
   wardId?: string;
 
   @ApiPropertyOptional({ type: Number, description: 'User latitude' })

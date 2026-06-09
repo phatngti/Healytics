@@ -35,14 +35,23 @@ Future<void> initApp() async {
 
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
-    log.severe(
-      'FlutterError - Catch all',
-      '${details.toString()}\n'
-          'Exception: ${details.exception}\n'
-          'Library: ${details.library}\n'
-          'Context: ${details.context}',
-      details.stack,
-    );
+    try {
+      log.severe(
+        'FlutterError - Catch all',
+        '${details.toString()}\n'
+            'Exception: ${details.exception}\n'
+            'Library: ${details.library}\n'
+            'Context: ${details.context}',
+        details.stack,
+      );
+    } catch (e) {
+      log.severe(
+        'FlutterError - Catch all (fallback)',
+        'Exception: ${details.exception}\n'
+            'Library: ${details.library}',
+        details.stack,
+      );
+    }
   };
 
   PlatformDispatcher.instance.onError = (error, stack) {

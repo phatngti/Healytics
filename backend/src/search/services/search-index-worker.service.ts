@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, LessThan, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import {
+  SearchIndexEnvironment,
   SearchIndexOutbox,
   SearchIndexOutboxStatus,
 } from '../entities/search-index-outbox.entity';
@@ -15,6 +16,11 @@ export class SearchIndexWorkerService {
   private static readonly PROCESS_LOCK_ID = 1;
   private static readonly RECONCILE_LOCK_ID = 2;
   private static readonly MAX_ATTEMPTS = 5;
+  private static readonly LOCK_ENVIRONMENT_OFFSETS = {
+    [SearchIndexEnvironment.PRODUCTION]: 0,
+    [SearchIndexEnvironment.DEV]: 100,
+    [SearchIndexEnvironment.UAT]: 200,
+  } as const;
 
   private readonly logger = new Logger(SearchIndexWorkerService.name);
 
@@ -28,20 +34,28 @@ export class SearchIndexWorkerService {
 
   @Cron(CronExpression.EVERY_10_SECONDS)
   async processPending(): Promise<void> {
-    if (this.configService.get<string>('NODE_ENV') !== 'production') {
-      return;
-    }
-    this.logger.log('Processing pending search index events...');
-    const hasLock = await this.tryAcquireLock(
-      SearchIndexWorkerService.PROCESS_LOCK_ID,
+    if (!this.isWorkerEnabled()) return;
+
+    const targetEnvironment = this.getWorkerEnvironment();
+    this.logger.log(
+      `Processing pending search index events for ${targetEnvironment}...`,
     );
+    const processLockId = this.getEnvironmentLockId(
+      SearchIndexWorkerService.PROCESS_LOCK_ID,
+      targetEnvironment,
+    );
+    const hasLock = await this.tryAcquireLock(processLockId);
     if (!hasLock) return;
 
     try {
       const events = await this.outboxRepository.find({
         where: [
-          { status: SearchIndexOutboxStatus.PENDING },
           {
+            targetEnvironment,
+            status: SearchIndexOutboxStatus.PENDING,
+          },
+          {
+            targetEnvironment,
             status: SearchIndexOutboxStatus.FAILED,
             attemptCount: LessThan(SearchIndexWorkerService.MAX_ATTEMPTS),
           },
@@ -54,20 +68,26 @@ export class SearchIndexWorkerService {
         await this.processEvent(event);
       }
     } finally {
-      await this.releaseLock(SearchIndexWorkerService.PROCESS_LOCK_ID);
+      await this.releaseLock(processLockId);
     }
   }
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async reconcile(): Promise<void> {
-    if (this.configService.get<string>('NODE_ENV') !== 'production') {
-      return;
-    }
-    this.logger.log('Reconciling search index events...');
+    if (!this.isWorkerEnabled()) return;
 
-    const hasLock = await this.tryAcquireLock(
-      SearchIndexWorkerService.RECONCILE_LOCK_ID,
+    this.logger.log('Start reconcile search index events');
+
+    const targetEnvironment = this.getWorkerEnvironment();
+    this.logger.log(
+      `Reconciling search index events for ${targetEnvironment}...`,
     );
+
+    const reconcileLockId = this.getEnvironmentLockId(
+      SearchIndexWorkerService.RECONCILE_LOCK_ID,
+      targetEnvironment,
+    );
+    const hasLock = await this.tryAcquireLock(reconcileLockId);
     if (!hasLock) return;
 
     try {
@@ -75,23 +95,30 @@ export class SearchIndexWorkerService {
       await this.indexer.refreshAll();
     } catch (error) {
       this.logger.warn(
-        `Booking search reconciliation failed: ${(error as Error).message}`,
+        `Booking search reconciliation failed for ${targetEnvironment}: ${
+          (error as Error).message
+        }`,
       );
     } finally {
-      await this.releaseLock(SearchIndexWorkerService.RECONCILE_LOCK_ID);
+      await this.releaseLock(reconcileLockId);
     }
   }
 
   async reindexAllNow(): Promise<void> {
-    this.logger.log('Reindexing all search index events...');
+    this.logger.log(
+      `Reindexing all search index events for ${this.getWorkerEnvironment()}...`,
+    );
     await this.indexer.refreshAll();
   }
 
   private async processEvent(event: SearchIndexOutbox): Promise<void> {
-    this.logger.log('Processing search index event...');
-    await this.outboxRepository.update(
+    this.logger.log(
+      `Processing search index event ${event.id} for ${event.targetEnvironment}...`,
+    );
+    const updateResult = await this.outboxRepository.update(
       {
         id: event.id,
+        targetEnvironment: event.targetEnvironment,
         status: In([
           SearchIndexOutboxStatus.PENDING,
           SearchIndexOutboxStatus.FAILED,
@@ -103,6 +130,7 @@ export class SearchIndexWorkerService {
         lastError: null,
       },
     );
+    if (updateResult.affected === 0) return;
 
     try {
       await this.indexer.syncEntity(
@@ -111,18 +139,26 @@ export class SearchIndexWorkerService {
         event.operation,
         event.payload,
       );
-      await this.outboxRepository.update(event.id, {
-        status: SearchIndexOutboxStatus.DONE,
-        processedAt: new Date(),
-        lastError: null,
-      });
+      await this.outboxRepository.update(
+        { id: event.id, targetEnvironment: event.targetEnvironment },
+        {
+          status: SearchIndexOutboxStatus.DONE,
+          processedAt: new Date(),
+          lastError: null,
+        },
+      );
     } catch (error) {
-      await this.outboxRepository.update(event.id, {
-        status: SearchIndexOutboxStatus.FAILED,
-        lastError: (error as Error).message.slice(0, 4000),
-      });
+      await this.outboxRepository.update(
+        { id: event.id, targetEnvironment: event.targetEnvironment },
+        {
+          status: SearchIndexOutboxStatus.FAILED,
+          lastError: (error as Error).message.slice(0, 4000),
+        },
+      );
       this.logger.warn(
-        `Search index event ${event.id} failed: ${(error as Error).message}`,
+        `Search index event ${event.id} failed for ${
+          event.targetEnvironment
+        }: ${(error as Error).message}`,
       );
     }
   }
@@ -140,5 +176,54 @@ export class SearchIndexWorkerService {
       SearchIndexWorkerService.PROCESS_LOCK_NAMESPACE,
       lockId,
     ]);
+  }
+
+  private isWorkerEnabled(): boolean {
+    const configured = this.configService.get<string>(
+      'SEARCH_INDEX_WORKER_ENABLED',
+    );
+    if (configured !== undefined) {
+      return configured !== 'false';
+    }
+
+    return this.configService.get<string>('NODE_ENV') !== 'test';
+  }
+
+  private getWorkerEnvironment(): SearchIndexEnvironment {
+    const configured = this.configService.get<string>(
+      'SEARCH_INDEX_WORKER_ENV',
+    );
+    const candidate = configured ?? this.configService.get<string>('NODE_ENV');
+    return this.normalizeEnvironment(candidate);
+  }
+
+  private normalizeEnvironment(
+    environment: string | undefined,
+  ): SearchIndexEnvironment {
+    const normalized = environment?.trim().toLowerCase();
+    if (normalized === SearchIndexEnvironment.PRODUCTION) {
+      return SearchIndexEnvironment.PRODUCTION;
+    }
+    if (normalized === SearchIndexEnvironment.UAT) {
+      return SearchIndexEnvironment.UAT;
+    }
+    if (
+      normalized === SearchIndexEnvironment.DEV ||
+      normalized === 'development'
+    ) {
+      return SearchIndexEnvironment.DEV;
+    }
+
+    return SearchIndexEnvironment.DEV;
+  }
+
+  private getEnvironmentLockId(
+    lockId: number,
+    targetEnvironment: SearchIndexEnvironment,
+  ): number {
+    return (
+      lockId +
+      SearchIndexWorkerService.LOCK_ENVIRONMENT_OFFSETS[targetEnvironment]
+    );
   }
 }

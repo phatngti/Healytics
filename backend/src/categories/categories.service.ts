@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull } from 'typeorm';
+import { Repository, IsNull, SelectQueryBuilder } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from '@/common/entities/category.entity';
@@ -20,6 +20,7 @@ import {
 import { CreateCategoryHandler } from './application/handlers/create-category.handler';
 import { UpdateCategoryHandler } from './application/handlers/update-category.handler';
 import { RemoveCategoryHandler } from './application/handlers/remove-category.handler';
+import { ElasticsearchBookingService } from '@/search/services/elasticsearch-booking.service';
 
 /**
  * Service facade for managing product categories.
@@ -41,6 +42,7 @@ export class CategoriesService {
     private readonly createCategoryHandler: CreateCategoryHandler,
     private readonly updateCategoryHandler: UpdateCategoryHandler,
     private readonly removeCategoryHandler: RemoveCategoryHandler,
+    private readonly elasticsearchBookingService: ElasticsearchBookingService,
   ) {}
 
   /**
@@ -225,23 +227,17 @@ export class CategoriesService {
         activeStatus: HealthServiceStatus.ACTIVE,
       });
 
-    if (query.clinicId) {
-      qb.andWhere('product.partner_id = :clinicId', {
-        clinicId: query.clinicId,
-      });
-    }
-    if (query.provinceId) {
-      qb.andWhere('partner.province_id = :provinceId', {
-        provinceId: query.provinceId,
-      });
-    }
-    if (query.districtId) {
-      qb.andWhere('partner.district_id = :districtId', {
-        districtId: query.districtId,
-      });
-    }
-    if (query.wardId) {
-      qb.andWhere('partner.ward_id = :wardId', { wardId: query.wardId });
+    const serviceIds = await this.resolveTextFilteredServiceIds(query);
+    if (serviceIds) {
+      if (serviceIds.length === 0) {
+        qb.andWhere('1 = 0');
+      } else {
+        qb.andWhere('product.id IN (:...textFilteredServiceIds)', {
+          textFilteredServiceIds: serviceIds,
+        });
+      }
+    } else {
+      this.applySqlTextFilters(qb, query);
     }
     if (query.minPrice != null) {
       qb.andWhere(
@@ -287,6 +283,85 @@ export class CategoriesService {
 
   async remove(id: string): Promise<void> {
     return this.removeCategoryHandler.execute(id);
+  }
+
+  private async resolveTextFilteredServiceIds(
+    query: PublicServiceListQueryDto,
+  ): Promise<string[] | null> {
+    if (!this.elasticsearchBookingService.isAvailable) return null;
+
+    const filters = serviceTextFilters(query);
+    if (filters.length === 0) return null;
+
+    let intersection: Set<string> | null = null;
+    for (const filter of filters) {
+      const ids = await this.elasticsearchBookingService.searchServiceIds(
+        filter.value,
+        filter.fields,
+      );
+      const current = new Set(ids);
+      intersection =
+        intersection == null
+          ? current
+          : new Set([...intersection].filter((id) => current.has(id)));
+
+      if (intersection.size === 0) return [];
+    }
+
+    return intersection ? [...intersection] : null;
+  }
+
+  private applySqlTextFilters(
+    qb: SelectQueryBuilder<Product>,
+    query: PublicServiceListQueryDto,
+  ): void {
+    const clinic = textQuery(query.clinic, query.clinicId);
+    if (clinic) {
+      qb.andWhere(
+        `(
+          partner.brandName ILIKE :clinicText
+          OR partner.legalName ILIKE :clinicText
+          OR partner.streetAddress ILIKE :clinicText
+        )`,
+        { clinicText: `%${clinic}%` },
+      );
+    }
+
+    const province = textQuery(query.province, query.provinceId);
+    if (province) {
+      qb.andWhere(
+        `(
+          province.fullName ILIKE :provinceText
+          OR province.name ILIKE :provinceText
+          OR province.nameEn ILIKE :provinceText
+        )`,
+        { provinceText: `%${province}%` },
+      );
+    }
+
+    const district = textQuery(query.district, query.districtId);
+    if (district) {
+      qb.andWhere(
+        `(
+          district.fullName ILIKE :districtText
+          OR district.name ILIKE :districtText
+          OR district.nameEn ILIKE :districtText
+        )`,
+        { districtText: `%${district}%` },
+      );
+    }
+
+    const ward = textQuery(query.ward, query.wardId);
+    if (ward) {
+      qb.andWhere(
+        `(
+          ward.fullName ILIKE :wardText
+          OR ward.name ILIKE :wardText
+          OR ward.nameEn ILIKE :wardText
+        )`,
+        { wardText: `%${ward}%` },
+      );
+    }
   }
 
   /**
@@ -386,4 +461,32 @@ export class CategoriesService {
       }),
     ) as (Category & { serviceCount: number })[];
   }
+}
+
+function textQuery(primary?: string, alias?: string): string | null {
+  const value = (primary ?? alias)?.trim();
+  return value && value.length >= 2 ? value : null;
+}
+
+function serviceTextFilters(query: PublicServiceListQueryDto) {
+  return [
+    {
+      value: textQuery(query.clinic, query.clinicId),
+      fields: ['clinicNameSearch', 'clinicAddressSearch'],
+    },
+    {
+      value: textQuery(query.province, query.provinceId),
+      fields: ['provinceName', 'locationText'],
+    },
+    {
+      value: textQuery(query.district, query.districtId),
+      fields: ['districtName', 'locationText'],
+    },
+    {
+      value: textQuery(query.ward, query.wardId),
+      fields: ['wardName', 'locationText'],
+    },
+  ].filter((filter): filter is { value: string; fields: string[] } =>
+    Boolean(filter.value),
+  );
 }

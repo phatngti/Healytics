@@ -2656,38 +2656,38 @@
             }
           },
           {
-            "name": "clinicId",
+            "name": "clinic",
             "required": false,
             "in": "query",
+            "description": "Clinic name or partial clinic text",
             "schema": {
-              "format": "uuid",
               "type": "string"
             }
           },
           {
-            "name": "provinceId",
+            "name": "province",
             "required": false,
             "in": "query",
+            "description": "Province/city name or partial text",
             "schema": {
-              "format": "uuid",
               "type": "string"
             }
           },
           {
-            "name": "districtId",
+            "name": "district",
             "required": false,
             "in": "query",
+            "description": "District name or partial text",
             "schema": {
-              "format": "uuid",
               "type": "string"
             }
           },
           {
-            "name": "wardId",
+            "name": "ward",
             "required": false,
             "in": "query",
+            "description": "Ward name or partial text",
             "schema": {
-              "format": "uuid",
               "type": "string"
             }
           },
@@ -3333,38 +3333,38 @@
             }
           },
           {
-            "name": "clinicId",
+            "name": "clinic",
             "required": false,
             "in": "query",
+            "description": "Clinic name or partial clinic text",
             "schema": {
-              "format": "uuid",
               "type": "string"
             }
           },
           {
-            "name": "provinceId",
+            "name": "province",
             "required": false,
             "in": "query",
+            "description": "Province/city name or partial text",
             "schema": {
-              "format": "uuid",
               "type": "string"
             }
           },
           {
-            "name": "districtId",
+            "name": "district",
             "required": false,
             "in": "query",
+            "description": "District name or partial text",
             "schema": {
-              "format": "uuid",
               "type": "string"
             }
           },
           {
-            "name": "wardId",
+            "name": "ward",
             "required": false,
             "in": "query",
+            "description": "Ward name or partial text",
             "schema": {
-              "format": "uuid",
               "type": "string"
             }
           },
@@ -12592,7 +12592,7 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-30T07:33:23.835Z"
+              "submittedAt": "2026-05-31T05:31:03.391Z"
             }
           }
         },

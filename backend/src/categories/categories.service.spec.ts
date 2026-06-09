@@ -9,6 +9,7 @@ import { PartnersService } from '@/partners/partners.service';
 import { CreateCategoryHandler } from './application/handlers/create-category.handler';
 import { UpdateCategoryHandler } from './application/handlers/update-category.handler';
 import { RemoveCategoryHandler } from './application/handlers/remove-category.handler';
+import { ElasticsearchBookingService } from '@/search/services/elasticsearch-booking.service';
 
 describe('CategoriesService', () => {
   let service: CategoriesService;
@@ -102,6 +103,13 @@ describe('CategoriesService', () => {
         {
           provide: RemoveCategoryHandler,
           useValue: mockRemoveCategoryHandler,
+        },
+        {
+          provide: ElasticsearchBookingService,
+          useValue: {
+            isAvailable: false,
+            searchServiceIds: jest.fn(),
+          },
         },
       ],
     }).compile();
