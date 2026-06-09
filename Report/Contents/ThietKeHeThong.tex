@@ -4,7 +4,7 @@
 \textbf{N-tier Architecture} chia hệ thống thành các tầng độc lập theo trách nhiệm, giao tiếp theo luồng một chiều rõ ràng nhằm tăng khả năng bảo trì, bảo mật và mở rộng. Mỗi tầng chỉ giao tiếp với tầng liền kề, qua đó giảm thiểu sự phụ thuộc chéo (Loose Coupling) và cho phép thay đổi công nghệ ở một tầng mà không ảnh hưởng đến các tầng còn lại. Hệ thống Healytics áp dụng mô hình 5 tầng; kết cấu chi tiết cùng công nghệ cụ thể cho từng tầng sẽ được trình bày sau sơ đồ kiến trúc tổng thể (Hình~\ref{fig:sys_arch}).
 
 \subsection{Ưu điểm và Nhược điểm}
-\begin{table}[htbp]
+\begin{table}[H]
     \centering
     \caption{Ưu điểm và Nhược điểm của Kiến trúc Layer (N-tier)}
     \label{tab:ntier-comparison}
@@ -47,9 +47,13 @@
 \end{table}
 
 \subsection{Các Kiến trúc Thay thế và So sánh}
-\begin{table}[htbp]
+
+Bảng~\ref{tab:arch-alt-comparison} đối chiếu kiến trúc N-tier với các mô hình thay thế thường gặp (CQRS, Microservices, Orchestration, MVP, Event-Driven) trên các tiêu chí then chốt.
+
+\begin{table}[H]
     \centering
     \caption{So sánh Kiến trúc N-tier với các Kiến trúc khác}
+    \label{tab:arch-alt-comparison}
     \vspace{0.3cm}
     \renewcommand{\arraystretch}{1.5} % Khoảng cách dòng
     
