@@ -30,6 +30,10 @@ import { SearchIndexWorkerService } from './services/search-index-worker.service
     SearchIndexOutboxService,
     SearchIndexWorkerService,
   ],
-  exports: [SearchIndexOutboxService, SearchIndexWorkerService],
+  exports: [
+    ElasticsearchBookingService,
+    SearchIndexOutboxService,
+    SearchIndexWorkerService,
+  ],
 })
 export class SearchModule {}

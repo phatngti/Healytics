@@ -12,10 +12,10 @@ import '../services/backdoor_api_service.dart';
 /// sends it to the test backdoor. Requests intentionally use raw JSON maps so
 /// newly added backend-only seed fields are not dropped by a stale generated
 /// Patrol OpenAPI client.
-Future<void> prepareBackendScenario([String? scenario]) async {
+Future<SeedResponseDto?> prepareBackendScenario([String? scenario]) async {
   final config = TestConfig.instance;
   if (!config.backdoorEnabled) {
-    return;
+    return null;
   }
 
   _configureServiceIfNeeded(config);
@@ -28,10 +28,38 @@ Future<void> prepareBackendScenario([String? scenario]) async {
 
   final api = BackdoorApiService.instance.backdoorApi;
 
-  if (config.resetBeforeEachTest) {
-    await _prepare(api, scenarioName, rawPayload);
-  } else {
-    await _seed(api, scenarioName, rawPayload);
+  return _seed(api, scenarioName, rawPayload);
+}
+
+/// Deletes only rows created by [prepareBackendScenario].
+///
+/// Cleanup is best-effort because a test may legitimately delete one of its own
+/// seeded rows during the flow. Missing rows and cleanup conflicts should not
+/// fail the Patrol run after assertions have already completed.
+Future<void> cleanupBackendScenario(SeedResponseDto? seedResponse) async {
+  final config = TestConfig.instance;
+  if (!config.backdoorEnabled || seedResponse == null) {
+    return;
+  }
+
+  _configureServiceIfNeeded(config);
+  final api = BackdoorApiService.instance.backdoorApi;
+  try {
+    final response = await _postJsonRequest(api, '/test-backdoor/cleanup', {
+      'ids': seedResponse.ids.toJson(),
+    });
+    log(
+      'Backdoor cleanup "${seedResponse.scenario}" OK – '
+      'deleted: ${response['deleted'] ?? {}}',
+      name: 'BackdoorHelper',
+    );
+  } catch (error, stackTrace) {
+    log(
+      'Backdoor cleanup "${seedResponse.scenario}" ignored: $error',
+      name: 'BackdoorHelper',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }
 
@@ -69,27 +97,15 @@ void _materializeOrdersPayload(Map<String, dynamic> payload) {
   }
 }
 
-/// Resets the DB and seeds the full scenario.
-Future<void> _prepare(
-  TestBackdoorApi api,
-  String scenario,
-  Map<String, dynamic> payload,
-) async {
-  final response = await _postSeedRequest(api, '/test-backdoor/prepare', {
-    'scenario': scenario,
-    'payload': payload,
-  });
-  _logResult('prepare', scenario, response);
-}
-
 /// Seeds data additively (no DB reset).
-Future<void> _seed(
+Future<SeedResponseDto?> _seed(
   TestBackdoorApi api,
   String scenario,
   Map<String, dynamic> payload,
 ) async {
   final response = await _postSeedRequest(api, '/test-backdoor/seed', payload);
   _logResult('seed', scenario, response);
+  return response;
 }
 
 Future<SeedResponseDto?> _postSeedRequest(
@@ -97,6 +113,16 @@ Future<SeedResponseDto?> _postSeedRequest(
   String path,
   Map<String, dynamic> body,
 ) async {
+  final decoded = await _postJsonRequest(api, path, body, ignoreConflict: true);
+  return SeedResponseDto.fromJson(decoded);
+}
+
+Future<Map<String, dynamic>> _postJsonRequest(
+  TestBackdoorApi api,
+  String path,
+  Map<String, dynamic> body, {
+  bool ignoreConflict = false,
+}) async {
   final response = await api.apiClient.invokeAPI(
     path,
     'POST',
@@ -107,17 +133,25 @@ Future<SeedResponseDto?> _postSeedRequest(
     'application/json',
   );
 
+  if (ignoreConflict && response.statusCode == 409) {
+    log(
+      'Backdoor request $path ignored insert conflict: ${response.body}',
+      name: 'BackdoorHelper',
+    );
+    return <String, dynamic>{};
+  }
+
   if (response.statusCode >= 400) {
     throw ApiException(response.statusCode, response.body);
   }
   if (response.body.isEmpty) {
-    return null;
+    return <String, dynamic>{};
   }
   final decoded = jsonDecode(response.body);
   if (decoded is! Map<String, dynamic>) {
     throw StateError('Backdoor response from $path must be a JSON object.');
   }
-  return SeedResponseDto.fromJson(decoded);
+  return decoded;
 }
 
 /// Lazily configures [BackdoorApiService] once.

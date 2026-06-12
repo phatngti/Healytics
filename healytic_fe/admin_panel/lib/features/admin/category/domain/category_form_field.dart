@@ -5,6 +5,7 @@
 /// enable IDE auto-complete.
 enum CategoryFormField {
   categoryName('category_name'),
+  parentCategory('parent_category'),
   description('description'),
   status('status'),
   sortOrder('sort_order'),

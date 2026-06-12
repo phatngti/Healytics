@@ -171,28 +171,52 @@ describe('AdminDashboardService', () => {
     const { service, txRepo } = createService();
     txRepo.manager.query.mockResolvedValue([
       {
-        id: 'cat-1',
-        name: 'Massage',
+        id: 'root-1',
+        name: 'Spa & Beauty',
         isActive: true,
-        serviceCount: '2',
+        subCategoryCount: '3',
+        serviceCount: '7',
+        totalCategories: '6',
+        activeCategories: '5',
+        inactiveCategories: '1',
+        rootCategories: '2',
+        subCategories: '4',
+        emptyCategories: '1',
+        totalMappedServices: '9',
       },
       {
-        id: 'cat-2',
-        name: 'Empty',
-        isActive: false,
-        serviceCount: '0',
+        id: 'root-2',
+        name: 'Exercise',
+        isActive: true,
+        subCategoryCount: '1',
+        serviceCount: '2',
+        totalCategories: '6',
+        activeCategories: '5',
+        inactiveCategories: '1',
+        rootCategories: '2',
+        subCategories: '4',
+        emptyCategories: '1',
+        totalMappedServices: '9',
       },
     ]);
 
     const result = await service.getCategoryHealth();
 
     expect(txRepo.manager.query).toHaveBeenCalledWith(
-      expect.stringContaining('LEFT JOIN products product'),
+      expect.stringContaining('root_rows'),
     );
-    expect(result.totalCategories).toBe(2);
-    expect(result.activeCategories).toBe(1);
+    expect(result.totalCategories).toBe(6);
+    expect(result.activeCategories).toBe(5);
     expect(result.inactiveCategories).toBe(1);
+    expect(result.rootCategories).toBe(2);
+    expect(result.subCategories).toBe(4);
     expect(result.emptyCategories).toBe(1);
-    expect(result.totalMappedServices).toBe(2);
+    expect(result.totalMappedServices).toBe(9);
+    expect(result.topCategories[0]).toMatchObject({
+      name: 'Spa & Beauty',
+      serviceCount: 7,
+      subCategoryCount: 3,
+      isRoot: true,
+    });
   });
 });

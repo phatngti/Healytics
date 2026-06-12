@@ -54,7 +54,7 @@ void main() {
 
     // Get all employees for this partner
     //
-    //Future<List<EmployeeResponseDto>> partnerEmployeesControllerFindAll({ String role }) async
+    //Future<List<EmployeeResponseDto>> partnerEmployeesControllerFindAll({ String role, String sort, String clinicId, String provinceId, String districtId, String wardId, num minExperienceYears }) async
     test('test partnerEmployeesControllerFindAll', () async {
       // TODO
     });

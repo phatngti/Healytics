@@ -6,6 +6,7 @@ class ProductTableColumns {
     {'label': 'ID'},
     {'label': 'Image'},
     {'label': 'Category'},
+    {'label': 'Sub-category'},
     {'label': 'Name'},
     {'label': 'Price'},
     {'label': 'Actions'},

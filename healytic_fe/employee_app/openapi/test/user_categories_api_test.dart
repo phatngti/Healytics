@@ -19,7 +19,7 @@ void main() {
   group('tests for UserCategoriesApi', () {
     // Get services for a category
     //
-    //Future<List<BookingServiceResponseDto>> userCategoriesControllerFindServicesByCategory(String categoryId, { num lat, num lng }) async
+    //Future<List<BookingServiceResponseDto>> userCategoriesControllerFindServicesByCategory(String categoryId, { String sort, num minPrice, num maxPrice, String categoryId2, String clinicId, String provinceId, String districtId, String wardId, num lat, num lng }) async
     test('test userCategoriesControllerFindServicesByCategory', () async {
       // TODO
     });

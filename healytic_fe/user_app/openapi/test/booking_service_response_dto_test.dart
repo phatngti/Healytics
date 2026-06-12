@@ -52,9 +52,21 @@ void main() {
       // TODO
     });
 
+    // Clinic or facility ID
+    // Object clinicId
+    test('to test the property `clinicId`', () async {
+      // TODO
+    });
+
     // Clinic street address
     // Object clinicAddress
     test('to test the property `clinicAddress`', () async {
+      // TODO
+    });
+
+    // Clinic location label
+    // Object location
+    test('to test the property `location`', () async {
       // TODO
     });
 
@@ -73,6 +85,30 @@ void main() {
     // Raw price in VND
     // Object priceVnd
     test('to test the property `priceVnd`', () async {
+      // TODO
+    });
+
+    // Sub-category ID
+    // Object categoryId
+    test('to test the property `categoryId`', () async {
+      // TODO
+    });
+
+    // Sub-category name
+    // Object categoryName
+    test('to test the property `categoryName`', () async {
+      // TODO
+    });
+
+    // Root category ID
+    // Object parentCategoryId
+    test('to test the property `parentCategoryId`', () async {
+      // TODO
+    });
+
+    // Root category name
+    // Object parentCategoryName
+    test('to test the property `parentCategoryName`', () async {
       // TODO
     });
 

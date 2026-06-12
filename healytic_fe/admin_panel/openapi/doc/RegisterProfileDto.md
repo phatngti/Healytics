@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **phone** | **String** |  | [optional] 
 **bio** | **String** | Short bio or notes | [optional] 
 **dateOfBirth** | **String** | Date of birth in ISO format | [optional] 
+**address** | [**RegisterAddressDto**](RegisterAddressDto.md) | Address provided during user registration | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

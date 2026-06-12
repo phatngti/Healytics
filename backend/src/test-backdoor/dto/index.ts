@@ -11,6 +11,8 @@ export { SeedPayloadDto } from './seed-payload.dto';
 export { BackdoorPrepareDto } from './backdoor-prepare.dto';
 export {
   BackdoorStatusResponseDto,
+  CleanupSeedDataDto,
+  CleanupSeedDataResponseDto,
   ResetDbResponseDto,
   SeedResponseDto,
 } from './responses.dto';

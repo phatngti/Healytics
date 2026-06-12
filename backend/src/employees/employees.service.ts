@@ -12,7 +12,10 @@ import {
   CreateMassageTherapistDto,
 } from './dto/create-therapist.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { GetEmployeesQueryDto } from './dto/get-employees-query.dto';
+import {
+  EmployeeListSort,
+  GetEmployeesQueryDto,
+} from './dto/get-employees-query.dto';
 import { GetTimeSlotsQueryDto } from './dto/get-time-slots-query.dto';
 import { Employee } from '@/common/entities/employee.entity';
 import { Partner } from '@/common/entities/partner.entity';
@@ -156,18 +159,76 @@ export class EmployeesService {
     query?: GetEmployeesQueryDto,
     partnerId?: string,
   ): Promise<Employee[]> {
-    const { role } = query || {};
-    const where: FindOptionsWhere<Employee> = {};
-    if (role) {
-      where.role = role;
+    const qb = this.employeeRepository
+      .createQueryBuilder('employee')
+      .leftJoinAndSelect('employee.doctorProfile', 'doctorProfile')
+      .leftJoinAndSelect('employee.therapistProfile', 'therapistProfile')
+      .leftJoinAndSelect('employee.partner', 'partner')
+      .leftJoinAndSelect('partner.province', 'province')
+      .leftJoinAndSelect('partner.district', 'district')
+      .leftJoinAndSelect('partner.ward', 'ward');
+
+    if (query?.role) {
+      qb.andWhere('employee.role = :role', { role: query.role });
     }
-    if (partnerId) {
-      where.partnerId = partnerId;
+    if (partnerId || query?.clinicId) {
+      qb.andWhere('employee.partner_id = :partnerId', {
+        partnerId: partnerId ?? query?.clinicId,
+      });
     }
-    const employees = await this.employeeRepository.find({
-      where,
-      relations: ['doctorProfile', 'therapistProfile'],
-    });
+    if (query?.provinceId) {
+      qb.andWhere('partner.province_id = :provinceId', {
+        provinceId: query.provinceId,
+      });
+    }
+    if (query?.districtId) {
+      qb.andWhere('partner.district_id = :districtId', {
+        districtId: query.districtId,
+      });
+    }
+    if (query?.wardId) {
+      qb.andWhere('partner.ward_id = :wardId', { wardId: query.wardId });
+    }
+    if (query?.minExperienceYears != null) {
+      qb.andWhere(
+        `COALESCE(
+          doctorProfile.experience_years,
+          FLOOR(EXTRACT(YEAR FROM AGE(CURRENT_DATE, employee.start_date)))
+        ) >= :minExperienceYears`,
+        { minExperienceYears: query.minExperienceYears },
+      );
+    }
+
+    switch (query?.sort) {
+      case EmployeeListSort.RATING_DESC:
+        qb.orderBy('employee.rating', 'DESC').addOrderBy(
+          'employee.review_count',
+          'DESC',
+        );
+        break;
+      case EmployeeListSort.REVIEWS_DESC:
+        qb.orderBy('employee.review_count', 'DESC').addOrderBy(
+          'employee.rating',
+          'DESC',
+        );
+        break;
+      case EmployeeListSort.EXPERIENCE_DESC:
+        qb.orderBy(
+          `COALESCE(
+            doctorProfile.experience_years,
+            FLOOR(EXTRACT(YEAR FROM AGE(CURRENT_DATE, employee.start_date))),
+            0
+          )`,
+          'DESC',
+        );
+        break;
+      case EmployeeListSort.DEFAULT:
+      default:
+        qb.orderBy('employee.created_at', 'DESC');
+        break;
+    }
+
+    const employees = await qb.getMany();
     return employees.map((employee) =>
       this.normalizeEmployeeResponse(employee),
     );
@@ -179,7 +240,14 @@ export class EmployeesService {
   async findOne(id: string): Promise<Employee> {
     const employee = await this.employeeRepository.findOne({
       where: { id },
-      relations: ['doctorProfile', 'therapistProfile'],
+      relations: [
+        'doctorProfile',
+        'therapistProfile',
+        'partner',
+        'partner.province',
+        'partner.district',
+        'partner.ward',
+      ],
     });
     if (!employee) {
       this.logger.warn(`Employee not found: ${id}`);
@@ -221,7 +289,14 @@ export class EmployeesService {
   async findOneForPartner(id: string, partnerId: string): Promise<Employee> {
     const employee = await this.employeeRepository.findOne({
       where: { id, partnerId },
-      relations: ['doctorProfile', 'therapistProfile'],
+      relations: [
+        'doctorProfile',
+        'therapistProfile',
+        'partner',
+        'partner.province',
+        'partner.district',
+        'partner.ward',
+      ],
     });
     if (!employee) {
       this.logger.warn(`Employee ${id} not found for partner ${partnerId}`);
@@ -420,7 +495,40 @@ export class EmployeesService {
         employee.therapistProfile.deviceProficiency ?? [];
     }
 
+    const response = employee as Employee & {
+      clinicId: string | null;
+      clinicName: string | null;
+      location: string | null;
+      experienceYears: number | null;
+    };
+    response.clinicId = employee.partner?.id ?? employee.partnerId ?? null;
+    response.clinicName = employee.partner?.brandName ?? null;
+    response.location = employee.partner
+      ? [
+          employee.partner.district?.fullName,
+          employee.partner.province?.fullName,
+        ]
+          .filter(Boolean)
+          .join(', ')
+      : null;
+    response.experienceYears =
+      employee.doctorProfile?.experienceYears ??
+      this.calculateExperienceYears(employee.startDate);
+
     return employee;
+  }
+
+  private calculateExperienceYears(startDate?: Date | null): number | null {
+    if (!startDate) return null;
+    const start = new Date(startDate);
+    if (Number.isNaN(start.getTime())) return null;
+    const now = new Date();
+    let years = now.getFullYear() - start.getFullYear();
+    const hasNotReachedAnniversary =
+      now.getMonth() < start.getMonth() ||
+      (now.getMonth() === start.getMonth() && now.getDate() < start.getDate());
+    if (hasNotReachedAnniversary) years -= 1;
+    return Math.max(years, 0);
   }
 
   // ──────────────────────────────────────────────────────────────

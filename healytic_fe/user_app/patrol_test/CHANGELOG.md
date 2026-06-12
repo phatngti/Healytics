@@ -5,6 +5,16 @@
 
 ---
 
+## [2026-05-27] — Selective Backdoor Cleanup
+
+### Refactored
+
+| File | Test Case | Description |
+|------|-----------|-------------|
+| `common.dart`, `helpers/backend_backdoor_helper.dart`, `fixtures/test_fixtures.json` | Real backend lane | Seeds additively, registers teardown cleanup by returned seed IDs, and disables reset-before-each-test truncation |
+
+---
+
 ## [2026-05-20] — Dual-Lane E2E Upgrade
 
 ### Added

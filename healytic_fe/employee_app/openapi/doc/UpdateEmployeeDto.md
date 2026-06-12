@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **employeeCode** | **String** |  | [optional] 
 **fullName** | **String** |  | [optional] 
 **email** | **String** |  | [optional] 
+**password** | **String** | New employee account password | [optional] 
 **role** | [**EmployeeRole**](EmployeeRole.md) |  | [optional] 
 **status** | [**EmployeeStatus**](EmployeeStatus.md) |  | [optional] 
 **firstName** | **String** |  | [optional] 

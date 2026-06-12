@@ -8,6 +8,7 @@ part 'create_category.request.g.dart';
 abstract class CreateCategoryRequest with _$CreateCategoryRequest {
   const factory CreateCategoryRequest({
     required String name,
+    String? parentId,
     @Default('') String description,
     @Default('category') String iconName,
     @Default(0xFF6366F1) int colorValue,

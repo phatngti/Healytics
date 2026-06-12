@@ -81,9 +81,19 @@ export class ListAppointmentsHandler {
 
     // ── Filter by category ──────────────────────────────────────
     if (query?.categoryId) {
-      qb.andWhere('product.category_id = :categoryId', {
-        categoryId: query.categoryId,
-      });
+      qb.andWhere(
+        `product.category_id IN (
+          SELECT category_filter.id
+          FROM categories category_filter
+          WHERE category_filter.deleted_at IS NULL
+            AND category_filter.is_active = true
+            AND (
+              category_filter.id = :categoryId
+              OR category_filter.parent_id = :categoryId
+            )
+        )`,
+        { categoryId: query.categoryId },
+      );
     }
 
     // ── Sort by time ────────────────────────────────────────────

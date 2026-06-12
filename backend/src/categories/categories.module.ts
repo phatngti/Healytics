@@ -9,6 +9,7 @@ import { Product } from '@/common/entities/product.entity';
 import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { PartnersModule } from '@/partners/partners.module';
+import { SearchModule } from '@/search/search.module';
 import { CreateCategoryHandler } from './application/handlers/create-category.handler';
 import { UpdateCategoryHandler } from './application/handlers/update-category.handler';
 import { RemoveCategoryHandler } from './application/handlers/remove-category.handler';
@@ -22,6 +23,7 @@ import { RemoveCategoryHandler } from './application/handlers/remove-category.ha
       Employee,
     ]),
     PartnersModule,
+    SearchModule,
   ],
   controllers: [
     CategoriesController,

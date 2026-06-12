@@ -1,4 +1,5 @@
 import 'package:admin_panel/core/keys/integration_test_keys.dart';
+import 'package:admin_panel/features/partner/products/domain/category.entity.dart';
 import 'package:common/widgets/table/helper.dart';
 import 'package:admin_panel/features/partner/products/presentation/providers/product.provider.dart';
 import 'package:admin_panel/features/partner/products/presentation/widgets/table/table_components/product_table_actions.widget.dart';
@@ -66,18 +67,31 @@ class ProductTableSource {
                     ),
             ),
           ),
-          DataCell(Align(
-            alignment: Alignment.centerLeft,
-            child: Text(product.category.name),
-          )),
-          DataCell(Align(
-            alignment: Alignment.centerLeft,
-            child: Text(product.name),
-          )),
-          DataCell(Align(
-            alignment: Alignment.centerLeft,
-            child: Text(product.basePrice.toString()),
-          )),
+          DataCell(
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(_displayValue(product.category.categoryDisplayName)),
+            ),
+          ),
+          DataCell(
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                _displayValue(product.category.subCategoryDisplayName),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+          DataCell(
+            Align(alignment: Alignment.centerLeft, child: Text(product.name)),
+          ),
+          DataCell(
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(product.basePrice.toString()),
+            ),
+          ),
         ],
       );
     }).toList();
@@ -121,5 +135,10 @@ class ProductTableSource {
       }
     }
     return rows;
+  }
+
+  static String _displayValue(String value) {
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? '-' : trimmed;
   }
 }

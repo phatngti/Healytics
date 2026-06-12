@@ -34,6 +34,12 @@ void main() {
       // TODO
     });
 
+    // If true, backend selects the best eligible available specialist for this service and time slot.
+    // bool autoAssignStaff (default value: false)
+    test('to test the property `autoAssignStaff`', () async {
+      // TODO
+    });
+
 
   });
 

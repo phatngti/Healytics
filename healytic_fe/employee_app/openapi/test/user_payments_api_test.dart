@@ -17,6 +17,13 @@ void main() {
   // final instance = UserPaymentsApi();
 
   group('tests for UserPaymentsApi', () {
+    // Confirm signed MoMo return payload for booking
+    //
+    //Future userPaymentControllerConfirmMoMoReturn(String bookingId, Object body) async
+    test('test userPaymentControllerConfirmMoMoReturn', () async {
+      // TODO
+    });
+
     // Confirm and persist a saved Stripe card
     //
     //Future<SavedPaymentCardDto> userPaymentControllerConfirmStripeSetupIntent(String setupIntentId, ConfirmStripeSetupIntentDto confirmStripeSetupIntentDto) async

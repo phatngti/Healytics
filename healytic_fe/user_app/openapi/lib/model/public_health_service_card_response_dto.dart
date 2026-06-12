@@ -18,10 +18,15 @@ class PublicHealthServiceCardResponseDto {
     required this.slug,
     this.imageUrl,
     required this.category,
+    this.categoryId,
+    this.parentCategoryId,
+    this.parentCategoryName,
     required this.duration,
     required this.price,
+    required this.priceAmount,
     required this.rating,
     required this.vendorName,
+    this.clinicId,
     required this.location,
     this.staffAvatars = const [],
     required this.type,
@@ -44,13 +49,47 @@ class PublicHealthServiceCardResponseDto {
 
   String category;
 
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  Object? categoryId;
+
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  Object? parentCategoryId;
+
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  Object? parentCategoryName;
+
   String duration;
 
   String price;
 
+  num priceAmount;
+
   String rating;
 
   String vendorName;
+
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  Object? clinicId;
 
   String location;
 
@@ -65,10 +104,15 @@ class PublicHealthServiceCardResponseDto {
     other.slug == slug &&
     other.imageUrl == imageUrl &&
     other.category == category &&
+    other.categoryId == categoryId &&
+    other.parentCategoryId == parentCategoryId &&
+    other.parentCategoryName == parentCategoryName &&
     other.duration == duration &&
     other.price == price &&
+    other.priceAmount == priceAmount &&
     other.rating == rating &&
     other.vendorName == vendorName &&
+    other.clinicId == clinicId &&
     other.location == location &&
     _deepEquality.equals(other.staffAvatars, staffAvatars) &&
     other.type == type;
@@ -81,16 +125,21 @@ class PublicHealthServiceCardResponseDto {
     (slug.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (category.hashCode) +
+    (categoryId == null ? 0 : categoryId!.hashCode) +
+    (parentCategoryId == null ? 0 : parentCategoryId!.hashCode) +
+    (parentCategoryName == null ? 0 : parentCategoryName!.hashCode) +
     (duration.hashCode) +
     (price.hashCode) +
+    (priceAmount.hashCode) +
     (rating.hashCode) +
     (vendorName.hashCode) +
+    (clinicId == null ? 0 : clinicId!.hashCode) +
     (location.hashCode) +
     (staffAvatars.hashCode) +
     (type.hashCode);
 
   @override
-  String toString() => 'PublicHealthServiceCardResponseDto[id=$id, name=$name, slug=$slug, imageUrl=$imageUrl, category=$category, duration=$duration, price=$price, rating=$rating, vendorName=$vendorName, location=$location, staffAvatars=$staffAvatars, type=$type]';
+  String toString() => 'PublicHealthServiceCardResponseDto[id=$id, name=$name, slug=$slug, imageUrl=$imageUrl, category=$category, categoryId=$categoryId, parentCategoryId=$parentCategoryId, parentCategoryName=$parentCategoryName, duration=$duration, price=$price, priceAmount=$priceAmount, rating=$rating, vendorName=$vendorName, clinicId=$clinicId, location=$location, staffAvatars=$staffAvatars, type=$type]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -103,10 +152,31 @@ class PublicHealthServiceCardResponseDto {
       json[r'imageUrl'] = null;
     }
       json[r'category'] = this.category;
+    if (this.categoryId != null) {
+      json[r'categoryId'] = this.categoryId;
+    } else {
+      json[r'categoryId'] = null;
+    }
+    if (this.parentCategoryId != null) {
+      json[r'parentCategoryId'] = this.parentCategoryId;
+    } else {
+      json[r'parentCategoryId'] = null;
+    }
+    if (this.parentCategoryName != null) {
+      json[r'parentCategoryName'] = this.parentCategoryName;
+    } else {
+      json[r'parentCategoryName'] = null;
+    }
       json[r'duration'] = this.duration;
       json[r'price'] = this.price;
+      json[r'priceAmount'] = this.priceAmount;
       json[r'rating'] = this.rating;
       json[r'vendorName'] = this.vendorName;
+    if (this.clinicId != null) {
+      json[r'clinicId'] = this.clinicId;
+    } else {
+      json[r'clinicId'] = null;
+    }
       json[r'location'] = this.location;
       json[r'staffAvatars'] = this.staffAvatars;
       json[r'type'] = this.type;
@@ -137,10 +207,15 @@ class PublicHealthServiceCardResponseDto {
         slug: mapValueOfType<String>(json, r'slug')!,
         imageUrl: mapValueOfType<Object>(json, r'imageUrl'),
         category: mapValueOfType<String>(json, r'category')!,
+        categoryId: mapValueOfType<Object>(json, r'categoryId'),
+        parentCategoryId: mapValueOfType<Object>(json, r'parentCategoryId'),
+        parentCategoryName: mapValueOfType<Object>(json, r'parentCategoryName'),
         duration: mapValueOfType<String>(json, r'duration')!,
         price: mapValueOfType<String>(json, r'price')!,
+        priceAmount: num.parse('${json[r'priceAmount']}'),
         rating: mapValueOfType<String>(json, r'rating')!,
         vendorName: mapValueOfType<String>(json, r'vendorName')!,
+        clinicId: mapValueOfType<Object>(json, r'clinicId'),
         location: mapValueOfType<String>(json, r'location')!,
         staffAvatars: json[r'staffAvatars'] is Iterable
             ? (json[r'staffAvatars'] as Iterable).cast<String>().toList(growable: false)
@@ -199,6 +274,7 @@ class PublicHealthServiceCardResponseDto {
     'category',
     'duration',
     'price',
+    'priceAmount',
     'rating',
     'vendorName',
     'location',

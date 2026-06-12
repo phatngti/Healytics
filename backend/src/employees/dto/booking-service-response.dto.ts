@@ -64,8 +64,22 @@ export class BookingServiceResponseDto {
   clinicName: string | null;
 
   @Expose()
+  @ApiPropertyOptional({
+    description: 'Clinic or facility ID',
+    nullable: true,
+  })
+  clinicId: string | null;
+
+  @Expose()
   @ApiPropertyOptional({ description: 'Clinic street address', nullable: true })
   clinicAddress: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({
+    description: 'Clinic location label',
+    nullable: true,
+  })
+  location: string | null;
 
   @Expose()
   @ApiPropertyOptional({
@@ -84,6 +98,22 @@ export class BookingServiceResponseDto {
   @ApiPropertyOptional({ description: 'Raw price in VND', example: 850000 })
   priceVnd: number | null;
 
+  @Expose()
+  @ApiPropertyOptional({ description: 'Sub-category ID', nullable: true })
+  categoryId: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Sub-category name', nullable: true })
+  categoryName: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Root category ID', nullable: true })
+  parentCategoryId: string | null;
+
+  @Expose()
+  @ApiPropertyOptional({ description: 'Root category name', nullable: true })
+  parentCategoryName: string | null;
+
   /**
    * Maps a Product entity → BookingServiceResponseDto.
    * @param product  The product entity (with media + productDefinition loaded)
@@ -98,6 +128,7 @@ export class BookingServiceResponseDto {
     userLng?: number | null,
   ): BookingServiceResponseDto {
     const dto = new BookingServiceResponseDto();
+    const resolvedPartner = product.partner ?? partner ?? null;
     dto.id = product.id;
     dto.title = product.name;
 
@@ -118,23 +149,34 @@ export class BookingServiceResponseDto {
     dto.priceVnd = numPrice;
     dto.price = numPrice ? formatVnd(numPrice) : '';
 
+    dto.categoryId = product.category?.id ?? product.categoryId ?? null;
+    dto.categoryName = product.category?.name ?? null;
+    dto.parentCategoryId = product.category?.parent?.id ?? null;
+    dto.parentCategoryName = product.category?.parent?.name ?? null;
+
     // Clinic info from partner
-    dto.clinicName = partner?.brandName ?? null;
-    dto.clinicAddress = partner?.streetAddress ?? null;
+    dto.clinicId = resolvedPartner?.id ?? product.partnerId ?? null;
+    dto.clinicName = resolvedPartner?.brandName ?? null;
+    dto.clinicAddress = resolvedPartner?.streetAddress ?? null;
+    dto.location = resolvedPartner
+      ? [resolvedPartner.district?.fullName, resolvedPartner.province?.fullName]
+          .filter(Boolean)
+          .join(', ')
+      : null;
 
     // Distance calculation
     dto.distance = null;
     if (
       userLat != null &&
       userLng != null &&
-      partner?.latitude != null &&
-      partner?.longitude != null
+      resolvedPartner?.latitude != null &&
+      resolvedPartner?.longitude != null
     ) {
       const km = haversineKm(
         userLat,
         userLng,
-        partner.latitude,
-        partner.longitude,
+        resolvedPartner.latitude,
+        resolvedPartner.longitude,
       );
       dto.distance = `${km.toFixed(1)} km`;
     }

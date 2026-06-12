@@ -16,6 +16,9 @@ class PublicCategoryDto {
   @ApiProperty({ type: String, example: 'a1b2c3d4-...' })
   id: string;
 
+  @ApiPropertyOptional({ type: String, nullable: true })
+  parentId: string | null;
+
   @ApiProperty({ type: String, example: 'Spa & Massage' })
   name: string;
 
@@ -28,6 +31,9 @@ class PublicCategoryDto {
     example: 'https://example.com/category.jpg',
   })
   imageUrl: string | null;
+
+  @ApiPropertyOptional({ type: PublicCategoryDto, nullable: true })
+  parent: PublicCategoryDto | null;
 }
 
 class PublicClinicDto {
@@ -109,15 +115,28 @@ export class PublicHealthServiceInfoResponseDto {
     dto.category = product.category
       ? {
           id: product.category.id,
+          parentId: product.category.parentId,
           name: product.category.name,
           slug: product.category.slug,
           imageUrl: product.category.imageUrl,
+          parent: product.category.parent
+            ? {
+                id: product.category.parent.id,
+                parentId: product.category.parent.parentId,
+                name: product.category.parent.name,
+                slug: product.category.parent.slug,
+                imageUrl: product.category.parent.imageUrl,
+                parent: null,
+              }
+            : null,
         }
       : {
           id: '',
+          parentId: null,
           name: 'Uncategorized',
           slug: 'uncategorized',
           imageUrl: null,
+          parent: null,
         };
     dto.images = (product.media ?? [])
       .sort((a, b) => a.sortOrder - b.sortOrder)

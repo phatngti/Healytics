@@ -19,6 +19,9 @@ class CategoryResponseDto {
     this.description,
     this.imageUrl,
     required this.isActive,
+    this.parentId,
+    required this.isRoot,
+    required this.subCategoryCount,
     this.categoryType = 'primary',
     required this.createdAt,
     required this.updatedAt,
@@ -44,6 +47,15 @@ class CategoryResponseDto {
 
   /// Whether category is active
   bool isActive;
+
+  /// Parent category ID. Null for root categories.
+  String? parentId;
+
+  /// Whether this category is a root category.
+  bool isRoot;
+
+  /// Number of direct child sub-categories.
+  num subCategoryCount;
 
   /// Category type for UI grouping
   String categoryType;
@@ -74,6 +86,9 @@ class CategoryResponseDto {
     other.description == description &&
     other.imageUrl == imageUrl &&
     other.isActive == isActive &&
+    other.parentId == parentId &&
+    other.isRoot == isRoot &&
+    other.subCategoryCount == subCategoryCount &&
     other.categoryType == categoryType &&
     other.createdAt == createdAt &&
     other.updatedAt == updatedAt &&
@@ -89,6 +104,9 @@ class CategoryResponseDto {
     (description == null ? 0 : description!.hashCode) +
     (imageUrl == null ? 0 : imageUrl!.hashCode) +
     (isActive.hashCode) +
+    (parentId == null ? 0 : parentId!.hashCode) +
+    (isRoot.hashCode) +
+    (subCategoryCount.hashCode) +
     (categoryType.hashCode) +
     (createdAt.hashCode) +
     (updatedAt.hashCode) +
@@ -96,7 +114,7 @@ class CategoryResponseDto {
     (children.hashCode);
 
   @override
-  String toString() => 'CategoryResponseDto[id=$id, name=$name, slug=$slug, description=$description, imageUrl=$imageUrl, isActive=$isActive, categoryType=$categoryType, createdAt=$createdAt, updatedAt=$updatedAt, parent=$parent, children=$children]';
+  String toString() => 'CategoryResponseDto[id=$id, name=$name, slug=$slug, description=$description, imageUrl=$imageUrl, isActive=$isActive, parentId=$parentId, isRoot=$isRoot, subCategoryCount=$subCategoryCount, categoryType=$categoryType, createdAt=$createdAt, updatedAt=$updatedAt, parent=$parent, children=$children]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -114,6 +132,13 @@ class CategoryResponseDto {
       json[r'imageUrl'] = null;
     }
       json[r'isActive'] = this.isActive;
+    if (this.parentId != null) {
+      json[r'parentId'] = this.parentId;
+    } else {
+      json[r'parentId'] = null;
+    }
+      json[r'isRoot'] = this.isRoot;
+      json[r'subCategoryCount'] = this.subCategoryCount;
       json[r'categoryType'] = this.categoryType;
       json[r'createdAt'] = this.createdAt.toUtc().toIso8601String();
       json[r'updatedAt'] = this.updatedAt.toUtc().toIso8601String();
@@ -151,6 +176,9 @@ class CategoryResponseDto {
         description: mapValueOfType<String>(json, r'description'),
         imageUrl: mapValueOfType<String>(json, r'imageUrl'),
         isActive: mapValueOfType<bool>(json, r'isActive')!,
+        parentId: mapValueOfType<String>(json, r'parentId'),
+        isRoot: mapValueOfType<bool>(json, r'isRoot')!,
+        subCategoryCount: num.parse('${json[r'subCategoryCount']}'),
         categoryType: mapValueOfType<String>(json, r'categoryType') ?? 'primary',
         createdAt: mapDateTime(json, r'createdAt', r'')!,
         updatedAt: mapDateTime(json, r'updatedAt', r'')!,
@@ -207,6 +235,8 @@ class CategoryResponseDto {
     'name',
     'slug',
     'isActive',
+    'isRoot',
+    'subCategoryCount',
     'createdAt',
     'updatedAt',
   };

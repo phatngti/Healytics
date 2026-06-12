@@ -7,6 +7,10 @@ import '../../../../router/routes.dart';
 import '../../domain/entities/booking.entity.dart';
 import '../providers/booking.provider.dart';
 import '../providers/booking_flow.provider.dart';
+import 'package:user_app/features/service_details/presentation/providers/service_details.provider.dart';
+import 'package:user_app/features/service_details/domain/entities/service_details.entity.dart'
+    as service_details;
+import '../widgets/book_appointment/auto_assigned_time_slot_section.widget.dart';
 import '../widgets/book_appointment/booking_bottom_action.widget.dart';
 import '../widgets/book_appointment/booking_step_indicator.widget.dart';
 import '../widgets/book_appointment/date_picker_row.widget.dart';
@@ -40,12 +44,7 @@ class _SelectSpecialistScreenState
   int _selectedTimeSlotIdx = -1;
   String _selectedTimeSlotLabel = '';
 
-  List<BookingSpecialist> _specialists = [];
-
-  bool get _canContinue =>
-      _selectedSpecialistIdx >= 0 &&
-      _selectedDateIdx >= 0 &&
-      _selectedTimeSlotIdx >= 0;
+  bool get _canContinue => _selectedDateIdx >= 0 && _selectedTimeSlotIdx >= 0;
 
   void _handleBack() {
     if (context.canPop()) context.pop();
@@ -54,29 +53,36 @@ class _SelectSpecialistScreenState
   void _handleContinue() {
     if (!_canContinue) return;
 
-    final specialist = _specialists[_selectedSpecialistIdx];
     final flowNotifier = ref.read(bookingFlowProvider.notifier);
+    final flowState = ref.read(bookingFlowProvider);
+    final serviceId = flowState.selectedService?.id;
 
-    flowNotifier.selectSpecialist(specialist);
+    if (_selectedSpecialistIdx >= 0 && serviceId != null) {
+      final specialists = ref
+          .read(specialistsByServiceProvider(serviceId))
+          .value;
+      if (specialists == null || _selectedSpecialistIdx >= specialists.length) {
+        return;
+      }
+      flowNotifier.selectSpecialist(specialists[_selectedSpecialistIdx]);
+    } else {
+      flowNotifier.selectAutoAssignedSpecialist();
+    }
 
-    final selectedDate = DateTime.now().add(
-      Duration(days: _selectedDateIdx),
-    );
+    final selectedDate = DateTime.now().add(Duration(days: _selectedDateIdx));
     flowNotifier.selectDate(selectedDate);
 
-    flowNotifier.selectTimeSlot(
-      _selectedTimeSlotIdx,
-      _selectedTimeSlotLabel,
-    );
+    flowNotifier.selectTimeSlot(_selectedTimeSlotIdx, _selectedTimeSlotLabel);
 
     const BookingSummaryRoute().push(context);
   }
 
   void _onSpecialistSelected(int index) {
     setState(() {
-      _selectedSpecialistIdx = index;
+      _selectedSpecialistIdx = _selectedSpecialistIdx == index ? -1 : index;
       _selectedDateIdx = -1;
       _selectedTimeSlotIdx = -1;
+      _selectedTimeSlotLabel = '';
     });
   }
 
@@ -87,10 +93,7 @@ class _SelectSpecialistScreenState
     });
   }
 
-  void _onTimeSlotSelected(
-    int index,
-    String label,
-  ) {
+  void _onTimeSlotSelected(int index, String label) {
     setState(() {
       _selectedTimeSlotIdx = index;
       _selectedTimeSlotLabel = label;
@@ -99,19 +102,19 @@ class _SelectSpecialistScreenState
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final hPad = AppDimens.horizontalPadding(context);
     final sectionGap = AppDimens.sectionSpacing(context);
-
-    final specialistsAsync = ref.watch(
-      specialistsByCategoryProvider(widget.categoryId),
-    );
 
     // Read selected service from flow state
     // for conflict detection.
     final flowState = ref.watch(bookingFlowProvider);
-    final currentServiceId =
-        flowState.selectedService?.id;
+    final currentServiceId = flowState.selectedService?.id;
+    final bookingSpecialistsAsync = currentServiceId == null
+        ? null
+        : ref.watch(specialistsByServiceProvider(currentServiceId));
+    final autoSpecialistsAsync = currentServiceId == null
+        ? null
+        : ref.watch(serviceEmployeesProvider(serviceId: currentServiceId));
 
     return Scaffold(
       appBar: AppBar(
@@ -122,28 +125,28 @@ class _SelectSpecialistScreenState
         ),
         title: const Text('Book Appointment'),
       ),
-      body: specialistsAsync.when(
-        loading: () =>
-            const Center(child: CircularProgressIndicator()),
-        error: (e, _) =>
-            Center(child: Text('Error: $e')),
-        data: (specialists) {
-          _specialists = specialists;
-          return _Step2Body(
-            categoryId: widget.categoryId,
-            hPad: hPad,
-            sectionGap: sectionGap,
-            specialists: specialists,
-            selectedSpecialistIdx: _selectedSpecialistIdx,
-            selectedDateIdx: _selectedDateIdx,
-            selectedTimeSlotIdx: _selectedTimeSlotIdx,
-            currentServiceId: currentServiceId,
-            onSpecialistSelected: _onSpecialistSelected,
-            onDateSelected: _onDateSelected,
-            onTimeSlotSelected: _onTimeSlotSelected,
-          );
-        },
-      ),
+      body:
+          currentServiceId == null ||
+              bookingSpecialistsAsync == null ||
+              autoSpecialistsAsync == null
+          ? const Center(child: Text('Select a service first.'))
+          : _CombinedSpecialistBody(
+              bookingSpecialistsAsync: bookingSpecialistsAsync,
+              autoSpecialistsAsync: autoSpecialistsAsync,
+              builder: (bookingSpecialists, autoSpecialists) => _Step2Body(
+                hPad: hPad,
+                sectionGap: sectionGap,
+                serviceId: currentServiceId,
+                bookingSpecialists: bookingSpecialists,
+                autoSpecialists: autoSpecialists,
+                selectedSpecialistIdx: _selectedSpecialistIdx,
+                selectedDateIdx: _selectedDateIdx,
+                selectedTimeSlotIdx: _selectedTimeSlotIdx,
+                onSpecialistSelected: _onSpecialistSelected,
+                onDateSelected: _onDateSelected,
+                onTimeSlotSelected: _onTimeSlotSelected,
+              ),
+            ),
       bottomNavigationBar: BookingBottomAction(
         canContinue: _canContinue,
         onContinue: _handleContinue,
@@ -155,30 +158,27 @@ class _SelectSpecialistScreenState
 /// Scrollable body for Step 2.
 class _Step2Body extends StatelessWidget {
   const _Step2Body({
-    required this.categoryId,
     required this.hPad,
     required this.sectionGap,
-    required this.specialists,
+    required this.serviceId,
+    required this.bookingSpecialists,
+    required this.autoSpecialists,
     required this.selectedSpecialistIdx,
     required this.selectedDateIdx,
     required this.selectedTimeSlotIdx,
-    required this.currentServiceId,
     required this.onSpecialistSelected,
     required this.onDateSelected,
     required this.onTimeSlotSelected,
   });
 
-  final String categoryId;
   final double hPad;
   final double sectionGap;
-  final List<BookingSpecialist> specialists;
+  final String serviceId;
+  final List<BookingSpecialist> bookingSpecialists;
+  final List<service_details.SpecialistEntity> autoSpecialists;
   final int selectedSpecialistIdx;
   final int selectedDateIdx;
   final int selectedTimeSlotIdx;
-
-  /// Service ID from Step 1, passed to
-  /// [TimeSlotSection] for conflict detection.
-  final String? currentServiceId;
 
   final ValueChanged<int> onSpecialistSelected;
   final ValueChanged<int> onDateSelected;
@@ -208,59 +208,159 @@ class _Step2Body extends StatelessWidget {
             ),
             SizedBox(height: sectionGap),
 
-            // Select Specialist
-            SpecialistCardList(
-              specialists: specialists,
-              selectedIndex: selectedSpecialistIdx,
-              onSelected: onSpecialistSelected,
-            ),
+            _OptionalSpecialistNotice(specialistCount: autoSpecialists.length),
 
-            // Date & Time (only if specialist
-            // is selected)
-            if (selectedSpecialistIdx >= 0) ...[
-              SizedBox(height: sectionGap),
-              _SectionTitle(title: 'Select Date'),
-              SizedBox(height: AppDimens.spaceMd),
-              DatePickerRow(
-                selectedIndex: selectedDateIdx,
-                onSelected: onDateSelected,
+            SizedBox(height: sectionGap),
+            if (bookingSpecialists.isEmpty)
+              const _EmptySpecialistMessage()
+            else
+              SpecialistCardList(
+                specialists: bookingSpecialists,
+                selectedIndex: selectedSpecialistIdx,
+                onSelected: onSpecialistSelected,
+                title: 'Select Specialist (Optional)',
               ),
-            ],
+
+            SizedBox(height: sectionGap),
+            _SectionTitle(title: 'Select Date'),
+            SizedBox(height: AppDimens.spaceMd),
+            DatePickerRow(
+              selectedIndex: selectedDateIdx,
+              onSelected: onDateSelected,
+            ),
 
             if (selectedDateIdx >= 0) ...[
               SizedBox(height: sectionGap),
               _SectionTitle(title: 'Available Time Slots'),
               SizedBox(height: AppDimens.spaceMd),
-              TimeSlotSection(
-                employeeId: specialists[
-                        selectedSpecialistIdx]
-                    .id,
-                currentServiceId:
-                    currentServiceId,
-                selectedDate: DateTime.now().add(
-                  Duration(days: selectedDateIdx),
+              if (selectedSpecialistIdx >= 0)
+                TimeSlotSection(
+                  employeeId: bookingSpecialists[selectedSpecialistIdx].id,
+                  currentServiceId: serviceId,
+                  selectedDate: DateTime.now().add(
+                    Duration(days: selectedDateIdx),
+                  ),
+                  selectedIndex: selectedTimeSlotIdx,
+                  onSelected: onTimeSlotSelected,
+                )
+              else
+                AutoAssignedTimeSlotSection(
+                  specialists: autoSpecialists,
+                  selectedDate: DateTime.now().add(
+                    Duration(days: selectedDateIdx),
+                  ),
+                  selectedIndex: selectedTimeSlotIdx,
+                  onSelected: onTimeSlotSelected,
                 ),
-                selectedIndex: selectedTimeSlotIdx,
-                onSelected: onTimeSlotSelected,
-              ),
             ],
 
             SizedBox(height: sectionGap),
 
-            // ── Reviews (shown when specialist
-            //    is selected) ──
-            if (selectedSpecialistIdx >= 0 && specialists.isNotEmpty)
+            if (selectedSpecialistIdx >= 0 && bookingSpecialists.isNotEmpty)
               ReviewsSectionLoader(
-                employeeId: specialists[selectedSpecialistIdx].id,
+                employeeId: bookingSpecialists[selectedSpecialistIdx].id,
                 onViewMoreTap: (context) => EmployeeReviewsRoute(
-                  employeeId: specialists[selectedSpecialistIdx].id,
-                  employeeName: specialists[selectedSpecialistIdx].name,
+                  employeeId: bookingSpecialists[selectedSpecialistIdx].id,
+                  employeeName: bookingSpecialists[selectedSpecialistIdx].name,
                 ).push(context),
               ),
 
             SizedBox(height: sectionGap),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CombinedSpecialistBody extends StatelessWidget {
+  const _CombinedSpecialistBody({
+    required this.bookingSpecialistsAsync,
+    required this.autoSpecialistsAsync,
+    required this.builder,
+  });
+
+  final AsyncValue<List<BookingSpecialist>> bookingSpecialistsAsync;
+  final AsyncValue<List<service_details.SpecialistEntity>> autoSpecialistsAsync;
+  final Widget Function(
+    List<BookingSpecialist>,
+    List<service_details.SpecialistEntity>,
+  )
+  builder;
+
+  @override
+  Widget build(BuildContext context) {
+    if (bookingSpecialistsAsync.isLoading || autoSpecialistsAsync.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final error = bookingSpecialistsAsync.error ?? autoSpecialistsAsync.error;
+    if (error != null) {
+      return Center(child: Text('Error: $error'));
+    }
+
+    return builder(
+      bookingSpecialistsAsync.value ?? const [],
+      autoSpecialistsAsync.value ?? const [],
+    );
+  }
+}
+
+class _OptionalSpecialistNotice extends StatelessWidget {
+  const _OptionalSpecialistNotice({required this.specialistCount});
+
+  final int specialistCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(AppDimens.spaceLg),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.45),
+        borderRadius: AppDimens.radiusMedium,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Choose a specialist or let the clinic assign one',
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(height: AppDimens.spaceXs),
+          Text(
+            specialistCount > 0
+                ? 'Leave specialist unselected to book with the best available specialist from $specialistCount eligible clinic staff.'
+                : 'The clinic will confirm the specialist after booking.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptySpecialistMessage extends StatelessWidget {
+  const _EmptySpecialistMessage();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(AppDimens.spaceLg),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: AppDimens.radiusMedium,
+      ),
+      child: Text(
+        'No specialist list is available. The clinic will assign one automatically.',
+        style: theme.textTheme.bodyMedium,
       ),
     );
   }

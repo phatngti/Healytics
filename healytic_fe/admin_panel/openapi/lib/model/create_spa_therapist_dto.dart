@@ -16,6 +16,7 @@ class CreateSpaTherapistDto {
     required this.firstName,
     required this.lastName,
     required this.email,
+    required this.password,
     this.phone,
     this.dateOfBirth,
     this.gender,
@@ -48,6 +49,9 @@ class CreateSpaTherapistDto {
 
   /// Email address
   String email;
+
+  /// Initial employee account password
+  String password;
 
   /// Phone number
   ///
@@ -165,6 +169,7 @@ class CreateSpaTherapistDto {
     other.firstName == firstName &&
     other.lastName == lastName &&
     other.email == email &&
+    other.password == password &&
     other.phone == phone &&
     other.dateOfBirth == dateOfBirth &&
     other.gender == gender &&
@@ -193,6 +198,7 @@ class CreateSpaTherapistDto {
     (firstName.hashCode) +
     (lastName.hashCode) +
     (email.hashCode) +
+    (password.hashCode) +
     (phone == null ? 0 : phone!.hashCode) +
     (dateOfBirth == null ? 0 : dateOfBirth!.hashCode) +
     (gender == null ? 0 : gender!.hashCode) +
@@ -216,13 +222,14 @@ class CreateSpaTherapistDto {
     (partnerId == null ? 0 : partnerId!.hashCode);
 
   @override
-  String toString() => 'CreateSpaTherapistDto[firstName=$firstName, lastName=$lastName, email=$email, phone=$phone, dateOfBirth=$dateOfBirth, gender=$gender, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, employeeId=$employeeId, employmentType=$employmentType, startDate=$startDate, schedule=$schedule, workHistory=$workHistory, avatar=$avatar, verificationDocuments=$verificationDocuments, status=$status, description=$description, jobTitle=$jobTitle, therapistLevel=$therapistLevel, commissionRate=$commissionRate, healthCheckDate=$healthCheckDate, skills=$skills, deviceProficiency=$deviceProficiency, partnerId=$partnerId]';
+  String toString() => 'CreateSpaTherapistDto[firstName=$firstName, lastName=$lastName, email=$email, password=$password, phone=$phone, dateOfBirth=$dateOfBirth, gender=$gender, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, employeeId=$employeeId, employmentType=$employmentType, startDate=$startDate, schedule=$schedule, workHistory=$workHistory, avatar=$avatar, verificationDocuments=$verificationDocuments, status=$status, description=$description, jobTitle=$jobTitle, therapistLevel=$therapistLevel, commissionRate=$commissionRate, healthCheckDate=$healthCheckDate, skills=$skills, deviceProficiency=$deviceProficiency, partnerId=$partnerId]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'firstName'] = this.firstName;
       json[r'lastName'] = this.lastName;
       json[r'email'] = this.email;
+      json[r'password'] = this.password;
     if (this.phone != null) {
       json[r'phone'] = this.phone;
     } else {
@@ -313,6 +320,7 @@ class CreateSpaTherapistDto {
         firstName: mapValueOfType<String>(json, r'firstName')!,
         lastName: mapValueOfType<String>(json, r'lastName')!,
         email: mapValueOfType<String>(json, r'email')!,
+        password: mapValueOfType<String>(json, r'password')!,
         phone: mapValueOfType<String>(json, r'phone'),
         dateOfBirth: mapValueOfType<String>(json, r'dateOfBirth'),
         gender: CreateSpaTherapistDtoGenderEnum.fromJson(json[r'gender']),
@@ -388,6 +396,7 @@ class CreateSpaTherapistDto {
     'firstName',
     'lastName',
     'email',
+    'password',
     'emergencyContactName',
     'emergencyContactPhone',
     'employeeId',

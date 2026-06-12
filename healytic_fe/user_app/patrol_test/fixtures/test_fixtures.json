@@ -1,8 +1,8 @@
 {
   "backdoor": {
     "enabled": true,
-    "baseUrl": "https://dev.healytics.me/backend",
-    "resetBeforeEachTest": true
+    "baseUrl": "https://healytics.me/backend",
+    "resetBeforeEachTest": false
   },
   "auth": {
     "defaultUserKey": "main_user"

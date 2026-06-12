@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/admin/category/domain/category.entity.dart';
 import 'package:admin_panel/features/admin/category/domain/category_form_field.dart';
 import 'package:admin_panel/features/admin/category/domain/category_status.dart';
 import 'package:admin_panel/features/admin/category/presentation/widgets/category_icon_picker.widget.dart';
@@ -22,6 +23,7 @@ class CategoryEditDesktop extends StatefulWidget {
     this.onSubmit,
     this.initialValue = const {},
     this.isLoadingData = false,
+    this.parentCategories = const [],
   });
 
   /// Called when the user taps the Cancel/Back button.
@@ -35,6 +37,8 @@ class CategoryEditDesktop extends StatefulWidget {
 
   /// Whether category data is still being fetched.
   final bool isLoadingData;
+
+  final List<CategoryEntity> parentCategories;
 
   @override
   State<CategoryEditDesktop> createState() => _CategoryEditDesktopState();
@@ -128,6 +132,8 @@ class _CategoryEditDesktopState extends State<CategoryEditDesktop> {
                             return null;
                           },
                         ),
+                        AppDimens.verticalMedium,
+                        _buildParentCategoryField(context),
                         AppDimens.verticalMedium,
                         FormFieldBuilders.buildTextField(
                           context,
@@ -304,6 +310,31 @@ class _CategoryEditDesktopState extends State<CategoryEditDesktop> {
           ...children,
         ],
       ),
+    );
+  }
+
+  Widget _buildParentCategoryField(BuildContext context) {
+    return FormFieldBuilders.buildCustomDropdownField<String>(
+      context,
+      label: 'Parent Category',
+      fieldKey: CategoryFormField.parentCategory.key,
+      initialValue:
+          widget.initialValue[CategoryFormField.parentCategory.key]
+              ?.toString() ??
+          '',
+      hintText: 'Select parent category',
+      items: [
+        const DropdownMenuItem<String>(
+          value: '',
+          child: Text('Root category'),
+        ),
+        ...widget.parentCategories.map(
+          (category) => DropdownMenuItem<String>(
+            value: category.id.value,
+            child: Text(category.name, overflow: TextOverflow.ellipsis),
+          ),
+        ),
+      ],
     );
   }
 

@@ -32,6 +32,7 @@ describe('EmployeesService', () => {
   const mockEmployeeRepository = {
     find: jest.fn(),
     findOne: jest.fn(),
+    createQueryBuilder: jest.fn(),
   };
 
   const mockPartnerRepository = {
@@ -85,6 +86,26 @@ describe('EmployeesService', () => {
   const mockPartnersService = {
     getFirstHealthPartner: jest.fn().mockResolvedValue(null),
   };
+
+  const createEmployeeQueryBuilder = (result: any[] = []) => {
+    const qb = {
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      addOrderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue(result),
+    };
+    return qb;
+  };
+
+  const expectedEmployeeRelations = [
+    'doctorProfile',
+    'therapistProfile',
+    'partner',
+    'partner.province',
+    'partner.district',
+    'partner.ward',
+  ];
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -349,7 +370,9 @@ describe('EmployeesService', () => {
     it('should return all employees', async () => {
       // Arrange
       const expectedEmployees = [{ id: '1' }, { id: '2' }];
-      mockEmployeeRepository.find.mockResolvedValue(expectedEmployees);
+      mockEmployeeRepository.createQueryBuilder.mockReturnValue(
+        createEmployeeQueryBuilder(expectedEmployees),
+      );
 
       // Act
       const result = await service.findAll();
@@ -360,32 +383,34 @@ describe('EmployeesService', () => {
 
     it('should filter by role when provided', async () => {
       // Arrange
-      mockEmployeeRepository.find.mockResolvedValue([]);
+      const qb = createEmployeeQueryBuilder([]);
+      mockEmployeeRepository.createQueryBuilder.mockReturnValue(qb);
 
       // Act
       await service.findAll({ role: EmployeeRole.DOCTOR });
 
       // Assert
-      expect(mockEmployeeRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { role: EmployeeRole.DOCTOR },
-        }),
-      );
+      expect(qb.andWhere).toHaveBeenCalledWith('employee.role = :role', {
+        role: EmployeeRole.DOCTOR,
+      });
     });
 
     it('should scope to partnerId when provided', async () => {
       // Arrange
       const partnerId = 'partner-uuid';
-      mockEmployeeRepository.find.mockResolvedValue([]);
+      const qb = createEmployeeQueryBuilder([]);
+      mockEmployeeRepository.createQueryBuilder.mockReturnValue(qb);
 
       // Act
       await service.findAll({ role: EmployeeRole.DOCTOR }, partnerId);
 
       // Assert
-      expect(mockEmployeeRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { role: EmployeeRole.DOCTOR, partnerId },
-        }),
+      expect(qb.andWhere).toHaveBeenCalledWith('employee.role = :role', {
+        role: EmployeeRole.DOCTOR,
+      });
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        'employee.partner_id = :partnerId',
+        { partnerId },
       );
     });
   });
@@ -563,7 +588,7 @@ describe('EmployeesService', () => {
       expect(result).toEqual(employee);
       expect(mockEmployeeRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'emp-uuid', partnerId: 'partner-uuid' },
-        relations: ['doctorProfile', 'therapistProfile'],
+        relations: expectedEmployeeRelations,
       });
     });
 
@@ -782,7 +807,7 @@ describe('EmployeesService', () => {
       expect(result).toEqual({ ...employee, ...updateDto });
       expect(mockEmployeeRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'emp-uuid', partnerId: 'partner-uuid' },
-        relations: ['doctorProfile', 'therapistProfile'],
+        relations: expectedEmployeeRelations,
       });
       expect(mockUpdateEmployeeHandler.execute).toHaveBeenCalledWith(
         'emp-uuid',
@@ -827,7 +852,7 @@ describe('EmployeesService', () => {
       // Assert
       expect(mockEmployeeRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'emp-uuid', partnerId: 'partner-uuid' },
-        relations: ['doctorProfile', 'therapistProfile'],
+        relations: expectedEmployeeRelations,
       });
       expect(mockRemoveEmployeeHandler.execute).toHaveBeenCalledWith(
         'emp-uuid',

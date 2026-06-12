@@ -38,8 +38,7 @@ class LoginForm extends HookConsumerWidget {
         FormValidators.email(emailController.text.trim()) == null &&
         FormValidators.password(passwordController.text) == null;
 
-    final authState = ref.watch(authenticateProvider);
-    final isLoading = authState.isLoading;
+    final isSubmitting = useState(false);
 
     // Derive inline error message from auth state.
     final signInError = useState<String?>(null);
@@ -47,7 +46,10 @@ class LoginForm extends HookConsumerWidget {
     // Listen for auth errors and update inline message.
     ref.listen(authenticateProvider, (previous, next) {
       final hasCompletedWithError =
-          previous?.isLoading == true && next.hasError && !next.isLoading;
+          isSubmitting.value &&
+          previous?.isLoading == true &&
+          next.hasError &&
+          !next.isLoading;
       if (hasCompletedWithError) {
         final error = next.error;
         final appEx = AppException.fromError(
@@ -78,9 +80,16 @@ class LoginForm extends HookConsumerWidget {
       final password = formData?['password'] as String;
 
       _log.fine('Submitting sign-in for $email');
-      await ref
-          .read(authenticateProvider.notifier)
-          .login(email: email, password: password);
+      isSubmitting.value = true;
+      try {
+        await ref
+            .read(authenticateProvider.notifier)
+            .login(email: email, password: password);
+      } finally {
+        if (context.mounted) {
+          isSubmitting.value = false;
+        }
+      }
     }
 
     return FormBuilder(
@@ -152,7 +161,9 @@ class LoginForm extends HookConsumerWidget {
                 widthFactor: 0.8,
                 child: AppButton(
                   key: keys.signInPage.signInButton,
-                  onPressed: (isLoading || !hasValidInput) ? null : signIn,
+                  onPressed: (isSubmitting.value || !hasValidInput)
+                      ? null
+                      : signIn,
                   buttonType: ButtonType.elevated,
                   customStyle: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
@@ -164,7 +175,7 @@ class LoginForm extends HookConsumerWidget {
                     textStyle: Theme.of(context).textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
-                  isLoading: isLoading,
+                  isLoading: isSubmitting.value,
                   child: Text('Sign In'),
                 ),
               ),

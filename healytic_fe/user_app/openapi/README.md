@@ -69,6 +69,7 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**accountControllerPostSurvey**](doc//AccountApi.md#accountcontrollerpostsurvey) | **POST** /account/survey | Create one-shot survey for current user
 *AccountApi* | [**accountControllerUpdateAddress**](doc//AccountApi.md#accountcontrollerupdateaddress) | **PATCH** /account/me/address | Update current user address
 *AccountApi* | [**accountControllerUpdateAvatar**](doc//AccountApi.md#accountcontrollerupdateavatar) | **PATCH** /account/me/avatar | Update current user avatar
+*AccountApi* | [**accountControllerUpdateProfile**](doc//AccountApi.md#accountcontrollerupdateprofile) | **PATCH** /account/me/profile | Update current user profile identity
 *AdminAuditLogsApi* | [**auditControllerGetAuditLogs**](doc//AdminAuditLogsApi.md#auditcontrollergetauditlogs) | **GET** /admin/audit-logs | Get audit logs with optional filters
 *AdminCategoriesApi* | [**adminCategoriesControllerCreate**](doc//AdminCategoriesApi.md#admincategoriescontrollercreate) | **POST** /admin/categories | Create a new category
 *AdminCategoriesApi* | [**adminCategoriesControllerFindAll**](doc//AdminCategoriesApi.md#admincategoriescontrollerfindall) | **GET** /admin/categories | List all categories (admin view)
@@ -159,6 +160,7 @@ Class | Method | HTTP request | Description
 *MapboxApi* | [**mapboxControllerGetClientKey**](doc//MapboxApi.md#mapboxcontrollergetclientkey) | **GET** /mapbox/client-key | Get public access token for frontend/mobile SDKs
 *MapboxApi* | [**mapboxControllerReverseGeocode**](doc//MapboxApi.md#mapboxcontrollerreversegeocode) | **GET** /mapbox/reverse-geocode | Reverse geocode lat/lng to address
 *MomoApi* | [**moMoControllerHandleMoMoIPN**](doc//MomoApi.md#momocontrollerhandlemomoipn) | **POST** /momo/ipn | MoMo IPN callback (server-to-server)
+*ObservabilityApi* | [**metricsControllerCollect**](doc//ObservabilityApi.md#metricscontrollercollect) | **GET** /metrics | 
 *PartnerBookingsApi* | [**partnerBookingsControllerGetBooking**](doc//PartnerBookingsApi.md#partnerbookingscontrollergetbooking) | **GET** /partner/bookings/{id} | Get partner booking detail
 *PartnerBookingsApi* | [**partnerBookingsControllerListBookings**](doc//PartnerBookingsApi.md#partnerbookingscontrollerlistbookings) | **GET** /partner/bookings | List bookings for the authenticated partner
 *PartnerChatApi* | [**partnerChatControllerCreateConversation**](doc//PartnerChatApi.md#partnerchatcontrollercreateconversation) | **POST** /partner/chat/conversations | Create a new conversation with a user
@@ -229,6 +231,19 @@ Class | Method | HTTP request | Description
 *S3Api* | [**s3ControllerGetFileUrl**](doc//S3Api.md#s3controllergetfileurl) | **GET** /s3/{key} | Get file URL
 *S3Api* | [**s3ControllerPreSign**](doc//S3Api.md#s3controllerpresign) | **POST** /s3/presign | Get presigned upload URL
 *StripeApi* | [**stripeWebhookControllerHandleStripeWebhook**](doc//StripeApi.md#stripewebhookcontrollerhandlestripewebhook) | **POST** /stripe/webhook | Stripe webhook callback (server-to-server)
+*TestBackdoorApi* | [**testBackdoorControllerCleanup**](doc//TestBackdoorApi.md#testbackdoorcontrollercleanup) | **POST** /test-backdoor/cleanup | Delete only rows returned by a seed response
+*TestBackdoorApi* | [**testBackdoorControllerPrepare**](doc//TestBackdoorApi.md#testbackdoorcontrollerprepare) | **POST** /test-backdoor/prepare | Reset DB then seed a scenario
+*TestBackdoorApi* | [**testBackdoorControllerResetDb**](doc//TestBackdoorApi.md#testbackdoorcontrollerresetdb) | **POST** /test-backdoor/reset-db | Truncate all non-master tables
+*TestBackdoorApi* | [**testBackdoorControllerSeed**](doc//TestBackdoorApi.md#testbackdoorcontrollerseed) | **POST** /test-backdoor/seed | Seed multiple entity types at once
+*TestBackdoorApi* | [**testBackdoorControllerSeedBooking**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedbooking) | **POST** /test-backdoor/seed-booking | Seed a single booking
+*TestBackdoorApi* | [**testBackdoorControllerSeedCart**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedcart) | **POST** /test-backdoor/seed-cart | Seed a single cart item
+*TestBackdoorApi* | [**testBackdoorControllerSeedCategory**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedcategory) | **POST** /test-backdoor/seed-category | Seed a single category
+*TestBackdoorApi* | [**testBackdoorControllerSeedCoupon**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedcoupon) | **POST** /test-backdoor/seed-coupon | Seed a single coupon
+*TestBackdoorApi* | [**testBackdoorControllerSeedEmployee**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedemployee) | **POST** /test-backdoor/seed-employee | Seed a single employee
+*TestBackdoorApi* | [**testBackdoorControllerSeedPartner**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedpartner) | **POST** /test-backdoor/seed-partner | Seed a single partner
+*TestBackdoorApi* | [**testBackdoorControllerSeedService**](doc//TestBackdoorApi.md#testbackdoorcontrollerseedservice) | **POST** /test-backdoor/seed-service | Seed a single health service
+*TestBackdoorApi* | [**testBackdoorControllerSeedUser**](doc//TestBackdoorApi.md#testbackdoorcontrollerseeduser) | **POST** /test-backdoor/seed-user | Seed a single user
+*TestBackdoorApi* | [**testBackdoorControllerStatus**](doc//TestBackdoorApi.md#testbackdoorcontrollerstatus) | **GET** /test-backdoor/status | Check if backdoor is available
 *UserAppointmentsApi* | [**userAppointmentControllerGetAppointment**](doc//UserAppointmentsApi.md#userappointmentcontrollergetappointment) | **GET** /user/appointments/{id} | Get appointment details by ID
 *UserAppointmentsApi* | [**userAppointmentControllerGetServiceManual**](doc//UserAppointmentsApi.md#userappointmentcontrollergetservicemanual) | **GET** /user/appointments/{appointmentId}/manual | Get service manual for an appointment
 *UserAppointmentsApi* | [**userAppointmentControllerListAppointments**](doc//UserAppointmentsApi.md#userappointmentcontrollerlistappointments) | **GET** /user/appointments | List all user appointments with optional distance calculation
@@ -272,6 +287,7 @@ Class | Method | HTTP request | Description
 *UserNotificationsApi* | [**userNotificationControllerGetUnreadCount**](doc//UserNotificationsApi.md#usernotificationcontrollergetunreadcount) | **GET** /user/notifications/unread-count | Get unread notification count
 *UserNotificationsApi* | [**userNotificationControllerMarkAllRead**](doc//UserNotificationsApi.md#usernotificationcontrollermarkallread) | **PATCH** /user/notifications/read-all | Mark all notifications as read
 *UserNotificationsApi* | [**userNotificationControllerMarkRead**](doc//UserNotificationsApi.md#usernotificationcontrollermarkread) | **PATCH** /user/notifications/{id}/read | Mark a specific notification as read
+*UserPaymentsApi* | [**userPaymentControllerConfirmMoMoReturn**](doc//UserPaymentsApi.md#userpaymentcontrollerconfirmmomoreturn) | **POST** /user/payments/momo/{bookingId}/return | Confirm signed MoMo return payload for booking
 *UserPaymentsApi* | [**userPaymentControllerConfirmStripeSetupIntent**](doc//UserPaymentsApi.md#userpaymentcontrollerconfirmstripesetupintent) | **POST** /user/payments/stripe/setup-intents/{setupIntentId}/confirm | Confirm and persist a saved Stripe card
 *UserPaymentsApi* | [**userPaymentControllerCreateMoMoPayment**](doc//UserPaymentsApi.md#userpaymentcontrollercreatemomopayment) | **POST** /user/payments/momo/{bookingId} | Create MoMo payment for booking
 *UserPaymentsApi* | [**userPaymentControllerCreateStripePayment**](doc//UserPaymentsApi.md#userpaymentcontrollercreatestripepayment) | **POST** /user/payments/stripe/{bookingId} | Create Stripe payment for booking (card)
@@ -373,6 +389,8 @@ Class | Method | HTTP request | Description
  - [AsyncCheckoutResponseDto](doc//AsyncCheckoutResponseDto.md)
  - [AttachTagResponseDto](doc//AttachTagResponseDto.md)
  - [AuthTokensDto](doc//AuthTokensDto.md)
+ - [BackdoorPrepareDto](doc//BackdoorPrepareDto.md)
+ - [BackdoorStatusResponseDto](doc//BackdoorStatusResponseDto.md)
  - [BookingResponseDto](doc//BookingResponseDto.md)
  - [BookingScheduleDto](doc//BookingScheduleDto.md)
  - [BookingSearchResponseDto](doc//BookingSearchResponseDto.md)
@@ -401,6 +419,8 @@ Class | Method | HTTP request | Description
  - [CheckEmailDto](doc//CheckEmailDto.md)
  - [CheckEmailResponseDto](doc//CheckEmailResponseDto.md)
  - [CheckoutTicketResponseDto](doc//CheckoutTicketResponseDto.md)
+ - [CleanupSeedDataDto](doc//CleanupSeedDataDto.md)
+ - [CleanupSeedDataResponseDto](doc//CleanupSeedDataResponseDto.md)
  - [ClientKeyResponseDto](doc//ClientKeyResponseDto.md)
  - [ClinicCertificationDto](doc//ClinicCertificationDto.md)
  - [ClinicInfoResponseDto](doc//ClinicInfoResponseDto.md)
@@ -613,6 +633,7 @@ Class | Method | HTTP request | Description
  - [RegisterPartnerDto](doc//RegisterPartnerDto.md)
  - [RegisterPartnerResponseDto](doc//RegisterPartnerResponseDto.md)
  - [RegisterProfileDto](doc//RegisterProfileDto.md)
+ - [ResetDbResponseDto](doc//ResetDbResponseDto.md)
  - [ResetPasswordDto](doc//ResetPasswordDto.md)
  - [RetryPayoutDto](doc//RetryPayoutDto.md)
  - [RevenueDataPointDto](doc//RevenueDataPointDto.md)
@@ -621,6 +642,18 @@ Class | Method | HTTP request | Description
  - [ReviewPartnerResponseDto](doc//ReviewPartnerResponseDto.md)
  - [ReviewSummaryDto](doc//ReviewSummaryDto.md)
  - [SavedPaymentCardDto](doc//SavedPaymentCardDto.md)
+ - [SeedBookingDto](doc//SeedBookingDto.md)
+ - [SeedCartItemDto](doc//SeedCartItemDto.md)
+ - [SeedCategoryDto](doc//SeedCategoryDto.md)
+ - [SeedCouponDto](doc//SeedCouponDto.md)
+ - [SeedEmployeeDto](doc//SeedEmployeeDto.md)
+ - [SeedIdsMapDto](doc//SeedIdsMapDto.md)
+ - [SeedNotificationDto](doc//SeedNotificationDto.md)
+ - [SeedPartnerDto](doc//SeedPartnerDto.md)
+ - [SeedPayloadDto](doc//SeedPayloadDto.md)
+ - [SeedResponseDto](doc//SeedResponseDto.md)
+ - [SeedServiceDto](doc//SeedServiceDto.md)
+ - [SeedUserDto](doc//SeedUserDto.md)
  - [ServiceInfoDto](doc//ServiceInfoDto.md)
  - [ServiceManualInputDto](doc//ServiceManualInputDto.md)
  - [ServiceManualResponseDto](doc//ServiceManualResponseDto.md)
@@ -642,6 +675,7 @@ Class | Method | HTTP request | Description
  - [TreatmentReviewResponseDto](doc//TreatmentReviewResponseDto.md)
  - [UpcomingAppointmentDto](doc//UpcomingAppointmentDto.md)
  - [UpdateAccountAddressDto](doc//UpdateAccountAddressDto.md)
+ - [UpdateAccountProfileDto](doc//UpdateAccountProfileDto.md)
  - [UpdateAvatarDto](doc//UpdateAvatarDto.md)
  - [UpdateBookingStatusDto](doc//UpdateBookingStatusDto.md)
  - [UpdateCategoryDto](doc//UpdateCategoryDto.md)

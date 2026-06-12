@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   Injectable,
   Logger,
+  HttpException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { CreateCategoryDto } from '../../dto/create-category.dto';
 import { Category } from '@/common/entities/category.entity';
 
@@ -29,6 +31,8 @@ export class CreateCategoryHandler {
     await queryRunner.startTransaction();
 
     try {
+      await this.validateParent(queryRunner.manager, command.parentId);
+
       // 1. Domain Action: Create Category entity
       const category = queryRunner.manager.create(Category, command);
       const savedCategory = await queryRunner.manager.save(Category, category);
@@ -46,6 +50,7 @@ export class CreateCategoryHandler {
       return completeCategory!;
     } catch (error) {
       await queryRunner.rollbackTransaction();
+      if (error instanceof HttpException) throw error;
       this.logger.error(
         `Failed to create category: ${error.message}`,
         error.stack,
@@ -55,6 +60,28 @@ export class CreateCategoryHandler {
       );
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  private async validateParent(
+    manager: EntityManager,
+    parentId?: string,
+  ): Promise<void> {
+    if (!parentId) return;
+
+    const parent = await manager.findOne(Category, {
+      where: { id: parentId, isActive: true },
+      select: ['id', 'parentId'],
+    });
+
+    if (!parent) {
+      throw new BadRequestException('Parent category must be active and exist');
+    }
+
+    if (parent.parentId != null) {
+      throw new BadRequestException(
+        'Sub-categories can only belong to a root category',
+      );
     }
   }
 }

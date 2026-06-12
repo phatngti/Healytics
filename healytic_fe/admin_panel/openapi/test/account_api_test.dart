@@ -38,10 +38,24 @@ void main() {
       // TODO
     });
 
+    // Update current user address
+    //
+    //Future<AccountMeResponseDto> accountControllerUpdateAddress(UpdateAccountAddressDto updateAccountAddressDto) async
+    test('test accountControllerUpdateAddress', () async {
+      // TODO
+    });
+
     // Update current user avatar
     //
     //Future<AccountMeResponseDto> accountControllerUpdateAvatar(UpdateAvatarDto updateAvatarDto) async
     test('test accountControllerUpdateAvatar', () async {
+      // TODO
+    });
+
+    // Update current user profile identity
+    //
+    //Future<AccountMeResponseDto> accountControllerUpdateProfile(UpdateAccountProfileDto updateAccountProfileDto) async
+    test('test accountControllerUpdateProfile', () async {
       // TODO
     });
 

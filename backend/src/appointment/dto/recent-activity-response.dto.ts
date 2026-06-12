@@ -43,6 +43,30 @@ export class RecentActivityResponseDto {
   @Expose()
   service_type_code: string;
 
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440001' })
+  @Expose()
+  health_partner_id: string;
+
+  @ApiProperty({ example: 'Healytics Spa' })
+  @Expose()
+  vendor_name: string;
+
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440002' })
+  @Expose()
+  provider_id: string;
+
+  @ApiProperty({ example: 'Dr. Anna Nguyen' })
+  @Expose()
+  provider_name: string;
+
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440003' })
+  @Expose()
+  service_id: string;
+
+  @ApiProperty({ example: 'District 1, HCMC' })
+  @Expose()
+  address: string;
+
   // ── Mapping helpers ─────────────────────────────────────────
 
   private static mapStatus(bookingStatus: BookingStatus): RecentActivityStatus {
@@ -81,6 +105,21 @@ export class RecentActivityResponseDto {
     dto.status = RecentActivityResponseDto.mapStatus(booking.status);
     dto.service_type_code =
       RecentActivityResponseDto.deriveServiceTypeCode(booking);
+    const partner = booking.product?.partner ?? booking.staff?.partner ?? null;
+    dto.health_partner_id = partner?.id ?? booking.product?.partnerId ?? '';
+    dto.vendor_name = booking.product?.vendorName ?? partner?.brandName ?? '';
+    dto.provider_id = booking.staffId ?? booking.staff?.id ?? '';
+    dto.provider_name = booking.staff?.fullName ?? '';
+    dto.service_id = booking.productId ?? booking.product?.id ?? '';
+    dto.address = partner
+      ? [
+          partner.streetAddress,
+          partner.district?.fullName,
+          partner.province?.fullName,
+        ]
+          .filter(Boolean)
+          .join(', ')
+      : '';
     return dto;
   }
 

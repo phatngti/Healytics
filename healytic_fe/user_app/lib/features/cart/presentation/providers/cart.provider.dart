@@ -79,8 +79,9 @@ class CartNotifier extends _$CartNotifier {
   /// in sync.
   Future<void> addItem({
     required String serviceId,
-    required String employeeId,
+    String? employeeId,
     required DateTime timeSlot,
+    bool autoAssignStaff = false,
   }) async {
     try {
       final repo = ref.read(cartRepositoryProvider);
@@ -88,6 +89,7 @@ class CartNotifier extends _$CartNotifier {
         serviceId: serviceId,
         employeeId: employeeId,
         timeSlot: timeSlot,
+        autoAssignStaff: autoAssignStaff,
       );
       if (!ref.mounted) return;
       ref.invalidateSelf();

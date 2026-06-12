@@ -112,6 +112,9 @@ sealed class EmployeeEntity {
   /// Emergency contact person's phone number.
   String? get emergencyContactPhone;
 
+  /// Date the employee record was created.
+  DateTime? get createdAt;
+
   /// Creates an [EmployeeEntity] from JSON data.
   ///
   /// Automatically determines the correct subtype based on the
@@ -175,6 +178,7 @@ abstract class DoctorEntity with _$DoctorEntity implements EmployeeEntity {
     String? startDate,
     String? emergencyContactName,
     String? emergencyContactPhone,
+    DateTime? createdAt,
   }) = _DoctorEntity;
 
   /// Creates a [DoctorEntity] from JSON data.
@@ -224,6 +228,7 @@ abstract class SpaTherapistEntity
     String? startDate,
     String? emergencyContactName,
     String? emergencyContactPhone,
+    DateTime? createdAt,
   }) = _SpaTherapistEntity;
 
   /// Creates a [SpaTherapistEntity] from JSON data.
@@ -273,6 +278,7 @@ abstract class MassageTherapistEntity
     String? startDate,
     String? emergencyContactName,
     String? emergencyContactPhone,
+    DateTime? createdAt,
   }) = _MassageTherapistEntity;
 
   /// Creates a [MassageTherapistEntity] from JSON data.
@@ -316,6 +322,7 @@ abstract class BasicEmployeeEntity
     String? startDate,
     String? emergencyContactName,
     String? emergencyContactPhone,
+    DateTime? createdAt,
   }) = _BasicEmployeeEntity;
 
   /// Creates a [BasicEmployeeEntity] from JSON data.

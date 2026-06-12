@@ -52,6 +52,18 @@ void main() {
       // TODO
     });
 
+    // Parent category ID. Null for root categories.
+    // String parentId
+    test('to test the property `parentId`', () async {
+      // TODO
+    });
+
+    // Whether this category is a root category.
+    // bool isRoot
+    test('to test the property `isRoot`', () async {
+      // TODO
+    });
+
     // Icon identifier for frontend rendering
     // String iconName
     test('to test the property `iconName`', () async {
@@ -73,6 +85,12 @@ void main() {
     // Number of health services in this category
     // num serviceCount
     test('to test the property `serviceCount`', () async {
+      // TODO
+    });
+
+    // Number of direct child sub-categories
+    // num subCategoryCount
+    test('to test the property `subCategoryCount`', () async {
       // TODO
     });
 

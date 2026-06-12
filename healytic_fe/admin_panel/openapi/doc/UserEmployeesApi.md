@@ -18,7 +18,7 @@ Method | HTTP request | Description
 
 
 # **userEmployeesControllerFindAll**
-> List<EmployeeResponseDto> userEmployeesControllerFindAll(role)
+> List<EmployeeResponseDto> userEmployeesControllerFindAll(role, sort, clinicId, provinceId, districtId, wardId, minExperienceYears)
 
 Get all employees
 
@@ -34,9 +34,15 @@ import 'package:admin_openapi/api.dart';
 
 final api_instance = UserEmployeesApi();
 final role = role_example; // String | 
+final sort = sort_example; // String | 
+final clinicId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final provinceId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final districtId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final wardId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final minExperienceYears = 8.14; // num | 
 
 try {
-    final result = api_instance.userEmployeesControllerFindAll(role);
+    final result = api_instance.userEmployeesControllerFindAll(role, sort, clinicId, provinceId, districtId, wardId, minExperienceYears);
     print(result);
 } catch (e) {
     print('Exception when calling UserEmployeesApi->userEmployeesControllerFindAll: $e\n');
@@ -48,6 +54,12 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **role** | **String**|  | [optional] 
+ **sort** | **String**|  | [optional] [default to 'default']
+ **clinicId** | **String**|  | [optional] 
+ **provinceId** | **String**|  | [optional] 
+ **districtId** | **String**|  | [optional] 
+ **wardId** | **String**|  | [optional] 
+ **minExperienceYears** | **num**|  | [optional] 
 
 ### Return type
 

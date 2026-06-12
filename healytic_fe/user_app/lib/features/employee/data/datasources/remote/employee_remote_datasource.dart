@@ -6,6 +6,8 @@ import 'package:user_app/core/providers/api.provider.dart';
 import 'package:user_app/core/services/api.service.dart';
 import 'package:user_app/features/employee/domain/entities/employee_detail.entity.dart';
 import 'package:user_app/features/employee/domain/entities/medical_credential.entity.dart';
+import 'package:user_app/features/home/domain/entities/filter_sort.entity.dart';
+import 'package:user_app/features/home/domain/entities/filter_sort_helpers.dart';
 import 'package:user_app/features/service_details/data/datasources/remote/service_details_mock_data.dart';
 import 'package:user_app/features/service_details/domain/entities/service_details.entity.dart';
 import 'package:user_openapi/api.dart' hide EmployeeRole, EmployeeStatus;
@@ -16,7 +18,10 @@ import 'employee_mock_data.dart';
 abstract class EmployeeRemoteDatasource {
   /// Fetches all employees, optionally filtered
   /// by [role].
-  Future<List<EmployeeDetailEntity>> getEmployees({String? role});
+  Future<List<EmployeeDetailEntity>> getEmployees({
+    String? role,
+    SpecialistListFilter? filter,
+  });
 
   /// Fetches a single employee by [id].
   Future<EmployeeDetailEntity> getEmployeeById(String id);
@@ -36,10 +41,21 @@ class EmployeeRemoteDatasourceImpl implements EmployeeRemoteDatasource {
   EmployeeRemoteDatasourceImpl(this._apiService);
 
   @override
-  Future<List<EmployeeDetailEntity>> getEmployees({String? role}) async {
+  Future<List<EmployeeDetailEntity>> getEmployees({
+    String? role,
+    SpecialistListFilter? filter,
+  }) async {
     try {
       final dtos = await _apiService.userEmployeesApi
-          .userEmployeesControllerFindAll(role: role);
+          .userEmployeesControllerFindAll(
+            role: role ?? filter?.role,
+            sort: filter?.sort.apiValue,
+            clinicId: filter?.clinicId,
+            provinceId: filter?.provinceId,
+            districtId: filter?.districtId,
+            wardId: filter?.wardId,
+            minExperienceYears: filter?.minExperienceYears,
+          );
 
       _log.info('Fetched ${dtos?.length ?? 0} employees');
 
@@ -105,6 +121,10 @@ class EmployeeRemoteDatasourceImpl implements EmployeeRemoteDatasource {
       emergencyContactPhone: _objToString(dto.emergencyContactPhone),
       rating: dto.rating.toDouble(),
       reviewCount: dto.reviewCount.toInt(),
+      clinicId: dto.clinicId,
+      clinicName: dto.clinicName,
+      location: dto.location,
+      experienceYears: dto.experienceYears?.toInt(),
       schedule: _mapSchedule(dto.schedule),
       workHistory: _mapWorkHistory(dto.workHistory),
       verificationDocuments: _mapVerificationDocs(dto.verificationDocuments),
@@ -242,11 +262,17 @@ class EmployeeRemoteDatasourceImpl implements EmployeeRemoteDatasource {
 /// simulated network delay.
 class EmployeeRemoteDatasourceMock implements EmployeeRemoteDatasource {
   @override
-  Future<List<EmployeeDetailEntity>> getEmployees({String? role}) async {
+  Future<List<EmployeeDetailEntity>> getEmployees({
+    String? role,
+    SpecialistListFilter? filter,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    if (role == null) return kMockEmployees;
+    final source = filter == null
+        ? kMockEmployees
+        : filterSpecialistsLocally(kMockEmployees, filter);
+    if (role == null) return source;
     final lower = role.toLowerCase();
-    return kMockEmployees.where((e) => e.role.name == lower).toList();
+    return source.where((e) => e.role.name == lower).toList();
   }
 
   @override

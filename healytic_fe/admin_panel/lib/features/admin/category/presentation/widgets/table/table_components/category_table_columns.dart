@@ -5,7 +5,10 @@ class CategoryTableColumns {
   static const List<Map<String, dynamic>> _columnDefinitions = [
     {'label': 'Icon'},
     {'label': 'Category Name'},
+    {'label': 'Type'},
+    {'label': 'Parent Category'},
     {'label': 'Description'},
+    {'label': 'Sub-categories'},
     {'label': 'Total Services'},
     {'label': 'Status'},
     {'label': 'Actions'},

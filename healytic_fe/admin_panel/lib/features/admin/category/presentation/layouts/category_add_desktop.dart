@@ -1,3 +1,4 @@
+import 'package:admin_panel/features/admin/category/domain/category.entity.dart';
 import 'package:admin_panel/features/admin/category/domain/category_form_field.dart';
 import 'package:admin_panel/features/admin/category/domain/category_status.dart';
 import 'package:admin_panel/features/admin/category/presentation/widgets/category_icon_picker.widget.dart';
@@ -14,12 +15,14 @@ class CategoryAddDesktop extends StatefulWidget {
   final VoidCallback? onCancel;
   final ValueChanged<Map<String, dynamic>>? onSubmit;
   final Map<String, dynamic> initialValue;
+  final List<CategoryEntity> parentCategories;
 
   const CategoryAddDesktop({
     super.key,
     this.onCancel,
     this.onSubmit,
     this.initialValue = const {},
+    this.parentCategories = const [],
   });
 
   @override
@@ -114,6 +117,8 @@ class _CategoryAddDesktopState extends State<CategoryAddDesktop> {
                             return null;
                           },
                         ),
+                        AppDimens.verticalMedium,
+                        _buildParentCategoryField(context),
                         AppDimens.verticalMedium,
                         // Description Field
                         FormFieldBuilders.buildTextField(
@@ -291,6 +296,31 @@ class _CategoryAddDesktopState extends State<CategoryAddDesktop> {
           ...children,
         ],
       ),
+    );
+  }
+
+  Widget _buildParentCategoryField(BuildContext context) {
+    return FormFieldBuilders.buildCustomDropdownField<String>(
+      context,
+      label: 'Parent Category',
+      fieldKey: CategoryFormField.parentCategory.key,
+      initialValue:
+          widget.initialValue[CategoryFormField.parentCategory.key]
+              ?.toString() ??
+          '',
+      hintText: 'Select parent category',
+      items: [
+        const DropdownMenuItem<String>(
+          value: '',
+          child: Text('Root category'),
+        ),
+        ...widget.parentCategories.map(
+          (category) => DropdownMenuItem<String>(
+            value: category.id.value,
+            child: Text(category.name, overflow: TextOverflow.ellipsis),
+          ),
+        ),
+      ],
     );
   }
 

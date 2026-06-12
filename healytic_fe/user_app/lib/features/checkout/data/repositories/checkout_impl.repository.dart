@@ -21,11 +21,12 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
   @override
   Future<AsyncCheckoutResult> asyncCheckout({
     required String userId,
-    required String staffId,
+    String? staffId,
     required String startTime,
     String? productId,
     required String idempotencyKey,
     bool payLater = false,
+    bool autoAssignStaff = false,
   }) {
     return remoteDatasource.asyncCheckout(
       userId: userId,
@@ -34,6 +35,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
       productId: productId,
       idempotencyKey: idempotencyKey,
       payLater: payLater,
+      autoAssignStaff: autoAssignStaff,
     );
   }
 

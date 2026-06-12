@@ -279,9 +279,9 @@ class AdminDashboardNotifier extends _$AdminDashboardNotifier {
       alerts.add(
         AdminDashboardAlert(
           id: 'empty-categories',
-          title: 'Empty categories need cleanup',
+          title: 'Empty sub-categories need cleanup',
           description:
-              '${categoryHealth.emptyCategories} categories currently have no mapped services.',
+              '${categoryHealth.emptyCategories} active sub-categories currently have no mapped services.',
           severity: AdminDashboardAlertSeverity.info,
           section: AdminDashboardSection.categoryHealth,
         ),

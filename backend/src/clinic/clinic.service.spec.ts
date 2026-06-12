@@ -349,7 +349,7 @@ describe('ClinicService', () => {
       search: '%laser%',
     });
     expect(productsQb.andWhere).toHaveBeenCalledWith(
-      'p.category_id = :categoryId',
+      expect.stringContaining('p.category_id IN'),
       { categoryId: 'cat-1' },
     );
     expect(productsQb.andWhere).toHaveBeenCalledWith(
@@ -376,19 +376,20 @@ describe('ClinicService', () => {
       'price',
     );
     expect(productsQb.orderBy).toHaveBeenCalledWith('price', 'ASC');
+    expect(productsQb.addOrderBy).toHaveBeenCalledWith('p.id', 'ASC');
     expect(productsQb.skip).toHaveBeenCalledWith(1);
     expect(productsQb.take).toHaveBeenCalledWith(1);
   });
 
   it.each([
-    ['popular', 'sold_count', 'DESC'],
-    ['top_sales', 'sold_count', 'DESC'],
-    ['latest', 'p.createdAt', 'DESC'],
-    ['price_asc', 'price', 'ASC'],
-    ['price_desc', 'price', 'DESC'],
+    ['popular', 'sold_count', 'DESC', 'DESC'],
+    ['top_sales', 'sold_count', 'DESC', 'DESC'],
+    ['latest', 'p.createdAt', 'DESC', 'DESC'],
+    ['price_asc', 'price', 'ASC', 'ASC'],
+    ['price_desc', 'price', 'DESC', 'DESC'],
   ])(
     'applies %s sort semantics for clinic products',
-    async (sort, orderField, orderDirection) => {
+    async (sort, orderField, orderDirection, idDirection) => {
       const productsQb = createQueryBuilderMock();
       const categoriesQb = createQueryBuilderMock();
       productRepo.createQueryBuilder
@@ -407,6 +408,7 @@ describe('ClinicService', () => {
         orderField,
         orderDirection,
       );
+      expect(productsQb.addOrderBy).toHaveBeenCalledWith('p.id', idDirection);
       if (sort === 'popular' || sort === 'top_sales') {
         expect(productsQb.setParameter).toHaveBeenCalledWith(
           'completedStatus',

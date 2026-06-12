@@ -16,6 +16,8 @@ class AdminCategoryHealthDto {
     required this.totalCategories,
     required this.activeCategories,
     required this.inactiveCategories,
+    required this.rootCategories,
+    required this.subCategories,
     required this.emptyCategories,
     required this.totalMappedServices,
     this.topCategories = const [],
@@ -28,6 +30,10 @@ class AdminCategoryHealthDto {
 
   num inactiveCategories;
 
+  num rootCategories;
+
+  num subCategories;
+
   num emptyCategories;
 
   num totalMappedServices;
@@ -39,6 +45,8 @@ class AdminCategoryHealthDto {
     other.totalCategories == totalCategories &&
     other.activeCategories == activeCategories &&
     other.inactiveCategories == inactiveCategories &&
+    other.rootCategories == rootCategories &&
+    other.subCategories == subCategories &&
     other.emptyCategories == emptyCategories &&
     other.totalMappedServices == totalMappedServices &&
     _deepEquality.equals(other.topCategories, topCategories);
@@ -49,18 +57,22 @@ class AdminCategoryHealthDto {
     (totalCategories.hashCode) +
     (activeCategories.hashCode) +
     (inactiveCategories.hashCode) +
+    (rootCategories.hashCode) +
+    (subCategories.hashCode) +
     (emptyCategories.hashCode) +
     (totalMappedServices.hashCode) +
     (topCategories.hashCode);
 
   @override
-  String toString() => 'AdminCategoryHealthDto[totalCategories=$totalCategories, activeCategories=$activeCategories, inactiveCategories=$inactiveCategories, emptyCategories=$emptyCategories, totalMappedServices=$totalMappedServices, topCategories=$topCategories]';
+  String toString() => 'AdminCategoryHealthDto[totalCategories=$totalCategories, activeCategories=$activeCategories, inactiveCategories=$inactiveCategories, rootCategories=$rootCategories, subCategories=$subCategories, emptyCategories=$emptyCategories, totalMappedServices=$totalMappedServices, topCategories=$topCategories]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'totalCategories'] = this.totalCategories;
       json[r'activeCategories'] = this.activeCategories;
       json[r'inactiveCategories'] = this.inactiveCategories;
+      json[r'rootCategories'] = this.rootCategories;
+      json[r'subCategories'] = this.subCategories;
       json[r'emptyCategories'] = this.emptyCategories;
       json[r'totalMappedServices'] = this.totalMappedServices;
       json[r'topCategories'] = this.topCategories;
@@ -89,6 +101,8 @@ class AdminCategoryHealthDto {
         totalCategories: num.parse('${json[r'totalCategories']}'),
         activeCategories: num.parse('${json[r'activeCategories']}'),
         inactiveCategories: num.parse('${json[r'inactiveCategories']}'),
+        rootCategories: num.parse('${json[r'rootCategories']}'),
+        subCategories: num.parse('${json[r'subCategories']}'),
         emptyCategories: num.parse('${json[r'emptyCategories']}'),
         totalMappedServices: num.parse('${json[r'totalMappedServices']}'),
         topCategories: AdminCategorySnapshotDto.listFromJson(json[r'topCategories']),
@@ -142,6 +156,8 @@ class AdminCategoryHealthDto {
     'totalCategories',
     'activeCategories',
     'inactiveCategories',
+    'rootCategories',
+    'subCategories',
     'emptyCategories',
     'totalMappedServices',
     'topCategories',

@@ -26,6 +26,8 @@ abstract class Product with _$Product {
     // General Information
     required String name,
     required String description,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     @Default('service') String productType,
 
     // Pricing & Inventory

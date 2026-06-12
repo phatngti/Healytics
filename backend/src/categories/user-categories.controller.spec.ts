@@ -32,7 +32,7 @@ describe('UserCategoriesController', () => {
   });
 
   describe('findServicesByCategory', () => {
-    it('should call service.findServicesByCategory with categoryId and coords', async () => {
+    it('should call service.findServicesByCategory with categoryId and query', async () => {
       // Arrange
       const categoryId = 'cat-uuid-1';
       const expected = [
@@ -46,34 +46,29 @@ describe('UserCategoriesController', () => {
       categoriesService.findServicesByCategory!.mockResolvedValue(expected);
 
       // Act
-      const result = await controller.findServicesByCategory(
-        categoryId,
-        '10.8',
-        '106.7',
-      );
+      const query = { lat: 10.8, lng: 106.7 };
+      const result = await controller.findServicesByCategory(categoryId, query);
 
       // Assert
       expect(result).toEqual(expected);
       expect(categoriesService.findServicesByCategory).toHaveBeenCalledWith(
         categoryId,
-        10.8,
-        106.7,
+        query,
       );
     });
 
-    it('should call without coords when not provided', async () => {
+    it('should pass an empty query when not provided', async () => {
       // Arrange
       categoriesService.findServicesByCategory!.mockResolvedValue([]);
 
       // Act
-      const result = await controller.findServicesByCategory('cat-uuid-2');
+      const result = await controller.findServicesByCategory('cat-uuid-2', {});
 
       // Assert
       expect(result).toEqual([]);
       expect(categoriesService.findServicesByCategory).toHaveBeenCalledWith(
         'cat-uuid-2',
-        undefined,
-        undefined,
+        {},
       );
     });
   });

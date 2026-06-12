@@ -9,9 +9,9 @@ import 'package:user_openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** | Profile ID | 
-**firstName** | **String** | First name | [optional] 
-**lastName** | **String** | Last name | [optional] 
-**phone** | **String** | Phone number | [optional] 
+**firstName** | [**Object**](.md) | First name | [optional] 
+**lastName** | [**Object**](.md) | Last name | [optional] 
+**phone** | [**Object**](.md) | Phone number | [optional] 
 **bio** | [**Object**](.md) | Bio | [optional] 
 **dateOfBirth** | **String** | Date of birth | [optional] 
 **avatarUrl** | [**Object**](.md) | Avatar image URL | [optional] 

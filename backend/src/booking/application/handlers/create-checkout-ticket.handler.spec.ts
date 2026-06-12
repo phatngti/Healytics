@@ -15,6 +15,7 @@ import {
 import { createCheckoutTicketEntity } from '../../../../test/fixtures/test-data.factory';
 import { BadRequestException } from '@nestjs/common';
 import { RedisService } from '@/redis/redis.service';
+import { AutoStaffAssignmentService } from '@/booking/services/auto-staff-assignment.service';
 
 describe('CreateCheckoutTicketHandler', () => {
   let handler: CreateCheckoutTicketHandler;
@@ -25,6 +26,7 @@ describe('CreateCheckoutTicketHandler', () => {
   let slotChecker: { execute: jest.Mock };
   let rmqClient: { emit: jest.Mock };
   let redisService: { [key: string]: jest.Mock };
+  let autoStaffAssignmentService: { resolveBestStaff: jest.Mock };
 
   beforeEach(async () => {
     ticketRepo = createMockRepository<CheckoutTicket>();
@@ -38,6 +40,9 @@ describe('CreateCheckoutTicketHandler', () => {
       set: jest.fn().mockResolvedValue(undefined),
       acquireLock: jest.fn().mockResolvedValue('mock-lock-token'),
       releaseLock: jest.fn().mockResolvedValue(undefined),
+    };
+    autoStaffAssignmentService = {
+      resolveBestStaff: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -70,6 +75,10 @@ describe('CreateCheckoutTicketHandler', () => {
         {
           provide: RedisService,
           useValue: redisService,
+        },
+        {
+          provide: AutoStaffAssignmentService,
+          useValue: autoStaffAssignmentService,
         },
       ],
     }).compile();
@@ -264,6 +273,39 @@ describe('CreateCheckoutTicketHandler', () => {
           ticketId: 'tk-pay-later',
           payLater: true,
         }),
+      );
+    });
+
+    it('should auto-assign staff when requested', async () => {
+      ticketRepo.findOne.mockResolvedValue(null);
+      slotChecker.execute.mockResolvedValue(true);
+      autoStaffAssignmentService.resolveBestStaff.mockResolvedValue({
+        staffId: 'auto-staff-1',
+        available: true,
+      });
+
+      const savedTicket = createCheckoutTicketEntity({ id: 'tk-auto' });
+      ticketRepo.create.mockReturnValue(savedTicket);
+      ticketRepo.save.mockResolvedValue(savedTicket);
+
+      await handler.execute({
+        ...baseDto,
+        staffId: undefined,
+        productId: 'prod-1',
+        autoAssignStaff: true,
+      } as any);
+
+      expect(autoStaffAssignmentService.resolveBestStaff).toHaveBeenCalledWith(
+        'prod-1',
+        new Date(baseDto.startTime),
+      );
+      expect(slotChecker.execute).toHaveBeenCalledWith(
+        'auto-staff-1',
+        new Date(baseDto.startTime),
+      );
+      expect(rmqClient.emit).toHaveBeenCalledWith(
+        'checkout.process',
+        expect.objectContaining({ staffId: 'auto-staff-1' }),
       );
     });
   });

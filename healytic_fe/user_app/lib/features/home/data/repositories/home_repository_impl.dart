@@ -2,6 +2,7 @@ import 'package:user_app/features/home/data/datasources/'
     'remote/home_remote_datasource.dart';
 import 'package:user_app/features/home/domain/entities/'
     'ai_recommendation.entity.dart';
+import 'package:user_app/features/home/domain/entities/filter_sort.entity.dart';
 import 'package:user_app/features/home/domain/entities/home.entity.dart';
 import 'package:user_app/features/home/domain/repositories/'
     'home.repository.dart';
@@ -31,8 +32,16 @@ class HomeImplementRepository implements HomeRepository {
   }
 
   @override
-  Future<List<HomeProduct>> getPremiumTreatments() async {
-    return await remoteDatasource.getPremiumTreatments();
+  Future<List<HomeProduct>> getPremiumTreatments({
+    ServiceListFilter? filter,
+    int? limit,
+    int? offset,
+  }) async {
+    return await remoteDatasource.getPremiumTreatments(
+      filter: filter,
+      limit: limit,
+      offset: offset,
+    );
   }
 
   @override
@@ -46,7 +55,13 @@ class HomeImplementRepository implements HomeRepository {
   }
 
   @override
-  Future<List<AppointmentEntity>> getRecentActivity({int limit = 5}) async {
-    return await remoteDatasource.getRecentActivity(limit: limit);
+  Future<List<AppointmentEntity>> getRecentActivity({
+    int limit = 5,
+    RecentActivityFilter? filter,
+  }) async {
+    return await remoteDatasource.getRecentActivity(
+      limit: limit,
+      filter: filter,
+    );
   }
 }

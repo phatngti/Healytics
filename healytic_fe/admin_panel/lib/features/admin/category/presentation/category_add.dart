@@ -1,5 +1,6 @@
 import 'package:admin_panel/core/entities/store.entity.dart';
 import 'package:admin_panel/core/models/store.model.dart';
+import 'package:admin_panel/features/admin/category/domain/category.entity.dart';
 import 'package:admin_panel/features/admin/category/domain/create_category.request.dart';
 import 'package:admin_panel/features/admin/category/domain/category_form_field.dart';
 import 'package:admin_panel/features/admin/category/domain/category_status.dart';
@@ -25,6 +26,24 @@ class CategoryAddScreen extends ConsumerStatefulWidget {
 }
 
 class _CategoryAddScreenState extends ConsumerState<CategoryAddScreen> {
+  List<CategoryEntity> _parentCategories = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadParentCategories();
+  }
+
+  Future<void> _loadParentCategories() async {
+    final categories = await ref
+        .read(categoryProvider.notifier)
+        .getVisibleCategories();
+    if (!mounted) return;
+    setState(() {
+      _parentCategories = categories.where((category) => category.isRoot).toList();
+    });
+  }
+
   Future<void> _handleSubmit(Map<String, dynamic> values) async {
     try {
       final categoryName =
@@ -42,6 +61,9 @@ class _CategoryAddScreenState extends ConsumerState<CategoryAddScreen> {
       final iconName = values[CategoryFormField.iconName.key]
           ?.toString()
           .trim();
+      final parentId = values[CategoryFormField.parentCategory.key]
+          ?.toString()
+          .trim();
       final colorValue = _parseColorHex(
         values[CategoryFormField.colorHex.key]?.toString(),
       );
@@ -51,6 +73,7 @@ class _CategoryAddScreenState extends ConsumerState<CategoryAddScreen> {
           .createCategory(
             CreateCategoryRequest(
               name: categoryName,
+              parentId: parentId == null || parentId.isEmpty ? null : parentId,
               description: description,
               iconName: iconName?.isEmpty ?? true ? 'category' : iconName!,
               colorValue: colorValue,
@@ -111,6 +134,7 @@ class _CategoryAddScreenState extends ConsumerState<CategoryAddScreen> {
         onCancel: _handleCancel,
         onSubmit: _handleSubmit,
         initialValue: initialValue,
+        parentCategories: _parentCategories,
       ),
     );
   }

@@ -32,6 +32,10 @@ Name | Type | Description | Notes
 **rating** | **num** | Rating (0-5) | 
 **reviewCount** | **num** | Number of reviews | 
 **partnerId** | **String** | Partner ID the employee belongs to | [optional] 
+**clinicId** | **String** | Public clinic ID the employee belongs to | [optional] 
+**clinicName** | **String** | Public clinic name the employee belongs to | [optional] 
+**location** | **String** | Clinic location label | [optional] 
+**experienceYears** | **num** | Normalized years of professional experience | [optional] 
 **createdAt** | [**DateTime**](DateTime.md) | Creation timestamp | 
 **updatedAt** | [**DateTime**](DateTime.md) | Last update timestamp | 
 **doctorProfile** | [**DoctorProfileResponseDto**](DoctorProfileResponseDto.md) | Doctor profile | [optional] 

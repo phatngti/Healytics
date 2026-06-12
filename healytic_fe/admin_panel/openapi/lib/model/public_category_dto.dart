@@ -14,13 +14,17 @@ class PublicCategoryDto {
   /// Returns a new [PublicCategoryDto] instance.
   PublicCategoryDto({
     required this.id,
+    this.parentId,
     required this.name,
     required this.slug,
     this.imageUrl,
+    this.parent,
   });
 
 
   String id;
+
+  String? parentId;
 
   String name;
 
@@ -28,33 +32,49 @@ class PublicCategoryDto {
 
   String? imageUrl;
 
+  PublicCategoryDto? parent;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is PublicCategoryDto &&
     other.id == id &&
+    other.parentId == parentId &&
     other.name == name &&
     other.slug == slug &&
-    other.imageUrl == imageUrl;
+    other.imageUrl == imageUrl &&
+    other.parent == parent;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
+    (parentId == null ? 0 : parentId!.hashCode) +
     (name.hashCode) +
     (slug.hashCode) +
-    (imageUrl == null ? 0 : imageUrl!.hashCode);
+    (imageUrl == null ? 0 : imageUrl!.hashCode) +
+    (parent == null ? 0 : parent!.hashCode);
 
   @override
-  String toString() => 'PublicCategoryDto[id=$id, name=$name, slug=$slug, imageUrl=$imageUrl]';
+  String toString() => 'PublicCategoryDto[id=$id, parentId=$parentId, name=$name, slug=$slug, imageUrl=$imageUrl, parent=$parent]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
+    if (this.parentId != null) {
+      json[r'parentId'] = this.parentId;
+    } else {
+      json[r'parentId'] = null;
+    }
       json[r'name'] = this.name;
       json[r'slug'] = this.slug;
     if (this.imageUrl != null) {
       json[r'imageUrl'] = this.imageUrl;
     } else {
       json[r'imageUrl'] = null;
+    }
+    if (this.parent != null) {
+      json[r'parent'] = this.parent;
+    } else {
+      json[r'parent'] = null;
     }
     return json;
   }
@@ -79,9 +99,11 @@ class PublicCategoryDto {
 
       return PublicCategoryDto(
         id: mapValueOfType<String>(json, r'id')!,
+        parentId: mapValueOfType<String>(json, r'parentId'),
         name: mapValueOfType<String>(json, r'name')!,
         slug: mapValueOfType<String>(json, r'slug')!,
         imageUrl: mapValueOfType<String>(json, r'imageUrl'),
+        parent: PublicCategoryDto.fromJson(json[r'parent']),
       );
     }
     return null;

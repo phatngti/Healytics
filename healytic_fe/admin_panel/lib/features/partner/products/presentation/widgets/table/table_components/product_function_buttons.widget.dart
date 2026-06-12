@@ -53,6 +53,12 @@ class ProductFunctionButtons {
                 onTap: notifier.setSort,
               ),
               _sortOption(
+                label: 'Sub-category',
+                value: ProductTableSort.subCategory,
+                state: state,
+                onTap: notifier.setSort,
+              ),
+              _sortOption(
                 label: 'Price',
                 value: ProductTableSort.price,
                 state: state,
@@ -61,6 +67,12 @@ class ProductFunctionButtons {
               _sortOption(
                 label: 'Status',
                 value: ProductTableSort.status,
+                state: state,
+                onTap: notifier.setSort,
+              ),
+              _sortOption(
+                label: 'Created At',
+                value: ProductTableSort.createdAt,
                 state: state,
                 onTap: notifier.setSort,
               ),
@@ -178,10 +190,11 @@ class ProductFunctionButtons {
     required ValueChanged<ProductTableSort> onTap,
   }) {
     final isSelected = state.sortBy == value;
+    final directionLabel = value == ProductTableSort.createdAt
+        ? (state.sortAscending ? 'Oldest' : 'Newest')
+        : (state.sortAscending ? 'A-Z' : 'Z-A');
     return ManagementTableMenuOption(
-      label: isSelected
-          ? '$label (${state.sortAscending ? 'A-Z' : 'Z-A'})'
-          : label,
+      label: isSelected ? '$label ($directionLabel)' : label,
       selected: isSelected,
       icon: Icons.sort,
       onTap: () => onTap(value),

@@ -234,7 +234,19 @@ export class ClinicService {
       qb = qb.andWhere('p.name ILIKE :search', { search: `%${search}%` });
     }
     if (categoryId) {
-      qb = qb.andWhere('p.category_id = :categoryId', { categoryId });
+      qb = qb.andWhere(
+        `p.category_id IN (
+          SELECT category_filter.id
+          FROM categories category_filter
+          WHERE category_filter.deleted_at IS NULL
+            AND category_filter.is_active = true
+            AND (
+              category_filter.id = :categoryId
+              OR category_filter.parent_id = :categoryId
+            )
+        )`,
+        { categoryId },
+      );
     }
     if (minPrice != null) {
       qb = qb.andWhere('COALESCE(p.sale_price, p.base_price) >= :minPrice', {
@@ -275,24 +287,27 @@ export class ClinicService {
             .andWhere('b.status = :completedStatus');
         }, 'sold_count')
         .setParameter('completedStatus', BookingStatus.COMPLETED)
-        .orderBy('sold_count', 'DESC');
+        .orderBy('sold_count', 'DESC')
+        .addOrderBy('p.id', 'DESC');
     } else {
       switch (sort) {
         case 'latest':
-          qb = qb.orderBy('p.createdAt', 'DESC');
+          qb = qb.orderBy('p.createdAt', 'DESC').addOrderBy('p.id', 'DESC');
           break;
         case 'price_asc':
           qb = qb
             .addSelect('COALESCE(p.sale_price, p.base_price)', 'price')
-            .orderBy('price', 'ASC');
+            .orderBy('price', 'ASC')
+            .addOrderBy('p.id', 'ASC');
           break;
         case 'price_desc':
           qb = qb
             .addSelect('COALESCE(p.sale_price, p.base_price)', 'price')
-            .orderBy('price', 'DESC');
+            .orderBy('price', 'DESC')
+            .addOrderBy('p.id', 'DESC');
           break;
         default:
-          qb = qb.orderBy('p.createdAt', 'DESC');
+          qb = qb.orderBy('p.createdAt', 'DESC').addOrderBy('p.id', 'DESC');
       }
     }
 

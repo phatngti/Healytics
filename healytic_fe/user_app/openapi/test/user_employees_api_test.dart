@@ -19,7 +19,7 @@ void main() {
   group('tests for UserEmployeesApi', () {
     // Get all employees
     //
-    //Future<List<EmployeeResponseDto>> userEmployeesControllerFindAll({ String role }) async
+    //Future<List<EmployeeResponseDto>> userEmployeesControllerFindAll({ String role, String sort, String clinicId, String provinceId, String districtId, String wardId, num minExperienceYears }) async
     test('test userEmployeesControllerFindAll', () async {
       // TODO
     });

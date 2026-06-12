@@ -9,6 +9,7 @@ import 'package:employee_openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **String** |  | 
+**parentId** | **String** |  | [optional] 
 **name** | **String** |  | 
 **slug** | **String** |  | 
 

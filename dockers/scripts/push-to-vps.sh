@@ -106,6 +106,9 @@ jenkins_home/
 # ── Agent/IDE tooling (not needed on VPS) ──
 .agents/
 
+# ── Landing page deploys separately to Heroku ──
+landing-page/
+
 # ── Git metadata ──
 .git/
 
@@ -341,14 +344,6 @@ if [[ "${DRY_RUN}" != "true" ]]; then
   else
     ok "${CONTAINER_COUNT} container(s) already running — skipping Docker Compose start"
     info "To restart manually: cd ${VPS_DEST} && docker compose --profile prod --profile ci up -d --build"
-
-    # The landing page is served from synced static files. On existing VPS
-    # deployments, docker compose may already be running before this service was
-    # added, so explicitly ensure it exists after every push.
-    info "Ensuring Healytics landing page service is running..."
-    ssh ${SSH_OPTS} "${VPS_USER}@${VPS_HOST}" \
-      "cd ${VPS_DEST} && docker compose --profile prod up -d --no-deps --force-recreate home"
-    ok "Landing page service deployed at app.healytics.me/demo origin (healytics-home:80)"
 
     info "Applying Cloudflare tunnel routes..."
     ssh ${SSH_OPTS} "${VPS_USER}@${VPS_HOST}" \

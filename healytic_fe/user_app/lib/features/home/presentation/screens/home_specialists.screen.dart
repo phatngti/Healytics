@@ -14,6 +14,11 @@ import 'package:user_app/features/employee/presentation/providers/'
     'employee_list.provider.dart';
 import 'package:user_app/features/employee/presentation/providers/'
     'employee_preview_cache.provider.dart';
+import 'package:user_app/features/home/domain/entities/filter_sort.entity.dart';
+import 'package:user_app/features/home/presentation/providers/'
+    'list_filter.provider.dart';
+import 'package:user_app/features/home/presentation/widgets/'
+    'filter_sort_controls.widget.dart';
 import 'package:user_app/features/home/presentation/widgets/'
     'home_list_screen_layout.widget.dart';
 import 'package:user_app/router/routes.dart';
@@ -24,38 +29,114 @@ class HomeSpecialistsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final specialistsAsync = ref.watch(employeeListProvider());
-
     return HomeListScreenLayout(
       title: 'Specialists',
-      body: switch (specialistsAsync) {
-        AsyncData(:final value) => _SpecialistList(specialists: value),
-        AsyncError(:final error, :final stackTrace) => Center(
-          child: Padding(
-            padding: AppDimens.paddingAllMedium,
-            child: ErrorCard(
-              title: 'Could not load specialists',
-              error: error,
-              stackTrace: stackTrace,
-              onRetry: () => ref.invalidate(employeeListProvider()),
-            ),
-          ),
-        ),
-        _ => const LoadingWidget(),
+      body: const _SpecialistsBody(),
+    );
+  }
+}
+
+class _SpecialistsBody extends StatelessWidget {
+  const _SpecialistsBody();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        AppDimens.verticalMedium,
+        _SpecialistFilterBar(),
+        Expanded(child: _SpecialistListContainer()),
+      ],
+    );
+  }
+}
+
+class _SpecialistFilterBar extends ConsumerWidget {
+  const _SpecialistFilterBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filter = ref.watch(specialistListFilterProvider);
+
+    return FilterSortBar<SpecialistListSort>(
+      options: SpecialistListSort.values
+          .map((sort) => SortOption(value: sort, label: sort.label))
+          .toList(),
+      selected: filter.sort,
+      filtersActive: filter.hasFilters,
+      onFilterTap: () async {
+        final next = await showSpecialistFilterSheet(context, filter);
+        if (next != null) {
+          ref.read(specialistListFilterProvider.notifier).state = next;
+        }
+      },
+      onSelected: (sort) {
+        ref.read(specialistListFilterProvider.notifier).state = filter.withSort(
+          sort,
+        );
       },
     );
   }
 }
 
+class _SpecialistListContainer extends ConsumerWidget {
+  const _SpecialistListContainer();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final specialistsAsync = ref.watch(employeeListProvider());
+    final filterActive = ref.watch(
+      specialistListFilterProvider.select((value) => value.isActive),
+    );
+    final specialists = specialistsAsync.value;
+
+    if (specialists != null) {
+      return _RefreshingStack(
+        isRefreshing: specialistsAsync.isLoading,
+        child: _SpecialistList(
+          specialists: specialists,
+          filtersActive: filterActive,
+          onReset: () {
+            ref.read(specialistListFilterProvider.notifier).state =
+                const SpecialistListFilter();
+          },
+        ),
+      );
+    }
+
+    if (specialistsAsync.hasError) {
+      return Center(
+        child: Padding(
+          padding: AppDimens.paddingAllMedium,
+          child: ErrorCard(
+            title: 'Could not load specialists',
+            error: specialistsAsync.error!,
+            stackTrace: specialistsAsync.stackTrace,
+            onRetry: () => ref.invalidate(employeeListProvider()),
+          ),
+        ),
+      );
+    }
+
+    return const LoadingWidget();
+  }
+}
+
 class _SpecialistList extends StatelessWidget {
-  const _SpecialistList({required this.specialists});
+  const _SpecialistList({
+    required this.specialists,
+    required this.filtersActive,
+    required this.onReset,
+  });
 
   final List<EmployeeDetailEntity> specialists;
+  final bool filtersActive;
+  final VoidCallback onReset;
 
   @override
   Widget build(BuildContext context) {
     if (specialists.isEmpty) {
-      return const _EmptyState();
+      return _EmptyState(filtersActive: filtersActive, onReset: onReset);
     }
 
     final hPad = AppDimens.horizontalPadding(context);
@@ -232,7 +313,10 @@ String _roleLabel(EmployeeRole role) {
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  const _EmptyState({required this.filtersActive, required this.onReset});
+
+  final bool filtersActive;
+  final VoidCallback onReset;
 
   @override
   Widget build(BuildContext context) {
@@ -241,13 +325,51 @@ class _EmptyState extends StatelessWidget {
     return Center(
       child: Padding(
         padding: AppDimens.paddingAllLarge,
-        child: Text(
-          'No specialists available',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              filtersActive
+                  ? 'No specialists match these filters'
+                  : 'No specialists available',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (filtersActive) ...[
+              AppDimens.verticalSmall,
+              TextButton(
+                onPressed: onReset,
+                child: const Text('Reset filters'),
+              ),
+            ],
+          ],
         ),
       ),
+    );
+  }
+}
+
+class _RefreshingStack extends StatelessWidget {
+  const _RefreshingStack({required this.isRefreshing, required this.child});
+
+  final bool isRefreshing;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        child,
+        if (isRefreshing)
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: LinearProgressIndicator(minHeight: 2),
+          ),
+      ],
     );
   }
 }

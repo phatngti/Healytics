@@ -57,6 +57,12 @@ class ServiceTagFunctionButtons {
                 state: state,
                 onTap: notifier.setSort,
               ),
+              _sortOption(
+                label: 'Created At',
+                value: ServiceTagTableSort.createdAt,
+                state: state,
+                onTap: notifier.setSort,
+              ),
             ],
           ),
         ),
@@ -112,10 +118,11 @@ class ServiceTagFunctionButtons {
     required ValueChanged<ServiceTagTableSort> onTap,
   }) {
     final isSelected = state.sortBy == value;
+    final directionLabel = value == ServiceTagTableSort.createdAt
+        ? (state.sortAscending ? 'Oldest' : 'Newest')
+        : (state.sortAscending ? 'Asc' : 'Desc');
     return ManagementTableMenuOption(
-      label: isSelected
-          ? '$label (${state.sortAscending ? 'Asc' : 'Desc'})'
-          : label,
+      label: isSelected ? '$label ($directionLabel)' : label,
       selected: isSelected,
       icon: Icons.sort,
       onTap: () => onTap(value),

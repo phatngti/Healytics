@@ -12,12 +12,21 @@ class PublicCategorySummaryDto {
   id: string;
 
   @Expose()
+  @ApiPropertyOptional({ type: String, nullable: true })
+  parentId: string | null;
+
+  @Expose()
   @ApiProperty({ type: String })
   name: string;
 
   @Expose()
   @ApiProperty({ type: String })
   slug: string;
+
+  @Expose()
+  @Type(() => PublicCategorySummaryDto)
+  @ApiPropertyOptional({ type: PublicCategorySummaryDto, nullable: true })
+  parent: PublicCategorySummaryDto | null;
 }
 
 /**

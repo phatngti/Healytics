@@ -238,6 +238,12 @@ export class AdminCategorySnapshotDto {
   @ApiProperty({ type: Number })
   serviceCount: number;
 
+  @ApiProperty({ type: Number })
+  subCategoryCount: number;
+
+  @ApiProperty({ type: Boolean })
+  isRoot: boolean;
+
   @ApiProperty({ type: Boolean })
   isActive: boolean;
 }
@@ -251,6 +257,12 @@ export class AdminCategoryHealthDto {
 
   @ApiProperty({ type: Number })
   inactiveCategories: number;
+
+  @ApiProperty({ type: Number })
+  rootCategories: number;
+
+  @ApiProperty({ type: Number })
+  subCategories: number;
 
   @ApiProperty({ type: Number })
   emptyCategories: number;

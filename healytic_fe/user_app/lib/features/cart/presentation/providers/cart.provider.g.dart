@@ -51,7 +51,7 @@ final class CartNotifierProvider
   CartNotifier create() => CartNotifier();
 }
 
-String _$cartNotifierHash() => r'3ec2500cb62cfd1caea26d167459dda0f2850221';
+String _$cartNotifierHash() => r'0cfdfcb9c89531a944a7e0014de9a0554c01e187';
 
 /// Global cart state notifier.
 ///

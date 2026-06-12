@@ -18,6 +18,7 @@ import { ProductEmployeeEligibility } from '@/common/entities/product-employee-e
 import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
 import { HealthServiceType } from '@/health-service/enums/health-service-type.enum';
 import { EmployeeRole } from '@/employees/enum/employee-role.enum';
+import { AutoStaffAssignmentService } from '@/booking/services/auto-staff-assignment.service';
 
 /** Employee roles allowed to be assigned to a cart item. */
 const ALLOWED_EMPLOYEE_ROLES: EmployeeRole[] = [
@@ -29,9 +30,14 @@ const ALLOWED_EMPLOYEE_ROLES: EmployeeRole[] = [
 export class AddCartItemHandler {
   private readonly logger = new Logger(AddCartItemHandler.name);
 
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly autoStaffAssignmentService: AutoStaffAssignmentService,
+  ) {}
 
   async execute(userId: string, dto: AddToCartDto): Promise<CartItem> {
+    const resolvedEmployeeId = await this.resolveEmployeeId(dto);
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -56,7 +62,7 @@ export class AddCartItemHandler {
 
       // 2. Validate employee exists and has allowed role
       const employee = await queryRunner.manager.findOne(Employee, {
-        where: { id: dto.employeeId },
+        where: { id: resolvedEmployeeId },
       });
 
       if (!employee) {
@@ -79,7 +85,7 @@ export class AddCartItemHandler {
         {
           where: {
             productId: dto.serviceId,
-            employeeId: dto.employeeId,
+            employeeId: resolvedEmployeeId,
           },
         },
       );
@@ -95,7 +101,7 @@ export class AddCartItemHandler {
       const cartItem = queryRunner.manager.create(CartItem, {
         userId,
         serviceId: dto.serviceId,
-        employeeId: dto.employeeId,
+        employeeId: resolvedEmployeeId,
         timeSlot: new Date(dto.timeSlot),
       });
 
@@ -131,6 +137,26 @@ export class AddCartItemHandler {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  private async resolveEmployeeId(dto: AddToCartDto): Promise<string> {
+    if (!dto.autoAssignStaff && dto.employeeId) {
+      return dto.employeeId;
+    }
+
+    const assignment = await this.autoStaffAssignmentService.resolveBestStaff(
+      dto.serviceId,
+      new Date(dto.timeSlot),
+    );
+
+    if (!assignment.available) {
+      throw new BadRequestException({
+        code: CART_ERROR_CODES.INVALID_EMPLOYEE,
+        message: 'No specialist is available for this time slot',
+      });
+    }
+
+    return assignment.staffId;
   }
 
   private async loadCartItem(

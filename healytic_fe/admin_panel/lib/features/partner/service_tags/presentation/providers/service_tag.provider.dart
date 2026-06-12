@@ -9,7 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'service_tag.provider.freezed.dart';
 part 'service_tag.provider.g.dart';
 
-enum ServiceTagTableSort { name, status, usage }
+enum ServiceTagTableSort { name, status, usage, createdAt }
 
 enum ServiceTagStatusFilter { all, active, inactive }
 
@@ -134,7 +134,7 @@ class ServiceTagNotifier extends _$ServiceTagNotifier {
     final current = _currentState;
     final nextAscending = current.sortBy == sortBy
         ? !current.sortAscending
-        : true;
+        : _defaultSortAscending(sortBy);
     _setTableState(
       current.copyWith(
         sortBy: sortBy,
@@ -307,6 +307,10 @@ class ServiceTagNotifier extends _$ServiceTagNotifier {
           b.isActive ? 1 : 0,
         ),
         ServiceTagTableSort.usage => a.usage.compareTo(b.usage),
+        ServiceTagTableSort.createdAt => _compareNullableDateString(
+          a.createdAt,
+          b.createdAt,
+        ),
       };
       return query.sortAscending ? comparison : -comparison;
     });
@@ -337,5 +341,23 @@ class ServiceTagNotifier extends _$ServiceTagNotifier {
 
   int _compareText(String a, String b) {
     return a.toLowerCase().compareTo(b.toLowerCase());
+  }
+
+  bool _defaultSortAscending(ServiceTagTableSort sortBy) {
+    return switch (sortBy) {
+      ServiceTagTableSort.createdAt => false,
+      _ => true,
+    };
+  }
+
+  int _compareNullableDateString(String? a, String? b) {
+    final left = a == null ? null : DateTime.tryParse(a);
+    final right = b == null ? null : DateTime.tryParse(b);
+    if (left != null || right != null) {
+      if (left == null) return -1;
+      if (right == null) return 1;
+      return left.compareTo(right);
+    }
+    return (a ?? '').compareTo(b ?? '');
   }
 }

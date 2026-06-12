@@ -7,6 +7,7 @@ import {
   IsUrl,
   IsBoolean,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 
 export class AsyncCheckoutDto {
@@ -14,9 +15,13 @@ export class AsyncCheckoutDto {
   @IsUUID()
   userId: string;
 
-  @ApiProperty({ description: 'Staff/employee UUID' })
+  @ApiProperty({
+    description: 'Staff/employee UUID. Optional when autoAssignStaff is true.',
+    required: false,
+  })
+  @ValidateIf((dto: AsyncCheckoutDto) => !dto.autoAssignStaff)
   @IsUUID()
-  staffId: string;
+  staffId?: string;
 
   @ApiProperty({
     description: 'Desired slot start time (ISO 8601)',
@@ -56,4 +61,15 @@ export class AsyncCheckoutDto {
   @IsBoolean()
   @IsOptional()
   payLater?: boolean;
+
+  @ApiPropertyOptional({
+    type: Boolean,
+    description:
+      'If true, backend selects the best eligible available specialist for the service and start time.',
+    example: true,
+    default: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  autoAssignStaff?: boolean;
 }

@@ -560,6 +560,80 @@
         ]
       }
     },
+    "/account/me/profile": {
+      "patch": {
+        "operationId": "AccountController_updateProfile",
+        "summary": "Update current user profile identity",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated, returns refreshed account data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountMeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/account/me/address": {
+      "patch": {
+        "operationId": "AccountController_updateAddress",
+        "summary": "Update current user address",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountAddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Address updated, returns refreshed account data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountMeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/account/survey": {
       "get": {
         "operationId": "AccountController_getSurvey",
@@ -622,6 +696,280 @@
           {
             "bearer": []
           }
+        ]
+      }
+    },
+    "/locations/provinces": {
+      "get": {
+        "operationId": "LocationsController_getProvinces",
+        "summary": "Get all provinces in Vietnam",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of all provinces",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
+    "/locations/provinces/{provinceId}/districts": {
+      "get": {
+        "operationId": "LocationsController_getDistricts",
+        "summary": "Get all districts in a province",
+        "parameters": [
+          {
+            "name": "provinceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of districts in the province",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationListResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Province not found"
+          }
+        },
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
+    "/locations/districts/{districtId}/wards": {
+      "get": {
+        "operationId": "LocationsController_getWards",
+        "summary": "Get all wards in a district",
+        "parameters": [
+          {
+            "name": "districtId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of wards in the district",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationListResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "District not found"
+          }
+        },
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
+    "/mapbox/geocode": {
+      "get": {
+        "operationId": "MapboxController_geocode",
+        "summary": "Geocode an address to lat/lng",
+        "parameters": [
+          {
+            "name": "address",
+            "required": true,
+            "in": "query",
+            "description": "Address to geocode",
+            "schema": {
+              "example": "227 Nguyen Van Cu, District 5, Ho Chi Minh City",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeocodeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
+        ]
+      }
+    },
+    "/mapbox/reverse-geocode": {
+      "get": {
+        "operationId": "MapboxController_reverseGeocode",
+        "summary": "Reverse geocode lat/lng to address",
+        "parameters": [
+          {
+            "name": "lat",
+            "required": true,
+            "in": "query",
+            "description": "Latitude",
+            "schema": {
+              "example": 10.762622,
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": true,
+            "in": "query",
+            "description": "Longitude",
+            "schema": {
+              "example": 106.660172,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeocodeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
+        ]
+      }
+    },
+    "/mapbox/distance-matrix": {
+      "get": {
+        "operationId": "MapboxController_distanceMatrix",
+        "summary": "Get travel distance and duration",
+        "parameters": [
+          {
+            "name": "origins",
+            "required": true,
+            "in": "query",
+            "description": "Origins — pipe-separated coordinates or addresses (e.g. \"10.762,106.660|10.823,106.629\")",
+            "schema": {
+              "example": "10.762622,106.660172",
+              "type": "string"
+            }
+          },
+          {
+            "name": "destinations",
+            "required": true,
+            "in": "query",
+            "description": "Destinations — pipe-separated coordinates or addresses (e.g. \"10.823,106.629|10.800,106.700\")",
+            "schema": {
+              "example": "10.823099,106.629662",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistanceMatrixResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
+        ]
+      }
+    },
+    "/mapbox/directions": {
+      "get": {
+        "operationId": "MapboxController_directions",
+        "summary": "Get driving directions route geometry",
+        "parameters": [
+          {
+            "name": "origin",
+            "required": true,
+            "in": "query",
+            "description": "Origin coordinate in lat,lng format",
+            "schema": {
+              "example": "10.762622,106.660172",
+              "type": "string"
+            }
+          },
+          {
+            "name": "destination",
+            "required": true,
+            "in": "query",
+            "description": "Destination coordinate in lat,lng format",
+            "schema": {
+              "example": "10.823099,106.629662",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectionsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
+        ]
+      }
+    },
+    "/mapbox/client-key": {
+      "get": {
+        "operationId": "MapboxController_getClientKey",
+        "summary": "Get public access token for frontend/mobile SDKs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientKeyResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
         ]
       }
     },
@@ -864,96 +1212,6 @@
         ]
       }
     },
-    "/locations/provinces": {
-      "get": {
-        "operationId": "LocationsController_getProvinces",
-        "summary": "Get all provinces in Vietnam",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "List of all provinces",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LocationListResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Locations"
-        ]
-      }
-    },
-    "/locations/provinces/{provinceId}/districts": {
-      "get": {
-        "operationId": "LocationsController_getDistricts",
-        "summary": "Get all districts in a province",
-        "parameters": [
-          {
-            "name": "provinceId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of districts in the province",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LocationListResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Province not found"
-          }
-        },
-        "tags": [
-          "Locations"
-        ]
-      }
-    },
-    "/locations/districts/{districtId}/wards": {
-      "get": {
-        "operationId": "LocationsController_getWards",
-        "summary": "Get all wards in a district",
-        "parameters": [
-          {
-            "name": "districtId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of wards in the district",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LocationListResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "District not found"
-          }
-        },
-        "tags": [
-          "Locations"
-        ]
-      }
-    },
     "/s3/presign": {
       "post": {
         "operationId": "S3Controller_preSign",
@@ -1045,190 +1303,6 @@
         },
         "tags": [
           "S3"
-        ]
-      }
-    },
-    "/mapbox/geocode": {
-      "get": {
-        "operationId": "MapboxController_geocode",
-        "summary": "Geocode an address to lat/lng",
-        "parameters": [
-          {
-            "name": "address",
-            "required": true,
-            "in": "query",
-            "description": "Address to geocode",
-            "schema": {
-              "example": "227 Nguyen Van Cu, District 5, Ho Chi Minh City",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeocodeResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Mapbox"
-        ]
-      }
-    },
-    "/mapbox/reverse-geocode": {
-      "get": {
-        "operationId": "MapboxController_reverseGeocode",
-        "summary": "Reverse geocode lat/lng to address",
-        "parameters": [
-          {
-            "name": "lat",
-            "required": true,
-            "in": "query",
-            "description": "Latitude",
-            "schema": {
-              "example": 10.762622,
-              "type": "number"
-            }
-          },
-          {
-            "name": "lng",
-            "required": true,
-            "in": "query",
-            "description": "Longitude",
-            "schema": {
-              "example": 106.660172,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeocodeResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Mapbox"
-        ]
-      }
-    },
-    "/mapbox/distance-matrix": {
-      "get": {
-        "operationId": "MapboxController_distanceMatrix",
-        "summary": "Get travel distance and duration",
-        "parameters": [
-          {
-            "name": "origins",
-            "required": true,
-            "in": "query",
-            "description": "Origins — pipe-separated coordinates or addresses (e.g. \"10.762,106.660|10.823,106.629\")",
-            "schema": {
-              "example": "10.762622,106.660172",
-              "type": "string"
-            }
-          },
-          {
-            "name": "destinations",
-            "required": true,
-            "in": "query",
-            "description": "Destinations — pipe-separated coordinates or addresses (e.g. \"10.823,106.629|10.800,106.700\")",
-            "schema": {
-              "example": "10.823099,106.629662",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DistanceMatrixResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Mapbox"
-        ]
-      }
-    },
-    "/mapbox/directions": {
-      "get": {
-        "operationId": "MapboxController_directions",
-        "summary": "Get driving directions route geometry",
-        "parameters": [
-          {
-            "name": "origin",
-            "required": true,
-            "in": "query",
-            "description": "Origin coordinate in lat,lng format",
-            "schema": {
-              "example": "10.762622,106.660172",
-              "type": "string"
-            }
-          },
-          {
-            "name": "destination",
-            "required": true,
-            "in": "query",
-            "description": "Destination coordinate in lat,lng format",
-            "schema": {
-              "example": "10.823099,106.629662",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DirectionsResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Mapbox"
-        ]
-      }
-    },
-    "/mapbox/client-key": {
-      "get": {
-        "operationId": "MapboxController_getClientKey",
-        "summary": "Get public access token for frontend/mobile SDKs",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClientKeyResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Mapbox"
         ]
       }
     },
@@ -1576,6 +1650,66 @@
               ],
               "type": "string"
             }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "default",
+              "enum": [
+                "default",
+                "rating_desc",
+                "experience_desc",
+                "reviews_desc"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "clinicId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "provinceId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "districtId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "wardId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minExperienceYears",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -1818,6 +1952,66 @@
                 "MANAGER"
               ],
               "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "default",
+              "enum": [
+                "default",
+                "rating_desc",
+                "experience_desc",
+                "reviews_desc"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "clinicId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "provinceId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "districtId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "wardId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "minExperienceYears",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
             }
           }
         ],
@@ -2419,6 +2613,85 @@
             }
           },
           {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "default",
+              "enum": [
+                "default",
+                "price_asc",
+                "price_desc",
+                "rating_desc",
+                "latest"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "minPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "clinicId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "provinceId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "districtId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "wardId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
             "name": "lat",
             "required": false,
             "in": "query",
@@ -3015,7 +3288,105 @@
       "get": {
         "operationId": "UserHealthServiceController_getPremiumTreatments",
         "summary": "Get premium treatments",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "default",
+              "enum": [
+                "default",
+                "price_asc",
+                "price_desc",
+                "rating_desc",
+                "latest"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "minPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "clinicId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "provinceId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "districtId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "wardId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "lat",
+            "required": false,
+            "in": "query",
+            "description": "User latitude",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": false,
+            "in": "query",
+            "description": "User longitude",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Return list of premium treatments.",
@@ -7914,6 +8285,65 @@
               "example": 0,
               "type": "number"
             }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "completed",
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "clinicId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fromDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-05-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "toDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-05-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "default",
+              "enum": [
+                "default",
+                "date_asc",
+                "date_desc"
+              ],
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -8233,6 +8663,51 @@
           },
           "400": {
             "description": "Booking not in PENDING_PAYMENT status or invalid amount"
+          },
+          "404": {
+            "description": "Booking not found"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/payments/momo/{bookingId}/return": {
+      "post": {
+        "operationId": "UserPaymentController_confirmMoMoReturn",
+        "summary": "Confirm signed MoMo return payload for booking",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoMoIPNDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "MoMo return payload accepted"
+          },
+          "400": {
+            "description": "Invalid signature, failed payment, or booking mismatch"
           },
           "404": {
             "description": "Booking not found"
@@ -10747,6 +11222,20 @@
         ]
       }
     },
+    "/metrics": {
+      "get": {
+        "operationId": "MetricsController_collect",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Prometheus metrics scrape endpoint."
+          }
+        },
+        "tags": [
+          "Observability"
+        ]
+      }
+    },
     "/health": {
       "get": {
         "tags": [
@@ -10764,6 +11253,402 @@
             }
           }
         }
+      }
+    },
+    "/test-backdoor/status": {
+      "get": {
+        "operationId": "TestBackdoorController_status",
+        "summary": "Check if backdoor is available",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackdoorStatusResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/reset-db": {
+      "post": {
+        "operationId": "TestBackdoorController_resetDb",
+        "summary": "Truncate all non-master tables",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetDbResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/prepare": {
+      "post": {
+        "operationId": "TestBackdoorController_prepare",
+        "summary": "Reset DB then seed a scenario",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackdoorPrepareDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/cleanup": {
+      "post": {
+        "operationId": "TestBackdoorController_cleanup",
+        "summary": "Delete only rows returned by a seed response",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CleanupSeedDataDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CleanupSeedDataResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed": {
+      "post": {
+        "operationId": "TestBackdoorController_seed",
+        "summary": "Seed multiple entity types at once",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedPayloadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-user": {
+      "post": {
+        "operationId": "TestBackdoorController_seedUser",
+        "summary": "Seed a single user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-category": {
+      "post": {
+        "operationId": "TestBackdoorController_seedCategory",
+        "summary": "Seed a single category",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-partner": {
+      "post": {
+        "operationId": "TestBackdoorController_seedPartner",
+        "summary": "Seed a single partner",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedPartnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-employee": {
+      "post": {
+        "operationId": "TestBackdoorController_seedEmployee",
+        "summary": "Seed a single employee",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedEmployeeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-service": {
+      "post": {
+        "operationId": "TestBackdoorController_seedService",
+        "summary": "Seed a single health service",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedServiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-cart": {
+      "post": {
+        "operationId": "TestBackdoorController_seedCart",
+        "summary": "Seed a single cart item",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedCartItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-coupon": {
+      "post": {
+        "operationId": "TestBackdoorController_seedCoupon",
+        "summary": "Seed a single coupon",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedCouponDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
+      }
+    },
+    "/test-backdoor/seed-booking": {
+      "post": {
+        "operationId": "TestBackdoorController_seedBooking",
+        "summary": "Seed a single booking",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeedBookingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Test Backdoor"
+        ]
       }
     },
     "/generative_ai/stream": {
@@ -11041,6 +11926,36 @@
           "exists"
         ]
       },
+      "RegisterAddressDto": {
+        "type": "object",
+        "properties": {
+          "streetAddress": {
+            "type": "string",
+            "example": "123 Nguyen Hue Street"
+          },
+          "provinceId": {
+            "type": "string",
+            "example": "0f0d876f-92f1-4fcb-8a40-1fd3dd115d6b",
+            "description": "Province/city Location UUID"
+          },
+          "districtId": {
+            "type": "string",
+            "example": "7c4020d4-343d-4a63-b017-6df5f82d8814",
+            "description": "District Location UUID"
+          },
+          "wardId": {
+            "type": "string",
+            "example": "aa3a7de4-4d1d-4bb5-a3c1-79ac1350c743",
+            "description": "Ward/commune Location UUID"
+          }
+        },
+        "required": [
+          "streetAddress",
+          "provinceId",
+          "districtId",
+          "wardId"
+        ]
+      },
       "RegisterProfileDto": {
         "type": "object",
         "properties": {
@@ -11065,6 +11980,14 @@
             "type": "string",
             "example": "1990-01-01",
             "description": "Date of birth in ISO format"
+          },
+          "address": {
+            "description": "Address provided during user registration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RegisterAddressDto"
+              }
+            ]
           }
         }
       },
@@ -11594,6 +12517,53 @@
           "message"
         ]
       },
+      "AccountAddressDto": {
+        "type": "object",
+        "properties": {
+          "street": {
+            "type": "string",
+            "description": "Street address"
+          },
+          "ward": {
+            "type": "string",
+            "description": "Ward or commune"
+          },
+          "district": {
+            "type": "string",
+            "description": "District"
+          },
+          "cityOrProvince": {
+            "type": "string",
+            "description": "City or province"
+          },
+          "provinceId": {
+            "type": "object",
+            "description": "Province/city Location UUID"
+          },
+          "districtId": {
+            "type": "object",
+            "description": "District Location UUID"
+          },
+          "wardId": {
+            "type": "object",
+            "description": "Ward/commune Location UUID"
+          },
+          "latitude": {
+            "type": "object",
+            "description": "Resolved latitude"
+          },
+          "longitude": {
+            "type": "object",
+            "description": "Resolved longitude"
+          }
+        },
+        "required": [
+          "street",
+          "ward",
+          "district",
+          "cityOrProvince"
+        ]
+      },
       "UserProfileDto": {
         "type": "object",
         "properties": {
@@ -11602,15 +12572,15 @@
             "description": "Profile ID"
           },
           "firstName": {
-            "type": "string",
+            "type": "object",
             "description": "First name"
           },
           "lastName": {
-            "type": "string",
+            "type": "object",
             "description": "Last name"
           },
           "phone": {
-            "type": "string",
+            "type": "object",
             "description": "Phone number"
           },
           "bio": {
@@ -11629,6 +12599,14 @@
           "profileCompleted": {
             "type": "boolean",
             "description": "Whether the profile is completed"
+          },
+          "address": {
+            "description": "Address provided during registration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AccountAddressDto"
+              }
+            ]
           }
         },
         "required": [
@@ -11701,6 +12679,56 @@
         },
         "required": [
           "avatarUrl"
+        ]
+      },
+      "UpdateAccountProfileDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "object",
+            "example": "Jane",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "object",
+            "example": "Doe",
+            "nullable": true
+          },
+          "phone": {
+            "type": "object",
+            "example": "0901234567",
+            "nullable": true
+          }
+        }
+      },
+      "UpdateAccountAddressDto": {
+        "type": "object",
+        "properties": {
+          "streetAddress": {
+            "type": "string",
+            "example": "123 Nguyen Hue Street"
+          },
+          "provinceId": {
+            "type": "string",
+            "example": "0f0d876f-92f1-4fcb-8a40-1fd3dd115d6b",
+            "description": "Province/city Location UUID"
+          },
+          "districtId": {
+            "type": "string",
+            "example": "7c4020d4-343d-4a63-b017-6df5f82d8814",
+            "description": "District Location UUID"
+          },
+          "wardId": {
+            "type": "string",
+            "example": "aa3a7de4-4d1d-4bb5-a3c1-79ac1350c743",
+            "description": "Ward/commune Location UUID"
+          }
+        },
+        "required": [
+          "streetAddress",
+          "provinceId",
+          "districtId",
+          "wardId"
         ]
       },
       "SurveyResponseDto": {
@@ -11782,12 +12810,264 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-19T09:31:29.852Z"
+              "submittedAt": "2026-05-29T18:37:44.156Z"
             }
           }
         },
         "required": [
           "survey"
+        ]
+      },
+      "LocationResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "uuid-string",
+            "description": "Location UUID"
+          },
+          "code": {
+            "type": "string",
+            "example": "01",
+            "description": "Official administrative code"
+          },
+          "name": {
+            "type": "string",
+            "example": "Hà Nội",
+            "description": "Location name"
+          },
+          "nameEn": {
+            "type": "string",
+            "example": "Ha Noi",
+            "description": "English name"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "Thành phố Hà Nội",
+            "description": "Full name with prefix"
+          },
+          "fullNameEn": {
+            "type": "string",
+            "example": "Hanoi City",
+            "description": "Full English name"
+          },
+          "level": {
+            "type": "string",
+            "example": "PROVINCE",
+            "description": "Administrative level"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "fullName",
+          "level"
+        ]
+      },
+      "LocationListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "List of locations",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationResponseDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "example": 63,
+            "description": "Total number of locations"
+          }
+        },
+        "required": [
+          "data",
+          "total"
+        ]
+      },
+      "GeocodeResultDto": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "example": 10.762622
+          },
+          "lng": {
+            "type": "number",
+            "example": 106.660172
+          },
+          "formattedAddress": {
+            "type": "string",
+            "example": "227 Nguyen Van Cu, District 5, Ho Chi Minh City, Vietnam"
+          },
+          "placeId": {
+            "type": "string",
+            "example": "address.1234567890"
+          }
+        },
+        "required": [
+          "lat",
+          "lng",
+          "formattedAddress"
+        ]
+      },
+      "GeocodeResponseDto": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeocodeResultDto"
+            }
+          }
+        },
+        "required": [
+          "results"
+        ]
+      },
+      "DistanceMatrixElementDto": {
+        "type": "object",
+        "properties": {
+          "distanceText": {
+            "type": "string",
+            "example": "12.3 km"
+          },
+          "distanceValue": {
+            "type": "number",
+            "example": 12300
+          },
+          "durationText": {
+            "type": "string",
+            "example": "25 mins"
+          },
+          "durationValue": {
+            "type": "number",
+            "example": 1500
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          }
+        },
+        "required": [
+          "distanceText",
+          "distanceValue",
+          "durationText",
+          "durationValue",
+          "status"
+        ]
+      },
+      "DistanceMatrixRowDto": {
+        "type": "object",
+        "properties": {
+          "elements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DistanceMatrixElementDto"
+            }
+          }
+        },
+        "required": [
+          "elements"
+        ]
+      },
+      "DistanceMatrixResponseDto": {
+        "type": "object",
+        "properties": {
+          "originAddresses": {
+            "example": [
+              "Ho Chi Minh City, Vietnam"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "destinationAddresses": {
+            "example": [
+              "District 7, Ho Chi Minh City, Vietnam"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DistanceMatrixRowDto"
+            }
+          }
+        },
+        "required": [
+          "originAddresses",
+          "destinationAddresses",
+          "rows"
+        ]
+      },
+      "DirectionsCoordinateDto": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "example": 10.762622
+          },
+          "longitude": {
+            "type": "number",
+            "example": 106.660172
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
+        ]
+      },
+      "DirectionsResponseDto": {
+        "type": "object",
+        "properties": {
+          "route": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DirectionsCoordinateDto"
+            }
+          },
+          "distanceText": {
+            "type": "string",
+            "example": "12.3 km"
+          },
+          "distanceValue": {
+            "type": "number",
+            "example": 12300
+          },
+          "durationText": {
+            "type": "string",
+            "example": "25 mins"
+          },
+          "durationValue": {
+            "type": "number",
+            "example": 1500
+          }
+        },
+        "required": [
+          "route",
+          "distanceText",
+          "distanceValue",
+          "durationText",
+          "durationValue"
+        ]
+      },
+      "ClientKeyResponseDto": {
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "description": "Mapbox public access token for frontend/mobile SDKs",
+            "example": "pk.eyJ1Ijoi..."
+          }
+        },
+        "required": [
+          "apiKey"
         ]
       },
       "BusinessServiceDto": {
@@ -12854,74 +14134,6 @@
           }
         }
       },
-      "LocationResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "uuid-string",
-            "description": "Location UUID"
-          },
-          "code": {
-            "type": "string",
-            "example": "01",
-            "description": "Official administrative code"
-          },
-          "name": {
-            "type": "string",
-            "example": "Hà Nội",
-            "description": "Location name"
-          },
-          "nameEn": {
-            "type": "string",
-            "example": "Ha Noi",
-            "description": "English name"
-          },
-          "fullName": {
-            "type": "string",
-            "example": "Thành phố Hà Nội",
-            "description": "Full name with prefix"
-          },
-          "fullNameEn": {
-            "type": "string",
-            "example": "Hanoi City",
-            "description": "Full English name"
-          },
-          "level": {
-            "type": "string",
-            "example": "PROVINCE",
-            "description": "Administrative level"
-          }
-        },
-        "required": [
-          "id",
-          "code",
-          "name",
-          "fullName",
-          "level"
-        ]
-      },
-      "LocationListResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "description": "List of locations",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LocationResponseDto"
-            }
-          },
-          "total": {
-            "type": "number",
-            "example": 63,
-            "description": "Total number of locations"
-          }
-        },
-        "required": [
-          "data",
-          "total"
-        ]
-      },
       "PresignRequestDto": {
         "type": "object",
         "properties": {
@@ -12984,190 +14196,6 @@
         },
         "required": [
           "message"
-        ]
-      },
-      "GeocodeResultDto": {
-        "type": "object",
-        "properties": {
-          "lat": {
-            "type": "number",
-            "example": 10.762622
-          },
-          "lng": {
-            "type": "number",
-            "example": 106.660172
-          },
-          "formattedAddress": {
-            "type": "string",
-            "example": "227 Nguyen Van Cu, District 5, Ho Chi Minh City, Vietnam"
-          },
-          "placeId": {
-            "type": "string",
-            "example": "address.1234567890"
-          }
-        },
-        "required": [
-          "lat",
-          "lng",
-          "formattedAddress"
-        ]
-      },
-      "GeocodeResponseDto": {
-        "type": "object",
-        "properties": {
-          "results": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GeocodeResultDto"
-            }
-          }
-        },
-        "required": [
-          "results"
-        ]
-      },
-      "DistanceMatrixElementDto": {
-        "type": "object",
-        "properties": {
-          "distanceText": {
-            "type": "string",
-            "example": "12.3 km"
-          },
-          "distanceValue": {
-            "type": "number",
-            "example": 12300
-          },
-          "durationText": {
-            "type": "string",
-            "example": "25 mins"
-          },
-          "durationValue": {
-            "type": "number",
-            "example": 1500
-          },
-          "status": {
-            "type": "string",
-            "example": "OK"
-          }
-        },
-        "required": [
-          "distanceText",
-          "distanceValue",
-          "durationText",
-          "durationValue",
-          "status"
-        ]
-      },
-      "DistanceMatrixRowDto": {
-        "type": "object",
-        "properties": {
-          "elements": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DistanceMatrixElementDto"
-            }
-          }
-        },
-        "required": [
-          "elements"
-        ]
-      },
-      "DistanceMatrixResponseDto": {
-        "type": "object",
-        "properties": {
-          "originAddresses": {
-            "example": [
-              "Ho Chi Minh City, Vietnam"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "destinationAddresses": {
-            "example": [
-              "District 7, Ho Chi Minh City, Vietnam"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "rows": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DistanceMatrixRowDto"
-            }
-          }
-        },
-        "required": [
-          "originAddresses",
-          "destinationAddresses",
-          "rows"
-        ]
-      },
-      "DirectionsCoordinateDto": {
-        "type": "object",
-        "properties": {
-          "latitude": {
-            "type": "number",
-            "example": 10.762622
-          },
-          "longitude": {
-            "type": "number",
-            "example": 106.660172
-          }
-        },
-        "required": [
-          "latitude",
-          "longitude"
-        ]
-      },
-      "DirectionsResponseDto": {
-        "type": "object",
-        "properties": {
-          "route": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DirectionsCoordinateDto"
-            }
-          },
-          "distanceText": {
-            "type": "string",
-            "example": "12.3 km"
-          },
-          "distanceValue": {
-            "type": "number",
-            "example": 12300
-          },
-          "durationText": {
-            "type": "string",
-            "example": "25 mins"
-          },
-          "durationValue": {
-            "type": "number",
-            "example": 1500
-          }
-        },
-        "required": [
-          "route",
-          "distanceText",
-          "distanceValue",
-          "durationText",
-          "durationValue"
-        ]
-      },
-      "ClientKeyResponseDto": {
-        "type": "object",
-        "properties": {
-          "apiKey": {
-            "type": "string",
-            "description": "Mapbox public access token for frontend/mobile SDKs",
-            "example": "pk.eyJ1Ijoi..."
-          }
-        },
-        "required": [
-          "apiKey"
         ]
       },
       "DashboardTimePeriod": {
@@ -13703,6 +14731,12 @@
             "example": "doctor.a@healytics.com",
             "description": "Email address"
           },
+          "password": {
+            "type": "string",
+            "example": "Password123!",
+            "description": "Initial employee account password",
+            "minLength": 8
+          },
           "phone": {
             "type": "string",
             "example": "0901234567",
@@ -13893,6 +14927,7 @@
           "firstName",
           "lastName",
           "email",
+          "password",
           "emergencyContactName",
           "emergencyContactPhone",
           "employeeId",
@@ -14152,6 +15187,26 @@
             "nullable": true,
             "description": "Partner ID the employee belongs to"
           },
+          "clinicId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Public clinic ID the employee belongs to"
+          },
+          "clinicName": {
+            "type": "string",
+            "nullable": true,
+            "description": "Public clinic name the employee belongs to"
+          },
+          "location": {
+            "type": "string",
+            "nullable": true,
+            "description": "Clinic location label"
+          },
+          "experienceYears": {
+            "type": "number",
+            "nullable": true,
+            "description": "Normalized years of professional experience"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string",
@@ -14211,6 +15266,12 @@
             "type": "string",
             "example": "spa.therapist.c@healytics.com",
             "description": "Email address"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123!",
+            "description": "Initial employee account password",
+            "minLength": 8
           },
           "phone": {
             "type": "string",
@@ -14397,6 +15458,7 @@
           "firstName",
           "lastName",
           "email",
+          "password",
           "emergencyContactName",
           "emergencyContactPhone",
           "employeeId",
@@ -14422,6 +15484,12 @@
             "type": "string",
             "example": "massage.therapist.e@healytics.com",
             "description": "Email address"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123!",
+            "description": "Initial employee account password",
+            "minLength": 8
           },
           "phone": {
             "type": "string",
@@ -14607,6 +15675,7 @@
           "firstName",
           "lastName",
           "email",
+          "password",
           "emergencyContactName",
           "emergencyContactPhone",
           "employeeId",
@@ -14842,6 +15911,11 @@
           "email": {
             "type": "string",
             "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "description": "New employee account password"
           },
           "role": {
             "$ref": "#/components/schemas/EmployeeRole"
@@ -15186,9 +16260,19 @@
             "description": "Clinic or facility name",
             "nullable": true
           },
+          "clinicId": {
+            "type": "object",
+            "description": "Clinic or facility ID",
+            "nullable": true
+          },
           "clinicAddress": {
             "type": "object",
             "description": "Clinic street address",
+            "nullable": true
+          },
+          "location": {
+            "type": "object",
+            "description": "Clinic location label",
             "nullable": true
           },
           "distance": {
@@ -15205,6 +16289,26 @@
             "type": "object",
             "description": "Raw price in VND",
             "example": 850000
+          },
+          "categoryId": {
+            "type": "object",
+            "description": "Sub-category ID",
+            "nullable": true
+          },
+          "categoryName": {
+            "type": "object",
+            "description": "Sub-category name",
+            "nullable": true
+          },
+          "parentCategoryId": {
+            "type": "object",
+            "description": "Root category ID",
+            "nullable": true
+          },
+          "parentCategoryName": {
+            "type": "object",
+            "description": "Root category name",
+            "nullable": true
           }
         },
         "required": [
@@ -15403,6 +16507,10 @@
           "id": {
             "type": "string"
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true
+          },
           "name": {
             "type": "string"
           },
@@ -15445,6 +16553,19 @@
             "type": "boolean",
             "description": "Whether category is active"
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Parent category ID. Null for root categories."
+          },
+          "isRoot": {
+            "type": "boolean",
+            "description": "Whether this category is a root category."
+          },
+          "subCategoryCount": {
+            "type": "number",
+            "description": "Number of direct child sub-categories."
+          },
           "categoryType": {
             "type": "string",
             "description": "Category type for UI grouping",
@@ -15481,6 +16602,8 @@
           "name",
           "slug",
           "isActive",
+          "isRoot",
+          "subCategoryCount",
           "createdAt",
           "updatedAt"
         ]
@@ -15514,6 +16637,15 @@
             "type": "boolean",
             "description": "Whether category is active"
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Parent category ID. Null for root categories."
+          },
+          "isRoot": {
+            "type": "boolean",
+            "description": "Whether this category is a root category."
+          },
           "iconName": {
             "type": "string",
             "nullable": true,
@@ -15531,6 +16663,10 @@
           "serviceCount": {
             "type": "number",
             "description": "Number of health services in this category"
+          },
+          "subCategoryCount": {
+            "type": "number",
+            "description": "Number of direct child sub-categories"
           },
           "createdAt": {
             "format": "date-time",
@@ -15563,8 +16699,10 @@
           "name",
           "slug",
           "isActive",
+          "isRoot",
           "sortOrder",
           "serviceCount",
+          "subCategoryCount",
           "createdAt",
           "updatedAt"
         ]
@@ -16103,11 +17241,23 @@
           "id": {
             "type": "string"
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true
+          },
           "name": {
             "type": "string"
           },
           "slug": {
             "type": "string"
+          },
+          "parent": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PartnerCategorySummaryDto"
+              }
+            ]
           }
         },
         "required": [
@@ -17229,6 +18379,18 @@
             "type": "string",
             "example": "Massage"
           },
+          "categoryId": {
+            "type": "object",
+            "example": "e2a7d9b7-..."
+          },
+          "parentCategoryId": {
+            "type": "object",
+            "example": "f7c8b2d1-..."
+          },
+          "parentCategoryName": {
+            "type": "object",
+            "example": "Spa & Beauty"
+          },
           "duration": {
             "type": "string",
             "example": "60 min"
@@ -17237,6 +18399,10 @@
             "type": "string",
             "example": "₫500,000"
           },
+          "priceAmount": {
+            "type": "number",
+            "example": 500000
+          },
           "rating": {
             "type": "string",
             "example": "4.9"
@@ -17244,6 +18410,10 @@
           "vendorName": {
             "type": "string",
             "example": "Healytics Spa"
+          },
+          "clinicId": {
+            "type": "object",
+            "example": "b2519c94-..."
           },
           "location": {
             "type": "string",
@@ -17270,6 +18440,7 @@
           "category",
           "duration",
           "price",
+          "priceAmount",
           "rating",
           "vendorName",
           "location",
@@ -17352,9 +18523,19 @@
             "type": "string",
             "example": "cat-555"
           },
+          "parentCategoryId": {
+            "type": "object",
+            "example": "root-cat-111",
+            "nullable": true
+          },
           "name": {
             "type": "string",
             "example": "Dermatology"
+          },
+          "parentCategoryName": {
+            "type": "object",
+            "example": "Spa & Beauty",
+            "nullable": true
           }
         },
         "required": [
@@ -17707,6 +18888,10 @@
             "type": "string",
             "example": "a1b2c3d4-..."
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true
+          },
           "name": {
             "type": "string",
             "example": "Spa & Massage"
@@ -17719,6 +18904,14 @@
             "type": "string",
             "nullable": true,
             "example": "https://example.com/category.jpg"
+          },
+          "parent": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicCategoryDto"
+              }
+            ]
           }
         },
         "required": [
@@ -18105,11 +19298,23 @@
           "id": {
             "type": "string"
           },
+          "parentId": {
+            "type": "string",
+            "nullable": true
+          },
           "name": {
             "type": "string"
           },
           "slug": {
             "type": "string"
+          },
+          "parent": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicCategorySummaryDto"
+              }
+            ]
           }
         },
         "required": [
@@ -19087,6 +20292,12 @@
           "serviceCount": {
             "type": "number"
           },
+          "subCategoryCount": {
+            "type": "number"
+          },
+          "isRoot": {
+            "type": "boolean"
+          },
           "isActive": {
             "type": "boolean"
           }
@@ -19095,6 +20306,8 @@
           "id",
           "name",
           "serviceCount",
+          "subCategoryCount",
+          "isRoot",
           "isActive"
         ]
       },
@@ -19108,6 +20321,12 @@
             "type": "number"
           },
           "inactiveCategories": {
+            "type": "number"
+          },
+          "rootCategories": {
+            "type": "number"
+          },
+          "subCategories": {
             "type": "number"
           },
           "emptyCategories": {
@@ -19127,6 +20346,8 @@
           "totalCategories",
           "activeCategories",
           "inactiveCategories",
+          "rootCategories",
+          "subCategories",
           "emptyCategories",
           "totalMappedServices",
           "topCategories"
@@ -20183,7 +21404,7 @@
           },
           "staffId": {
             "type": "string",
-            "description": "Staff/employee UUID"
+            "description": "Staff/employee UUID. Optional when autoAssignStaff is true."
           },
           "startTime": {
             "type": "string",
@@ -20209,11 +21430,16 @@
             "description": "If true, booking is immediately CONFIRMED without requiring payment. The booking has no payment URL or expiry — suitable for in-person pay-later scenarios.",
             "example": false,
             "default": false
+          },
+          "autoAssignStaff": {
+            "type": "boolean",
+            "description": "If true, backend selects the best eligible available specialist for the service and start time.",
+            "example": true,
+            "default": false
           }
         },
         "required": [
           "userId",
-          "staffId",
           "startTime",
           "productId",
           "idempotencyKey"
@@ -22019,11 +23245,15 @@
             "type": "string",
             "description": "Desired time slot in ISO 8601 datetime format",
             "example": "2026-04-10T09:00:00.000Z"
+          },
+          "autoAssignStaff": {
+            "type": "boolean",
+            "description": "If true, backend selects the best eligible available specialist for this service and time slot.",
+            "default": false
           }
         },
         "required": [
           "serviceId",
-          "employeeId",
           "timeSlot"
         ]
       },
@@ -23322,6 +24552,702 @@
             "example": "Approved from partner transaction manager."
           }
         }
+      },
+      "BackdoorStatusResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "database": {
+            "type": "string",
+            "example": "healytics_test"
+          },
+          "nodeEnv": {
+            "type": "string",
+            "example": "test"
+          }
+        },
+        "required": [
+          "ok",
+          "database",
+          "nodeEnv"
+        ]
+      },
+      "ResetDbResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "truncatedTables": {
+            "type": "number",
+            "example": 12
+          }
+        },
+        "required": [
+          "ok",
+          "truncatedTables"
+        ]
+      },
+      "SeedUserDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key for this seeded user"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@test.healytics.vn"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123!"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Nguyen"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Van A"
+          },
+          "phone": {
+            "type": "string",
+            "example": "0901234567"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "SeedCategoryDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "name": {
+            "type": "string",
+            "example": "Spa & Beauty"
+          },
+          "slug": {
+            "type": "string",
+            "example": "spa-beauty"
+          },
+          "description": {
+            "type": "string"
+          },
+          "iconName": {
+            "type": "string",
+            "example": "spa"
+          },
+          "colorValue": {
+            "type": "string",
+            "example": "#FF6B6B"
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "SeedPartnerDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "email": {
+            "type": "string",
+            "example": "partner@test.healytics.vn"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123!"
+          },
+          "taxCode": {
+            "type": "string",
+            "example": "TAX-12345"
+          },
+          "legalName": {
+            "type": "string",
+            "example": "Healytics Spa LLC"
+          },
+          "brandName": {
+            "type": "string",
+            "example": "Healytics Spa"
+          },
+          "businessTypes": {
+            "description": "Business type categories",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "streetAddress": {
+            "type": "string",
+            "example": "District 1, Ho Chi Minh City"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "0901234567"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "REQUIRED_RESUBMIT"
+            ],
+            "description": "Verification status"
+          }
+        },
+        "required": [
+          "brandName"
+        ]
+      },
+      "SeedEmployeeDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "partnerKey": {
+            "type": "string",
+            "description": "Key of a previously seeded partner"
+          },
+          "partnerBrandName": {
+            "type": "string",
+            "description": "Brand name to look up the partner"
+          },
+          "email": {
+            "type": "string",
+            "example": "emp@test.healytics.vn"
+          },
+          "employeeCode": {
+            "type": "string",
+            "example": "EMP-001"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Nguyen"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Van B"
+          },
+          "displayName": {
+            "type": "string",
+            "example": "Dr. Nguyen Van B"
+          },
+          "phone": {
+            "type": "string",
+            "example": "0912345678"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "DOCTOR",
+              "THERAPIST",
+              "RECEPTIONIST",
+              "MANAGER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "ON_LEAVE"
+            ]
+          },
+          "schedule": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkScheduleEntryDto"
+            }
+          }
+        },
+        "required": [
+          "displayName"
+        ]
+      },
+      "SeedServiceDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "partnerKey": {
+            "type": "string",
+            "description": "Key of a previously seeded partner"
+          },
+          "partnerBrandName": {
+            "type": "string",
+            "description": "Brand name to look up the partner"
+          },
+          "employeeKeys": {
+            "description": "Keys of previously seeded employees",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "categoryKey": {
+            "type": "string",
+            "description": "Key of a previously seeded category"
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "Category name (auto-created if missing)"
+          },
+          "name": {
+            "type": "string",
+            "example": "Deep Tissue Massage"
+          },
+          "slug": {
+            "type": "string",
+            "example": "deep-tissue-massage"
+          },
+          "description": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "example": 500000
+          },
+          "durationMinutes": {
+            "type": "number",
+            "example": 60
+          },
+          "vendorName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "SeedCouponDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "code": {
+            "type": "string",
+            "example": "SUMMER20"
+          },
+          "discountPercent": {
+            "type": "number",
+            "example": 20
+          },
+          "maxDiscountAmount": {
+            "type": "number",
+            "example": 100000
+          },
+          "usageLimit": {
+            "type": "number",
+            "example": 50
+          },
+          "serviceKey": {
+            "type": "string",
+            "description": "Key of a previously seeded service"
+          },
+          "serviceSlug": {
+            "type": "string",
+            "description": "Slug to look up the service"
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "Category name (auto-created if missing)"
+          },
+          "expiresAt": {
+            "type": "string",
+            "example": "2026-12-31T23:59:59Z",
+            "description": "ISO 8601 expiry"
+          }
+        },
+        "required": [
+          "code",
+          "discountPercent"
+        ]
+      },
+      "SeedCartItemDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "userKey": {
+            "type": "string",
+            "description": "Key of a previously seeded user"
+          },
+          "userEmail": {
+            "type": "string",
+            "description": "Email to look up the user"
+          },
+          "serviceKey": {
+            "type": "string",
+            "description": "Key of a previously seeded service"
+          },
+          "serviceSlug": {
+            "type": "string",
+            "description": "Slug to look up the service"
+          },
+          "employeeKey": {
+            "type": "string",
+            "description": "Key of a previously seeded employee"
+          },
+          "employeeEmail": {
+            "type": "string",
+            "description": "Email to look up the employee"
+          },
+          "startsAt": {
+            "type": "string",
+            "example": "2026-06-01T10:00:00Z",
+            "description": "ISO 8601 start time"
+          }
+        },
+        "required": [
+          "startsAt"
+        ]
+      },
+      "SeedBookingDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "userKey": {
+            "type": "string",
+            "description": "Key of a previously seeded user"
+          },
+          "userEmail": {
+            "type": "string",
+            "description": "Email to look up the user"
+          },
+          "serviceKey": {
+            "type": "string",
+            "description": "Key of a previously seeded service"
+          },
+          "serviceSlug": {
+            "type": "string",
+            "description": "Slug to look up the service"
+          },
+          "employeeKey": {
+            "type": "string",
+            "description": "Key of a previously seeded employee"
+          },
+          "employeeEmail": {
+            "type": "string",
+            "description": "Email to look up the employee"
+          },
+          "startsAt": {
+            "type": "string",
+            "example": "2026-06-01T10:00:00Z",
+            "description": "ISO 8601 start time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING_PAYMENT",
+              "CONFIRMED",
+              "IN_PROGRESS",
+              "CANCELLED",
+              "COMPLETED",
+              "NO_SHOW"
+            ]
+          },
+          "endsAt": {
+            "type": "string",
+            "example": "2026-06-01T11:00:00Z",
+            "description": "ISO 8601 end time"
+          },
+          "paymentUrl": {
+            "type": "string",
+            "example": "https://pay.stripe.com/xxx"
+          },
+          "paymentExpiresAt": {
+            "type": "string",
+            "example": "2026-06-01T10:30:00Z"
+          }
+        },
+        "required": [
+          "startsAt"
+        ]
+      },
+      "SeedNotificationDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Unique lookup key"
+          },
+          "userKey": {
+            "type": "string",
+            "description": "Key of a previously seeded user"
+          },
+          "userEmail": {
+            "type": "string",
+            "description": "Email to look up the recipient user"
+          },
+          "senderKey": {
+            "type": "string",
+            "description": "Key of a previously seeded sender account"
+          },
+          "senderEmail": {
+            "type": "string",
+            "description": "Email to look up the sender account"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "booking_confirmed",
+              "booking_cancelled",
+              "booking_completed",
+              "appointment_reminder",
+              "appointment_updated",
+              "new_chat_message",
+              "payment_success",
+              "payment_failed",
+              "system_broadcast",
+              "system_maintenance",
+              "partner_verified",
+              "partner_rejected"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "example": "Booking confirmed"
+          },
+          "body": {
+            "type": "string",
+            "example": "Your appointment is confirmed."
+          },
+          "data": {
+            "type": "object"
+          },
+          "isRead": {
+            "type": "boolean",
+            "default": false
+          },
+          "isBroadcast": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "body"
+        ]
+      },
+      "SeedPayloadDto": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedUserDto"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedCategoryDto"
+            }
+          },
+          "partners": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedPartnerDto"
+            }
+          },
+          "employees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedEmployeeDto"
+            }
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedServiceDto"
+            }
+          },
+          "coupons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedCouponDto"
+            }
+          },
+          "cartItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedCartItemDto"
+            }
+          },
+          "bookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedBookingDto"
+            }
+          },
+          "notifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeedNotificationDto"
+            }
+          }
+        }
+      },
+      "BackdoorPrepareDto": {
+        "type": "object",
+        "properties": {
+          "scenario": {
+            "type": "string",
+            "example": "login-flow",
+            "description": "Scenario name"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/SeedPayloadDto"
+          }
+        }
+      },
+      "SeedIdsMapDto": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "user@test.healytics.vn": "a1b2c3d4-..."
+            },
+            "description": "user key → account UUID"
+          },
+          "categories": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "partners": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "employees": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "services": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "cartItems": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "bookings": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "coupons": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "notifications": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SeedResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "scenario": {
+            "type": "string",
+            "example": "inline"
+          },
+          "ids": {
+            "$ref": "#/components/schemas/SeedIdsMapDto"
+          }
+        },
+        "required": [
+          "ok",
+          "scenario",
+          "ids"
+        ]
+      },
+      "CleanupSeedDataDto": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "$ref": "#/components/schemas/SeedIdsMapDto"
+          }
+        },
+        "required": [
+          "ids"
+        ]
+      },
+      "CleanupSeedDataResponseDto": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "example": true
+          },
+          "deleted": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            },
+            "example": {
+              "users": 1,
+              "bookings": 2
+            }
+          }
+        },
+        "required": [
+          "ok",
+          "deleted"
+        ]
       },
       "AiRecommendationItemDto": {
         "properties": {

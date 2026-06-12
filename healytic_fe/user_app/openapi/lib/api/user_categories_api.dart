@@ -24,12 +24,28 @@ class UserCategoriesApi {
   ///
   /// * [String] categoryId (required):
   ///
+  /// * [String] sort:
+  ///
+  /// * [num] minPrice:
+  ///
+  /// * [num] maxPrice:
+  ///
+  /// * [String] categoryId2:
+  ///
+  /// * [String] clinicId:
+  ///
+  /// * [String] provinceId:
+  ///
+  /// * [String] districtId:
+  ///
+  /// * [String] wardId:
+  ///
   /// * [num] lat:
   ///   User latitude for distance calc
   ///
   /// * [num] lng:
   ///   User longitude for distance calc
-  Future<Response> userCategoriesControllerFindServicesByCategoryWithHttpInfo(String categoryId, { num? lat, num? lng, }) async {
+  Future<Response> userCategoriesControllerFindServicesByCategoryWithHttpInfo(String categoryId, { String? sort, num? minPrice, num? maxPrice, String? categoryId2, String? clinicId, String? provinceId, String? districtId, String? wardId, num? lat, num? lng, }) async {
     // ignore: prefer_const_declarations
     final path = r'/user/categories/{categoryId}/services'
       .replaceAll('{categoryId}', categoryId);
@@ -41,6 +57,30 @@ class UserCategoriesApi {
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
 
+    if (sort != null) {
+      queryParams.addAll(_queryParams('', 'sort', sort));
+    }
+    if (minPrice != null) {
+      queryParams.addAll(_queryParams('', 'minPrice', minPrice));
+    }
+    if (maxPrice != null) {
+      queryParams.addAll(_queryParams('', 'maxPrice', maxPrice));
+    }
+    if (categoryId2 != null) {
+      queryParams.addAll(_queryParams('', 'categoryId', categoryId2));
+    }
+    if (clinicId != null) {
+      queryParams.addAll(_queryParams('', 'clinicId', clinicId));
+    }
+    if (provinceId != null) {
+      queryParams.addAll(_queryParams('', 'provinceId', provinceId));
+    }
+    if (districtId != null) {
+      queryParams.addAll(_queryParams('', 'districtId', districtId));
+    }
+    if (wardId != null) {
+      queryParams.addAll(_queryParams('', 'wardId', wardId));
+    }
     if (lat != null) {
       queryParams.addAll(_queryParams('', 'lat', lat));
     }
@@ -68,13 +108,29 @@ class UserCategoriesApi {
   ///
   /// * [String] categoryId (required):
   ///
+  /// * [String] sort:
+  ///
+  /// * [num] minPrice:
+  ///
+  /// * [num] maxPrice:
+  ///
+  /// * [String] categoryId2:
+  ///
+  /// * [String] clinicId:
+  ///
+  /// * [String] provinceId:
+  ///
+  /// * [String] districtId:
+  ///
+  /// * [String] wardId:
+  ///
   /// * [num] lat:
   ///   User latitude for distance calc
   ///
   /// * [num] lng:
   ///   User longitude for distance calc
-  Future<List<BookingServiceResponseDto>?> userCategoriesControllerFindServicesByCategory(String categoryId, { num? lat, num? lng, }) async {
-    final response = await userCategoriesControllerFindServicesByCategoryWithHttpInfo(categoryId,  lat: lat, lng: lng, );
+  Future<List<BookingServiceResponseDto>?> userCategoriesControllerFindServicesByCategory(String categoryId, { String? sort, num? minPrice, num? maxPrice, String? categoryId2, String? clinicId, String? provinceId, String? districtId, String? wardId, num? lat, num? lng, }) async {
+    final response = await userCategoriesControllerFindServicesByCategoryWithHttpInfo(categoryId,  sort: sort, minPrice: minPrice, maxPrice: maxPrice, categoryId2: categoryId2, clinicId: clinicId, provinceId: provinceId, districtId: districtId, wardId: wardId, lat: lat, lng: lng, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

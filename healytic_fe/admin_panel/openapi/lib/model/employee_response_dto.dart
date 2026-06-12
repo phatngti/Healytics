@@ -37,6 +37,10 @@ class EmployeeResponseDto {
     required this.rating,
     required this.reviewCount,
     this.partnerId,
+    this.clinicId,
+    this.clinicName,
+    this.location,
+    this.experienceYears,
     required this.createdAt,
     required this.updatedAt,
     this.doctorProfile,
@@ -119,6 +123,18 @@ class EmployeeResponseDto {
   /// Partner ID the employee belongs to
   String? partnerId;
 
+  /// Public clinic ID the employee belongs to
+  String? clinicId;
+
+  /// Public clinic name the employee belongs to
+  String? clinicName;
+
+  /// Clinic location label
+  String? location;
+
+  /// Normalized years of professional experience
+  num? experienceYears;
+
   /// Creation timestamp
   DateTime createdAt;
 
@@ -157,6 +173,10 @@ class EmployeeResponseDto {
     other.rating == rating &&
     other.reviewCount == reviewCount &&
     other.partnerId == partnerId &&
+    other.clinicId == clinicId &&
+    other.clinicName == clinicName &&
+    other.location == location &&
+    other.experienceYears == experienceYears &&
     other.createdAt == createdAt &&
     other.updatedAt == updatedAt &&
     other.doctorProfile == doctorProfile &&
@@ -189,13 +209,17 @@ class EmployeeResponseDto {
     (rating.hashCode) +
     (reviewCount.hashCode) +
     (partnerId == null ? 0 : partnerId!.hashCode) +
+    (clinicId == null ? 0 : clinicId!.hashCode) +
+    (clinicName == null ? 0 : clinicName!.hashCode) +
+    (location == null ? 0 : location!.hashCode) +
+    (experienceYears == null ? 0 : experienceYears!.hashCode) +
     (createdAt.hashCode) +
     (updatedAt.hashCode) +
     (doctorProfile == null ? 0 : doctorProfile!.hashCode) +
     (therapistProfile == null ? 0 : therapistProfile!.hashCode);
 
   @override
-  String toString() => 'EmployeeResponseDto[id=$id, employeeCode=$employeeCode, firstName=$firstName, lastName=$lastName, fullName=$fullName, email=$email, phone=$phone, avatarUrl=$avatarUrl, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, description=$description, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, verificationDocuments=$verificationDocuments, schedule=$schedule, workHistory=$workHistory, dob=$dob, gender=$gender, role=$role, status=$status, rating=$rating, reviewCount=$reviewCount, partnerId=$partnerId, createdAt=$createdAt, updatedAt=$updatedAt, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
+  String toString() => 'EmployeeResponseDto[id=$id, employeeCode=$employeeCode, firstName=$firstName, lastName=$lastName, fullName=$fullName, email=$email, phone=$phone, avatarUrl=$avatarUrl, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, description=$description, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, verificationDocuments=$verificationDocuments, schedule=$schedule, workHistory=$workHistory, dob=$dob, gender=$gender, role=$role, status=$status, rating=$rating, reviewCount=$reviewCount, partnerId=$partnerId, clinicId=$clinicId, clinicName=$clinicName, location=$location, experienceYears=$experienceYears, createdAt=$createdAt, updatedAt=$updatedAt, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -275,6 +299,26 @@ class EmployeeResponseDto {
     } else {
       json[r'partnerId'] = null;
     }
+    if (this.clinicId != null) {
+      json[r'clinicId'] = this.clinicId;
+    } else {
+      json[r'clinicId'] = null;
+    }
+    if (this.clinicName != null) {
+      json[r'clinicName'] = this.clinicName;
+    } else {
+      json[r'clinicName'] = null;
+    }
+    if (this.location != null) {
+      json[r'location'] = this.location;
+    } else {
+      json[r'location'] = null;
+    }
+    if (this.experienceYears != null) {
+      json[r'experienceYears'] = this.experienceYears;
+    } else {
+      json[r'experienceYears'] = null;
+    }
       json[r'createdAt'] = this.createdAt.toUtc().toIso8601String();
       json[r'updatedAt'] = this.updatedAt.toUtc().toIso8601String();
     if (this.doctorProfile != null) {
@@ -333,6 +377,12 @@ class EmployeeResponseDto {
         rating: num.parse('${json[r'rating']}'),
         reviewCount: num.parse('${json[r'reviewCount']}'),
         partnerId: mapValueOfType<String>(json, r'partnerId'),
+        clinicId: mapValueOfType<String>(json, r'clinicId'),
+        clinicName: mapValueOfType<String>(json, r'clinicName'),
+        location: mapValueOfType<String>(json, r'location'),
+        experienceYears: json[r'experienceYears'] == null
+            ? null
+            : num.parse('${json[r'experienceYears']}'),
         createdAt: mapDateTime(json, r'createdAt', r'')!,
         updatedAt: mapDateTime(json, r'updatedAt', r'')!,
         doctorProfile: DoctorProfileResponseDto.fromJson(json[r'doctorProfile']),

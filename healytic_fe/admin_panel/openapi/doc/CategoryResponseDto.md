@@ -14,6 +14,9 @@ Name | Type | Description | Notes
 **description** | **String** | Category description | [optional] 
 **imageUrl** | **String** | Category image URL | [optional] 
 **isActive** | **bool** | Whether category is active | 
+**parentId** | **String** | Parent category ID. Null for root categories. | [optional] 
+**isRoot** | **bool** | Whether this category is a root category. | 
+**subCategoryCount** | **num** | Number of direct child sub-categories. | 
 **categoryType** | **String** | Category type for UI grouping | [optional] [default to 'primary']
 **createdAt** | [**DateTime**](DateTime.md) | Creation timestamp | 
 **updatedAt** | [**DateTime**](DateTime.md) | Last update timestamp | 

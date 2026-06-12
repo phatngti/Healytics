@@ -190,7 +190,7 @@ class CheckoutNotifier extends _$CheckoutNotifier {
       vendorIcon: 'local_hospital',
       vendorAddress: params.clinicAddress,
       duration: params.selectedTimeSlot,
-      specialistName: params.employeeName,
+      specialistName: params.employeeName ?? 'Assigned automatically',
       originalPrice: price,
       discountedPrice: price,
     );
@@ -294,6 +294,7 @@ class CheckoutNotifier extends _$CheckoutNotifier {
         productId: params.serviceId,
         idempotencyKey: idempotencyKey,
         payLater: current.selectedPayment == PaymentMethodType.payLater,
+        autoAssignStaff: params.autoAssignSpecialist,
       );
 
       // Fast-fail: slot already taken.

@@ -1,4 +1,6 @@
 import {
+  ConflictException,
+  HttpException,
   Injectable,
   Logger,
   NotFoundException,
@@ -16,6 +18,7 @@ import { Employee } from '@/common/entities/employee.entity';
 import { ProductFacilityImage } from '@/common/entities/product-facility-image.entity';
 import { ProductTag } from '@/common/entities/product-tag.entity';
 import { ProductFeatureTag } from '@/common/entities/product-feature-tag.entity';
+import { Category } from '@/common/entities/category.entity';
 import { SearchIndexOperation } from '@/search/entities/search-index-outbox.entity';
 import { SearchIndexOutboxService } from '@/search/services/search-index-outbox.service';
 
@@ -76,6 +79,24 @@ export class UpdateHealthServiceHandler {
       const sanitizedUpdate = Object.fromEntries(
         Object.entries(updateData).filter(([, value]) => value !== undefined),
       );
+
+      if (typeof sanitizedUpdate.categoryId === 'string') {
+        const category = await queryRunner.manager.findOne(Category, {
+          where: { id: sanitizedUpdate.categoryId, isActive: true },
+          select: ['id', 'parentId'],
+        });
+
+        if (!category) {
+          throw new NotFoundException(
+            `Category with ID ${sanitizedUpdate.categoryId} not found`,
+          );
+        }
+        if (category.parentId == null) {
+          throw new ConflictException(
+            'Services must be assigned to a sub-category',
+          );
+        }
+      }
 
       if (Object.keys(sanitizedUpdate).length > 0) {
         Object.assign(existingProduct, sanitizedUpdate);
@@ -271,6 +292,7 @@ export class UpdateHealthServiceHandler {
         where: { id },
         relations: [
           'category',
+          'category.parent',
           'media',
           'productDefinition',
           'productEmployeeEligibilities',
@@ -288,7 +310,7 @@ export class UpdateHealthServiceHandler {
         error.stack,
       );
 
-      if (error instanceof NotFoundException) throw error;
+      if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException(
         'Transaction failed during product update',
       );
