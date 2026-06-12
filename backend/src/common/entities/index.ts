@@ -98,6 +98,7 @@ export { AdminFinanceReconciliationException } from './admin-finance-reconciliat
 // Search
 export { SearchIndexOutbox } from '@/search/entities/search-index-outbox.entity';
 export {
+  SearchIndexEnvironment,
   SearchIndexEntityType,
   SearchIndexOperation,
   SearchIndexOutboxStatus,

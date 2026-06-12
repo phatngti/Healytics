@@ -229,7 +229,31 @@ class UserHealthServicesApi {
   /// Get premium treatments
   ///
   /// Note: This method returns the HTTP [Response].
-  Future<Response> userHealthServiceControllerGetPremiumTreatmentsWithHttpInfo() async {
+  ///
+  /// Parameters:
+  ///
+  /// * [String] sort:
+  ///
+  /// * [num] minPrice:
+  ///
+  /// * [num] maxPrice:
+  ///
+  /// * [String] categoryId:
+  ///
+  /// * [String] clinicId:
+  ///
+  /// * [String] provinceId:
+  ///
+  /// * [String] districtId:
+  ///
+  /// * [String] wardId:
+  ///
+  /// * [num] lat:
+  ///   User latitude
+  ///
+  /// * [num] lng:
+  ///   User longitude
+  Future<Response> userHealthServiceControllerGetPremiumTreatmentsWithHttpInfo({ String? sort, num? minPrice, num? maxPrice, String? categoryId, String? clinicId, String? provinceId, String? districtId, String? wardId, num? lat, num? lng, }) async {
     // ignore: prefer_const_declarations
     final path = r'/user/health-services/premium-treatments';
 
@@ -239,6 +263,37 @@ class UserHealthServicesApi {
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
+
+    if (sort != null) {
+      queryParams.addAll(_queryParams('', 'sort', sort));
+    }
+    if (minPrice != null) {
+      queryParams.addAll(_queryParams('', 'minPrice', minPrice));
+    }
+    if (maxPrice != null) {
+      queryParams.addAll(_queryParams('', 'maxPrice', maxPrice));
+    }
+    if (categoryId != null) {
+      queryParams.addAll(_queryParams('', 'categoryId', categoryId));
+    }
+    if (clinicId != null) {
+      queryParams.addAll(_queryParams('', 'clinicId', clinicId));
+    }
+    if (provinceId != null) {
+      queryParams.addAll(_queryParams('', 'provinceId', provinceId));
+    }
+    if (districtId != null) {
+      queryParams.addAll(_queryParams('', 'districtId', districtId));
+    }
+    if (wardId != null) {
+      queryParams.addAll(_queryParams('', 'wardId', wardId));
+    }
+    if (lat != null) {
+      queryParams.addAll(_queryParams('', 'lat', lat));
+    }
+    if (lng != null) {
+      queryParams.addAll(_queryParams('', 'lng', lng));
+    }
 
     const contentTypes = <String>[];
 
@@ -255,8 +310,32 @@ class UserHealthServicesApi {
   }
 
   /// Get premium treatments
-  Future<List<PublicHealthServiceCardResponseDto>?> userHealthServiceControllerGetPremiumTreatments() async {
-    final response = await userHealthServiceControllerGetPremiumTreatmentsWithHttpInfo();
+  ///
+  /// Parameters:
+  ///
+  /// * [String] sort:
+  ///
+  /// * [num] minPrice:
+  ///
+  /// * [num] maxPrice:
+  ///
+  /// * [String] categoryId:
+  ///
+  /// * [String] clinicId:
+  ///
+  /// * [String] provinceId:
+  ///
+  /// * [String] districtId:
+  ///
+  /// * [String] wardId:
+  ///
+  /// * [num] lat:
+  ///   User latitude
+  ///
+  /// * [num] lng:
+  ///   User longitude
+  Future<List<PublicHealthServiceCardResponseDto>?> userHealthServiceControllerGetPremiumTreatments({ String? sort, num? minPrice, num? maxPrice, String? categoryId, String? clinicId, String? provinceId, String? districtId, String? wardId, num? lat, num? lng, }) async {
+    final response = await userHealthServiceControllerGetPremiumTreatmentsWithHttpInfo( sort: sort, minPrice: minPrice, maxPrice: maxPrice, categoryId: categoryId, clinicId: clinicId, provinceId: provinceId, districtId: districtId, wardId: wardId, lat: lat, lng: lng, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }

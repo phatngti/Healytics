@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository, In } from 'typeorm';
+import { Not, Repository, In, SelectQueryBuilder } from 'typeorm';
 import { CreatePartnerHealthServiceDto } from './dto/partner/create-partner-health-service.dto';
 import { UpdatePartnerHealthServiceDto } from './dto/partner/update-partner-health-service.dto';
 import { Product } from '@/common/entities/product.entity';
@@ -29,10 +29,18 @@ import { PublicHealthServiceRecommendedResponseDto } from './dto/public/public-h
 import { PublicHealthServiceCardResponseDto } from './dto/public/public-health-service-card-response.dto';
 import { PublicClinicInfoResponseDto } from './dto/public/public-clinic-info-response.dto';
 import { UserEligibilityDetailResponseDto } from './dto/public/user-eligibility-detail-response.dto';
+import {
+  PublicServiceListQueryDto,
+  PublicServiceListSort,
+} from './dto/public/service-list-query.dto';
 import { PartnersService } from '@/partners/partners.service';
 import { HealthServiceStatus } from './enums/health-service-status.enum';
 import { HealthServiceType } from './enums/health-service-type.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
+import { ElasticsearchBookingService } from '@/search/services/elasticsearch-booking.service';
+
+const PUBLIC_SERVICE_LIST_DEFAULT_LIMIT = 50;
+const PUBLIC_SERVICE_LIST_MAX_LIMIT = 50;
 
 @Injectable()
 export class HealthServiceService {
@@ -60,6 +68,7 @@ export class HealthServiceService {
     private readonly getOverviewAnalyticsHandler: GetOverviewAnalyticsHandler,
     private readonly getDetailAnalyticsHandler: GetDetailAnalyticsHandler,
     private readonly partnersService: PartnersService,
+    private readonly elasticsearchBookingService: ElasticsearchBookingService,
   ) {}
 
   // ─── Analytics Facades ────────────────────────────────────
@@ -118,6 +127,7 @@ export class HealthServiceService {
       },
       relations: [
         'category',
+        'category.parent',
         'media',
         'productDefinition',
         'productEmployeeEligibilities',
@@ -125,7 +135,7 @@ export class HealthServiceService {
         'productTags',
         'productTags.tag',
       ],
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'DESC', id: 'DESC' },
     });
   }
 
@@ -134,6 +144,7 @@ export class HealthServiceService {
       where: { id },
       relations: [
         'category',
+        'category.parent',
         'media',
         'productDefinition',
         'productEmployeeEligibilities',
@@ -156,6 +167,7 @@ export class HealthServiceService {
       where: { slug },
       relations: [
         'category',
+        'category.parent',
         'media',
         'productDefinition',
         'productEmployeeEligibilities',
@@ -184,6 +196,7 @@ export class HealthServiceService {
       where: { slug },
       relations: [
         'category',
+        'category.parent',
         'media',
         'productDefinition',
         'productEmployeeEligibilities',
@@ -210,7 +223,7 @@ export class HealthServiceService {
         },
         relations: ['media'],
         take: 3,
-        order: { createdAt: 'DESC' },
+        order: { createdAt: 'DESC', id: 'DESC' },
       });
     }
 
@@ -283,6 +296,7 @@ export class HealthServiceService {
       where: { id },
       relations: [
         'category',
+        'category.parent',
         'media',
         'productTags',
         'productTags.tag',
@@ -448,7 +462,7 @@ export class HealthServiceService {
       },
       relations: ['media'],
       take: 5,
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'DESC', id: 'DESC' },
     });
 
     const ratingsMap = await this.buildRatingsMap(recommended.map((p) => p.id));
@@ -476,7 +490,7 @@ export class HealthServiceService {
     const products = await this.productRepository.find({
       where: { partnerId: partner.id },
       relations: ['media', 'facilityImages'],
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'DESC', id: 'DESC' },
       take: 10,
     });
 
@@ -510,7 +524,12 @@ export class HealthServiceService {
       where: { id: eligibilityId },
       relations: [
         'product',
+        'product.partner',
+        'product.partner.province',
+        'product.partner.district',
+        'product.partner.ward',
         'product.category',
+        'product.category.parent',
         'product.media',
         'product.productDefinition',
         'employee',
@@ -525,7 +544,7 @@ export class HealthServiceService {
       );
     }
 
-    const partner = await this.partnersService.getFirstHealthPartner();
+    const partner = eligibility.product?.partner ?? null;
 
     return UserEligibilityDetailResponseDto.fromEntity(eligibility, partner);
   }
@@ -535,8 +554,13 @@ export class HealthServiceService {
   /** Common relations needed for card DTO mapping. */
   private readonly cardRelations = [
     'category',
+    'category.parent',
     'media',
     'productDefinition',
+    'partner',
+    'partner.province',
+    'partner.district',
+    'partner.ward',
     'productEmployeeEligibilities',
     'productEmployeeEligibilities.employee',
   ];
@@ -544,24 +568,18 @@ export class HealthServiceService {
   /**
    * Returns premium treatment services (active, visible, highest rated).
    */
-  async getPremiumTreatments(): Promise<PublicHealthServiceCardResponseDto[]> {
-    const products = await this.productRepository.find({
-      where: {
-        status: HealthServiceStatus.ACTIVE,
-        isVisibleOnline: true,
-      },
-      relations: this.cardRelations,
-      take: 10,
-      order: { createdAt: 'DESC' },
-    });
+  async getPremiumTreatments(
+    query: PublicServiceListQueryDto = {},
+  ): Promise<PublicHealthServiceCardResponseDto[]> {
+    const products = await this.findPublicServiceCards(query);
 
-    const [partner, ratingsMap] = await Promise.all([
-      this.partnersService.getFirstHealthPartner(),
+    const [ratingsMap] = await Promise.all([
       this.buildRatingsMap(products.map((p) => p.id)),
     ]);
+    const sorted = this.sortPublicServiceCards(products, ratingsMap, query);
     return PublicHealthServiceCardResponseDto.fromEntities(
-      products,
-      partner,
+      sorted,
+      null,
       ratingsMap,
     );
   }
@@ -577,18 +595,270 @@ export class HealthServiceService {
       },
       relations: this.cardRelations,
       take: 10,
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'DESC', id: 'DESC' },
     });
 
-    const [partner, ratingsMap] = await Promise.all([
-      this.partnersService.getFirstHealthPartner(),
+    const [ratingsMap] = await Promise.all([
       this.buildRatingsMap(products.map((p) => p.id)),
     ]);
     return PublicHealthServiceCardResponseDto.fromEntities(
       products,
-      partner,
+      null,
       ratingsMap,
     );
+  }
+
+  private async findPublicServiceCards(
+    query: PublicServiceListQueryDto,
+  ): Promise<Product[]> {
+    const { limit, offset } = this.publicServicePagination(query);
+    const qb = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('category.parent', 'parentCategory')
+      .leftJoinAndSelect('product.media', 'media')
+      .leftJoinAndSelect('product.productDefinition', 'productDefinition')
+      .leftJoinAndSelect(
+        'product.productEmployeeEligibilities',
+        'productEmployeeEligibilities',
+      )
+      .leftJoinAndSelect(
+        'productEmployeeEligibilities.employee',
+        'eligibilityEmployee',
+      )
+      .leftJoinAndSelect('product.partner', 'partner')
+      .leftJoinAndSelect('partner.province', 'province')
+      .leftJoinAndSelect('partner.district', 'district')
+      .leftJoinAndSelect('partner.ward', 'ward')
+      .addSelect(
+        'COALESCE(product.sale_price, product.base_price)',
+        'sort_price',
+      )
+      .where('product.status = :status', {
+        status: HealthServiceStatus.ACTIVE,
+      })
+      .andWhere('product.is_visible_online = :isVisibleOnline', {
+        isVisibleOnline: true,
+      });
+
+    await this.applyPublicServiceFilters(qb, query);
+
+    const sort = query.sort ?? PublicServiceListSort.DEFAULT;
+    if (sort === PublicServiceListSort.PRICE_ASC) {
+      qb.orderBy('sort_price', 'ASC').addOrderBy('product.id', 'ASC');
+    } else if (sort === PublicServiceListSort.PRICE_DESC) {
+      qb.orderBy('sort_price', 'DESC').addOrderBy('product.id', 'DESC');
+    } else {
+      qb.orderBy('product.createdAt', 'DESC').addOrderBy('product.id', 'DESC');
+    }
+
+    if (sort === PublicServiceListSort.RATING_DESC) {
+      return qb.getMany();
+    }
+
+    return qb.skip(offset).take(limit).getMany();
+  }
+
+  private publicServicePagination(query: PublicServiceListQueryDto): {
+    limit: number;
+    offset: number;
+  } {
+    return {
+      limit: this.clampedInteger(
+        query.limit,
+        PUBLIC_SERVICE_LIST_DEFAULT_LIMIT,
+        1,
+        PUBLIC_SERVICE_LIST_MAX_LIMIT,
+      ),
+      offset: this.clampedInteger(query.offset, 0, 0, Number.MAX_SAFE_INTEGER),
+    };
+  }
+
+  private clampedInteger(
+    value: unknown,
+    fallback: number,
+    min: number,
+    max: number,
+  ): number {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return fallback;
+    return Math.min(Math.max(Math.trunc(numeric), min), max);
+  }
+
+  private async applyPublicServiceFilters(
+    qb: SelectQueryBuilder<Product>,
+    query: PublicServiceListQueryDto,
+  ): Promise<void> {
+    if (query.categoryId) {
+      qb.andWhere(
+        `product.category_id IN (
+          SELECT category_filter.id
+          FROM categories category_filter
+          WHERE category_filter.deleted_at IS NULL
+            AND category_filter.is_active = true
+            AND (
+              category_filter.id = :categoryId
+              OR category_filter.parent_id = :categoryId
+            )
+        )`,
+        {
+          categoryId: query.categoryId,
+        },
+      );
+    }
+
+    const serviceIds = await this.resolveTextFilteredServiceIds(query);
+    if (serviceIds) {
+      if (serviceIds.length === 0) {
+        qb.andWhere('1 = 0');
+      } else {
+        qb.andWhere('product.id IN (:...textFilteredServiceIds)', {
+          textFilteredServiceIds: serviceIds,
+        });
+      }
+    } else {
+      this.applySqlTextFilters(qb, query);
+    }
+
+    if (query.minPrice != null) {
+      qb.andWhere(
+        'COALESCE(product.sale_price, product.base_price) >= :minPrice',
+        {
+          minPrice: query.minPrice,
+        },
+      );
+    }
+    if (query.maxPrice != null) {
+      qb.andWhere(
+        'COALESCE(product.sale_price, product.base_price) <= :maxPrice',
+        {
+          maxPrice: query.maxPrice,
+        },
+      );
+    }
+  }
+
+  private async resolveTextFilteredServiceIds(
+    query: PublicServiceListQueryDto,
+  ): Promise<string[] | null> {
+    if (!this.elasticsearchBookingService.isAvailable) return null;
+
+    const filters = this.serviceTextFilters(query);
+    if (filters.length === 0) return null;
+
+    let intersection: Set<string> | null = null;
+    for (const filter of filters) {
+      const ids = await this.elasticsearchBookingService.searchServiceIds(
+        filter.value,
+        filter.fields,
+      );
+      const current = new Set(ids);
+      intersection =
+        intersection == null
+          ? current
+          : new Set([...intersection].filter((id) => current.has(id)));
+
+      if (intersection.size === 0) return [];
+    }
+
+    return intersection ? [...intersection] : null;
+  }
+
+  private applySqlTextFilters(
+    qb: SelectQueryBuilder<Product>,
+    query: PublicServiceListQueryDto,
+  ): void {
+    const clinic = textQuery(query.clinic, query.clinicId);
+    if (clinic) {
+      qb.andWhere(
+        `(
+          partner.brandName ILIKE :clinicText
+          OR partner.legalName ILIKE :clinicText
+          OR partner.streetAddress ILIKE :clinicText
+        )`,
+        { clinicText: `%${clinic}%` },
+      );
+    }
+
+    const province = textQuery(query.province, query.provinceId);
+    if (province) {
+      qb.andWhere(
+        `(
+          province.fullName ILIKE :provinceText
+          OR province.name ILIKE :provinceText
+          OR province.nameEn ILIKE :provinceText
+        )`,
+        { provinceText: `%${province}%` },
+      );
+    }
+
+    const district = textQuery(query.district, query.districtId);
+    if (district) {
+      qb.andWhere(
+        `(
+          district.fullName ILIKE :districtText
+          OR district.name ILIKE :districtText
+          OR district.nameEn ILIKE :districtText
+        )`,
+        { districtText: `%${district}%` },
+      );
+    }
+
+    const ward = textQuery(query.ward, query.wardId);
+    if (ward) {
+      qb.andWhere(
+        `(
+          ward.fullName ILIKE :wardText
+          OR ward.name ILIKE :wardText
+          OR ward.nameEn ILIKE :wardText
+        )`,
+        { wardText: `%${ward}%` },
+      );
+    }
+  }
+
+  private serviceTextFilters(query: PublicServiceListQueryDto) {
+    return [
+      {
+        value: textQuery(query.clinic, query.clinicId),
+        fields: ['clinicNameSearch', 'clinicAddressSearch'],
+      },
+      {
+        value: textQuery(query.province, query.provinceId),
+        fields: ['provinceName', 'locationText'],
+      },
+      {
+        value: textQuery(query.district, query.districtId),
+        fields: ['districtName', 'locationText'],
+      },
+      {
+        value: textQuery(query.ward, query.wardId),
+        fields: ['wardName', 'locationText'],
+      },
+    ].filter((filter): filter is { value: string; fields: string[] } =>
+      Boolean(filter.value),
+    );
+  }
+
+  private sortPublicServiceCards(
+    products: Product[],
+    ratingsMap: Map<string, { rating: number; count: number }>,
+    query: PublicServiceListQueryDto,
+  ): Product[] {
+    if (query.sort !== PublicServiceListSort.RATING_DESC) {
+      return products;
+    }
+
+    const { offset, limit } = this.publicServicePagination(query);
+    return [...products]
+      .sort((a, b) => {
+        const ratingDiff =
+          (ratingsMap.get(b.id)?.rating ?? 0) -
+          (ratingsMap.get(a.id)?.rating ?? 0);
+        if (ratingDiff !== 0) return ratingDiff;
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      })
+      .slice(offset, offset + limit);
   }
 
   /**
@@ -760,4 +1030,9 @@ export class HealthServiceService {
     const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
     return `${String(h12).padStart(2, '0')}:${String(minute).padStart(2, '0')} ${period}`;
   }
+}
+
+function textQuery(primary?: string, alias?: string): string | null {
+  const value = (primary ?? alias)?.trim();
+  return value && value.length >= 2 ? value : null;
 }

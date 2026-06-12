@@ -56,7 +56,7 @@ final class BookingFlowProvider
   }
 }
 
-String _$bookingFlowHash() => r'a5680832026509dd97aa0e27faa715c808321764';
+String _$bookingFlowHash() => r'88bdb9a11319aae31af6b1434b0d490dd7713a12';
 
 /// Riverpod notifier managing the booking flow state
 /// across all 3 wizard steps.

@@ -24,7 +24,7 @@ export class ResetDbResponseDto {
 // ── Seed response ────────────────────────────────────────────────
 
 /** A map of `{ key → uuid }` for each entity type. */
-class SeedIdsMapDto {
+export class SeedIdsMapDto {
   @ApiPropertyOptional({
     type: 'object',
     additionalProperties: { type: 'string' },
@@ -91,4 +91,21 @@ export class SeedResponseDto {
 
   @ApiProperty({ type: SeedIdsMapDto })
   ids: SeedIdsMapDto;
+}
+
+export class CleanupSeedDataDto {
+  @ApiProperty({ type: SeedIdsMapDto })
+  ids: SeedIdsMapDto;
+}
+
+export class CleanupSeedDataResponseDto {
+  @ApiProperty({ type: Boolean, example: true })
+  ok: boolean;
+
+  @ApiProperty({
+    type: 'object',
+    additionalProperties: { type: 'number' },
+    example: { users: 1, bookings: 2 },
+  })
+  deleted: Record<string, number>;
 }

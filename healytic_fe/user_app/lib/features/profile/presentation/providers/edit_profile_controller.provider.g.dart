@@ -34,7 +34,7 @@ final class EditProfileControllerProvider
 }
 
 String _$editProfileControllerHash() =>
-    r'04a14266514112996fa85ed2b8ecd63c3e9973b2';
+    r'cee02933b8a9c342b6f01a31be4d7df9b36c33f1';
 
 abstract class _$EditProfileController extends $AsyncNotifier<void> {
   FutureOr<void> build();

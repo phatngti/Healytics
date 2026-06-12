@@ -10,12 +10,15 @@ class CategoryServiceInfo extends StatelessWidget {
     super.key,
     required this.categoryName,
     required this.serviceTitle,
+    this.subCategoryName,
     this.serviceSubtitle,
     this.serviceImageUrl,
   });
 
   /// Selected category name.
   final String categoryName;
+
+  final String? subCategoryName;
 
   /// Selected service title.
   final String serviceTitle;
@@ -68,6 +71,7 @@ class CategoryServiceInfo extends StatelessWidget {
               Expanded(
                 child: _ServiceTextInfo(
                   categoryName: categoryName,
+                  subCategoryName: subCategoryName,
                   serviceTitle: serviceTitle,
                   serviceSubtitle:
                       serviceSubtitle,
@@ -149,10 +153,12 @@ class _ServiceTextInfo extends StatelessWidget {
   const _ServiceTextInfo({
     required this.categoryName,
     required this.serviceTitle,
+    this.subCategoryName,
     this.serviceSubtitle,
   });
 
   final String categoryName;
+  final String? subCategoryName;
   final String serviceTitle;
   final String? serviceSubtitle;
 
@@ -165,8 +171,15 @@ class _ServiceTextInfo extends StatelessWidget {
       crossAxisAlignment:
           CrossAxisAlignment.start,
       children: [
-        // Category tag chip
-        _CategoryTag(name: categoryName),
+        Wrap(
+          spacing: AppDimens.spaceXs,
+          runSpacing: AppDimens.spaceXs,
+          children: [
+            _CategoryTag(name: categoryName),
+            if (subCategoryName != null && subCategoryName!.isNotEmpty)
+              _CategoryTag(name: subCategoryName!),
+          ],
+        ),
         SizedBox(height: AppDimens.spaceSm),
 
         // Service title

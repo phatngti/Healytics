@@ -14,32 +14,52 @@ class CategoryInfoDto {
   /// Returns a new [CategoryInfoDto] instance.
   CategoryInfoDto({
     required this.id,
+    this.parentCategoryId,
     required this.name,
+    this.parentCategoryName,
   });
 
 
   String id;
 
+  Object? parentCategoryId;
+
   String name;
+
+  Object? parentCategoryName;
 
   @override
   bool operator ==(Object other) => identical(this, other) || other is CategoryInfoDto &&
     other.id == id &&
-    other.name == name;
+    other.parentCategoryId == parentCategoryId &&
+    other.name == name &&
+    other.parentCategoryName == parentCategoryName;
 
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
-    (name.hashCode);
+    (parentCategoryId == null ? 0 : parentCategoryId!.hashCode) +
+    (name.hashCode) +
+    (parentCategoryName == null ? 0 : parentCategoryName!.hashCode);
 
   @override
-  String toString() => 'CategoryInfoDto[id=$id, name=$name]';
+  String toString() => 'CategoryInfoDto[id=$id, parentCategoryId=$parentCategoryId, name=$name, parentCategoryName=$parentCategoryName]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
+    if (this.parentCategoryId != null) {
+      json[r'parentCategoryId'] = this.parentCategoryId;
+    } else {
+      json[r'parentCategoryId'] = null;
+    }
       json[r'name'] = this.name;
+    if (this.parentCategoryName != null) {
+      json[r'parentCategoryName'] = this.parentCategoryName;
+    } else {
+      json[r'parentCategoryName'] = null;
+    }
     return json;
   }
 
@@ -63,7 +83,9 @@ class CategoryInfoDto {
 
       return CategoryInfoDto(
         id: mapValueOfType<String>(json, r'id')!,
+        parentCategoryId: mapValueOfType<Object>(json, r'parentCategoryId'),
         name: mapValueOfType<String>(json, r'name')!,
+        parentCategoryName: mapValueOfType<Object>(json, r'parentCategoryName'),
       );
     }
     return null;

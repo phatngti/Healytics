@@ -13,10 +13,15 @@ Name | Type | Description | Notes
 **slug** | **String** |  | 
 **imageUrl** | [**Object**](.md) |  | [optional] 
 **category** | **String** |  | 
+**categoryId** | [**Object**](.md) |  | [optional] 
+**parentCategoryId** | [**Object**](.md) |  | [optional] 
+**parentCategoryName** | [**Object**](.md) |  | [optional] 
 **duration** | **String** |  | 
 **price** | **String** |  | 
+**priceAmount** | **num** |  | 
 **rating** | **String** |  | 
 **vendorName** | **String** |  | 
+**clinicId** | [**Object**](.md) |  | [optional] 
 **location** | **String** |  | 
 **staffAvatars** | **List<String>** |  | [default to const []]
 **type** | **String** |  | 

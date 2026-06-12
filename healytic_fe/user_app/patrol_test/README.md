@@ -7,7 +7,7 @@ This directory contains end-to-end integration tests using the [Patrol](https://
 Tests are configured to run against specific environments using `--dart-define=ENV=<env>`.
 
 - `ENV=dev` is the fast mock lane.
-- `ENV=test` is the seeded real-backend lane. It prepares scenario data through `/backend/test-backdoor/prepare`, so the backend must run with `NODE_ENV=test`.
+- `ENV=test` is the seeded real-backend lane. It adds scenario data through `/backend/test-backdoor/seed` and removes only the returned seed IDs through `/backend/test-backdoor/cleanup`.
 
 `ENV=uat` is not used for Patrol unless a test explicitly opts into it.
 

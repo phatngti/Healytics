@@ -1,4 +1,6 @@
 import {
+  ConflictException,
+  HttpException,
   Injectable,
   Logger,
   NotFoundException,
@@ -6,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { Category } from '@/common/entities/category.entity';
+import { Product } from '@/common/entities/product.entity';
 
 /**
  * Handler for removing categories using soft delete.
@@ -37,6 +40,24 @@ export class RemoveCategoryHandler {
         throw new NotFoundException(`Category with ID ${id} not found`);
       }
 
+      const activeChildren = await queryRunner.manager.count(Category, {
+        where: { parentId: id, isActive: true },
+      });
+      if (activeChildren > 0) {
+        throw new ConflictException(
+          'Cannot delete a category with active sub-categories',
+        );
+      }
+
+      const serviceCount = await queryRunner.manager.count(Product, {
+        where: { categoryId: id },
+      });
+      if (serviceCount > 0) {
+        throw new ConflictException(
+          'Cannot delete a sub-category with assigned services',
+        );
+      }
+
       // 2. Domain Action: Soft delete category
       await queryRunner.manager.softRemove(Category, category);
 
@@ -45,7 +66,7 @@ export class RemoveCategoryHandler {
       this.logger.log(`Category soft deleted successfully: ${id}`);
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      if (error instanceof NotFoundException) throw error;
+      if (error instanceof HttpException) throw error;
       this.logger.error(
         `Failed to remove category: ${error.message}`,
         error.stack,

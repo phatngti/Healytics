@@ -41,6 +41,21 @@ void main() {
       // TODO
     });
 
+    // Object categoryId
+    test('to test the property `categoryId`', () async {
+      // TODO
+    });
+
+    // Object parentCategoryId
+    test('to test the property `parentCategoryId`', () async {
+      // TODO
+    });
+
+    // Object parentCategoryName
+    test('to test the property `parentCategoryName`', () async {
+      // TODO
+    });
+
     // String duration
     test('to test the property `duration`', () async {
       // TODO
@@ -51,6 +66,11 @@ void main() {
       // TODO
     });
 
+    // num priceAmount
+    test('to test the property `priceAmount`', () async {
+      // TODO
+    });
+
     // String rating
     test('to test the property `rating`', () async {
       // TODO
@@ -58,6 +78,11 @@ void main() {
 
     // String vendorName
     test('to test the property `vendorName`', () async {
+      // TODO
+    });
+
+    // Object clinicId
+    test('to test the property `clinicId`', () async {
       // TODO
     });
 

@@ -11,6 +11,10 @@ class CategorySummaryDto {
   id: string;
 
   @Expose()
+  @ApiPropertyOptional({ type: String, nullable: true })
+  parentId: string | null;
+
+  @Expose()
   @ApiProperty({ type: String })
   name: string;
 
@@ -21,6 +25,7 @@ class CategorySummaryDto {
   static fromEntity(entity: Category): CategorySummaryDto {
     const dto = new CategorySummaryDto();
     dto.id = entity.id;
+    dto.parentId = entity.parentId;
     dto.name = entity.name;
     dto.slug = entity.slug;
     return dto;
@@ -67,6 +72,28 @@ export class CategoryResponseDto {
   @Expose()
   @ApiPropertyOptional({
     type: String,
+    nullable: true,
+    description: 'Parent category ID. Null for root categories.',
+  })
+  parentId: string | null;
+
+  @Expose()
+  @ApiProperty({
+    type: Boolean,
+    description: 'Whether this category is a root category.',
+  })
+  isRoot: boolean;
+
+  @Expose()
+  @ApiProperty({
+    type: Number,
+    description: 'Number of direct child sub-categories.',
+  })
+  subCategoryCount: number;
+
+  @Expose()
+  @ApiPropertyOptional({
+    type: String,
     description: 'Category type for UI grouping',
     default: 'primary',
   })
@@ -104,6 +131,9 @@ export class CategoryResponseDto {
     dto.description = entity.description;
     dto.imageUrl = entity.imageUrl;
     dto.isActive = entity.isActive;
+    dto.parentId = entity.parentId;
+    dto.isRoot = entity.parentId == null;
+    dto.subCategoryCount = entity.children?.length ?? 0;
     dto.categoryType = 'primary';
     dto.createdAt = entity.createdAt;
     dto.updatedAt = entity.updatedAt;

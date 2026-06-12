@@ -9,6 +9,8 @@ abstract class AdminCategorySnapshot with _$AdminCategorySnapshot {
     required String id,
     required String name,
     @Default(0) int serviceCount,
+    @Default(0) int subCategoryCount,
+    @Default(true) bool isRoot,
     @Default(true) bool isActive,
   }) = _AdminCategorySnapshot;
 
@@ -22,6 +24,8 @@ abstract class AdminCategoryHealth with _$AdminCategoryHealth {
     @Default(0) int totalCategories,
     @Default(0) int activeCategories,
     @Default(0) int inactiveCategories,
+    @Default(0) int rootCategories,
+    @Default(0) int subCategories,
     @Default(0) int emptyCategories,
     @Default(0) int totalMappedServices,
     @Default([]) List<AdminCategorySnapshot> topCategories,

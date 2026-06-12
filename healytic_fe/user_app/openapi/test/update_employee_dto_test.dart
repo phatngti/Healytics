@@ -31,6 +31,12 @@ void main() {
       // TODO
     });
 
+    // New employee account password
+    // String password
+    test('to test the property `password`', () async {
+      // TODO
+    });
+
     // EmployeeRole role
     test('to test the property `role`', () async {
       // TODO

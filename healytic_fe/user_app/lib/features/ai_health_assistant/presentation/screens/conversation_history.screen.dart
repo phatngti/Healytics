@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/core/keys/integration_test_keys.dart';
@@ -29,38 +30,31 @@ import '../widgets/history/partner_date_section.widget.dart';
 ///
 /// All dimensions use [AppDimens]; all colours from
 /// the active [ColorScheme].
-class ConversationHistoryScreen extends ConsumerStatefulWidget {
+class ConversationHistoryScreen extends HookConsumerWidget {
   const ConversationHistoryScreen({super.key});
 
   @override
-  ConsumerState<ConversationHistoryScreen> createState() =>
-      _ConversationHistoryScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchController = useTextEditingController();
+    final isSearching = useState(false);
+    final selectedChatType = useState(ChatType.aiSession);
 
-class _ConversationHistoryScreenState
-    extends ConsumerState<ConversationHistoryScreen> {
-  final _searchController = TextEditingController();
-  bool _isSearching = false;
-  ChatType _selectedChatType = ChatType.aiSession;
+    useEffect(() {
+      Future.microtask(() {
+        if (!context.mounted) return;
+        ref.read(conversationHistoryProvider.notifier).refresh();
+      });
+      return null;
+    }, const []);
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _toggleSearch() {
-    setState(() {
-      _isSearching = !_isSearching;
-      if (!_isSearching) {
-        _searchController.clear();
+    void toggleSearch() {
+      isSearching.value = !isSearching.value;
+      if (!isSearching.value) {
+        searchController.clear();
         ref.read(conversationHistoryProvider.notifier).updateSearchQuery('');
       }
-    });
-  }
+    }
 
-  @override
-  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final historyState = ref.watch(conversationHistoryProvider);
@@ -72,9 +66,9 @@ class _ConversationHistoryScreenState
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: _isSearching
+        title: isSearching.value
             ? _SearchField(
-                controller: _searchController,
+                controller: searchController,
                 textTheme: textTheme,
                 colorScheme: colorScheme,
                 onChanged: (value) {
@@ -93,26 +87,24 @@ class _ConversationHistoryScreenState
         actions: [
           IconButton(
             icon: Icon(
-              _isSearching ? Icons.close : Icons.search,
+              isSearching.value ? Icons.close : Icons.search,
               color: colorScheme.primary,
             ),
-            tooltip: _isSearching ? 'Close search' : 'Search',
-            onPressed: _toggleSearch,
+            tooltip: isSearching.value ? 'Close search' : 'Search',
+            onPressed: toggleSearch,
           ),
         ],
       ),
       body: Column(
         children: [
           ChatTypeSelector(
-            selected: _selectedChatType,
+            selected: selectedChatType.value,
             onChanged: (type) {
-              setState(() {
-                _selectedChatType = type;
-              });
+              selectedChatType.value = type;
             },
           ),
           Expanded(
-            child: _selectedChatType == ChatType.aiSession
+            child: selectedChatType.value == ChatType.aiSession
                 ? _buildAiBody(context, historyState, colorScheme)
                 : _buildPartnerBody(context, historyState, colorScheme),
           ),

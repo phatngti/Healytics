@@ -26,11 +26,12 @@ abstract class CheckoutRemoteDatasource {
   /// Starts an async checkout, returning a ticket.
   Future<AsyncCheckoutResult> asyncCheckout({
     required String userId,
-    required String staffId,
+    String? staffId,
     required String startTime,
     String? productId,
     required String idempotencyKey,
     bool payLater = false,
+    bool autoAssignStaff = false,
   });
 
   /// Polls the status of a checkout ticket.
@@ -115,36 +116,44 @@ class CheckoutRemoteDatasourceImpl implements CheckoutRemoteDatasource {
   @override
   Future<AsyncCheckoutResult> asyncCheckout({
     required String userId,
-    required String staffId,
+    String? staffId,
     required String startTime,
     String? productId,
     required String idempotencyKey,
     bool payLater = false,
+    bool autoAssignStaff = false,
   }) async {
     if (productId == null) {
       throw ArgumentError('productId is required for async checkout');
     }
 
-    final dto = AsyncCheckoutDto(
-      userId: userId,
-      staffId: staffId,
-      startTime: startTime,
-      productId: productId,
-      idempotencyKey: idempotencyKey,
-      payLater: payLater,
+    final response = await _apiService.apiClient.invokeAPI(
+      '/user/bookings/async-checkout',
+      'POST',
+      const [],
+      {
+        'userId': userId,
+        if (staffId != null && staffId.isNotEmpty) 'staffId': staffId,
+        'startTime': startTime,
+        'productId': productId,
+        'idempotencyKey': idempotencyKey,
+        'payLater': payLater,
+        'autoAssignStaff': autoAssignStaff,
+      },
+      {},
+      {},
+      'application/json',
     );
 
-    final response = await _apiService.userBookingsApi
-        .bookingControllerAsyncCheckout(dto);
-
-    if (response == null) {
+    if (response.statusCode >= 400 || response.body.isEmpty) {
       throw Exception('Empty response from checkout');
     }
 
+    final decoded = json.decode(response.body) as Map<String, dynamic>;
     return AsyncCheckoutResult(
-      ticketId: response.ticketId,
-      status: response.status,
-      message: response.message,
+      ticketId: decoded['ticketId']?.toString() ?? '',
+      status: decoded['status']?.toString() ?? '',
+      message: decoded['message']?.toString() ?? '',
     );
   }
 
@@ -531,11 +540,12 @@ class CheckoutRemoteDatasourceMock implements CheckoutRemoteDatasource {
   @override
   Future<AsyncCheckoutResult> asyncCheckout({
     required String userId,
-    required String staffId,
+    String? staffId,
     required String startTime,
     String? productId,
     required String idempotencyKey,
     bool payLater = false,
+    bool autoAssignStaff = false,
   }) async {
     await Future.delayed(const Duration(milliseconds: 600));
     return kMockAsyncCheckoutResult;

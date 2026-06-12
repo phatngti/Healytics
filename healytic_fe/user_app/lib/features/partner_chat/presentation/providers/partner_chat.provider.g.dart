@@ -192,7 +192,7 @@ final class PartnerChatProvider
   }
 }
 
-String _$partnerChatHash() => r'0601ad675714b844f2626b9e512f85bd3a2bd4fb';
+String _$partnerChatHash() => r'48cb39fb1783b75956a8fa99905ae2375d3e6e50';
 
 /// Main chat notifier — manages the full lifecycle of
 /// a partner chat conversation.

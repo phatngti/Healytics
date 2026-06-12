@@ -19,6 +19,7 @@ import { CheckSlotAvailabilityHandler } from './check-slot-availability.handler'
 import { RABBITMQ_CLIENT } from '@/rabbitmq/rabbitmq.module';
 import { RedisService } from '@/redis/redis.service';
 import { formatSlotKey } from '../../utils/slot-key.util';
+import { AutoStaffAssignmentService } from '@/booking/services/auto-staff-assignment.service';
 
 /** Pre-lock TTL in seconds — must be >= max queue delay + transaction time */
 const CHECKOUT_PRELOCK_TTL_SECONDS = 600; // 10 minutes
@@ -45,11 +46,12 @@ export class CreateCheckoutTicketHandler {
     private readonly rmqClient: ClientProxy,
     private readonly slotChecker: CheckSlotAvailabilityHandler,
     private readonly redisService: RedisService,
+    private readonly autoStaffAssignmentService: AutoStaffAssignmentService,
   ) {}
 
   async execute(dto: AsyncCheckoutDto): Promise<AsyncCheckoutResponseDto> {
     this.logger.log(
-      `Creating checkout ticket: user=${dto.userId}, staff=${dto.staffId}, key=${dto.idempotencyKey}`,
+      `Creating checkout ticket: user=${dto.userId}, staff=${dto.staffId ?? 'auto'}, key=${dto.idempotencyKey}`,
     );
 
     // 1. Idempotency check — Redis fast path, then DB fallback
@@ -111,19 +113,22 @@ export class CreateCheckoutTicketHandler {
       throw error;
     }
 
+    const startDate = new Date(dto.startTime);
+    const normalizedDto = await this.resolveStaff(dto, startDate);
+
     // 2. Validate FK references exist before insert
-    await this.validateForeignKeys(dto);
+    await this.validateForeignKeys(normalizedDto);
 
     // 3. Pre-check slot availability (optional fast fail)
     let available: boolean;
     try {
       available = await this.slotChecker.execute(
-        dto.staffId,
-        new Date(dto.startTime),
+        normalizedDto.staffId,
+        startDate,
       );
     } catch (error) {
       this.logger.error(
-        `Slot availability check failed — staffId=${dto.staffId}, startTime=${dto.startTime}`,
+        `Slot availability check failed — staffId=${normalizedDto.staffId}, startTime=${normalizedDto.startTime}`,
         error.stack,
       );
       throw error;
@@ -131,19 +136,18 @@ export class CreateCheckoutTicketHandler {
 
     if (!available) {
       this.logger.warn(
-        `Slot pre-check failed: staff=${dto.staffId}, time=${dto.startTime}`,
+        `Slot pre-check failed: staff=${normalizedDto.staffId}, time=${normalizedDto.startTime}`,
       );
       return this.createFailedTicket(
-        dto,
+        normalizedDto,
         cacheKey,
         'Slot is no longer available.',
       );
     }
 
     // 3b. Acquire checkout pre-lock (closes TOCTOU gap between API and consumer)
-    const startDate = new Date(dto.startTime);
     const dateStr = formatSlotKey(startDate);
-    const lockKey = `lock:checkout:${dto.staffId}_${dateStr}`;
+    const lockKey = `lock:checkout:${normalizedDto.staffId}_${dateStr}`;
     let lockToken: string | null = null;
 
     try {
@@ -162,10 +166,10 @@ export class CreateCheckoutTicketHandler {
     if (lockToken === null) {
       // Another ticket already holds this slot — fast fail
       this.logger.warn(
-        `Pre-lock denied: staff=${dto.staffId}, time=${dto.startTime}, key=${lockKey}`,
+        `Pre-lock denied: staff=${normalizedDto.staffId}, time=${normalizedDto.startTime}, key=${lockKey}`,
       );
       return this.createFailedTicket(
-        dto,
+        normalizedDto,
         cacheKey,
         'Slot is no longer available.',
       );
@@ -175,23 +179,23 @@ export class CreateCheckoutTicketHandler {
     let saved: CheckoutTicket;
     try {
       const ticket = this.ticketRepo.create({
-        userId: dto.userId,
-        staffId: dto.staffId,
+        userId: normalizedDto.userId,
+        staffId: normalizedDto.staffId,
         startTime: startDate,
-        productId: dto.productId || null,
-        idempotencyKey: dto.idempotencyKey,
-        webhookUrl: dto.webhookUrl || null,
+        productId: normalizedDto.productId || null,
+        idempotencyKey: normalizedDto.idempotencyKey,
+        webhookUrl: normalizedDto.webhookUrl || null,
         status: CheckoutTicketStatus.QUEUED,
         lockToken,
       });
       saved = await this.ticketRepo.save(ticket);
     } catch (error) {
       const ticketData = {
-        userId: dto.userId,
-        staffId: dto.staffId,
-        startTime: dto.startTime,
-        productId: dto.productId,
-        idempotencyKey: dto.idempotencyKey,
+        userId: normalizedDto.userId,
+        staffId: normalizedDto.staffId,
+        startTime: normalizedDto.startTime,
+        productId: normalizedDto.productId,
+        idempotencyKey: normalizedDto.idempotencyKey,
       };
 
       // Release pre-lock on ticket save failure so slot becomes available again
@@ -235,13 +239,13 @@ export class CreateCheckoutTicketHandler {
     // 6. Publish to RabbitMQ queue (include lockToken for consumer validation)
     const rmqPayload = {
       ticketId: saved.id,
-      staffId: dto.staffId,
-      startTime: dto.startTime,
-      userId: dto.userId,
-      productId: dto.productId,
-      webhookUrl: dto.webhookUrl,
+      staffId: normalizedDto.staffId,
+      startTime: normalizedDto.startTime,
+      userId: normalizedDto.userId,
+      productId: normalizedDto.productId,
+      webhookUrl: normalizedDto.webhookUrl,
       lockToken,
-      payLater: dto.payLater ?? false,
+      payLater: normalizedDto.payLater ?? false,
     };
     try {
       this.rmqClient.emit('checkout.process', rmqPayload);
@@ -263,12 +267,33 @@ export class CreateCheckoutTicketHandler {
     );
   }
 
+  private async resolveStaff(
+    dto: AsyncCheckoutDto,
+    startDate: Date,
+  ): Promise<AsyncCheckoutDto & { staffId: string }> {
+    if (!dto.autoAssignStaff && dto.staffId) {
+      return { ...dto, staffId: dto.staffId };
+    }
+
+    const assignment = await this.autoStaffAssignmentService.resolveBestStaff(
+      dto.productId,
+      startDate,
+    );
+
+    return {
+      ...dto,
+      staffId: assignment.staffId,
+    };
+  }
+
   /**
    * Validate that all FK references exist in their respective tables.
    * Runs all lookups in parallel via Promise.all to minimize latency.
    * Throws BadRequestException with clear detail if any reference is invalid.
    */
-  private async validateForeignKeys(dto: AsyncCheckoutDto): Promise<void> {
+  private async validateForeignKeys(
+    dto: AsyncCheckoutDto & { staffId: string },
+  ): Promise<void> {
     const [accountExists, employeeExists, productExists] = await Promise.all([
       this.accountRepo.findOne({ where: { id: dto.userId }, select: ['id'] }),
       this.employeeRepo.findOne({ where: { id: dto.staffId }, select: ['id'] }),
@@ -306,7 +331,7 @@ export class CreateCheckoutTicketHandler {
    * fails or when the Redis pre-lock is denied.
    */
   private async createFailedTicket(
-    dto: AsyncCheckoutDto,
+    dto: AsyncCheckoutDto & { staffId: string },
     cacheKey: string,
     errorMessage: string,
   ): Promise<AsyncCheckoutResponseDto> {

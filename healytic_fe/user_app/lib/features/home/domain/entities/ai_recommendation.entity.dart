@@ -37,6 +37,12 @@ class AiRecommendation {
   /// Optional staff/specialist display name.
   final String? staffName;
 
+  /// Optional category label from the recommender source.
+  final String category;
+
+  /// Optional vendor or clinic label from the recommender source.
+  final String vendorName;
+
   /// Available time slots (ISO strings).
   final List<String> slots;
 
@@ -53,11 +59,13 @@ class AiRecommendation {
     this.totalReviews = 0,
     this.location = '',
     this.staffName,
+    this.category = '',
+    this.vendorName = '',
     this.slots = const [],
   });
 
   @override
   String toString() {
-    return 'AiRecommendation{serviceId: $serviceId, name: $name, imageUrl: $imageUrl, badge: $badge, bookedCount: $bookedCount, price: $price, priceAmount: $priceAmount, currency: $currency, rating: $rating, totalReviews: $totalReviews, location: $location, staffName: $staffName, slots: $slots}';
+    return 'AiRecommendation{serviceId: $serviceId, name: $name, imageUrl: $imageUrl, badge: $badge, bookedCount: $bookedCount, price: $price, priceAmount: $priceAmount, currency: $currency, rating: $rating, totalReviews: $totalReviews, location: $location, staffName: $staffName, category: $category, vendorName: $vendorName, slots: $slots}';
   }
 }

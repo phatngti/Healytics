@@ -61,6 +61,7 @@ import 'package:user_app/features/clinic_info/presentation/screens/clinic_specia
 import 'package:user_app/features/cart/presentation/screens/cart.screen.dart';
 import 'package:user_app/features/notifications/'
     'presentation/providers/notification.provider.dart';
+import 'package:user_app/features/orders/presentation/providers/appointment.provider.dart';
 
 part 'routes.g.dart';
 
@@ -151,6 +152,16 @@ class _MobileWrapperBody extends ConsumerWidget {
     return AdaptiveRootScraffold(
       navigationShell: navigationShell,
       notificationBadgeCount: unreadCount,
+      onDestinationSelected: (index) {
+        if (index != 1) return;
+
+        final selectedCategory = ref.read(selectedCategoryProvider);
+        if (selectedCategory == kCategoryAllFilterId) {
+          ref.read(filteredAppointmentsProvider.notifier).silentRefresh();
+        } else {
+          ref.read(selectedCategoryProvider.notifier).clear();
+        }
+      },
       destinationKeys: [
         keys.bottomNav.homeTab,
         keys.bottomNav.ordersTab,

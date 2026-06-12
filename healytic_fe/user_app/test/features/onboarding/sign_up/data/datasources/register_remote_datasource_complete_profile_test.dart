@@ -76,14 +76,12 @@ void main() {
       apiService = _MockApiService();
       apiClient = _MockApiClient();
       when(() => apiService.apiClient).thenReturn(apiClient);
-      when(
-        () => apiService.setAccessToken(any()),
-      ).thenAnswer((_) async {});
+      when(() => apiService.setAccessToken(any())).thenAnswer((_) async {});
       ds = RegisterRemoteDatasourceImpl(apiService: apiService);
     });
 
     test(
-      'PATCHes /auth/user/profile with Bearer access token and correct body',
+      'PATCHes account profile and address endpoints with correct bodies',
       () async {
         when(
           () => apiClient.invokeAPI(
@@ -126,62 +124,81 @@ void main() {
           ),
         ).captured;
 
-        expect(captured[0], '/auth/user/profile');
+        expect(captured[0], '/account/me/profile');
         expect(captured[1], 'PATCH');
         expect(captured[3], <String, dynamic>{
           'firstName': 'Alice',
           'lastName': 'Test',
           'dateOfBirth': '1990-01-15',
-          'streetAddress': '123 Main St',
-          'provinceId': 'province-1',
-          'districtId': 'district-1',
-          'wardId': 'ward-1',
         });
         expect(captured[4], <String, String>{
           'Content-Type': 'application/json',
         });
         expect(captured[6], 'application/json');
-      },
-    );
 
-    test(
-      'wraps TimeoutException as ApiException(requestTimeout, ...) '
-      'after 30 seconds',
-      () {
-        // Stub invokeAPI to return a Future that never completes so the
-        // 30-second `.timeout(...)` in the data source fires.
-        final completer = Completer<http.Response>();
-        when(
-          () => apiClient.invokeAPI(
-            any(),
-            any(),
-            any(),
-            any(),
-            any(),
-            any(),
-            any(),
-          ),
-        ).thenAnswer((_) => completer.future);
-
-        fakeAsync((async) {
-          Object? caught;
-          ds.completeProfile(testProfile).catchError((Object e) {
-            caught = e;
-            // Return a dummy value to satisfy the Future signature; the
-            // test only inspects `caught`.
-            return null;
-          });
-
-          // Advance virtual time past the 30-second budget.
-          async.elapse(const Duration(seconds: 31));
-          async.flushMicrotasks();
-
-          expect(caught, isA<ApiException>());
-          final apiEx = caught! as ApiException;
-          expect(apiEx.code, HttpStatus.requestTimeout);
-          expect(apiEx.message, contains('timed out'));
+        expect(captured[7], '/account/me/address');
+        expect(captured[8], 'PATCH');
+        expect(captured[10], <String, dynamic>{
+          'streetAddress': '123 Main St',
+          'provinceId': 'province-1',
+          'districtId': 'district-1',
+          'wardId': 'ward-1',
         });
+        expect(captured[11], <String, String>{
+          'Content-Type': 'application/json',
+        });
+        expect(captured[13], 'application/json');
+
+        expect(captured[14], '/account/me/profile');
+        expect(captured[15], 'PATCH');
+        expect(captured[17], <String, dynamic>{
+          'firstName': 'Alice',
+          'lastName': 'Test',
+          'dateOfBirth': '1990-01-15',
+          'profileCompleted': true,
+        });
+        expect(captured[18], <String, String>{
+          'Content-Type': 'application/json',
+        });
+        expect(captured[20], 'application/json');
       },
     );
+
+    test('wraps TimeoutException as ApiException(requestTimeout, ...) '
+        'after 30 seconds', () {
+      // Stub invokeAPI to return a Future that never completes so the
+      // 30-second `.timeout(...)` in the data source fires.
+      final completer = Completer<http.Response>();
+      when(
+        () => apiClient.invokeAPI(
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+        ),
+      ).thenAnswer((_) => completer.future);
+
+      fakeAsync((async) {
+        Object? caught;
+        ds.completeProfile(testProfile).catchError((Object e) {
+          caught = e;
+          // Return a dummy value to satisfy the Future signature; the
+          // test only inspects `caught`.
+          return null;
+        });
+
+        // Advance virtual time past the 30-second budget.
+        async.elapse(const Duration(seconds: 31));
+        async.flushMicrotasks();
+
+        expect(caught, isA<ApiException>());
+        final apiEx = caught! as ApiException;
+        expect(apiEx.code, HttpStatus.requestTimeout);
+        expect(apiEx.message, contains('timed out'));
+      });
+    });
   });
 }

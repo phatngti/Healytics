@@ -531,6 +531,10 @@ class AdminDashboardRemoteDataSourceImpl
           _toInt(d['activeCategories']),
       inactiveCategories:
           _toInt(d['inactiveCategories']),
+      rootCategories:
+          _toInt(d['rootCategories']),
+      subCategories:
+          _toInt(d['subCategories']),
       emptyCategories:
           _toInt(d['emptyCategories']),
       totalMappedServices:
@@ -549,6 +553,8 @@ class AdminDashboardRemoteDataSourceImpl
       id: '${d['id'] ?? ''}',
       name: '${d['name'] ?? ''}',
       serviceCount: _toInt(d['serviceCount']),
+      subCategoryCount: _toInt(d['subCategoryCount']),
+      isRoot: d['isRoot'] != false,
       isActive: d['isActive'] != false,
     );
   }

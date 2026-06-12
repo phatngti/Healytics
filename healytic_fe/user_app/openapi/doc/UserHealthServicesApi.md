@@ -207,7 +207,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **userHealthServiceControllerGetPremiumTreatments**
-> List<PublicHealthServiceCardResponseDto> userHealthServiceControllerGetPremiumTreatments()
+> List<PublicHealthServiceCardResponseDto> userHealthServiceControllerGetPremiumTreatments(sort, minPrice, maxPrice, categoryId, clinicId, provinceId, districtId, wardId, lat, lng)
 
 Get premium treatments
 
@@ -222,9 +222,19 @@ import 'package:user_openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('bearer').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = UserHealthServicesApi();
+final sort = sort_example; // String | 
+final minPrice = 8.14; // num | 
+final maxPrice = 8.14; // num | 
+final categoryId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final clinicId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final provinceId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final districtId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final wardId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final lat = 8.14; // num | User latitude
+final lng = 8.14; // num | User longitude
 
 try {
-    final result = api_instance.userHealthServiceControllerGetPremiumTreatments();
+    final result = api_instance.userHealthServiceControllerGetPremiumTreatments(sort, minPrice, maxPrice, categoryId, clinicId, provinceId, districtId, wardId, lat, lng);
     print(result);
 } catch (e) {
     print('Exception when calling UserHealthServicesApi->userHealthServiceControllerGetPremiumTreatments: $e\n');
@@ -232,7 +242,19 @@ try {
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **sort** | **String**|  | [optional] [default to 'default']
+ **minPrice** | **num**|  | [optional] 
+ **maxPrice** | **num**|  | [optional] 
+ **categoryId** | **String**|  | [optional] 
+ **clinicId** | **String**|  | [optional] 
+ **provinceId** | **String**|  | [optional] 
+ **districtId** | **String**|  | [optional] 
+ **wardId** | **String**|  | [optional] 
+ **lat** | **num**| User latitude | [optional] 
+ **lng** | **num**| User longitude | [optional] 
 
 ### Return type
 

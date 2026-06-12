@@ -70,6 +70,12 @@ class EmployeeFunctionButtons {
                 state: state,
                 onTap: notifier.setSort,
               ),
+              _sortOption(
+                label: 'Created At',
+                value: EmployeeTableSort.createdAt,
+                state: state,
+                onTap: notifier.setSort,
+              ),
             ],
           ),
         ),
@@ -177,10 +183,11 @@ class EmployeeFunctionButtons {
     required ValueChanged<EmployeeTableSort> onTap,
   }) {
     final isSelected = state.sortBy == value;
+    final directionLabel = value == EmployeeTableSort.createdAt
+        ? (state.sortAscending ? 'Oldest' : 'Newest')
+        : (state.sortAscending ? 'A-Z' : 'Z-A');
     return ManagementTableMenuOption(
-      label: isSelected
-          ? '$label (${state.sortAscending ? 'A-Z' : 'Z-A'})'
-          : label,
+      label: isSelected ? '$label ($directionLabel)' : label,
       selected: isSelected,
       icon: Icons.sort,
       onTap: () => onTap(value),

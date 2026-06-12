@@ -133,7 +133,10 @@ const envFilePath =
     ObservabilityModule,
     HealthModule,
     SearchModule,
-    ...(process.env.NODE_ENV === 'test' ? [TestBackdoorModule] : []),
+    ...(process.env.NODE_ENV === 'test' ||
+    process.env.ENABLE_TEST_BACKDOOR === 'true'
+      ? [TestBackdoorModule]
+      : []),
   ],
   providers: [
     {

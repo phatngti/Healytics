@@ -18,6 +18,12 @@ export enum SearchIndexOperation {
   DELETE = 'delete',
 }
 
+export enum SearchIndexEnvironment {
+  PRODUCTION = 'production',
+  DEV = 'dev',
+  UAT = 'uat',
+}
+
 export enum SearchIndexOutboxStatus {
   PENDING = 'pending',
   PROCESSING = 'processing',
@@ -26,7 +32,11 @@ export enum SearchIndexOutboxStatus {
 }
 
 @Entity('search_index_outbox')
-@Index('IDX_SEARCH_INDEX_OUTBOX_STATUS_CREATED', ['status', 'createdAt'])
+@Index('IDX_SEARCH_INDEX_OUTBOX_ENV_STATUS_CREATED', [
+  'targetEnvironment',
+  'status',
+  'createdAt',
+])
 @Index('IDX_SEARCH_INDEX_OUTBOX_ENTITY', ['entityType', 'entityId'])
 export class SearchIndexOutbox {
   @PrimaryGeneratedColumn('uuid')
@@ -40,6 +50,14 @@ export class SearchIndexOutbox {
 
   @Column({ type: 'varchar', length: 20 })
   operation: SearchIndexOperation;
+
+  @Column({
+    name: 'target_environment',
+    type: 'varchar',
+    length: 20,
+    default: SearchIndexEnvironment.PRODUCTION,
+  })
+  targetEnvironment: SearchIndexEnvironment;
 
   @Column({ type: 'jsonb', nullable: true })
   payload: Record<string, unknown> | null;

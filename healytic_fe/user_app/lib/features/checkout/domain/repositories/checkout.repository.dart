@@ -13,11 +13,12 @@ abstract class CheckoutRepository {
   /// Initiates an async checkout and returns a ticket.
   Future<AsyncCheckoutResult> asyncCheckout({
     required String userId,
-    required String staffId,
+    String? staffId,
     required String startTime,
     String? productId,
     required String idempotencyKey,
     bool payLater = false,
+    bool autoAssignStaff = false,
   });
 
   /// Polls the status of a checkout ticket.

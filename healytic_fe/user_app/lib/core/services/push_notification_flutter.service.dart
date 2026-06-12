@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/core/config/notification_config.dart';
@@ -16,6 +17,23 @@ import 'package:user_app/features/notifications/'
 part 'push_notification_flutter.service.g.dart';
 
 final _log = Logger('PushNotificationFlutter');
+const _firebaseConfigChannel = MethodChannel('healytics/firebase_config');
+
+Future<bool> _hasNativeFirebaseConfig() async {
+  if (!Platform.isAndroid) {
+    return true;
+  }
+
+  try {
+    return await _firebaseConfigChannel.invokeMethod<bool>('isConfigured') ??
+        false;
+  } on MissingPluginException {
+    return true;
+  } catch (error) {
+    _log.warning('Firebase native config check failed: $error');
+    return true;
+  }
+}
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -35,6 +53,10 @@ Future<void> configureFirebaseMessagingBackgroundHandler() async {
   }
 
   try {
+    if (!await _hasNativeFirebaseConfig()) {
+      return;
+    }
+
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   } catch (error) {
@@ -64,6 +86,7 @@ class PushNotificationFlutterService {
   final LocalNotificationService _localNotificationService;
   bool _initialized = false;
   bool _firebaseAvailable = false;
+  bool? _nativeFirebaseConfigAvailable;
   StreamSubscription<String>? _tokenRefreshSub;
   StreamSubscription<RemoteMessage>? _foregroundSub;
   StreamSubscription<RemoteMessage>? _openedSub;
@@ -101,13 +124,6 @@ class PushNotificationFlutterService {
       return;
     }
 
-    final granted = await requestPermission();
-    if (!granted) {
-      _log.warning('Push permission denied');
-      _initialized = true;
-      return;
-    }
-
     if (_config.mockPushTokenEnabled) {
       final token = await getToken();
       await _registerToken(token);
@@ -117,10 +133,17 @@ class PushNotificationFlutterService {
 
     _firebaseAvailable = await _ensureFirebase();
     if (!_firebaseAvailable) {
-      _log.warning(
-        'Real push registration is enabled, but Firebase client config '
+      _log.info(
+        'Real push registration skipped because Firebase client config '
         'is missing for this build',
       );
+      _initialized = true;
+      return;
+    }
+
+    final granted = await requestPermission();
+    if (!granted) {
+      _log.warning('Push permission denied');
       _initialized = true;
       return;
     }
@@ -238,6 +261,11 @@ class PushNotificationFlutterService {
 
   Future<bool> _ensureFirebase() async {
     if (_firebaseAvailable) return true;
+    _nativeFirebaseConfigAvailable ??= await _hasNativeFirebaseConfig();
+    if (!_nativeFirebaseConfigAvailable!) {
+      return false;
+    }
+
     try {
       await Firebase.initializeApp();
       _firebaseAvailable = true;

@@ -1,0 +1,12 @@
+{
+  "name": "healytics-landing-page",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Healytics static landing page for Heroku.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}

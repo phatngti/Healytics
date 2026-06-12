@@ -210,7 +210,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **userAppointmentControllerListRecentActivity**
-> userAppointmentControllerListRecentActivity(limit, offset)
+> userAppointmentControllerListRecentActivity(limit, offset, status, categoryId, clinicId, fromDate, toDate, sort)
 
 Get recent appointment activity for home dashboard
 
@@ -227,9 +227,15 @@ import 'package:admin_openapi/api.dart';
 final api_instance = UserAppointmentsApi();
 final limit = 5; // num | Maximum number of items to return (1–20)
 final offset = 0; // num | Number of items to skip
+final status = completed; // String | 
+final categoryId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final clinicId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final fromDate = 2026-05-01; // String | 
+final toDate = 2026-05-31; // String | 
+final sort = sort_example; // String | 
 
 try {
-    api_instance.userAppointmentControllerListRecentActivity(limit, offset);
+    api_instance.userAppointmentControllerListRecentActivity(limit, offset, status, categoryId, clinicId, fromDate, toDate, sort);
 } catch (e) {
     print('Exception when calling UserAppointmentsApi->userAppointmentControllerListRecentActivity: $e\n');
 }
@@ -241,6 +247,12 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **limit** | **num**| Maximum number of items to return (1–20) | [optional] [default to 5]
  **offset** | **num**| Number of items to skip | [optional] [default to 0]
+ **status** | **String**|  | [optional] 
+ **categoryId** | **String**|  | [optional] 
+ **clinicId** | **String**|  | [optional] 
+ **fromDate** | **String**|  | [optional] 
+ **toDate** | **String**|  | [optional] 
+ **sort** | **String**|  | [optional] [default to 'default']
 
 ### Return type
 

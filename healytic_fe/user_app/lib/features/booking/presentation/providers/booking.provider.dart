@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/features/booking/data/datasources/remote/booking_remote_datasource.dart';
 import 'package:user_app/features/booking/domain/entities/booking.entity.dart';
 import 'package:user_app/features/booking/domain/entities/time_slot.entity.dart';
+import 'package:user_app/features/home/presentation/providers/list_filter.provider.dart';
 
 part 'booking.provider.g.dart';
 
@@ -14,9 +15,7 @@ Future<List<BookingSpecialist>> specialistsByCategory(
   Ref ref,
   String categoryId,
 ) async {
-  final datasource = ref.read(
-    bookingRemoteDatasourceProvider,
-  );
+  final datasource = ref.read(bookingRemoteDatasourceProvider);
   return datasource.getSpecialistsByCategory(categoryId);
 }
 
@@ -29,12 +28,8 @@ Future<List<BookingSpecialist>> specialistsByService(
   Ref ref,
   String serviceId,
 ) async {
-  final datasource = ref.read(
-    bookingRemoteDatasourceProvider,
-  );
-  return datasource.getSpecialistsByService(
-    serviceId,
-  );
+  final datasource = ref.read(bookingRemoteDatasourceProvider);
+  return datasource.getSpecialistsByService(serviceId);
 }
 
 /// Fetches services for the given [specialistId].
@@ -45,9 +40,7 @@ Future<List<BookingService>> servicesBySpecialist(
   Ref ref,
   String specialistId,
 ) async {
-  final datasource = ref.read(
-    bookingRemoteDatasourceProvider,
-  );
+  final datasource = ref.read(bookingRemoteDatasourceProvider);
   return datasource.getServicesBySpecialist(specialistId);
 }
 
@@ -59,22 +52,16 @@ Future<List<BookingService>> servicesByCategory(
   Ref ref,
   String categoryId,
 ) async {
-  final datasource = ref.read(
-    bookingRemoteDatasourceProvider,
-  );
-  return datasource.getServicesByCategory(categoryId);
+  final datasource = ref.read(bookingRemoteDatasourceProvider);
+  final filter = ref.watch(bookingServiceFilterProvider);
+  return datasource.getServicesByCategory(categoryId, filter: filter);
 }
 
 /// Searches services and specialists matching
 /// [query] via the backend (Elasticsearch).
 @riverpod
-Future<BookingSearchResult> searchBooking(
-  Ref ref,
-  String query,
-) async {
-  final datasource = ref.read(
-    bookingRemoteDatasourceProvider,
-  );
+Future<BookingSearchResult> searchBooking(Ref ref, String query) async {
+  final datasource = ref.read(bookingRemoteDatasourceProvider);
   return datasource.searchBooking(query);
 }
 
@@ -89,12 +76,6 @@ Future<EmployeeTimeSlotsEntity> employeeTimeSlots(
   String employeeId, {
   String? date,
 }) async {
-  final datasource = ref.read(
-    bookingRemoteDatasourceProvider,
-  );
-  return datasource.getTimeSlots(
-    employeeId: employeeId,
-    date: date,
-    days: 7,
-  );
+  final datasource = ref.read(bookingRemoteDatasourceProvider);
+  return datasource.getTimeSlots(employeeId: employeeId, date: date, days: 7);
 }

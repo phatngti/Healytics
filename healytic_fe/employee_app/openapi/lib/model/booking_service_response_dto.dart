@@ -19,10 +19,16 @@ class BookingServiceResponseDto {
     required this.duration,
     required this.price,
     this.clinicName,
+    this.clinicId,
     this.clinicAddress,
+    this.location,
     this.distance,
     this.durationMinutes,
     this.priceVnd,
+    this.categoryId,
+    this.categoryName,
+    this.parentCategoryId,
+    this.parentCategoryName,
   });
 
 
@@ -44,8 +50,14 @@ class BookingServiceResponseDto {
   /// Clinic or facility name
   Object? clinicName;
 
+  /// Clinic or facility ID
+  Object? clinicId;
+
   /// Clinic street address
   Object? clinicAddress;
+
+  /// Clinic location label
+  Object? location;
 
   /// Distance from user (e.g. \"1.2 km\")
   Object? distance;
@@ -68,6 +80,18 @@ class BookingServiceResponseDto {
   ///
   Object? priceVnd;
 
+  /// Sub-category ID
+  Object? categoryId;
+
+  /// Sub-category name
+  Object? categoryName;
+
+  /// Root category ID
+  Object? parentCategoryId;
+
+  /// Root category name
+  Object? parentCategoryName;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is BookingServiceResponseDto &&
     other.id == id &&
@@ -76,10 +100,16 @@ class BookingServiceResponseDto {
     other.duration == duration &&
     other.price == price &&
     other.clinicName == clinicName &&
+    other.clinicId == clinicId &&
     other.clinicAddress == clinicAddress &&
+    other.location == location &&
     other.distance == distance &&
     other.durationMinutes == durationMinutes &&
-    other.priceVnd == priceVnd;
+    other.priceVnd == priceVnd &&
+    other.categoryId == categoryId &&
+    other.categoryName == categoryName &&
+    other.parentCategoryId == parentCategoryId &&
+    other.parentCategoryName == parentCategoryName;
 
   @override
   int get hashCode =>
@@ -90,13 +120,19 @@ class BookingServiceResponseDto {
     (duration.hashCode) +
     (price.hashCode) +
     (clinicName == null ? 0 : clinicName!.hashCode) +
+    (clinicId == null ? 0 : clinicId!.hashCode) +
     (clinicAddress == null ? 0 : clinicAddress!.hashCode) +
+    (location == null ? 0 : location!.hashCode) +
     (distance == null ? 0 : distance!.hashCode) +
     (durationMinutes == null ? 0 : durationMinutes!.hashCode) +
-    (priceVnd == null ? 0 : priceVnd!.hashCode);
+    (priceVnd == null ? 0 : priceVnd!.hashCode) +
+    (categoryId == null ? 0 : categoryId!.hashCode) +
+    (categoryName == null ? 0 : categoryName!.hashCode) +
+    (parentCategoryId == null ? 0 : parentCategoryId!.hashCode) +
+    (parentCategoryName == null ? 0 : parentCategoryName!.hashCode);
 
   @override
-  String toString() => 'BookingServiceResponseDto[id=$id, imageUrl=$imageUrl, title=$title, duration=$duration, price=$price, clinicName=$clinicName, clinicAddress=$clinicAddress, distance=$distance, durationMinutes=$durationMinutes, priceVnd=$priceVnd]';
+  String toString() => 'BookingServiceResponseDto[id=$id, imageUrl=$imageUrl, title=$title, duration=$duration, price=$price, clinicName=$clinicName, clinicId=$clinicId, clinicAddress=$clinicAddress, location=$location, distance=$distance, durationMinutes=$durationMinutes, priceVnd=$priceVnd, categoryId=$categoryId, categoryName=$categoryName, parentCategoryId=$parentCategoryId, parentCategoryName=$parentCategoryName]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -114,10 +150,20 @@ class BookingServiceResponseDto {
     } else {
       json[r'clinicName'] = null;
     }
+    if (this.clinicId != null) {
+      json[r'clinicId'] = this.clinicId;
+    } else {
+      json[r'clinicId'] = null;
+    }
     if (this.clinicAddress != null) {
       json[r'clinicAddress'] = this.clinicAddress;
     } else {
       json[r'clinicAddress'] = null;
+    }
+    if (this.location != null) {
+      json[r'location'] = this.location;
+    } else {
+      json[r'location'] = null;
     }
     if (this.distance != null) {
       json[r'distance'] = this.distance;
@@ -133,6 +179,26 @@ class BookingServiceResponseDto {
       json[r'priceVnd'] = this.priceVnd;
     } else {
       json[r'priceVnd'] = null;
+    }
+    if (this.categoryId != null) {
+      json[r'categoryId'] = this.categoryId;
+    } else {
+      json[r'categoryId'] = null;
+    }
+    if (this.categoryName != null) {
+      json[r'categoryName'] = this.categoryName;
+    } else {
+      json[r'categoryName'] = null;
+    }
+    if (this.parentCategoryId != null) {
+      json[r'parentCategoryId'] = this.parentCategoryId;
+    } else {
+      json[r'parentCategoryId'] = null;
+    }
+    if (this.parentCategoryName != null) {
+      json[r'parentCategoryName'] = this.parentCategoryName;
+    } else {
+      json[r'parentCategoryName'] = null;
     }
     return json;
   }
@@ -162,10 +228,16 @@ class BookingServiceResponseDto {
         duration: mapValueOfType<String>(json, r'duration')!,
         price: mapValueOfType<String>(json, r'price')!,
         clinicName: mapValueOfType<Object>(json, r'clinicName'),
+        clinicId: mapValueOfType<Object>(json, r'clinicId'),
         clinicAddress: mapValueOfType<Object>(json, r'clinicAddress'),
+        location: mapValueOfType<Object>(json, r'location'),
         distance: mapValueOfType<Object>(json, r'distance'),
         durationMinutes: mapValueOfType<Object>(json, r'durationMinutes'),
         priceVnd: mapValueOfType<Object>(json, r'priceVnd'),
+        categoryId: mapValueOfType<Object>(json, r'categoryId'),
+        categoryName: mapValueOfType<Object>(json, r'categoryName'),
+        parentCategoryId: mapValueOfType<Object>(json, r'parentCategoryId'),
+        parentCategoryName: mapValueOfType<Object>(json, r'parentCategoryName'),
       );
     }
     return null;

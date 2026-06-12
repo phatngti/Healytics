@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull } from 'typeorm';
+import { Repository, IsNull, SelectQueryBuilder } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from '@/common/entities/category.entity';
@@ -13,9 +13,14 @@ import { BookingServiceResponseDto } from '@/employees/dto/booking-service-respo
 import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
 import { EmployeeStatus } from '@/employees/enum/employee-status.enum';
 import { PartnersService } from '@/partners/partners.service';
+import {
+  PublicServiceListQueryDto,
+  PublicServiceListSort,
+} from '@/health-service/dto/public/service-list-query.dto';
 import { CreateCategoryHandler } from './application/handlers/create-category.handler';
 import { UpdateCategoryHandler } from './application/handlers/update-category.handler';
 import { RemoveCategoryHandler } from './application/handlers/remove-category.handler';
+import { ElasticsearchBookingService } from '@/search/services/elasticsearch-booking.service';
 
 /**
  * Service facade for managing product categories.
@@ -37,6 +42,7 @@ export class CategoriesService {
     private readonly createCategoryHandler: CreateCategoryHandler,
     private readonly updateCategoryHandler: UpdateCategoryHandler,
     private readonly removeCategoryHandler: RemoveCategoryHandler,
+    private readonly elasticsearchBookingService: ElasticsearchBookingService,
   ) {}
 
   /**
@@ -76,8 +82,27 @@ export class CategoriesService {
     return this.categoryRepository.find({
       where: { parentId: IsNull() },
       relations: ['children'],
-      order: { name: 'ASC' },
+      order: { sortOrder: 'ASC', name: 'ASC' },
     });
+  }
+
+  async resolveBookableCategoryIds(categoryId: string): Promise<string[]> {
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+      relations: ['children'],
+    });
+    if (!category) {
+      this.logger.warn(`Category not found: ${categoryId}`);
+      throw new NotFoundException(`Category with ID ${categoryId} not found`);
+    }
+
+    if (category.parentId == null) {
+      return (category.children ?? [])
+        .filter((child) => child.isActive && child.deletedAt == null)
+        .map((child) => child.id);
+    }
+
+    return [category.id];
   }
 
   /**
@@ -145,21 +170,15 @@ export class CategoriesService {
   async findSpecialistsByCategory(
     categoryId: string,
   ): Promise<BookingSpecialistResponseDto[]> {
-    // Verify category exists
-    const category = await this.categoryRepository.findOne({
-      where: { id: categoryId },
-    });
-    if (!category) {
-      this.logger.warn(`Category not found: ${categoryId}`);
-      throw new NotFoundException(`Category with ID ${categoryId} not found`);
-    }
+    const categoryIds = await this.resolveBookableCategoryIds(categoryId);
+    if (categoryIds.length === 0) return [];
 
     // Query eligible employees via the join chain, retaining the eligibility record
     const eligibilities = await this.eligibilityRepository
       .createQueryBuilder('elig')
       .innerJoinAndSelect('elig.employee', 'emp')
       .innerJoin('elig.product', 'prod')
-      .where('prod.category_id = :categoryId', { categoryId })
+      .where('prod.category_id IN (:...categoryIds)', { categoryIds })
       .andWhere('prod.status = :activeStatus', {
         activeStatus: HealthServiceStatus.ACTIVE,
       })
@@ -188,41 +207,161 @@ export class CategoriesService {
    */
   async findServicesByCategory(
     categoryId: string,
-    userLat?: number,
-    userLng?: number,
+    query: PublicServiceListQueryDto = {},
   ): Promise<BookingServiceResponseDto[]> {
-    // Verify category exists
-    const category = await this.categoryRepository.findOne({
-      where: { id: categoryId },
-    });
-    if (!category) {
-      this.logger.warn(`Category not found: ${categoryId}`);
-      throw new NotFoundException(`Category with ID ${categoryId} not found`);
+    const categoryIds = await this.resolveBookableCategoryIds(categoryId);
+    if (categoryIds.length === 0) return [];
+
+    const qb = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('category.parent', 'parentCategory')
+      .leftJoinAndSelect('product.media', 'media')
+      .leftJoinAndSelect('product.productDefinition', 'productDefinition')
+      .leftJoinAndSelect('product.partner', 'partner')
+      .leftJoinAndSelect('partner.province', 'province')
+      .leftJoinAndSelect('partner.district', 'district')
+      .leftJoinAndSelect('partner.ward', 'ward')
+      .where('product.category_id IN (:...categoryIds)', { categoryIds })
+      .andWhere('product.status = :activeStatus', {
+        activeStatus: HealthServiceStatus.ACTIVE,
+      });
+
+    const serviceIds = await this.resolveTextFilteredServiceIds(query);
+    if (serviceIds) {
+      if (serviceIds.length === 0) {
+        qb.andWhere('1 = 0');
+      } else {
+        qb.andWhere('product.id IN (:...textFilteredServiceIds)', {
+          textFilteredServiceIds: serviceIds,
+        });
+      }
+    } else {
+      this.applySqlTextFilters(qb, query);
+    }
+    if (query.minPrice != null) {
+      qb.andWhere(
+        'COALESCE(product.sale_price, product.base_price) >= :minPrice',
+        {
+          minPrice: query.minPrice,
+        },
+      );
+    }
+    if (query.maxPrice != null) {
+      qb.andWhere(
+        'COALESCE(product.sale_price, product.base_price) <= :maxPrice',
+        {
+          maxPrice: query.maxPrice,
+        },
+      );
     }
 
-    // Query active products in this category with media + definition
-    const products = await this.productRepository.find({
-      where: {
-        categoryId,
-        status: HealthServiceStatus.ACTIVE,
-      },
-      relations: ['media', 'productDefinition'],
-      order: { createdAt: 'DESC' },
-    });
+    switch (query.sort) {
+      case PublicServiceListSort.PRICE_ASC:
+        qb.orderBy('COALESCE(product.sale_price, product.base_price)', 'ASC');
+        break;
+      case PublicServiceListSort.PRICE_DESC:
+        qb.orderBy('COALESCE(product.sale_price, product.base_price)', 'DESC');
+        break;
+      case PublicServiceListSort.LATEST:
+      case PublicServiceListSort.RATING_DESC:
+      case PublicServiceListSort.DEFAULT:
+      default:
+        qb.orderBy('product.created_at', 'DESC');
+        break;
+    }
 
-    // Load partner for clinic info
-    const partner = await this.partnersService.getFirstHealthPartner();
+    const products = await qb.getMany();
 
     return BookingServiceResponseDto.fromEntities(
       products,
-      partner,
-      userLat,
-      userLng,
+      null,
+      query.lat,
+      query.lng,
     );
   }
 
   async remove(id: string): Promise<void> {
     return this.removeCategoryHandler.execute(id);
+  }
+
+  private async resolveTextFilteredServiceIds(
+    query: PublicServiceListQueryDto,
+  ): Promise<string[] | null> {
+    if (!this.elasticsearchBookingService.isAvailable) return null;
+
+    const filters = serviceTextFilters(query);
+    if (filters.length === 0) return null;
+
+    let intersection: Set<string> | null = null;
+    for (const filter of filters) {
+      const ids = await this.elasticsearchBookingService.searchServiceIds(
+        filter.value,
+        filter.fields,
+      );
+      const current = new Set(ids);
+      intersection =
+        intersection == null
+          ? current
+          : new Set([...intersection].filter((id) => current.has(id)));
+
+      if (intersection.size === 0) return [];
+    }
+
+    return intersection ? [...intersection] : null;
+  }
+
+  private applySqlTextFilters(
+    qb: SelectQueryBuilder<Product>,
+    query: PublicServiceListQueryDto,
+  ): void {
+    const clinic = textQuery(query.clinic, query.clinicId);
+    if (clinic) {
+      qb.andWhere(
+        `(
+          partner.brandName ILIKE :clinicText
+          OR partner.legalName ILIKE :clinicText
+          OR partner.streetAddress ILIKE :clinicText
+        )`,
+        { clinicText: `%${clinic}%` },
+      );
+    }
+
+    const province = textQuery(query.province, query.provinceId);
+    if (province) {
+      qb.andWhere(
+        `(
+          province.fullName ILIKE :provinceText
+          OR province.name ILIKE :provinceText
+          OR province.nameEn ILIKE :provinceText
+        )`,
+        { provinceText: `%${province}%` },
+      );
+    }
+
+    const district = textQuery(query.district, query.districtId);
+    if (district) {
+      qb.andWhere(
+        `(
+          district.fullName ILIKE :districtText
+          OR district.name ILIKE :districtText
+          OR district.nameEn ILIKE :districtText
+        )`,
+        { districtText: `%${district}%` },
+      );
+    }
+
+    const ward = textQuery(query.ward, query.wardId);
+    if (ward) {
+      qb.andWhere(
+        `(
+          ward.fullName ILIKE :wardText
+          OR ward.name ILIKE :wardText
+          OR ward.nameEn ILIKE :wardText
+        )`,
+        { wardText: `%${ward}%` },
+      );
+    }
   }
 
   /**
@@ -234,7 +373,6 @@ export class CategoriesService {
       .createQueryBuilder('cat')
       .leftJoinAndSelect('cat.parent', 'parent')
       .leftJoinAndSelect('cat.children', 'children')
-      .loadRelationCountAndMap('cat.serviceCount', 'cat.products')
       .orderBy('cat.sortOrder', 'ASC')
       .addOrderBy('cat.name', 'ASC')
       .withDeleted()
@@ -242,7 +380,7 @@ export class CategoriesService {
       .getMany();
 
     return AdminCategoryResponseDto.fromEntities(
-      categories as (Category & { serviceCount: number })[],
+      await this.withAdminServiceCounts(categories),
     );
   }
 
@@ -254,7 +392,6 @@ export class CategoriesService {
       .createQueryBuilder('cat')
       .leftJoinAndSelect('cat.parent', 'parent')
       .leftJoinAndSelect('cat.children', 'children')
-      .loadRelationCountAndMap('cat.serviceCount', 'cat.products')
       .where('cat.id = :id', { id })
       .getOne();
 
@@ -263,9 +400,8 @@ export class CategoriesService {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
 
-    return AdminCategoryResponseDto.fromEntity(
-      category as Category & { serviceCount: number },
-    );
+    const [withCounts] = await this.withAdminServiceCounts([category]);
+    return AdminCategoryResponseDto.fromEntity(withCounts);
   }
 
   /**
@@ -288,4 +424,69 @@ export class CategoriesService {
     await this.updateCategoryHandler.execute(id, updateCategoryDto);
     return this.findOneForAdmin(id);
   }
+
+  private async withAdminServiceCounts(
+    categories: Category[],
+  ): Promise<(Category & { serviceCount: number })[]> {
+    if (categories.length === 0) return [];
+
+    const rows = await this.categoryRepository.query(`
+      SELECT
+        cat.id,
+        COUNT(product.id)::int AS "serviceCount"
+      FROM categories cat
+      LEFT JOIN categories child
+        ON child.parent_id = cat.id
+        AND child.deleted_at IS NULL
+        AND child.is_active = true
+      LEFT JOIN products product
+        ON (
+          (cat.parent_id IS NULL AND product.category_id = child.id)
+          OR (cat.parent_id IS NOT NULL AND product.category_id = cat.id)
+        )
+        AND product.deleted_at IS NULL
+      WHERE cat.deleted_at IS NULL
+      GROUP BY cat.id
+    `);
+    const counts = new Map<string, number>(
+      rows.map((row: { id: string; serviceCount: number | string }) => [
+        row.id,
+        Number(row.serviceCount) || 0,
+      ]),
+    );
+
+    return categories.map((category) =>
+      Object.assign(category, {
+        serviceCount: counts.get(category.id) ?? 0,
+      }),
+    ) as (Category & { serviceCount: number })[];
+  }
+}
+
+function textQuery(primary?: string, alias?: string): string | null {
+  const value = (primary ?? alias)?.trim();
+  return value && value.length >= 2 ? value : null;
+}
+
+function serviceTextFilters(query: PublicServiceListQueryDto) {
+  return [
+    {
+      value: textQuery(query.clinic, query.clinicId),
+      fields: ['clinicNameSearch', 'clinicAddressSearch'],
+    },
+    {
+      value: textQuery(query.province, query.provinceId),
+      fields: ['provinceName', 'locationText'],
+    },
+    {
+      value: textQuery(query.district, query.districtId),
+      fields: ['districtName', 'locationText'],
+    },
+    {
+      value: textQuery(query.ward, query.wardId),
+      fields: ['wardName', 'locationText'],
+    },
+  ].filter((filter): filter is { value: string; fields: string[] } =>
+    Boolean(filter.value),
+  );
 }

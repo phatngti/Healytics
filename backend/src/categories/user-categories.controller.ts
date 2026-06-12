@@ -10,6 +10,7 @@ import { CategoriesService } from './categories.service';
 import { BookingSpecialistResponseDto } from './dto/booking-specialist-response.dto';
 import { BookingServiceResponseDto } from '@/employees/dto/booking-service-response.dto';
 import { LogResponse } from '@/common/interceptors/response.interceptor';
+import { PublicServiceListQueryDto } from '@/health-service/dto/public/service-list-query.dto';
 
 /**
  * User controller for category-related booking endpoints.
@@ -45,16 +46,9 @@ export class UserCategoriesController {
   })
   findServicesByCategory(
     @Param('categoryId', ParseUUIDPipe) categoryId: string,
-    @Query('lat') lat?: string,
-    @Query('lng') lng?: string,
+    @Query() query: PublicServiceListQueryDto,
   ): Promise<BookingServiceResponseDto[]> {
-    const userLat = lat ? parseFloat(lat) : undefined;
-    const userLng = lng ? parseFloat(lng) : undefined;
-    return this.categoriesService.findServicesByCategory(
-      categoryId,
-      userLat,
-      userLng,
-    );
+    return this.categoriesService.findServicesByCategory(categoryId, query);
   }
 
   /**

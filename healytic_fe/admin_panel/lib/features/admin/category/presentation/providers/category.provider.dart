@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'category.provider.freezed.dart';
 part 'category.provider.g.dart';
 
-enum CategoryTableSort { name, serviceCount, status }
+enum CategoryTableSort { name, serviceCount, status, createdAt }
 
 enum CategoryVisibilityFilter { all, visible, hidden }
 
@@ -87,7 +87,7 @@ class CategoryNotifier extends _$CategoryNotifier {
     final current = _currentState;
     final nextAscending = current.sortBy == sortBy
         ? !current.sortAscending
-        : true;
+        : _defaultSortAscending(sortBy);
     _setTableState(
       current.copyWith(
         sortBy: sortBy,
@@ -146,6 +146,7 @@ class CategoryNotifier extends _$CategoryNotifier {
   /// Update an existing category
   Future<void> updateCategory({
     required CategoryId id,
+    String? parentId,
     String? name,
     String? description,
     String? iconName,
@@ -156,6 +157,7 @@ class CategoryNotifier extends _$CategoryNotifier {
     final repo = ref.read(categoryRepositoryProvider);
     await repo.updateCategory(
       id: id,
+      parentId: parentId,
       name: name,
       description: description,
       iconName: iconName,
@@ -247,7 +249,9 @@ class CategoryNotifier extends _$CategoryNotifier {
       final matchesSearch =
           normalizedSearch.isEmpty ||
           category.name.toLowerCase().contains(normalizedSearch) ||
-          category.description.toLowerCase().contains(normalizedSearch);
+          category.description.toLowerCase().contains(normalizedSearch) ||
+          (category.parentName?.toLowerCase().contains(normalizedSearch) ??
+              false);
 
       final matchesVisibility = switch (query.visibilityFilter) {
         CategoryVisibilityFilter.all => true,
@@ -266,6 +270,10 @@ class CategoryNotifier extends _$CategoryNotifier {
         ),
         CategoryTableSort.status => (a.isVisible ? 1 : 0).compareTo(
           b.isVisible ? 1 : 0,
+        ),
+        CategoryTableSort.createdAt => _compareNullableDateString(
+          a.createdAt,
+          b.createdAt,
         ),
       };
       return query.sortAscending ? comparison : -comparison;
@@ -297,5 +305,23 @@ class CategoryNotifier extends _$CategoryNotifier {
 
   int _compareText(String a, String b) {
     return a.toLowerCase().compareTo(b.toLowerCase());
+  }
+
+  bool _defaultSortAscending(CategoryTableSort sortBy) {
+    return switch (sortBy) {
+      CategoryTableSort.createdAt => false,
+      _ => true,
+    };
+  }
+
+  int _compareNullableDateString(String? a, String? b) {
+    final left = a == null ? null : DateTime.tryParse(a);
+    final right = b == null ? null : DateTime.tryParse(b);
+    if (left != null || right != null) {
+      if (left == null) return -1;
+      if (right == null) return 1;
+      return left.compareTo(right);
+    }
+    return (a ?? '').compareTo(b ?? '');
   }
 }

@@ -16,6 +16,7 @@ class UpdateEmployeeDto {
     this.employeeCode,
     this.fullName,
     this.email,
+    this.password,
     this.role,
     this.status,
     this.firstName,
@@ -62,6 +63,15 @@ class UpdateEmployeeDto {
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
   String? email;
+
+  /// New employee account password
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? password;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -120,6 +130,7 @@ class UpdateEmployeeDto {
     other.employeeCode == employeeCode &&
     other.fullName == fullName &&
     other.email == email &&
+    other.password == password &&
     other.role == role &&
     other.status == status &&
     other.firstName == firstName &&
@@ -147,6 +158,7 @@ class UpdateEmployeeDto {
     (employeeCode == null ? 0 : employeeCode!.hashCode) +
     (fullName == null ? 0 : fullName!.hashCode) +
     (email == null ? 0 : email!.hashCode) +
+    (password == null ? 0 : password!.hashCode) +
     (role == null ? 0 : role!.hashCode) +
     (status == null ? 0 : status!.hashCode) +
     (firstName == null ? 0 : firstName!.hashCode) +
@@ -169,7 +181,7 @@ class UpdateEmployeeDto {
     (therapistProfile == null ? 0 : therapistProfile!.hashCode);
 
   @override
-  String toString() => 'UpdateEmployeeDto[employeeCode=$employeeCode, fullName=$fullName, email=$email, role=$role, status=$status, firstName=$firstName, lastName=$lastName, phone=$phone, avatarUrl=$avatarUrl, dob=$dob, gender=$gender, partnerId=$partnerId, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, description=$description, verificationDocuments=$verificationDocuments, schedule=$schedule, workHistory=$workHistory, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
+  String toString() => 'UpdateEmployeeDto[employeeCode=$employeeCode, fullName=$fullName, email=$email, password=$password, role=$role, status=$status, firstName=$firstName, lastName=$lastName, phone=$phone, avatarUrl=$avatarUrl, dob=$dob, gender=$gender, partnerId=$partnerId, jobTitle=$jobTitle, startDate=$startDate, employmentType=$employmentType, emergencyContactName=$emergencyContactName, emergencyContactPhone=$emergencyContactPhone, description=$description, verificationDocuments=$verificationDocuments, schedule=$schedule, workHistory=$workHistory, doctorProfile=$doctorProfile, therapistProfile=$therapistProfile]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -187,6 +199,11 @@ class UpdateEmployeeDto {
       json[r'email'] = this.email;
     } else {
       json[r'email'] = null;
+    }
+    if (this.password != null) {
+      json[r'password'] = this.password;
+    } else {
+      json[r'password'] = null;
     }
     if (this.role != null) {
       json[r'role'] = this.role;
@@ -313,6 +330,7 @@ class UpdateEmployeeDto {
         employeeCode: mapValueOfType<String>(json, r'employeeCode'),
         fullName: mapValueOfType<String>(json, r'fullName'),
         email: mapValueOfType<String>(json, r'email'),
+        password: mapValueOfType<String>(json, r'password'),
         role: EmployeeRole.fromJson(json[r'role']),
         status: EmployeeStatus.fromJson(json[r'status']),
         firstName: mapValueOfType<String>(json, r'firstName'),

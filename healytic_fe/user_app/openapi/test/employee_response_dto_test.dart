@@ -157,6 +157,30 @@ void main() {
       // TODO
     });
 
+    // Public clinic ID the employee belongs to
+    // String clinicId
+    test('to test the property `clinicId`', () async {
+      // TODO
+    });
+
+    // Public clinic name the employee belongs to
+    // String clinicName
+    test('to test the property `clinicName`', () async {
+      // TODO
+    });
+
+    // Clinic location label
+    // String location
+    test('to test the property `location`', () async {
+      // TODO
+    });
+
+    // Normalized years of professional experience
+    // num experienceYears
+    test('to test the property `experienceYears`', () async {
+      // TODO
+    });
+
     // Creation timestamp
     // DateTime createdAt
     test('to test the property `createdAt`', () async {

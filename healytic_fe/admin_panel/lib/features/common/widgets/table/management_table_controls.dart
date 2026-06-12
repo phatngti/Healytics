@@ -20,34 +20,57 @@ class ManagementTableMenuOption extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: AppDimens.radiusSmall,
-      child: Padding(
-        padding: AppDimens.paddingAllSmall,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              selected ? Icons.check_circle : icon ?? Icons.circle_outlined,
-              size: 18,
-              color: selected
-                  ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant,
-            ),
-            AppDimens.horizontalSmall,
-            Flexible(
-              child: Text(
-                label,
-                style: textTheme.bodyMedium?.copyWith(
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                  color: selected ? colorScheme.primary : colorScheme.onSurface,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final hasBoundedWidth = constraints.hasBoundedWidth;
+        final option = InkWell(
+          onTap: onTap,
+          borderRadius: AppDimens.radiusSmall,
+          child: Padding(
+            padding: AppDimens.paddingAllSmall,
+            child: Row(
+              mainAxisSize: hasBoundedWidth
+                  ? MainAxisSize.max
+                  : MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 24,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Icon(
+                      selected
+                          ? Icons.check_circle
+                          : icon ?? Icons.circle_outlined,
+                      size: 18,
+                      color: selected
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 ),
-              ),
+                AppDimens.horizontalSmall,
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                      color: selected
+                          ? colorScheme.primary
+                          : colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+
+        return hasBoundedWidth
+            ? SizedBox(width: constraints.maxWidth, child: option)
+            : option;
+      },
     );
   }
 }

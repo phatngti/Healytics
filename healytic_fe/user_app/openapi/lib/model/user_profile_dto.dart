@@ -35,7 +35,7 @@ class UserProfileDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? firstName;
+  Object? firstName;
 
   /// Last name
   ///
@@ -44,7 +44,7 @@ class UserProfileDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? lastName;
+  Object? lastName;
 
   /// Phone number
   ///
@@ -53,7 +53,7 @@ class UserProfileDto {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  String? phone;
+  Object? phone;
 
   /// Bio
   ///
@@ -184,9 +184,9 @@ class UserProfileDto {
 
       return UserProfileDto(
         id: mapValueOfType<String>(json, r'id')!,
-        firstName: mapValueOfType<String>(json, r'firstName'),
-        lastName: mapValueOfType<String>(json, r'lastName'),
-        phone: mapValueOfType<String>(json, r'phone'),
+        firstName: mapValueOfType<Object>(json, r'firstName'),
+        lastName: mapValueOfType<Object>(json, r'lastName'),
+        phone: mapValueOfType<Object>(json, r'phone'),
         bio: mapValueOfType<Object>(json, r'bio'),
         dateOfBirth: mapValueOfType<String>(json, r'dateOfBirth'),
         avatarUrl: mapValueOfType<Object>(json, r'avatarUrl'),

@@ -41,31 +41,31 @@ void main() {
     });
 
     // Province/city Location UUID
-    // String provinceId
+    // Object provinceId
     test('to test the property `provinceId`', () async {
       // TODO
     });
 
     // District Location UUID
-    // String districtId
+    // Object districtId
     test('to test the property `districtId`', () async {
       // TODO
     });
 
     // Ward/commune Location UUID
-    // String wardId
+    // Object wardId
     test('to test the property `wardId`', () async {
       // TODO
     });
 
     // Resolved latitude
-    // num latitude
+    // Object latitude
     test('to test the property `latitude`', () async {
       // TODO
     });
 
     // Resolved longitude
-    // num longitude
+    // Object longitude
     test('to test the property `longitude`', () async {
       // TODO
     });

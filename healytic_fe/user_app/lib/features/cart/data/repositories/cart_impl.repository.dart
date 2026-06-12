@@ -20,12 +20,14 @@ class CartRepositoryImpl implements CartRepository {
   @override
   Future<CartItemEntity> addItem({
     required String serviceId,
-    required String employeeId,
+    String? employeeId,
     required DateTime timeSlot,
+    bool autoAssignStaff = false,
   }) => _remoteDatasource.addItem(
     serviceId: serviceId,
     employeeId: employeeId,
     timeSlot: timeSlot,
+    autoAssignStaff: autoAssignStaff,
   );
 
   @override

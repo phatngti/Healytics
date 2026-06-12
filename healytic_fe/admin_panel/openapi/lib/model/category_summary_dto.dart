@@ -14,12 +14,15 @@ class CategorySummaryDto {
   /// Returns a new [CategorySummaryDto] instance.
   CategorySummaryDto({
     required this.id,
+    this.parentId,
     required this.name,
     required this.slug,
   });
 
 
   String id;
+
+  String? parentId;
 
   String name;
 
@@ -28,6 +31,7 @@ class CategorySummaryDto {
   @override
   bool operator ==(Object other) => identical(this, other) || other is CategorySummaryDto &&
     other.id == id &&
+    other.parentId == parentId &&
     other.name == name &&
     other.slug == slug;
 
@@ -35,15 +39,21 @@ class CategorySummaryDto {
   int get hashCode =>
     // ignore: unnecessary_parenthesis
     (id.hashCode) +
+    (parentId == null ? 0 : parentId!.hashCode) +
     (name.hashCode) +
     (slug.hashCode);
 
   @override
-  String toString() => 'CategorySummaryDto[id=$id, name=$name, slug=$slug]';
+  String toString() => 'CategorySummaryDto[id=$id, parentId=$parentId, name=$name, slug=$slug]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
       json[r'id'] = this.id;
+    if (this.parentId != null) {
+      json[r'parentId'] = this.parentId;
+    } else {
+      json[r'parentId'] = null;
+    }
       json[r'name'] = this.name;
       json[r'slug'] = this.slug;
     return json;
@@ -69,6 +79,7 @@ class CategorySummaryDto {
 
       return CategorySummaryDto(
         id: mapValueOfType<String>(json, r'id')!,
+        parentId: mapValueOfType<String>(json, r'parentId'),
         name: mapValueOfType<String>(json, r'name')!,
         slug: mapValueOfType<String>(json, r'slug')!,
       );

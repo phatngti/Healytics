@@ -25,7 +25,12 @@ class OrdersPage extends HookConsumerWidget {
     // screen access; only re-renders when data
     // has actually changed.
     useEffect(() {
-      ref.read(filteredAppointmentsProvider.notifier).silentRefresh();
+      final selectedCategory = ref.read(selectedCategoryProvider);
+      if (selectedCategory == kCategoryAllFilterId) {
+        ref.read(filteredAppointmentsProvider.notifier).silentRefresh();
+      } else {
+        ref.read(selectedCategoryProvider.notifier).clear();
+      }
       return null;
     }, const []);
 

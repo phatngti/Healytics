@@ -10,6 +10,10 @@ export class ElasticsearchBookingService implements OnModuleInit {
   readonly indexName: string;
   readonly enabled: boolean;
 
+  get isAvailable(): boolean {
+    return Boolean(this.client);
+  }
+
   constructor(private readonly configService: ConfigService) {
     const config =
       this.configService.get<Record<string, string | boolean | undefined>>(
@@ -55,7 +59,13 @@ export class ElasticsearchBookingService implements OnModuleInit {
     if (!this.client) return;
 
     const exists = await this.client.indices.exists({ index: this.indexName });
-    if (exists) return;
+    if (exists) {
+      await this.client.indices.putMapping({
+        index: this.indexName,
+        properties: this.searchableMappingProperties(),
+      });
+      return;
+    }
 
     await this.client.indices.create({
       index: this.indexName,
@@ -128,10 +138,82 @@ export class ElasticsearchBookingService implements OnModuleInit {
           priceVnd: { type: 'double' },
           clinicName: { type: 'keyword', index: false },
           clinicAddress: { type: 'keyword', index: false },
+          ...this.searchableMappingProperties(),
           updatedAt: { type: 'date' },
         },
       },
     });
+  }
+
+  private searchableMappingProperties() {
+    return {
+      clinicNameSearch: {
+        type: 'text',
+        analyzer: 'booking_search',
+        fields: {
+          autocomplete: {
+            type: 'text',
+            analyzer: 'booking_autocomplete',
+            search_analyzer: 'booking_search',
+          },
+        },
+      },
+      clinicAddressSearch: {
+        type: 'text',
+        analyzer: 'booking_search',
+        fields: {
+          autocomplete: {
+            type: 'text',
+            analyzer: 'booking_autocomplete',
+            search_analyzer: 'booking_search',
+          },
+        },
+      },
+      provinceName: {
+        type: 'text',
+        analyzer: 'booking_search',
+        fields: {
+          autocomplete: {
+            type: 'text',
+            analyzer: 'booking_autocomplete',
+            search_analyzer: 'booking_search',
+          },
+        },
+      },
+      districtName: {
+        type: 'text',
+        analyzer: 'booking_search',
+        fields: {
+          autocomplete: {
+            type: 'text',
+            analyzer: 'booking_autocomplete',
+            search_analyzer: 'booking_search',
+          },
+        },
+      },
+      wardName: {
+        type: 'text',
+        analyzer: 'booking_search',
+        fields: {
+          autocomplete: {
+            type: 'text',
+            analyzer: 'booking_autocomplete',
+            search_analyzer: 'booking_search',
+          },
+        },
+      },
+      locationText: {
+        type: 'text',
+        analyzer: 'booking_search',
+        fields: {
+          autocomplete: {
+            type: 'text',
+            analyzer: 'booking_autocomplete',
+            search_analyzer: 'booking_search',
+          },
+        },
+      },
+    } as const;
   }
 
   async search(query: string, limit: number): Promise<BookingSearchDocument[]> {
@@ -177,6 +259,12 @@ export class ElasticsearchBookingService implements OnModuleInit {
                     'description',
                     'specialty^3',
                     'serviceNames^2',
+                    'clinicNameSearch^3',
+                    'clinicAddressSearch^2',
+                    'provinceName^2',
+                    'districtName^2',
+                    'wardName^2',
+                    'locationText^2',
                     'role',
                   ],
                   fuzziness: 'AUTO',
@@ -194,6 +282,70 @@ export class ElasticsearchBookingService implements OnModuleInit {
         .filter((source): source is BookingSearchDocument => Boolean(source));
     } catch (error) {
       this.logger.warn(`Booking search failed: ${(error as Error).message}`);
+      return [];
+    }
+  }
+
+  async searchServiceIds(
+    query: string,
+    fields: string[],
+    limit = 500,
+  ): Promise<string[]> {
+    if (!this.client) return [];
+
+    const normalizedQuery = query.trim();
+    if (normalizedQuery.length < 2) return [];
+
+    try {
+      await this.ensureIndex();
+      const autocompleteFields = fields.map((field) => `${field}.autocomplete`);
+      const result = await this.client.search<BookingSearchDocument>({
+        index: this.indexName,
+        size: limit,
+        query: {
+          bool: {
+            filter: [{ term: { type: 'service' } }],
+            should: [
+              {
+                multi_match: {
+                  query: normalizedQuery,
+                  fields: fields.map((field) => `${field}^3`),
+                  type: 'phrase',
+                  boost: 5,
+                },
+              },
+              {
+                multi_match: {
+                  query: normalizedQuery,
+                  fields: autocompleteFields,
+                  boost: 3,
+                },
+              },
+              {
+                multi_match: {
+                  query: normalizedQuery,
+                  fields,
+                  fuzziness: 'AUTO',
+                  operator: 'and',
+                },
+              },
+            ],
+            minimum_should_match: 1,
+          },
+        },
+      });
+
+      return [
+        ...new Set(
+          result.hits.hits
+            .map((hit) => hit._source?.serviceId ?? hit._source?.entityId)
+            .filter((id): id is string => Boolean(id)),
+        ),
+      ];
+    } catch (error) {
+      this.logger.warn(
+        `Booking service filter search failed: ${(error as Error).message}`,
+      );
       return [];
     }
   }

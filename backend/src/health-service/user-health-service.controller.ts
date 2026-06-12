@@ -1,4 +1,4 @@
-import { Get, Param, ParseUUIDPipe } from '@nestjs/common';
+import { Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import {
   ApiOperation,
   ApiOkResponse,
@@ -16,6 +16,7 @@ import { PublicHealthServiceCardResponseDto } from './dto/public/public-health-s
 import { PublicClinicInfoResponseDto } from './dto/public/public-clinic-info-response.dto';
 import { UserEligibilityDetailResponseDto } from './dto/public/user-eligibility-detail-response.dto';
 import { LogResponse } from '@/common/interceptors/response.interceptor';
+import { PublicServiceListQueryDto } from './dto/public/service-list-query.dto';
 
 /**
  * User-authenticated controller for health service endpoints.
@@ -41,8 +42,10 @@ export class UserHealthServiceController {
     description: 'Return list of premium treatments.',
     type: [PublicHealthServiceCardResponseDto],
   })
-  getPremiumTreatments(): Promise<PublicHealthServiceCardResponseDto[]> {
-    return this.healthServiceService.getPremiumTreatments();
+  getPremiumTreatments(
+    @Query() query: PublicServiceListQueryDto,
+  ): Promise<PublicHealthServiceCardResponseDto[]> {
+    return this.healthServiceService.getPremiumTreatments(query);
   }
 
   /**

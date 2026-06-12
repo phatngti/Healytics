@@ -4,8 +4,8 @@ const healyticsConfig = {
     viewUrl: "https://drive.google.com/file/d/1DqM6ewntBPVNJPPJDmvPD0L0YFKIORUa/view?usp=sharing",
   },
   downloads: {
-    user: "https://drive.google.com/uc?export=download&id=1AbvqOX_h1fkn79F6H9Xv6Pw4_8sXnxPd",
-    partner: "https://drive.google.com/uc?export=download&id=1YrL8YOogoArxERSRcPFz6g0gQQHWIkO0",
+    user: "https://drive.google.com/uc?export=download&id=1hiifjYZ7ShyYb5mCG8ogsI3ve-lfRoYZ",
+    partner: "https://drive.google.com/uc?export=download&id=1AbvqOX_h1fkn79F6H9Xv6Pw4_8sXnxPd",
   },
 };
 

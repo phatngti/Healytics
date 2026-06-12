@@ -14,7 +14,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'product.provider.freezed.dart';
 part 'product.provider.g.dart';
 
-enum ProductTableSort { name, category, price, status }
+enum ProductTableSort { name, category, subCategory, price, status, createdAt }
 
 enum ProductStatusFilter { all, active, draft, archived }
 
@@ -73,7 +73,7 @@ class ProductNotifier extends _$ProductNotifier {
     final products = await repo.getAllProducts();
     final categories =
         products
-            .map((product) => product.category.name.trim())
+            .map((product) => product.category.categoryDisplayName.trim())
             .where((name) => name.isNotEmpty)
             .toSet()
             .toList()
@@ -96,7 +96,7 @@ class ProductNotifier extends _$ProductNotifier {
     final current = _currentState;
     final nextAscending = current.sortBy == sortBy
         ? !current.sortAscending
-        : true;
+        : _defaultSortAscending(sortBy);
     _setTableState(
       current.copyWith(
         sortBy: sortBy,
@@ -262,16 +262,19 @@ class ProductNotifier extends _$ProductNotifier {
     final categoryFilter = query.categoryFilter?.trim().toLowerCase();
 
     final filtered = products.where((product) {
+      final categoryName = product.category.categoryDisplayName.toLowerCase();
+      final subCategoryName = product.category.subCategoryDisplayName
+          .toLowerCase();
       final matchesSearch =
           normalizedSearch.isEmpty ||
           product.id.value.toLowerCase().contains(normalizedSearch) ||
           product.name.toLowerCase().contains(normalizedSearch) ||
           product.description.toLowerCase().contains(normalizedSearch) ||
-          product.category.name.toLowerCase().contains(normalizedSearch);
+          categoryName.contains(normalizedSearch) ||
+          subCategoryName.contains(normalizedSearch);
 
       final matchesCategory =
-          categoryFilter == null ||
-          product.category.name.toLowerCase() == categoryFilter;
+          categoryFilter == null || categoryName == categoryFilter;
 
       final matchesStatus = switch (query.statusFilter) {
         ProductStatusFilter.all => true,
@@ -288,11 +291,19 @@ class ProductNotifier extends _$ProductNotifier {
       final comparison = switch (query.sortBy) {
         ProductTableSort.name => _compareText(a.name, b.name),
         ProductTableSort.category => _compareText(
-          a.category.name,
-          b.category.name,
+          a.category.categoryDisplayName,
+          b.category.categoryDisplayName,
+        ),
+        ProductTableSort.subCategory => _compareText(
+          a.category.subCategoryDisplayName,
+          b.category.subCategoryDisplayName,
         ),
         ProductTableSort.price => a.basePrice.compareTo(b.basePrice),
         ProductTableSort.status => _compareText(a.status, b.status),
+        ProductTableSort.createdAt => _compareNullableDateTime(
+          a.createdAt,
+          b.createdAt,
+        ),
       };
       return query.sortAscending ? comparison : -comparison;
     });
@@ -324,5 +335,19 @@ class ProductNotifier extends _$ProductNotifier {
 
   int _compareText(String a, String b) {
     return a.toLowerCase().compareTo(b.toLowerCase());
+  }
+
+  bool _defaultSortAscending(ProductTableSort sortBy) {
+    return switch (sortBy) {
+      ProductTableSort.createdAt => false,
+      _ => true,
+    };
+  }
+
+  int _compareNullableDateTime(DateTime? a, DateTime? b) {
+    if (a == null && b == null) return 0;
+    if (a == null) return -1;
+    if (b == null) return 1;
+    return a.compareTo(b);
   }
 }

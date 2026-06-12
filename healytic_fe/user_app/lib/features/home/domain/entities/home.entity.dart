@@ -5,15 +5,21 @@ class HomeCategory {
   final String id;
   final String name;
   final String slug;
+  final String? parentId;
+  final String? parentName;
   final IconData icon;
   final String categoryType;
+  final List<HomeCategory> children;
 
   const HomeCategory({
     required this.id,
     required this.name,
     required this.slug,
+    this.parentId,
+    this.parentName,
     this.icon = Symbols.spa,
     this.categoryType = 'primary',
+    this.children = const [],
   });
 }
 
@@ -23,10 +29,13 @@ class HomeProduct {
   final String slug;
   final String imageUrl;
   final String category;
+  final String? categoryId;
   final String duration;
   final String price;
+  final num priceAmount;
   final String rating;
   final String vendorName;
+  final String? clinicId;
   final String location;
   final List<String> staffAvatars;
 
@@ -36,10 +45,13 @@ class HomeProduct {
     required this.slug,
     required this.imageUrl,
     required this.category,
+    this.categoryId,
     required this.duration,
     required this.price,
+    this.priceAmount = 0,
     this.rating = '4.9',
     this.vendorName = '',
+    this.clinicId,
     this.location = '',
     this.staffAvatars = const [],
     this.type = 'service',
@@ -124,4 +136,3 @@ class HomeSpecialist {
     this.clinicName = '',
   });
 }
-

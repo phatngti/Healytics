@@ -16,6 +16,55 @@ class UserPaymentsApi {
 
   final ApiClient apiClient;
 
+  /// Confirm signed MoMo return payload for booking
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] bookingId (required):
+  ///
+  /// * [Object] body (required):
+  Future<Response> userPaymentControllerConfirmMoMoReturnWithHttpInfo(String bookingId, Object body,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/user/payments/momo/{bookingId}/return'
+      .replaceAll('{bookingId}', bookingId);
+
+    // ignore: prefer_final_locals
+    Object? postBody = body;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Confirm signed MoMo return payload for booking
+  ///
+  /// Parameters:
+  ///
+  /// * [String] bookingId (required):
+  ///
+  /// * [Object] body (required):
+  Future<void> userPaymentControllerConfirmMoMoReturn(String bookingId, Object body,) async {
+    final response = await userPaymentControllerConfirmMoMoReturnWithHttpInfo(bookingId, body,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+  }
+
   /// Confirm and persist a saved Stripe card
   ///
   /// Note: This method returns the HTTP [Response].

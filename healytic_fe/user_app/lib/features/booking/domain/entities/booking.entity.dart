@@ -52,11 +52,25 @@ class BookingService {
   /// Formatted price (e.g. "850,000 VND").
   final String price;
 
+  /// Numeric price amount in VND.
+  final num priceAmount;
+
   /// Clinic or facility name.
   final String? clinicName;
 
+  final String? categoryId;
+  final String? categoryName;
+  final String? parentCategoryId;
+  final String? parentCategoryName;
+
+  /// Clinic or facility ID.
+  final String? clinicId;
+
   /// Clinic street address.
   final String? clinicAddress;
+
+  /// Clinic location label.
+  final String? location;
 
   /// Distance from user (e.g. "2.3 km").
   final String? distance;
@@ -67,8 +81,15 @@ class BookingService {
     required this.title,
     required this.duration,
     required this.price,
+    this.priceAmount = 0,
     this.clinicName,
+    this.categoryId,
+    this.categoryName,
+    this.parentCategoryId,
+    this.parentCategoryName,
+    this.clinicId,
     this.clinicAddress,
+    this.location,
     this.distance,
   });
 
@@ -94,6 +115,5 @@ class BookingSearchResult {
   });
 
   /// Whether neither list has any results.
-  bool get isEmpty =>
-      services.isEmpty && specialists.isEmpty;
+  bool get isEmpty => services.isEmpty && specialists.isEmpty;
 }

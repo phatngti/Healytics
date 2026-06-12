@@ -17,6 +17,7 @@ export default new DataSource({
     __dirname + '/scripts/*{.ts,.js}',
     __dirname + '/master-data/*{.ts,.js}',
   ],
+  migrationsTransactionMode: 'each',
   synchronize: false,
   ssl:
     process.env.POSTGRES_SSL === 'true' ? { rejectUnauthorized: false } : false,

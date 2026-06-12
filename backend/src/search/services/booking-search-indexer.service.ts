@@ -125,12 +125,31 @@ export class BookingSearchIndexerService {
         status: HealthServiceStatus.ACTIVE,
         isVisibleOnline: true,
       },
-      relations: ['media', 'productDefinition', 'partner'],
+      relations: [
+        'media',
+        'productDefinition',
+        'partner',
+        'partner.province',
+        'partner.district',
+        'partner.ward',
+      ],
     });
 
     if (!product || product.deletedAt) return null;
 
     const dto = BookingServiceResponseDto.fromEntity(product, product.partner);
+    const provinceName = product.partner?.province?.fullName ?? null;
+    const districtName = product.partner?.district?.fullName ?? null;
+    const wardName = product.partner?.ward?.fullName ?? null;
+    const locationText = [
+      dto.clinicAddress,
+      wardName,
+      districtName,
+      provinceName,
+    ]
+      .filter(Boolean)
+      .join(', ');
+
     return {
       type: 'service',
       entityId: product.id,
@@ -144,6 +163,12 @@ export class BookingSearchIndexerService {
       priceVnd: dto.priceVnd,
       clinicName: dto.clinicName,
       clinicAddress: dto.clinicAddress,
+      clinicNameSearch: dto.clinicName,
+      clinicAddressSearch: dto.clinicAddress,
+      provinceName,
+      districtName,
+      wardName,
+      locationText,
       updatedAt: product.updatedAt.toISOString(),
     };
   }

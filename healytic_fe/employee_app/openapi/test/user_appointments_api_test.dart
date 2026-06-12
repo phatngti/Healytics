@@ -47,7 +47,7 @@ void main() {
 
     // Get recent appointment activity for home dashboard
     //
-    //Future userAppointmentControllerListRecentActivity({ num limit, num offset }) async
+    //Future userAppointmentControllerListRecentActivity({ num limit, num offset, String status, String categoryId, String clinicId, String fromDate, String toDate, String sort }) async
     test('test userAppointmentControllerListRecentActivity', () async {
       // TODO
     });

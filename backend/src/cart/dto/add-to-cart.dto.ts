@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsUUID } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsOptional,
+  IsUUID,
+  ValidateIf,
+} from 'class-validator';
 
 export class AddToCartDto {
   @ApiProperty({
@@ -12,9 +18,11 @@ export class AddToCartDto {
   @ApiProperty({
     description: 'UUID of the assigned employee (doctor or therapist)',
     example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    required: false,
   })
+  @ValidateIf((dto: AddToCartDto) => !dto.autoAssignStaff)
   @IsUUID()
-  employeeId: string;
+  employeeId?: string;
 
   @ApiProperty({
     description: 'Desired time slot in ISO 8601 datetime format',
@@ -22,4 +30,15 @@ export class AddToCartDto {
   })
   @IsDateString()
   timeSlot: string;
+
+  @ApiProperty({
+    type: Boolean,
+    description:
+      'If true, backend selects the best eligible available specialist for this service and time slot.',
+    required: false,
+    default: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  autoAssignStaff?: boolean;
 }

@@ -342,6 +342,10 @@ class ApiClient {
           return AttachTagResponseDto.fromJson(value);
         case 'AuthTokensDto':
           return AuthTokensDto.fromJson(value);
+        case 'BackdoorPrepareDto':
+          return BackdoorPrepareDto.fromJson(value);
+        case 'BackdoorStatusResponseDto':
+          return BackdoorStatusResponseDto.fromJson(value);
         case 'BookingResponseDto':
           return BookingResponseDto.fromJson(value);
         case 'BookingScheduleDto':
@@ -398,6 +402,10 @@ class ApiClient {
           return CheckEmailResponseDto.fromJson(value);
         case 'CheckoutTicketResponseDto':
           return CheckoutTicketResponseDto.fromJson(value);
+        case 'CleanupSeedDataDto':
+          return CleanupSeedDataDto.fromJson(value);
+        case 'CleanupSeedDataResponseDto':
+          return CleanupSeedDataResponseDto.fromJson(value);
         case 'ClientKeyResponseDto':
           return ClientKeyResponseDto.fromJson(value);
         case 'ClinicCertificationDto':
@@ -822,6 +830,8 @@ class ApiClient {
           return RegisterPartnerResponseDto.fromJson(value);
         case 'RegisterProfileDto':
           return RegisterProfileDto.fromJson(value);
+        case 'ResetDbResponseDto':
+          return ResetDbResponseDto.fromJson(value);
         case 'ResetPasswordDto':
           return ResetPasswordDto.fromJson(value);
         case 'RetryPayoutDto':
@@ -838,6 +848,30 @@ class ApiClient {
           return ReviewSummaryDto.fromJson(value);
         case 'SavedPaymentCardDto':
           return SavedPaymentCardDto.fromJson(value);
+        case 'SeedBookingDto':
+          return SeedBookingDto.fromJson(value);
+        case 'SeedCartItemDto':
+          return SeedCartItemDto.fromJson(value);
+        case 'SeedCategoryDto':
+          return SeedCategoryDto.fromJson(value);
+        case 'SeedCouponDto':
+          return SeedCouponDto.fromJson(value);
+        case 'SeedEmployeeDto':
+          return SeedEmployeeDto.fromJson(value);
+        case 'SeedIdsMapDto':
+          return SeedIdsMapDto.fromJson(value);
+        case 'SeedNotificationDto':
+          return SeedNotificationDto.fromJson(value);
+        case 'SeedPartnerDto':
+          return SeedPartnerDto.fromJson(value);
+        case 'SeedPayloadDto':
+          return SeedPayloadDto.fromJson(value);
+        case 'SeedResponseDto':
+          return SeedResponseDto.fromJson(value);
+        case 'SeedServiceDto':
+          return SeedServiceDto.fromJson(value);
+        case 'SeedUserDto':
+          return SeedUserDto.fromJson(value);
         case 'ServiceInfoDto':
           return ServiceInfoDto.fromJson(value);
         case 'ServiceManualInputDto':
@@ -880,6 +914,8 @@ class ApiClient {
           return UpcomingAppointmentDto.fromJson(value);
         case 'UpdateAccountAddressDto':
           return UpdateAccountAddressDto.fromJson(value);
+        case 'UpdateAccountProfileDto':
+          return UpdateAccountProfileDto.fromJson(value);
         case 'UpdateAvatarDto':
           return UpdateAvatarDto.fromJson(value);
         case 'UpdateBookingStatusDto':

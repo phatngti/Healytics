@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **firstName** | **String** | First name | 
 **lastName** | **String** | Last name | 
 **email** | **String** | Email address | 
+**password** | **String** | Initial employee account password | 
 **phone** | **String** | Phone number | [optional] 
 **dateOfBirth** | **String** | Date of birth | [optional] 
 **gender** | **String** | Gender | [optional] 

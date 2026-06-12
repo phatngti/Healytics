@@ -37,6 +37,7 @@ abstract class CategoryRemoteDataSource {
 
   Future<void> updateCategory({
     required CategoryId id,
+    String? parentId,
     String? name,
     String? description,
     String? iconName,
@@ -108,6 +109,7 @@ class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
   Future<CategoryEntity> createCategory(CreateCategoryRequest request) async {
     final dto = await _api.adminCategoriesControllerCreate(
       CreateCategoryDto(
+        parentId: request.parentId,
         name: request.name,
         slug: _slugify(request.name),
         description: request.description,
@@ -126,6 +128,7 @@ class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
   @override
   Future<void> updateCategory({
     required CategoryId id,
+    String? parentId,
     String? name,
     String? description,
     String? iconName,
@@ -136,6 +139,7 @@ class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
     await _api.adminCategoriesControllerUpdate(
       id,
       UpdateCategoryDto(
+        parentId: parentId,
         name: name,
         slug: name != null ? _slugify(name) : null,
         description: description,
@@ -170,10 +174,14 @@ CategoryEntity _mapDtoToEntity(AdminCategoryResponseDto dto) {
   return CategoryEntity(
     id: CategoryId(dto.id),
     name: dto.name,
+    parentId: dto.parent?.id,
+    parentName: dto.parent?.name,
     description: dto.description?.toString() ?? '',
     iconName: dto.iconName?.toString() ?? 'category',
     colorValue: _parseColorValue(dto.colorValue),
     serviceCount: dto.serviceCount.toInt(),
+    subCategoryCount: dto.children.length,
+    isRoot: dto.parent == null,
     isVisible: dto.isActive,
     sortOrder: dto.sortOrder.toInt(),
     createdAt: dto.createdAt.toIso8601String(),
@@ -256,10 +264,13 @@ class CategoryRemoteDataSourceMock implements CategoryRemoteDataSource {
     final newCategory = CategoryEntity(
       id: CategoryId('new-${DateTime.now().millisecondsSinceEpoch}'),
       name: request.name,
+      parentId: request.parentId,
+      parentName: _findCategoryName(request.parentId),
       description: request.description,
       iconName: request.iconName,
       colorValue: request.colorValue,
       serviceCount: 0,
+      isRoot: request.parentId == null,
       isVisible: request.isVisible,
       sortOrder: request.sortOrder,
       createdAt: DateTime.now().toIso8601String(),
@@ -272,6 +283,7 @@ class CategoryRemoteDataSourceMock implements CategoryRemoteDataSource {
   @override
   Future<void> updateCategory({
     required CategoryId id,
+    String? parentId,
     String? name,
     String? description,
     String? iconName,
@@ -284,6 +296,9 @@ class CategoryRemoteDataSourceMock implements CategoryRemoteDataSource {
     if (index != -1) {
       final current = _mockCategories[index];
       _mockCategories[index] = current.copyWith(
+        parentId: parentId,
+        parentName: _findCategoryName(parentId),
+        isRoot: parentId == null,
         name: name ?? current.name,
         description: description ?? current.description,
         iconName: iconName ?? current.iconName,
@@ -307,6 +322,14 @@ class CategoryRemoteDataSourceMock implements CategoryRemoteDataSource {
   Future<List<CategoryEntity>> getVisibleCategories() async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _mockCategories.where((c) => c.isVisible).toList();
+  }
+
+  String? _findCategoryName(String? id) {
+    if (id == null) return null;
+    for (final category in _mockCategories) {
+      if (category.id.value == id) return category.name;
+    }
+    return null;
   }
 }
 

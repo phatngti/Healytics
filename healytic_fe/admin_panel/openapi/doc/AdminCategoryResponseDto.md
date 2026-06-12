@@ -14,10 +14,13 @@ Name | Type | Description | Notes
 **description** | **String** | Category description | [optional] 
 **imageUrl** | **String** | Category image URL | [optional] 
 **isActive** | **bool** | Whether category is active | 
+**parentId** | **String** | Parent category ID. Null for root categories. | [optional] 
+**isRoot** | **bool** | Whether this category is a root category. | 
 **iconName** | **String** | Icon identifier for frontend rendering | [optional] 
 **colorValue** | **String** | Hex color value (e.g. #FF6B6B) | [optional] 
 **sortOrder** | **num** | Sort order for display (lower = first) | 
 **serviceCount** | **num** | Number of health services in this category | 
+**subCategoryCount** | **num** | Number of direct child sub-categories | 
 **createdAt** | [**DateTime**](DateTime.md) | Creation timestamp | 
 **updatedAt** | [**DateTime**](DateTime.md) | Last update timestamp | 
 **parent** | [**CategorySummaryDto**](CategorySummaryDto.md) | Parent category | [optional] 

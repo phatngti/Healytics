@@ -23,19 +23,19 @@ void main() {
     });
 
     // First name
-    // String firstName
+    // Object firstName
     test('to test the property `firstName`', () async {
       // TODO
     });
 
     // Last name
-    // String lastName
+    // Object lastName
     test('to test the property `lastName`', () async {
       // TODO
     });
 
     // Phone number
-    // String phone
+    // Object phone
     test('to test the property `phone`', () async {
       // TODO
     });

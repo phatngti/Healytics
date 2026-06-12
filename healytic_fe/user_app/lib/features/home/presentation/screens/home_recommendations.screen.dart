@@ -8,7 +8,13 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import 'package:user_app/features/home/domain/entities/'
     'ai_recommendation.entity.dart';
+import 'package:user_app/features/home/domain/entities/filter_sort.entity.dart';
+import 'package:user_app/features/home/domain/entities/filter_sort_helpers.dart';
+import 'package:user_app/features/home/presentation/providers/'
+    'list_filter.provider.dart';
 import 'package:user_app/features/home/presentation/providers/home.provider.dart';
+import 'package:user_app/features/home/presentation/widgets/'
+    'filter_sort_controls.widget.dart';
 import 'package:user_app/features/home/presentation/widgets/'
     'home_list_screen_layout.widget.dart';
 import 'package:user_app/router/routes.dart';
@@ -19,38 +25,114 @@ class HomeRecommendationsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final recommendationsAsync = ref.watch(allRecommendedProductsProvider);
-
     return HomeListScreenLayout(
       title: 'Recommendations',
-      body: switch (recommendationsAsync) {
-        AsyncData(:final value) => _RecommendationList(items: value),
-        AsyncError(:final error, :final stackTrace) => Center(
-          child: Padding(
-            padding: AppDimens.paddingAllMedium,
-            child: ErrorCard(
-              title: 'Could not load recommendations',
-              error: error,
-              stackTrace: stackTrace,
-              onRetry: () => ref.invalidate(allRecommendedProductsProvider),
-            ),
-          ),
-        ),
-        _ => const LoadingWidget(),
+      body: const _RecommendationsBody(),
+    );
+  }
+}
+
+class _RecommendationsBody extends StatelessWidget {
+  const _RecommendationsBody();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        AppDimens.verticalMedium,
+        _RecommendationFilterBar(),
+        Expanded(child: _RecommendationListContainer()),
+      ],
+    );
+  }
+}
+
+class _RecommendationFilterBar extends ConsumerWidget {
+  const _RecommendationFilterBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filter = ref.watch(recommendationFilterProvider);
+
+    return FilterSortBar<ServiceListSort>(
+      options: ServiceListSort.values
+          .map((sort) => SortOption(value: sort, label: sort.label))
+          .toList(),
+      selected: filter.sort,
+      filtersActive: filter.hasFilters,
+      onFilterTap: () async {
+        final next = await showServiceFilterSheet(
+          context,
+          filter,
+          includeCategory: true,
+        );
+        if (next != null) {
+          ref.read(recommendationFilterProvider.notifier).state = next;
+        }
+      },
+      onSelected: (sort) {
+        ref.read(recommendationFilterProvider.notifier).state = filter.withSort(
+          sort,
+        );
       },
     );
   }
 }
 
+class _RecommendationListContainer extends ConsumerWidget {
+  const _RecommendationListContainer();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final recommendationsAsync = ref.watch(allRecommendedProductsProvider);
+    final filter = ref.watch(recommendationFilterProvider);
+    final source = recommendationsAsync.value;
+
+    if (source != null) {
+      final value = filterRecommendations(source, filter);
+      return _RecommendationList(
+        items: value,
+        filtersActive: filter.isActive,
+        onReset: () {
+          ref.read(recommendationFilterProvider.notifier).state =
+              const ServiceListFilter();
+        },
+      );
+    }
+
+    if (recommendationsAsync.hasError) {
+      return Center(
+        child: Padding(
+          padding: AppDimens.paddingAllMedium,
+          child: ErrorCard(
+            title: 'Could not load recommendations',
+            error: recommendationsAsync.error!,
+            stackTrace: recommendationsAsync.stackTrace,
+            onRetry: () => ref.invalidate(allRecommendedProductsProvider),
+          ),
+        ),
+      );
+    }
+
+    return const LoadingWidget();
+  }
+}
+
 class _RecommendationList extends StatelessWidget {
-  const _RecommendationList({required this.items});
+  const _RecommendationList({
+    required this.items,
+    required this.filtersActive,
+    required this.onReset,
+  });
 
   final List<AiRecommendation> items;
+  final bool filtersActive;
+  final VoidCallback onReset;
 
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const _EmptyState();
+      return _EmptyState(filtersActive: filtersActive, onReset: onReset);
     }
 
     final hPad = AppDimens.horizontalPadding(context);
@@ -243,7 +325,10 @@ class _MetaRow extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  const _EmptyState({required this.filtersActive, required this.onReset});
+
+  final bool filtersActive;
+  final VoidCallback onReset;
 
   @override
   Widget build(BuildContext context) {
@@ -252,11 +337,26 @@ class _EmptyState extends StatelessWidget {
     return Center(
       child: Padding(
         padding: AppDimens.paddingAllLarge,
-        child: Text(
-          'No recommendations yet',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              filtersActive
+                  ? 'No recommendations match these filters'
+                  : 'No recommendations yet',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (filtersActive) ...[
+              AppDimens.verticalSmall,
+              TextButton(
+                onPressed: onReset,
+                child: const Text('Reset filters'),
+              ),
+            ],
+          ],
         ),
       ),
     );

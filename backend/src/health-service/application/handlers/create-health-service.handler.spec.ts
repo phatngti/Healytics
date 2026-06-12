@@ -55,7 +55,7 @@ describe('CreateHealthServiceHandler', () => {
     queryRunner.manager.findOne.mockImplementation(async (entity) => {
       if (entity === Partner)
         return { id: 'partner-uuid', brandName: 'Test Partner' };
-      if (entity === Category) return { id: 'category-uuid' };
+      if (entity === Category) return { id: 'category-uuid', parentId: 'parent-category-uuid' };
       return null;
     });
     queryRunner.manager.find.mockResolvedValue([

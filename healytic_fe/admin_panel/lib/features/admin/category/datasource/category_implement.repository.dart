@@ -56,6 +56,7 @@ class CategoryImplementRepository implements CategoryRepository {
   @override
   Future<void> updateCategory({
     required CategoryId id,
+    String? parentId,
     String? name,
     String? description,
     String? iconName,
@@ -65,6 +66,7 @@ class CategoryImplementRepository implements CategoryRepository {
   }) {
     return remoteDataSource.updateCategory(
       id: id,
+      parentId: parentId,
       name: name,
       description: description,
       iconName: iconName,

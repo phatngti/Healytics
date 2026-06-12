@@ -7,9 +7,12 @@ import { Product } from '@/common/entities/product.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { Booking } from '@/common/entities/booking.entity';
 import { CheckoutTicket } from '@/common/entities/checkout-ticket.entity';
+import { ProductEmployeeEligibility } from '@/common/entities/product-employee-eligibility.entity';
 import { AddCartItemHandler } from '@/cart/application/handlers/add-cart-item.handler';
 import { RemoveCartItemHandler } from '@/cart/application/handlers/remove-cart-item.handler';
 import { ClearCartHandler } from '@/cart/application/handlers/clear-cart.handler';
+import { CheckSlotAvailabilityHandler } from '@/booking/application/handlers/check-slot-availability.handler';
+import { AutoStaffAssignmentService } from '@/booking/services/auto-staff-assignment.service';
 
 @Module({
   imports: [
@@ -19,6 +22,7 @@ import { ClearCartHandler } from '@/cart/application/handlers/clear-cart.handler
       Employee,
       Booking,
       CheckoutTicket,
+      ProductEmployeeEligibility,
     ]),
   ],
   controllers: [CartController],
@@ -27,6 +31,8 @@ import { ClearCartHandler } from '@/cart/application/handlers/clear-cart.handler
     AddCartItemHandler,
     RemoveCartItemHandler,
     ClearCartHandler,
+    CheckSlotAvailabilityHandler,
+    AutoStaffAssignmentService,
   ],
   exports: [CartService],
 })

@@ -13,6 +13,7 @@ import { Account } from '@/common/entities/account.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { Product } from '@/common/entities/product.entity';
 import { RedisService } from '@/redis/redis.service';
+import { AutoStaffAssignmentService } from '@/booking/services/auto-staff-assignment.service';
 import { WebhookService } from '../../../services/webhook.service';
 import { BookingStatusLogWriterService } from '../../../services/booking-status-log-writer.service';
 import { NotificationEventService } from '@/notification/services/notification-event.service';
@@ -219,6 +220,10 @@ describe('Race Condition: CreateCheckoutTicketHandler — Slot pre-check race wi
             releaseLock: jest.fn().mockResolvedValue(undefined),
           },
         },
+        {
+          provide: AutoStaffAssignmentService,
+          useValue: { resolveBestStaff: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -376,6 +381,10 @@ describe('Race Condition: Idempotency — duplicate request handling', () => {
             acquireLock: jest.fn().mockResolvedValue('mock-lock-token'),
             releaseLock: jest.fn().mockResolvedValue(undefined),
           },
+        },
+        {
+          provide: AutoStaffAssignmentService,
+          useValue: { resolveBestStaff: jest.fn() },
         },
       ],
     }).compile();

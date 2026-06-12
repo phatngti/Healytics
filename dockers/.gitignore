@@ -19,3 +19,5 @@ deploy-panel.env
 cloudflare-tunnels.json
 cloudflare-tunnels.dev.json
 jenkins-agent.env
+origin.crt
+origin.key

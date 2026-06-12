@@ -6,9 +6,11 @@ import { EmployeeRole } from '@/employees/enum/employee-role.enum';
 
 describe('TestBackdoorService', () => {
   const originalNodeEnv = process.env.NODE_ENV;
+  const originalEnableTestBackdoor = process.env.ENABLE_TEST_BACKDOOR;
 
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv;
+    process.env.ENABLE_TEST_BACKDOOR = originalEnableTestBackdoor;
     jest.restoreAllMocks();
   });
 
@@ -28,6 +30,26 @@ describe('TestBackdoorService', () => {
     );
 
     expect(() => service.status()).toThrow(ForbiddenException);
+  });
+
+  it('allows access outside NODE_ENV=test if ENABLE_TEST_BACKDOOR is true', () => {
+    process.env.NODE_ENV = 'development';
+    process.env.ENABLE_TEST_BACKDOOR = 'true';
+    const service = new TestBackdoorService(
+      makeDataSource({ database: 'healytics_test' }),
+    );
+
+    expect(() => service.status()).not.toThrow();
+  });
+
+  it('allows access even if not a test DB if ENABLE_TEST_BACKDOOR is true', () => {
+    process.env.NODE_ENV = 'production';
+    process.env.ENABLE_TEST_BACKDOOR = 'true';
+    const service = new TestBackdoorService(
+      makeDataSource({ database: 'healytics' }),
+    );
+
+    expect(() => service.status()).not.toThrow();
   });
 
   it('resets only non-master entity tables', async () => {
@@ -153,6 +175,36 @@ describe('TestBackdoorService', () => {
       }),
     );
   });
+
+  it('cleans only ids returned by a seed response', async () => {
+    process.env.NODE_ENV = 'test';
+    const manager = makeManager();
+    const service = new TestBackdoorService(
+      makeDataSource({
+        database: 'healytics_test',
+        transaction: (callback) => callback(manager),
+      }),
+    );
+
+    const result = await service.cleanupSeedData({
+      users: {
+        main_user: 'account-1',
+        'user@test.healytics.vn': 'account-1',
+      },
+      bookings: { pending: 'booking-1' },
+      cartItems: { cart: 'cart-1' },
+    });
+
+    expect(result.ok).toBe(true);
+    expect(manager.delete).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.objectContaining({ id: expect.any(Object) }),
+    );
+    expect(manager.delete).not.toHaveBeenCalledWith(
+      expect.anything(),
+      expect.any(String),
+    );
+  });
 });
 
 function makeDataSource(overrides: Record<string, any> = {}) {
@@ -178,6 +230,8 @@ function makeManager() {
     create: (_entity: unknown, value: Record<string, unknown>) => ({
       ...value,
     }),
+    delete: jest.fn().mockResolvedValue({ affected: 1 }),
+    find: jest.fn().mockResolvedValue([]),
     save: jest.fn(async (value: Record<string, unknown>) => ({
       ...value,
       id: value.id ?? `seed-${++sequence}`,

@@ -52,5 +52,12 @@ void main() {
       // TODO
     });
 
+    // Update current user profile identity
+    //
+    //Future<AccountMeResponseDto> accountControllerUpdateProfile(UpdateAccountProfileDto updateAccountProfileDto) async
+    test('test accountControllerUpdateProfile', () async {
+      // TODO
+    });
+
   });
 }

@@ -17,12 +17,14 @@ class SpecialistCardList extends StatelessWidget {
     required this.specialists,
     required this.selectedIndex,
     required this.onSelected,
+    this.title = 'Select Specialist',
     this.isLocked = false,
   });
 
   final List<BookingSpecialist> specialists;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
+  final String title;
 
   /// When true, non-selected cards are dimmed
   /// and tapping them is a no-op. The "See all"
@@ -42,7 +44,7 @@ class SpecialistCardList extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Select Specialist',
+              title,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),

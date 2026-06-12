@@ -14,7 +14,9 @@ import { UpdateHealthServiceHandler } from './application/handlers/update-health
 import { RemoveHealthServiceHandler } from './application/handlers/remove-health-service.handler';
 import { GetOverviewAnalyticsHandler } from './application/handlers/get-overview-analytics.handler';
 import { GetDetailAnalyticsHandler } from './application/handlers/get-detail-analytics.handler';
+import { PublicServiceListQueryDto } from './dto/public/service-list-query.dto';
 import { PartnersService } from '@/partners/partners.service';
+import { ElasticsearchBookingService } from '@/search/services/elasticsearch-booking.service';
 import {
   MockRepository,
   MockHandler,
@@ -36,6 +38,10 @@ describe('HealthServiceService', () => {
   let overviewAnalyticsHandler: MockHandler;
   let detailAnalyticsHandler: MockHandler;
   let partnersService: MockType<PartnersService>;
+  let elasticsearchBookingService: {
+    isAvailable: boolean;
+    searchServiceIds: jest.Mock;
+  };
 
   beforeEach(async () => {
     // Arrange - Create fresh mocks for each test
@@ -49,6 +55,10 @@ describe('HealthServiceService', () => {
     removeHandler = createMockHandler();
     overviewAnalyticsHandler = createMockHandler();
     detailAnalyticsHandler = createMockHandler();
+    elasticsearchBookingService = {
+      isAvailable: false,
+      searchServiceIds: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -101,6 +111,10 @@ describe('HealthServiceService', () => {
               .mockResolvedValue({ id: 'partner-uuid' }),
             getFirstHealthPartner: jest.fn().mockResolvedValue(null),
           },
+        },
+        {
+          provide: ElasticsearchBookingService,
+          useValue: elasticsearchBookingService,
         },
       ],
     }).compile();
@@ -181,7 +195,7 @@ describe('HealthServiceService', () => {
   });
 
   describe('findAll', () => {
-    it('should return all products with relations ordered by createdAt DESC', async () => {
+    it('should return all products with relations ordered by createdAt DESC and id DESC', async () => {
       // Arrange
       const expectedProducts = [
         { id: 'uuid-1', name: 'Product 1' },
@@ -197,7 +211,7 @@ describe('HealthServiceService', () => {
       expect(productRepository.find).toHaveBeenCalledWith(
         expect.objectContaining({
           relations: expect.any(Array),
-          order: { createdAt: 'DESC' },
+          order: { createdAt: 'DESC', id: 'DESC' },
         }),
       );
     });
@@ -270,6 +284,67 @@ describe('HealthServiceService', () => {
       await expect(service.findBySlug(slug)).rejects.toThrow(NotFoundException);
       await expect(service.findBySlug(slug)).rejects.toThrow(
         `Product with slug "${slug}" not found`,
+      );
+    });
+  });
+
+  describe('getEligibilityDetail', () => {
+    it('uses the selected product partner for booking summary location', async () => {
+      const partner = {
+        id: 'partner-hcm',
+        brandName: 'Yoga phuc hoi TPHCM 17',
+        streetAddress: '40 Nguyen Trai',
+        ward: null,
+        district: { fullName: 'Quan 8' },
+        province: { fullName: 'Thanh pho Ho Chi Minh' },
+        latitude: 10.75,
+        longitude: 106.66,
+      };
+      const eligibility = {
+        id: 'elig-1',
+        product: {
+          id: 'service-1',
+          name: 'Stress Reset TPHCM 0529',
+          description: 'Therapy session',
+          basePrice: 430000,
+          salePrice: null,
+          currency: 'VND',
+          partner,
+          category: {
+            id: 'category-1',
+            name: 'Psychology Therapy',
+            parent: null,
+          },
+          media: [],
+          productDefinition: { durationMinutes: 50 },
+        },
+        employee: {
+          id: 'employee-1',
+          fullName: 'Dr. TPHCM',
+          jobTitle: 'Therapist',
+          avatarUrl: null,
+          doctorProfile: null,
+        },
+      } as ProductEmployeeEligibility;
+      eligibilityRepository.findOne.mockResolvedValue(eligibility);
+
+      const result = await service.getEligibilityDetail('elig-1');
+
+      expect(eligibilityRepository.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'elig-1' },
+          relations: expect.arrayContaining([
+            'product.partner',
+            'product.partner.province',
+            'product.partner.district',
+            'product.partner.ward',
+          ]),
+        }),
+      );
+      expect(partnersService.getFirstHealthPartner).not.toHaveBeenCalled();
+      expect(result.location.name).toBe('Yoga phuc hoi TPHCM 17');
+      expect(result.location.address).toBe(
+        '40 Nguyen Trai, Quan 8, Thanh pho Ho Chi Minh',
       );
     });
   });
@@ -481,7 +556,8 @@ describe('HealthServiceService', () => {
           productEmployeeEligibilities: [],
         },
       ];
-      productRepository.find.mockResolvedValue(mockProducts);
+      const qb = productRepository.createQueryBuilder();
+      qb.getMany.mockResolvedValue(mockProducts);
 
       // Act
       const result = await service.getPremiumTreatments();
@@ -489,23 +565,109 @@ describe('HealthServiceService', () => {
       // Assert
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
-      expect(productRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { status: 'active', isVisibleOnline: true },
-          take: 10,
-        }),
+      expect(productRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'product',
       );
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        'product.is_visible_online = :isVisibleOnline',
+        { isVisibleOnline: true },
+      );
+      expect(qb.take).toHaveBeenCalledWith(50);
+    });
+
+    it('should not clamp paginated premium treatment results to ten items', async () => {
+      // Arrange
+      const mockProducts = Array.from({ length: 13 }, (_, index) => ({
+        id: `uuid-${index + 1}`,
+        name: `Product ${index + 1}`,
+        slug: `product-${index + 1}`,
+        type: 'service',
+        basePrice: 500000,
+        media: [],
+        reviews: [],
+        productEmployeeEligibilities: [],
+      }));
+      const qb = productRepository.createQueryBuilder();
+      qb.getMany.mockResolvedValue(mockProducts);
+
+      // Act
+      const result = await service.getPremiumTreatments({
+        limit: 13,
+        offset: 12,
+      });
+
+      // Assert
+      expect(qb.skip).toHaveBeenCalledWith(12);
+      expect(qb.take).toHaveBeenCalledWith(13);
+      expect(result).toHaveLength(13);
+    });
+
+    it('should normalize pagination query params received as strings', async () => {
+      // Arrange
+      const mockProducts = Array.from({ length: 13 }, (_, index) => ({
+        id: `uuid-${index + 1}`,
+        name: `Product ${index + 1}`,
+        slug: `product-${index + 1}`,
+        type: 'service',
+        basePrice: 500000,
+        media: [],
+        reviews: [],
+        productEmployeeEligibilities: [],
+      }));
+      const qb = productRepository.createQueryBuilder();
+      qb.getMany.mockResolvedValue(mockProducts);
+
+      // Act
+      await service.getPremiumTreatments({
+        limit: '13',
+        offset: '12',
+      } as unknown as PublicServiceListQueryDto);
+
+      // Assert
+      expect(qb.skip).toHaveBeenCalledWith(12);
+      expect(qb.take).toHaveBeenCalledWith(13);
     });
 
     it('should return empty array when no products exist', async () => {
       // Arrange
-      productRepository.find.mockResolvedValue([]);
+      const qb = productRepository.createQueryBuilder();
+      qb.getMany.mockResolvedValue([]);
 
       // Act
       const result = await service.getPremiumTreatments();
 
       // Assert
       expect(result).toEqual([]);
+    });
+
+    it('should narrow clinic and location text filters through Elasticsearch', async () => {
+      // Arrange
+      elasticsearchBookingService.isAvailable = true;
+      elasticsearchBookingService.searchServiceIds
+        .mockResolvedValueOnce(['service-1', 'service-2'])
+        .mockResolvedValueOnce(['service-2', 'service-3']);
+      const qb = productRepository.createQueryBuilder();
+      qb.getMany.mockResolvedValue([]);
+
+      // Act
+      await service.getPremiumTreatments({
+        clinic: 'Healytics',
+        district: 'District 1',
+      });
+
+      // Assert
+      expect(elasticsearchBookingService.searchServiceIds).toHaveBeenCalledWith(
+        'Healytics',
+        ['clinicNameSearch', 'clinicAddressSearch'],
+      );
+      expect(elasticsearchBookingService.searchServiceIds).toHaveBeenCalledWith(
+        'District 1',
+        ['districtName', 'locationText'],
+      );
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        'product.id IN (:...textFilteredServiceIds)',
+        { textFilteredServiceIds: ['service-2'] },
+      );
     });
   });
 

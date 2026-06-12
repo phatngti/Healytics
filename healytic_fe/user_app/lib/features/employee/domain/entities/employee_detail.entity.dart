@@ -226,6 +226,10 @@ class EmployeeDetailEntity {
   final String? emergencyContactPhone;
   final double rating;
   final int reviewCount;
+  final String? clinicId;
+  final String? clinicName;
+  final String? location;
+  final int? experienceYears;
   final List<WorkScheduleEntry> schedule;
   final List<WorkHistoryEntry> workHistory;
   final List<VerificationDocumentEntity> verificationDocuments;
@@ -251,6 +255,10 @@ class EmployeeDetailEntity {
     this.emergencyContactPhone,
     required this.rating,
     required this.reviewCount,
+    this.clinicId,
+    this.clinicName,
+    this.location,
+    this.experienceYears,
     this.schedule = const [],
     this.workHistory = const [],
     this.verificationDocuments = const [],

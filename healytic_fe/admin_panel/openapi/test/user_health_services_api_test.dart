@@ -49,7 +49,7 @@ void main() {
 
     // Get premium treatments
     //
-    //Future<List<PublicHealthServiceCardResponseDto>> userHealthServiceControllerGetPremiumTreatments() async
+    //Future<List<PublicHealthServiceCardResponseDto>> userHealthServiceControllerGetPremiumTreatments({ String sort, num minPrice, num maxPrice, String categoryId, String clinicId, String provinceId, String districtId, String wardId, num lat, num lng }) async
     test('test userHealthServiceControllerGetPremiumTreatments', () async {
       // TODO
     });
