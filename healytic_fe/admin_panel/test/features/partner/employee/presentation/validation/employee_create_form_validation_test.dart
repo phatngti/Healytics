@@ -117,6 +117,7 @@ Map<String, dynamic> _baseValues({
     EmployeeFormField.firstName.key: 'An',
     EmployeeFormField.lastName.key: 'Nguyen',
     EmployeeFormField.emailAddress.key: 'an.nguyen@healytics.dev',
+    EmployeeFormField.password.key: 'Password123!',
     EmployeeFormField.phoneNumber.key: '0901234567',
     EmployeeFormField.dateOfBirth.key: '1990-01-01',
     EmployeeFormField.gender.key: 'MALE',

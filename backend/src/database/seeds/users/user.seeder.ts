@@ -6,6 +6,7 @@ import { Account } from '@/common/entities/account.entity';
 import { UserProfile } from '@/common/entities/user-profile.entity';
 import { Role } from '@/account/enum/role.enum';
 import { ISeeder } from '../seeder.interface';
+import { BULK_WELLNESS_PARTNER_ACCOUNTS } from '../wellness-bulk.seed';
 
 const SEED_USERS = [
   {
@@ -199,6 +200,7 @@ const SEED_USERS = [
     password: 'partner@123',
     role: Role.HEALTH_PARTNER,
   },
+  ...BULK_WELLNESS_PARTNER_ACCOUNTS,
 ];
 
 @Injectable()
@@ -218,6 +220,7 @@ export class UserSeeder implements ISeeder {
     for (const userData of SEED_USERS) {
       const exists = await this.accountRepo.findOne({
         where: { email: userData.email },
+        loadEagerRelations: false,
       });
 
       if (exists) {
@@ -243,10 +246,11 @@ export class UserSeeder implements ISeeder {
 
       // Create UserProfile for USER-role accounts
       if (userData.role === Role.USER) {
+        const profileData = userData as any;
         const profile = this.userProfileRepo.create({
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          phone: userData.phone,
+          firstName: profileData.firstName,
+          lastName: profileData.lastName,
+          phone: profileData.phone,
           accountId: account.id,
         });
         await this.userProfileRepo.save(profile);

@@ -9,9 +9,7 @@ export class GetServicePerformanceHandler {
   constructor(private readonly dataSource: DataSource) {}
 
   async execute(partnerId: string): Promise<ServicePerformanceDto[]> {
-    this.logger.log(
-      `Getting service performance for partner: ${partnerId}`,
-    );
+    this.logger.log(`Getting service performance for partner: ${partnerId}`);
 
     const rows = await this.dataSource.query(
       `SELECT

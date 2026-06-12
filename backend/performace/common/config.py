@@ -93,6 +93,10 @@ EMPLOYEE_PASSWORD = os.getenv("TEST_EMPLOYEE_PASSWORD", "employee@123")
 MIN_WAIT = float(os.getenv("MIN_WAIT", "1"))
 MAX_WAIT = float(os.getenv("MAX_WAIT", "3"))
 
+# ── Headless USER stress mix tuning ──────────────────────────────────────────
+PERF_HEADLESS_RETRY_MAX_ATTEMPTS = int(os.getenv("PERF_HEADLESS_RETRY_MAX_ATTEMPTS", "3"))
+PERF_HEADLESS_RETRY_BASE_SLEEP = float(os.getenv("PERF_HEADLESS_RETRY_BASE_SLEEP", "0.25"))
+
 # ── Updated-module stress settings ───────────────────────────────────────────
 PERF_ENABLE_MUTATIONS = os.getenv("PERF_ENABLE_MUTATIONS", "0").strip().lower() in {
     "1",

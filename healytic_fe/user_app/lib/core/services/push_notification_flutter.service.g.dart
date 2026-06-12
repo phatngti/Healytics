@@ -65,4 +65,4 @@ final class PushNotificationServiceProvider
 }
 
 String _$pushNotificationServiceHash() =>
-    r'e9bbc3a23e8cdd5882757cef8773385b2b7e5048';
+    r'26f748c7ea4e9faf7886b557928e64666c49eb4c';

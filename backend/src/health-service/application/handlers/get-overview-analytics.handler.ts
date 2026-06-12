@@ -6,7 +6,10 @@ import {
   resolveGranularity,
 } from '@/dashboard-partner/helpers/date-range.helper';
 import { HealthServiceOverviewAnalyticsResponseDto } from '../../dto/partner/analytics/health-service-overview-analytics.dto';
-import { AnalyticsBookingMetricsDto, BookingStatusBreakdownDto } from '../../dto/partner/analytics/analytics-booking-metrics.dto';
+import {
+  AnalyticsBookingMetricsDto,
+  BookingStatusBreakdownDto,
+} from '../../dto/partner/analytics/analytics-booking-metrics.dto';
 import { AnalyticsTrendPointDto } from '../../dto/partner/analytics/analytics-trend-point.dto';
 import { AnalyticsCategoryPerformanceDto } from '../../dto/partner/analytics/analytics-category-performance.dto';
 import { AnalyticsServicePerformanceDto } from '../../dto/partner/analytics/analytics-service-performance.dto';
@@ -16,14 +19,11 @@ import { PaymentStatus } from '@/payment-gateway/enums/payment-status.enum';
 import { HealthServiceStatus } from '../../enums/health-service-status.enum';
 
 /** Subquery that selects product IDs for a given partner. */
-const PARTNER_PRODUCTS_SUBQUERY =
-  `(SELECT id FROM products WHERE partner_id = $1 AND deleted_at IS NULL)`;
+const PARTNER_PRODUCTS_SUBQUERY = `(SELECT id FROM products WHERE partner_id = $1 AND deleted_at IS NULL)`;
 
 @Injectable()
 export class GetOverviewAnalyticsHandler {
-  private readonly logger = new Logger(
-    GetOverviewAnalyticsHandler.name,
-  );
+  private readonly logger = new Logger(GetOverviewAnalyticsHandler.name);
 
   constructor(private readonly dataSource: DataSource) {}
 
@@ -33,7 +33,7 @@ export class GetOverviewAnalyticsHandler {
   ): Promise<HealthServiceOverviewAnalyticsResponseDto> {
     this.logger.log(
       `Getting overview analytics for partner: ${partnerId}, ` +
-      `period: ${period}`,
+        `period: ${period}`,
     );
 
     const { startDate, endDate, prevStartDate, prevEndDate } =
@@ -61,9 +61,7 @@ export class GetOverviewAnalyticsHandler {
       this.getReviewStats(partnerId, prevStartDate, prevEndDate),
       this.getDelayedBookings(partnerId, startDate, endDate),
       this.getTrendData(partnerId, period, startDate, endDate),
-      this.getCategoryPerformance(
-        partnerId, startDate, endDate,
-      ),
+      this.getCategoryPerformance(partnerId, startDate, endDate),
       this.getTopServices(partnerId, startDate, endDate),
     ]);
 
@@ -204,8 +202,7 @@ export class GetOverviewAnalyticsHandler {
     );
     const row = result[0] || {};
     return {
-      avgRating:
-        Math.round((parseFloat(row.avg_rating) || 0) * 10) / 10,
+      avgRating: Math.round((parseFloat(row.avg_rating) || 0) * 10) / 10,
       count: parseInt(row.review_count) || 0,
     };
   }
@@ -315,10 +312,13 @@ export class GetOverviewAnalyticsHandler {
     };
 
     // Build map of existing buckets
-    const revenueMap = new Map<string, {
-      bookings: number;
-      revenue: number;
-    }>();
+    const revenueMap = new Map<
+      string,
+      {
+        bookings: number;
+        revenue: number;
+      }
+    >();
     for (const row of rows) {
       const key = sqlBucketKey(row.bucket);
       revenueMap.set(key, {
@@ -328,9 +328,7 @@ export class GetOverviewAnalyticsHandler {
     }
 
     // Generate complete time series and zero-fill
-    const allBuckets = this.generateTimeBuckets(
-      start, end, granularity,
-    );
+    const allBuckets = this.generateTimeBuckets(start, end, granularity);
 
     return allBuckets.map((bucketDate) => {
       const key = bucketKey(bucketDate);
@@ -469,9 +467,7 @@ export class GetOverviewAnalyticsHandler {
         count: stats.noShow,
       },
     ];
-    dto.statusBreakdown = rawBreakdown.filter(
-      (item) => item.count > 0,
-    );
+    dto.statusBreakdown = rawBreakdown.filter((item) => item.count > 0);
 
     // Alerts
     const alerts: AnalyticsAlertDto[] = [];
@@ -484,12 +480,9 @@ export class GetOverviewAnalyticsHandler {
       alert.tone = 'critical';
       alerts.push(alert);
     }
-    if (
-      stats.pending > Math.max(6, Math.floor(stats.total / 8))
-    ) {
+    if (stats.pending > Math.max(6, Math.floor(stats.total / 8))) {
       const alert = new AnalyticsAlertDto();
-      alert.title =
-        'Pending bookings are awaiting confirmation';
+      alert.title = 'Pending bookings are awaiting confirmation';
       alert.detail =
         `${stats.pending} bookings are still in the ` +
         `approval queue for this period.`;
@@ -497,13 +490,9 @@ export class GetOverviewAnalyticsHandler {
       alerts.push(alert);
     }
     const cancellationRisk = stats.cancelled + stats.noShow;
-    if (
-      cancellationRisk >
-      Math.max(4, Math.floor(stats.total / 12))
-    ) {
+    if (cancellationRisk > Math.max(4, Math.floor(stats.total / 12))) {
       const alert = new AnalyticsAlertDto();
-      alert.title =
-        'Cancellation and no-show risk is elevated';
+      alert.title = 'Cancellation and no-show risk is elevated';
       alert.detail =
         'Review reminder flows and staffing handoffs ' +
         'to protect the booking pipeline.';
@@ -518,11 +507,7 @@ export class GetOverviewAnalyticsHandler {
   /** Computes % change between current and previous values. */
   private delta(current: number, previous: number): number {
     if (previous <= 0) return 0;
-    return (
-      Math.round(
-        ((current - previous) / previous) * 100 * 10,
-      ) / 10
-    );
+    return Math.round(((current - previous) / previous) * 100 * 10) / 10;
   }
 
   /** Generates a complete series of time buckets. */
@@ -556,13 +541,20 @@ export class GetOverviewAnalyticsHandler {
   }
 
   /** Formats a bucket date into a human-readable label. */
-  private formatBucketLabel(
-    date: Date,
-    period: DashboardTimePeriod,
-  ): string {
+  private formatBucketLabel(date: Date, period: DashboardTimePeriod): string {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
 
     switch (period) {

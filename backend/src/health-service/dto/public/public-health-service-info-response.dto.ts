@@ -22,7 +22,11 @@ class PublicCategoryDto {
   @ApiProperty({ type: String, example: 'spa-massage' })
   slug: string;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: 'https://example.com/category.jpg' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: 'https://example.com/category.jpg',
+  })
   imageUrl: string | null;
 }
 
@@ -33,8 +37,10 @@ class PublicClinicDto {
   @ApiProperty({ type: String, example: 'Healytics Wellness Center' })
   name: string;
 
-  @ApiPropertyOptional({ type: String, example: 'https://example.com/logo.jpg' })
-    
+  @ApiPropertyOptional({
+    type: String,
+    example: 'https://example.com/logo.jpg',
+  })
   avatarUrl?: string;
 
   @ApiProperty({ type: String, example: '123 Health Street, District 1, HCMC' })
@@ -59,7 +65,11 @@ class PublicServiceTagDto {
   @ApiProperty({ type: String, example: '#FF4CAF50' })
   colorValue: string;
 
-  @ApiPropertyOptional({ type: String, nullable: true, example: 'Pain management and relief services' })
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    example: 'Pain management and relief services',
+  })
   description: string | null;
 }
 
@@ -75,7 +85,9 @@ export class PublicHealthServiceInfoResponseDto {
   @ApiProperty({ type: String, example: '$350.00' }) price: string;
   @ApiProperty({ type: Boolean, example: true }) isVerified: boolean;
   @ApiProperty({ type: Boolean, example: false }) isWishlisted: boolean;
-  @ApiPropertyOptional({ type: String, nullable: true }) description: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) description:
+    | string
+    | null;
   @ApiProperty({ type: [PublicFeatureTagDto] })
   featureTags: PublicFeatureTagDto[];
   @ApiProperty({ type: PublicClinicDto }) clinic: PublicClinicDto;

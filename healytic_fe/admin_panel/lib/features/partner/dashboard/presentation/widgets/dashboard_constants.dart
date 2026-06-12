@@ -30,14 +30,21 @@ class DashboardLayout {
   /// Employee overview flex in wide layout.
   static const int employeeOverviewFlex = 4;
 
-  /// Staff schedule flex in wide layout.
-  static const int staffScheduleFlex = 4;
+  /// Staff schedule flex inside the operations
+  /// dashboard section.
+  static const int operationsScheduleFlex = 5;
 
-  /// Notification center flex in wide layout.
-  static const int notificationFlex = 3;
+  /// Notification center flex inside the
+  /// operations dashboard section.
+  static const int operationsNotificationFlex = 4;
 
-  /// Inventory alerts flex in wide layout.
-  static const int inventoryFlex = 3;
+  /// Width threshold for showing inventory alert
+  /// cards in two columns.
+  static const double inventoryGridBreakpoint = 720;
+
+  /// Width threshold for showing inventory alert
+  /// cards in three columns.
+  static const double inventoryGridWideBreakpoint = 1100;
 
   // --- KPI Grid ---
 

@@ -101,7 +101,9 @@ export class PartnersService {
   async getMyProfileCompletion(
     accountId: string,
   ): Promise<MyProfileCompletionResponseDto> {
-    this.logger.log(`Getting profile completion data for account: ${accountId}`);
+    this.logger.log(
+      `Getting profile completion data for account: ${accountId}`,
+    );
     const partner = await this.partnerRepository.findOne({
       where: { accountId },
       relations: ['province', 'district', 'ward'],
@@ -273,10 +275,12 @@ export class PartnersService {
     return partner;
   }
 
-  isPartnerProfileCompleted(partner: Pick<
-    Partner,
-    'coverImageUrl' | 'logoImageUrl' | 'description' | 'gallery'
-  >): boolean {
+  isPartnerProfileCompleted(
+    partner: Pick<
+      Partner,
+      'coverImageUrl' | 'logoImageUrl' | 'description' | 'gallery'
+    >,
+  ): boolean {
     const descriptionLength = partner.description?.trim().length ?? 0;
     return (
       Boolean(partner.coverImageUrl) &&
@@ -400,9 +404,7 @@ export class PartnersService {
       }
 
       const entity =
-        (certification.id
-          ? existingById.get(certification.id)
-          : undefined) ??
+        (certification.id ? existingById.get(certification.id) : undefined) ??
         this.certificationRepository.create({ partnerId });
 
       entity.partnerId = partnerId;

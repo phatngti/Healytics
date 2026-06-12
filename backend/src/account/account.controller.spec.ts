@@ -12,6 +12,9 @@ describe('AccountController', () => {
 
   beforeEach(async () => {
     const mockAccountService: MockType<AccountService> = {
+      getMe: jest.fn(),
+      updateProfile: jest.fn(),
+      updateAddress: jest.fn(),
       getSurveyResponse: jest.fn(),
       createSurvey: jest.fn(),
     };
@@ -32,6 +35,43 @@ describe('AccountController', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('updateProfile', () => {
+    it('should delegate profile identity update to service and return response', async () => {
+      const userId = 'uuid-1';
+      const dto = {
+        firstName: 'Test',
+        lastName: 'New',
+        phone: '0901234567',
+      };
+      const response = { id: userId, email: 'user@test.com' } as any;
+      accountService.updateProfile!.mockResolvedValue(response);
+
+      const result = await controller.updateProfile(userId, dto);
+
+      expect(result).toEqual(response);
+      expect(accountService.updateProfile).toHaveBeenCalledWith(userId, dto);
+    });
+  });
+
+  describe('updateAddress', () => {
+    it('should delegate address update to service and return response', async () => {
+      const userId = 'uuid-1';
+      const dto = {
+        streetAddress: '123 Nguyen Hue Street',
+        provinceId: '11111111-1111-4111-8111-111111111111',
+        districtId: '22222222-2222-4222-8222-222222222222',
+        wardId: '33333333-3333-4333-8333-333333333333',
+      };
+      const response = { id: userId, email: 'user@test.com' } as any;
+      accountService.updateAddress!.mockResolvedValue(response);
+
+      const result = await controller.updateAddress(userId, dto);
+
+      expect(result).toEqual(response);
+      expect(accountService.updateAddress).toHaveBeenCalledWith(userId, dto);
+    });
   });
 
   describe('getSurvey', () => {

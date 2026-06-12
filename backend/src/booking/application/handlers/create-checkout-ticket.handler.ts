@@ -133,7 +133,11 @@ export class CreateCheckoutTicketHandler {
       this.logger.warn(
         `Slot pre-check failed: staff=${dto.staffId}, time=${dto.startTime}`,
       );
-      return this.createFailedTicket(dto, cacheKey, 'Slot is no longer available.');
+      return this.createFailedTicket(
+        dto,
+        cacheKey,
+        'Slot is no longer available.',
+      );
     }
 
     // 3b. Acquire checkout pre-lock (closes TOCTOU gap between API and consumer)
@@ -160,7 +164,11 @@ export class CreateCheckoutTicketHandler {
       this.logger.warn(
         `Pre-lock denied: staff=${dto.staffId}, time=${dto.startTime}, key=${lockKey}`,
       );
-      return this.createFailedTicket(dto, cacheKey, 'Slot is no longer available.');
+      return this.createFailedTicket(
+        dto,
+        cacheKey,
+        'Slot is no longer available.',
+      );
     }
 
     // 4. Create QUEUED ticket (with lockToken for consumer validation)
@@ -322,11 +330,7 @@ export class CreateCheckoutTicketHandler {
         message: errorMessage,
       });
 
-      return new AsyncCheckoutResponseDto(
-        saved.id,
-        saved.status,
-        errorMessage,
-      );
+      return new AsyncCheckoutResponseDto(saved.id, saved.status, errorMessage);
     } catch (error) {
       this.logger.error(
         `DB error saving FAILED ticket — data=${JSON.stringify({ userId: dto.userId, staffId: dto.staffId, startTime: dto.startTime, productId: dto.productId, idempotencyKey: dto.idempotencyKey })}`,
@@ -354,9 +358,7 @@ export class CreateCheckoutTicketHandler {
       );
       this.logger.debug(`Cached ticket response: ${key}`);
     } catch (error) {
-      this.logger.warn(
-        `Redis cache write failed for ${key}: ${error.message}`,
-      );
+      this.logger.warn(`Redis cache write failed for ${key}: ${error.message}`);
       // Non-critical — DB is the source of truth
     }
   }

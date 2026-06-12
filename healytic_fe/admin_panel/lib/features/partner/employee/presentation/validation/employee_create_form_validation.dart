@@ -12,6 +12,7 @@ abstract final class EmployeeCreateFormValidation {
     EmployeeFormField.firstName.key,
     EmployeeFormField.lastName.key,
     EmployeeFormField.emailAddress.key,
+    EmployeeFormField.password.key,
     EmployeeFormField.phoneNumber.key,
     EmployeeFormField.dateOfBirth.key,
     EmployeeFormField.gender.key,

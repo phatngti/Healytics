@@ -1,0 +1,30 @@
+filebeat.inputs:
+  - type: filestream
+    id: docker-containers
+    enabled: true
+    paths:
+      - /var/lib/docker/containers/*/*.log
+    parsers:
+      - container: ~
+    processors:
+      - add_docker_metadata:
+          host: unix:///var/run/docker.sock
+      - drop_event:
+          when:
+            equals:
+              container.name: healytics-filebeat
+
+processors:
+  - add_fields:
+      target: healytics
+      fields:
+        environment: ${NODE_ENV:production}
+        log_source: docker
+
+setup.kibana:
+  host: ${KIBANA_HOST:http://kibana:5601}
+
+output.elasticsearch:
+  hosts: ["${ELASTICSEARCH_HOSTS:http://elasticsearch:9200}"]
+  username: ${ELASTICSEARCH_USERNAME:elastic}
+  password: ${ELASTICSEARCH_PASSWORD:elastic@123}

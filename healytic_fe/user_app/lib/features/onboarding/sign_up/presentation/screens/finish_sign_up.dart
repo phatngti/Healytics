@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:common/widgets/toast.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/utils/form_validators.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/user_entity.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/widgets/finish_sign_up/legal_name_section.widget.dart';
@@ -24,11 +24,8 @@ class FinishSignUpScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final minBodyHeight =
-        DeviceUtils.getMinBodyHeight(context);
-    final formKey = useMemoized(
-      () => GlobalKey<FormBuilderState>(),
-    );
+    final minBodyHeight = DeviceUtils.getMinBodyHeight(context);
+    final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final isFilledAll = useState(false);
     final isSubmitLoading = useState(false);
     final scrollController = useScrollController();
@@ -44,10 +41,8 @@ class FinishSignUpScreen extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(
-          color:
-              Theme.of(context).colorScheme.onSurface,
-          onPressed: () =>
-              {OnboardingRoute().push(context)},
+          color: Theme.of(context).colorScheme.onSurface,
+          onPressed: () => {OnboardingRoute().push(context)},
         ),
         title: Text(
           'Finish Sign Up',
@@ -58,22 +53,15 @@ class FinishSignUpScreen extends HookConsumerWidget {
         padding: const EdgeInsets.all(16.0),
         controller: scrollController,
         child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: minBodyHeight,
-          ),
+          constraints: BoxConstraints(minHeight: minBodyHeight),
           child: Container(
-            margin: EdgeInsets.only(
-              top: AppDimens.paddingAllSmall.vertical,
-            ),
+            margin: EdgeInsets.only(top: AppDimens.paddingAllSmall.vertical),
             child: FormBuilder(
               key: formKey,
-              onChanged: () => _checkFormFilled(
-                formKey: formKey,
-                isFilledAll: isFilledAll,
-              ),
+              onChanged: () =>
+                  _checkFormFilled(formKey: formKey, isFilledAll: isFilledAll),
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const LegalNameSection(),
                   AppDimens.verticalLarge,
@@ -90,8 +78,7 @@ class FinishSignUpScreen extends HookConsumerWidget {
                       context: context,
                       ref: ref,
                       formKey: formKey,
-                      isSubmitLoading:
-                          isSubmitLoading,
+                      isSubmitLoading: isSubmitLoading,
                     ),
                   ),
                   AppDimens.verticalExtraLarge,
@@ -123,13 +110,8 @@ class FinishSignUpScreen extends HookConsumerWidget {
         next.hasValue &&
         !next.isLoading) {
       if (context.mounted) {
-        AppToast.success(
-          context,
-          'Registration completed successfully.',
-        );
-        context.pushReplacementNamed(
-          SurveyScreenRoute.name,
-        );
+        AppToast.success(context, 'Registration completed successfully.');
+        const SurveyScreenRoute().go(context);
       }
     }
     isSubmitLoading.value = false;
@@ -144,14 +126,46 @@ class FinishSignUpScreen extends HookConsumerWidget {
     final formState = formKey.currentState;
     if (formState == null) return;
 
-    // Use FormBuilder's built-in valid state which runs all field validators
-    // (including age, password match, etc.) without forcibly showing errors
-    // unless the user has interacted with the field.
-    final isValid = formState.isValid;
+    formState.save();
+    final isValid = _isFormDataValid(formState.value);
 
     if (isFilledAll.value != isValid) {
       isFilledAll.value = isValid;
     }
+  }
+
+  bool _isFormDataValid(Map<String, dynamic> formData) {
+    final password = _asString(formData['password']);
+    final confirmPassword = _asString(formData['confirm_password']);
+
+    final validators = <String? Function()>[
+      () => FormValidators.fullName(
+        formData['first_name'],
+        fieldName: 'First name',
+      ),
+      () => FormValidators.fullName(
+        formData['last_name'],
+        fieldName: 'Last name',
+      ),
+      () => FormValidators.dateOfBirth(formData['date_of_birth'], minAge: 16),
+      () => FormValidators.password(password),
+      () => FormValidators.confirmPassword(confirmPassword, password: password),
+      () => FormValidators.requiredField(
+        formData['city_or_province'],
+        fieldName: 'province or city',
+      ),
+      () => FormValidators.requiredField(
+        formData['district'],
+        fieldName: 'district',
+      ),
+      () => FormValidators.requiredField(formData['ward'], fieldName: 'ward'),
+      () => FormValidators.requiredField(
+        formData['street_address'],
+        fieldName: 'street address',
+      ),
+    ];
+
+    return validators.every((validator) => validator() == null);
   }
 
   /// Validates and submits the sign-up form by calling
@@ -163,10 +177,8 @@ class FinishSignUpScreen extends HookConsumerWidget {
     required ValueNotifier<bool> isSubmitLoading,
   }) {
     isSubmitLoading.value = true;
-    if (formKey.currentState?.saveAndValidate() ??
-        false) {
-      final formData =
-          formKey.currentState?.value ?? {};
+    if (formKey.currentState?.saveAndValidate() ?? false) {
+      final formData = formKey.currentState?.value ?? {};
       if (formData.isNotEmpty) {
         final dobValue = formData['date_of_birth'];
         String dobString = '';
@@ -176,31 +188,25 @@ class FinishSignUpScreen extends HookConsumerWidget {
           dobString = dobValue;
         }
 
-        final email = ref
-                .read(registerFlowProvider)
-                .value
-                ?.user
-                ?.email ??
-            '';
+        final email = ref.read(registerFlowProvider).value?.user?.email ?? '';
+        final provinceId = _asString(formData['city_or_province']);
+        final districtId = _asString(formData['district']);
+        final wardId = _asString(formData['ward']);
+
         ref
             .read(registerFlowProvider.notifier)
             .completeRegistration(
               UserEntity(
                 email: email,
-                password:
-                    formData['password'] as String? ?? '',
-                firstName:
-                    formData['first_name'] as String,
-                lastName:
-                    formData['last_name'] as String,
+                password: formData['password'] as String? ?? '',
+                firstName: formData['first_name'] as String,
+                lastName: formData['last_name'] as String,
                 dateOfBirth: dobString,
                 address: AddressEntity(
-                  street:
-                      formData['street_address'],
-                  ward: formData['ward'],
-                  district: formData['district'],
-                  cityOrProvince:
-                      formData['city_or_province'],
+                  streetAddress: _asString(formData['street_address']),
+                  provinceId: provinceId,
+                  districtId: districtId,
+                  wardId: wardId,
                 ),
               ),
             );
@@ -213,5 +219,9 @@ class FinishSignUpScreen extends HookConsumerWidget {
         'fields correctly.',
       );
     }
+  }
+
+  String _asString(Object? value) {
+    return value?.toString().trim() ?? '';
   }
 }

@@ -36,7 +36,8 @@ export class UpdatePartnerPublicProfileDto {
   logoImageUrl?: string;
 
   @ApiPropertyOptional({
-    description: 'Public clinic profile description (120–1000 chars recommended)',
+    description:
+      'Public clinic profile description (120–1000 chars recommended)',
     example: 'A modern wellness clinic focused on long-term care.',
   })
   @IsOptional()

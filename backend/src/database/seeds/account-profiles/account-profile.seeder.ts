@@ -174,7 +174,8 @@ export class AccountProfileSeeder implements ISeeder {
     const emails = SEED_ADDRESS_PROFILES.map((item) => item.accountEmail);
     const accounts = await this.accountRepo.find({
       where: { email: In(emails) },
-      relations: ['userProfile', 'userProfile.address'],
+      relations: ['userProfile'],
+      loadEagerRelations: false,
     });
     const accountMap = new Map(
       accounts.map((account) => [account.email, account]),
@@ -194,9 +195,15 @@ export class AccountProfileSeeder implements ISeeder {
       const profile = account.userProfile;
 
       if (profile.addressId) {
-        const currentAddress = await this.addressRepo.findOne({
-          where: { id: profile.addressId },
-        });
+        const [currentAddress] = await this.addressRepo.query(
+          `
+          SELECT id, street
+          FROM address
+          WHERE id = $1 AND deleted_at IS NULL
+          LIMIT 1
+          `,
+          [profile.addressId],
+        );
 
         if (!currentAddress) {
           this.logger.warn(
@@ -208,11 +215,24 @@ export class AccountProfileSeeder implements ISeeder {
           );
           continue;
         } else {
-          currentAddress.street = fullStreet;
-          currentAddress.ward = entry.ward;
-          currentAddress.district = entry.district;
-          currentAddress.cityOrProvince = entry.cityOrProvince;
-          await this.addressRepo.save(currentAddress);
+          await this.addressRepo.query(
+            `
+            UPDATE address
+            SET street = $1,
+                ward = $2,
+                district = $3,
+                city_or_province = $4,
+                updated_at = NOW()
+            WHERE id = $5
+            `,
+            [
+              fullStreet,
+              entry.ward,
+              entry.district,
+              entry.cityOrProvince,
+              profile.addressId,
+            ],
+          );
           this.logger.log(
             `  🔄 Updated seed address for "${entry.accountEmail}"`,
           );
@@ -220,13 +240,14 @@ export class AccountProfileSeeder implements ISeeder {
         }
       }
 
-      const address = this.addressRepo.create({
-        street: fullStreet,
-        ward: entry.ward,
-        district: entry.district,
-        cityOrProvince: entry.cityOrProvince,
-      });
-      const savedAddress = await this.addressRepo.save(address);
+      const [savedAddress] = await this.addressRepo.query(
+        `
+        INSERT INTO address (id, street, ward, district, city_or_province, created_at, updated_at)
+        VALUES (uuid_generate_v4(), $1, $2, $3, $4, NOW(), NOW())
+        RETURNING id
+        `,
+        [fullStreet, entry.ward, entry.district, entry.cityOrProvince],
+      );
 
       profile.addressId = savedAddress.id;
       await this.userProfileRepo.save(profile);

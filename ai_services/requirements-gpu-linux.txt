@@ -1,0 +1,13 @@
+# =============================================================================
+# Tuỳ chọn: chỉ cài trên Linux có NVIDIA GPU (RunPod, AWS g4/g5, ...)
+# KHÔNG cài trên macOS — sẽ lỗi nvidia-cublas-cu12.
+#
+#   pip install -r requirements.txt
+#   pip install -r requirements-gpu-linux.txt
+# =============================================================================
+
+bitsandbytes>=0.43.0,<0.49.0
+accelerate>=0.30.0,<2.0.0
+xformers>=0.0.27; platform_system == "Linux"
+triton>=3.0.0; platform_system == "Linux"
+vllm>=0.6.0,<0.12.0; platform_system == "Linux"

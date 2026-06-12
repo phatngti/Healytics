@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 
 /// Height of the clinic tab bar used as both
 /// [maxExtent] and [minExtent] so it never resizes.
@@ -60,7 +61,14 @@ class ClinicPinnedTabBarDelegate extends SliverPersistentHeaderDelegate {
         ),
         indicatorColor: colorScheme.primary,
         indicatorWeight: 2,
-        tabs: tabLabels.map((l) => Tab(text: l)).toList(),
+        tabs: tabLabels
+            .map(
+              (label) => Tab(
+                key: keys.clinicPage.tab(label.toLowerCase()),
+                text: label,
+              ),
+            )
+            .toList(),
       ),
     );
   }

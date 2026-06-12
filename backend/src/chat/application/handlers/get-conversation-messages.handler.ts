@@ -84,9 +84,7 @@ export class GetConversationMessagesHandler {
 
     // nextCursor = ID of the oldest message in this page (last element)
     const nextCursor =
-      hasMore && messages.length > 0
-        ? messages[messages.length - 1].id
-        : null;
+      hasMore && messages.length > 0 ? messages[messages.length - 1].id : null;
 
     this.logger.log(
       `Fetched ${messages.length} messages for conversation ${conversationId} (hasMore: ${hasMore}, nextCursor: ${nextCursor ?? 'none'})`,

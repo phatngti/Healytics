@@ -83,8 +83,6 @@ class BusinessInfo {
   @IsOptional()
   address?: AddressDto;
 
-
-
   @ApiPropertyOptional({
     type: UpdatedField,
     example: { fieldKey: 'email', value: 'Email' },

@@ -18,10 +18,18 @@ export class BookingResponseDto {
   @ApiProperty({ type: Date, example: '2023-10-25T14:00:00Z' })
   startTime: Date;
 
-  @ApiPropertyOptional({ type: Date, nullable: true, example: '2023-10-25T15:00:00Z' })
+  @ApiPropertyOptional({
+    type: Date,
+    nullable: true,
+    example: '2023-10-25T15:00:00Z',
+  })
   endTime: Date | null;
 
-  @ApiProperty({ enum: BookingStatus, enumName: 'BookingStatus', example: BookingStatus.PENDING_PAYMENT })
+  @ApiProperty({
+    enum: BookingStatus,
+    enumName: 'BookingStatus',
+    example: BookingStatus.PENDING_PAYMENT,
+  })
   status: BookingStatus;
 
   @ApiPropertyOptional({
@@ -31,7 +39,11 @@ export class BookingResponseDto {
   })
   paymentUrl: string | null;
 
-  @ApiPropertyOptional({ type: Date, nullable: true, example: '2023-10-25T14:10:00Z' })
+  @ApiPropertyOptional({
+    type: Date,
+    nullable: true,
+    example: '2023-10-25T14:10:00Z',
+  })
   paymentExpiresAt: Date | null;
 
   @ApiPropertyOptional({ type: String, nullable: true })

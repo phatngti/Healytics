@@ -46,6 +46,9 @@ class ApiService implements Authentication {
   late UserAppointmentsApi userAppointmentsApi;
   late EmployeeAppointmentsApi employeeAppointmentsApi;
 
+  // ── Revenue ─────────────────────────────────
+  late EmployeeRevenueApi employeeRevenueApi;
+
   ApiService({AuthHttpClient? httpClient}) : _authHttpClient = httpClient {
     setEndpoint('');
     final endpoint = Store.tryGet(StoreKey.serverEndpoint);
@@ -102,6 +105,7 @@ class ApiService implements Authentication {
     bookingsApi = BookingsApi(backend);
     userAppointmentsApi = UserAppointmentsApi(backend);
     employeeAppointmentsApi = EmployeeAppointmentsApi(backend);
+    employeeRevenueApi = EmployeeRevenueApi(backend);
   }
 
   Future<void> _setUserAgentHeaders() async {

@@ -1,0 +1,3 @@
+# Đã gộp vào ai_services/requirements.txt (rank-bm25, elasticsearch).
+# Giữ file này để tương thích script cũ:
+#   pip install -r ../requirements.txt

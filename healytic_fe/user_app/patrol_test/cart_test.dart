@@ -18,61 +18,36 @@ Future<void> _openCart(PatrolIntegrationTester $) async {
 }
 
 void main() {
-  patrolTest('cart screen renders seeded items from home header', ($) async {
+  patrolTest('cart screen renders seeded items and applies coupon', ($) async {
     await pumpApp($, scenario: 'cartCheckout');
-    final config = TestConfig.instance;
-
-    if (!config.useMock) {
-      await $.pump(const Duration(seconds: 1));
-      return;
-    }
-
     await _openCart($);
 
     expect($(CartScreen), findsOneWidget);
     expect($('Swedish Relax'), findsOneWidget);
     expect($('Herbal Hot Stone'), findsOneWidget);
-  });
-
-  patrolTest('searching cart filters visible items', ($) async {
-    await pumpApp($, scenario: 'cartCheckout');
-    final config = TestConfig.instance;
-
-    if (!config.useMock) {
-      await $.pump(const Duration(seconds: 1));
-      return;
-    }
-
-    await _openCart($);
 
     await $(keys.cartPage.searchField).enterText('Swedish');
     await $.pump(const Duration(seconds: 1));
 
     expect($('Swedish Relax'), findsOneWidget);
     expect($('Herbal Hot Stone'), findsNothing);
-  });
 
-  patrolTest('selecting an item exposes voucher actions and applies coupon', (
-    $,
-  ) async {
-    await pumpApp($, scenario: 'cartCheckout');
-    final config = TestConfig.instance;
-
-    if (!config.useMock) {
-      await $.pump(const Duration(seconds: 1));
-      return;
-    }
-
-    await _openCart($);
-
-    await $(keys.cartPage.itemSelection('cart-001')).tap();
+    await $(keys.cartPage.itemSelectionByService('Swedish Relax')).tap();
     await $.pump(const Duration(seconds: 1));
 
-    expect($(keys.cartPage.voucherSelector('cart-001')), findsOneWidget);
+    expect(
+      $(keys.cartPage.voucherSelectorByService('Swedish Relax')),
+      findsOneWidget,
+    );
     expect($(keys.cartPage.checkoutButton), findsOneWidget);
 
-    await $(keys.cartPage.voucherSelector('cart-001')).tap();
+    await $(keys.cartPage.voucherSelectorByService('Swedish Relax')).tap();
     await $.pump(const Duration(seconds: 1));
+
+    if (!TestConfig.instance.useMock) {
+      expect($('No vouchers available'), findsOneWidget);
+      return;
+    }
 
     await $(keys.cartPage.voucherTile('RELAX10')).tap();
     await $(keys.cartPage.voucherApplyButton).tap();

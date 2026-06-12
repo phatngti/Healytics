@@ -8,6 +8,7 @@ import {
   IsNumber,
   IsArray,
   ValidateNested,
+  MinLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -41,6 +42,16 @@ export class CreateDoctorDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
+
+  @ApiProperty({
+    example: 'Password123!',
+    description: 'Initial employee account password',
+    minLength: 8,
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
+  password: string;
 
   @ApiPropertyOptional({ example: '0901234567', description: 'Phone number' })
   @IsString()

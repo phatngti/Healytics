@@ -13,7 +13,10 @@ export class PartnerRefundCaseRecordDto {
   @Expose()
   transactionId: string;
 
-  @ApiProperty({ enum: PartnerRefundCaseType, enumName: 'PartnerRefundCaseType' })
+  @ApiProperty({
+    enum: PartnerRefundCaseType,
+    enumName: 'PartnerRefundCaseType',
+  })
   @Expose()
   caseType: PartnerRefundCaseType;
 
@@ -37,11 +40,18 @@ export class PartnerRefundCaseRecordDto {
   @Expose()
   owner: string;
 
-  @ApiProperty({ enum: PartnerRefundCaseStatus, enumName: 'PartnerRefundCaseStatus' })
+  @ApiProperty({
+    enum: PartnerRefundCaseStatus,
+    enumName: 'PartnerRefundCaseStatus',
+  })
   @Expose()
   status: PartnerRefundCaseStatus;
 
-  @ApiProperty({ type: Number, example: 48, description: 'Remaining SLA hours (0 for resolved cases)' })
+  @ApiProperty({
+    type: Number,
+    example: 48,
+    description: 'Remaining SLA hours (0 for resolved cases)',
+  })
   @Expose()
   slaHours: number;
 
@@ -60,7 +70,9 @@ export class PartnerRefundCaseRecordDto {
     return dto;
   }
 
-  static fromEntities(entities: PartnerRefundCase[]): PartnerRefundCaseRecordDto[] {
+  static fromEntities(
+    entities: PartnerRefundCase[],
+  ): PartnerRefundCaseRecordDto[] {
     return entities.map((e) => PartnerRefundCaseRecordDto.fromEntity(e));
   }
 
@@ -73,7 +85,8 @@ export class PartnerRefundCaseRecordDto {
       return 0;
     }
     if (!entity.slaDueAt) return 0;
-    const remaining = (entity.slaDueAt.getTime() - Date.now()) / (1000 * 60 * 60);
+    const remaining =
+      (entity.slaDueAt.getTime() - Date.now()) / (1000 * 60 * 60);
     return Math.max(0, Math.round(remaining));
   }
 }

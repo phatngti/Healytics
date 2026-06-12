@@ -1,11 +1,15 @@
 import {
+  ConflictException,
   Injectable,
   Logger,
   InternalServerErrorException,
   Optional,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { CreateDoctorDto } from '../../dto/create-doctor.dto';
+import { Role } from '@/account/enum/role.enum';
+import { Account } from '@/common/entities/account.entity';
 import { Employee } from '@/common/entities/employee.entity';
 import { DoctorProfile } from '@/common/entities/doctor-profile.entity';
 import { EmployeeRole } from '../../enum/employee-role.enum';
@@ -37,11 +41,30 @@ export class CreateDoctorHandler {
     await queryRunner.startTransaction();
 
     try {
+      const accountEmail = command.email.trim().toLowerCase();
+      const existingAccount = await queryRunner.manager.findOne(Account, {
+        where: { email: accountEmail },
+        withDeleted: true,
+      });
+      if (existingAccount) {
+        throw new ConflictException(
+          'An account with this email already exists',
+        );
+      }
+      const passwordHash = await bcrypt.hash(command.password, 10);
+      const account = queryRunner.manager.create(Account, {
+        email: accountEmail,
+        passwordHash,
+        role: Role.EMPLOYEE,
+        isActive: true,
+      });
+      const savedAccount = await queryRunner.manager.save(Account, account);
+
       // 1. Map flat DTO → Employee entity fields
       const employee = queryRunner.manager.create(Employee, {
         firstName: command.firstName,
         lastName: command.lastName,
-        email: command.email,
+        email: accountEmail,
         phone: command.phone,
         dob: command.dateOfBirth ? new Date(command.dateOfBirth) : undefined,
         gender: command.gender,
@@ -58,6 +81,7 @@ export class CreateDoctorHandler {
         description: command.description,
         jobTitle: command.jobTitle,
         partnerId: command.partnerId,
+        accountId: savedAccount.id,
         role: EmployeeRole.DOCTOR,
       });
       const savedEmployee = await queryRunner.manager.save(Employee, employee);
@@ -92,6 +116,7 @@ export class CreateDoctorHandler {
       return completeEmployee!;
     } catch (error) {
       await queryRunner.rollbackTransaction();
+      if (error instanceof ConflictException) throw error;
       this.logger.error(
         `Failed to create doctor: ${error.message}`,
         error.stack,

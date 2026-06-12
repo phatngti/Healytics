@@ -62,6 +62,7 @@ class _HeroImageCarouselState extends State<HeroImageCarousel>
 
   void _startAutoAdvance() {
     _autoAdvanceTimer?.cancel();
+    if (widget.images.length <= 1) return;
     _autoAdvanceTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!mounted) return;
       final next = (_currentPage + 1) % widget.images.length;

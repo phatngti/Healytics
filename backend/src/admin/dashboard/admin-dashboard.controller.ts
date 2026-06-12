@@ -20,9 +20,7 @@ import {
 
 @AdminDashboardApi()
 export class AdminDashboardController {
-  constructor(
-    private readonly service: AdminDashboardService,
-  ) {}
+  constructor(private readonly service: AdminDashboardService) {}
 
   @Get('overview')
   @ApiOperation({

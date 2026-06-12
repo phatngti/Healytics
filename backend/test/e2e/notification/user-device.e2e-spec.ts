@@ -1,5 +1,9 @@
 import { randomUUID } from 'crypto';
-import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
+import {
+  INestApplication,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
 import request from 'supertest';
@@ -19,10 +23,7 @@ import { AccountService } from '../../../src/account/account.service';
 import { ConfigService } from '@nestjs/config';
 import { jwtConstants } from '../../../src/auth/constants';
 
-type AccountRepoMock = Pick<
-  Repository<Account>,
-  'create' | 'save' | 'findOne'
->;
+type AccountRepoMock = Pick<Repository<Account>, 'create' | 'save' | 'findOne'>;
 type DeviceTokenRepoMock = Pick<
   Repository<DeviceToken>,
   'create' | 'save' | 'findOne' | 'find' | 'update'
@@ -70,15 +71,10 @@ describe('User Device API (e2e)', () => {
 
         return account;
       },
-      findOne: async ({
-        where,
-      }: {
-        where: Partial<Account>;
-      }) =>
+      findOne: async ({ where }: { where: Partial<Account> }) =>
         accounts.find((account) =>
           Object.entries(where).every(
-            ([key, value]) =>
-              account[key as keyof Account] === value,
+            ([key, value]) => account[key as keyof Account] === value,
           ),
         ) ?? null,
     };
@@ -99,7 +95,8 @@ describe('User Device API (e2e)', () => {
         } as DeviceToken;
 
         const existingIndex = deviceTokens.findIndex(
-          (candidate) => candidate.id === entity.id || candidate.token === entity.token,
+          (candidate) =>
+            candidate.id === entity.id || candidate.token === entity.token,
         );
         if (existingIndex >= 0) {
           deviceTokens[existingIndex] = entity;
@@ -109,26 +106,16 @@ describe('User Device API (e2e)', () => {
 
         return entity;
       },
-      findOne: async ({
-        where,
-      }: {
-        where: Partial<DeviceToken>;
-      }) =>
+      findOne: async ({ where }: { where: Partial<DeviceToken> }) =>
         deviceTokens.find((deviceToken) =>
           Object.entries(where).every(
-            ([key, value]) =>
-              deviceToken[key as keyof DeviceToken] === value,
+            ([key, value]) => deviceToken[key as keyof DeviceToken] === value,
           ),
         ) ?? null,
-      find: async ({
-        where,
-      }: {
-        where: Partial<DeviceToken>;
-      }) =>
+      find: async ({ where }: { where: Partial<DeviceToken> }) =>
         deviceTokens.filter((deviceToken) =>
           Object.entries(where).every(
-            ([key, value]) =>
-              deviceToken[key as keyof DeviceToken] === value,
+            ([key, value]) => deviceToken[key as keyof DeviceToken] === value,
           ),
         ),
       update: async (
@@ -160,7 +147,10 @@ describe('User Device API (e2e)', () => {
     };
   }
 
-  async function createUserAndToken(emailPrefix: string, role = Role.USER): Promise<{
+  async function createUserAndToken(
+    emailPrefix: string,
+    role = Role.USER,
+  ): Promise<{
     accessToken: string;
     userId: string;
   }> {
@@ -307,10 +297,12 @@ describe('User Device API (e2e)', () => {
   });
 
   it('POST /v1/user/devices returns 401 without JWT', async () => {
-    const res = await api().post('/v1/user/devices').send({
-      token: `unauthorized-token-${Date.now()}`,
-      platform: 'android',
-    });
+    const res = await api()
+      .post('/v1/user/devices')
+      .send({
+        token: `unauthorized-token-${Date.now()}`,
+        platform: 'android',
+      });
 
     expect(res.status).toBe(401);
   });
@@ -376,7 +368,9 @@ describe('User Device API (e2e)', () => {
 
     expect(unauthorizedDelete.status).toBe(204);
 
-    const unchangedB = await deviceTokenRepo.findOne({ where: { token: tokenB } });
+    const unchangedB = await deviceTokenRepo.findOne({
+      where: { token: tokenB },
+    });
     expect(unchangedB?.isActive).toBe(true);
   });
 

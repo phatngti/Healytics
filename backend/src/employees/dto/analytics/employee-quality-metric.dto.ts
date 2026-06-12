@@ -13,7 +13,8 @@ export class EmployeeQualityMetricDto {
   @ApiProperty({
     type: String,
     example: '4.8',
-    description: 'Display value (intentionally a string for flexible formatting)',
+    description:
+      'Display value (intentionally a string for flexible formatting)',
   })
   @Expose()
   value: string;

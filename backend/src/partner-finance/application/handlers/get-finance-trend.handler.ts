@@ -47,11 +47,15 @@ export class GetFinanceTrendHandler {
       .getRawMany();
 
     // Build lookup from raw data
-    const dataMap = new Map<string, { gross: number; net: number; refund: number }>();
+    const dataMap = new Map<
+      string,
+      { gross: number; net: number; refund: number }
+    >();
     for (const row of rawRows) {
-      const dateStr = row.date instanceof Date
-        ? row.date.toISOString().split('T')[0]
-        : String(row.date);
+      const dateStr =
+        row.date instanceof Date
+          ? row.date.toISOString().split('T')[0]
+          : String(row.date);
       dataMap.set(dateStr, {
         gross: Number(row.grossAmount),
         net: Number(row.netAmount),
@@ -81,7 +85,10 @@ export class GetFinanceTrendHandler {
     return result;
   }
 
-  private getDateRange(query: PartnerFinanceQueryDto): { start: Date; end: Date } {
+  private getDateRange(query: PartnerFinanceQueryDto): {
+    start: Date;
+    end: Date;
+  } {
     const end = query.endDate ? new Date(query.endDate) : new Date();
     end.setHours(23, 59, 59, 999);
 

@@ -66,7 +66,10 @@ describe('ProcessCheckoutHandler', () => {
         { provide: RedisService, useValue: redisService },
         { provide: WebhookService, useValue: webhookService },
         BookingStatusLogWriterService,
-        { provide: NotificationEventService, useValue: notificationEventService },
+        {
+          provide: NotificationEventService,
+          useValue: notificationEventService,
+        },
       ],
     }).compile();
 
@@ -131,6 +134,10 @@ describe('ProcessCheckoutHandler', () => {
 
       // 5. Message was ACK'd
       expect(context.getChannelRef().ack).toHaveBeenCalled();
+
+      // 6. Notification should NOT be emitted for standard payment flow
+      //    (notification moves to payment gateway IPN/webhook)
+      expect(notificationEventService.emit).not.toHaveBeenCalled();
     });
 
     it('should create a confirmed booking with no payment expiry for pay later', async () => {

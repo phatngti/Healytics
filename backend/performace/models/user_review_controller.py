@@ -9,6 +9,16 @@ from .base import DtoModel, dto_field
 
 
 @dataclass(slots=True)
+class CreateFacilityReviewDto(DtoModel):
+    appointmentId: str
+    facilityId: str
+    rating: float
+    comment: str | None = None
+    tags: list[str] | None = None
+    photoKeys: list[str] | None = None
+
+
+@dataclass(slots=True)
 class CreateSpecialistReviewDto(DtoModel):
     appointmentId: str
     specialistId: str
@@ -25,6 +35,18 @@ class CreateTreatmentReviewDto(DtoModel):
     comment: str | None = None
     tags: list[str] | None = None
     photoKeys: list[str] | None = None
+
+
+@dataclass(slots=True)
+class FacilityReviewResponseDto(DtoModel):
+    id: str
+    appointmentId: str
+    facilityId: str
+    rating: float
+    tags: list[str]
+    photoUrls: list[str]
+    createdAt: datetime
+    comment: dict[str, Any] | None = None
 
 
 @dataclass(slots=True)
@@ -51,8 +73,10 @@ class TreatmentReviewResponseDto(DtoModel):
 
 
 __all__ = [
+    "CreateFacilityReviewDto",
     "CreateSpecialistReviewDto",
     "CreateTreatmentReviewDto",
+    "FacilityReviewResponseDto",
     "SpecialistReviewResponseDto",
     "TreatmentReviewResponseDto",
 ]

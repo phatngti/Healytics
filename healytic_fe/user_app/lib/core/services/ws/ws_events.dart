@@ -74,3 +74,22 @@ abstract final class WsChatNotificationsEvent {
   static const newMessageNotification = 'new_message_notification';
 }
 
+/// WebSocket event constants for the WsNotificationsEvent namespace(s).
+///
+/// Client → Server events are used with `socket.emit()`.
+/// Server → Client events are used with `socket.on()`.
+abstract final class WsNotificationsEvent {
+  WsNotificationsEvent._();
+
+  // ── Server → Client ────────────────────────────────
+
+  /// A new notification was pushed to the user
+  static const newNotification = 'new_notification';
+
+  /// The unread notification count changed (after new notification or mark-read)
+  static const unreadCount = 'unread_count';
+
+  /// A system-wide broadcast was sent (admin-facing)
+  static const broadcastSent = 'broadcast_sent';
+}
+

@@ -64,6 +64,62 @@ class CodeConfirmationPageKeys {
 class HomePageKeys {
   final searchField = const Key('homeSearchField');
   final cartButton = const Key('homeCartButton');
+  final recommendationsViewAll = const Key('homeRecommendationsViewAll');
+  final recentActivityViewAll = const Key('homeRecentActivityViewAll');
+  final specialistsViewAll = const Key('homeSpecialistsViewAll');
+  final premiumTreatmentsViewAll = const Key('homePremiumTreatmentsViewAll');
+  final bookAppointmentAction = const Key('homeBookAppointmentAction');
+  final aiAssistantAction = const Key('homeAiAssistantAction');
+
+  Key sectionCard(String section, String id) =>
+      ValueKey('homeSectionCard-$section-$id');
+}
+
+// --- Clinic / Employee / Booking ---
+
+class ClinicPageKeys {
+  Key tab(String tab) => ValueKey('clinicTab-$tab');
+  final followButton = const Key('clinicFollowButton');
+  final searchField = const Key('clinicProductSearchField');
+  final sortButton = const Key('clinicProductSortButton');
+  final specialistsSection = const Key('clinicSpecialistsSection');
+
+  Key sortOption(String label) => ValueKey('clinicProductSort-$label');
+}
+
+class EmployeePageKeys {
+  final bookButton = const Key('employeeBookButton');
+  final certificatesSection = const Key('employeeCertificatesSection');
+  final reviewsSection = const Key('employeeReviewsSection');
+
+  Key serviceBookButton(String serviceId) =>
+      ValueKey('employeeBookButton-$serviceId');
+}
+
+class BookingPageKeys {
+  final continueButton = const Key('bookingContinueButton');
+  final addToCartButton = const Key('bookingAddToCartButton');
+  final summaryConfirmButton = const Key('bookingSummaryConfirmButton');
+
+  Key categoryTile(String categoryId) =>
+      ValueKey('bookingCategoryTile-$categoryId');
+
+  Key serviceTile(String serviceId) =>
+      ValueKey('bookingServiceTile-$serviceId');
+
+  Key specialistTile(String employeeId) =>
+      ValueKey('bookingSpecialistTile-$employeeId');
+
+  Key timeSlot(String label) => ValueKey('bookingTimeSlot-$label');
+}
+
+class ReviewPageKeys {
+  final submitButton = const Key('reviewSubmitButton');
+  final treatmentRating = const Key('reviewTreatmentRating');
+  final specialistRating = const Key('reviewSpecialistRating');
+  final facilityRating = const Key('reviewFacilityRating');
+
+  Key star(int value) => ValueKey('reviewStar-$value');
 }
 
 // --- AI Health Assistant Chat ---
@@ -92,7 +148,13 @@ class CartPageKeys {
 
   Key itemSelection(String itemId) => ValueKey('cartItemSelection-$itemId');
 
+  Key itemSelectionByService(String serviceName) =>
+      ValueKey('cartItemSelectionService-$serviceName');
+
   Key voucherSelector(String itemId) => ValueKey('cartVoucherSelector-$itemId');
+
+  Key voucherSelectorByService(String serviceName) =>
+      ValueKey('cartVoucherSelectorService-$serviceName');
 
   Key voucherTile(String code) => ValueKey('cartVoucherTile-$code');
 }
@@ -117,6 +179,9 @@ class LogoutDialogKeys {
 
 class NotificationsPageKeys {
   final notificationsList = const Key('notificationsList');
+  final markAllReadButton = const Key('notificationsMarkAllReadButton');
+
+  Key card(String id) => ValueKey('notificationCard-$id');
 }
 
 // --- Bottom Navigation ---
@@ -140,6 +205,10 @@ class Keys {
   final emailFormPage = EmailFormPageKeys();
   final codeConfirmationPage = CodeConfirmationPageKeys();
   final homePage = HomePageKeys();
+  final clinicPage = ClinicPageKeys();
+  final employeePage = EmployeePageKeys();
+  final bookingPage = BookingPageKeys();
+  final reviewPage = ReviewPageKeys();
   final chatScreen = ChatScreenKeys();
   final checkoutPage = CheckoutPageKeys();
   final cartPage = CartPageKeys();

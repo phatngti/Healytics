@@ -35,8 +35,7 @@ export class SlotsController {
    */
   @Post('check-duplicate')
   @ApiOperation({
-    summary:
-      'Check if the user already has a booking at the same datetime',
+    summary: 'Check if the user already has a booking at the same datetime',
   })
   @ApiOkResponse({ type: CheckDuplicateSlotResponseDto })
   async checkDuplicateSlot(

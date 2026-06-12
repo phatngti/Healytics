@@ -48,8 +48,7 @@ class RecommendedServicesSection extends ConsumerWidget {
                 scrollDirection: Axis.horizontal,
                 clipBehavior: Clip.none,
                 itemCount: services.length,
-                separatorBuilder: (_, __) =>
-                    AppDimens.horizontalMedium,
+                separatorBuilder: (_, __) => AppDimens.horizontalMedium,
                 itemBuilder: (_, index) {
                   final service = services[index];
                   return _ServiceCard(
@@ -163,7 +162,7 @@ class _ServiceCard extends StatelessWidget {
 
             // Rating row
             _RatingRow(
-              rating: service.rating,
+              rating: service.rating > 0 ? service.rating : 5.0,
               reviewLabel: service.reviewLabel,
             ),
             const SizedBox(height: AppDimens.spaceSm),

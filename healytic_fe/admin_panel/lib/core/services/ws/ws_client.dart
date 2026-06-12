@@ -156,6 +156,11 @@ class BookingEventsSocket implements WsNamespaceSocket {
       io.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
+          .enableReconnection()
+          .setReconnectionAttempts(5)
+          .setReconnectionDelay(1000)
+          .setReconnectionDelayMax(10000)
+          .setTimeout(10000)
           .setPath(server.path)
           .setAuth({'token': token})
           .build(),
@@ -177,12 +182,12 @@ class BookingEventsSocket implements WsNamespaceSocket {
     });
 
     _socket!.onConnectError((err) {
-      _log.severe('Connection error: $err');
+      _log.warning('Connection error: $err');
       _updateStatus(WsConnectionStatus.error);
     });
 
     _socket!.onError((err) {
-      _log.severe('Socket error: $err');
+      _log.warning('Socket error: $err');
     });
 
     // ── Server → Client event listeners ─────────────
@@ -319,6 +324,11 @@ class PartnerChatSocket implements WsNamespaceSocket {
       io.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
+          .enableReconnection()
+          .setReconnectionAttempts(5)
+          .setReconnectionDelay(1000)
+          .setReconnectionDelayMax(10000)
+          .setTimeout(10000)
           .setPath(server.path)
           .setAuth({'token': token})
           .build(),
@@ -340,12 +350,12 @@ class PartnerChatSocket implements WsNamespaceSocket {
     });
 
     _socket!.onConnectError((err) {
-      _log.severe('Connection error: $err');
+      _log.warning('Connection error: $err');
       _updateStatus(WsConnectionStatus.error);
     });
 
     _socket!.onError((err) {
-      _log.severe('Socket error: $err');
+      _log.warning('Socket error: $err');
     });
 
     // ── Server → Client event listeners ─────────────
@@ -541,6 +551,11 @@ class ChatNotificationsSocket implements WsNamespaceSocket {
       io.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
+          .enableReconnection()
+          .setReconnectionAttempts(5)
+          .setReconnectionDelay(1000)
+          .setReconnectionDelayMax(10000)
+          .setTimeout(10000)
           .setPath(server.path)
           .setAuth({'token': token})
           .build(),
@@ -562,12 +577,12 @@ class ChatNotificationsSocket implements WsNamespaceSocket {
     });
 
     _socket!.onConnectError((err) {
-      _log.severe('Connection error: $err');
+      _log.warning('Connection error: $err');
       _updateStatus(WsConnectionStatus.error);
     });
 
     _socket!.onError((err) {
-      _log.severe('Socket error: $err');
+      _log.warning('Socket error: $err');
     });
 
     // ── Server → Client event listeners ─────────────

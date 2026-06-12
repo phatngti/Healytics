@@ -1,5 +1,6 @@
 import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:user_app/features/employee/domain/entities/employee_detail.entity.dart';
@@ -33,6 +34,7 @@ class EmployeePracticeDetailsGrid extends StatelessWidget {
           _GridRow(
             spacing: section,
             left: _DetailCard(
+              cardKey: keys.employeePage.certificatesSection,
               icon: Symbols.description,
               iconColor: colorScheme.tertiary,
               iconBgColor: colorScheme.tertiaryContainer.withValues(alpha: 0.4),
@@ -40,6 +42,7 @@ class EmployeePracticeDetailsGrid extends StatelessWidget {
               onTap: () => _openCertificates(context),
             ),
             right: _DetailCard(
+              cardKey: keys.employeePage.reviewsSection,
               icon: Symbols.star_rate,
               iconColor: colorScheme.secondaryContainer,
               iconBgColor: colorScheme.secondary.withValues(alpha: 0.1),
@@ -110,6 +113,7 @@ class _DetailCard extends StatelessWidget {
     required this.iconColor,
     required this.iconBgColor,
     required this.label,
+    this.cardKey,
     // ignore: unused_element_parameter
     this.subtitle,
     this.onTap,
@@ -119,6 +123,7 @@ class _DetailCard extends StatelessWidget {
   final Color iconColor;
   final Color iconBgColor;
   final String label;
+  final Key? cardKey;
   final String? subtitle;
   final VoidCallback? onTap;
 
@@ -129,6 +134,7 @@ class _DetailCard extends StatelessWidget {
     final radius = AppDimens.cardRadius(context);
 
     return Semantics(
+      key: cardKey,
       button: onTap != null,
       label: label,
       child: Material(

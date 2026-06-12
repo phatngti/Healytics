@@ -8,12 +8,18 @@ import { PaginationMetaResponseDto } from './pagination-meta-response.dto';
  * Wraps data array + pagination metadata.
  */
 export class PaginatedEmployeeAppointmentsResponseDto {
-  @ApiProperty({ type: [EmployeeAppointmentResponseDto], description: 'List of appointments' })
+  @ApiProperty({
+    type: [EmployeeAppointmentResponseDto],
+    description: 'List of appointments',
+  })
   @Type(() => EmployeeAppointmentResponseDto)
   @Expose()
   data: EmployeeAppointmentResponseDto[];
 
-  @ApiProperty({ type: () => PaginationMetaResponseDto, description: 'Pagination metadata' })
+  @ApiProperty({
+    type: () => PaginationMetaResponseDto,
+    description: 'Pagination metadata',
+  })
   @Type(() => PaginationMetaResponseDto)
   @Expose()
   meta: PaginationMetaResponseDto;

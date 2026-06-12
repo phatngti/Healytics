@@ -17,7 +17,7 @@ export class AiServiceController {
   constructor(private readonly aiServiceService: AiServiceService) {}
 
   @Post()
-    @LogResponse()
+  @LogResponse()
   @ApiExcludeEndpoint()
   getRecommendations(
     @Body() dto: AiRecommendationsRequestDto,

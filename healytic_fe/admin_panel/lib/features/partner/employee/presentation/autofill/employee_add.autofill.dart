@@ -23,6 +23,8 @@ abstract final class EmployeeAddAutofill {
       'Gemini_Generated_Image_86fd6v86fd6v86fd'
       '-Photoroom.png';
 
+  static const password = 'Password123!';
+
   /// Returns the autofill map for the given
   /// [role] and optional [therapistType].
   ///
@@ -55,6 +57,7 @@ abstract final class EmployeeAddAutofill {
     EmployeeFormField.firstName.key: 'Nguyen',
     EmployeeFormField.lastName.key: 'Thi Lan',
     EmployeeFormField.emailAddress.key: 'lan.therapist@healytics.dev',
+    EmployeeFormField.password.key: password,
     EmployeeFormField.phoneNumber.key: '0901234567',
     EmployeeFormField.dateOfBirth.key: DateTime(1995, 6, 15),
     EmployeeFormField.gender.key: EmployeeGender.female.displayName,
@@ -121,6 +124,7 @@ abstract final class EmployeeAddAutofill {
     EmployeeFormField.firstName.key: 'Le',
     EmployeeFormField.lastName.key: 'Van Huy',
     EmployeeFormField.emailAddress.key: 'huy.massage@healytics.dev',
+    EmployeeFormField.password.key: password,
     EmployeeFormField.phoneNumber.key: '0908765432',
     EmployeeFormField.dateOfBirth.key: DateTime(1993, 9, 5),
     EmployeeFormField.gender.key: EmployeeGender.male.displayName,
@@ -190,6 +194,7 @@ abstract final class EmployeeAddAutofill {
     EmployeeFormField.firstName.key: 'Tran',
     EmployeeFormField.lastName.key: 'Minh Duc',
     EmployeeFormField.emailAddress.key: 'duc.doctor@healytics.dev',
+    EmployeeFormField.password.key: password,
     EmployeeFormField.phoneNumber.key: '0987654321',
     EmployeeFormField.dateOfBirth.key: DateTime(1988, 3, 22),
     EmployeeFormField.gender.key: EmployeeGender.male.displayName,

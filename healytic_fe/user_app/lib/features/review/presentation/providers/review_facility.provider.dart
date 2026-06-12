@@ -7,6 +7,8 @@ import 'package:user_app/features/review/'
 import 'package:user_app/features/review/domain/'
     'entities/facility_review.entity.dart';
 
+import 'review_rating_defaults.dart';
+
 part 'review_facility.provider.freezed.dart';
 part 'review_facility.provider.g.dart';
 
@@ -16,8 +18,8 @@ part 'review_facility.provider.g.dart';
 @freezed
 abstract class ReviewFacilityState with _$ReviewFacilityState {
   const factory ReviewFacilityState({
-    /// Star rating (0 = unset, 1–5).
-    @Default(0) int rating,
+    /// Star rating (1–5).
+    @Default(defaultReviewRating) int rating,
 
     /// Optional free-text comment.
     @Default('') String comment,

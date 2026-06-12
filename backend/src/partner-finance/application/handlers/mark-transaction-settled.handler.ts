@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { PartnerLedgerTransaction } from '@/common/entities/partner-ledger-transaction.entity';
 import { PartnerTransactionTimeline } from '@/common/entities/partner-transaction-timeline.entity';
@@ -69,7 +74,8 @@ export class MarkTransactionSettledHandler {
         transactionId: txn.id,
         partnerId,
         title: `Settlement marked: ${dto.settlementStatus}`,
-        description: dto.note ?? `Settlement status changed to ${dto.settlementStatus}`,
+        description:
+          dto.note ?? `Settlement status changed to ${dto.settlementStatus}`,
         occurredAt: new Date(),
         actorAccountId: accountId,
       });
@@ -79,16 +85,23 @@ export class MarkTransactionSettledHandler {
       this.logger.log(`Settlement updated for txn: ${transactionId}`);
 
       // Reload with relations
-      const updated = await this.dataSource.manager.findOne(PartnerLedgerTransaction, {
-        where: { id: transactionId },
-        relations: ['timelineEvents'],
-      });
+      const updated = await this.dataSource.manager.findOne(
+        PartnerLedgerTransaction,
+        {
+          where: { id: transactionId },
+          relations: ['timelineEvents'],
+        },
+      );
 
       return PartnerTransactionRecordDto.fromEntity(updated!);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(`Settlement failed: ${error.message}`, error.stack);
-      if (error instanceof NotFoundException || error instanceof ConflictException) throw error;
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ConflictException
+      )
+        throw error;
       throw error;
     } finally {
       await queryRunner.release();

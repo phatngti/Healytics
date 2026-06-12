@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ReviewTreatmentState {
 
-/// Star rating (0 = unset, 1–5).
+/// Star rating (1–5).
  int get rating;/// Optional free-text comment.
  String get comment;/// Currently selected feedback tags.
  List<String> get selectedTags;/// Local file paths of selected photos.
@@ -222,10 +222,10 @@ return $default(_that.rating,_that.comment,_that.selectedTags,_that.photoPaths,_
 
 
 class _ReviewTreatmentState implements ReviewTreatmentState {
-  const _ReviewTreatmentState({this.rating = 0, this.comment = '', final  List<String> selectedTags = const [], final  List<String> photoPaths = const [], this.isSubmitting = false, this.isSubmitted = false, this.appointment, this.errorMessage}): _selectedTags = selectedTags,_photoPaths = photoPaths;
+  const _ReviewTreatmentState({this.rating = defaultReviewRating, this.comment = '', final  List<String> selectedTags = const [], final  List<String> photoPaths = const [], this.isSubmitting = false, this.isSubmitted = false, this.appointment, this.errorMessage}): _selectedTags = selectedTags,_photoPaths = photoPaths;
   
 
-/// Star rating (0 = unset, 1–5).
+/// Star rating (1–5).
 @override@JsonKey() final  int rating;
 /// Optional free-text comment.
 @override@JsonKey() final  String comment;

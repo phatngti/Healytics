@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:common/widgets/images/avatar.dart';
 import 'package:intl/intl.dart';
 
 import 'package:user_app/features/partner_chat/domain/entities/partner_chat_message.entity.dart';
@@ -125,19 +126,10 @@ class _ReceivedBubble extends StatelessWidget {
             // Partner avatar
             Padding(
               padding: EdgeInsets.only(bottom: AppDimens.spaceMd),
-              child: CircleAvatar(
+              child: AvatarImage(
+                name: message.senderName ?? 'Partner',
+                imageUrl: message.senderAvatar,
                 radius: 16,
-                backgroundColor: colorScheme.primaryContainer,
-                backgroundImage: message.senderAvatar != null
-                    ? NetworkImage(message.senderAvatar!)
-                    : null,
-                child: message.senderAvatar == null
-                    ? Icon(
-                        Icons.storefront_rounded,
-                        size: 14,
-                        color: colorScheme.onPrimaryContainer,
-                      )
-                    : null,
               ),
             ),
             SizedBox(width: AppDimens.spaceXs),
@@ -218,11 +210,7 @@ class _StatusIcon extends StatelessWidget {
     }
 
     if (message.isRead) {
-      return Icon(
-        Icons.done_all_rounded,
-        size: 14,
-        color: colorScheme.primary,
-      );
+      return Icon(Icons.done_all_rounded, size: 14, color: colorScheme.primary);
     }
 
     return Icon(

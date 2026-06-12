@@ -1,9 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import { BusinessType } from '@/partners/enum/business-type.enum';
-import {
-  PartnerVerificationStatus,
-} from '@/partners/enum/partner-verification-status.enum';
+import { PartnerVerificationStatus } from '@/partners/enum/partner-verification-status.enum';
 import { PartnerPriority } from './admin-partner-detail-response.dto';
 
 /**

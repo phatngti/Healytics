@@ -2,6 +2,7 @@ import 'package:common/utils/demensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/clinic_info/domain/entities/clinic_product.entity.dart';
 import 'package:user_app/features/clinic_info/presentation/providers/clinic_products.provider.dart';
 import 'package:user_app/features/clinic_info/presentation/widgets/clinic_products/product_filter_sheet.widget.dart';
@@ -89,6 +90,7 @@ class _SortButton extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Semantics(
+      key: keys.clinicPage.sortOption(label),
       button: true,
       selected: isActive,
       label: '$label sort',

@@ -36,6 +36,7 @@ import {
 import { ChatNotificationGateway } from './chat-notification.gateway';
 import { NotificationEventService } from '@/notification/services/notification-event.service';
 import { NotificationType } from '@/notification/enums/notification-type.enum';
+import { ObservabilityMetricsService } from '@/observability/observability-metrics.service';
 
 /**
  * WebSocket gateway for the **User** (patient) side of the chat.
@@ -105,6 +106,7 @@ export class UserChatGateway
     private readonly accountService: AccountService,
     private readonly chatNotificationGateway: ChatNotificationGateway,
     private readonly notificationEventService: NotificationEventService,
+    private readonly observabilityMetrics: ObservabilityMetricsService,
   ) {}
 
   // ── Lifecycle ────────────────────────────────────────────────
@@ -112,12 +114,19 @@ export class UserChatGateway
   afterInit(server: Namespace) {
     server.use(WsJwtAuthMiddleware(this.jwtService, this.accountService));
     server.use(WsRoleMiddleware([Role.USER]));
+    this.observabilityMetrics.registerWsNamespace('user-chat', server);
     this.chatService.setUserServer(server);
     this.logger.log('UserChatGateway initialized on /user-chat');
   }
 
   async handleConnection(client: Socket) {
     const user = client.data.user;
+    this.observabilityMetrics.recordWsConnect(
+      client.id,
+      'user-chat',
+      user.role,
+      user.id,
+    );
     this.logger.log(
       `[WS Connected] user=${user.email} userId=${user.id} socketId=${client.id} transport=${client.conn?.transport?.name ?? 'unknown'}`,
     );
@@ -159,6 +168,7 @@ export class UserChatGateway
 
   handleDisconnect(client: Socket) {
     const user = client.data.user;
+    this.observabilityMetrics.recordWsDisconnect(client.id, 'user-chat');
     this.logger.log(
       `[WS Disconnected] user=${user?.email ?? 'unknown'} userId=${user?.id ?? 'N/A'} socketId=${client.id}`,
     );

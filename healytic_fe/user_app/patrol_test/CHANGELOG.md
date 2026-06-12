@@ -5,6 +5,30 @@
 
 ---
 
+## [2026-05-20] — Dual-Lane E2E Upgrade
+
+### Added
+
+| File | Test Case | Description |
+|------|-----------|-------------|
+| `auth_password_reset_test.dart` | Password reset | Covers forgot-password validation and real-backend reset with fixed test code |
+| `booking_test.dart` | Booking entry | Opens booking from home quick action and verifies category/service selection routing |
+| `fixtures/scenarios/password_reset_seed.json` | — | Adds deterministic reset-account scenario |
+
+### Modified
+
+| File | Test Case | Description |
+|------|-----------|-------------|
+| `fixtures/test_fixtures.json` | — | Adds `passwordReset` config and scenario mapping |
+| `fixtures/scenarios/*_seed.json` | — | Adds employee schedules for real booking/time-slot coverage and completed order seed for review flow |
+| `helpers/backend_backdoor_helper.dart` | — | Sends raw JSON payloads so backend seed fields are not dropped by stale generated DTOs |
+| `home_test.dart` | Home view all | Adds route checks for all home view-all actions |
+| `notifications_test.dart` | Notifications | Adds seeded item, mark-one-read, and mark-all-read coverage |
+| `cart_test.dart`, `checkout_test.dart`, `orders_test.dart` | Real backend lane | Replaces mock-only skips with real-scenario assertions where deterministic seeds exist |
+| `../lib/core/keys/integration_test_keys.dart` | — | Adds selectors for home, clinic, employee, booking, review, cart, and notification flows |
+
+---
+
 ## [2026-03-14] — Initial Setup
 
 ### Added
@@ -12,7 +36,7 @@
 | File | Test Case | Description |
 |------|-----------|-------------|
 | `fixtures/dev_fixtures.json` | — | DEV environment seed data (mock credentials, orders, conversations, services) |
-| `fixtures/uat_fixtures.json` | — | UAT environment template (fill in real test account) |
+| `fixtures/test_fixtures.json` | — | TEST environment seeded-backend configuration |
 | `README.md` | — | Guide for creating, running, and managing tests |
 | `config/test_config.dart` | — | Env-aware fixture loader with typed accessors |
 | `common.dart` | — | Patrol-compatible app bootstrap (no binding, no runApp, no error handler) |

@@ -58,7 +58,10 @@ export class CartService {
     return CartItemResponseDto.fromEntities(items, availabilityMap);
   }
 
-  async addItem(userId: string, dto: AddToCartDto): Promise<CartItemResponseDto> {
+  async addItem(
+    userId: string,
+    dto: AddToCartDto,
+  ): Promise<CartItemResponseDto> {
     const created = await this.addCartItemHandler.execute(userId, dto);
     return CartItemResponseDto.fromEntity(created);
   }

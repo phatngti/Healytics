@@ -12,7 +12,11 @@ export class MarkSettlementDto {
   @IsEnum(PartnerSettlementStatus)
   settlementStatus: PartnerSettlementStatus;
 
-  @ApiPropertyOptional({ type: String, description: 'Audit note', example: 'Finance manager confirmed manual settlement.' })
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Audit note',
+    example: 'Finance manager confirmed manual settlement.',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(1000)

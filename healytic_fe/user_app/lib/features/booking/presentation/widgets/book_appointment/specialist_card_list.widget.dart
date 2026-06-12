@@ -3,6 +3,7 @@ import 'package:common/widgets/images/network_image_auto.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import '../../../domain/entities/booking.entity.dart';
 
 /// Horizontal scrollable list of specialist cards with
@@ -32,22 +33,17 @@ class SpecialistCardList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final cardWidth = AppDimens.widthFraction(
-      context,
-      fraction: 0.4,
-    );
+    final cardWidth = AppDimens.widthFraction(context, fraction: 0.4);
 
     return Column(
       children: [
         // Header row
         Row(
-          mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               'Select Specialist',
-              style: theme.textTheme.titleSmall
-                  ?.copyWith(
+              style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -58,9 +54,7 @@ class SpecialistCardList extends StatelessWidget {
                 },
                 child: Text(
                   'See all',
-                  style: theme
-                      .textTheme.labelSmall
-                      ?.copyWith(
+                  style: theme.textTheme.labelSmall?.copyWith(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.w600,
                   ),
@@ -76,27 +70,21 @@ class SpecialistCardList extends StatelessWidget {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: specialists.length,
-            separatorBuilder: (_, __) =>
-                SizedBox(
-              width: AppDimens.spaceMd,
-            ),
+            separatorBuilder: (_, __) => SizedBox(width: AppDimens.spaceMd),
             itemBuilder: (context, index) {
-              final isSelected =
-                  index == selectedIndex;
-              final isDimmed =
-                  isLocked && !isSelected;
+              final isSelected = index == selectedIndex;
+              final isDimmed = isLocked && !isSelected;
 
               return Opacity(
                 opacity: isDimmed ? 0.4 : 1.0,
                 child: IgnorePointer(
                   ignoring: isDimmed,
                   child: _SpecialistCard(
-                    specialist:
-                        specialists[index],
+                    key: keys.bookingPage.specialistTile(specialists[index].id),
+                    specialist: specialists[index],
                     isSelected: isSelected,
                     width: cardWidth,
-                    onTap: () =>
-                        onSelected(index),
+                    onTap: () => onSelected(index),
                   ),
                 ),
               );
@@ -110,6 +98,7 @@ class SpecialistCardList extends StatelessWidget {
 
 class _SpecialistCard extends StatelessWidget {
   const _SpecialistCard({
+    super.key,
     required this.specialist,
     required this.isSelected,
     required this.width,
@@ -228,50 +217,32 @@ class _SpecialistCard extends StatelessWidget {
 /// Falls back to a person icon when [avatarUrl]
 /// is null or the image fails to load.
 class _SpecialistAvatar extends StatelessWidget {
-  const _SpecialistAvatar({
-    this.avatarUrl,
-    required this.isSelected,
-  });
+  const _SpecialistAvatar({this.avatarUrl, required this.isSelected});
 
   final String? avatarUrl;
   final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final hasUrl =
-        avatarUrl != null &&
-        avatarUrl!.isNotEmpty;
+    final colorScheme = Theme.of(context).colorScheme;
+    final hasUrl = avatarUrl != null && avatarUrl!.isNotEmpty;
 
     return Container(
       decoration: BoxDecoration(
         color: isSelected
-            ? colorScheme
-                .surfaceContainerHighest
-            : colorScheme
-                .surfaceContainerHighest
-                .withValues(alpha: 0.7),
-        borderRadius:
-            AppDimens.radiusMediumSmall,
+            ? colorScheme.surfaceContainerHighest
+            : colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
+        borderRadius: AppDimens.radiusMediumSmall,
       ),
       clipBehavior: Clip.antiAlias,
       child: hasUrl
           ? NetworkImageAuto(
               imageUrl: avatarUrl!,
               fit: BoxFit.cover,
-              placeholder: (_) =>
-                  _AvatarFallback(
-                isSelected: isSelected,
-              ),
-              errorWidget: (_) =>
-                  _AvatarFallback(
-                isSelected: isSelected,
-              ),
+              placeholder: (_) => _AvatarFallback(isSelected: isSelected),
+              errorWidget: (_) => _AvatarFallback(isSelected: isSelected),
             )
-          : _AvatarFallback(
-              isSelected: isSelected,
-            ),
+          : _AvatarFallback(isSelected: isSelected),
     );
   }
 }

@@ -24,7 +24,10 @@ export class DashboardStatsResponseDto {
   @Expose()
   totalRevenue: number;
 
-  @ApiProperty({ example: 12.5, description: 'Revenue growth % vs previous period' })
+  @ApiProperty({
+    example: 12.5,
+    description: 'Revenue growth % vs previous period',
+  })
   @Expose()
   revenueGrowthPercent: number;
 

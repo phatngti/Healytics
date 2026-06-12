@@ -1,5 +1,9 @@
 import { Get, Post, Body } from '@nestjs/common';
-import { ApiOperation, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiCreatedResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { AdminApi } from '@/common/decorators/api/admin-api.decorator';
 import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import { NotificationService } from './notification.service';
@@ -15,7 +19,9 @@ export class AdminNotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   @Post('broadcast')
-  @ApiOperation({ summary: 'Create and send a system-wide broadcast notification' })
+  @ApiOperation({
+    summary: 'Create and send a system-wide broadcast notification',
+  })
   @ApiCreatedResponse({
     description: 'Broadcast created and pushed to all users',
     type: NotificationResponseDto,

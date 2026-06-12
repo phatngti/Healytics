@@ -26,7 +26,7 @@ final class ActiveChatConversationIdProvider
         argument: null,
         retry: null,
         name: r'activeChatConversationIdProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,7 +48,7 @@ final class ActiveChatConversationIdProvider
 }
 
 String _$activeChatConversationIdHash() =>
-    r'0bf3079f6aa24bde7f30478af88adcbf1bde5706';
+    r'f553575d7df0bc79abc6f44f3899465a934be8d9';
 
 /// Tracks which conversation is currently visible
 /// so inline toasts can be suppressed for it.

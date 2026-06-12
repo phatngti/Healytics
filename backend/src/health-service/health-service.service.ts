@@ -72,12 +72,8 @@ export class HealthServiceService {
     accountId: string,
     period: DashboardTimePeriod,
   ): Promise<HealthServiceOverviewAnalyticsResponseDto> {
-    const partnerId =
-      await this.resolvePartnerId(accountId);
-    return this.getOverviewAnalyticsHandler.execute(
-      partnerId,
-      period,
-    );
+    const partnerId = await this.resolvePartnerId(accountId);
+    return this.getOverviewAnalyticsHandler.execute(partnerId, period);
   }
 
   /**
@@ -89,21 +85,13 @@ export class HealthServiceService {
     productId: string,
     period: DashboardTimePeriod,
   ): Promise<HealthServiceDetailAnalyticsResponseDto> {
-    const partnerId =
-      await this.resolvePartnerId(accountId);
-    return this.getDetailAnalyticsHandler.execute(
-      partnerId,
-      productId,
-      period,
-    );
+    const partnerId = await this.resolvePartnerId(accountId);
+    return this.getDetailAnalyticsHandler.execute(partnerId, productId, period);
   }
 
   /** Resolves partner ID from the JWT account ID. */
-  private async resolvePartnerId(
-    accountId: string,
-  ): Promise<string> {
-    const partner = await this.partnersService
-      .getPartnerProfile(accountId);
+  private async resolvePartnerId(accountId: string): Promise<string> {
+    const partner = await this.partnersService.getPartnerProfile(accountId);
     return partner.id;
   }
 
@@ -477,16 +465,12 @@ export class HealthServiceService {
    * Aggregates employees, products, and ratings into
    * the clinic info response.
    */
-  async getClinicInfo(
-    partnerId: string,
-  ): Promise<PublicClinicInfoResponseDto> {
+  async getClinicInfo(partnerId: string): Promise<PublicClinicInfoResponseDto> {
     const partner = await this.partnersService.findOneById(partnerId);
 
     if (!partner) {
       this.logger.warn(`Partner not found for clinic info: ${partnerId}`);
-      throw new NotFoundException(
-        `Clinic with ID ${partnerId} not found`,
-      );
+      throw new NotFoundException(`Clinic with ID ${partnerId} not found`);
     }
 
     const products = await this.productRepository.find({
@@ -503,9 +487,7 @@ export class HealthServiceService {
         take: 10,
       });
 
-    const ratingsMap = await this.buildRatingsMap(
-      products.map((p) => p.id),
-    );
+    const ratingsMap = await this.buildRatingsMap(products.map((p) => p.id));
 
     return PublicClinicInfoResponseDto.fromPartner(
       partner,

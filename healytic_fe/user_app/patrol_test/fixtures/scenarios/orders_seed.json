@@ -31,7 +31,33 @@
       "partnerKey": "spa_partner",
       "employeeCode": "PATROL-ORDER-DR",
       "displayName": "Dr. Nguyen Van A",
-      "role": "DOCTOR"
+      "role": "DOCTOR",
+      "schedule": [
+        {
+          "day": "Wednesday",
+          "start": "08:00",
+          "end": "17:00",
+          "isWorking": true
+        },
+        {
+          "day": "Thursday",
+          "start": "08:00",
+          "end": "17:00",
+          "isWorking": true
+        },
+        {
+          "day": "Friday",
+          "start": "08:00",
+          "end": "17:00",
+          "isWorking": true
+        },
+        {
+          "day": "Saturday",
+          "start": "08:00",
+          "end": "17:00",
+          "isWorking": true
+        }
+      ]
     }
   ],
   "services": [
@@ -43,6 +69,17 @@
       "name": "Swedish Relax",
       "slug": "swedish-relax",
       "price": 500000,
+      "durationMinutes": 60,
+      "vendorName": "Spa An Nhien"
+    },
+    {
+      "key": "posture_correction",
+      "partnerKey": "spa_partner",
+      "employeeKeys": ["doctor_a"],
+      "categoryName": "Spa",
+      "name": "Posture Correction",
+      "slug": "posture-correction",
+      "price": 900000,
       "durationMinutes": 60,
       "vendorName": "Spa An Nhien"
     },
@@ -75,6 +112,14 @@
       "employeeKey": "doctor_a",
       "startsAt": "2026-05-23T14:00:00+07:00",
       "status": "CONFIRMED"
+    },
+    {
+      "key": "booking_completed",
+      "userKey": "main_user",
+      "serviceKey": "posture_correction",
+      "employeeKey": "doctor_a",
+      "startsAt": "2026-05-18T09:00:00+07:00",
+      "status": "COMPLETED"
     }
   ]
 }

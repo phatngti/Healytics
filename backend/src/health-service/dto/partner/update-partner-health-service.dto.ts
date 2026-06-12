@@ -69,7 +69,10 @@ export class UpdatePartnerHealthServiceDto {
   @MaxLength(255)
   slug?: string;
 
-  @ApiPropertyOptional({ enum: HealthServiceType, enumName: 'HealthServiceType' })
+  @ApiPropertyOptional({
+    enum: HealthServiceType,
+    enumName: 'HealthServiceType',
+  })
   @IsOptional()
   @IsEnum(HealthServiceType)
   type?: HealthServiceType;
@@ -107,7 +110,8 @@ export class UpdatePartnerHealthServiceDto {
   @ApiPropertyOptional({
     type: [String],
     nullable: true,
-    description: 'Feature tag IDs to associate with this service (full replacement)',
+    description:
+      'Feature tag IDs to associate with this service (full replacement)',
   })
   @IsOptional()
   @IsArray()

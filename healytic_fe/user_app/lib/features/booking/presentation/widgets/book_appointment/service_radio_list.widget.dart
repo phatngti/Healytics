@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import '../../../domain/entities/booking.entity.dart';
 
 /// Vertical list of radio-style service cards.
@@ -32,6 +33,7 @@ class ServiceRadioList extends StatelessWidget {
             bottom: i < services.length - 1 ? AppDimens.spaceMd : 0,
           ),
           child: _ServiceRadioCard(
+            key: keys.bookingPage.serviceTile(services[i].id),
             service: services[i],
             isSelected: i == selectedIndex,
             onTap: () => onSelected(i),
@@ -44,6 +46,7 @@ class ServiceRadioList extends StatelessWidget {
 
 class _ServiceRadioCard extends StatelessWidget {
   const _ServiceRadioCard({
+    super.key,
     required this.service,
     required this.isSelected,
     required this.onTap,

@@ -207,7 +207,9 @@ export class ProcessCheckoutHandler {
       await this.logWriter.write(queryRunner.manager, {
         bookingId: savedBooking.id,
         fromStatus: null,
-        toStatus: isPayLater ? BookingStatus.CONFIRMED : BookingStatus.PENDING_PAYMENT,
+        toStatus: isPayLater
+          ? BookingStatus.CONFIRMED
+          : BookingStatus.PENDING_PAYMENT,
         changedBy: 'system',
         reasonCode: isPayLater
           ? BookingStatusReasonCode.CHECKOUT_CREATED_CONFIRMED
@@ -224,9 +226,7 @@ export class ProcessCheckoutHandler {
       });
 
       await queryRunner.commitTransaction();
-      this.logger.log(
-        `Booking created: ${savedBooking.id} for ${msgContext}`,
-      );
+      this.logger.log(`Booking created: ${savedBooking.id} for ${msgContext}`);
 
       // Notify webhook (fire-and-forget, outside transaction)
       const webhookPayload: WebhookPayload = isPayLater
@@ -252,30 +252,30 @@ export class ProcessCheckoutHandler {
           };
       await this.webhookService.notify(data.webhookUrl ?? null, webhookPayload);
 
-      // Send booking confirmation notification (fire-and-forget, outside transaction)
-      try {
-        this.notificationEventService.emit({
-          type: NotificationType.BOOKING_CONFIRMED,
-          recipientId: data.userId,
-          title: 'Booking Confirmed! 🎉',
-          body: isPayLater
-            ? (serviceName
-                ? `Your booking for "${serviceName}" on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Payment is due at the clinic.`
-                : `Your booking on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Payment is due at the clinic.`)
-            : (serviceName
-                ? `Your booking for "${serviceName}" on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`
-                : `Your booking on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Please complete your payment.`),
-          data: {
-            bookingId: savedBooking.id,
-            action: 'view_booking',
-          },
-        });
-      } catch (notifError) {
-        this.logger.error(
-          `RabbitMQ notification emit failed — ${msgContext}, bookingId=${savedBooking.id}, notificationType=${NotificationType.BOOKING_CONFIRMED}`,
-          notifError.stack,
-        );
-        // Don't throw — booking is already committed
+      // Send booking confirmation notification ONLY for pay-later flow.
+      // For payment flows (MoMo/Stripe), the notification is sent by
+      // the payment gateway after payment confirmation (IPN/webhook).
+      if (isPayLater) {
+        try {
+          this.notificationEventService.emit({
+            type: NotificationType.BOOKING_CONFIRMED,
+            recipientId: data.userId,
+            title: 'Booking Confirmed! 🎉',
+            body: serviceName
+              ? `Your booking for "${serviceName}" on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Payment is due at the clinic.`
+              : `Your booking on ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} has been confirmed. Payment is due at the clinic.`,
+            data: {
+              bookingId: savedBooking.id,
+              action: 'view_booking',
+            },
+          });
+        } catch (notifError) {
+          this.logger.error(
+            `RabbitMQ notification emit failed — ${msgContext}, bookingId=${savedBooking.id}, notificationType=${NotificationType.BOOKING_CONFIRMED}`,
+            notifError.stack,
+          );
+          // Don't throw — booking is already committed
+        }
       }
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -316,9 +316,7 @@ export class ProcessCheckoutHandler {
       );
     }
 
-    this.logger.warn(
-      `Checkout failed: ${msgContext}: ${errorMessage}`,
-    );
+    this.logger.warn(`Checkout failed: ${msgContext}: ${errorMessage}`);
 
     const webhookPayload: WebhookPayload = {
       ticket_id: data.ticketId,

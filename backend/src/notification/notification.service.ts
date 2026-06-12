@@ -69,7 +69,12 @@ export class NotificationService {
       .sendToUser(params.recipientId, {
         title: params.title,
         body: params.body,
-        data: params.data,
+        data: {
+          ...(params.data ?? {}),
+          notificationId: dto.id,
+          notificationType: params.type,
+          type: params.type,
+        },
       })
       .catch((err: unknown) => {
         const message = err instanceof Error ? err.message : String(err);
@@ -106,7 +111,12 @@ export class NotificationService {
         this.pushService.sendBroadcast({
           title,
           body,
-          data: params.data,
+          data: {
+            ...(params.data ?? {}),
+            notificationId: dto.id,
+            notificationType: dto.type,
+            type: dto.type,
+          },
         }),
       )
       .catch((err: unknown) => {

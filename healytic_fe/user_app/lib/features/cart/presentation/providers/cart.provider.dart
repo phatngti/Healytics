@@ -12,10 +12,7 @@ part 'cart.provider.g.dart';
 /// is single-item only for checkout.
 class CartState {
   /// Creates a cart state.
-  const CartState({
-    this.items = const [],
-    this.selectedIds = const {},
-  });
+  const CartState({this.items = const [], this.selectedIds = const {}});
 
   /// All cart items from the backend.
   final List<CartItemEntity> items;
@@ -28,9 +25,7 @@ class CartState {
 
   /// Items currently selected for checkout.
   List<CartItemEntity> get selectedItems =>
-      items
-          .where((i) => selectedIds.contains(i.id))
-          .toList();
+      items.where((i) => selectedIds.contains(i.id)).toList();
 
   /// Number of selected items (0 or 1).
   int get selectedCount => selectedIds.length;
@@ -108,28 +103,27 @@ class CartNotifier extends _$CartNotifier {
   /// with the backend. Rolls back on error.
   Future<void> removeItem(String cartItemId) async {
     final current = state.value;
-    if (current == null) return;
 
-    // Optimistic removal.
-    final rollback = current;
-    state = AsyncData(
-      current.copyWith(
-        items: current.items
-            .where((i) => i.id != cartItemId)
-            .toList(),
-        selectedIds:
-            current.selectedIds.difference({cartItemId}),
-      ),
-    );
+    // Optimistic removal when cart data is loaded.
+    if (current != null) {
+      state = AsyncData(
+        current.copyWith(
+          items: current.items.where((i) => i.id != cartItemId).toList(),
+          selectedIds: current.selectedIds.difference({cartItemId}),
+        ),
+      );
+    }
 
     try {
       final repo = ref.read(cartRepositoryProvider);
       await repo.removeItem(cartItemId);
+      if (current == null && ref.mounted) {
+        ref.invalidateSelf();
+      }
     } catch (e, st) {
       _log.severe('Failed to remove item', e, st);
-      // Rollback on failure.
-      if (ref.mounted) {
-        state = AsyncData(rollback);
+      if (current != null && ref.mounted) {
+        state = AsyncData(current);
       }
       rethrow;
     }
@@ -143,16 +137,11 @@ class CartNotifier extends _$CartNotifier {
     final current = state.value;
     if (current == null) return;
 
-    final isAlreadySelected =
-        current.selectedIds.contains(cartItemId);
+    final isAlreadySelected = current.selectedIds.contains(cartItemId);
 
-    final newIds = isAlreadySelected
-        ? <String>{}
-        : {cartItemId};
+    final newIds = isAlreadySelected ? <String>{} : {cartItemId};
 
-    state = AsyncData(
-      current.copyWith(selectedIds: newIds),
-    );
+    state = AsyncData(current.copyWith(selectedIds: newIds));
   }
 
   /// Applies a coupon code to a specific item.

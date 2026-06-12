@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:user_app/core/utils/form_validators.dart';
 import 'package:user_app/features/profile/data/provider/profile.provider.dart';
@@ -19,7 +16,10 @@ class EditProfileController extends _$EditProfileController {
     required String fullName,
     required String email,
     required String phone,
-    required String location,
+    required String streetAddress,
+    required String provinceId,
+    required String districtId,
+    required String wardId,
   }) async {
     state = const AsyncValue.loading();
 
@@ -42,22 +42,76 @@ class EditProfileController extends _$EditProfileController {
         throw Exception(phoneError);
       }
 
-      // Simulate network request
-      await Future.delayed(const Duration(seconds: 1));
+      final hasAddressInput = [
+        streetAddress,
+        provinceId,
+        districtId,
+        wardId,
+      ].any((value) => value.trim().isNotEmpty);
+      if (hasAddressInput) {
+        final streetError = FormValidators.requiredField(
+          streetAddress,
+          fieldName: 'street address',
+        );
+        if (streetError != null) {
+          throw Exception(streetError);
+        }
+        final provinceError = FormValidators.requiredField(
+          provinceId,
+          fieldName: 'province or city',
+        );
+        if (provinceError != null) {
+          throw Exception(provinceError);
+        }
+        final districtError = FormValidators.requiredField(
+          districtId,
+          fieldName: 'district',
+        );
+        if (districtError != null) {
+          throw Exception(districtError);
+        }
+        final wardError = FormValidators.requiredField(
+          wardId,
+          fieldName: 'ward',
+        );
+        if (wardError != null) {
+          throw Exception(wardError);
+        }
+      }
 
-      // Mock JSON payload output
-      final payload = {
-        'fullName': fullName,
-        'email': email,
-        'phone': phone,
-        'location': location,
-      };
-
-      log('Mock API Payload Reference:');
-      log(const JsonEncoder.withIndent('  ').convert(payload));
+      final repo = ref.read(profileRepositoryProvider);
+      final splitName = _splitFullName(fullName);
+      await repo.updateAccountProfile(
+        firstName: splitName.firstName,
+        lastName: splitName.lastName,
+        phone: phone.trim().isEmpty ? null : phone.trim(),
+      );
+      if (hasAddressInput) {
+        await repo.updateAccountAddress(
+          streetAddress: streetAddress,
+          provinceId: provinceId,
+          districtId: districtId,
+          wardId: wardId,
+        );
+      }
+      ref.invalidate(accountMeProvider);
+      ref.invalidate(accountLocationProvider);
+      ref.invalidate(accountAddressProvider);
     });
 
     return !state.hasError;
+  }
+
+  ({String firstName, String? lastName}) _splitFullName(String fullName) {
+    final parts = fullName
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .toList(growable: false);
+    if (parts.length == 1) {
+      return (firstName: parts.first, lastName: null);
+    }
+    return (firstName: parts.first, lastName: parts.skip(1).join(' '));
   }
 
   /// Uploads avatar via S3 presigned URL.
@@ -68,9 +122,7 @@ class EditProfileController extends _$EditProfileController {
   }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final repo = ref.read(
-        profileRepositoryProvider,
-      );
+      final repo = ref.read(profileRepositoryProvider);
       await repo.uploadAvatar(
         fileName: fileName,
         contentType: contentType,

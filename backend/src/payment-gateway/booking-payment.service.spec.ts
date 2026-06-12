@@ -20,7 +20,8 @@ describe('BookingPaymentService', () => {
 
   beforeEach(async () => {
     bookingRepo = createMockRepository<Booking>();
-    (bookingRepo as MockRepository<Booking> & { manager: unknown }).manager = {};
+    (bookingRepo as MockRepository<Booking> & { manager: unknown }).manager =
+      {};
     productRepo = createMockRepository<Product>();
     logWriter = { write: jest.fn().mockResolvedValue({}) };
 
@@ -145,7 +146,11 @@ describe('BookingPaymentService', () => {
 
   describe('updatePaymentLinks', () => {
     it('should update payment URL and deeplink', async () => {
-      const booking = { id: 'booking-1', paymentUrl: null, paymentDeeplink: null };
+      const booking = {
+        id: 'booking-1',
+        paymentUrl: null,
+        paymentDeeplink: null,
+      };
       bookingRepo.findOne.mockResolvedValue(booking);
       bookingRepo.save.mockResolvedValue(booking);
 

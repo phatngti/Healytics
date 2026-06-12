@@ -99,7 +99,9 @@ describe('NotificationProcessorService', () => {
 
     await service.handleNotificationEvent(payload as any, ctx as any);
 
-    expect(notificationService.createAndPushNotification).not.toHaveBeenCalled();
+    expect(
+      notificationService.createAndPushNotification,
+    ).not.toHaveBeenCalled();
     expect(notificationService.createAndPushBroadcast).not.toHaveBeenCalled();
     expect(ctx.getChannelRef().ack).toHaveBeenCalled();
   });

@@ -184,6 +184,8 @@ class ApiClient {
           return value is DateTime ? value : DateTime.tryParse(value);
         case 'Object':
           return value;
+        case 'AccountAddressDto':
+          return AccountAddressDto.fromJson(value);
         case 'AccountMeResponseDto':
           return AccountMeResponseDto.fromJson(value);
         case 'AccountRequestDto':
@@ -808,6 +810,8 @@ class ApiClient {
           return RefreshTokenRequestDto.fromJson(value);
         case 'RefundCaseActionDto':
           return RefundCaseActionDto.fromJson(value);
+        case 'RegisterAddressDto':
+          return RegisterAddressDto.fromJson(value);
         case 'RegisterDeviceDto':
           return RegisterDeviceDto.fromJson(value);
         case 'RegisterDto':
@@ -874,6 +878,8 @@ class ApiClient {
           return TreatmentReviewResponseDto.fromJson(value);
         case 'UpcomingAppointmentDto':
           return UpcomingAppointmentDto.fromJson(value);
+        case 'UpdateAccountAddressDto':
+          return UpdateAccountAddressDto.fromJson(value);
         case 'UpdateAvatarDto':
           return UpdateAvatarDto.fromJson(value);
         case 'UpdateBookingStatusDto':

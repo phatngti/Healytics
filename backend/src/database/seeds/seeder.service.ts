@@ -666,9 +666,7 @@ export class SeederService {
 
     let hasViolation = false;
     for (const check of checks) {
-      const [{ count }] = (await this.dataSource.query(check.sql)) as Array<{
-        count: number;
-      }>;
+      const [{ count }] = await this.dataSource.query(check.sql);
       const violationCount = Number(count);
       if (violationCount > 0) {
         hasViolation = true;

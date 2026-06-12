@@ -2,6 +2,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { TestBackdoorService } from './test-backdoor.service';
 import { NotificationType } from '@/notification/enums/notification-type.enum';
+import { EmployeeRole } from '@/employees/enum/employee-role.enum';
 
 describe('TestBackdoorService', () => {
   const originalNodeEnv = process.env.NODE_ENV;
@@ -94,6 +95,61 @@ describe('TestBackdoorService', () => {
         title: 'Welcome',
         isRead: true,
         readAt: expect.any(Date),
+      }),
+    );
+  });
+
+  it('seeds employee schedules for booking time-slot scenarios', async () => {
+    process.env.NODE_ENV = 'test';
+    const manager = makeManager();
+    const service = new TestBackdoorService(
+      makeDataSource({
+        database: 'healytics_test',
+        transaction: (callback) => callback(manager),
+      }),
+    );
+
+    const response = await service.seedPayload(
+      {
+        partners: [
+          {
+            key: 'spa_partner',
+            brandName: 'Patrol Spa',
+          },
+        ],
+        employees: [
+          {
+            key: 'doctor_a',
+            partnerKey: 'spa_partner',
+            displayName: 'Dr. Patrol',
+            role: EmployeeRole.DOCTOR,
+            schedule: [
+              {
+                day: 'Wednesday',
+                start: '08:00',
+                end: '17:00',
+                isWorking: true,
+              },
+            ],
+          },
+        ],
+      },
+      'booking',
+    );
+
+    expect(response.ok).toBe(true);
+    expect(response.ids.employees.doctor_a).toBeDefined();
+    expect(manager.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fullName: 'Dr. Patrol',
+        schedule: [
+          {
+            day: 'Wednesday',
+            start: '08:00',
+            end: '17:00',
+            isWorking: true,
+          },
+        ],
       }),
     );
   });

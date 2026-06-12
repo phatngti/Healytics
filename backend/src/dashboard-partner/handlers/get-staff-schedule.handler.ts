@@ -63,8 +63,7 @@ export class GetStaffScheduleHandler {
         ? new Date(row.end_time).toISOString()
         : dto.startTime;
       dto.serviceName = row.service_name ?? 'Unknown Service';
-      dto.patientName =
-        (row.patient_name ?? '').trim() || undefined;
+      dto.patientName = (row.patient_name ?? '').trim() || undefined;
       return dto;
     });
   }

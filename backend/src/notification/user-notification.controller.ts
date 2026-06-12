@@ -7,7 +7,11 @@ import {
   HttpStatus,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { ApiOperation, ApiOkResponse, ApiNoContentResponse } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiOkResponse,
+  ApiNoContentResponse,
+} from '@nestjs/swagger';
 import { UserApi } from '@/common/decorators/api/user-api.decorator';
 import { CurrentUser } from '@/common/decorators/auth/current-user.decorator';
 import { NotificationService } from './notification.service';

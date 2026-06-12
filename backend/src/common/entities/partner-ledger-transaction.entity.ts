@@ -27,9 +27,21 @@ import { PartnerPayoutStatus } from '@/partner-finance/enums/partner-payout-stat
 @Entity('partner_ledger_transactions')
 @Index('IDX_PLT_PARTNER_CREATED', ['partnerId', 'createdAt'])
 @Index('IDX_PLT_PARTNER_STATUS_CREATED', ['partnerId', 'status', 'createdAt'])
-@Index('IDX_PLT_PARTNER_SETTLEMENT_CREATED', ['partnerId', 'settlementStatus', 'createdAt'])
-@Index('IDX_PLT_PARTNER_PAYOUT_STATUS_CREATED', ['partnerId', 'payoutStatus', 'createdAt'])
-@Index('IDX_PLT_PARTNER_SOURCE_TYPE_CREATED', ['partnerId', 'sourceType', 'createdAt'])
+@Index('IDX_PLT_PARTNER_SETTLEMENT_CREATED', [
+  'partnerId',
+  'settlementStatus',
+  'createdAt',
+])
+@Index('IDX_PLT_PARTNER_PAYOUT_STATUS_CREATED', [
+  'partnerId',
+  'payoutStatus',
+  'createdAt',
+])
+@Index('IDX_PLT_PARTNER_SOURCE_TYPE_CREATED', [
+  'partnerId',
+  'sourceType',
+  'createdAt',
+])
 @Index('IDX_PLT_PARTNER_REFERENCE', ['partnerId', 'reference'])
 export class PartnerLedgerTransaction {
   @PrimaryGeneratedColumn('uuid')
@@ -84,13 +96,28 @@ export class PartnerLedgerTransaction {
   @Column({ name: 'payout_status', type: 'varchar', length: 30 })
   payoutStatus: PartnerPayoutStatus;
 
-  @Column({ name: 'payment_method_label', type: 'varchar', length: 100, nullable: true })
+  @Column({
+    name: 'payment_method_label',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
   paymentMethodLabel: string | null;
 
-  @Column({ name: 'source_title_snapshot', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'source_title_snapshot',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   sourceTitleSnapshot: string | null;
 
-  @Column({ name: 'source_subtitle_snapshot', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'source_subtitle_snapshot',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   sourceSubtitleSnapshot: string | null;
 
   @Column({ name: 'flagged_for_review', type: 'boolean', default: false })

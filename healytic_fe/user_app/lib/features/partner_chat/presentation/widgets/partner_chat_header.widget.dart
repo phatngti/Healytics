@@ -4,15 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:common/widgets/button/button.dart';
-
-
+import 'package:common/widgets/images/avatar.dart';
 
 /// Chat header for partner conversations.
 ///
 /// Frosted-glass style matching the existing AI chat
 /// header, but parameterized with partner info.
-class PartnerChatHeader extends StatelessWidget
-    implements PreferredSizeWidget {
+class PartnerChatHeader extends StatelessWidget implements PreferredSizeWidget {
   final String partnerName;
   final String? partnerAvatar;
 
@@ -23,8 +21,7 @@ class PartnerChatHeader extends StatelessWidget
   });
 
   @override
-  Size get preferredSize =>
-      const Size.fromHeight(64);
+  Size get preferredSize => const Size.fromHeight(64);
 
   @override
   Widget build(BuildContext context) {
@@ -35,22 +32,15 @@ class PartnerChatHeader extends StatelessWidget
       bottom: false,
       child: ClipRRect(
         child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 20,
-            sigmaY: 20,
-          ),
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             height: 64,
-            padding: EdgeInsets.symmetric(
-              horizontal: AppDimens.spaceXs,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: AppDimens.spaceXs),
             decoration: BoxDecoration(
-              color: colorScheme.surface
-                  .withValues(alpha: 0.9),
+              color: colorScheme.surface.withValues(alpha: 0.9),
               border: Border(
                 bottom: BorderSide(
-                  color: colorScheme.outlineVariant
-                      .withValues(alpha: 0.2),
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.2),
                 ),
               ),
             ),
@@ -65,18 +55,13 @@ class PartnerChatHeader extends StatelessWidget
                     }
                   },
                   primaryColor: colorScheme.primary,
-                  customStyle:
-                      TextButton.styleFrom(
-                    padding: EdgeInsets.all(
-                      AppDimens.spaceSm,
-                    ),
+                  customStyle: TextButton.styleFrom(
+                    padding: EdgeInsets.all(AppDimens.spaceSm),
                     minimumSize: Size(
                       AppDimens.ctaButtonMd,
                       AppDimens.ctaButtonMd,
                     ),
-                    tapTargetSize:
-                        MaterialTapTargetSize
-                            .shrinkWrap,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     shape: const CircleBorder(),
                   ),
                   child: Icon(
@@ -87,53 +72,32 @@ class PartnerChatHeader extends StatelessWidget
                 ),
 
                 // Partner avatar
-                CircleAvatar(
+                AvatarImage(
+                  name: partnerName,
+                  imageUrl: partnerAvatar,
                   radius: 20,
-                  backgroundColor:
-                      colorScheme.primaryContainer,
-                  backgroundImage:
-                      partnerAvatar != null
-                          ? NetworkImage(
-                              partnerAvatar!,
-                            )
-                          : null,
-                  child: partnerAvatar == null
-                      ? Icon(
-                          Icons.storefront_rounded,
-                          size: AppDimens.iconMd,
-                          color: colorScheme
-                              .onPrimaryContainer,
-                        )
-                      : null,
                 ),
                 SizedBox(width: AppDimens.spaceSm),
 
                 // Partner name
                 Expanded(
                   child: Column(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center,
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         partnerName,
-                        style: textTheme.titleSmall
-                            ?.copyWith(
+                        style: textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color:
-                              colorScheme.onSurface,
+                          color: colorScheme.onSurface,
                         ),
                         maxLines: 1,
-                        overflow:
-                            TextOverflow.ellipsis,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         'Health Partner',
-                        style: textTheme.bodySmall
-                            ?.copyWith(
-                          color: colorScheme
-                              .onSurfaceVariant,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -145,18 +109,13 @@ class PartnerChatHeader extends StatelessWidget
                   buttonType: ButtonType.text,
                   onPressed: () {},
                   primaryColor: colorScheme.primary,
-                  customStyle:
-                      TextButton.styleFrom(
-                    padding: EdgeInsets.all(
-                      AppDimens.spaceSm,
-                    ),
+                  customStyle: TextButton.styleFrom(
+                    padding: EdgeInsets.all(AppDimens.spaceSm),
                     minimumSize: Size(
                       AppDimens.ctaButtonMd,
                       AppDimens.ctaButtonMd,
                     ),
-                    tapTargetSize:
-                        MaterialTapTargetSize
-                            .shrinkWrap,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     shape: const CircleBorder(),
                   ),
                   child: Icon(

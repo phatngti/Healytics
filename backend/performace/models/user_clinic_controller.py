@@ -20,6 +20,8 @@ class ClinicInfoResponseDto(DtoModel):
     name: str
     gallery: list[str]
     followersLabel: str
+    followerCount: float
+    isFollowing: bool
     reviewsLabel: str
     trustMetrics: ClinicTrustMetricsDto
     certifications: list[ClinicCertificationDto]
@@ -27,6 +29,7 @@ class ClinicInfoResponseDto(DtoModel):
     businessTypes: list[str]
     coverImageUrl: str | None = None
     logoImageUrl: str | None = None
+    chatPartnerId: str | None = None
     description: str | None = None
     address: str | None = None
     phoneNumber: str | None = None

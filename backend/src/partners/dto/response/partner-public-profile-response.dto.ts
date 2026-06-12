@@ -31,7 +31,6 @@ export class PublicProfileBusinessInfoDto {
   @ApiPropertyOptional({ example: 'clinic@example.com', nullable: true })
   email: string | null;
 
-
   static fromPartner(partner: Partner): PublicProfileBusinessInfoDto {
     const dto = new PublicProfileBusinessInfoDto();
     dto.brandName = partner.brandName;
@@ -159,9 +158,7 @@ export class PublicProfileCertificationDto {
   @ApiProperty({ example: 1 })
   sortOrder: number;
 
-  static fromEntity(
-    cert: PartnerCertification,
-  ): PublicProfileCertificationDto {
+  static fromEntity(cert: PartnerCertification): PublicProfileCertificationDto {
     const dto = new PublicProfileCertificationDto();
     dto.id = cert.id;
     dto.title = cert.title;

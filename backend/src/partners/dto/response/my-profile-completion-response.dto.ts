@@ -171,7 +171,8 @@ export class MyProfileCompletionResponseDto {
     identity.legalName = partner.legalName;
     identity.businessType = partner.businessType;
     identity.phoneNumber = partner.phoneNumber;
-    identity.address = addressParts.length === 0 ? null : addressParts.join(', ');
+    identity.address =
+      addressParts.length === 0 ? null : addressParts.join(', ');
     dto.clinicIdentity = identity;
     dto.coverImageUrl = partner.coverImageUrl;
     dto.logoImageUrl = partner.logoImageUrl;

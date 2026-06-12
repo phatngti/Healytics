@@ -16,11 +16,15 @@ class ReviewsSectionLoader extends ConsumerWidget {
   const ReviewsSectionLoader({
     super.key,
     required this.employeeId,
+    required this.onViewMoreTap,
     this.rating = 4.9,
   });
 
   /// Employee whose reviews to fetch.
   final String employeeId;
+
+  /// Opens the full specialist reviews screen.
+  final void Function(BuildContext context) onViewMoreTap;
 
   /// Overall rating shown in the section header.
   final double rating;
@@ -28,9 +32,7 @@ class ReviewsSectionLoader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncReviews = ref.watch(
-      employeeReviewsProvider(
-        employeeId: employeeId,
-      ),
+      employeeReviewsProvider(employeeId: employeeId),
     );
 
     return asyncReviews.when(
@@ -40,6 +42,7 @@ class ReviewsSectionLoader extends ConsumerWidget {
         reviews: reviews,
         rating: rating,
         serviceId: employeeId,
+        onViewMoreTap: () => onViewMoreTap(context),
       ),
     );
   }

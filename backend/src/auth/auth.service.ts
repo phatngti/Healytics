@@ -219,19 +219,11 @@ export class AuthService {
       throw new ConflictException('Email already in use');
     }
     const hash = await bcrypt.hash(dto.password, 10);
-    const createData: Partial<Account> = {
+    const user = await this.accountService.createRegisteredUser(
       email,
-      passwordHash: hash,
-      role: Role.USER,
-    };
-    if (dto.profile) {
-      const profileData = { ...dto.profile } as UserProfile;
-      if (profileData.dateOfBirth) {
-        profileData.dateOfBirth = new Date(profileData.dateOfBirth);
-      }
-      createData.userProfile = profileData;
-    }
-    const user = await this.accountService.create(createData);
+      hash,
+      dto.profile,
+    );
     this.logger.log(`User registered: ${user.id}`);
     const tokens = await this.createTokensForUser(
       user.id,
@@ -643,6 +635,12 @@ export class AuthService {
   }
 
   private generatePasswordResetCode(): string {
+    if (process.env.NODE_ENV === 'test') {
+      const fixedCode = process.env.TEST_PASSWORD_RESET_CODE?.trim();
+      if (fixedCode && /^\d{6}$/.test(fixedCode)) {
+        return fixedCode;
+      }
+    }
     return randomInt(0, 1000000).toString().padStart(6, '0');
   }
 
@@ -763,7 +761,7 @@ export class AuthService {
 
   private verifyPasswordResetToken(token: string): PasswordResetJwtPayload {
     try {
-      return this.jwtService.verify(token) as PasswordResetJwtPayload;
+      return this.jwtService.verify(token);
     } catch {
       throw new BadRequestException('Invalid or expired password reset token');
     }
@@ -807,8 +805,8 @@ export class AuthService {
         .join(' ')
         .trim();
       payload.name = fullName || undefined;
-      payload.firstName = profile.firstName;
-      payload.lastName = profile.lastName;
+      payload.firstName = profile.firstName ?? undefined;
+      payload.lastName = profile.lastName ?? undefined;
       payload.profileCompleted = profile.profileCompleted;
     }
 

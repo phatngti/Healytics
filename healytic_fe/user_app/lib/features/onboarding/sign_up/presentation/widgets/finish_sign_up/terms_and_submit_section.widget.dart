@@ -50,14 +50,11 @@ class TermsAndSubmitSection extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: AppDimens.radiusSmall,
               ),
-              textStyle: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              textStyle: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
-            child: const Text('Agree & Continue'),
+            child: const Text('Sign Up'),
           ),
         ),
       ],
@@ -70,37 +67,30 @@ class TermsAndSubmitSection extends StatelessWidget {
 class _TermsRichText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final bodyColor = Theme.of(context)
-        .textTheme
-        .bodyMedium
-        ?.color
-        ?.withAlpha(200);
+    final bodyColor = Theme.of(
+      context,
+    ).textTheme.bodyMedium?.color?.withAlpha(200);
 
-    final linkStyle = Theme.of(context)
-        .textTheme
-        .bodyMedium
-        ?.copyWith(
-          color: Theme.of(context)
-              .colorScheme
-              .primary
-              .withAlpha(700),
-          fontWeight: FontWeight.bold,
-        );
+    final linkStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
+      color: Theme.of(context).colorScheme.primary.withAlpha(700),
+      fontWeight: FontWeight.bold,
+    );
 
-    final bodyStyle = Theme.of(context)
-        .textTheme
-        .bodyMedium
-        ?.copyWith(color: bodyColor);
+    final bodyStyle = Theme.of(
+      context,
+    ).textTheme.bodyMedium?.copyWith(color: bodyColor);
 
     return Text.rich(
       textAlign: TextAlign.left,
       TextSpan(
-        text: 'By selecting "Agree & Continue", '
+        text:
+            'By selecting "Sign Up", '
             'I agree to Healytic',
         style: bodyStyle,
         children: [
           TextSpan(
-            text: 'Terms of Service, '
+            text:
+                'Terms of Service, '
                 'Payment Terms of Service ',
             style: linkStyle,
             recognizer: TapGestureRecognizer()
@@ -108,10 +98,7 @@ class _TermsRichText extends StatelessWidget {
                 // Handle Terms of Service tap
               },
           ),
-          TextSpan(
-            text: 'and acknowledge the ',
-            style: bodyStyle,
-          ),
+          TextSpan(text: 'and acknowledge the ', style: bodyStyle),
           TextSpan(
             text: 'Privacy Policy.',
             style: linkStyle,

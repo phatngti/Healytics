@@ -7,14 +7,21 @@
  */
 const fs = require("fs");
 const path = require("path");
+const { collectHardwareConfig, formatBytes } = require("./hardware_config");
 
 const REPORTS_DIR = path.join(__dirname, "..", "reports");
 const TEMPLATE = path.join(__dirname, "report_template.html");
 const DEFAULT_OUT = path.join(REPORTS_DIR, "analysis_report.html");
-const TARGETS = {
+const HARDWARE_CONFIG_FILE = path.join(REPORTS_DIR, "hardware_config.json");
+const BASE_TARGETS = {
   avg_response_time_ms: 200, p95_response_time_ms: 500, p99_response_time_ms: 1000,
-  error_rate_pct: 0.01, min_throughput_rps: 500, min_concurrent_users: 1000,
+  error_rate_pct: 0.01,
 };
+const SCORING_PROFILES = [
+  { name: "target/large", minPeakUsers: 1000, min_throughput_rps: 500, min_concurrent_users: 1000 },
+  { name: "medium", minPeakUsers: 500, min_throughput_rps: 200, min_concurrent_users: 500 },
+  { name: "small", minPeakUsers: 100, min_throughput_rps: 40, min_concurrent_users: 100 },
+];
 const MEANINGFUL_RUN = {
   minDurationSeconds: 10,
   minRequests: 10,
@@ -41,6 +48,19 @@ function parseDuration(s) {
 const f1 = (n,d=1) => n==null?"N/A":Number(n).toFixed(d);
 const fPct = n => n==null?"N/A":Number(n).toFixed(3)+"%";
 const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function safeValue(value) {
+  return value == null || value === "" ? "Not set" : String(value);
+}
+function loadHardwareConfig() {
+  try {
+    if (fs.existsSync(HARDWARE_CONFIG_FILE)) {
+      return JSON.parse(fs.readFileSync(HARDWARE_CONFIG_FILE, "utf8"));
+    }
+  } catch (error) {
+    console.warn(`Could not read ${HARDWARE_CONFIG_FILE}: ${error.message}`);
+  }
+  return collectHardwareConfig({ source: "analysis-host-fallback" });
+}
 function isMeaningfulRun(r) {
   return r.duration_secs >= MEANINGFUL_RUN.minDurationSeconds &&
     r.agg.requests >= MEANINGFUL_RUN.minRequests &&
@@ -65,6 +85,61 @@ function runShape(r) {
 function latestMeaningfulRun(runs) {
   const meaningful = runs.filter(isMeaningfulRun);
   return meaningful.length ? meaningful[meaningful.length - 1] : runs[runs.length - 1];
+}
+function scoringProfileForRun(r) {
+  const profile = SCORING_PROFILES.find(p => r.peak_users >= p.minPeakUsers);
+  if (profile) return profile;
+  return {
+    ...SCORING_PROFILES[SCORING_PROFILES.length - 1],
+    name: "below-small",
+  };
+}
+function targetsForRun(r) {
+  return { ...BASE_TARGETS, ...scoringProfileForRun(r) };
+}
+function profileTargetSummary(t) {
+  return `profile ${t.name}: users ≥${t.min_concurrent_users}, RPS ≥${t.min_throughput_rps}, ` +
+    `avg ≤${t.avg_response_time_ms}ms, P95 ≤${t.p95_response_time_ms}ms, errors ≤${t.error_rate_pct}%`;
+}
+function hardwareConfigHtml(config) {
+  const cores = config.cpu?.physical_cores
+    ? `${config.cpu.physical_cores} physical / ${config.cpu.logical_cores} logical`
+    : `${safeValue(config.cpu?.logical_cores)} logical`;
+  const host = config.host || {};
+  const limits = config.performance_limits || {};
+  const loadAverage = Array.isArray(config.runtime?.load_average)
+    ? config.runtime.load_average.join(", ")
+    : "Not measured";
+  const fallbackNotice = config.source === "analysis-host-fallback"
+    ? `<div class="notice notice-warn"><strong>Hardware snapshot fallback:</strong> <code>${esc(HARDWARE_CONFIG_FILE)}</code> was not available, so this section uses the machine that generated the analysis report.</div>`
+    : "";
+  const rows = [
+    ["Captured at", safeValue(config.captured_at)],
+    ["Hostname", safeValue(host.hostname)],
+    ["Operating system", `${safeValue(host.type)} ${safeValue(host.release)} (${safeValue(host.machine || host.arch)})`],
+    ["CPU model", safeValue(config.cpu?.model)],
+    ["CPU cores", cores],
+    ["Memory", `${safeValue(config.memory?.total || (config.memory?.total_bytes ? formatBytes(config.memory.total_bytes) : ""))} total, ${safeValue(config.memory?.free || (config.memory?.free_bytes ? formatBytes(config.memory.free_bytes) : ""))} free at capture`],
+    ["Disk free", `${safeValue(config.disk?.free || (config.disk?.free_bytes ? formatBytes(config.disk.free_bytes) : ""))} at ${safeValue(config.disk?.cwd)}`],
+    ["Load average", loadAverage],
+    ["Node.js", safeValue(config.runtime?.node)],
+    ["Target host", safeValue(limits.target_host)],
+    ["Backend CPU limit", safeValue(limits.backend_limit_cpus)],
+    ["Backend memory limit", safeValue(limits.backend_limit_memory)],
+    ["Configured CCU", safeValue(limits.perf_ccu)],
+    ["Target users", safeValue(limits.perf_target_users)],
+    ["Run time", safeValue(limits.perf_run_time)],
+  ];
+  return `${fallbackNotice}
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Host</div><div class="kpi-value">${esc(host.hostname || "N/A")}</div><div class="kpi-sub">${esc(host.type || "N/A")} ${esc(host.release || "")}</div></div>
+    <div class="kpi"><div class="kpi-label">CPU</div><div class="kpi-value">${esc(cores)}</div><div class="kpi-sub">${esc(config.cpu?.model || "Unknown CPU")}</div></div>
+    <div class="kpi"><div class="kpi-label">Memory</div><div class="kpi-value">${esc(config.memory?.total || "N/A")}</div><div class="kpi-sub">${esc(config.memory?.free || "N/A")} free at capture</div></div>
+    <div class="kpi"><div class="kpi-label">Disk Free</div><div class="kpi-value">${esc(config.disk?.free || "N/A")}</div><div class="kpi-sub">${esc(config.disk?.cwd || "")}</div></div>
+  </div>
+  <table><thead><tr><th>Configuration</th><th>Value</th></tr></thead><tbody>
+  ${rows.map(([label, value]) => `<tr><td>${esc(label)}</td><td>${esc(value)}</td></tr>`).join("\n")}
+  </tbody></table>`;
 }
 function trendInfo(vals) {
   if (vals.length<2) return {text:"—",cls:"trend-stable"};
@@ -124,8 +199,10 @@ function main() {
   const latestRaw = reports[reports.length-1];
   const latest = meaningful.length ? meaningful[meaningful.length-1] : latestRaw;
   const la = latest.agg;
+  const TARGETS = targetsForRun(latest);
   const excludedReports = reports.filter(r => !isMeaningfulRun(r));
   const now = new Date().toISOString().replace("T"," ").substring(0,19);
+  const hardwareConfig = loadHardwareConfig();
 
   // Pass/fail
   const checks = [
@@ -141,7 +218,8 @@ function main() {
 
   const meaningfulCriteria = `≥${MEANINGFUL_RUN.minDurationSeconds}s, ≥${MEANINGFUL_RUN.minRequests} requests, ≥${MEANINGFUL_RUN.minPeakUsers} user`;
   const scoreContext = `<p>${meaningful.length ? "Scored run" : "Scored run (fallback; no meaningful runs found)"}: <code>${esc(latest.file)}</code><br>
-    Scope: latest meaningful run (${meaningfulCriteria}) from ${meaningful.length || reports.length} eligible report(s).</p>`;
+    Scope: latest meaningful run (${meaningfulCriteria}) from ${meaningful.length || reports.length} eligible report(s).<br>
+    Scoring thresholds: ${esc(profileTargetSummary(TARGETS))}.</p>`;
   const runScopeNotice = latest.file !== latestRaw.file
     ? `<div class="notice notice-warn"><strong>Latest parsed report excluded from KPI:</strong> <code>${esc(latestRaw.file)}</code> (${esc(runShape(latestRaw))}). Reasons: ${esc(runExclusionReasons(latestRaw).join(", "))}. The run remains visible in the timeline and suite breakdown.</div>`
     : `<div class="notice"><strong>KPI source:</strong> latest parsed report is also the latest meaningful run. ${excludedReports.length ? `${excludedReports.length} earlier report(s) are excluded from KPI and trend scoring.` : "No reports were excluded from KPI scoring."}</div>`;
@@ -319,6 +397,7 @@ function main() {
     "{{SCORE_CONTEXT}}": scoreContext,
     "{{RUN_SCOPE_NOTICE}}": runScopeNotice,
     "{{KPI_CARDS}}": kpiCards,
+    "{{HARDWARE_CONFIG}}": hardwareConfigHtml(hardwareConfig),
     "{{TREND_TABLE}}": trendTable,
     "{{CHART_AVG_RT}}": chartAvgRt,
     "{{CHART_RPS}}": chartRps,

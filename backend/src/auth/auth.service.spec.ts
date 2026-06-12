@@ -9,11 +9,22 @@ import { PasswordResetMailerService } from './password-reset-mailer.service';
 
 describe('AuthService', () => {
   let service: AuthService;
+  const originalNodeEnv = process.env.NODE_ENV;
+  const originalFixedResetCode = process.env.TEST_PASSWORD_RESET_CODE;
+  const restoreEnv = (key: string, value: string | undefined) => {
+    if (value === undefined) {
+      delete process.env[key];
+    } else {
+      process.env[key] = value;
+    }
+  };
 
   const mockAccountService = {
     findByEmail: jest.fn(),
     findOne: jest.fn(),
     create: jest.fn(),
+    createRegisteredUser: jest.fn(),
+    checkEmailExists: jest.fn(),
     setRefreshTokenHash: jest.fn(),
     updatePasswordHash: jest.fn(),
   };
@@ -33,6 +44,8 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    restoreEnv('NODE_ENV', originalNodeEnv);
+    restoreEnv('TEST_PASSWORD_RESET_CODE', originalFixedResetCode);
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -47,6 +60,11 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
+  });
+
+  afterEach(() => {
+    restoreEnv('NODE_ENV', originalNodeEnv);
+    restoreEnv('TEST_PASSWORD_RESET_CODE', originalFixedResetCode);
   });
 
   it('should be defined', () => {
@@ -78,6 +96,40 @@ describe('AuthService', () => {
     );
   });
 
+  it('should register a user through the explicit account/profile creation path', async () => {
+    mockAccountService.checkEmailExists.mockResolvedValue(false);
+    mockAccountService.createRegisteredUser.mockResolvedValue({
+      id: 'account-uuid',
+      email: 'user@test.com',
+      role: Role.USER,
+      userProfile: {
+        id: 'profile-uuid',
+        firstName: 'Test',
+        lastName: 'User',
+      },
+    });
+    mockJwtService.sign
+      .mockReturnValueOnce('access-token')
+      .mockReturnValueOnce('refresh-token');
+    mockAccountService.setRefreshTokenHash.mockResolvedValue(undefined);
+
+    const result = await service.register({
+      email: ' USER@Test.com ',
+      password: 'Password123!',
+      profile: {
+        firstName: 'Test',
+        lastName: 'User',
+      },
+    });
+
+    expect(result.access_token).toBe('access-token');
+    expect(mockAccountService.createRegisteredUser).toHaveBeenCalledWith(
+      'user@test.com',
+      expect.any(String),
+      expect.objectContaining({ firstName: 'Test' }),
+    );
+  });
+
   it('should send reset code for active account', async () => {
     mockAccountService.findByEmail.mockResolvedValue({
       id: 'account-uuid',
@@ -94,6 +146,26 @@ describe('AuthService', () => {
     expect(mockPasswordResetMailer.sendPasswordResetCode).toHaveBeenCalledWith(
       'user@test.com',
       expect.stringMatching(/^\d{6}$/),
+    );
+  });
+
+  it('should use fixed reset code only in test environment', async () => {
+    process.env.NODE_ENV = 'test';
+    process.env.TEST_PASSWORD_RESET_CODE = '123456';
+    mockAccountService.findByEmail.mockResolvedValue({
+      id: 'account-uuid',
+      email: 'user@test.com',
+      role: Role.USER,
+      isActive: true,
+    });
+
+    await service.requestUserPasswordReset({
+      email: 'user@test.com',
+    });
+
+    expect(mockPasswordResetMailer.sendPasswordResetCode).toHaveBeenCalledWith(
+      'user@test.com',
+      '123456',
     );
   });
 

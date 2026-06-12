@@ -104,7 +104,12 @@ describe('NotificationService', () => {
       expect(pushService.sendBroadcast).toHaveBeenCalledWith({
         title: 'Maintenance starts at 01:00 ICT',
         body: 'The platform will enter maintenance mode.',
-        data,
+        data: {
+          ...data,
+          notificationId: broadcastDto.id,
+          notificationType: broadcastDto.type,
+          type: broadcastDto.type,
+        },
       });
     });
 

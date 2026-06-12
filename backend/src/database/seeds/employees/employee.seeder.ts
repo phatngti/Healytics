@@ -12,6 +12,7 @@ import { Gender } from '@/employees/enum/gender.enum';
 import { TherapistLevel } from '@/employees/enum/therapist-level.enum';
 import { StrengthLevel } from '@/employees/enum/strength-level.enum';
 import { ISeeder } from '../seeder.interface';
+import { BULK_WELLNESS_EMPLOYEES } from '../wellness-bulk.seed';
 
 const schedule = (
   weekdayStart = '08:00',
@@ -433,6 +434,7 @@ const SEED_EMPLOYEES = [
       },
     ],
   },
+  ...BULK_WELLNESS_EMPLOYEES,
 ];
 
 /** Doctor profile seed data keyed by employee code */
@@ -662,22 +664,26 @@ export class EmployeeSeeder implements ISeeder {
     }
 
     for (const empData of SEED_EMPLOYEES) {
-      const { partnerTaxCode, accountEmail, ...employeeData } = empData;
-      const partner = partnerMap.get(partnerTaxCode ?? '0123456789') ?? null;
+      const rawEmployeeData = empData as any;
+      const { partnerTaxCode, accountEmail, ...employeeData } = rawEmployeeData;
+      const partner =
+        partnerMap.get(rawEmployeeData.partnerTaxCode ?? '0123456789') ?? null;
       const exists = await this.employeeRepo.findOne({
         where: { employeeCode: employeeData.employeeCode },
+        withDeleted: true,
       });
 
       // Resolve linked account if accountEmail is provided
       let accountId: string | null = null;
-      if (accountEmail) {
+      if (rawEmployeeData.accountEmail) {
         const account = await this.accountRepo.findOne({
-          where: { email: accountEmail },
+          where: { email: rawEmployeeData.accountEmail },
+          loadEagerRelations: false,
         });
         accountId = account?.id ?? null;
         if (!account) {
           this.logger.warn(
-            `  ⚠ Account "${accountEmail}" not found for employee "${employeeData.employeeCode}"`,
+            `  ⚠ Account "${rawEmployeeData.accountEmail}" not found for employee "${employeeData.employeeCode}"`,
           );
         }
       }
@@ -694,6 +700,7 @@ export class EmployeeSeeder implements ISeeder {
         if (partner && !exists.partnerId) fieldsToUpdate.partnerId = partner.id;
         if (accountId && !exists.accountId)
           fieldsToUpdate.accountId = accountId;
+        if (exists.deletedAt) fieldsToUpdate.deletedAt = null;
 
         if (Object.keys(fieldsToUpdate).length > 0) {
           await this.employeeRepo.update(exists.id, fieldsToUpdate);
@@ -716,7 +723,7 @@ export class EmployeeSeeder implements ISeeder {
         reviewCount: 0,
         partnerId: partner?.id ?? null,
         accountId,
-      });
+      } as Partial<Employee>);
 
       await this.employeeRepo.save(employee);
       this.logger.log(

@@ -560,6 +560,80 @@
         ]
       }
     },
+    "/account/me/profile": {
+      "patch": {
+        "operationId": "AccountController_updateProfile",
+        "summary": "Update current user profile identity",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated, returns refreshed account data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountMeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/account/me/address": {
+      "patch": {
+        "operationId": "AccountController_updateAddress",
+        "summary": "Update current user address",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountAddressDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Address updated, returns refreshed account data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountMeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/account/survey": {
       "get": {
         "operationId": "AccountController_getSurvey",
@@ -622,6 +696,280 @@
           {
             "bearer": []
           }
+        ]
+      }
+    },
+    "/locations/provinces": {
+      "get": {
+        "operationId": "LocationsController_getProvinces",
+        "summary": "Get all provinces in Vietnam",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of all provinces",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
+    "/locations/provinces/{provinceId}/districts": {
+      "get": {
+        "operationId": "LocationsController_getDistricts",
+        "summary": "Get all districts in a province",
+        "parameters": [
+          {
+            "name": "provinceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of districts in the province",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationListResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Province not found"
+          }
+        },
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
+    "/locations/districts/{districtId}/wards": {
+      "get": {
+        "operationId": "LocationsController_getWards",
+        "summary": "Get all wards in a district",
+        "parameters": [
+          {
+            "name": "districtId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of wards in the district",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationListResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "District not found"
+          }
+        },
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
+    "/mapbox/geocode": {
+      "get": {
+        "operationId": "MapboxController_geocode",
+        "summary": "Geocode an address to lat/lng",
+        "parameters": [
+          {
+            "name": "address",
+            "required": true,
+            "in": "query",
+            "description": "Address to geocode",
+            "schema": {
+              "example": "227 Nguyen Van Cu, District 5, Ho Chi Minh City",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeocodeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
+        ]
+      }
+    },
+    "/mapbox/reverse-geocode": {
+      "get": {
+        "operationId": "MapboxController_reverseGeocode",
+        "summary": "Reverse geocode lat/lng to address",
+        "parameters": [
+          {
+            "name": "lat",
+            "required": true,
+            "in": "query",
+            "description": "Latitude",
+            "schema": {
+              "example": 10.762622,
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": true,
+            "in": "query",
+            "description": "Longitude",
+            "schema": {
+              "example": 106.660172,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeocodeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
+        ]
+      }
+    },
+    "/mapbox/distance-matrix": {
+      "get": {
+        "operationId": "MapboxController_distanceMatrix",
+        "summary": "Get travel distance and duration",
+        "parameters": [
+          {
+            "name": "origins",
+            "required": true,
+            "in": "query",
+            "description": "Origins — pipe-separated coordinates or addresses (e.g. \"10.762,106.660|10.823,106.629\")",
+            "schema": {
+              "example": "10.762622,106.660172",
+              "type": "string"
+            }
+          },
+          {
+            "name": "destinations",
+            "required": true,
+            "in": "query",
+            "description": "Destinations — pipe-separated coordinates or addresses (e.g. \"10.823,106.629|10.800,106.700\")",
+            "schema": {
+              "example": "10.823099,106.629662",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistanceMatrixResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
+        ]
+      }
+    },
+    "/mapbox/directions": {
+      "get": {
+        "operationId": "MapboxController_directions",
+        "summary": "Get driving directions route geometry",
+        "parameters": [
+          {
+            "name": "origin",
+            "required": true,
+            "in": "query",
+            "description": "Origin coordinate in lat,lng format",
+            "schema": {
+              "example": "10.762622,106.660172",
+              "type": "string"
+            }
+          },
+          {
+            "name": "destination",
+            "required": true,
+            "in": "query",
+            "description": "Destination coordinate in lat,lng format",
+            "schema": {
+              "example": "10.823099,106.629662",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectionsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
+        ]
+      }
+    },
+    "/mapbox/client-key": {
+      "get": {
+        "operationId": "MapboxController_getClientKey",
+        "summary": "Get public access token for frontend/mobile SDKs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientKeyResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Mapbox"
         ]
       }
     },
@@ -864,96 +1212,6 @@
         ]
       }
     },
-    "/locations/provinces": {
-      "get": {
-        "operationId": "LocationsController_getProvinces",
-        "summary": "Get all provinces in Vietnam",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "List of all provinces",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LocationListResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Locations"
-        ]
-      }
-    },
-    "/locations/provinces/{provinceId}/districts": {
-      "get": {
-        "operationId": "LocationsController_getDistricts",
-        "summary": "Get all districts in a province",
-        "parameters": [
-          {
-            "name": "provinceId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of districts in the province",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LocationListResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Province not found"
-          }
-        },
-        "tags": [
-          "Locations"
-        ]
-      }
-    },
-    "/locations/districts/{districtId}/wards": {
-      "get": {
-        "operationId": "LocationsController_getWards",
-        "summary": "Get all wards in a district",
-        "parameters": [
-          {
-            "name": "districtId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of wards in the district",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LocationListResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "District not found"
-          }
-        },
-        "tags": [
-          "Locations"
-        ]
-      }
-    },
     "/s3/presign": {
       "post": {
         "operationId": "S3Controller_preSign",
@@ -1045,190 +1303,6 @@
         },
         "tags": [
           "S3"
-        ]
-      }
-    },
-    "/mapbox/geocode": {
-      "get": {
-        "operationId": "MapboxController_geocode",
-        "summary": "Geocode an address to lat/lng",
-        "parameters": [
-          {
-            "name": "address",
-            "required": true,
-            "in": "query",
-            "description": "Address to geocode",
-            "schema": {
-              "example": "227 Nguyen Van Cu, District 5, Ho Chi Minh City",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeocodeResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Mapbox"
-        ]
-      }
-    },
-    "/mapbox/reverse-geocode": {
-      "get": {
-        "operationId": "MapboxController_reverseGeocode",
-        "summary": "Reverse geocode lat/lng to address",
-        "parameters": [
-          {
-            "name": "lat",
-            "required": true,
-            "in": "query",
-            "description": "Latitude",
-            "schema": {
-              "example": 10.762622,
-              "type": "number"
-            }
-          },
-          {
-            "name": "lng",
-            "required": true,
-            "in": "query",
-            "description": "Longitude",
-            "schema": {
-              "example": 106.660172,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeocodeResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Mapbox"
-        ]
-      }
-    },
-    "/mapbox/distance-matrix": {
-      "get": {
-        "operationId": "MapboxController_distanceMatrix",
-        "summary": "Get travel distance and duration",
-        "parameters": [
-          {
-            "name": "origins",
-            "required": true,
-            "in": "query",
-            "description": "Origins — pipe-separated coordinates or addresses (e.g. \"10.762,106.660|10.823,106.629\")",
-            "schema": {
-              "example": "10.762622,106.660172",
-              "type": "string"
-            }
-          },
-          {
-            "name": "destinations",
-            "required": true,
-            "in": "query",
-            "description": "Destinations — pipe-separated coordinates or addresses (e.g. \"10.823,106.629|10.800,106.700\")",
-            "schema": {
-              "example": "10.823099,106.629662",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DistanceMatrixResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Mapbox"
-        ]
-      }
-    },
-    "/mapbox/directions": {
-      "get": {
-        "operationId": "MapboxController_directions",
-        "summary": "Get driving directions route geometry",
-        "parameters": [
-          {
-            "name": "origin",
-            "required": true,
-            "in": "query",
-            "description": "Origin coordinate in lat,lng format",
-            "schema": {
-              "example": "10.762622,106.660172",
-              "type": "string"
-            }
-          },
-          {
-            "name": "destination",
-            "required": true,
-            "in": "query",
-            "description": "Destination coordinate in lat,lng format",
-            "schema": {
-              "example": "10.823099,106.629662",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DirectionsResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Mapbox"
-        ]
-      }
-    },
-    "/mapbox/client-key": {
-      "get": {
-        "operationId": "MapboxController_getClientKey",
-        "summary": "Get public access token for frontend/mobile SDKs",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClientKeyResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Mapbox"
         ]
       }
     },
@@ -8248,6 +8322,51 @@
         ]
       }
     },
+    "/user/payments/momo/{bookingId}/return": {
+      "post": {
+        "operationId": "UserPaymentController_confirmMoMoReturn",
+        "summary": "Confirm signed MoMo return payload for booking",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoMoIPNDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "MoMo return payload accepted"
+          },
+          "400": {
+            "description": "Invalid signature, failed payment, or booking mismatch"
+          },
+          "404": {
+            "description": "Booking not found"
+          }
+        },
+        "tags": [
+          "User Payments"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/user/payments/momo/{bookingId}/refund": {
       "post": {
         "operationId": "UserPaymentController_refundMoMoPayment",
@@ -10747,6 +10866,20 @@
         ]
       }
     },
+    "/metrics": {
+      "get": {
+        "operationId": "MetricsController_collect",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Prometheus metrics scrape endpoint."
+          }
+        },
+        "tags": [
+          "Observability"
+        ]
+      }
+    },
     "/health": {
       "get": {
         "operationId": "HealthController_check",
@@ -10812,6 +10945,36 @@
           "exists"
         ]
       },
+      "RegisterAddressDto": {
+        "type": "object",
+        "properties": {
+          "streetAddress": {
+            "type": "string",
+            "example": "123 Nguyen Hue Street"
+          },
+          "provinceId": {
+            "type": "string",
+            "example": "0f0d876f-92f1-4fcb-8a40-1fd3dd115d6b",
+            "description": "Province/city Location UUID"
+          },
+          "districtId": {
+            "type": "string",
+            "example": "7c4020d4-343d-4a63-b017-6df5f82d8814",
+            "description": "District Location UUID"
+          },
+          "wardId": {
+            "type": "string",
+            "example": "aa3a7de4-4d1d-4bb5-a3c1-79ac1350c743",
+            "description": "Ward/commune Location UUID"
+          }
+        },
+        "required": [
+          "streetAddress",
+          "provinceId",
+          "districtId",
+          "wardId"
+        ]
+      },
       "RegisterProfileDto": {
         "type": "object",
         "properties": {
@@ -10836,6 +10999,14 @@
             "type": "string",
             "example": "1990-01-01",
             "description": "Date of birth in ISO format"
+          },
+          "address": {
+            "description": "Address provided during user registration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RegisterAddressDto"
+              }
+            ]
           }
         }
       },
@@ -11365,6 +11536,53 @@
           "message"
         ]
       },
+      "AccountAddressDto": {
+        "type": "object",
+        "properties": {
+          "street": {
+            "type": "string",
+            "description": "Street address"
+          },
+          "ward": {
+            "type": "string",
+            "description": "Ward or commune"
+          },
+          "district": {
+            "type": "string",
+            "description": "District"
+          },
+          "cityOrProvince": {
+            "type": "string",
+            "description": "City or province"
+          },
+          "provinceId": {
+            "type": "object",
+            "description": "Province/city Location UUID"
+          },
+          "districtId": {
+            "type": "object",
+            "description": "District Location UUID"
+          },
+          "wardId": {
+            "type": "object",
+            "description": "Ward/commune Location UUID"
+          },
+          "latitude": {
+            "type": "object",
+            "description": "Resolved latitude"
+          },
+          "longitude": {
+            "type": "object",
+            "description": "Resolved longitude"
+          }
+        },
+        "required": [
+          "street",
+          "ward",
+          "district",
+          "cityOrProvince"
+        ]
+      },
       "UserProfileDto": {
         "type": "object",
         "properties": {
@@ -11373,15 +11591,15 @@
             "description": "Profile ID"
           },
           "firstName": {
-            "type": "string",
+            "type": "object",
             "description": "First name"
           },
           "lastName": {
-            "type": "string",
+            "type": "object",
             "description": "Last name"
           },
           "phone": {
-            "type": "string",
+            "type": "object",
             "description": "Phone number"
           },
           "bio": {
@@ -11400,6 +11618,14 @@
           "profileCompleted": {
             "type": "boolean",
             "description": "Whether the profile is completed"
+          },
+          "address": {
+            "description": "Address provided during registration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AccountAddressDto"
+              }
+            ]
           }
         },
         "required": [
@@ -11472,6 +11698,56 @@
         },
         "required": [
           "avatarUrl"
+        ]
+      },
+      "UpdateAccountProfileDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "object",
+            "example": "Jane",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "object",
+            "example": "Doe",
+            "nullable": true
+          },
+          "phone": {
+            "type": "object",
+            "example": "0901234567",
+            "nullable": true
+          }
+        }
+      },
+      "UpdateAccountAddressDto": {
+        "type": "object",
+        "properties": {
+          "streetAddress": {
+            "type": "string",
+            "example": "123 Nguyen Hue Street"
+          },
+          "provinceId": {
+            "type": "string",
+            "example": "0f0d876f-92f1-4fcb-8a40-1fd3dd115d6b",
+            "description": "Province/city Location UUID"
+          },
+          "districtId": {
+            "type": "string",
+            "example": "7c4020d4-343d-4a63-b017-6df5f82d8814",
+            "description": "District Location UUID"
+          },
+          "wardId": {
+            "type": "string",
+            "example": "aa3a7de4-4d1d-4bb5-a3c1-79ac1350c743",
+            "description": "Ward/commune Location UUID"
+          }
+        },
+        "required": [
+          "streetAddress",
+          "provinceId",
+          "districtId",
+          "wardId"
         ]
       },
       "SurveyResponseDto": {
@@ -11553,12 +11829,264 @@
                   "answer": "no"
                 }
               ],
-              "submittedAt": "2026-05-19T07:56:43.411Z"
+              "submittedAt": "2026-05-27T08:00:18.147Z"
             }
           }
         },
         "required": [
           "survey"
+        ]
+      },
+      "LocationResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "uuid-string",
+            "description": "Location UUID"
+          },
+          "code": {
+            "type": "string",
+            "example": "01",
+            "description": "Official administrative code"
+          },
+          "name": {
+            "type": "string",
+            "example": "Hà Nội",
+            "description": "Location name"
+          },
+          "nameEn": {
+            "type": "string",
+            "example": "Ha Noi",
+            "description": "English name"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "Thành phố Hà Nội",
+            "description": "Full name with prefix"
+          },
+          "fullNameEn": {
+            "type": "string",
+            "example": "Hanoi City",
+            "description": "Full English name"
+          },
+          "level": {
+            "type": "string",
+            "example": "PROVINCE",
+            "description": "Administrative level"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "fullName",
+          "level"
+        ]
+      },
+      "LocationListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "List of locations",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationResponseDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "example": 63,
+            "description": "Total number of locations"
+          }
+        },
+        "required": [
+          "data",
+          "total"
+        ]
+      },
+      "GeocodeResultDto": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "example": 10.762622
+          },
+          "lng": {
+            "type": "number",
+            "example": 106.660172
+          },
+          "formattedAddress": {
+            "type": "string",
+            "example": "227 Nguyen Van Cu, District 5, Ho Chi Minh City, Vietnam"
+          },
+          "placeId": {
+            "type": "string",
+            "example": "address.1234567890"
+          }
+        },
+        "required": [
+          "lat",
+          "lng",
+          "formattedAddress"
+        ]
+      },
+      "GeocodeResponseDto": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeocodeResultDto"
+            }
+          }
+        },
+        "required": [
+          "results"
+        ]
+      },
+      "DistanceMatrixElementDto": {
+        "type": "object",
+        "properties": {
+          "distanceText": {
+            "type": "string",
+            "example": "12.3 km"
+          },
+          "distanceValue": {
+            "type": "number",
+            "example": 12300
+          },
+          "durationText": {
+            "type": "string",
+            "example": "25 mins"
+          },
+          "durationValue": {
+            "type": "number",
+            "example": 1500
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          }
+        },
+        "required": [
+          "distanceText",
+          "distanceValue",
+          "durationText",
+          "durationValue",
+          "status"
+        ]
+      },
+      "DistanceMatrixRowDto": {
+        "type": "object",
+        "properties": {
+          "elements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DistanceMatrixElementDto"
+            }
+          }
+        },
+        "required": [
+          "elements"
+        ]
+      },
+      "DistanceMatrixResponseDto": {
+        "type": "object",
+        "properties": {
+          "originAddresses": {
+            "example": [
+              "Ho Chi Minh City, Vietnam"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "destinationAddresses": {
+            "example": [
+              "District 7, Ho Chi Minh City, Vietnam"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DistanceMatrixRowDto"
+            }
+          }
+        },
+        "required": [
+          "originAddresses",
+          "destinationAddresses",
+          "rows"
+        ]
+      },
+      "DirectionsCoordinateDto": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "example": 10.762622
+          },
+          "longitude": {
+            "type": "number",
+            "example": 106.660172
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
+        ]
+      },
+      "DirectionsResponseDto": {
+        "type": "object",
+        "properties": {
+          "route": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DirectionsCoordinateDto"
+            }
+          },
+          "distanceText": {
+            "type": "string",
+            "example": "12.3 km"
+          },
+          "distanceValue": {
+            "type": "number",
+            "example": 12300
+          },
+          "durationText": {
+            "type": "string",
+            "example": "25 mins"
+          },
+          "durationValue": {
+            "type": "number",
+            "example": 1500
+          }
+        },
+        "required": [
+          "route",
+          "distanceText",
+          "distanceValue",
+          "durationText",
+          "durationValue"
+        ]
+      },
+      "ClientKeyResponseDto": {
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "description": "Mapbox public access token for frontend/mobile SDKs",
+            "example": "pk.eyJ1Ijoi..."
+          }
+        },
+        "required": [
+          "apiKey"
         ]
       },
       "BusinessServiceDto": {
@@ -12625,74 +13153,6 @@
           }
         }
       },
-      "LocationResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "uuid-string",
-            "description": "Location UUID"
-          },
-          "code": {
-            "type": "string",
-            "example": "01",
-            "description": "Official administrative code"
-          },
-          "name": {
-            "type": "string",
-            "example": "Hà Nội",
-            "description": "Location name"
-          },
-          "nameEn": {
-            "type": "string",
-            "example": "Ha Noi",
-            "description": "English name"
-          },
-          "fullName": {
-            "type": "string",
-            "example": "Thành phố Hà Nội",
-            "description": "Full name with prefix"
-          },
-          "fullNameEn": {
-            "type": "string",
-            "example": "Hanoi City",
-            "description": "Full English name"
-          },
-          "level": {
-            "type": "string",
-            "example": "PROVINCE",
-            "description": "Administrative level"
-          }
-        },
-        "required": [
-          "id",
-          "code",
-          "name",
-          "fullName",
-          "level"
-        ]
-      },
-      "LocationListResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "description": "List of locations",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LocationResponseDto"
-            }
-          },
-          "total": {
-            "type": "number",
-            "example": 63,
-            "description": "Total number of locations"
-          }
-        },
-        "required": [
-          "data",
-          "total"
-        ]
-      },
       "PresignRequestDto": {
         "type": "object",
         "properties": {
@@ -12755,190 +13215,6 @@
         },
         "required": [
           "message"
-        ]
-      },
-      "GeocodeResultDto": {
-        "type": "object",
-        "properties": {
-          "lat": {
-            "type": "number",
-            "example": 10.762622
-          },
-          "lng": {
-            "type": "number",
-            "example": 106.660172
-          },
-          "formattedAddress": {
-            "type": "string",
-            "example": "227 Nguyen Van Cu, District 5, Ho Chi Minh City, Vietnam"
-          },
-          "placeId": {
-            "type": "string",
-            "example": "address.1234567890"
-          }
-        },
-        "required": [
-          "lat",
-          "lng",
-          "formattedAddress"
-        ]
-      },
-      "GeocodeResponseDto": {
-        "type": "object",
-        "properties": {
-          "results": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GeocodeResultDto"
-            }
-          }
-        },
-        "required": [
-          "results"
-        ]
-      },
-      "DistanceMatrixElementDto": {
-        "type": "object",
-        "properties": {
-          "distanceText": {
-            "type": "string",
-            "example": "12.3 km"
-          },
-          "distanceValue": {
-            "type": "number",
-            "example": 12300
-          },
-          "durationText": {
-            "type": "string",
-            "example": "25 mins"
-          },
-          "durationValue": {
-            "type": "number",
-            "example": 1500
-          },
-          "status": {
-            "type": "string",
-            "example": "OK"
-          }
-        },
-        "required": [
-          "distanceText",
-          "distanceValue",
-          "durationText",
-          "durationValue",
-          "status"
-        ]
-      },
-      "DistanceMatrixRowDto": {
-        "type": "object",
-        "properties": {
-          "elements": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DistanceMatrixElementDto"
-            }
-          }
-        },
-        "required": [
-          "elements"
-        ]
-      },
-      "DistanceMatrixResponseDto": {
-        "type": "object",
-        "properties": {
-          "originAddresses": {
-            "example": [
-              "Ho Chi Minh City, Vietnam"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "destinationAddresses": {
-            "example": [
-              "District 7, Ho Chi Minh City, Vietnam"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "rows": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DistanceMatrixRowDto"
-            }
-          }
-        },
-        "required": [
-          "originAddresses",
-          "destinationAddresses",
-          "rows"
-        ]
-      },
-      "DirectionsCoordinateDto": {
-        "type": "object",
-        "properties": {
-          "latitude": {
-            "type": "number",
-            "example": 10.762622
-          },
-          "longitude": {
-            "type": "number",
-            "example": 106.660172
-          }
-        },
-        "required": [
-          "latitude",
-          "longitude"
-        ]
-      },
-      "DirectionsResponseDto": {
-        "type": "object",
-        "properties": {
-          "route": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DirectionsCoordinateDto"
-            }
-          },
-          "distanceText": {
-            "type": "string",
-            "example": "12.3 km"
-          },
-          "distanceValue": {
-            "type": "number",
-            "example": 12300
-          },
-          "durationText": {
-            "type": "string",
-            "example": "25 mins"
-          },
-          "durationValue": {
-            "type": "number",
-            "example": 1500
-          }
-        },
-        "required": [
-          "route",
-          "distanceText",
-          "distanceValue",
-          "durationText",
-          "durationValue"
-        ]
-      },
-      "ClientKeyResponseDto": {
-        "type": "object",
-        "properties": {
-          "apiKey": {
-            "type": "string",
-            "description": "Mapbox public access token for frontend/mobile SDKs",
-            "example": "pk.eyJ1Ijoi..."
-          }
-        },
-        "required": [
-          "apiKey"
         ]
       },
       "DashboardTimePeriod": {
@@ -13474,6 +13750,12 @@
             "example": "doctor.a@healytics.com",
             "description": "Email address"
           },
+          "password": {
+            "type": "string",
+            "example": "Password123!",
+            "description": "Initial employee account password",
+            "minLength": 8
+          },
           "phone": {
             "type": "string",
             "example": "0901234567",
@@ -13664,6 +13946,7 @@
           "firstName",
           "lastName",
           "email",
+          "password",
           "emergencyContactName",
           "emergencyContactPhone",
           "employeeId",
@@ -13983,6 +14266,12 @@
             "example": "spa.therapist.c@healytics.com",
             "description": "Email address"
           },
+          "password": {
+            "type": "string",
+            "example": "Password123!",
+            "description": "Initial employee account password",
+            "minLength": 8
+          },
           "phone": {
             "type": "string",
             "example": "0923456789",
@@ -14168,6 +14457,7 @@
           "firstName",
           "lastName",
           "email",
+          "password",
           "emergencyContactName",
           "emergencyContactPhone",
           "employeeId",
@@ -14193,6 +14483,12 @@
             "type": "string",
             "example": "massage.therapist.e@healytics.com",
             "description": "Email address"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123!",
+            "description": "Initial employee account password",
+            "minLength": 8
           },
           "phone": {
             "type": "string",
@@ -14378,6 +14674,7 @@
           "firstName",
           "lastName",
           "email",
+          "password",
           "emergencyContactName",
           "emergencyContactPhone",
           "employeeId",
@@ -14613,6 +14910,11 @@
           "email": {
             "type": "string",
             "example": "john@example.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "description": "New employee account password"
           },
           "role": {
             "$ref": "#/components/schemas/EmployeeRole"

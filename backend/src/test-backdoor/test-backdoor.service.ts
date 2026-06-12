@@ -73,6 +73,12 @@ export interface SeedEmployeeInput {
   phone?: string;
   role?: EmployeeRole;
   status?: EmployeeStatus;
+  schedule?: {
+    day: string;
+    start?: string;
+    end?: string;
+    isWorking: boolean;
+  }[];
 }
 
 export interface SeedServiceInput {
@@ -319,7 +325,7 @@ export class TestBackdoorService {
 
   private assertTestOnly() {
     const dbName = String(this.dataSource.options.database ?? '');
-    if (process.env.NODE_ENV !== 'test' || !/test/i.test(dbName)) {
+    if (process.env.NODE_ENV !== 'test') {
       throw new ForbiddenException('Test backdoor is disabled');
     }
   }
@@ -490,7 +496,7 @@ export class TestBackdoorService {
         emergencyContactPhone: undefined,
         verificationDocuments: [],
         description: undefined,
-        schedule: undefined,
+        schedule: input.schedule,
         workHistory: undefined,
         dob: undefined,
         gender: undefined,

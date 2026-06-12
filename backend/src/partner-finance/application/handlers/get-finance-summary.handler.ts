@@ -51,7 +51,10 @@ export class GetFinanceSummaryHandler {
       .setParameters({
         chargeType: PartnerTransactionType.CHARGE,
         settledStatus: PartnerSettlementStatus.SETTLED,
-        pendingPayoutStatuses: [PartnerPayoutStatus.NOT_ASSIGNED, PartnerPayoutStatus.IN_PAYOUT],
+        pendingPayoutStatuses: [
+          PartnerPayoutStatus.NOT_ASSIGNED,
+          PartnerPayoutStatus.IN_PAYOUT,
+        ],
       })
       .getRawOne();
 
@@ -62,7 +65,10 @@ export class GetFinanceSummaryHandler {
       .where('rc.partnerId = :partnerId', { partnerId })
       .andWhere('rc.currency = :currency', { currency })
       .andWhere('rc.status IN (:...openStatuses)', {
-        openStatuses: [PartnerRefundCaseStatus.PENDING, PartnerRefundCaseStatus.UNDER_REVIEW],
+        openStatuses: [
+          PartnerRefundCaseStatus.PENDING,
+          PartnerRefundCaseStatus.UNDER_REVIEW,
+        ],
       })
       .getRawOne();
 
@@ -71,7 +77,10 @@ export class GetFinanceSummaryHandler {
       .createQueryBuilder('p')
       .where('p.partnerId = :partnerId', { partnerId })
       .andWhere('p.status IN (:...activeStatuses)', {
-        activeStatuses: [PartnerPayoutStatus.IN_PAYOUT, PartnerPayoutStatus.FAILED],
+        activeStatuses: [
+          PartnerPayoutStatus.IN_PAYOUT,
+          PartnerPayoutStatus.FAILED,
+        ],
       })
       .orderBy('p.scheduledDate', 'ASC')
       .getOne();
@@ -96,7 +105,10 @@ export class GetFinanceSummaryHandler {
     return dto;
   }
 
-  private getDateRange(query: PartnerFinanceQueryDto): { start: Date; end: Date } {
+  private getDateRange(query: PartnerFinanceQueryDto): {
+    start: Date;
+    end: Date;
+  } {
     const end = query.endDate ? new Date(query.endDate) : new Date();
     end.setHours(23, 59, 59, 999);
 

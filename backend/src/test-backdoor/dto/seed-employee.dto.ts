@@ -1,7 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { EmployeeRole } from '@/employees/enum/employee-role.enum';
 import { EmployeeStatus } from '@/employees/enum/employee-status.enum';
+import { WorkScheduleEntryDto } from '@/employees/dto/work-schedule-entry.dto';
 
 export class SeedEmployeeDto {
   @ApiPropertyOptional({ type: String, description: 'Unique lookup key' })
@@ -64,4 +73,11 @@ export class SeedEmployeeDto {
   @IsOptional()
   @IsEnum(EmployeeStatus)
   status?: EmployeeStatus;
+
+  @ApiPropertyOptional({ type: [WorkScheduleEntryDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => WorkScheduleEntryDto)
+  schedule?: WorkScheduleEntryDto[];
 }

@@ -18,40 +18,18 @@ import {
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import {
-  AdminApi,
-} from '@/common/decorators/api/admin-api.decorator';
-import {
-  AdminPartnersService,
-} from '../services/admin-partners.service';
-import {
-  AdminPartnersQueryDto,
-} from '../dto/admin-partners-query.dto';
-import {
-  AuditInterceptor,
-} from '@/audit/interceptors/audit.interceptor';
-import {
-  AdminPartnerDetailResponseDto,
-} from '../dto/admin-partner-detail-response.dto';
-import {
-  ReviewPartnerProfileDto,
-} from '../dto/review-partner-profile.dto';
-import {
-  ReviewPartnerResponseDto,
-} from '../dto/review-partner-response.dto';
-import {
-  AdminPartnersResponseDto,
-} from '../dto/admin-partner-list-response.dto';
-import {
-  AdminPartnerStatsResponseDto,
-} from '../dto/admin-partner-stats-response.dto';
-import {
-  TotalPartnersResponseDto,
-} from '../dto/total-partners-response.dto';
+import { AdminApi } from '@/common/decorators/api/admin-api.decorator';
+import { AdminPartnersService } from '../services/admin-partners.service';
+import { AdminPartnersQueryDto } from '../dto/admin-partners-query.dto';
+import { AuditInterceptor } from '@/audit/interceptors/audit.interceptor';
+import { AdminPartnerDetailResponseDto } from '../dto/admin-partner-detail-response.dto';
+import { ReviewPartnerProfileDto } from '../dto/review-partner-profile.dto';
+import { ReviewPartnerResponseDto } from '../dto/review-partner-response.dto';
+import { AdminPartnersResponseDto } from '../dto/admin-partner-list-response.dto';
+import { AdminPartnerStatsResponseDto } from '../dto/admin-partner-stats-response.dto';
+import { TotalPartnersResponseDto } from '../dto/total-partners-response.dto';
 import { Audit } from '@/audit/decorators/audit.decorator';
-import {
-  LogResponse,
-} from '@/common/interceptors/response.interceptor';
+import { LogResponse } from '@/common/interceptors/response.interceptor';
 
 /**
  * Admin controller for partner management.
@@ -64,10 +42,7 @@ import {
 @AdminApi('partners')
 @UseInterceptors(AuditInterceptor)
 export class AdminPartnersController {
-  constructor(
-    private readonly adminPartnersService:
-      AdminPartnersService,
-  ) {}
+  constructor(private readonly adminPartnersService: AdminPartnersService) {}
 
   @Get()
   @ApiOperation({ summary: 'List all partners' })
@@ -75,7 +50,7 @@ export class AdminPartnersController {
     description: 'Paginated list of partners.',
     type: AdminPartnersResponseDto,
   })
-    @LogResponse()
+  @LogResponse()
   async getPartners(
     @Query() query: AdminPartnersQueryDto,
   ): Promise<AdminPartnersResponseDto> {
@@ -93,9 +68,7 @@ export class AdminPartnersController {
   async getPartnerStats(
     @Query() query: AdminPartnersQueryDto,
   ): Promise<AdminPartnerStatsResponseDto> {
-    return this.adminPartnersService.getPartnerStats(
-      query,
-    );
+    return this.adminPartnersService.getPartnerStats(query);
   }
 
   @Get('total')
@@ -109,9 +82,7 @@ export class AdminPartnersController {
   async getTotalPartners(
     @Query() query: AdminPartnersQueryDto,
   ): Promise<TotalPartnersResponseDto> {
-    return this.adminPartnersService.getTotalPartners(
-      query,
-    );
+    return this.adminPartnersService.getTotalPartners(query);
   }
 
   @Get(':id')
@@ -153,10 +124,6 @@ export class AdminPartnersController {
     @Body() dto: ReviewPartnerProfileDto,
     @Req() req,
   ): Promise<ReviewPartnerResponseDto> {
-    return this.adminPartnersService.reviewPartner(
-      id,
-      dto,
-      req.user.id,
-    );
+    return this.adminPartnersService.reviewPartner(id, dto, req.user.id);
   }
 }

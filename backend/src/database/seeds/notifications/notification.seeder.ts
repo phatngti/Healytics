@@ -234,6 +234,7 @@ export class NotificationSeeder implements ISeeder {
     const accounts = await this.accountRepo.find({
       where: { email: In(involvedEmails) },
       select: ['id', 'email'],
+      loadEagerRelations: false,
     });
     const accountMap = buildMapBy(accounts, (account) => account.email);
 

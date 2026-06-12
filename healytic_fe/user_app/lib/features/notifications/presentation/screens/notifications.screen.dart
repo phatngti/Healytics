@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/core/widgets/main_screen_layout.widget.dart';
 import 'package:user_app/features/notifications/'
     'domain/entities/notification.entity.dart';
@@ -35,56 +36,36 @@ class NotificationsPage extends HookConsumerWidget {
     useEffect(() {
       Future.microtask(() {
         if (context.mounted) {
-          ref
-              .read(notificationProvider.notifier)
-              .refresh();
+          ref.read(notificationProvider.notifier).refresh();
         }
       });
       return null;
     }, const []);
 
-    final asyncNotifications = ref.watch(
-      notificationProvider,
-    );
-    final hPad =
-        AppDimens.horizontalPadding(context);
-    final bottomPad =
-        AppDimens.bottomScrollPadding(context);
-    final unreadAsync = ref.watch(
-      unreadCountProvider,
-    );
-    final unreadCount =
-        unreadAsync.value ?? 0;
+    final asyncNotifications = ref.watch(notificationProvider);
+    final hPad = AppDimens.horizontalPadding(context);
+    final bottomPad = AppDimens.bottomScrollPadding(context);
+    final unreadAsync = ref.watch(unreadCountProvider);
+    final unreadCount = unreadAsync.value ?? 0;
 
     return MainScreenLayout(
       title: 'Notifications',
       actions: [
         if (unreadCount > 0)
           IconButton(
-            icon: const Icon(
-              Symbols.done_all,
-              size: AppDimens.iconMd,
-            ),
+            key: keys.notificationsPage.markAllReadButton,
+            icon: const Icon(Symbols.done_all, size: AppDimens.iconMd),
             tooltip: 'Mark all as read',
             onPressed: () {
-              ref
-                  .read(
-                    notificationProvider
-                        .notifier,
-                  )
-                  .markAllRead();
+              ref.read(notificationProvider.notifier).markAllRead();
             },
           ),
         const SizedBox(width: 4),
       ],
       body: asyncNotifications.when(
-        loading: () =>
-            _LoadingState(hPadding: hPad),
-        error: (error, _) => _ErrorState(
-          onRetry: () => ref.invalidate(
-            notificationProvider,
-          ),
-        ),
+        loading: () => _LoadingState(hPadding: hPad),
+        error: (error, _) =>
+            _ErrorState(onRetry: () => ref.invalidate(notificationProvider)),
         data: (notifications) {
           if (notifications.isEmpty) {
             return const _EmptyState();
@@ -93,30 +74,12 @@ class NotificationsPage extends HookConsumerWidget {
             notifications: notifications,
             hPadding: hPad,
             bottomPadding: bottomPad,
-            onRefresh: () => ref
-                .read(
-                  notificationProvider
-                      .notifier,
-                )
-                .refresh(),
-            onLoadMore: () => ref
-                .read(
-                  notificationProvider
-                      .notifier,
-                )
-                .loadMore(),
-            hasMore: ref
-                .read(
-                  notificationProvider
-                      .notifier,
-                )
-                .hasMore,
-            onMarkRead: (id) => ref
-                .read(
-                  notificationProvider
-                      .notifier,
-                )
-                .markRead(id),
+            onRefresh: () => ref.read(notificationProvider.notifier).refresh(),
+            onLoadMore: () =>
+                ref.read(notificationProvider.notifier).loadMore(),
+            hasMore: ref.read(notificationProvider.notifier).hasMore,
+            onMarkRead: (id) =>
+                ref.read(notificationProvider.notifier).markRead(id),
           );
         },
       ),
@@ -146,12 +109,10 @@ class _NotificationList extends StatefulWidget {
   final void Function(String id) onMarkRead;
 
   @override
-  State<_NotificationList> createState() =>
-      _NotificationListState();
+  State<_NotificationList> createState() => _NotificationListState();
 }
 
-class _NotificationListState
-    extends State<_NotificationList> {
+class _NotificationListState extends State<_NotificationList> {
   final _scrollController = ScrollController();
   bool _isLoadingMore = false;
 
@@ -172,10 +133,8 @@ class _NotificationListState
   void _onScroll() {
     if (_isLoadingMore || !widget.hasMore) return;
 
-    final maxScroll =
-        _scrollController.position.maxScrollExtent;
-    final currentScroll =
-        _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
     // Trigger load-more when 200px from bottom
     if (currentScroll >= maxScroll - 200) {
       _loadMore();
@@ -193,16 +152,14 @@ class _NotificationListState
   @override
   Widget build(BuildContext context) {
     // Group notifications by date section
-    final sections = _groupByDate(
-      widget.notifications,
-    );
+    final sections = _groupByDate(widget.notifications);
 
     return RefreshIndicator(
       onRefresh: widget.onRefresh,
       child: ListView.builder(
+        key: keys.notificationsPage.notificationsList,
         controller: _scrollController,
-        physics:
-            const AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.fromLTRB(
           widget.hPadding,
           AppDimens.spaceXl,
@@ -211,11 +168,7 @@ class _NotificationListState
         ),
         itemCount: _calculateItemCount(sections),
         itemBuilder: (context, index) {
-          return _buildItem(
-            index,
-            sections,
-            context,
-          );
+          return _buildItem(index, sections, context);
         },
       ),
     );
@@ -223,20 +176,12 @@ class _NotificationListState
 
   /// Groups a flat notification list into
   /// date-labelled sections.
-  List<_DateSection> _groupByDate(
-    List<NotificationEntity> notifications,
-  ) {
+  List<_DateSection> _groupByDate(List<NotificationEntity> notifications) {
     final now = DateTime.now();
-    final today = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    );
-    final yesterday =
-        today.subtract(const Duration(days: 1));
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
 
-    final Map<String, List<NotificationEntity>>
-        grouped = {};
+    final Map<String, List<NotificationEntity>> grouped = {};
     for (final n in notifications) {
       final date = DateTime(
         n.createdAt.year,
@@ -252,32 +197,22 @@ class _NotificationListState
       } else if (now.difference(date).inDays < 7) {
         label = 'This Week';
       } else {
-        label =
-            '${date.day}/${date.month}/${date.year}';
+        label = '${date.day}/${date.month}/${date.year}';
       }
 
       (grouped[label] ??= []).add(n);
     }
 
     return grouped.entries
-        .map(
-          (e) => _DateSection(
-            label: e.key,
-            notifications: e.value,
-          ),
-        )
+        .map((e) => _DateSection(label: e.key, notifications: e.value))
         .toList();
   }
 
-  int _calculateItemCount(
-    List<_DateSection> sections,
-  ) {
+  int _calculateItemCount(List<_DateSection> sections) {
     var count = 0;
     for (final section in sections) {
       // 1 header + N cards + 1 spacing
-      count += 1 +
-          section.notifications.length +
-          1;
+      count += 1 + section.notifications.length + 1;
     }
     // +1 for load-more indicator
     if (widget.hasMore || _isLoadingMore) count++;
@@ -293,24 +228,19 @@ class _NotificationListState
     for (final section in sections) {
       // Section header
       if (index == cursor) {
-        return NotificationSectionHeader(
-          label: section.label,
-        );
+        return NotificationSectionHeader(label: section.label);
       }
       cursor++;
 
       // Notification cards
-      final notifCount =
-          section.notifications.length;
+      final notifCount = section.notifications.length;
       if (index < cursor + notifCount) {
         final notifIndex = index - cursor;
-        final notification =
-            section.notifications[notifIndex];
+        final notification = section.notifications[notifIndex];
         return Padding(
-          padding: EdgeInsets.only(
-            bottom: AppDimens.spaceLg,
-          ),
+          padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
           child: NotificationCard(
+            key: keys.notificationsPage.card(notification.id),
             notification: notification,
             onTap: () {
               if (!notification.isRead) {
@@ -324,9 +254,7 @@ class _NotificationListState
 
       // Section bottom spacing
       if (index == cursor) {
-        return SizedBox(
-          height: AppDimens.spaceXl,
-        );
+        return SizedBox(height: AppDimens.spaceXl);
       }
       cursor++;
     }
@@ -339,9 +267,7 @@ class _NotificationListState
           child: SizedBox(
             width: 24,
             height: 24,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-            ),
+            child: CircularProgressIndicator(strokeWidth: 2),
           ),
         ),
       );
@@ -355,10 +281,7 @@ class _NotificationListState
 class _DateSection {
   final String label;
   final List<NotificationEntity> notifications;
-  const _DateSection({
-    required this.label,
-    required this.notifications,
-  });
+  const _DateSection({required this.label, required this.notifications});
 }
 
 // ─── Loading State ──────────────────────────────────
@@ -384,86 +307,62 @@ class _LoadingState extends StatelessWidget {
         Container(
           width: 60,
           height: 12,
-          margin: EdgeInsets.only(
-            bottom: AppDimens.spaceLg,
-          ),
+          margin: EdgeInsets.only(bottom: AppDimens.spaceLg),
           decoration: BoxDecoration(
-            color: theme
-                .colorScheme.surfaceContainerHighest,
-            borderRadius:
-                AppDimens.radiusExtraSmall,
+            color: theme.colorScheme.surfaceContainerHighest,
+            borderRadius: AppDimens.radiusExtraSmall,
           ),
         ),
         // Shimmer cards
         ...List.generate(4, (i) {
           return Padding(
-            padding: EdgeInsets.only(
-              bottom: AppDimens.spaceLg,
-            ),
+            padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
             child: Container(
               padding: EdgeInsets.all(cardPad),
               decoration: BoxDecoration(
-                color: theme.colorScheme
-                    .surfaceContainerLow,
-                borderRadius:
-                    BorderRadius.circular(cardRad),
+                color: theme.colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(cardRad),
               ),
               child: Row(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     width: AppDimens.avatarLg,
                     height: AppDimens.avatarLg,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme
-                          .surfaceContainerHighest,
-                      borderRadius:
-                          AppDimens.radiusMedium,
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: AppDimens.radiusMedium,
                     ),
                   ),
-                  SizedBox(
-                    width: AppDimens.spaceLg,
-                  ),
+                  SizedBox(width: AppDimens.spaceLg),
                   Expanded(
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           height: 14,
                           width: 160,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme
-                                .surfaceContainerHighest,
-                            borderRadius: AppDimens
-                                .radiusExtraSmall,
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: AppDimens.radiusExtraSmall,
                           ),
                         ),
-                        SizedBox(
-                          height: AppDimens.spaceSm,
-                        ),
+                        SizedBox(height: AppDimens.spaceSm),
                         Container(
                           height: 12,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme
-                                .surfaceContainerHighest,
-                            borderRadius: AppDimens
-                                .radiusExtraSmall,
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: AppDimens.radiusExtraSmall,
                           ),
                         ),
-                        SizedBox(
-                          height: AppDimens.spaceXs,
-                        ),
+                        SizedBox(height: AppDimens.spaceXs),
                         Container(
                           height: 12,
                           width: 120,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme
-                                .surfaceContainerHighest,
-                            borderRadius: AppDimens
-                                .radiusExtraSmall,
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: AppDimens.radiusExtraSmall,
                           ),
                         ),
                       ],
@@ -495,28 +394,21 @@ class _EmptyState extends StatelessWidget {
           Icon(
             Symbols.notifications_none,
             size: 64,
-            color: theme
-                .colorScheme.onSurfaceVariant
-                .withValues(alpha: 0.4),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
           ),
           AppDimens.verticalMedium,
           Text(
             'No notifications yet',
-            style:
-                theme.textTheme.titleMedium?.copyWith(
-              color: theme
-                  .colorScheme.onSurfaceVariant,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           AppDimens.verticalSmall,
           Text(
             "We'll notify you when something "
             'important happens',
-            style:
-                theme.textTheme.bodySmall?.copyWith(
-              color: theme
-                  .colorScheme.onSurfaceVariant
-                  .withValues(alpha: 0.7),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -544,17 +436,13 @@ class _ErrorState extends StatelessWidget {
           Icon(
             Symbols.error_outline,
             size: 64,
-            color: theme
-                .colorScheme.onSurfaceVariant
-                .withValues(alpha: 0.4),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
           ),
           AppDimens.verticalMedium,
           Text(
             'Could not load notifications',
-            style:
-                theme.textTheme.titleMedium?.copyWith(
-              color: theme
-                  .colorScheme.onSurfaceVariant,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           if (onRetry != null) ...[

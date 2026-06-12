@@ -1,0 +1,18 @@
+# user_openapi.model.RegisterAddressDto
+
+## Load the model package
+```dart
+import 'package:user_openapi/api.dart';
+```
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**streetAddress** | **String** |  | 
+**provinceId** | **String** | Province/city Location UUID | 
+**districtId** | **String** | District Location UUID | 
+**wardId** | **String** | Ward/commune Location UUID | 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

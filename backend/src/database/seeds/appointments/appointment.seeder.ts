@@ -15,6 +15,7 @@ import { PaymentMethod } from '@/payment-gateway/enums/payment-method.enum';
 import { PaymentStatus } from '@/payment-gateway/enums/payment-status.enum';
 import { Role } from '@/account/enum/role.enum';
 import { ISeeder } from '../seeder.interface';
+import { BULK_WELLNESS_APPOINTMENTS } from '../wellness-bulk.seed';
 
 const seedAppointmentMarker = (idempotencyKey: string): string =>
   `SEED_APPOINTMENT:${idempotencyKey}`;
@@ -743,6 +744,11 @@ const SEED_APPOINTMENTS: {
   },
 ];
 
+const ALL_SEED_APPOINTMENTS = [
+  ...SEED_APPOINTMENTS,
+  ...BULK_WELLNESS_APPOINTMENTS,
+];
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Injectable()
@@ -780,11 +786,12 @@ export class AppointmentSeeder implements ISeeder {
 
     // ── Pre-load lookup maps ──────────────────────────────────────────────────
     const userEmails = [
-      ...new Set(SEED_APPOINTMENTS.map((apt) => apt.userEmail)),
+      ...new Set(ALL_SEED_APPOINTMENTS.map((apt) => apt.userEmail)),
     ];
     const userAccounts = await this.accountRepo.find({
       where: { email: In(userEmails), role: Role.USER },
       select: ['id', 'email'],
+      loadEagerRelations: false,
     });
     const userMap = new Map(
       userAccounts.map((account) => [account.email, account]),
@@ -803,7 +810,10 @@ export class AppointmentSeeder implements ISeeder {
     const products = await this.productRepo.find();
     const productMap = new Map(products.map((p) => [p.slug, p]));
 
-    // ── Seed each appointment ─────────────────────────────────────────────────
+    const markedBookingIdsByKey = await this.loadMarkedSeedBookingIds();
+    const bulkBookingIdsByNote = await this.loadBulkBookingIdsByNote();
+
+    // ── Seed hand-authored appointments ───────────────────────────────────────
     for (const apt of SEED_APPOINTMENTS) {
       // Use notes + startTime as a logical idempotency check via idempotencyKey
       // We store idempotencyKey in the `notes` field is NOT correct — instead
@@ -832,12 +842,20 @@ export class AppointmentSeeder implements ISeeder {
         continue;
       }
 
-      const existing = await this.findExistingSeedBooking(
-        apt,
-        userAccount.id,
-        employee.id,
-        product?.id ?? null,
-      );
+      const markedBookingId = markedBookingIdsByKey.get(apt.idempotencyKey);
+      const existing =
+        markedBookingId !== undefined
+          ? ({ id: markedBookingId } as Booking)
+          : apt.idempotencyKey.startsWith('BULK-SVC-')
+            ? bulkBookingIdsByNote.has(apt.notes ?? '')
+              ? ({ id: bulkBookingIdsByNote.get(apt.notes ?? '') } as Booking)
+              : null
+            : await this.findExistingSeedBooking(
+                apt,
+                userAccount.id,
+                employee.id,
+                product?.id ?? null,
+              );
 
       if (existing) {
         await this.markSeedBooking(existing.id, apt.idempotencyKey);
@@ -863,14 +881,19 @@ export class AppointmentSeeder implements ISeeder {
       });
 
       await this.bookingRepo.save(booking);
+      markedBookingIdsByKey.set(apt.idempotencyKey, booking.id);
+      if (apt.idempotencyKey.startsWith('BULK-SVC-') && apt.notes) {
+        bulkBookingIdsByNote.set(apt.notes, booking.id);
+      }
       this.logger.log(
         `  ✅ Created booking ${apt.idempotencyKey} (${apt.status}) → staff: ${apt.staffCode}, product: ${apt.productSlug ?? 'none'}`,
       );
 
       // 2. Booking Status Logs (audit trail)
       for (const log of apt.statusLogs) {
+        const statusLogData = log as any;
         const reasonCode =
-          log.reasonCode ??
+          statusLogData.reasonCode ??
           this.inferSeedReasonCode(log.fromStatus, log.toStatus);
         const statusLog = this.statusLogRepo.create({
           bookingId: booking.id,
@@ -880,7 +903,8 @@ export class AppointmentSeeder implements ISeeder {
           reasonCode,
           reason: this.buildSeedStatusLogReason(
             apt.idempotencyKey,
-            log.reason ?? this.defaultSeedReason(log.fromStatus, log.toStatus),
+            statusLogData.reason ??
+              this.defaultSeedReason(log.fromStatus, log.toStatus),
           ),
         });
         await this.statusLogRepo.save(statusLog);
@@ -946,8 +970,211 @@ export class AppointmentSeeder implements ISeeder {
       }
     }
 
+    await this.seedBulkWellnessAppointments(
+      userMap,
+      employeeMap,
+      productMap,
+      markedBookingIdsByKey,
+      bulkBookingIdsByNote,
+    );
+
     await this.refreshEmployeeReviewAggregates();
     this.logger.log('Appointments seeding completed');
+  }
+
+  private async seedBulkWellnessAppointments(
+    userMap: Map<string, Account>,
+    employeeMap: Map<string, Employee>,
+    productMap: Map<string, Product>,
+    markedBookingIdsByKey: Map<string, string>,
+    bulkBookingIdsByNote: Map<string, string>,
+  ): Promise<void> {
+    const pendingAppointments: any[] = [];
+    const repairAppointments: { apt: any; bookingId: string }[] = [];
+
+    for (const apt of BULK_WELLNESS_APPOINTMENTS) {
+      if (markedBookingIdsByKey.has(apt.idempotencyKey)) continue;
+
+      const existingBookingId = bulkBookingIdsByNote.get(apt.notes ?? '');
+      if (existingBookingId) {
+        repairAppointments.push({ apt, bookingId: existingBookingId });
+        continue;
+      }
+
+      const userAccount = userMap.get(apt.userEmail);
+      const employee = employeeMap.get(apt.staffCode);
+      const product = productMap.get(apt.productSlug);
+
+      if (!userAccount || !employee || !product) {
+        this.logger.warn(
+          `  ⚠ Missing bulk appointment refs for ${apt.idempotencyKey} — skipping`,
+        );
+        continue;
+      }
+
+      pendingAppointments.push({ apt, userAccount, employee, product });
+    }
+
+    if (!pendingAppointments.length && !repairAppointments.length) {
+      this.logger.log('  ⏭ Bulk wellness appointments already seeded');
+      return;
+    }
+
+    this.logger.log(
+      `  🌿 Seeding ${pendingAppointments.length} bulk wellness appointment(s), repairing ${repairAppointments.length} partial row(s)...`,
+    );
+
+    const bookingRows = pendingAppointments.map(
+      ({ apt, userAccount, employee, product }) =>
+        this.bookingRepo.create({
+          userId: userAccount.id,
+          staffId: employee.id,
+          productId: product.id,
+          startTime: apt.startTime,
+          endTime: apt.endTime,
+          status: apt.status,
+          isReviewed: apt.isReviewed,
+          notes: apt.notes,
+          paymentUrl: null,
+          paymentDeeplink: null,
+          paymentExpiresAt: null,
+        }),
+    );
+
+    const savedBookings = bookingRows.length
+      ? await this.bookingRepo.save(bookingRows, { chunk: 500 })
+      : [];
+
+    const seededAppointments = pendingAppointments.map((entry, index) => ({
+      ...entry,
+      bookingId: savedBookings[index].id,
+    }));
+
+    const repairIds = repairAppointments.map((entry) => entry.bookingId);
+    if (repairIds.length) {
+      await Promise.all([
+        this.treatmentReviewRepo.delete({ appointmentId: In(repairIds) }),
+        this.specialistReviewRepo.delete({ appointmentId: In(repairIds) }),
+        this.paymentRepo.delete({ bookingId: In(repairIds) }),
+        this.statusLogRepo.delete({ bookingId: In(repairIds) }),
+        this.bookingRepo.update(
+          { id: In(repairIds) },
+          { status: BookingStatus.COMPLETED, isReviewed: true },
+        ),
+      ]);
+    }
+
+    const materializedAppointments = [
+      ...seededAppointments,
+      ...repairAppointments.map(({ apt, bookingId }) => {
+        const userAccount = userMap.get(apt.userEmail);
+        const employee = employeeMap.get(apt.staffCode);
+        const product = productMap.get(apt.productSlug);
+        if (!userAccount || !employee || !product) return null;
+        return { apt, userAccount, employee, product, bookingId };
+      }),
+    ].filter(Boolean) as {
+      apt: any;
+      userAccount: Account;
+      employee: Employee;
+      product: Product;
+      bookingId: string;
+    }[];
+
+    const statusLogRows: BookingStatusLog[] = [];
+    const paymentRows: Payment[] = [];
+    const treatmentReviewRows: TreatmentReview[] = [];
+    const specialistReviewRows: SpecialistReview[] = [];
+
+    for (const entry of materializedAppointments) {
+      const { apt, userAccount, employee, bookingId } = entry;
+
+      for (const log of apt.statusLogs) {
+        const statusLogData = log;
+        const reasonCode =
+          statusLogData.reasonCode ??
+          this.inferSeedReasonCode(log.fromStatus, log.toStatus);
+        statusLogRows.push(
+          this.statusLogRepo.create({
+            bookingId,
+            fromStatus: log.fromStatus,
+            toStatus: log.toStatus,
+            changedBy: log.changedBy,
+            reasonCode,
+            reason: this.buildSeedStatusLogReason(
+              apt.idempotencyKey,
+              statusLogData.reason ??
+                this.defaultSeedReason(log.fromStatus, log.toStatus),
+            ),
+          }),
+        );
+      }
+
+      paymentRows.push(
+        this.paymentRepo.create({
+          bookingId,
+          userId: userAccount.id,
+          paymentMethod: apt.payment.method,
+          paymentStatus: apt.payment.status,
+          amount: apt.payment.amount,
+          paidAt: apt.payment.paidAt,
+          gatewayOrderId: null,
+          gatewayTransId: null,
+          paymentUrl: null,
+          paymentDeeplink: null,
+          gatewayResultCode:
+            apt.payment.status === PaymentStatus.PAID ? 0 : null,
+          gatewayMessage:
+            apt.payment.status === PaymentStatus.PAID ? 'Success' : null,
+          refundedAt:
+            apt.payment.status === PaymentStatus.REFUND
+              ? apt.payment.paidAt
+              : null,
+        }),
+      );
+
+      treatmentReviewRows.push(
+        this.treatmentReviewRepo.create({
+          appointmentId: bookingId,
+          userId: userAccount.id,
+          rating: apt.treatmentReview.rating,
+          comment: apt.treatmentReview.comment,
+          tags: apt.treatmentReview.tags,
+          photoUrls: apt.treatmentReview.photoUrls,
+        }),
+      );
+
+      specialistReviewRows.push(
+        this.specialistReviewRepo.create({
+          appointmentId: bookingId,
+          specialistId: employee.id,
+          userId: userAccount.id,
+          rating: apt.specialistReview.rating,
+          comment: apt.specialistReview.comment,
+          tags: apt.specialistReview.tags,
+          wouldRecommend: apt.specialistReview.wouldRecommend,
+        }),
+      );
+    }
+
+    await Promise.all([
+      statusLogRows.length
+        ? this.statusLogRepo.save(statusLogRows, { chunk: 1000 })
+        : Promise.resolve(),
+      paymentRows.length
+        ? this.paymentRepo.save(paymentRows, { chunk: 1000 })
+        : Promise.resolve(),
+      treatmentReviewRows.length
+        ? this.treatmentReviewRepo.save(treatmentReviewRows, { chunk: 1000 })
+        : Promise.resolve(),
+      specialistReviewRows.length
+        ? this.specialistReviewRepo.save(specialistReviewRows, { chunk: 1000 })
+        : Promise.resolve(),
+    ]);
+
+    this.logger.log(
+      `  ✅ Bulk wellness appointments ready: ${materializedAppointments.length}`,
+    );
   }
 
   async clear(): Promise<void> {
@@ -957,10 +1184,11 @@ export class AppointmentSeeder implements ISeeder {
     // Strategy: find all bookings where userId = testUser + staffId in seedEmployee IDs
     const userAccounts = await this.accountRepo.find({
       where: {
-        email: In([...new Set(SEED_APPOINTMENTS.map((a) => a.userEmail))]),
+        email: In([...new Set(ALL_SEED_APPOINTMENTS.map((a) => a.userEmail))]),
         role: Role.USER,
       },
       select: ['id'],
+      loadEagerRelations: false,
     });
 
     if (!userAccounts.length) {
@@ -970,7 +1198,7 @@ export class AppointmentSeeder implements ISeeder {
     const userIds = userAccounts.map((account) => account.id);
 
     const seedStaffCodes = [
-      ...new Set(SEED_APPOINTMENTS.map((a) => a.staffCode)),
+      ...new Set(ALL_SEED_APPOINTMENTS.map((a) => a.staffCode)),
     ];
     const employees = await this.employeeRepo.find({
       where: { employeeCode: In(seedStaffCodes) },
@@ -1088,7 +1316,7 @@ export class AppointmentSeeder implements ISeeder {
   }
 
   private async findExistingSeedBooking(
-    apt: (typeof SEED_APPOINTMENTS)[number],
+    apt: (typeof ALL_SEED_APPOINTMENTS)[number],
     userId: string,
     staffId: string,
     productId: string | null,
@@ -1139,6 +1367,45 @@ export class AppointmentSeeder implements ISeeder {
     }
 
     return candidates[0] ?? null;
+  }
+
+  private async loadMarkedSeedBookingIds(): Promise<Map<string, string>> {
+    const rows = await this.statusLogRepo
+      .createQueryBuilder('statusLog')
+      .select('statusLog.bookingId', 'bookingId')
+      .addSelect('statusLog.reason', 'reason')
+      .where('statusLog.reason LIKE :markerPrefix', {
+        markerPrefix: 'SEED_APPOINTMENT:%',
+      })
+      .getRawMany<{ bookingId: string; reason: string | null }>();
+
+    const map = new Map<string, string>();
+    for (const row of rows) {
+      const match = row.reason?.match(/^SEED_APPOINTMENT:([^ ]+)/);
+      if (match?.[1] && !map.has(match[1])) {
+        map.set(match[1], row.bookingId);
+      }
+    }
+    return map;
+  }
+
+  private async loadBulkBookingIdsByNote(): Promise<Map<string, string>> {
+    const rows = await this.bookingRepo
+      .createQueryBuilder('booking')
+      .select('booking.id', 'id')
+      .addSelect('booking.notes', 'notes')
+      .where('booking.notes LIKE :notePrefix', {
+        notePrefix: 'Bulk wellness completed booking BULK-SVC-%',
+      })
+      .getRawMany<{ id: string; notes: string | null }>();
+
+    const map = new Map<string, string>();
+    for (const row of rows) {
+      if (row.notes && !map.has(row.notes)) {
+        map.set(row.notes, row.id);
+      }
+    }
+    return map;
   }
 
   private async markSeedBooking(

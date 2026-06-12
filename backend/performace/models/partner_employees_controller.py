@@ -2,24 +2,10 @@
 
 from __future__ import annotations
 
-from enum import Enum
 from typing import Any, TypeAlias
 from dataclasses import dataclass
 from .base import DtoModel, dto_field
-from .shared import EmployeeResponseDto, MedicalCredentialResponseDto, VerificationDocumentEntryDto, WorkHistoryEntryDto, WorkScheduleEntryDto
-
-
-class EmployeeRole(str, Enum):
-    DOCTOR = 'DOCTOR'
-    THERAPIST = 'THERAPIST'
-    RECEPTIONIST = 'RECEPTIONIST'
-    MANAGER = 'MANAGER'
-
-
-class EmployeeStatus(str, Enum):
-    ACTIVE = 'ACTIVE'
-    INACTIVE = 'INACTIVE'
-    ON_LEAVE = 'ON_LEAVE'
+from .shared import EmployeeResponseDto, EmployeeRole, EmployeeStatus, HealthServiceStatus, MedicalCredentialResponseDto, VerificationDocumentEntryDto, WorkHistoryEntryDto, WorkScheduleEntryDto
 
 
 @dataclass(slots=True)
@@ -27,6 +13,7 @@ class CreateDoctorDto(DtoModel):
     firstName: str
     lastName: str
     email: str
+    password: str
     emergencyContactName: str
     emergencyContactPhone: str
     employeeId: str
@@ -67,6 +54,7 @@ class CreateMassageTherapistDto(DtoModel):
     firstName: str
     lastName: str
     email: str
+    password: str
     emergencyContactName: str
     emergencyContactPhone: str
     employeeId: str
@@ -91,10 +79,16 @@ class CreateMassageTherapistDto(DtoModel):
 
 
 @dataclass(slots=True)
+class CreateSkillDto(DtoModel):
+    name: str
+
+
+@dataclass(slots=True)
 class CreateSpaTherapistDto(DtoModel):
     firstName: str
     lastName: str
     email: str
+    password: str
     emergencyContactName: str
     emergencyContactPhone: str
     employeeId: str
@@ -127,6 +121,20 @@ class CreateTherapistProfileDto(DtoModel):
     healthCheckDate: str | None = None
     skills: list[str] | None = None
     deviceProficiency: list[str] | None = None
+
+
+@dataclass(slots=True)
+class EmployeeAssignedServiceDto(DtoModel):
+    id: str
+    name: str
+    status: HealthServiceStatus
+    basePrice: float
+    currency: str
+    isPrimary: bool
+    salePrice: float | None = None
+    durationMinutes: float | None = None
+    categoryName: str | None = None
+    imageUrl: str | None = None
 
 
 @dataclass(slots=True)
@@ -216,10 +224,17 @@ class EmployeeTrendPointDto(DtoModel):
 
 
 @dataclass(slots=True)
+class SkillCatalogResponseDto(DtoModel):
+    key: str
+    label: str
+
+
+@dataclass(slots=True)
 class UpdateEmployeeDto(DtoModel):
     employeeCode: str | None = None
     fullName: str | None = None
     email: str | None = None
+    password: str | None = None
     role: EmployeeRole | None = None
     status: EmployeeStatus | None = None
     firstName: str | None = None
@@ -245,14 +260,23 @@ class UpdateEmployeeDto(DtoModel):
 PartnerEmployeesControllerFindAllResponseDto: TypeAlias = list[EmployeeResponseDto]  # GET /partner/employees [200]
 
 
+PartnerEmployeesControllerGetMassageSkillsResponseDto: TypeAlias = list[SkillCatalogResponseDto]  # GET /partner/employees/massage-skills [200]
+
+
+PartnerEmployeesControllerGetSpaSkillsResponseDto: TypeAlias = list[SkillCatalogResponseDto]  # GET /partner/employees/spa-skills [200]
+
+
+PartnerEmployeesControllerFindAssignedServicesResponseDto: TypeAlias = list[EmployeeAssignedServiceDto]  # GET /partner/employees/{id}/services [200]
+
+
 __all__ = [
-    "EmployeeRole",
-    "EmployeeStatus",
     "CreateDoctorDto",
     "CreateDoctorProfileDto",
     "CreateMassageTherapistDto",
+    "CreateSkillDto",
     "CreateSpaTherapistDto",
     "CreateTherapistProfileDto",
+    "EmployeeAssignedServiceDto",
     "EmployeeComplianceItemDto",
     "EmployeeDetailAnalyticsResponseDto",
     "EmployeeMixMetricDto",
@@ -262,6 +286,10 @@ __all__ = [
     "EmployeeRoleDistributionDto",
     "EmployeeScheduleLoadDto",
     "EmployeeTrendPointDto",
+    "SkillCatalogResponseDto",
     "UpdateEmployeeDto",
     "PartnerEmployeesControllerFindAllResponseDto",
+    "PartnerEmployeesControllerGetMassageSkillsResponseDto",
+    "PartnerEmployeesControllerGetSpaSkillsResponseDto",
+    "PartnerEmployeesControllerFindAssignedServicesResponseDto",
 ]

@@ -4,7 +4,7 @@
 \textbf{N-tier Architecture} chia hệ thống thành các tầng độc lập theo trách nhiệm, giao tiếp theo luồng một chiều rõ ràng nhằm tăng khả năng bảo trì, bảo mật và mở rộng. Mỗi tầng chỉ giao tiếp với tầng liền kề, qua đó giảm thiểu sự phụ thuộc chéo (Loose Coupling) và cho phép thay đổi công nghệ ở một tầng mà không ảnh hưởng đến các tầng còn lại. Hệ thống Healytics áp dụng mô hình 5 tầng; kết cấu chi tiết cùng công nghệ cụ thể cho từng tầng sẽ được trình bày sau sơ đồ kiến trúc tổng thể (Hình~\ref{fig:sys_arch}).
 
 \subsection{Ưu điểm và Nhược điểm}
-\begin{table}[htbp]
+\begin{table}[H]
     \centering
     \caption{Ưu điểm và Nhược điểm của Kiến trúc Layer (N-tier)}
     \label{tab:ntier-comparison}
@@ -47,9 +47,13 @@
 \end{table}
 
 \subsection{Các Kiến trúc Thay thế và So sánh}
-\begin{table}[htbp]
+
+Bảng~\ref{tab:arch-alt-comparison} đối chiếu kiến trúc N-tier với các mô hình thay thế thường gặp (CQRS, Microservices, Orchestration, MVP, Event-Driven) trên các tiêu chí then chốt.
+
+\begin{table}[H]
     \centering
     \caption{So sánh Kiến trúc N-tier với các Kiến trúc khác}
+    \label{tab:arch-alt-comparison}
     \vspace{0.3cm}
     \renewcommand{\arraystretch}{1.5} % Khoảng cách dòng
     
@@ -151,7 +155,8 @@ Dựa trên Hình \ref{fig:sys_arch}, kiến trúc tổng thể được thiết
         \item \textit{PostgreSQL DB:} Cơ sở dữ liệu quan hệ cho dữ liệu nghiệp vụ chính.
         \item \textit{Redis Cache:} Bộ nhớ đệm giúp tăng tốc độ truy xuất dữ liệu.
         \item \textit{Cloud Storage:} Lưu trữ tài liệu, hình ảnh.
-        \item \textit{Vector DB / NoSQL:} Hỗ trợ lưu trữ dữ liệu phi cấu trúc phục vụ cho AI/ML.
+        \item \textit{OpenSearch:} Lưu trữ và tìm kiếm kho tri thức WHO phục vụ RAG Chatbot (full-text + vector).
+        \item \textit{ChromaDB:} Lưu trữ vector embeddings phục vụ hệ thống gợi ý dịch vụ (Recommender).
         \item \textit{Message Queue:} Hàng đợi thông điệp giúp xử lý bất đồng bộ và giao tiếp giữa các services (Event-driven).
     \end{itemize}
 
@@ -252,11 +257,40 @@ Các giao diện thiết kế chi tiết được trình bày đầy đủ tại
 Dữ liệu phục vụ các pipeline AI trong mã nguồn hiện tại được phân theo từng dịch vụ như sau.
 
 \begin{itemize}
-    \item \textbf{RAG Chatbot:} Kho tri thức gồm các tài liệu PDF; khi khởi động dịch vụ, toàn bộ PDF trong thư mục tri thức được đọc song song, loại bỏ ký tự ngoài ASCII (UTF-8), sau đó chia nhỏ với độ dài đoạn 300 ký tự và không chồng lấp giữa các đoạn.
+    \item \textbf{RAG Chatbot:} Thu thập tài liệu WHO từ thư viện số IRIS và trang who.int, tải file PDF, trích xuất văn bản, chia thành các chunk nhỏ, tạo embedding (768 chiều) và lưu vào \textbf{OpenSearch} (index \texttt{healytics\_who\_chunks}). Kho tri thức hiện có \textbf{564} tài liệu tương ứng \textbf{44.615} chunk, phân bố theo bốn lĩnh vực: dinh dưỡng (\textit{nutrition}), vận động (\textit{physical\_activity}), sức khỏe tâm thần (\textit{mental\_health}) và wellness.
     \item \textbf{Recommender (vector search):} Mỗi bản ghi được ghép thành một văn bản gồm tên và mô tả, gắn metadata \texttt{service\_id} và \texttt{category}, rồi được embedding và lưu vào Chroma persistent để truy vấn tương đồng.
     \item \textbf{Recommender Home (hồ sơ người dùng):} Dịch vụ gợi ý trang chủ đọc PostgreSQL: khảo sát người dùng lưu trong trường JSON trên bảng tài khoản (chuẩn hóa thành ba nhóm \textit{goals}, \textit{interests}, \textit{health\_conditions}), đồng thời có thể đọc hồ sơ cá nhân (tên, ngày sinh suy ra tuổi, v.v.).
     \item \textbf{NER / PreFilter:} Dịch vụ tải cache địa điểm và dữ liệu phục vụ lọc từ cơ sở dữ liệu quan hệ khi khởi động; hỗ trợ truy vấn không gian (PostGIS) khi có ngữ cảnh khoảng cách hợp lệ.
 \end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Phân bố chunk WHO theo lĩnh vực trên OpenSearch}
+\label{tab:who_domain_dist}
+\begin{tabular}{|l|r|}
+\hline
+\textbf{Lĩnh vực} & \textbf{Số chunk} \\
+\hline
+Sức khỏe tâm thần (\textit{mental\_health}) & 11.602 \\
+\hline
+Wellness & 11.391 \\
+\hline
+Vận động (\textit{physical\_activity}) & 11.361 \\
+\hline
+Dinh dưỡng (\textit{nutrition}) & 10.261 \\
+\hline
+\textbf{Tổng cộng} & \textbf{44.615} \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{Images/who_opensearch_dashboard.png}
+\vspace{10pt}
+\caption{Tổng quan dữ liệu WHO trên OpenSearch (index \texttt{healytics\_who\_chunks}): 564 tài liệu, 44.615 chunk.}
+\label{fig:who_opensearch_dashboard}
+\end{figure}
 
 \subsection{Thiết kế hệ thống NER/PreFilter}
 
@@ -328,21 +362,63 @@ Trong kiến trúc microservices của hệ thống, dịch vụ chatbot không 
 
 Thứ tự xử lý trong một phiên hội thoại diễn ra theo trình tự: phân loại ý định $\rightarrow$ (nếu cần) gọi dịch vụ NER để trích xuất địa điểm $\rightarrow$ gọi dịch vụ gợi ý $\rightarrow$ gọi dịch vụ RAG kèm ngữ cảnh đã làm giàu $\rightarrow$ phát các SSE event về client.
 
+\subsubsection{Kho tri thức WHO và OpenSearch}
+
+Trong kiến trúc RAG, OpenSearch đóng vai trò kho tri thức có thể tìm kiếm nhanh. Khi người dùng đặt câu hỏi, hệ thống không đọc toàn bộ 564 tài liệu WHO mà chỉ truy xuất các chunk liên quan nhất rồi đưa vào mô hình ngôn ngữ. Mỗi bản ghi trong index \texttt{healytics\_who\_chunks} tương ứng một chunk, gồm nội dung văn bản, vector embedding, tiêu đề tài liệu, lĩnh vực (\textit{domain}), mã tài liệu và đường dẫn nguồn WHO.
+
+Luồng dữ liệu từ thu thập đến truy vấn được thiết kế như sau: tài liệu WHO trên IRIS/who.int $\rightarrow$ tải PDF và trích xuất text $\rightarrow$ chia chunk và tạo embedding $\rightarrow$ lưu vào OpenSearch $\rightarrow$ khi có câu hỏi, retriever truy xuất chunk liên quan $\rightarrow$ LLM tổng hợp câu trả lời.
+
+Về quy mô lưu trữ và chi phí vận hành, index \texttt{healytics\_who\_chunks} hiện chứa 44.615 chunk (25,5~GB trên cluster). Hệ thống triển khai trên Amazon OpenSearch Service (domain \texttt{healytics-who}), instance type \texttt{r8g.large.search} với chi phí \textbf{0,236 USD/giờ}.
+
 \subsubsection{Pipeline RAG trong dịch vụ chatbot}
 
-Dịch vụ RAG nhận payload từ Gateway gồm ba thành phần: lịch sử hội thoại đã định dạng, mô tả các dịch vụ liên quan (có thể rỗng nếu ý định không yêu cầu gợi ý), và câu hỏi hiện tại của người dùng. Pipeline xử lý nội bộ bao gồm:
+Dịch vụ RAG nhận payload từ Gateway gồm ba thành phần: lịch sử hội thoại đã định dạng, mô tả các dịch vụ liên quan (có thể rỗng nếu ý định không yêu cầu gợi ý), và câu hỏi hiện tại của người dùng. Phần truy xuất được thiết kế theo hai phương án; các bước xây dựng prompt, sinh câu trả lời và trả về luồng SSE dùng chung cho cả hai.
+
+\paragraph{Standard RAG (tìm kiếm theo embedding)}
+
+Đây là phương án baseline đã dùng trong giai đoạn đánh giá ban đầu. Câu hỏi được chuyển thành vector embedding qua \texttt{HuggingFaceEmbeddings}; hệ thống tìm trong vector store \textbf{ChromaDB} hoặc \textbf{FAISS} theo chế độ \textit{similarity} với $k = 10$, chọn các chunk có vector gần nhất về ngữ nghĩa. Standard RAG \textbf{không} dùng tìm kiếm từ khóa (BM25); toàn bộ truy xuất dựa trên độ tương đồng embedding.
+
+\paragraph{Advanced RAG (multi-query fusion trên OpenSearch)}
+
+Đây là phương án nâng cấp dùng kho tri thức WHO trên OpenSearch, kết hợp ba kỹ thuật retrieval hiện đại: \textbf{multi-query expansion}, \textbf{hybrid search} và \textbf{rank fusion}.
+
+\textbf{Multi-query expansion.} Một câu hỏi người dùng thường chỉ phản ánh một góc nhìn, trong khi tài liệu WHO có thể dùng từ ngữ khác (thuật ngữ y khoa, tên guideline, cách diễn đạt phòng ngừa/điều trị). Hệ thống dùng \textbf{Llama-3.1-8B-Instruct} sinh $N = 4$ truy vấn thay thế từ câu hỏi gốc; mỗi truy vấn tiếp cận cùng chủ đề nhưng nhấn mạnh khía cạnh khác nhau (triệu chứng, phòng ngừa, khuyến nghị WHO, thuật ngữ đồng nghĩa). Câu hỏi gốc luôn được giữ trong tập truy vấn để không mất ý định ban đầu.
+
+\textbf{Hybrid search (trên từng truy vấn).} Với mỗi truy vấn (gốc hoặc sinh thêm), hệ thống chạy song song hai nhánh trên OpenSearch:
+\begin{itemize}
+    \item \textbf{Dense (kNN):} embedding đa ngôn ngữ, bắt được câu hỏi diễn đạt tự nhiên.
+    \item \textbf{Sparse (BM25):} tìm theo từ khóa; truy vấn tiếng Việt được dịch sang tiếng Anh trước khi vào nhánh này vì corpus WHO chủ yếu là tiếng Anh.
+\end{itemize}
+Hai danh sách kết quả của \emph{một} truy vấn được gộp bằng RRF (Reciprocal Rank Fusion, $k = 60$).
+
+\textbf{Multi-query fusion.} Sau khi mỗi truy vấn cho ra một danh sách chunk đã hybrid, hệ thống áp dụng RRF lần thứ hai trên toàn bộ danh sách (câu hỏi gốc + 4 biến thể). Chunk xuất hiện cao ở nhiều truy vấn khác nhau được ưu tiên --- dấu hiệu nội dung thật sự liên quan, không phải trùng hợp từ khóa đơn lẻ.
+
+\textbf{Reranking.} CrossEncoder (\texttt{ms-marco-MiniLM-L-6-v2}) chấm lại cặp (câu hỏi gốc, chunk) trên top ứng viên và giữ $5$ chunk tốt nhất trước khi đưa vào LLM.
+
+Luồng tổng thể:
+\begin{center}
+\begin{tabular}{c}
+User Query \\
+$\downarrow$ \\
+Llama-3.1-8B sinh $N$ truy vấn \\
+$\downarrow$ \\
+Mỗi truy vấn $\rightarrow$ BM25 $\parallel$ kNN $\rightarrow$ RRF (intra-query) \\
+$\downarrow$ \\
+RRF (inter-query) gộp mọi danh sách \\
+$\downarrow$ \\
+CrossEncoder rerank $\rightarrow$ prompt LLM \\
+\end{tabular}
+\end{center}
+
+\paragraph{Các bước chung sau truy xuất}
 
 \begin{enumerate}
-    \item \textbf{Truy xuất ngữ cảnh:} Câu hỏi hiện tại được embedding thông qua lớp \texttt{HuggingFaceEmbeddings} của LangChain, ưu tiên thiết bị CUDA khi có. Hệ thống tìm kiếm trong vector store \textbf{ChromaDB} theo chế độ \textit{similarity} với $k = 10$ đoạn tài liệu liên quan nhất, sau đó ghép nội dung các đoạn thành một khối ngữ cảnh thống nhất.
+    \item \textbf{Xây dựng prompt:} Mẫu prompt quy định vai trò trợ lý sức khỏe, thứ tự ưu tiên nguồn thông tin (lịch sử hội thoại $\rightarrow$ knowledge base $\rightarrow$ dịch vụ gợi ý $\rightarrow$ kiến thức chung) và các ràng buộc an toàn y tế. Mô tả dịch vụ chỉ được đưa vào prompt khi danh sách gợi ý không rỗng.
 
-    \item \textbf{Xây dựng prompt:} Hệ thống sử dụng một mẫu prompt quy định rõ vai trò trợ lý sức khỏe, thứ tự ưu tiên nguồn thông tin (lịch sử hội thoại $\rightarrow$ knowledge base $\rightarrow$ dịch vụ gợi ý $\rightarrow$ kiến thức chung), và các ràng buộc an toàn y tế. Mô tả dịch vụ chỉ được đưa vào prompt khi danh sách gợi ý không rỗng.
+    \item \textbf{Sinh câu trả lời:} Mô hình \textbf{Llama-3.1-8B-Instruct} (lượng tử hoá 4-bit, NF4) sinh câu trả lời dựa trên ngữ cảnh đã truy xuất.
 
-    \item \textbf{Sinh câu trả lời:} Mô hình ngôn ngữ \textbf{Llama-3.1-8B-Instruct} được tải với lượng tử hoá 4-bit (NF4, double quantization, compute dtype float16).
-
-    \item \textbf{Trả về luồng:} Sau khi có câu trả lời đầy đủ, dịch vụ chatbot chia nhỏ văn bản thành các cụm từ và trả về dưới dạng \texttt{StreamingResponse} (plain text). Gateway nhận từng chunk và bọc thành SSE event kiểu \texttt{TOKEN} trước khi đẩy về client.
+    \item \textbf{Trả về luồng:} Dịch vụ chia nhỏ văn bản thành các cụm từ, trả về qua \texttt{StreamingResponse}; Gateway bọc thành SSE event \texttt{TOKEN}.
 \end{enumerate}
-
-Kho tri thức được xây dựng từ các tài liệu PDF của Tổ chức Y tế Thế giới (WHO) bao gồm hướng dẫn về bệnh tim mạch, đái tháo đường, huyết áp, sức khoẻ tâm thần và hoạt động thể chất. Tài liệu được đọc song song bằng multiprocessing, làm sạch ký tự không thuộc ASCII, và chia đoạn bằng \textit{RecursiveCharacterTextSplitter} với độ dài 300 ký tự, không chồng lấp. Vector store được dựng lại mỗi khi dịch vụ khởi động.
 
 \subsubsection{Thiết kế SSE và phân tách trách nhiệm}
 
@@ -408,7 +484,5 @@ Mô hình sử dụng kiến trúc hai tầng:
 
 \begin{enumerate}
     \item \textbf{Encoder:} SentenceTransformer mã hoá câu đầu vào thành vector biểu diễn ngữ nghĩa cố định chiều. Mô hình encoder được huấn luyện với \texttt{all-MiniLM-L6-v2} và lưu cục bộ cùng mã nguồn để đảm bảo hoạt động offline, chạy trên CPU khi suy luận.
-    \item \textbf{Bộ phân lớp:} Hồi quy logistic (scikit-learn) nhận vector từ encoder và dự đoán nhãn nhị phân (0: không cần gợi ý, 1: cần gợi ý). Trọng số được lưu dưới dạng tệp pickle và nạp theo cơ chế singleton để tránh tải lại nhiều lần trong vòng đời ứng dụng.
+    \item \textbf{Bộ phân lớp:} Hồi quy logistic (scikit-learn) nhận vector từ encoder và dự đoán nhãn nhị phân (0: không cần gợi ý, 1: cần gợi ý). Trọng số được lưu dưới dạng tệp pickle và nạp theo cơ chế singleton để tránh tải lại nhiều lần trong vòng đời ứng dụng. Mô hình được huấn luyện trên 1000 mẫu — dương tính: câu tìm kiếm/gợi ý/mô tả triệu chứng; âm tính: chào hỏi, hỏi thông tin y tế chung, quản lý lịch hẹn.
 \end{enumerate}
-
-Mô hình được huấn luyện trên tập dữ liệu 1000 samples, với các mẫu dương tính là các câu hỏi yêu cầu tìm kiếm, gợi ý dịch vụ hoặc mô tả triệu chứng, và các mẫu âm tính là các câu chào hỏi, hỏi thông tin y tế chung, hoặc yêu cầu quản lý lịch hẹn.

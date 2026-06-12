@@ -5,6 +5,7 @@ import 'package:common/widgets/images/avatar.dart';
 import 'package:common/widgets/images/network_image_auto.dart';
 import 'package:flutter/material.dart';
 
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/features/clinic_info/domain/entities/clinic_info.entity.dart';
 
 /// Shared measurements for the collapsing clinic header.
@@ -23,7 +24,6 @@ class ClinicCollapsingHeaderLayout {
 
   static const _coverAspectRatio = 9 / 21;
   static const _floatingButtonSize = 36.0;
-  static const _profileTopGap = 10.0;
   static const _statsRowHeight = 40.0;
   static const _minExpandedHeight = kToolbarHeight + 120;
 
@@ -33,25 +33,66 @@ class ClinicCollapsingHeaderLayout {
   final double expandedHeight;
   final double blurThreshold;
 
-  static ClinicCollapsingHeaderLayout of(BuildContext context) {
+  static ClinicCollapsingHeaderLayout of(
+    BuildContext context, {
+    String name = '',
+    String address = '',
+  }) {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final topInset = mediaQuery.padding.top;
+    final textTheme = Theme.of(context).textTheme;
+    final nameStyle = _nameTextStyle(context, textTheme);
+    final addressStyle = _addressTextStyle(context, textTheme);
     final avatarSize = AppDimens.adaptive(
       context,
       small: 64.0,
-      medium: 72.0,
-      large: 80.0,
+      medium: 76.0,
+      large: 84.0,
     );
+    final profileTopGap = _profileTopGap(context);
+    final textTopInset = _textTopInset(
+      context,
+      avatarSize: avatarSize,
+      profileTopGap: profileTopGap,
+    );
+    final avatarTextGap = _avatarTextGap(context);
     final avatarTopOverlap = avatarSize / 2;
     final coverHeight = math.max(
       screenWidth * _coverAspectRatio,
       topInset + _floatingButtonSize + AppDimens.spaceXxl,
     );
-    final contentTop = coverHeight - avatarTopOverlap + _profileTopGap;
+    final hPad = AppDimens.horizontalPadding(context);
+    final textColumnWidth = math.max(
+      0.0,
+      screenWidth - hPad * 2 - avatarSize - avatarTextGap,
+    );
+    final addressTextWidth = math.max(
+      0.0,
+      textColumnWidth - AppDimens.iconXs - AppDimens.spaceXxs,
+    );
+    final textScaler = mediaQuery.textScaler;
+    final nameHeight = _measureTextHeight(
+      name,
+      style: nameStyle,
+      maxWidth: textColumnWidth,
+      textScaler: textScaler,
+      maxLines: 1,
+    );
+    final addressHeight = _measureTextHeight(
+      address,
+      style: addressStyle,
+      maxWidth: addressTextWidth,
+      textScaler: textScaler,
+    );
+    final profileRowHeight = math.max(
+      avatarSize,
+      textTopInset + nameHeight + AppDimens.spaceXxs + addressHeight,
+    );
+    final contentTop = coverHeight - avatarTopOverlap + profileTopGap;
     final paintedHeight =
         contentTop +
-        avatarSize +
+        profileRowHeight +
         AppDimens.spaceSm +
         _statsRowHeight +
         AppDimens.spaceMd;
@@ -64,6 +105,73 @@ class ClinicCollapsingHeaderLayout {
           .clamp(_minExpandedHeight, double.infinity)
           .toDouble(),
       blurThreshold: coverHeight * 0.5,
+    );
+  }
+
+  static double _measureTextHeight(
+    String text, {
+    required TextStyle? style,
+    required double maxWidth,
+    required TextScaler textScaler,
+    int? maxLines,
+  }) {
+    if (maxWidth <= 0) return 0;
+    final painter = TextPainter(
+      text: TextSpan(text: text.isEmpty ? ' ' : text, style: style),
+      textDirection: TextDirection.ltr,
+      textScaler: textScaler,
+      maxLines: maxLines,
+    )..layout(maxWidth: maxWidth);
+    return painter.height;
+  }
+
+  static double _avatarTextGap(BuildContext context) {
+    return AppDimens.adaptive(context, small: 10.0, medium: 12.0, large: 14.0);
+  }
+
+  static double _textTopInset(
+    BuildContext context, {
+    required double avatarSize,
+    required double profileTopGap,
+  }) {
+    final belowCoverGap = AppDimens.adaptive(
+      context,
+      small: 4.0,
+      medium: 6.0,
+      large: 8.0,
+    );
+    return math.max(0.0, avatarSize / 2 - profileTopGap + belowCoverGap);
+  }
+
+  static double _profileTopGap(BuildContext context) {
+    return AppDimens.adaptive(context, small: 14.0, medium: 18.0, large: 22.0);
+  }
+
+  static TextStyle? _nameTextStyle(BuildContext context, TextTheme textTheme) {
+    return textTheme.titleMedium?.copyWith(
+      fontSize: AppDimens.adaptive(
+        context,
+        small: 15.0,
+        medium: 16.0,
+        large: 18.0,
+      ),
+      height: 1.15,
+      fontWeight: FontWeight.bold,
+    );
+  }
+
+  static TextStyle? _addressTextStyle(
+    BuildContext context,
+    TextTheme textTheme,
+  ) {
+    return textTheme.labelSmall?.copyWith(
+      fontSize: AppDimens.adaptive(
+        context,
+        small: 11.0,
+        medium: 12.0,
+        large: 13.0,
+      ),
+      height: 1.25,
     );
   }
 }
@@ -97,7 +205,11 @@ class ClinicCollapsingHeader extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final hPad = AppDimens.horizontalPadding(context);
-    final headerLayout = ClinicCollapsingHeaderLayout.of(context);
+    final headerLayout = ClinicCollapsingHeaderLayout.of(
+      context,
+      name: clinic.name,
+      address: clinic.address ?? '',
+    );
 
     // Content fades out faster than the cover image
     // so text disappears before the image is gone.
@@ -205,8 +317,23 @@ class _LogoNameRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final nameStyle = ClinicCollapsingHeaderLayout._nameTextStyle(
+      context,
+      textTheme,
+    );
+    final addressStyle = ClinicCollapsingHeaderLayout._addressTextStyle(
+      context,
+      textTheme,
+    );
+    final avatarTextGap = ClinicCollapsingHeaderLayout._avatarTextGap(context);
+    final textTopInset = ClinicCollapsingHeaderLayout._textTopInset(
+      context,
+      avatarSize: avatarSize,
+      profileTopGap: ClinicCollapsingHeaderLayout._profileTopGap(context),
+    );
+
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Avatar with white border
         Container(
@@ -231,10 +358,10 @@ class _LogoNameRow extends StatelessWidget {
             radius: (avatarSize - AppDimens.spaceXs * 2) / 2,
           ),
         ),
-        AppDimens.horizontalMediumSmall,
+        SizedBox(width: avatarTextGap),
         Expanded(
           child: Padding(
-            padding: EdgeInsets.only(bottom: AppDimens.spaceXs),
+            padding: EdgeInsets.only(top: textTopInset),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -246,9 +373,7 @@ class _LogoNameRow extends StatelessWidget {
                         name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: nameStyle,
                       ),
                     ),
                     AppDimens.horizontalExtraSmall,
@@ -262,6 +387,7 @@ class _LogoNameRow extends StatelessWidget {
                 AppDimens.spaceXxs.verticalSpace,
                 // Address
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(
                       Icons.location_on,
@@ -272,9 +398,8 @@ class _LogoNameRow extends StatelessWidget {
                     Expanded(
                       child: Text(
                         address,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.labelSmall?.copyWith(
+                        softWrap: true,
+                        style: addressStyle?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -386,6 +511,7 @@ class _CompactFollowButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FilledButton(
+      key: keys.clinicPage.followButton,
       onPressed: onPressed,
       style: FilledButton.styleFrom(
         padding: const EdgeInsets.symmetric(

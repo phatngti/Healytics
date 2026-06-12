@@ -2,20 +2,11 @@
 
 from __future__ import annotations
 
-from enum import Enum
 from datetime import datetime
 from typing import Any, TypeAlias
 from dataclasses import dataclass
 from .base import DtoModel, dto_field
-
-
-class BookingStatus(str, Enum):
-    PENDING_PAYMENT = 'PENDING_PAYMENT'
-    CONFIRMED = 'CONFIRMED'
-    IN_PROGRESS = 'IN_PROGRESS'
-    CANCELLED = 'CANCELLED'
-    COMPLETED = 'COMPLETED'
-    NO_SHOW = 'NO_SHOW'
+from .shared import BookingStatus
 
 
 @dataclass(slots=True)
@@ -26,6 +17,7 @@ class AsyncCheckoutDto(DtoModel):
     productId: str
     idempotencyKey: str
     webhookUrl: str | None = None
+    payLater: bool | None = None
 
 
 @dataclass(slots=True)
@@ -69,7 +61,6 @@ BookingControllerListMyBookingsResponseDto: TypeAlias = list[BookingResponseDto]
 
 
 __all__ = [
-    "BookingStatus",
     "AsyncCheckoutDto",
     "AsyncCheckoutResponseDto",
     "BookingResponseDto",

@@ -59,17 +59,8 @@ export class EmployeesService {
   private readonly SLOT_DURATION_MINUTES = 30;
   /** Default number of days ahead to return. */
   private readonly DEFAULT_DAYS_AHEAD = 7;
-
-  /** Day-of-week names matching the employee schedule JSONB keys. */
-  private static readonly DAY_NAMES = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ];
+  /** Business timezone used for employee schedules and booking slots. */
+  private static readonly BUSINESS_TIME_ZONE = 'Asia/Ho_Chi_Minh';
 
   constructor(
     @InjectRepository(Employee)
@@ -513,15 +504,8 @@ export class EmployeesService {
 
     // 2. Determine date range
     const days = query.days ?? this.DEFAULT_DAYS_AHEAD;
-    const rangeStart = query.date
-      ? new Date(query.date)
-      : new Date(
-          new Date().getFullYear(),
-          new Date().getMonth(),
-          new Date().getDate(),
-        );
-    const rangeEnd = new Date(rangeStart);
-    rangeEnd.setDate(rangeEnd.getDate() + days);
+    const rangeStart = this.startOfBusinessDayUtc(query.date);
+    const rangeEnd = this.addUtcDays(rangeStart, days);
 
     // 3. Fetch non-cancelled bookings for this employee in the range
     const bookings = await this.bookingRepository.find({
@@ -551,10 +535,9 @@ export class EmployeesService {
 
     const schedule: DayScheduleDto[] = [];
     for (let i = 0; i < days; i++) {
-      const date = new Date(rangeStart);
-      date.setDate(date.getDate() + i);
+      const date = this.addUtcDays(rangeStart, i);
 
-      const dayName = EmployeesService.DAY_NAMES[date.getDay()];
+      const dayName = this.formatDayName(date);
       const dateStr = this.formatDate(date);
       const entry = scheduleByDay.get(dayName);
 
@@ -712,15 +695,89 @@ export class EmployeesService {
 
   /** Formats a Date to YYYY-MM-DD. */
   private formatDate(date: Date): string {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+    const parts = this.businessDateParts(date);
+    return `${parts.year}-${parts.month}-${parts.day}`;
   }
 
   /** Formats a Date's time to HH:mm (24h). */
   private formatTime24(date: Date): string {
-    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: EmployeesService.BUSINESS_TIME_ZONE,
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).formatToParts(date);
+    const value = (type: string) =>
+      parts.find((part) => part.type === type)?.value ?? '00';
+    return `${value('hour')}:${value('minute')}`;
+  }
+
+  /** Converts any incoming ISO date/datetime into Vietnam-local day start. */
+  private startOfBusinessDayUtc(date?: string): Date {
+    const parts = date
+      ? this.businessDatePartsFromInput(date)
+      : this.businessDateParts(new Date());
+    return this.businessDateStartUtc(parts.year, parts.month, parts.day);
+  }
+
+  private businessDatePartsFromInput(date: string): {
+    year: string;
+    month: string;
+    day: string;
+  } {
+    const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+    if (dateOnly) {
+      return {
+        year: dateOnly[1],
+        month: dateOnly[2],
+        day: dateOnly[3],
+      };
+    }
+
+    const parsed = new Date(date);
+    if (Number.isNaN(parsed.getTime())) {
+      return this.businessDateParts(new Date());
+    }
+    return this.businessDateParts(parsed);
+  }
+
+  private businessDateParts(date: Date): {
+    year: string;
+    month: string;
+    day: string;
+  } {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: EmployeesService.BUSINESS_TIME_ZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(date);
+    const value = (type: string) =>
+      parts.find((part) => part.type === type)?.value ?? '';
+    return {
+      year: value('year'),
+      month: value('month'),
+      day: value('day'),
+    };
+  }
+
+  private businessDateStartUtc(year: string, month: string, day: string): Date {
+    return new Date(
+      Date.UTC(Number(year), Number(month) - 1, Number(day), -7, 0, 0, 0),
+    );
+  }
+
+  private addUtcDays(date: Date, days: number): Date {
+    const next = new Date(date);
+    next.setUTCDate(next.getUTCDate() + days);
+    return next;
+  }
+
+  private formatDayName(date: Date): string {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: EmployeesService.BUSINESS_TIME_ZONE,
+      weekday: 'long',
+    }).format(date);
   }
 
   /** Converts 24h hour/minute to 12h format label (e.g. "09:00 AM"). */

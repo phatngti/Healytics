@@ -118,6 +118,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
       lastName: lastName,
       employeeId: _employeeId(values),
       email: _str(values, EmployeeFormField.emailAddress),
+      password: _password(values),
       phone: _str(values, EmployeeFormField.phoneNumber),
       avatar: _avatarUrl(values),
       dateOfBirth: _strOrEmpty(values, EmployeeFormField.dateOfBirth),
@@ -196,6 +197,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
     // Common fields
     final commonEmployeeId = _employeeId(values);
     final commonEmail = _str(values, EmployeeFormField.emailAddress);
+    final commonPassword = _password(values);
     final commonPhone = _str(values, EmployeeFormField.phoneNumber);
     final commonAvatar = _avatarUrl(values);
     final commonDob = _strOrEmpty(values, EmployeeFormField.dateOfBirth);
@@ -225,6 +227,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         lastName: lastName,
         employeeId: commonEmployeeId,
         email: commonEmail,
+        password: commonPassword,
         phone: commonPhone,
         dateOfBirth: commonDob,
         gender: commonGender,
@@ -257,6 +260,7 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
         lastName: lastName,
         employeeId: commonEmployeeId,
         email: commonEmail,
+        password: commonPassword,
         phone: commonPhone,
         dateOfBirth: commonDob,
         gender: commonGender,
@@ -286,6 +290,9 @@ class _EmployeeAddScreenState extends ConsumerState<EmployeeAddScreen> {
   /// Reads a trimmed string from form [values].
   String _str(Map<String, dynamic> values, EmployeeFormField field) =>
       values[field.key]?.toString().trim() ?? '';
+
+  String _password(Map<String, dynamic> values) =>
+      _str(values, EmployeeFormField.password);
 
   /// Reads a non-trimmed string, defaulting to `''`.
   String _strOrEmpty(Map<String, dynamic> values, EmployeeFormField field) =>

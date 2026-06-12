@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from enum import Enum
 from datetime import datetime
+from typing import Any
 from dataclasses import dataclass
 from .base import DtoModel, dto_field
 from .shared import BusinessInfoDto, BusinessType, LegalRepresentativeDto, PartnerVerificationStatus, VerifiedField
@@ -29,20 +30,36 @@ class AdminPartnerDetailResponseDto(DtoModel):
 
 
 @dataclass(slots=True)
-class PartnerItemDto(DtoModel):
+class AdminPartnerItemDto(DtoModel):
     id: str
     taxCode: str
-    brandName: str
     legalName: str
+    brandName: str
     email: str
     businessType: list[BusinessType]
     verificationStatus: PartnerVerificationStatus
+    priority: PartnerPriority
     createdAt: datetime
+    isAccountActive: bool
+    verificationCompletedAt: dict[str, Any] | None = None
 
 
 @dataclass(slots=True)
-class PartnersResponseDto(DtoModel):
-    data: list[PartnerItemDto]
+class AdminPartnerStatsResponseDto(DtoModel):
+    pendingReview: float
+    highPriority: float
+    activeToday: float
+    avgWaitSeconds: float
+    avgWaitTime: str
+    totalProviders: float
+    requiredResubmit: float
+    approved: float
+    rejected: float
+
+
+@dataclass(slots=True)
+class AdminPartnersResponseDto(DtoModel):
+    data: list[AdminPartnerItemDto]
     total: float
     page: float
     limit: float
@@ -74,8 +91,9 @@ class TotalPartnersResponseDto(DtoModel):
 __all__ = [
     "PartnerPriority",
     "AdminPartnerDetailResponseDto",
-    "PartnerItemDto",
-    "PartnersResponseDto",
+    "AdminPartnerItemDto",
+    "AdminPartnerStatsResponseDto",
+    "AdminPartnersResponseDto",
     "ReviewItemDto",
     "ReviewPartnerProfileDto",
     "ReviewPartnerResponseDto",

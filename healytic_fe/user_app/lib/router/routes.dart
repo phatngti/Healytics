@@ -22,6 +22,7 @@ import 'package:user_app/features/onboarding/presentation/screens/onboard.screen
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/email_code_confirmation.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/email_form.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/finish_sign_up.dart';
+import 'package:user_app/features/onboarding/sign_up/presentation/screens/finish_google_sign_up.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/steps/step_2_lifestyle.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/steps/step_3_body_energy.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/steps/step_4_health_safety.dart';
@@ -846,6 +847,33 @@ class FinishSignUpRoute extends GoRouteData with $FinishSignUpRoute {
     return _buildSlideTransitionPage(
       pageKey: state.pageKey,
       child: const FinishSignUpScreen(),
+    );
+  }
+}
+
+@TypedGoRoute<FinishGoogleSignUpRoute>(
+  path: '/finish_google_sign_up',
+  name: FinishGoogleSignUpRoute.routeName,
+)
+class FinishGoogleSignUpRoute extends GoRouteData
+    with $FinishGoogleSignUpRoute {
+  static const String pathPattern = '/finish_google_sign_up';
+  static const bool isPublic = true;
+  static const routeName = 'finish_google_sign_up';
+
+  const FinishGoogleSignUpRoute({this.name, this.email});
+
+  final String? name;
+  final String? email;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _buildSlideTransitionPage(
+      pageKey: state.pageKey,
+      child: FinishGoogleSignUpScreen(
+        googleDisplayName: name,
+        googleEmail: email,
+      ),
     );
   }
 }

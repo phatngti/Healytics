@@ -153,7 +153,7 @@ export class PerformanceMetricsInterceptor
     const path =
       typeof routePath === 'string'
         ? `${req.baseUrl ?? ''}${routePath}`
-        : req.path ?? req.originalUrl ?? req.url ?? 'unknown';
+        : (req.path ?? req.originalUrl ?? req.url ?? 'unknown');
 
     return `${method} ${path}`;
   }
@@ -174,7 +174,10 @@ export class PerformanceMetricsInterceptor
     return value.toFixed(1);
   }
 
-  private parsePositiveInt(value: string | undefined, fallback: number): number {
+  private parsePositiveInt(
+    value: string | undefined,
+    fallback: number,
+  ): number {
     const parsed = Number(value);
     return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
   }

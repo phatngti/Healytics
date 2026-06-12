@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:user_app/core/keys/integration_test_keys.dart';
 
 import 'review_tags_selector.widget.dart';
 
@@ -54,13 +55,10 @@ class ReviewRatingCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface,
-                ),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: colorScheme.onSurface,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
@@ -86,6 +84,7 @@ class ReviewRatingCard extends StatelessWidget {
         final isSelected = starValue <= currentRating;
 
         return GestureDetector(
+          key: keys.reviewPage.star(starValue),
           onTap: () => onRatingChanged(starValue),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -107,17 +106,14 @@ class ReviewRatingCard extends StatelessWidget {
       initialValue: comment,
       onChanged: onCommentChanged,
       maxLines: 4,
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: colorScheme.onSurface,
-          ),
+      style: Theme.of(
+        context,
+      ).textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: Theme.of(context)
-            .textTheme
-            .bodyLarge
-            ?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
+        hintStyle: Theme.of(
+          context,
+        ).textTheme.bodyLarge?.copyWith(color: colorScheme.onSurfaceVariant),
         filled: true,
         fillColor: colorScheme.surfaceContainerLow,
         contentPadding: const EdgeInsets.all(16),

@@ -188,10 +188,7 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
 
   @override
   Future<void> updateEmployee(UpdateEmployeeRequest request) async {
-    await _patchEmployee(
-      request.id.value.toString(),
-      request.fields,
-    );
+    await _patchEmployee(request.id.value.toString(), request.fields);
 
     developer.log(
       'Updated employee: ${request.id} (${request.fields.keys.join(', ')})',
@@ -204,10 +201,9 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     EmployeeId id,
     EmployeeStatusType status,
   ) async {
-    await _patchEmployee(
-      id.value.toString(),
-      <String, dynamic>{'status': status.apiValue},
-    );
+    await _patchEmployee(id.value.toString(), <String, dynamic>{
+      'status': status.apiValue,
+    });
 
     developer.log(
       'Updated employee status: $id -> ${status.apiValue}',
@@ -231,6 +227,34 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
     if (response.statusCode >= 400) {
       throw ApiException(response.statusCode, response.body);
     }
+  }
+
+  Future<EmployeeResponseDto> _postEmployee(
+    String path,
+    Map<String, dynamic> fields,
+  ) async {
+    final response = await apiService.apiClient.invokeAPI(
+      path,
+      'POST',
+      <QueryParam>[],
+      fields,
+      <String, String>{},
+      <String, String>{},
+      'application/json',
+    );
+
+    if (response.statusCode >= 400) {
+      throw ApiException(response.statusCode, response.body);
+    }
+    if (response.body.isEmpty) {
+      throw EmployeeCreationException('Employee creation returned no body');
+    }
+
+    return await apiService.apiClient.deserializeAsync(
+          response.body,
+          'EmployeeResponseDto',
+        )
+        as EmployeeResponseDto;
   }
 
   @override
@@ -285,12 +309,10 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       workHistory: _toWorkHistoryEntries(request.workHistory),
     );
 
-    final response = await _employeesApi.partnerEmployeesControllerCreateDoctor(
-      dto,
+    final response = await _postEmployee(
+      '/partner/employees/doctors',
+      <String, dynamic>{...dto.toJson(), 'password': request.password},
     );
-    if (response == null) {
-      throw EmployeeCreationException('Failed to create doctor');
-    }
 
     developer.log(
       'Created doctor: '
@@ -336,11 +358,10 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       workHistory: _toWorkHistoryEntries(request.workHistory),
     );
 
-    final response = await _employeesApi
-        .partnerEmployeesControllerCreateSpaTherapist(dto);
-    if (response == null) {
-      throw EmployeeCreationException('Failed to create spa therapist');
-    }
+    final response = await _postEmployee(
+      '/partner/employees/spa-therapists',
+      <String, dynamic>{...dto.toJson(), 'password': request.password},
+    );
 
     developer.log(
       'Created spa therapist: '
@@ -388,11 +409,10 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
       workHistory: _toWorkHistoryEntries(request.workHistory),
     );
 
-    final response = await _employeesApi
-        .partnerEmployeesControllerCreateMassageTherapist(dto);
-    if (response == null) {
-      throw EmployeeCreationException('Failed to create massage therapist');
-    }
+    final response = await _postEmployee(
+      '/partner/employees/massage-therapists',
+      <String, dynamic>{...dto.toJson(), 'password': request.password},
+    );
 
     developer.log(
       'Created massage therapist: '

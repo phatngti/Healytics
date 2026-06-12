@@ -9,6 +9,7 @@ import 'package:common/widgets/toast.dart';
 import 'package:user_app/features/onboarding/sign_up/domain/entities/survey_entity.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/providers/register_flow_provider.dart';
 import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/widgets/survey_field.dart';
+import 'package:user_app/features/onboarding/sign_up/presentation/screens/survey/widgets/survey_text_styles.dart';
 import 'package:user_app/router/routes.dart';
 import 'package:common/utils/demensions.dart';
 import 'package:user_app/utils/device.dart';
@@ -132,10 +133,7 @@ class HealthSafetyStep extends HookConsumerWidget {
                     children: [
                       Text(
                         'Part 4: Safety & Background Health',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Theme.of(context).textTheme.titleLarge?.color,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: SurveyTextStyles.sectionTitle(context),
                       ),
                       AppDimens.verticalSmall,
                       ...questions.map(

@@ -64,6 +64,12 @@ void main() {
       // TODO
     });
 
+    // Address provided during registration
+    // AccountAddressDto address
+    test('to test the property `address`', () async {
+      // TODO
+    });
+
 
   });
 

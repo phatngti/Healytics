@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:common/utils/demensions.dart';
 
+import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/router/routes.dart';
 
 class QuickActionsSection extends StatelessWidget {
@@ -33,6 +34,7 @@ class QuickActionsSection extends StatelessWidget {
           children: [
             Expanded(
               child: _QuickActionCard(
+                cardKey: keys.homePage.bookAppointmentAction,
                 icon: Symbols.calendar_add_on,
                 iconColor: theme.colorScheme.primary,
                 backgroundColor: theme.colorScheme.primaryContainer,
@@ -46,6 +48,7 @@ class QuickActionsSection extends StatelessWidget {
             SizedBox(width: cardGap),
             Expanded(
               child: _QuickActionCard(
+                cardKey: keys.homePage.aiAssistantAction,
                 icon: Symbols.smart_toy,
                 iconColor: theme.colorScheme.secondary,
                 backgroundColor: theme.colorScheme.secondaryContainer,
@@ -64,6 +67,7 @@ class QuickActionsSection extends StatelessWidget {
 }
 
 class _QuickActionCard extends StatelessWidget {
+  final Key? cardKey;
   final IconData icon;
   final Color iconColor;
   final Color backgroundColor;
@@ -72,6 +76,7 @@ class _QuickActionCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _QuickActionCard({
+    this.cardKey,
     required this.icon,
     required this.iconColor,
     required this.backgroundColor,
@@ -106,6 +111,7 @@ class _QuickActionCard extends StatelessWidget {
       button: true,
       label: title,
       child: GestureDetector(
+        key: cardKey,
         onTap: onTap,
         child: Container(
           padding: EdgeInsets.all(cardPad),

@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { PartnerPayout } from '@/common/entities/partner-payout.entity';
 import { RetryPayoutDto } from '@/partner-finance/dto/request/retry-payout.dto';
@@ -60,7 +65,11 @@ export class RetryPartnerPayoutHandler {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(`Retry failed: ${error.message}`, error.stack);
-      if (error instanceof NotFoundException || error instanceof ConflictException) throw error;
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ConflictException
+      )
+        throw error;
       throw error;
     } finally {
       await queryRunner.release();

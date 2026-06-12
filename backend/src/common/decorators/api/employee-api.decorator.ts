@@ -24,9 +24,7 @@ import { Role } from '@/account/enum/role.enum';
  */
 export function EmployeeApi(resource: string) {
   return applyDecorators(
-    ApiTags(
-      `Employee ${resource.charAt(0).toUpperCase() + resource.slice(1)}`,
-    ),
+    ApiTags(`Employee ${resource.charAt(0).toUpperCase() + resource.slice(1)}`),
     ApiBearerAuth(),
     Controller({ path: `employee/${resource}`, version: '1' }),
     UseGuards(JwtAuthGuard, RolesGuard),

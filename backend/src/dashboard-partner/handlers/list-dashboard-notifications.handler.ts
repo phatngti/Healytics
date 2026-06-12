@@ -23,9 +23,7 @@ const TYPE_MAPPING: Record<string, string> = {
 
 @Injectable()
 export class ListDashboardNotificationsHandler {
-  private readonly logger = new Logger(
-    ListDashboardNotificationsHandler.name,
-  );
+  private readonly logger = new Logger(ListDashboardNotificationsHandler.name);
 
   constructor(private readonly dataSource: DataSource) {}
 
@@ -68,9 +66,7 @@ export class ListDashboardNotificationsHandler {
       dto.type = TYPE_MAPPING[row.type] ?? 'system';
       dto.createdAt = new Date(row.created_at).toISOString();
       // For broadcasts, check the reads table; for targeted, use is_read directly
-      dto.isRead = row.is_broadcast
-        ? !!row.read_record_id
-        : !!row.is_read;
+      dto.isRead = row.is_broadcast ? !!row.read_record_id : !!row.is_read;
       return dto;
     });
   }

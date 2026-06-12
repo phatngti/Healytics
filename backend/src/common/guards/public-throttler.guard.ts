@@ -6,6 +6,24 @@ import {
 } from '@nestjs/throttler';
 import { IS_PUBLIC_KEY } from '@/common/decorators/auth/public.decorator';
 
+const THROTTLE_DISABLED_VALUES = new Set([
+  'false',
+  '0',
+  'off',
+  'disabled',
+  'no',
+]);
+
+export function isThrottleEnabled(
+  value = process.env.THROTTLE_ENABLED,
+): boolean {
+  if (value === undefined || value === null || value.trim() === '') {
+    return true;
+  }
+
+  return !THROTTLE_DISABLED_VALUES.has(value.trim().toLowerCase());
+}
+
 /**
  * Custom throttler guard that only applies rate limiting to public routes.
  * Authenticated routes (protected by JWT) are not rate limited since
@@ -22,6 +40,10 @@ export class PublicThrottlerGuard extends ThrottlerGuard {
    * Only applies rate limiting to routes marked with @Public() decorator.
    */
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    if (!isThrottleEnabled()) {
+      return true;
+    }
+
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),

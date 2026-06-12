@@ -10,6 +10,7 @@ import { SpecialistReview } from '@/common/entities/specialist-review.entity';
 import { NotFoundException } from '@nestjs/common';
 import { EmployeeRole } from './enum/employee-role.enum';
 import { HealthServiceStatus } from '@/health-service/enums/health-service-status.enum';
+import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { PartnersService } from '@/partners/partners.service';
 import { CreateDoctorHandler } from './application/handlers/create-doctor.handler';
 import { CreateTherapistHandler } from './application/handlers/create-therapist.handler';
@@ -689,6 +690,50 @@ describe('EmployeesService', () => {
       expect(
         mockEligibilityRepository.createQueryBuilder,
       ).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getTimeSlots', () => {
+    it('compares bookings by Vietnam-local date when query date is UTC', async () => {
+      mockEmployeeRepository.findOne.mockResolvedValue({
+        id: 'emp-uuid',
+        fullName: 'James Anderson',
+        schedule: [
+          {
+            day: 'Wednesday',
+            start: '09:00',
+            end: '11:00',
+            isWorking: true,
+          },
+        ],
+      });
+      mockBookingRepository.find.mockResolvedValue([
+        {
+          staffId: 'emp-uuid',
+          status: BookingStatus.CONFIRMED,
+          startTime: new Date('2026-05-20T03:00:00.000Z'),
+        },
+      ]);
+
+      const result = await service.getTimeSlots('emp-uuid', {
+        date: '2026-05-19T17:00:00.000Z',
+        days: 1,
+      });
+
+      expect(result.rangeStart).toBe('2026-05-20');
+      expect(result.rangeEnd).toBe('2026-05-21');
+      expect(result.schedule).toHaveLength(1);
+      expect(result.schedule[0]).toMatchObject({
+        date: '2026-05-20',
+        dayOfWeek: 'Wednesday',
+        isWorkingDay: true,
+      });
+      expect(result.schedule[0].slots).toEqual([
+        { label: '09:00 AM', time: '09:00', isBusy: false },
+        { label: '09:30 AM', time: '09:30', isBusy: false },
+        { label: '10:00 AM', time: '10:00', isBusy: true },
+        { label: '10:30 AM', time: '10:30', isBusy: false },
+      ]);
     });
   });
 

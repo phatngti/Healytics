@@ -92,7 +92,7 @@ describe('SubmitFacilityReviewHandler', () => {
 
     expect(queryRunner.manager.findOne).toHaveBeenNthCalledWith(1, Booking, {
       where: { id: appointmentId },
-      relations: { product: true },
+      relations: { product: { partner: true } },
     });
     expect(queryRunner.manager.findOne).toHaveBeenNthCalledWith(
       2,
@@ -119,6 +119,43 @@ describe('SubmitFacilityReviewHandler', () => {
       tags: ['Clean'],
       photoUrls: saved.photoUrls,
     });
+  });
+
+  it('accepts the facility account id and stores the canonical facility id', async () => {
+    const booking = completedBooking();
+    const saved = {
+      id: 'review-1',
+      appointmentId,
+      facilityId,
+      rating: 5,
+      comment: null,
+      tags: [],
+      photoUrls: [],
+      createdAt: new Date('2026-05-19T00:00:00.000Z'),
+    };
+
+    queryRunner.manager.findOne
+      .mockResolvedValueOnce(booking)
+      .mockResolvedValueOnce(null);
+    queryRunner.manager.create.mockReturnValue(saved);
+    queryRunner.manager.save.mockResolvedValue(saved);
+
+    await handler.execute(userId, {
+      appointmentId,
+      facilityId: 'facility-account-1',
+      rating: 5,
+    });
+
+    expect(queryRunner.manager.create).toHaveBeenCalledWith(FacilityReview, {
+      appointmentId,
+      facilityId,
+      userId,
+      rating: 5,
+      comment: null,
+      tags: [],
+      photoUrls: [],
+    });
+    expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(1);
   });
 
   it('rejects reviews for another user appointment', async () => {
@@ -186,13 +223,16 @@ describe('SubmitFacilityReviewHandler', () => {
     expect(queryRunner.commitTransaction).not.toHaveBeenCalled();
   });
 
-  function completedBooking() {
+  function completedBooking(options?: { partnerAccountId?: string }) {
     return {
       id: appointmentId,
       userId,
       status: BookingStatus.COMPLETED,
       product: {
         partnerId: facilityId,
+        partner: {
+          accountId: 'facility-account-1',
+        },
       },
     };
   }

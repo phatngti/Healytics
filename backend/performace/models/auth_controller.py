@@ -44,6 +44,11 @@ class EmployeeLoginDto(DtoModel):
 
 
 @dataclass(slots=True)
+class ForgotPasswordDto(DtoModel):
+    email: str
+
+
+@dataclass(slots=True)
 class LegalRepresentativeRequestDto(DtoModel):
     fullName: str
     idType: str
@@ -93,8 +98,21 @@ class PartnerRequestDto(DtoModel):
 
 
 @dataclass(slots=True)
+class PasswordResetResponseDto(DtoModel):
+    message: str
+
+
+@dataclass(slots=True)
 class RefreshTokenRequestDto(DtoModel):
     refresh_token: str
+
+
+@dataclass(slots=True)
+class RegisterAddressDto(DtoModel):
+    streetAddress: str
+    provinceId: str
+    districtId: str
+    wardId: str
 
 
 @dataclass(slots=True)
@@ -130,6 +148,25 @@ class RegisterProfileDto(DtoModel):
     phone: str | None = None
     bio: str | None = None
     dateOfBirth: str | None = None
+    address: RegisterAddressDto | None = None
+
+
+@dataclass(slots=True)
+class ResetPasswordDto(DtoModel):
+    token: str
+    password: str
+
+
+@dataclass(slots=True)
+class ValidatePasswordResetCodeDto(DtoModel):
+    email: str
+    code: str
+
+
+@dataclass(slots=True)
+class ValidatePasswordResetCodeResponseDto(DtoModel):
+    message: str
+    resetToken: str
 
 
 __all__ = [
@@ -139,15 +176,21 @@ __all__ = [
     "CheckEmailDto",
     "CheckEmailResponseDto",
     "EmployeeLoginDto",
+    "ForgotPasswordDto",
     "LegalRepresentativeRequestDto",
     "LoginDto",
     "LogoutResponseDto",
     "PartnerDocumentVerificationDto",
     "PartnerLoginDto",
     "PartnerRequestDto",
+    "PasswordResetResponseDto",
     "RefreshTokenRequestDto",
+    "RegisterAddressDto",
     "RegisterDto",
     "RegisterPartnerDto",
     "RegisterPartnerResponseDto",
     "RegisterProfileDto",
+    "ResetPasswordDto",
+    "ValidatePasswordResetCodeDto",
+    "ValidatePasswordResetCodeResponseDto",
 ]

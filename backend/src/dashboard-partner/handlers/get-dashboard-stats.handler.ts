@@ -22,14 +22,25 @@ export class GetDashboardStatsHandler {
       resolveDateRange(period);
 
     // Run all independent queries in parallel
-    const [appointmentStats, revenueStats, serviceStats, employeeStats, ratingStats] =
-      await Promise.all([
-        this.getAppointmentStats(partnerId, startDate, endDate),
-        this.getRevenueStats(partnerId, startDate, endDate, prevStartDate, prevEndDate),
-        this.getServiceStats(partnerId),
-        this.getEmployeeStats(partnerId),
-        this.getRatingStats(partnerId),
-      ]);
+    const [
+      appointmentStats,
+      revenueStats,
+      serviceStats,
+      employeeStats,
+      ratingStats,
+    ] = await Promise.all([
+      this.getAppointmentStats(partnerId, startDate, endDate),
+      this.getRevenueStats(
+        partnerId,
+        startDate,
+        endDate,
+        prevStartDate,
+        prevEndDate,
+      ),
+      this.getServiceStats(partnerId),
+      this.getEmployeeStats(partnerId),
+      this.getRatingStats(partnerId),
+    ]);
 
     const dto = new DashboardStatsResponseDto();
     dto.totalAppointments = parseInt(appointmentStats.total) || 0;
@@ -67,7 +78,9 @@ export class GetDashboardStatsHandler {
         AND b.deleted_at IS NULL`,
       [partnerId, startDate, endDate],
     );
-    return result[0] || { total: '0', completed: '0', cancelled: '0', pending: '0' };
+    return (
+      result[0] || { total: '0', completed: '0', cancelled: '0', pending: '0' }
+    );
   }
 
   private async getRevenueStats(

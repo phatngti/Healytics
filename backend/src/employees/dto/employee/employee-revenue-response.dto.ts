@@ -6,7 +6,10 @@ import { EmployeeRevenuePeriod } from './employee-revenue-query.dto';
  * Revenue summary response matching the frontend RevenueSummaryEntity.
  */
 export class EmployeeRevenueSummaryResponseDto {
-  @ApiProperty({ type: Number, description: 'Total revenue from completed appointments' })
+  @ApiProperty({
+    type: Number,
+    description: 'Total revenue from completed appointments',
+  })
   @Expose()
   totalRevenue: number;
 
@@ -18,7 +21,10 @@ export class EmployeeRevenueSummaryResponseDto {
   @Expose()
   netEarnings: number;
 
-  @ApiProperty({ type: Number, description: 'Number of completed appointments' })
+  @ApiProperty({
+    type: Number,
+    description: 'Number of completed appointments',
+  })
   @Expose()
   completedAppointments: number;
 

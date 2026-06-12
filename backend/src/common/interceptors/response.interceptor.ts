@@ -35,11 +35,6 @@ export class ResponseInterceptor implements NestInterceptor {
             this.logResponseBody(method, url, data);
           }
         },
-        error: (error) => {
-          this.logger.error(
-            `Response Error [${method} ${url}]: ${error.message}`,
-          );
-        },
       }),
     );
   }

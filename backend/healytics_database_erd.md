@@ -32,6 +32,11 @@ erDiagram
         varchar ward
         varchar district
         varchar city_or_province
+        uuid province_id FK
+        uuid district_id FK
+        uuid ward_id FK
+        text coordinates "lat,lng text"
+        geography location "PostGIS Point(4326)"
         timestamptz created_at
         timestamptz updated_at
         timestamptz deleted_at
@@ -55,6 +60,9 @@ erDiagram
 
     account ||--o| user_profile : "has"
     address ||--o| user_profile : "lives at"
+    location ||--o{ address : "province"
+    location ||--o{ address : "district"
+    location ||--o{ address : "ward"
 
     %% ═══════════════════════════════════════════════════
     %% DOMAIN 2: LOCATION (Administrative Divisions)
@@ -807,6 +815,9 @@ Stores physical address information, linked 1:1 to user profiles.
 | `ward` | VARCHAR(255) | Administrative ward |
 | `district` | VARCHAR(255) | District/county |
 | `city_or_province` | VARCHAR(255) | City or province |
+| `province_id / district_id / ward_id` | UUID, FK → location, nullable | Administrative location hierarchy |
+| `coordinates` | TEXT, nullable | Latitude,longitude as text |
+| `location` | GEOGRAPHY(Point, 4326), nullable | PostGIS point for spatial queries |
 
 ---
 

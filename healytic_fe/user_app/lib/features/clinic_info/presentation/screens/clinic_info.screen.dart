@@ -93,6 +93,7 @@ class _ClinicInfoBodyState extends ConsumerState<_ClinicInfoBody>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.clinic != widget.clinic) {
       _clinic = widget.clinic;
+      _computeLayout();
     }
   }
 
@@ -106,7 +107,11 @@ class _ClinicInfoBodyState extends ConsumerState<_ClinicInfoBody>
   /// Pre-compute expanded height and blur threshold
   /// from screen dimensions.
   void _computeLayout() {
-    final headerLayout = ClinicCollapsingHeaderLayout.of(context);
+    final headerLayout = ClinicCollapsingHeaderLayout.of(
+      context,
+      name: _clinic.name,
+      address: _clinic.address ?? '',
+    );
     _expandedHeight = headerLayout.expandedHeight;
     _blurThreshold = headerLayout.blurThreshold;
   }

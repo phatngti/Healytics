@@ -40,13 +40,27 @@ export interface MockRepository<T = any> {
 const createMockQueryBuilder = () => {
   const qb: Record<string, jest.Mock> = {};
   const chainMethods = [
-    'select', 'addSelect', 'innerJoin', 'leftJoin',
-    'innerJoinAndSelect', 'leftJoinAndSelect',
-    'where', 'andWhere', 'orWhere',
-    'groupBy', 'addGroupBy', 'orderBy', 'addOrderBy',
-    'limit', 'offset', 'take', 'skip',
-    'having', 'addHaving',
-    'setParameter', 'setParameters',
+    'select',
+    'addSelect',
+    'innerJoin',
+    'leftJoin',
+    'innerJoinAndSelect',
+    'leftJoinAndSelect',
+    'where',
+    'andWhere',
+    'orWhere',
+    'groupBy',
+    'addGroupBy',
+    'orderBy',
+    'addOrderBy',
+    'limit',
+    'offset',
+    'take',
+    'skip',
+    'having',
+    'addHaving',
+    'setParameter',
+    'setParameters',
   ];
   for (const method of chainMethods) {
     qb[method] = jest.fn().mockReturnThis();

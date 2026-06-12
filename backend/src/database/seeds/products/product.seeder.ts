@@ -23,6 +23,10 @@ import { StaffAssignmentType } from '@/health-service/enums/staff-assignment-typ
 import { MediaType } from '@/health-service/enums/media-type.enum';
 import { BookingStatus } from '@/booking/enums/booking-status.enum';
 import { ISeeder } from '../seeder.interface';
+import {
+  BULK_WELLNESS_PRODUCTS,
+  BULK_WELLNESS_PRODUCT_PREFIX,
+} from '../wellness-bulk.seed';
 
 /**
  * Seed data for products with full service details.
@@ -940,6 +944,8 @@ const SEED_PRODUCTS = [
   },
 ];
 
+const ALL_SEED_PRODUCTS = [...SEED_PRODUCTS, ...BULK_WELLNESS_PRODUCTS];
+
 @Injectable()
 export class ProductSeeder implements ISeeder {
   private readonly logger = new Logger(ProductSeeder.name);
@@ -1009,9 +1015,11 @@ export class ProductSeeder implements ISeeder {
     const tagOwner =
       (await this.accountRepo.findOne({
         where: { email: 'partner@healytics.vn', role: Role.HEALTH_PARTNER },
+        loadEagerRelations: false,
       })) ??
       (await this.accountRepo.findOne({
         where: { role: Role.HEALTH_PARTNER },
+        loadEagerRelations: false,
       }));
 
     for (const prodData of SEED_PRODUCTS) {
@@ -1100,12 +1108,245 @@ export class ProductSeeder implements ISeeder {
       await this.seedProductChildren(product, prodData, employeeMap, tagOwner);
     }
 
+    await this.seedBulkWellnessProducts(
+      categoryMap,
+      employeeMap,
+      partnerMap,
+      tagOwner,
+    );
+
     this.logger.log('Products seeding completed');
+  }
+
+  private async seedBulkWellnessProducts(
+    categoryMap: Map<string, string>,
+    employeeMap: Map<string, string>,
+    partnerMap: Map<string, string>,
+    tagOwner: Account | null,
+  ): Promise<void> {
+    const bulkProducts = BULK_WELLNESS_PRODUCTS;
+    const slugs = bulkProducts.map((p) => p.slug);
+
+    this.logger.log(
+      `  🌿 Upserting ${bulkProducts.length} bulk wellness product(s)...`,
+    );
+
+    const existingProducts = await this.productRepo.find({
+      where: { slug: In(slugs) },
+      select: ['id', 'slug'],
+      withDeleted: true,
+    });
+    const existingProductMap = new Map(
+      existingProducts.map((product) => [product.slug, product]),
+    );
+
+    const productEntities = bulkProducts.map((prodData) => {
+      const partnerId = prodData.partnerTaxCode
+        ? (partnerMap.get(prodData.partnerTaxCode) ?? null)
+        : null;
+      const categoryId = categoryMap.get(prodData.categorySlug) ?? null;
+      const existing = existingProductMap.get(prodData.slug);
+
+      return this.productRepo.create({
+        ...(existing ? { id: existing.id } : {}),
+        name: prodData.name,
+        slug: prodData.slug,
+        description: prodData.description,
+        type: prodData.type,
+        basePrice: prodData.basePrice,
+        salePrice: prodData.salePrice ?? null,
+        vendorName: null,
+        serviceManual: prodData.serviceManual,
+        currency: 'VND',
+        status: HealthServiceStatus.ACTIVE,
+        isVisibleOnline: true,
+        categoryId,
+        partnerId,
+        deletedAt: null,
+      } as Partial<Product>);
+    });
+
+    await this.productRepo.save(productEntities, { chunk: 200 });
+
+    const savedProducts = await this.productRepo.find({
+      where: { slug: In(slugs) },
+      select: ['id', 'slug'],
+    });
+    const savedProductMap = new Map(
+      savedProducts.map((product) => [product.slug, product]),
+    );
+    const productIds = savedProducts.map((product) => product.id);
+
+    if (!productIds.length) {
+      this.logger.warn('  ⚠ No bulk wellness products were saved');
+      return;
+    }
+
+    await Promise.all([
+      this.mediaRepo.delete({ productId: In(productIds) }),
+      this.resourceReqRepo.delete({ productId: In(productIds) }),
+      this.facilityImageRepo.delete({ productId: In(productIds) }),
+      this.productTagRepo.delete({ productId: In(productIds) }),
+      this.eligibilityRepo.delete({ productId: In(productIds) }),
+    ]);
+
+    const mediaRows: ProductMedia[] = [];
+    const serviceDefinitionRows: ProductDefinition[] = [];
+    const facilityImageRows: ProductFacilityImage[] = [];
+    const eligibilityRows: ProductEmployeeEligibility[] = [];
+    const resourceRequirementInputs: {
+      productId: string;
+      resourceTypeName: string;
+      quantityRequired: number;
+    }[] = [];
+
+    for (const prodData of bulkProducts) {
+      const product = savedProductMap.get(prodData.slug);
+      if (!product) continue;
+
+      for (const media of prodData.media) {
+        mediaRows.push(
+          this.mediaRepo.create({
+            productId: product.id,
+            url: media.url,
+            mediaType: MediaType.IMAGE,
+            isThumbnail: media.isThumbnail,
+            sortOrder: media.sortOrder,
+          }),
+        );
+      }
+
+      serviceDefinitionRows.push(
+        this.serviceDefRepo.create({
+          productId: product.id,
+          ...prodData.serviceDefinition,
+        }),
+      );
+
+      for (const requirement of prodData.resourceRequirements) {
+        resourceRequirementInputs.push({
+          productId: product.id,
+          resourceTypeName: requirement.resourceTypeName,
+          quantityRequired: requirement.quantityRequired,
+        });
+      }
+
+      for (const employee of prodData.eligibleEmployees) {
+        const employeeId = employeeMap.get(employee.code);
+        if (!employeeId) continue;
+        eligibilityRows.push(
+          this.eligibilityRepo.create({
+            productId: product.id,
+            employeeId,
+            isPrimary: employee.isPrimary,
+          }),
+        );
+      }
+
+      for (const facilityImage of prodData.facilityImages) {
+        facilityImageRows.push(
+          this.facilityImageRepo.create({
+            productId: product.id,
+            imageUrl: facilityImage.imageUrl,
+            label: facilityImage.label,
+            sortOrder: facilityImage.sortOrder ?? 0,
+          }),
+        );
+      }
+    }
+
+    const resourceTypeNames = [
+      ...new Set(resourceRequirementInputs.map((req) => req.resourceTypeName)),
+    ];
+    const existingResourceTypes = await this.resourceTypeRepo.find({
+      where: { name: In(resourceTypeNames) },
+      withDeleted: true,
+    });
+    const resourceTypeMap = new Map(
+      existingResourceTypes.map((resourceType) => [
+        resourceType.name,
+        resourceType,
+      ]),
+    );
+    const missingResourceTypes = resourceTypeNames
+      .filter((name) => !resourceTypeMap.has(name))
+      .map((name) => this.resourceTypeRepo.create({ name, totalQuantity: 64 }));
+
+    if (missingResourceTypes.length) {
+      const savedResourceTypes = await this.resourceTypeRepo.save(
+        missingResourceTypes,
+        { chunk: 100 },
+      );
+      for (const resourceType of savedResourceTypes) {
+        resourceTypeMap.set(resourceType.name, resourceType);
+      }
+    }
+
+    const resourceRequirementRows = resourceRequirementInputs
+      .map((req) => {
+        const resourceType = resourceTypeMap.get(req.resourceTypeName);
+        if (!resourceType) return null;
+        return this.resourceReqRepo.create({
+          productId: req.productId,
+          resourceTypeId: resourceType.id,
+          quantityRequired: req.quantityRequired,
+        });
+      })
+      .filter(Boolean) as ProductResourceRequirement[];
+
+    const productTagRows: ProductTag[] = [];
+    if (tagOwner) {
+      const tagNames = [...new Set(bulkProducts.flatMap((p) => p.tagNames))];
+      const tags = await this.serviceTagRepo.find({
+        where: { name: In(tagNames), userId: tagOwner.id },
+      });
+      const tagMap = new Map(tags.map((tag) => [tag.name, tag.id]));
+
+      for (const prodData of bulkProducts) {
+        const product = savedProductMap.get(prodData.slug);
+        if (!product) continue;
+        for (const tagName of prodData.tagNames) {
+          const tagId = tagMap.get(tagName);
+          if (!tagId) continue;
+          productTagRows.push(
+            this.productTagRepo.create({
+              productId: product.id,
+              tagId,
+            }),
+          );
+        }
+      }
+    }
+
+    await Promise.all([
+      mediaRows.length
+        ? this.mediaRepo.save(mediaRows, { chunk: 500 })
+        : Promise.resolve(),
+      serviceDefinitionRows.length
+        ? this.serviceDefRepo.save(serviceDefinitionRows, { chunk: 500 })
+        : Promise.resolve(),
+      resourceRequirementRows.length
+        ? this.resourceReqRepo.save(resourceRequirementRows, { chunk: 500 })
+        : Promise.resolve(),
+      eligibilityRows.length
+        ? this.eligibilityRepo.save(eligibilityRows, { chunk: 500 })
+        : Promise.resolve(),
+      productTagRows.length
+        ? this.productTagRepo.save(productTagRows, { chunk: 500 })
+        : Promise.resolve(),
+      facilityImageRows.length
+        ? this.facilityImageRepo.save(facilityImageRows, { chunk: 500 })
+        : Promise.resolve(),
+    ]);
+
+    this.logger.log(
+      `  ✅ Bulk wellness products upserted: ${savedProducts.length} (${BULK_WELLNESS_PRODUCT_PREFIX}-*)`,
+    );
   }
 
   private async seedProductChildren(
     product: Product,
-    prodData: (typeof SEED_PRODUCTS)[number],
+    prodData: any,
     employeeMap: Map<string, string>,
     tagOwner: Account | null,
   ): Promise<void> {
@@ -1138,8 +1379,8 @@ export class ProductSeeder implements ISeeder {
     await this.seedTreatmentReviews(product.id);
 
     // Employee Eligibility (for all product types)
-    if ((prodData as any).eligibleEmployees?.length) {
-      for (const emp of (prodData as any).eligibleEmployees) {
+    if (prodData.eligibleEmployees?.length) {
+      for (const emp of prodData.eligibleEmployees) {
         const employeeId = employeeMap.get(emp.code);
 
         if (!employeeId) {
@@ -1177,21 +1418,21 @@ export class ProductSeeder implements ISeeder {
     if (prodData.type !== HealthServiceType.SERVICE) return;
 
     // Service Definition (1:1)
-    if ((prodData as any).serviceDefinition) {
+    if (prodData.serviceDefinition) {
       await this.serviceDefRepo.save(
         this.serviceDefRepo.create({
           productId: product.id,
-          ...(prodData as any).serviceDefinition,
+          ...prodData.serviceDefinition,
         }),
       );
       this.logger.log(
-        `    📋 Service definition: ${(prodData as any).serviceDefinition.durationMinutes}min + ${(prodData as any).serviceDefinition.bufferMinutes}min buffer`,
+        `    📋 Service definition: ${prodData.serviceDefinition.durationMinutes}min + ${prodData.serviceDefinition.bufferMinutes}min buffer`,
       );
     }
 
     // Resource Requirements (upsert ResourceType, then replace requirements)
-    if ((prodData as any).resourceRequirements?.length) {
-      for (const req of (prodData as any).resourceRequirements) {
+    if (prodData.resourceRequirements?.length) {
+      for (const req of prodData.resourceRequirements) {
         let resourceType = await this.resourceTypeRepo.findOne({
           where: { name: req.resourceTypeName },
         });
@@ -1222,8 +1463,8 @@ export class ProductSeeder implements ISeeder {
     }
 
     // Service Tags (via product_tags junction)
-    if ((prodData as any).tagNames?.length && tagOwner) {
-      for (const tagName of (prodData as any).tagNames) {
+    if (prodData.tagNames?.length && tagOwner) {
+      for (const tagName of prodData.tagNames) {
         const tag = await this.serviceTagRepo.findOne({
           where: { name: tagName, userId: tagOwner.id },
         });
@@ -1252,8 +1493,8 @@ export class ProductSeeder implements ISeeder {
     }
 
     // Facility Images
-    if ((prodData as any).facilityImages?.length) {
-      for (const fi of (prodData as any).facilityImages) {
+    if (prodData.facilityImages?.length) {
+      for (const fi of prodData.facilityImages) {
         await this.facilityImageRepo.save(
           this.facilityImageRepo.create({
             productId: product.id,
@@ -1264,7 +1505,7 @@ export class ProductSeeder implements ISeeder {
         );
       }
       this.logger.log(
-        `    🏢 Upserted ${(prodData as any).facilityImages.length} facility image(s)`,
+        `    🏢 Upserted ${prodData.facilityImages.length} facility image(s)`,
       );
     }
   }
@@ -1352,7 +1593,7 @@ export class ProductSeeder implements ISeeder {
   }
 
   async clear(): Promise<void> {
-    const slugs = SEED_PRODUCTS.map((p) => p.slug);
+    const slugs = ALL_SEED_PRODUCTS.map((p) => p.slug);
 
     // Products cascade-delete child rows (service_definitions, service_resource_requirements,
     // product_tags, service_employee_eligibility, media, reviews, facility_images),
@@ -1371,9 +1612,9 @@ export class ProductSeeder implements ISeeder {
     // Clean up resource_types created during seeding
     const resourceTypeNames = [
       ...new Set(
-        SEED_PRODUCTS.flatMap((p) => (p as any).resourceRequirements || []).map(
-          (r: any) => r.resourceTypeName,
-        ),
+        ALL_SEED_PRODUCTS.flatMap(
+          (p) => (p as any).resourceRequirements || [],
+        ).map((r: any) => r.resourceTypeName),
       ),
     ];
 

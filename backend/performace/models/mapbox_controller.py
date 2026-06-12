@@ -12,6 +12,21 @@ class ClientKeyResponseDto(DtoModel):
 
 
 @dataclass(slots=True)
+class DirectionsCoordinateDto(DtoModel):
+    latitude: float
+    longitude: float
+
+
+@dataclass(slots=True)
+class DirectionsResponseDto(DtoModel):
+    route: list[DirectionsCoordinateDto]
+    distanceText: str
+    distanceValue: float
+    durationText: str
+    durationValue: float
+
+
+@dataclass(slots=True)
 class DistanceMatrixElementDto(DtoModel):
     distanceText: str
     distanceValue: float
@@ -47,6 +62,8 @@ class GeocodeResultDto(DtoModel):
 
 __all__ = [
     "ClientKeyResponseDto",
+    "DirectionsCoordinateDto",
+    "DirectionsResponseDto",
     "DistanceMatrixElementDto",
     "DistanceMatrixResponseDto",
     "DistanceMatrixRowDto",

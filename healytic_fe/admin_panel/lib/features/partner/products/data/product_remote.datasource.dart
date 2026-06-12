@@ -258,8 +258,8 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       employeeIds: request.staffIds,
       tagIds: request.tagIds,
       productDefinition: hasProductDefinitionChanges
-          ? _SparseCreatePartnerHealthServiceDefinitionDto(
-              durationMinutes: request.duration ?? 1,
+          ? _SparseUpdatePartnerHealthServiceDefinitionDto(
+              durationMinutes: request.duration,
               includeDurationMinutes: request.duration != null,
               bufferMinutes: request.buffer,
               includeBufferMinutes: request.buffer != null,
@@ -267,7 +267,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
               includeMaxCapacity: request.capacity != null,
               staffAssignmentType: request.staffAllocation == null
                   ? null
-                  : _mapStaffAssignment(request.staffAllocation!),
+                  : _mapUpdateStaffAssignment(request.staffAllocation!),
               includeStaffAssignmentType: request.staffAllocation != null,
             )
           : null,
@@ -396,6 +396,20 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     }
   }
 
+  // ignore: lines_longer_than_80_chars
+  UpdatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum?
+  _mapUpdateStaffAssignment(String assignment) {
+    switch (assignment.toLowerCase()) {
+      case 'specific':
+        return UpdatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum
+            .specific;
+      case 'any':
+      default:
+        return UpdatePartnerHealthServiceDefinitionDtoStaffAssignmentTypeEnum
+            .any;
+    }
+  }
+
   /// Maps a domain [ServiceManualEntity] to the
   /// OpenAPI [ServiceManualInputDto].
   ServiceManualInputDto? _mapServiceManual(ServiceManualEntity? manual) {
@@ -475,10 +489,10 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 }
 
-class _SparseCreatePartnerHealthServiceDefinitionDto
-    extends CreatePartnerHealthServiceDefinitionDto {
-  _SparseCreatePartnerHealthServiceDefinitionDto({
-    required super.durationMinutes,
+class _SparseUpdatePartnerHealthServiceDefinitionDto
+    extends UpdatePartnerHealthServiceDefinitionDto {
+  _SparseUpdatePartnerHealthServiceDefinitionDto({
+    super.durationMinutes,
     super.bufferMinutes,
     super.maxCapacity,
     super.staffAssignmentType,
@@ -530,16 +544,13 @@ class _SparseUpdatePartnerHealthServiceDto
     super.facilityImages,
     super.productDefinition,
     super.serviceManual,
+    super.tagIds,
     this.includeSalePrice = false,
     this.includeServiceManual = false,
-    this.tagIds,
   });
 
   final bool includeSalePrice;
   final bool includeServiceManual;
-
-  /// Tag IDs to associate with this service.
-  final List<String>? tagIds;
 
   @override
   Map<String, dynamic> toJson() {

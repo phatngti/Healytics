@@ -20,10 +20,7 @@ function createRepo(): MockRepo {
 function createService() {
   const txRepo = createRepo();
   const partnerRepo = createRepo();
-  const service = new AdminDashboardService(
-    txRepo as any,
-    partnerRepo as any,
-  );
+  const service = new AdminDashboardService(txRepo as any, partnerRepo as any);
   return { service, txRepo, partnerRepo };
 }
 
@@ -61,9 +58,7 @@ describe('AdminDashboardService', () => {
         },
       ]);
     });
-    partnerRepo.count
-      .mockResolvedValueOnce(12)
-      .mockResolvedValueOnce(3);
+    partnerRepo.count.mockResolvedValueOnce(12).mockResolvedValueOnce(3);
 
     const result = await service.getOverview({
       period: AdminDashboardPeriod.THIRTY_DAYS,

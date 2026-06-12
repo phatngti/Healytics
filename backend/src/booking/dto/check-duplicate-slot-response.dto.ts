@@ -8,8 +8,7 @@ export class CheckDuplicateSlotResponseDto {
   isDuplicate: boolean;
 
   @ApiPropertyOptional({
-    description:
-      'Name of the conflicting service/product (if duplicate found)',
+    description: 'Name of the conflicting service/product (if duplicate found)',
     example: 'Premium Skin Treatment',
   })
   conflictingServiceName?: string;

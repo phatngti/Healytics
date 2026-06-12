@@ -6,8 +6,7 @@ export class BookingStatusBreakdownDto {
   @ApiProperty({
     type: String,
     example: 'confirmed',
-    description:
-      'Machine-readable status key: confirmed, cancelled, no_show',
+    description: 'Machine-readable status key: confirmed, cancelled, no_show',
   })
   @Expose()
   statusKey: string;

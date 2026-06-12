@@ -1,0 +1,43 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "HealyticsWhoS3Access",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:HeadObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::healytics-who-docs",
+        "arn:aws:s3:::healytics-who-docs/*"
+      ]
+    },
+    {
+      "Sid": "HealyticsWhoOpenSearchHttp",
+      "Effect": "Allow",
+      "Action": [
+        "es:ESHttpGet",
+        "es:ESHttpPut",
+        "es:ESHttpPost",
+        "es:ESHttpDelete",
+        "es:ESHttpHead",
+        "es:ESHttpPatch"
+      ],
+      "Resource": "arn:aws:es:ap-southeast-1:206193621163:domain/healytics-who/*"
+    },
+    {
+      "Sid": "HealyticsWhoOpenSearchDescribe",
+      "Effect": "Allow",
+      "Action": [
+        "es:DescribeDomain",
+        "es:DescribeElasticsearchDomain",
+        "es:ListDomainNames",
+        "es:ListDomainNamesForPackage"
+      ],
+      "Resource": "arn:aws:es:ap-southeast-1:206193621163:domain/healytics-who"
+    }
+  ]
+}

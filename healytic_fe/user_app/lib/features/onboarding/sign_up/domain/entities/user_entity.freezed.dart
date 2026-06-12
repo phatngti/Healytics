@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AddressEntity {
 
- String get street; String get ward; String get district; String get cityOrProvince;
+ String get streetAddress; String get provinceId; String get districtId; String get wardId;
 /// Create a copy of AddressEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $AddressEntityCopyWith<AddressEntity> get copyWith => _$AddressEntityCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AddressEntity&&(identical(other.street, street) || other.street == street)&&(identical(other.ward, ward) || other.ward == ward)&&(identical(other.district, district) || other.district == district)&&(identical(other.cityOrProvince, cityOrProvince) || other.cityOrProvince == cityOrProvince));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AddressEntity&&(identical(other.streetAddress, streetAddress) || other.streetAddress == streetAddress)&&(identical(other.provinceId, provinceId) || other.provinceId == provinceId)&&(identical(other.districtId, districtId) || other.districtId == districtId)&&(identical(other.wardId, wardId) || other.wardId == wardId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,street,ward,district,cityOrProvince);
+int get hashCode => Object.hash(runtimeType,streetAddress,provinceId,districtId,wardId);
 
 @override
 String toString() {
-  return 'AddressEntity(street: $street, ward: $ward, district: $district, cityOrProvince: $cityOrProvince)';
+  return 'AddressEntity(streetAddress: $streetAddress, provinceId: $provinceId, districtId: $districtId, wardId: $wardId)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $AddressEntityCopyWith<$Res>  {
   factory $AddressEntityCopyWith(AddressEntity value, $Res Function(AddressEntity) _then) = _$AddressEntityCopyWithImpl;
 @useResult
 $Res call({
- String street, String ward, String district, String cityOrProvince
+ String streetAddress, String provinceId, String districtId, String wardId
 });
 
 
@@ -65,12 +65,12 @@ class _$AddressEntityCopyWithImpl<$Res>
 
 /// Create a copy of AddressEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? street = null,Object? ward = null,Object? district = null,Object? cityOrProvince = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? streetAddress = null,Object? provinceId = null,Object? districtId = null,Object? wardId = null,}) {
   return _then(_self.copyWith(
-street: null == street ? _self.street : street // ignore: cast_nullable_to_non_nullable
-as String,ward: null == ward ? _self.ward : ward // ignore: cast_nullable_to_non_nullable
-as String,district: null == district ? _self.district : district // ignore: cast_nullable_to_non_nullable
-as String,cityOrProvince: null == cityOrProvince ? _self.cityOrProvince : cityOrProvince // ignore: cast_nullable_to_non_nullable
+streetAddress: null == streetAddress ? _self.streetAddress : streetAddress // ignore: cast_nullable_to_non_nullable
+as String,provinceId: null == provinceId ? _self.provinceId : provinceId // ignore: cast_nullable_to_non_nullable
+as String,districtId: null == districtId ? _self.districtId : districtId // ignore: cast_nullable_to_non_nullable
+as String,wardId: null == wardId ? _self.wardId : wardId // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -156,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String street,  String ward,  String district,  String cityOrProvince)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String streetAddress,  String provinceId,  String districtId,  String wardId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AddressEntity() when $default != null:
-return $default(_that.street,_that.ward,_that.district,_that.cityOrProvince);case _:
+return $default(_that.streetAddress,_that.provinceId,_that.districtId,_that.wardId);case _:
   return orElse();
 
 }
@@ -177,10 +177,10 @@ return $default(_that.street,_that.ward,_that.district,_that.cityOrProvince);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String street,  String ward,  String district,  String cityOrProvince)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String streetAddress,  String provinceId,  String districtId,  String wardId)  $default,) {final _that = this;
 switch (_that) {
 case _AddressEntity():
-return $default(_that.street,_that.ward,_that.district,_that.cityOrProvince);case _:
+return $default(_that.streetAddress,_that.provinceId,_that.districtId,_that.wardId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +197,10 @@ return $default(_that.street,_that.ward,_that.district,_that.cityOrProvince);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String street,  String ward,  String district,  String cityOrProvince)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String streetAddress,  String provinceId,  String districtId,  String wardId)?  $default,) {final _that = this;
 switch (_that) {
 case _AddressEntity() when $default != null:
-return $default(_that.street,_that.ward,_that.district,_that.cityOrProvince);case _:
+return $default(_that.streetAddress,_that.provinceId,_that.districtId,_that.wardId);case _:
   return null;
 
 }
@@ -212,13 +212,13 @@ return $default(_that.street,_that.ward,_that.district,_that.cityOrProvince);cas
 @JsonSerializable()
 
 class _AddressEntity implements AddressEntity {
-  const _AddressEntity({required this.street, required this.ward, required this.district, required this.cityOrProvince});
+  const _AddressEntity({required this.streetAddress, required this.provinceId, required this.districtId, required this.wardId});
   factory _AddressEntity.fromJson(Map<String, dynamic> json) => _$AddressEntityFromJson(json);
 
-@override final  String street;
-@override final  String ward;
-@override final  String district;
-@override final  String cityOrProvince;
+@override final  String streetAddress;
+@override final  String provinceId;
+@override final  String districtId;
+@override final  String wardId;
 
 /// Create a copy of AddressEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AddressEntity&&(identical(other.street, street) || other.street == street)&&(identical(other.ward, ward) || other.ward == ward)&&(identical(other.district, district) || other.district == district)&&(identical(other.cityOrProvince, cityOrProvince) || other.cityOrProvince == cityOrProvince));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AddressEntity&&(identical(other.streetAddress, streetAddress) || other.streetAddress == streetAddress)&&(identical(other.provinceId, provinceId) || other.provinceId == provinceId)&&(identical(other.districtId, districtId) || other.districtId == districtId)&&(identical(other.wardId, wardId) || other.wardId == wardId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,street,ward,district,cityOrProvince);
+int get hashCode => Object.hash(runtimeType,streetAddress,provinceId,districtId,wardId);
 
 @override
 String toString() {
-  return 'AddressEntity(street: $street, ward: $ward, district: $district, cityOrProvince: $cityOrProvince)';
+  return 'AddressEntity(streetAddress: $streetAddress, provinceId: $provinceId, districtId: $districtId, wardId: $wardId)';
 }
 
 
@@ -253,7 +253,7 @@ abstract mixin class _$AddressEntityCopyWith<$Res> implements $AddressEntityCopy
   factory _$AddressEntityCopyWith(_AddressEntity value, $Res Function(_AddressEntity) _then) = __$AddressEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String street, String ward, String district, String cityOrProvince
+ String streetAddress, String provinceId, String districtId, String wardId
 });
 
 
@@ -270,12 +270,12 @@ class __$AddressEntityCopyWithImpl<$Res>
 
 /// Create a copy of AddressEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? street = null,Object? ward = null,Object? district = null,Object? cityOrProvince = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? streetAddress = null,Object? provinceId = null,Object? districtId = null,Object? wardId = null,}) {
   return _then(_AddressEntity(
-street: null == street ? _self.street : street // ignore: cast_nullable_to_non_nullable
-as String,ward: null == ward ? _self.ward : ward // ignore: cast_nullable_to_non_nullable
-as String,district: null == district ? _self.district : district // ignore: cast_nullable_to_non_nullable
-as String,cityOrProvince: null == cityOrProvince ? _self.cityOrProvince : cityOrProvince // ignore: cast_nullable_to_non_nullable
+streetAddress: null == streetAddress ? _self.streetAddress : streetAddress // ignore: cast_nullable_to_non_nullable
+as String,provinceId: null == provinceId ? _self.provinceId : provinceId // ignore: cast_nullable_to_non_nullable
+as String,districtId: null == districtId ? _self.districtId : districtId // ignore: cast_nullable_to_non_nullable
+as String,wardId: null == wardId ? _self.wardId : wardId // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

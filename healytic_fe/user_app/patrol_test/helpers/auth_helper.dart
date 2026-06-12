@@ -3,6 +3,7 @@ import 'package:user_app/core/keys/integration_test_keys.dart';
 
 import '../config/test_config.dart';
 import 'navigation_helper.dart';
+import 'permission_helper.dart';
 
 /// Signs out by navigating to the Profile tab,
 /// tapping the Log Out button, and confirming.
@@ -27,28 +28,32 @@ Future<void> signOut(PatrolIntegrationTester $) async {
   await $(keys.profilePage.logoutButton).tap();
 
   // Confirm in the dialog.
-  await $(keys.logoutDialog.confirmButton)
-      .waitUntilVisible()
-      .tap();
+  await $(keys.logoutDialog.confirmButton).waitUntilVisible().tap();
 
   // Wait for the router to redirect to onboarding.
   // Use a generous pump to ensure the session is
   // cleared and the redirect completes fully before
   // the sign-in flow begins.
   await $.pump(const Duration(seconds: 5));
+  await grantAllPermissions($);
 }
 
 /// Signs in using fixture credentials via key finders.
 ///
 /// Calls [signOut] first to ensure a clean session,
 /// then proceeds through the onboarding → sign-in flow.
-Future<void> signIn(PatrolIntegrationTester $) async {
+Future<void> signIn(
+  PatrolIntegrationTester $, {
+  String? email,
+  String? password,
+}) async {
   final config = TestConfig.instance;
 
   // In mock mode the user is already "logged in" and
   // the router redirects straight to home.
   if (config.useMock) {
     await $.pump(const Duration(seconds: 2));
+    await grantAllPermissions($);
     return;
   }
 
@@ -63,20 +68,22 @@ Future<void> signIn(PatrolIntegrationTester $) async {
         .then((_) => true)
         .catchError((_) => false)) {
       await signInNavBtn.tap();
-      await $.pumpAndSettle();
+      await $.pump(const Duration(seconds: 1));
     }
   } catch (_) {}
 
   // Wait for the SignInScreen form.
   await $(keys.signInPage.emailTextField).waitUntilVisible();
 
-  await $(keys.signInPage.emailTextField)
-      .enterText(config.testEmail);
+  await $(keys.signInPage.emailTextField).enterText(email ?? config.testEmail);
 
-  await $(keys.signInPage.passwordTextField)
-      .enterText(config.testPassword);
+  await $(
+    keys.signInPage.passwordTextField,
+  ).enterText(password ?? config.testPassword);
 
   await $(keys.signInPage.signInButton).tap();
 
-  await $.pumpAndSettle();
+  await $.pump(const Duration(seconds: 1));
+  await grantAllPermissions($);
+  await $.pump(const Duration(seconds: 2));
 }
