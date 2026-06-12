@@ -118,7 +118,8 @@ export class UserEligibilityDetailResponseDto {
 
   /**
    * Factory: maps a fully-loaded ProductEmployeeEligibility entity to the DTO.
-   * Requires relations: product, product.category, product.media, product.productDefinition, employee, employee.doctorProfile
+   * Requires relations: product, product.partner, product.category,
+   * product.media, product.productDefinition, employee, employee.doctorProfile
    */
   static fromEntity(
     eligibility: ProductEmployeeEligibility,

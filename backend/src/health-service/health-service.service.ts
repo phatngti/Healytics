@@ -524,6 +524,10 @@ export class HealthServiceService {
       where: { id: eligibilityId },
       relations: [
         'product',
+        'product.partner',
+        'product.partner.province',
+        'product.partner.district',
+        'product.partner.ward',
         'product.category',
         'product.category.parent',
         'product.media',
@@ -540,7 +544,7 @@ export class HealthServiceService {
       );
     }
 
-    const partner = await this.partnersService.getFirstHealthPartner();
+    const partner = eligibility.product?.partner ?? null;
 
     return UserEligibilityDetailResponseDto.fromEntity(eligibility, partner);
   }

@@ -17,8 +17,6 @@ import 'package:user_app/features/home/presentation/'
 import 'package:user_app/core/keys/integration_test_keys.dart';
 import 'package:user_app/router/routes.dart';
 
-const _previewProductCount = 4;
-
 /// Displays a 2-column grid of premium treatment cards
 /// fetched via [productsProvider].
 class PremiumTreatmentsSection extends ConsumerWidget {
@@ -28,7 +26,7 @@ class PremiumTreatmentsSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final titleGap = AppDimens.titleGap(context);
     final contentPad = AppDimens.contentPadding(context);
-    final productsAsync = ref.watch(premiumTreatmentPreviewProvider);
+    final productsAsync = ref.watch(homePremiumTreatmentsPaginatedProvider);
 
     return Column(
       children: [
@@ -48,19 +46,29 @@ class PremiumTreatmentsSection extends ConsumerWidget {
               title: 'Could not load premium treatments',
               error: error,
               stackTrace: stackTrace,
-              onRetry: () => ref.invalidate(premiumTreatmentPreviewProvider),
+              onRetry: () =>
+                  ref.invalidate(homePremiumTreatmentsPaginatedProvider),
             ),
           ),
-          data: (products) {
-            final previewProducts = products
-                .take(_previewProductCount)
-                .toList(growable: false);
-            if (previewProducts.isEmpty) {
+          data: (data) {
+            if (data.products.isEmpty) {
               return const _EmptyState();
             }
-            return _ProductGrid(
-              products: previewProducts,
-              contentPad: contentPad,
+            return Column(
+              children: [
+                _ProductGrid(products: data.products, contentPad: contentPad),
+                if (data.isLoadingMore) ...[
+                  SizedBox(height: AppDimens.spaceLg),
+                  const Center(child: CircularProgressIndicator()),
+                ] else if (data.loadMoreError != null) ...[
+                  SizedBox(height: AppDimens.spaceLg),
+                  _LoadMoreError(
+                    onRetry: () => ref
+                        .read(homePremiumTreatmentsPaginatedProvider.notifier)
+                        .loadMore(),
+                  ),
+                ],
+              ],
             );
           },
         ),
@@ -90,6 +98,56 @@ class _ProductGrid extends StatelessWidget {
       padding: EdgeInsets.zero,
       itemCount: products.length,
       itemBuilder: (context, index) => TreatmentCard(product: products[index]),
+    );
+  }
+}
+
+class _LoadMoreError extends StatelessWidget {
+  const _LoadMoreError({required this.onRetry});
+
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Material(
+      color: colorScheme.errorContainer,
+      borderRadius: AppDimens.radiusSmall,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppDimens.spaceMd,
+          vertical: AppDimens.spaceXs,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: colorScheme.onErrorContainer,
+              size: AppDimens.iconSm,
+            ),
+            SizedBox(width: AppDimens.spaceXs),
+            Expanded(
+              child: Text(
+                'Could not load more treatments',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onErrorContainer,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => onRetry(),
+              style: TextButton.styleFrom(
+                foregroundColor: colorScheme.onErrorContainer,
+              ),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

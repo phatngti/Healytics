@@ -288,6 +288,67 @@ describe('HealthServiceService', () => {
     });
   });
 
+  describe('getEligibilityDetail', () => {
+    it('uses the selected product partner for booking summary location', async () => {
+      const partner = {
+        id: 'partner-hcm',
+        brandName: 'Yoga phuc hoi TPHCM 17',
+        streetAddress: '40 Nguyen Trai',
+        ward: null,
+        district: { fullName: 'Quan 8' },
+        province: { fullName: 'Thanh pho Ho Chi Minh' },
+        latitude: 10.75,
+        longitude: 106.66,
+      };
+      const eligibility = {
+        id: 'elig-1',
+        product: {
+          id: 'service-1',
+          name: 'Stress Reset TPHCM 0529',
+          description: 'Therapy session',
+          basePrice: 430000,
+          salePrice: null,
+          currency: 'VND',
+          partner,
+          category: {
+            id: 'category-1',
+            name: 'Psychology Therapy',
+            parent: null,
+          },
+          media: [],
+          productDefinition: { durationMinutes: 50 },
+        },
+        employee: {
+          id: 'employee-1',
+          fullName: 'Dr. TPHCM',
+          jobTitle: 'Therapist',
+          avatarUrl: null,
+          doctorProfile: null,
+        },
+      } as ProductEmployeeEligibility;
+      eligibilityRepository.findOne.mockResolvedValue(eligibility);
+
+      const result = await service.getEligibilityDetail('elig-1');
+
+      expect(eligibilityRepository.findOne).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'elig-1' },
+          relations: expect.arrayContaining([
+            'product.partner',
+            'product.partner.province',
+            'product.partner.district',
+            'product.partner.ward',
+          ]),
+        }),
+      );
+      expect(partnersService.getFirstHealthPartner).not.toHaveBeenCalled();
+      expect(result.location.name).toBe('Yoga phuc hoi TPHCM 17');
+      expect(result.location.address).toBe(
+        '40 Nguyen Trai, Quan 8, Thanh pho Ho Chi Minh',
+      );
+    });
+  });
+
   describe('getProductEmployees', () => {
     it('should throw NotFoundException when product not found', async () => {
       // Arrange

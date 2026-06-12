@@ -231,11 +231,85 @@ final class PremiumTreatmentsPaginatedProvider
 }
 
 String _$premiumTreatmentsPaginatedHash() =>
-    r'758081715b299bde6d93436473b54f791da10cd0';
+    r'61d4419bf8cd0f36fe72b0e36c6504b9d89e9796';
 
 /// Accumulates the full Premium Treatments screen as pages are loaded.
 
 abstract class _$PremiumTreatmentsPaginated
+    extends $AsyncNotifier<PremiumTreatmentsAccumulated> {
+  FutureOr<PremiumTreatmentsAccumulated> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<PremiumTreatmentsAccumulated>,
+              PremiumTreatmentsAccumulated
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<PremiumTreatmentsAccumulated>,
+                PremiumTreatmentsAccumulated
+              >,
+              AsyncValue<PremiumTreatmentsAccumulated>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
+
+/// Accumulates premium treatment cards directly on the Home screen.
+///
+/// This stays separate from the filter-aware full Premium Treatments screen.
+
+@ProviderFor(HomePremiumTreatmentsPaginated)
+const homePremiumTreatmentsPaginatedProvider =
+    HomePremiumTreatmentsPaginatedProvider._();
+
+/// Accumulates premium treatment cards directly on the Home screen.
+///
+/// This stays separate from the filter-aware full Premium Treatments screen.
+final class HomePremiumTreatmentsPaginatedProvider
+    extends
+        $AsyncNotifierProvider<
+          HomePremiumTreatmentsPaginated,
+          PremiumTreatmentsAccumulated
+        > {
+  /// Accumulates premium treatment cards directly on the Home screen.
+  ///
+  /// This stays separate from the filter-aware full Premium Treatments screen.
+  const HomePremiumTreatmentsPaginatedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'homePremiumTreatmentsPaginatedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$homePremiumTreatmentsPaginatedHash();
+
+  @$internal
+  @override
+  HomePremiumTreatmentsPaginated create() => HomePremiumTreatmentsPaginated();
+}
+
+String _$homePremiumTreatmentsPaginatedHash() =>
+    r'df3f18a3e97f5a8d7217050e2189d218ef9d87fa';
+
+/// Accumulates premium treatment cards directly on the Home screen.
+///
+/// This stays separate from the filter-aware full Premium Treatments screen.
+
+abstract class _$HomePremiumTreatmentsPaginated
     extends $AsyncNotifier<PremiumTreatmentsAccumulated> {
   FutureOr<PremiumTreatmentsAccumulated> build();
   @$mustCallSuper

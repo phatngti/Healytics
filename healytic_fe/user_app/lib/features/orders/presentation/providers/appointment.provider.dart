@@ -33,6 +33,7 @@ const kTabUpcoming = 1;
 const kTabProcessing = 2;
 const kTabCompleted = 3;
 const kTabCanceled = 4;
+const kCategoryAllFilterId = 'cat-all';
 
 const _statusByTab = [
   'pending_payment',
@@ -56,9 +57,7 @@ class FilteredAppointmentsNotifier extends _$FilteredAppointmentsNotifier {
     final categoryId = ref.watch(selectedCategoryProvider);
 
     final status = _statusByTab[tab];
-    final resolvedCategory = categoryId == 'cat-all'
-        ? null
-        : categoryId.replaceFirst('cat-', '');
+    final resolvedCategory = _resolveCategoryFilter(categoryId);
 
     final raw = await repo.getAppointments(
       status: status,
@@ -79,9 +78,7 @@ class FilteredAppointmentsNotifier extends _$FilteredAppointmentsNotifier {
     final categoryId = ref.read(selectedCategoryProvider);
 
     final status = _statusByTab[tab];
-    final resolvedCategory = categoryId == 'cat-all'
-        ? null
-        : categoryId.replaceFirst('cat-', '');
+    final resolvedCategory = _resolveCategoryFilter(categoryId);
 
     final raw = await repo.getAppointments(
       status: status,
@@ -170,6 +167,12 @@ bool _isExpiredPayment(AppointmentEntity apt) {
   return exp != null && exp.isBefore(DateTime.now());
 }
 
+String? _resolveCategoryFilter(String categoryId) {
+  return categoryId == kCategoryAllFilterId
+      ? null
+      : categoryId.replaceFirst('cat-', '');
+}
+
 /// Keeps the booking-events socket subscribed while
 /// the orders screen is mounted. Incoming events are
 /// pushed into the filtered list notifier so cards can
@@ -226,10 +229,13 @@ class SelectedTabNotifier extends _$SelectedTabNotifier {
 @riverpod
 class SelectedCategoryNotifier extends _$SelectedCategoryNotifier {
   @override
-  String build() => 'cat-all';
+  String build() => kCategoryAllFilterId;
 
   /// Updates the active category.
   void select(String categoryId) => state = categoryId;
+
+  /// Clears the category filter.
+  void clear() => state = kCategoryAllFilterId;
 }
 
 /// Holds the currently selected layout view mode.

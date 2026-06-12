@@ -179,8 +179,7 @@ class _PremiumTreatmentPage {
 ///
 /// This stays separate from the filter-aware full Premium Treatments screen.
 @riverpod
-class HomePremiumTreatmentsPaginated
-    extends _$HomePremiumTreatmentsPaginated {
+class HomePremiumTreatmentsPaginated extends _$HomePremiumTreatmentsPaginated {
   int _loadMoreGeneration = 0;
 
   @override

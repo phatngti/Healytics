@@ -419,7 +419,14 @@ class _FallbackBody extends StatelessWidget {
               ),
               SizedBox(height: sectionGap),
             ],
-            const LocationDetailsCard(),
+            LocationDetailsCard(
+              partnerName:
+                  flowState.selectedService?.clinicName ?? 'Unknown clinic',
+              address:
+                  flowState.selectedService?.clinicAddress ??
+                  flowState.selectedService?.location ??
+                  'Unknown address',
+            ),
             SizedBox(height: sectionGap),
             const PriceBreakdownCard(),
             SizedBox(height: sectionGap),

@@ -57,16 +57,16 @@ class _HomeUpdatePageState extends ConsumerState<HomeUpdatePage> {
     final distanceToBottom = position.maxScrollExtent - position.pixels;
     if (distanceToBottom > _homeLoadMoreScrollThreshold) return;
 
-    final data = ref.read(homePremiumTreatmentsPaginatedProvider).valueOrNull;
+    final data = ref.read(homePremiumTreatmentsPaginatedProvider).value;
     if (data == null || !data.hasMore || data.isLoadingMore) return;
 
     ref.read(homePremiumTreatmentsPaginatedProvider.notifier).loadMore();
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     ref.listen(homePremiumTreatmentsPaginatedProvider, (previous, next) {
-      final data = next.valueOrNull;
+      final data = next.value;
       if (data != null && !data.isLoadingMore) {
         _scheduleLoadMoreCheck();
       }

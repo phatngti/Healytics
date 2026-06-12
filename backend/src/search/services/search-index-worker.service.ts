@@ -32,7 +32,7 @@ export class SearchIndexWorkerService {
     private readonly configService: ConfigService,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async processPending(): Promise<void> {
     if (!this.isWorkerEnabled()) return;
 
@@ -72,7 +72,7 @@ export class SearchIndexWorkerService {
     }
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async reconcile(): Promise<void> {
     if (!this.isWorkerEnabled()) return;
 

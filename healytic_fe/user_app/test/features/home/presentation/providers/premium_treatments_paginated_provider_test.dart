@@ -12,6 +12,58 @@ import 'package:user_app/features/orders/domain/entities/'
     'appointment.entity.dart';
 
 void main() {
+  test('home premium treatments appends four-card batches', () async {
+    final repository = _FakeHomeRepository(
+      List.generate(9, (index) => _product('home-service-$index')),
+    );
+    final container = ProviderContainer(
+      overrides: [
+        data_provider.homeRepositoryProvider.overrideWithValue(repository),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final firstPage = await container.read(
+      homePremiumTreatmentsPaginatedProvider.future,
+    );
+
+    expect(firstPage.products.length, 4);
+    expect(firstPage.hasMore, isTrue);
+    expect(firstPage.offset, 4);
+    expect(repository.requests, const [_PageRequest(limit: 5, offset: 0)]);
+
+    await container
+        .read(homePremiumTreatmentsPaginatedProvider.notifier)
+        .loadMore();
+
+    final secondPage = container
+        .read(homePremiumTreatmentsPaginatedProvider)
+        .requireValue;
+    expect(secondPage.products.length, 8);
+    expect(secondPage.hasMore, isTrue);
+    expect(secondPage.offset, 8);
+    expect(repository.requests, const [
+      _PageRequest(limit: 5, offset: 0),
+      _PageRequest(limit: 5, offset: 4),
+    ]);
+
+    await container
+        .read(homePremiumTreatmentsPaginatedProvider.notifier)
+        .loadMore();
+
+    final finalPage = container
+        .read(homePremiumTreatmentsPaginatedProvider)
+        .requireValue;
+    expect(finalPage.products.length, 9);
+    expect(finalPage.hasMore, isFalse);
+    expect(finalPage.offset, 9);
+    expect(repository.requests, const [
+      _PageRequest(limit: 5, offset: 0),
+      _PageRequest(limit: 5, offset: 4),
+      _PageRequest(limit: 5, offset: 8),
+    ]);
+  });
+
   test('premium treatments appends pages until the final page', () async {
     final repository = _FakeHomeRepository(
       List.generate(25, (index) => _product('service-$index')),

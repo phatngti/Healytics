@@ -25,11 +25,13 @@ class AdaptiveRootScraffold extends HookConsumerWidget {
   ///
   /// - [navigationShell] — The GoRouter shell that manages branch navigation.
   /// - [destinationKeys] — Optional keys for each destination (for integration tests).
+  /// - [onDestinationSelected] — Optional hook fired before branch navigation.
   const AdaptiveRootScraffold({
     super.key,
     required this.navigationShell,
     this.destinationKeys,
     this.notificationBadgeCount = 0,
+    this.onDestinationSelected,
   });
 
   /// The stateful navigation shell managing tab-based branch routing.
@@ -45,6 +47,9 @@ class AdaptiveRootScraffold extends HookConsumerWidget {
   /// When > 0, a badge is shown on the
   /// Notifications tab icon.
   final int notificationBadgeCount;
+
+  /// Optional callback fired whenever a destination is selected.
+  final void Function(int index)? onDestinationSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -88,6 +93,7 @@ class AdaptiveRootScraffold extends HookConsumerWidget {
     return _CustomAdaptiveScaffold(
       selectedIndex: selectedIndex,
       onSelectedIndexChange: (index) {
+        onDestinationSelected?.call(index);
         navigationShell.goBranch(
           index,
           initialLocation: index == navigationShell.currentIndex,
