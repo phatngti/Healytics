@@ -1,8 +1,7 @@
 \chapter{Thiết kế hệ thống}
 \section{Kiến trúc tổng thể hệ thống}
 \subsection{Kiến trúc N-tier}
-\textbf{N-tier Architecture} chia hệ thống thành các tầng độc lập theo trách nhiệm, giao tiếp theo luồng một chiều rõ ràng nhằm tăng khả năng bảo trì, bảo mật và mở rộng. Mỗi tầng chỉ giao tiếp với tầng liền kề, qua đó giảm thiểu sự phụ thuộc chéo (Loose Coupling) và cho phép thay đổi công nghệ ở một tầng mà không ảnh hưởng đến các tầng còn lại. Hệ thống Healytics áp dụng mô hình 5 tầng; kết cấu chi tiết cùng công nghệ cụ thể cho từng tầng sẽ được trình bày sau sơ đồ kiến trúc tổng thể (Hình~\ref{fig:sys_arch}).
-
+\textbf{N-tier Architecture} tổ chức hệ thống thành các tầng độc lập, giao tiếp một chiều với tầng liền kề giúp giảm phụ thuộc chéo (Loose Coupling), tối ưu khả năng bảo trì, bảo mật và mở rộng. Hệ thống Healytics áp dụng kiến trúc 5 tầng; chi tiết công nghệ sẽ được trình bày sau sơ đồ tổng thể (Hình~\ref{fig:sys_arch}).
 \subsection{Ưu điểm và Nhược điểm}
 \begin{table}[H]
     \centering
@@ -217,7 +216,7 @@ Kiến trúc dữ liệu toàn diện hỗ trợ quản lý người dùng đa v
 \subsection{Lược đồ}
 \begin{figure}[H]
     \centering
-    \includegraphics[angle=-90, width=0.9\textwidth]{Images/ERD.png}
+    \includegraphics[angle=-90, width=0.8\textwidth]{Images/ERD.png}
     \vspace{10pt}
     
     % Thêm chú thích cho hình ảnh
@@ -249,7 +248,7 @@ Mockup bao gồm các nhóm màn hình chính:
     \item \textbf{AI Chat Assistant:} Giao diện trợ lý AI hỗ trợ người dùng tư vấn sức khỏe thông qua hội thoại tự nhiên.
 \end{itemize}
 
-Các giao diện thiết kế chi tiết được trình bày đầy đủ tại \textbf{Phụ lục A}.
+Các giao diện thiết kế chi tiết được trình bày đầy đủ tại \textbf{Phụ lục C}.
 
 \section{Phần AI – Thiết kế}
 \subsection{Thu thập và tiền xử lý dữ liệu}

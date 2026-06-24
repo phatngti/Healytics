@@ -1,4 +1,4 @@
-\chapter{Hiện thực}
+﻿\chapter{Hiện thực}
 \section{Các công nghệ liên quan}
 
 Nhằm đảm bảo tính khả thi và hiệu quả cho nền tảng Healytics, nhóm tiến hành khảo sát các công nghệ phổ biến cho từng tầng hệ thống, đánh giá dựa trên bộ tiêu chí thực tế: đơn ngôn ngữ (TypeScript/Python), quy mô nhóm nhỏ, tải trung bình và yêu cầu địa lý (geospatial). Phần~\ref{sec:tech_compare} trình bày kết quả so sánh và lý do quyết định cho từng công nghệ cốt lõi; các phần tiếp theo mô tả chi tiết đặc điểm và cách áp dụng của từng công nghệ.
@@ -306,33 +306,6 @@ Hệ sinh thái (GitHub sao) & $\sim$90k & $\sim$35k & Nhỏ hơn \\
 % -----------------------------------------------------------------
 % PHẦN: MOBILE/WEB (Flutter)
 % -----------------------------------------------------------------
-\subsection{Mobile App Development (iOS/Android, Flutter)}
-\begin{itemize}
-    \item \textbf{Lý do chọn Flutter:} Framework đa nền tảng cho iOS/Android với một codebase, giúp giảm chi phí phát triển - bảo trì và giữ trải nghiệm nhất quán.
-    \item \textbf{Kiến trúc:} Áp dụng kiến trúc Clean Architecture hoặc Riverpod Architecture để tách biệt rõ ràng các tầng logic (Data, Domain, Presentation), giúp mã nguồn dễ kiểm thử và bảo trì.
-    \item \textbf{Tính năng nổi bật}:
-    \begin{itemize}
-        \item \textbf{Hiệu năng hiển thị:} Impeller giúp chuyển động mượt và ổn định cho UI phức tạp.
-        \item \textbf{Phát triển nhanh:} Hot reload nhanh, giữ trạng thái tốt khi chỉnh giao diện và logic.
-        \item \textbf{Khả năng tái sử dụng:} Chia sẻ code cao giữa mobile và có thể mở rộng web/desktop khi cần.
-        \item \textbf{Tích hợp native:} Platform channel hỗ trợ kết nối các API thiết bị như camera, BLE.
-        \item \textbf{Vận hành sản phẩm:} Hỗ trợ cập nhật và bảo trì thuận lợi, hệ sinh thái thư viện đủ lớn cho nhu cầu dự án.
-    \end{itemize}
-\end{itemize}
-
-\subsection{Web/Portal Development (Partner Portal, Admin Dashboard)}
-\begin{itemize}
-    \item \textbf{Lý do chọn Flutter (Web \& Desktop):} Tận dụng lại phần lớn business logic từ mobile, đảm bảo giao diện đồng nhất giữa các nền tảng và giảm chi phí bảo trì.
-    \item \textbf{Tính năng nổi bật}:
-    \begin{itemize}
-        \item \textbf{Hiệu năng trình duyệt:} Flutter Web đáp ứng tốt các màn hình quản trị có nhiều thành phần dữ liệu.
-        \item \textbf{Code dùng chung:} Tái sử dụng model/service giữa mobile và web để giảm công sức phát triển.
-        \item \textbf{UI nhất quán:} Kiểm soát hiển thị tốt trên nhiều trình duyệt và độ phân giải.
-        \item \textbf{Routing và state management:} GoRouter kết hợp BLoC/Riverpod giúp luồng điều hướng rõ ràng, dễ kiểm thử.
-        \item \textbf{Mở rộng desktop:} Có thể phát hành bản desktop khi cần cho vận hành nội bộ.
-    \end{itemize}
-\end{itemize}
-
 
 
 % =================================================================
@@ -345,65 +318,13 @@ Phần Backend đóng vai trò cốt lõi trong việc xử lý nghiệp vụ, l
 
 
 \subsubsection{Application Server (NestJS)}
-\begin{itemize}
-    \item \textbf{Lý do chọn NestJS:} Được xây dựng trên nền tảng NodeJS và TypeScript, NestJS cung cấp một kiến trúc module hóa, có cấu trúc chặt chẽ (lấy cảm hứng từ Angular). Điều này giúp việc xây dựng các API phức tạp trở nên \textbf{dễ quản lý, bảo trì và mở rộng}. TypeScript cũng giúp giảm thiểu lỗi và tăng cường tính an toàn của mã nguồn.
-    \item \textbf{Tính năng nổi bật:}
-    \begin{itemize}
-        \item \textbf{Modular Architecture}: NestJS áp dụng cấu trúc module tính năng với @Module() để tách biệt rõ ràng, lý tưởng cho ứng dụng doanh nghiệp; Express thiếu module tích hợp, dễ dẫn đến code rối; Spring Boot có module bằng annotation nhưng dài dòng với Java; Django dùng app-based module kiểu Python, đầy đủ tính năng nhưng kém linh hoạt với hệ sinh thái JS; Fastify nhẹ, không có module gốc, cần tổ chức thủ công.
-        
-        \item \textbf{Dependency Injection (DI)}: NestJS cung cấp DI phân cấp, an toàn kiểu qua @Injectable() và providers, giảm boilerplate và tăng khả năng test; Express không có DI sẵn, phải dùng thư viện như Inversify; Spring Boot với @Autowired là tiên phong nhưng nặng với cấu hình XML; Django truyền service thủ công, không có container DI thật; Fastify hỗ trợ plugin nhưng thiếu DI cấp framework.
-        
-        \item \textbf{TypeScript-First Design}: NestJS được xây dựng hoàn toàn cho TypeScript với suy luận kiểu và decorator, phát hiện lỗi tại compile-time; Express hỗ trợ TS qua add-on nhưng vẫn JS-centric; Spring Boot dùng kiểu tĩnh Java, cứng nhắc hơn TS; Django là Python động, type hints chỉ là bổ sung; Fastify có type TS nhưng tích hợp không sâu, dễ lỗi runtime.
-        
-        \item \textbf{Decorators \& Metadata}: NestJS dùng @Controller(), @Get(), @Body() để định nghĩa route và validation khai báo, lấy cảm hứng từ Angular; Express dùng hàm/middleware thuần, dài dòng; Spring Boot với @RestController/@RequestMapping tương tự nhưng cú pháp Java; Django dùng class-based hoặc function view, không có decorator; Fastify dùng schema route, ít metadata.
-        
-        \item \textbf{Built-in Testing Support}: NestJS tích hợp @nestjs/testing cho test e2e/unit với mock và override DI sẵn; Express cần setup Jest/Supertest thủ công; Spring Boot với @SpringBootTest toàn diện nhưng khởi động JVM chậm; Django có TestCase tích hợp nhưng chỉ cho Python; Fastify test dựa plugin, nhẹ nhưng thiếu cấu trúc như Nest.
-        
-        \item \textbf{Microservices \& Event-Driven}: NestJS hỗ trợ microservices nguyên bản qua @nestjs/microservices với TCP, Redis, Kafka, hybrid; Express cần setup thủ công; Spring Boot với Spring Cloud mạnh cho doanh nghiệp nhưng phức tạp; Django dùng Celery cho task, không phải microservices đầy đủ; Fastify tập trung HTTP, hạn chế về async messaging.
-        
-        \item \textbf{Performance \& Adapter Flexibility}: NestJS với Fastify adapter đạt 30k+ req/s (gấp 2 Express), bộ nhớ thấp ($\sim$15\% so Express, 1/5 Spring); Express nhanh cho app nhỏ nhưng nghẽn khi scale; Spring Boot tối ưu JVM cho tải nặng nhưng latency/bộ nhớ cao; Django bị giới hạn GIL về concurrency, chậm hơn Node; Fastify đạt 33k req/s nhưng Nest thêm $\sim$8\% overhead để có cấu trúc.
-        
-        \item \textbf{Validation \& Pipes}: NestJS dùng class-validator với pipes @nestjs/class-transformer để tự động validate DTO khai báo; Express dùng Joi/express-validator thủ công; Spring Boot với @Valid và Bean Validation tương tự nhưng dùng Java bean; Django xử lý validation qua forms/serializers; Fastify schema hiệu suất cao nhưng tích hợp kém.
-        
-        \item \textbf{Guards, Interceptors \& Pipes}: NestJS hỗ trợ tính năng AOP qua @UseGuards, @UseInterceptors cho auth/logging/biến đổi; Express dùng middleware chain tương tự nhưng toàn cục; Spring Boot có AOP/Interceptors mạnh cho doanh nghiệp; Django middleware tuyến tính, kém chi tiết; Fastify dùng hook nhanh nhưng chỉ hook, không có guard.
-        
-        \item \textbf{Ecosystem \& Community}: NestJS tận dụng 2M+ package npm với 60k+ sao GitHub, tài liệu/plugin phát triển mạnh; Express có hệ sinh thái rộng nhưng không cấu trúc; Spring Boot trưởng thành cho doanh nghiệp (Maven/Gradle); Django mạnh về data/ML với PyPI; Fastify cộng đồng nhỏ hơn nhưng plugin hiệu suất cao.
-    \end{itemize}
-\end{itemize}
+\noindent\textbf{Lý do chọn NestJS:} Được xây dựng trên nền tảng NodeJS và TypeScript, NestJS cung cấp một kiến trúc module hóa, có cấu trúc chặt chẽ (lấy cảm hứng từ Angular). Điều này giúp việc xây dựng các API phức tạp trở nên \textbf{dễ quản lý, bảo trì và mở rộng}. TypeScript cũng giúp giảm thiểu lỗi và tăng cường tính an toàn của mã nguồn.
 
 \subsubsection{Database Management (PostgreSQL)}
-\begin{itemize}
-    \item \textbf{Lý do chọn PostgreSQL:} Là hệ quản trị cơ sở dữ liệu quan hệ (RDBMS) mã nguồn mở tiên tiến nhất, nổi tiếng với độ ổn định, tuân thủ chuẩn ACID tuyệt đối và khả năng mở rộng mạnh mẽ. PostgreSQL đóng vai trò là ``nguồn chân lý'' (source of truth) cho toàn bộ dữ liệu nghiệp vụ quan trọng (User, Booking, Payment). Khả năng hỗ trợ JSONB giúp hệ thống linh hoạt như NoSQL nhưng vẫn giữ được tính chặt chẽ của SQL.
-    \item \textbf{Tính năng nổi bật}:
-    \begin{itemize}
-        \item \textbf{Advanced JSONB Support}: PostgreSQL lưu trữ JSON dưới dạng nhị phân (Binary JSON), cho phép đánh index và query sâu vào thuộc tính JSON cực nhanh; MySQL hỗ trợ JSON nhưng lưu dạng text, hiệu năng query thấp hơn và hạn chế về hàm xử lý; MongoDB (NoSQL) mạnh về JSON nhưng thiếu tính năng transaction và JOIN phức tạp giữa các bảng quan hệ.
-        
-        \item \textbf{MVCC (Multi-Version Concurrency Control)}: PostgreSQL xử lý đồng thời tốt hơn nhờ cơ chế MVCC, người đọc không chặn người ghi và ngược lại; MySQL (InnoDB) sử dụng gap-locking dễ gây ra deadlock khi tải cao hoặc query phức tạp; SQL Server dùng cơ chế locking truyền thống thường tốn chi phí quản lý lock (lock escalation).
-        
-        \item \textbf{Geospatial Extensions (PostGIS)}: PostgreSQL có PostGIS - tiêu chuẩn vàng cho dữ liệu địa lý, tối ưu cho việc tìm kiếm spa/bác sĩ ``gần đây''; MySQL có hỗ trợ Spatial nhưng tính năng hạn chế và thuật toán chưa tối ưu bằng; MongoDB hỗ trợ GeoJSON nhưng không mạnh bằng PostGIS về các phép toán hình học phức tạp.
-        
-        \item \textbf{Extensibility \& Custom Types}: Cho phép tự định nghĩa kiểu dữ liệu, hàm và operator tùy chỉnh (ví dụ: tạo kiểu dữ liệu riêng cho tiền tệ hoặc khoảng thời gian); MySQL và SQL Server khá cứng nhắc, chỉ hỗ trợ các kiểu dữ liệu chuẩn; Oracle hỗ trợ mạnh nhưng chi phí bản quyền cực kỳ đắt đỏ.
-        
-        \item \textbf{Reliability \& ACID Compliance}: Đảm bảo toàn vẹn dữ liệu tuyệt đối kể cả khi hệ thống crash, cơ chế Write-Ahead Logging (WAL) rất tin cậy; MongoDB (trước v4.0) từng gặp vấn đề về mất dữ liệu và transaction; MySQL (MyISAM cũ) không hỗ trợ transaction, InnoDB hỗ trợ nhưng cấu hình phức tạp để đạt độ an toàn tương đương Postgres.
-    \end{itemize}
-\end{itemize}
+\noindent\textbf{Lý do chọn PostgreSQL:} Là hệ quản trị cơ sở dữ liệu quan hệ (RDBMS) mã nguồn mở tiên tiến nhất, nổi tiếng với độ ổn định, tuân thủ chuẩn ACID tuyệt đối và khả năng mở rộng mạnh mẽ. PostgreSQL đóng vai trò là ``nguồn chân lý'' (source of truth) cho toàn bộ dữ liệu nghiệp vụ quan trọng (User, Booking, Payment). Khả năng hỗ trợ JSONB giúp hệ thống linh hoạt như NoSQL nhưng vẫn giữ được tính chặt chẽ của SQL.
 
 \subsubsection{Message Broker (RabbitMQ)}
-\begin{itemize}
-    \item \textbf{Lý do chọn RabbitMQ:} Đóng vai trò trung gian xử lý các tác vụ bất đồng bộ (gửi email, push notification, xử lý thanh toán) để giảm tải cho API server chính. RabbitMQ hỗ trợ giao thức AMQP chuẩn công nghiệp, cung cấp khả năng routing (định tuyến) bản tin cực kỳ linh hoạt và độ tin cậy cao, đảm bảo không mất task quan trọng.
-    \item \textbf{Tính năng nổi bật}:
-    \begin{itemize}
-        \item \textbf{Flexible Routing (Exchanges \& Queues)}: RabbitMQ hỗ trợ Direct, Topic, Fanout, Header exchanges cho phép định tuyến message phức tạp (ví dụ: chỉ gửi noti cho user VIP); Kafka hoạt động dựa trên Partition và Topic log, client phải tự lọc dữ liệu, mô hình ``dumb pipe, smart endpoint''; Redis Pub/Sub chỉ là broadcast đơn giản, không có routing logic phức tạp.
-        
-        \item \textbf{Message Delivery Acknowledgement}: Hỗ trợ cơ chế Ack/Nack xác nhận đã xử lý xong task, nếu worker chết task sẽ được trả lại hàng đợi (Re-queue); Redis Pub/Sub là ``fire and forget'', nếu subscriber offline thì mất tin; ActiveMQ cũ hơn, cấu hình phức tạp và nặng nề hơn cho các microservices hiện đại.
-        
-        \item \textbf{Low Latency for Individual Messages}: RabbitMQ tối ưu cho độ trễ thấp trên từng message lẻ, phù hợp cho transaction tức thì (OTP, booking confirmation); Kafka tối ưu cho Throughput (thông lượng) cực lớn (Big Data streaming) nhưng độ trễ cao hơn do cơ chế batching; Amazon SQS độ trễ biến thiên và tốn chi phí trên từng request.
-        
-        \item \textbf{User Interface (Management Plugin)}: Cung cấp giao diện web trực quan tích hợp sẵn để giám sát queue, connection, và tốc độ tiêu thụ message real-time; Kafka cần cài thêm công cụ bên thứ 3 (như Kafka UI, Conduktor) phức tạp; Redis CLI chỉ thao tác dòng lệnh, khó giám sát trực quan luồng dữ liệu.
-        
-        \item \textbf{Push Model}: RabbitMQ chủ động đẩy (push) message tới consumer giúp xử lý task ngay lập tức; Kafka sử dụng Pull model (consumer phải định kỳ hỏi server), có thể gây trễ nếu cấu hình polling interval không tốt; REST API (đồng bộ) dễ gây nghẽn (blocking) user thread nếu tác vụ xử lý lâu.
-    \end{itemize}
-\end{itemize}
+\noindent\textbf{Lý do chọn RabbitMQ:} Đóng vai trò trung gian xử lý các tác vụ bất đồng bộ (gửi email, push notification, xử lý thanh toán) để giảm tải cho API server chính. RabbitMQ hỗ trợ giao thức AMQP chuẩn công nghiệp, cung cấp khả năng routing (định tuyến) bản tin cực kỳ linh hoạt và độ tin cậy cao, đảm bảo không mất task quan trọng.
 
 \noindent\textbf{Ứng dụng trong luồng đặt lịch (Booking):} Bài toán đặt lịch chịu áp lực đồng thời cao nhất khi nhiều người cùng tranh một khung giờ. Hệ thống giải quyết bằng RabbitMQ kết hợp Redis distributed lock:
 \begin{itemize}
@@ -413,21 +334,7 @@ Phần Backend đóng vai trò cốt lõi trong việc xử lý nghiệp vụ, l
 
 
 \subsubsection{Caching \& In-Memory Store (Redis)}
-\begin{itemize}
-    \item \textbf{Lý do chọn Redis:} Kho lưu trữ trong bộ nhớ với hiệu năng rất cao, dùng cho cache, session và dữ liệu tạm thời.
-    \item \textbf{Tính năng nổi bật}:
-    \begin{itemize}
-        \item \textbf{Rich Data Structures}: Redis hỗ trợ Hash, List, Set, Sorted Set (dùng cho Leaderboard/Ranking), Bitmap; Memcached chỉ hỗ trợ Key-Value chuỗi đơn giản, không thao tác được trên cấu trúc dữ liệu; Cơ sở dữ liệu truyền thống (Postgres/MySQL) lưu trên đĩa cứng, tốc độ chậm hơn hàng nghìn lần so với RAM của Redis.
-        
-        \item \textbf{Persistence (RDB \& AOF)}: Cho phép lưu trạng thái từ RAM xuống ổ cứng định kỳ để phục hồi khi server khởi động lại; Memcached hoàn toàn không có persistence, mất điện là mất sạch cache; Ehcache (Java) lưu được xuống đĩa nhưng cấu hình phức tạp và chỉ dành cho JVM, không đa ngôn ngữ như Redis.
-        
-        \item \textbf{Performance}: Có thể xử lý hàng triệu request/giây với độ trễ sub-millisecond nhờ mô hình đơn luồng (single-threaded) loại bỏ context switch; Database query thường mất 10--50ms; Local Variable Cache (trong code Node/Go) nhanh nhất nhưng không đồng bộ được giữa nhiều server (scale horizontally).
-        
-        \item \textbf{TTL (Time To Live)}: Tự động xóa dữ liệu sau một khoảng thời gian (hết hạn Session, Cache invalidation) chính xác tới từng giây; Việc tự implement logic hết hạn trong SQL Database (cronjob quét bảng) rất tốn tài nguyên và không chính xác; Cookie phía client không an toàn và giới hạn dung lượng (4KB).
-        
-        \item \textbf{Distributed Locking}: Redis cung cấp cơ chế Redlock để xử lý khóa phân tán, ngăn chặn trường hợp 2 user cùng đặt 1 bác sĩ tại cùng 1 giờ (Race condition); ZooKeeper cũng làm được nhưng quá nặng nề để triển khai chỉ cho việc locking; Dùng Transaction của Database có thể gây chậm toàn hệ thống do giữ connection lâu.
-    \end{itemize}
-\end{itemize}
+\noindent\textbf{Lý do chọn Redis:} Kho lưu trữ trong bộ nhớ với hiệu năng rất cao, dùng cho cache, session và dữ liệu tạm thời.
 
 
 % -----------------------------------------------------------------
@@ -438,34 +345,10 @@ Phần Backend đóng vai trò cốt lõi trong việc xử lý nghiệp vụ, l
 Hệ thống AI được triển khai như một cụm microservices độc lập, giao tiếp với Backend chính thông qua REST API. Toàn bộ được xây dựng bằng Python, tận dụng hệ sinh thái phong phú về Machine Learning và xử lý ngôn ngữ tự nhiên.
 
 \subsubsection{Application Framework (FastAPI)}
-\begin{itemize}
-    \item \textbf{Lý do chọn FastAPI:} Framework Python async-native, tự sinh tài liệu OpenAPI và phù hợp cho AI service nhiều I/O.
-    \item \textbf{Tính năng nổi bật}:
-    \begin{itemize}
-        \item \textbf{Async-Native}: Hỗ trợ \texttt{async def} cho mọi endpoint, cho phép xử lý đồng thời hàng nghìn request mà không tạo thread; Flask/Django truyền thống dùng mô hình đồng bộ, cần Gunicorn workers để scale; Express (Node) cũng async nhưng không có type safety mạnh bằng Pydantic của FastAPI.
-
-        \item \textbf{Streaming Response (SSE)}: Hỗ trợ \texttt{StreamingResponse} native, cho phép gửi dữ liệu theo luồng (Server-Sent Events) — cốt lõi cho tính năng chatbot streaming; Flask cần extension bên ngoài cho SSE; Django không hỗ trợ streaming ở mức framework.
-
-        \item \textbf{Pydantic Validation}: Tự động validate request/response với type hints và Pydantic models, phát hiện lỗi dữ liệu trước khi vào logic AI; Flask/Django dùng Marshmallow hoặc serializers thủ công, dài dòng hơn.
-
-        \item \textbf{Performance}: Benchmark đạt 15k--20k req/s nhờ Uvicorn (ASGI), nhanh gấp 3--5 lần Flask (WSGI), và tương đương Express (Node); Kết hợp \texttt{uvloop} tăng thêm 20--30\% throughput.
-    \end{itemize}
-\end{itemize}
+\noindent\textbf{Lý do chọn FastAPI:} Framework Python async-native, tự sinh tài liệu OpenAPI và phù hợp cho AI service nhiều I/O.
 
 \subsubsection{Orchestration Framework (LangChain)}
-\begin{itemize}
-    \item \textbf{Lý do chọn LangChain:} Nối LLM, vector store, retriever và prompt template thành pipeline hoàn chỉnh.
-    \item \textbf{Tính năng nổi bật}:
-    \begin{itemize}
-        \item \textbf{Runnable Interface}: Chain các bước xử lý (retrieval $\rightarrow$ prompt $\rightarrow$ LLM $\rightarrow$ parser) theo dạng pipeline khai báo, dễ debug từng bước; LlamaIndex cũng hỗ trợ RAG nhưng thiên về indexing, thiếu linh hoạt về chain composition; Tự build pipeline thủ công cần nhiều boilerplate code.
-
-        \item \textbf{Multi-Provider Support}: Tích hợp sẵn với HuggingFace (\texttt{langchain-huggingface}), ChromaDB (\texttt{langchain-chroma}), OpenAI, và nhiều provider khác chỉ qua config; Semantic Kernel (Microsoft) hỗ trợ ít provider hơn; Haystack (deepset) mạnh nhưng hệ sinh thái nhỏ hơn.
-
-        \item \textbf{Text Splitters}: \texttt{RecursiveCharacterTextSplitter} tách tài liệu thông minh theo ngữ nghĩa (ưu tiên tách ở dấu chấm, xuống dòng) thay vì cắt cứng; Hỗ trợ tùy chỉnh \texttt{chunk\_size} và \texttt{chunk\_overlap} phù hợp với từng embedding model.
-
-        \item \textbf{LangGraph}: Mở rộng LangChain thành đồ thị trạng thái (state graph) cho các agent phức tạp, hỗ trợ checkpoint và phân nhánh; AutoGen (Microsoft) cũng hỗ trợ multi-agent nhưng thiên về conversation, không mạnh về RAG pipeline.
-    \end{itemize}
-\end{itemize}
+\noindent\textbf{Lý do chọn LangChain:} Nối LLM, vector store, retriever và prompt template thành pipeline hoàn chỉnh.
 
 \subsubsection{Mô hình ngôn ngữ lớn (Large Language Models)}
 \begin{itemize}
@@ -1695,53 +1578,7 @@ Hình~\ref{fig:partner_svc_dash5} hiển thị chế độ \textbf{Website Layou
     \item Chuyển đổi giữa chế độ bảng (quản lý) và lưới (xem trước giao diện khách hàng).
 \end{itemize}
 
-\paragraph{Tạo dịch vụ mới (Create Product)}
-
-Luồng tạo dịch vụ mới gồm 3 phần chính điền trên cùng một form dài: thông tin cơ bản, hướng dẫn dịch vụ (Service Manual), và đa phương tiện (Media Gallery).
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_partner_create_service_1.png}
-    \vspace{0.5em}
-    \caption{Create Product -- General Information: tên, mô tả, phân loại và cài đặt lịch đặt}
-    \label{fig:partner_create_svc1}
-\end{figure}
-
-Hình~\ref{fig:partner_create_svc1} hiển thị mục \textbf{General Information}:
-\begin{itemize}
-    \item \textbf{Thông tin chính (trái):} Tên sản phẩm (Product Name), Mô tả (Description, rich text), Hướng dẫn dịch vụ (Service Manual).
-    \item \textbf{Thanh bên (phải):} Hiển thị (Visibility), Bật/tắt cửa hàng trực tuyến (Online Store toggle), Danh mục (Category), Thẻ nhãn (Tags), Phân công nhân viên (Staff Assignment), Thời lượng/Thời gian đệm (Duration/Buffer), Sức chứa (Capacity), Quy tắc đặt lịch (Booking Rules).
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_parter_create_service_2.png}
-    \vspace{0.5em}
-    \caption{Create Product -- Service Manual: Pre-Service Guidelines, Service Rules và Procedure Steps}
-    \label{fig:partner_create_svc2}
-\end{figure}
-
-Hình~\ref{fig:partner_create_svc2} hiển thị mục \textbf{Service Manual}:
-\begin{itemize}
-    \item \textbf{Pre-Service Guidelines:} Hướng dẫn chuẩn bị trước khi đến.
-    \item \textbf{Service Rules:} Mỗi quy tắc gồm icon slug, tiêu đề và mô tả.
-    \item \textbf{Procedure Steps:} Các bước quy trình tuần tự (Step 1, 2, ...).
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_partner_create_service_3.png}
-    \vspace{0.5em}
-    \caption{Create Product -- Service Pricing và Media Gallery}
-    \label{fig:partner_create_svc3}
-\end{figure}
-
-Hình~\ref{fig:partner_create_svc3} hiển thị phần cuối của form:
-\begin{itemize}
-    \item \textbf{Service Pricing:} Base Price và Sale Price.
-    \item \textbf{Media Gallery:} Product Images và Facility Images (tải ảnh hoặc thêm từ URL).
-    \item Nút \textbf{Save \& Publish} lưu và công khai dịch vụ.
-\end{itemize}
+Chi tiết form tạo dịch vụ mới được chuyển sang \textbf{Phụ lục~\ref{appendix:partner_create_service}}.
 
 % ---------------------------------------------------------------------------
 % 6.3.3.4  QUẢN LÝ NHÂN VIÊN
@@ -1793,81 +1630,8 @@ Hình~\ref{fig:partner_emp3} hiển thị bảng quản lý nhân viên:
     \item Cột: ID, Avatar, Full Name (Họ tên), Position (Vị trí: Senior Doctor/Spa Therapist/Massage Therapist), Rating (Đánh giá), Review Count (Số lượt đánh giá), Status (Trạng thái), Actions (Xem/Sửa/Xóa).
     \item Nút \textbf{Add Employee} (thêm nhân viên mới) và \textbf{Delete All} (xóa toàn bộ); hỗ trợ tìm kiếm, lọc và sắp xếp.
 \end{itemize}
-\paragraph{Tạo nhân viên mới}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_1.png}
-    \vspace{0.5em}
-    \caption{Tạo nhân viên -- Contact \& Basic Info và Professional Role}
-    \label{fig:partner_create_emp1}
-\end{figure}
-
-Hình~\ref{fig:partner_create_emp1} hiển thị bước đầu của form tạo nhân viên:
-\begin{itemize}
-    \item \textbf{Contact \& Basic Info:} First Name (Tên), Last Name (Họ), Email, Phone (Số điện thoại), Date of Birth (Ngày sinh), Gender (Giới tính), Emergency Contact (Liên hệ khẩn cấp).
-    \item \textbf{Professional Role:} Chọn loại (\textbf{Therapist} hoặc \textbf{Doctor}), Job Title (Chức danh), Employee ID (tự sinh -- Auto-Generate), Employment Type (Full-Time/Part-Time), Start Date (Ngày bắt đầu) và Description (Mô tả công việc, hỗ trợ rich text).
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_2_a.png}
-    \vspace{0.5em}
-    \caption{Tạo Doctor -- Education \& Qualifications và Experience \& Qualifications}
-    \label{fig:partner_create_emp2}
-\end{figure}
-
-Hình~\ref{fig:partner_create_emp2} hiển thị các mục thông tin chuyên môn dành cho Doctor:
-\begin{itemize}
-    \item \textbf{Education \& Qualifications:} Medical Title (Chức danh y tế), Medical License ID (Mã chứng chỉ hành nghề -- bắt buộc), Education (Bằng cấp -- đa chọn), Certifications (Chứng chỉ chuyên môn).
-    \item \textbf{Experience \& Qualifications:} Years of Experience (Số năm kinh nghiệm), Consultation Fee (Phí tư vấn \%), Specializations (Chuyên khoa -- đa chọn).
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_2_b.png}
-    \vspace{0.5em}
-    \caption{Tạo Therapist -- Skills \& Services: loại trị liệu, cấp bậc và kỹ năng chuyên môn}
-    \label{fig:partner_create_emp2b}
-\end{figure}
-
-Hình~\ref{fig:partner_create_emp2b} hiển thị mục \textbf{Skills \& Services} dành cho Therapist:
-\begin{itemize}
-    \item \textbf{Therapist Type:} Spa Therapist (General wellness) hoặc Massage Therapist (Deep tissue).
-    \item \textbf{Therapist Level} (Cấp bậc) và \textbf{Commission Rate} (Tỷ lệ hoa hồng \%).
-    \item \textbf{Massage Strength:} Mức lực massage -- Soft / Medium / Strong (chỉ hiện khi chọn Massage Therapist).
-    \item \textbf{Last Health Check} (Ngày kiểm tra sức khoẻ gần nhất) và \textbf{Skill Set} (Kỹ năng chuyên môn -- đa chọn).
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_3.png}
-    \vspace{0.5em}
-    \caption{Tạo nhân viên -- Work History và Documents \& Certifications}
-    \label{fig:partner_create_emp3}
-\end{figure}
-
-Hình~\ref{fig:partner_create_emp3} hiển thị phần tài liệu và lịch sử công tác:
-\begin{itemize}
-    \item \textbf{Work History:} Thêm nhiều mục lịch sử công tác qua nút \textbf{Add Work History}.
-    \item \textbf{Documents \& Certifications -- Required:} Giấy phép hành nghề (License/Permit) và Chứng minh nhân thân (Identity Card) -- bắt buộc; hỗ trợ xem (View) và thay thế (Replace).
-    \item \textbf{Other Documents:} Khu vực tải lên tự do (PDF, JPG, PNG -- tối đa 10MB).
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_4.png}
-    \vspace{0.5em}
-    \caption{Tạo nhân viên -- Work Schedule: ca làm việc theo từng ngày trong tuần}
-    \label{fig:partner_create_emp4}
-\end{figure}
-
-Hình~\ref{fig:partner_create_emp4} hiển thị phần \textbf{Work Schedule}:
-\begin{itemize}
-    \item Cấu hình ca theo từng ngày (Mon--Sun): toggle bật/tắt và giờ bắt đầu/kết thúc (Shift Hours).
-    \item Nút \textbf{Apply Preset} áp dụng mẫu ca mặc định (Full-Time Morning: Mon--Fri 09:00--17:00).
-    \item Nhấn \textbf{Create Employee/Doctor} để lưu; hệ thống tự sinh Employee ID.
-\end{itemize}
+Chi tiết form tạo nhân viên mới được chuyển sang \textbf{Phụ lục~\ref{appendix:partner_create_employee}}.
 
 % 6.3.3.5  SERVICE TAGS
 % ---------------------------------------------------------------------------
@@ -2111,104 +1875,17 @@ Hình~\ref{fig:admin_finance2} hiển thị hai phần phía dưới tab Overvie
 % 6.3.4.4  CATEGORY MANAGEMENT
 % ---------------------------------------------------------------------------
 \subsubsection{Quản lý Danh mục (Category Management)}
+Module Category cho phép quản trị viên duy trì cây phân loại dịch vụ trên toàn nền tảng, phục vụ cho việc tạo dịch vụ mới và phân loại Business Type.
 
-Module Category cho phép quản trị viên duy trì cây phân loại dịch vụ trên toàn nền tảng. Danh mục này được đối tác sử dụng khi tạo dịch vụ mới và là tiêu chí phân loại khi xét duyệt Business Type của hồ sơ đăng ký.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/category/fig_admin_category_dashboard.png}
-    \vspace{0.5em}
-    \caption{Category Management -- danh sách danh mục với tên, số dịch vụ, trạng thái và thao tác}
-    \label{fig:admin_category_dash}
-\end{figure}
-
-Hình~\ref{fig:admin_category_dash} hiển thị danh sách danh mục:
-\begin{itemize}
-    \item Mỗi hàng: icon màu, tên, mô tả, Total Services, trạng thái Visible/Hidden, nút sửa/xóa.
-    \item Checkbox cho thao tác hàng loạt; thanh công cụ: Sort, Filter, \textbf{Add Category}, \textbf{Delete All}.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/category/fig_admin_create_new_category.png}
-    \vspace{0.5em}
-    \caption{Form tạo danh mục mới -- thông tin, cài đặt và nút Create Category}
-    \label{fig:admin_create_category}
-\end{figure}
-
-Hình~\ref{fig:admin_create_category} hiển thị form tạo danh mục:
-\begin{itemize}
-    \item \textbf{Category Information:} Name (bắt buộc), Description (textarea).
-    \item \textbf{Category Settings:} Status Active/Inactive, Sort Order, Icon Name, Color Hex.
-    \item Nút \textbf{Create Category} lưu; \textbf{Cancel} bỏ qua.
-\end{itemize}
+Chi tiết giao diện danh sách danh mục và form tạo mới được chuyển sang \textbf{Phụ lục~\ref{appendix:admin_category_management}}.
 
 % ---------------------------------------------------------------------------
 % 6.3.4.5  NOTIFICATION MANAGEMENT
 % ---------------------------------------------------------------------------
 \subsubsection{Quản lý Thông báo (Notification Management)}
-
 Module Notifications cho phép quản trị viên tạo và quản lý chiến dịch thông báo đến các nhóm đối tượng khác nhau (đối tác, khách hàng, admin).
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_dashboard_1.png}
-    \vspace{0.5em}
-    \caption{Notification Control Center -- KPI chiến dịch và bộ lọc Campaign Activity}
-    \label{fig:admin_notif_dash1}
-\end{figure}
-
-Hình~\ref{fig:admin_notif_dash1} hiển thị Notification Control Center:
-\begin{itemize}
-    \item \textbf{KPI:} Sent Today, Scheduled, Drafts, Active Segments.
-    \item \textbf{Bộ lọc:} Tab All/Draft/Scheduled/Sent/Failed và 6 bộ lọc (nội dung, kênh, đối tượng, người tạo, thời gian).
-    \item Nút \textbf{Create Campaign} mở wizard tạo chiến dịch mới.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_dashboard_2.png}
-    \vspace{0.5em}
-    \caption{Notification Control Center -- bảng Campaign Activity: danh sách chiến dịch và trạng thái}
-    \label{fig:admin_notif_dash2}
-\end{figure}
-
-Hình~\ref{fig:admin_notif_dash2} hiển thị bảng Campaign Activity:
-\begin{itemize}
-    \item Mỗi hàng: Campaign, Channel, Audience, Status badge (Scheduled/Sent/Draft/Failed), thời gian, menu Actions.
-    \item Phân trang 10 hàng/trang.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_detail.png}
-    \vspace{0.5em}
-    \caption{Chi tiết chiến dịch thông báo -- nội dung, đối tượng, trạng thái và lịch gửi}
-    \label{fig:admin_notif_detail}
-\end{figure}
-
-Hình~\ref{fig:admin_notif_detail} hiển thị chi tiết chiến dịch:
-\begin{itemize}
-    \item Nội dung đầy đủ: tiêu đề, thông điệp, kênh gửi (In-App/Push/Email).
-    \item Đối tượng, trạng thái và thời gian đặt lịch.
-    \item Chỉnh sửa chiến dịch Draft/Scheduled hoặc clone chiến dịch đã gửi.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_create_new_campain.png}
-    \vspace{0.5em}
-    \caption{Tạo chiến dịch thông báo -- wizard soạn nội dung, chọn kênh, đối tượng và lịch gửi}
-    \label{fig:admin_create_campaign}
-\end{figure}
-
-Hình~\ref{fig:admin_create_campaign} hiển thị wizard tạo chiến dịch:
-\begin{itemize}
-    \item \textbf{Nội dung:} Campaign Name, Title, Message body.
-    \item \textbf{Kênh gửi:} In-App, Push Notification, Email (chọn một hoặc nhiều).
-    \item \textbf{Đối tượng:} Verified Partners, Active Customers, All Users, Admin Operations.
-    \item \textbf{Lịch gửi:} Send Now hoặc Schedule (picker ngày giờ).
-\end{itemize}
+Chi tiết giao diện cấu hình chiến dịch, từ dashboard, bảng chiến dịch đến wizard soạn nội dung và lịch gửi, được chuyển sang \textbf{Phụ lục~\ref{appendix:admin_notification_management}}.
 
 \subsubsection{Nhật ký Kiểm toán (Audit Logging)}
 
@@ -2412,161 +2089,14 @@ Cụ thể:
 "context": question → retriever → format_docs
 \end{verbatim}
 
-\paragraph{Prompt template}
 
-Mẫu prompt được khai báo trong \texttt{rag\_langchain/src/rag/offline\_rag.py} (\texttt{rag\_prompt}), dùng chung cho cả Standard RAG và Advanced RAG. Các biến đầu vào: \texttt{context} (chunk truy xuất), \texttt{history}, \texttt{services}, \texttt{question}. Nội dung nguyên văn như sau:
+\paragraph{Prompt Template}
 
-\footnotesize
-\begin{verbatim}
-<|system|>
-You are Healytics Assistant — a professional, empathetic wellness service
-consultant for the Healytics platform.
+Mẫu prompt hệ thống (system prompt) cho Healytics Assistant được khai báo trong \texttt{rag\_langchain/src/rag/offline\_rag.py}, được thiết kế nhằm định hình vai trò tư vấn viên, giới hạn phạm vi dịch vụ (Spa, Y học cổ truyền, Vật lý trị liệu) và thiết lập các quy tắc an toàn y tế nghiêm ngặt (không chẩn đoán y khoa, ưu tiên cấp cứu 115 đối với các trường hợp khẩn cấp).
 
-============================
-DOMAIN SCOPE
-============================
-You ONLY advise and recommend within these Healytics service areas:
-- Spa & Massage: relaxation massage, therapeutic massage, skin care, facial
-  care, body relaxation, stress relief.
-- Traditional Medicine: acupuncture, acupressure, herbal foot soak, cupping,
-  and related non-invasive traditional wellness therapies.
-- Physiotherapy & Rehabilitation: exercise guidance, physical therapy,
-  rehabilitation, and non-invasive support for muscle, joint, mobility,
-  posture, and recovery concerns.
+Đặc biệt, cấu trúc prompt phân cấp rõ ràng thứ tự ưu tiên của các nguồn tri thức (lịch sử hội thoại $\rightarrow$ ngữ cảnh truy xuất $\rightarrow$ dịch vụ gợi ý $\rightarrow$ kiến thức nền của mô hình), đồng thời kiểm soát chặt chẽ rủi ro ảo giác (hallucination) bằng cách yêu cầu mô hình tuyệt đối không bịa đặt tên dịch vụ, địa chỉ hay giá cả khi danh sách gợi ý rỗng.
 
-Out of scope:
-- Specialized medical diagnosis or treatment.
-- Surgery, dentistry, emergency care, prescription medication, lab
-  interpretation, or services requiring diagnosis and prescription by a
-  specialist doctor.
-- If the user asks about out-of-scope topics, politely explain that
-  Healytics Assistant can only help with Spa & Massage, Traditional Medicine,
-  and Physiotherapy/Rehabilitation services, then redirect to a suitable
-  in-scope wellness option if possible.
-
-============================
-YOUR KNOWLEDGE SOURCES
-============================
-You have access to the following information, listed in priority order:
-
-1. CONVERSATION HISTORY — previous messages with this user
-2. WELLNESS KNOWLEDGE BASE — retrieved documents from Healytics' allowed
-   wellness service database
-3. RELEVANT SERVICES — allowed wellness services suggested by the
-   recommender system
-4. YOUR OWN KNOWLEDGE — your general wellness knowledge as a fallback, only
-   inside the allowed domain
-
-============================
-HOW TO USE EACH SOURCE
-============================
-
-CONVERSATION HISTORY:
-- Always read history first to maintain context across turns
-- Do NOT repeat information you already gave in previous turns
-- If the user refers to something mentioned earlier, resolve it correctly
-- If history is empty, this is the first message — respond naturally
-
-WELLNESS KNOWLEDGE BASE (use only when truly needed):
-- The knowledge base is retrieved automatically based on the user's question
-- Use it ONLY if the question requires specific facts about the allowed
-  wellness services, common non-emergency symptoms, relaxation needs, skin
-  care concerns, traditional therapies, or physiotherapy/rehabilitation topics
-- For simple greetings, casual questions, or questions you can answer
-  accurately from your own knowledge → IGNORE the knowledge base entirely
-- If the knowledge base content is irrelevant to the question → IGNORE it
-  entirely, do NOT force it into your answer
-- Never mention to the user that you are using a knowledge base
-
-RELEVANT SERVICES:
-- Services are provided by Healytics' recommender system when relevant
-- Recommend services only if they fit the allowed domain: Spa & Massage,
-  Traditional Medicine, or Physiotherapy/Rehabilitation
-- If services are listed → recommend ONLY services from the provided list;
-  naturally weave 1 to 3 most relevant ones into your answer, briefly
-  explain why each fits the user's concern
-- Never invent service names, provider names, addresses, prices, ratings,
-  time slots, or availability that are not present in the provided services
-  list
-- If the user asks for service recommendations but the services list is
-  empty → clearly say that Healytics has not found matching/nearby services
-  for the user's request right now; do NOT suggest fake or generic specific
-  services
-- When no services are available, give brief practical advice instead:
-  suggest broad next steps such as adjusting location, trying another keyword,
-  expanding distance, or choosing a suitable in-scope wellness category
-- If the services list is empty and the user is not asking for services →
-  answer only if the question is inside the allowed domain
-
-============================
-ANSWERING RULES
-============================
-
-LANGUAGE:
-- Detect the language of the user's question and reply in that exact language
-- Vietnamese question → Vietnamese answer. English question → English answer.
-  Never mix.
-
-TONE:
-- Warm, caring, professional — like a knowledgeable wellness consultant
-- Use simple everyday language. If you must use a technical term, briefly
-  explain it.
-
-ACCURACY:
-- Be specific and accurate. Avoid vague answers.
-- NEVER make a definitive medical diagnosis
-- NEVER recommend specific prescription medications or dosages
-- NEVER present massage, traditional medicine, physiotherapy, or skin care as
-  a replacement for professional medical care
-- If symptoms are severe, persistent, rapidly worsening, or need diagnosis/
-  prescription → advise the user to consult a qualified doctor or specialist
-
-LENGTH:
-- Greeting or small talk: 1 to 2 sentences only
-- Simple health questions: 3 to 5 sentences
-- Complex health questions: up to 8 sentences maximum
-- Never exceed 8 sentences
-
-FORMAT:
-- Write in natural conversational paragraphs only
-- Do NOT use bullet points, numbered lists, or markdown
-- Do NOT add filler phrases like "Great question!" or "Of course!"
-- Do NOT end with "Is there anything else I can help you with?" type closings
-
-SAFETY:
-- Medical emergency (chest pain, stroke symptoms, difficulty breathing) →
-  tell user to call 115 immediately before anything else
-- Emotionally distressed user → respond with empathy first, health info second
-- Question completely outside the allowed domain → politely redirect back to
-  Spa & Massage, Traditional Medicine, or Physiotherapy/Rehabilitation
-<|end|>
-
-<|user|>
-[WELLNESS KNOWLEDGE BASE]
-{context}
-
-[CONVERSATION HISTORY]
-{history}
-
-[RELEVANT SERVICES]
-{services}
-
-[USER QUESTION]
-{question}
-<|end|>
-
-<|assistant|>
-\end{verbatim}
-\normalsize
-
-Điểm quan trọng trong thiết kế prompt:
-\begin{itemize}
-    \item Phân cấp nguồn tri thức: history $\rightarrow$ knowledge base $\rightarrow$ services $\rightarrow$ kiến thức chung của LLM.
-    \item Knowledge base chỉ dùng khi thật sự cần; không ép nhét context không liên quan.
-    \item Không được bịa tên dịch vụ, địa chỉ, giá khi danh sách \texttt{services} rỗng.
-    \item Không chẩn đoán y khoa; trường hợp khẩn cấp phải hướng dẫn gọi 115 trước.
-\end{itemize}
-
+Chi tiết nội dung nguyên văn của mẫu prompt này được trình bày tại \textbf{Phụ lục \ref{sec:appendix_prompt}}.
 \paragraph{Output parser}
 
 Custom parser:

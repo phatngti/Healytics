@@ -1,10 +1,141 @@
 \appendix
+\chapter{Sequence Diagram bổ sung}
+\label{appendix:sequence_diagrams}
+
+Phụ lục này trình bày các sơ đồ luồng dữ liệu (Sequence Diagram) bổ sung cho Chương 4. Các sơ đồ dưới đây mô tả chi tiết các luồng nghiệp vụ của phân hệ Partner Portal và các chức năng vận hành hỗ trợ.
+
+% --------------------------------
+\section{Tìm kiếm \& Lọc Nâng cao}
+\label{appendix:seq_search}
+
+Sơ đồ mô tả chức năng tìm kiếm theo từ khóa và áp dụng các bộ lọc nâng cao (giá, đánh giá, khoảng cách) với Dynamic Query Builder để trả về kết quả chính xác theo nhu cầu người dùng.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/sequences/4.2.3.png}
+    \vspace{10pt}
+    \caption{Sequence Diagram --- Tìm kiếm \& Lọc Nâng cao}
+    \label{fig:appendix_seq_search_filter}
+\end{figure}
+\newpage
+
+% --------------------------------
+\section{Quản lý Nhân viên (Staff Management)}
+\label{appendix:seq_staff}
+
+Sơ đồ thể hiện chức năng quản lý nhân viên của đối tác, bao gồm xem danh sách, thêm nhân viên mới với thông tin cá nhân và upload ảnh đại diện.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/sequences/fig_seq_partner_staff_manager.png}
+    \vspace{10pt}
+    \caption{Sequence Diagram --- Quản lý Nhân viên (Staff Management)}
+    \label{fig:appendix_seq_staff_management}
+\end{figure}
+\newpage
+
+% --------------------------------
+\section{Quản lý Lịch hẹn (Booking Dashboard)}
+\label{appendix:seq_booking_dashboard}
+
+Sơ đồ thể hiện cách đối tác quản lý lịch hẹn qua Dashboard, bao gồm nhận thông báo, xác nhận/từ chối, nhắc lịch và cập nhật trạng thái hoàn thành.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/sequences/fig_seq_booking_management_partner.png}
+    \vspace{10pt}
+    \caption{Sequence Diagram --- Quản lý Lịch hẹn (Booking Dashboard)}
+    \label{fig:appendix_seq_booking_dashboard}
+\end{figure}
+\newpage
+
+% --------------------------------
+\section{Quản lý Dịch vụ (Service Management)}
+\label{appendix:seq_service}
+
+Sơ đồ mô tả quy trình đối tác quản lý dịch vụ, từ xem danh sách hiện có, thêm dịch vụ mới với thông tin chi tiết đến upload hình ảnh và liên kết nhân viên.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/sequences/fig_seq_partner_service_management.png}
+    \vspace{10pt}
+    \caption{Sequence Diagram --- Quản lý Dịch vụ (Service Management)}
+    \label{fig:appendix_seq_service_management}
+\end{figure}
+\newpage
+
+% --------------------------------
+\section{Hoàn tiền (Refund Flow)}
+\label{appendix:seq_refund}
+
+Sơ đồ mô tả quy trình hoàn tiền cho người dùng khi hủy lịch hẹn, bao gồm hai nhánh xử lý song song: hoàn tiền qua MoMo và Stripe. Sau khi thành công, Booking chuyển sang \texttt{CANCELLED} và tạo \texttt{PartnerRefundCase}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Images/sequences/fig_seq_refund.png}
+    \vspace{10pt}
+    \caption{Sequence Diagram --- Hoàn tiền (Refund Flow --- MoMo \& Stripe)}
+    \label{fig:appendix_seq_refund}
+\end{figure}
+
+% ================================================================
+% PHỤ LỤC E — ACTIVITY DIAGRAM BỔ SUNG
+% ================================================================
+\chapter{Activity Diagram bổ sung}
+\label{appendix:activity_diagrams}
+
+Phụ lục này trình bày các sơ đồ hoạt động (Activity Diagram) bổ sung cho Chương 4. Các sơ đồ dưới đây mô tả các luồng nghiệp vụ phụ trợ từ góc nhìn Partner và Admin.
+
+% --------------------------------
+\section{Quản lý Nhân viên \& Phân quyền}
+\label{appendix:activity_staff}
+
+Sơ đồ mô tả quy trình quản lý nhân sự trong hệ thống dành cho Quản trị viên. Sau khi đăng nhập và truy cập trang quản lý nhân viên, Quản trị viên có thể thực hiện các hành động như thêm mới, cập nhật thông tin, phân quyền vai trò hoặc vô hiệu hóa tài khoản. Hệ thống xử lý yêu cầu tương ứng, cập nhật cơ sở dữ liệu và hiển thị kết quả trực tiếp trên Dashboard quản trị.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Activity/4.5.8.png}
+    \vspace{10pt}
+    \caption{Activity Diagram --- Quản lý Nhân viên \& Phân quyền}
+    \label{fig:appendix_activity_staff_management}
+\end{figure}
+\newpage
+
+% --------------------------------
+\section{Quản lý Lịch hẹn (Góc nhìn Đối tác)}
+\label{appendix:activity_booking_partner}
+
+Sơ đồ mô tả luồng hoạt động từ góc nhìn của Đối tác hoặc Nhân viên khi xử lý lịch hẹn qua Dashboard. Sau khi đăng nhập, họ nhận thông báo lịch hẹn mới, xem chi tiết thông tin và đưa ra quyết định xác nhận hoặc từ chối. Hệ thống gửi thông báo tương ứng đến người dùng, đồng thời sau khi hoàn tất dịch vụ, Đối tác đánh dấu hoàn tất để kích hoạt quy trình gửi yêu cầu đánh giá dịch vụ.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Activity/4.5.7.png}
+    \vspace{10pt}
+    \caption{Activity Diagram --- Quản lý Lịch hẹn (Góc nhìn Đối tác / Dashboard)}
+    \label{fig:appendix_activity_partner_booking}
+\end{figure}
+\newpage
+
+% --------------------------------
+\section{Hoàn tiền (Refund Flow)}
+\label{appendix:activity_refund}
+
+Sơ đồ mô tả quy trình hoàn tiền khi người dùng hủy lịch hẹn. Hệ thống xác định cổng thanh toán (MoMo hoặc Stripe) và gọi API tương ứng. Nếu thành công, trạng thái Payment chuyển sang \texttt{REFUND}, Booking chuyển sang \texttt{CANCELLED} và tạo \texttt{PartnerRefundCase} để đối tác xét duyệt.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Activity/4.5.9.png}
+    \vspace{10pt}
+    \caption{Activity Diagram --- Hoàn tiền (Refund Flow --- MoMo \& Stripe)}
+    \label{fig:appendix_activity_refund}
+\end{figure}
+
 \chapter{Chi tiết Mockup UI/UX}
 \label{appendix:mockup_ui}
 
 Phụ lục này trình bày chi tiết thiết kế giao diện cho các nhóm chức năng chính và bổ sung của ứng dụng di động Healytics, bổ sung cho phần tổng quan đã được trình bày tại Chương 5.
 
-\subsection{Authentication - Đăng nhập \& Đăng ký}
+\section{Authentication - Đăng nhập \& Đăng ký}
 \begin{figure}[H]
     \centering
     
@@ -58,7 +189,7 @@ Phụ lục này trình bày chi tiết thiết kế giao diện cho các nhóm 
     \caption{Giao diện Authentication}
 \end{figure}
 
-\subsection{Navigation - Các trang điều hướng chính}
+\section{Navigation - Các trang điều hướng chính}
 \begin{figure}[H]
     \centering
     
@@ -115,7 +246,7 @@ Phụ lục này trình bày chi tiết thiết kế giao diện cho các nhóm 
     \caption{Giao diện Navigation}
 \end{figure}
 
-\subsection{Appointment - Đặt lịch hẹn}
+\section{Appointment - Đặt lịch hẹn}
 \begin{figure}[H]
     \centering
     
@@ -169,7 +300,7 @@ Phụ lục này trình bày chi tiết thiết kế giao diện cho các nhóm 
     \caption{Giao diện Appointment}
 \end{figure}
 
-\subsection{AI Chat - Trợ lý AI}
+\section{AI Chat - Trợ lý AI}
 \begin{figure}[H]
     \centering
     
@@ -223,7 +354,7 @@ Phụ lục này trình bày chi tiết thiết kế giao diện cho các nhóm 
     \caption{Giao diện AI Chat}
 \end{figure}
 
-\subsection{Survey - Khảo sát người dùng}
+\section{Survey - Khảo sát người dùng}
 \begin{figure}[H]
     \centering
     
@@ -274,7 +405,7 @@ Phụ lục này trình bày chi tiết thiết kế giao diện cho các nhóm 
     \caption{Giao diện Survey}
 \end{figure}
 
-\subsection{Provider Service - Chi tiết dịch vụ}
+\section{Provider Service - Chi tiết dịch vụ}
 \captionsetup{skip=8pt}
 \begin{figure}[H]
     \centering
@@ -326,7 +457,7 @@ Phụ lục này trình bày chi tiết thiết kế giao diện cho các nhóm 
     \caption{Giao diện Provider Service}
 \end{figure}
 
-\subsection{Checkout - Thanh toán}
+\section{Checkout - Thanh toán}
 \begin{figure}[H]
     \centering
     
@@ -356,6 +487,685 @@ Phụ lục này trình bày chi tiết thiết kế giao diện cho các nhóm 
     \caption{Giao diện Checkout}
 \end{figure}
 
+
+\chapter{Phụ lục luồng nghiệp vụ Partner \& Admin}
+\section{Partner - Tạo dịch vụ mới}
+\label{appendix:partner_create_service}
+
+Mục này trình bày luồng tạo dịch vụ mới trong Partner Portal. Đây là form dài nhiều bước nhập liệu, phù hợp hơn với phụ lục vì thiên về thao tác sử dụng chi tiết hơn là mô tả kiến trúc.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_partner_create_service_1.png}
+    \vspace{0.5em}
+    \caption{Create Product -- General Information: tên, mô tả, phân loại và cài đặt lịch đặt}
+    \label{fig:partner_create_svc1}
+\end{figure}
+
+Hình~\ref{fig:partner_create_svc1} hiển thị mục \textbf{General Information}:
+\begin{itemize}
+    \item \textbf{Thông tin chính (trái):} Tên sản phẩm (Product Name), Mô tả (Description, rich text), Hướng dẫn dịch vụ (Service Manual).
+    \item \textbf{Thanh bên (phải):} Hiển thị (Visibility), Bật/tắt cửa hàng trực tuyến (Online Store toggle), Danh mục (Category), Thẻ nhãn (Tags), Phân công nhân viên (Staff Assignment), Thời lượng/Thời gian đệm (Duration/Buffer), Sức chứa (Capacity), Quy tắc đặt lịch (Booking Rules).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_parter_create_service_2.png}
+    \vspace{0.5em}
+    \caption{Create Product -- Service Manual: Pre-Service Guidelines, Service Rules và Procedure Steps}
+    \label{fig:partner_create_svc2}
+\end{figure}
+
+Hình~\ref{fig:partner_create_svc2} hiển thị mục \textbf{Service Manual}:
+\begin{itemize}
+    \item \textbf{Pre-Service Guidelines:} Hướng dẫn chuẩn bị trước khi đến.
+    \item \textbf{Service Rules:} Mỗi quy tắc gồm icon slug, tiêu đề và mô tả.
+    \item \textbf{Procedure Steps:} Các bước quy trình tuần tự (Step 1, 2, ...).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/service/fig_partner_create_service_3.png}
+    \vspace{0.5em}
+    \caption{Create Product -- Service Pricing và Media Gallery}
+    \label{fig:partner_create_svc3}
+\end{figure}
+
+Hình~\ref{fig:partner_create_svc3} hiển thị phần cuối của form:
+\begin{itemize}
+    \item \textbf{Service Pricing:} Base Price và Sale Price.
+    \item \textbf{Media Gallery:} Product Images và Facility Images (tải ảnh hoặc thêm từ URL).
+    \item Nút \textbf{Save \& Publish} lưu và công khai dịch vụ.
+\end{itemize}
+
+\section{Partner - Tạo nhân viên mới}
+\label{appendix:partner_create_employee}
+
+Mục này trình bày chi tiết luồng tạo mới nhân viên trong Partner Portal. Đây là màn hình nhiều bước, thiên về thao tác nhập liệu và hướng dẫn sử dụng, nên được chuyển xuống phụ lục để phần thân bài tập trung vào kiến trúc và chức năng cốt lõi.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_1.png}
+    \vspace{0.5em}
+    \caption{Tạo nhân viên -- Contact \& Basic Info và Professional Role}
+    \label{fig:partner_create_emp1}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp1} hiển thị bước đầu của form tạo nhân viên:
+\begin{itemize}
+    \item \textbf{Contact \& Basic Info:} First Name (Tên), Last Name (Họ), Email, Phone (Số điện thoại), Date of Birth (Ngày sinh), Gender (Giới tính), Emergency Contact (Liên hệ khẩn cấp).
+    \item \textbf{Professional Role:} Chọn loại (\textbf{Therapist} hoặc \textbf{Doctor}), Job Title (Chức danh), Employee ID (tự sinh -- Auto-Generate), Employment Type (Full-Time/Part-Time), Start Date (Ngày bắt đầu) và Description (Mô tả công việc, hỗ trợ rich text).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_2_a.png}
+    \vspace{0.5em}
+    \caption{Tạo Doctor -- Education \& Qualifications và Experience \& Qualifications}
+    \label{fig:partner_create_emp2}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp2} hiển thị các mục thông tin chuyên môn dành cho Doctor:
+\begin{itemize}
+    \item \textbf{Education \& Qualifications:} Medical Title (Chức danh y tế), Medical License ID (Mã chứng chỉ hành nghề -- bắt buộc), Education (Bằng cấp -- đa chọn), Certifications (Chứng chỉ chuyên môn).
+    \item \textbf{Experience \& Qualifications:} Years of Experience (Số năm kinh nghiệm), Consultation Fee (Phí tư vấn \%), Specializations (Chuyên khoa -- đa chọn).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_2_b.png}
+    \vspace{0.5em}
+    \caption{Tạo Therapist -- Skills \& Services: loại trị liệu, cấp bậc và kỹ năng chuyên môn}
+    \label{fig:partner_create_emp2b}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp2b} hiển thị mục \textbf{Skills \& Services} dành cho Therapist:
+\begin{itemize}
+    \item \textbf{Therapist Type:} Spa Therapist (General wellness) hoặc Massage Therapist (Deep tissue).
+    \item \textbf{Therapist Level} (Cấp bậc) và \textbf{Commission Rate} (Tỷ lệ hoa hồng \%).
+    \item \textbf{Massage Strength:} Mức lực massage -- Soft / Medium / Strong (chỉ hiện khi chọn Massage Therapist).
+    \item \textbf{Last Health Check} (Ngày kiểm tra sức khoẻ gần nhất) và \textbf{Skill Set} (Kỹ năng chuyên môn -- đa chọn).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_3.png}
+    \vspace{0.5em}
+    \caption{Tạo nhân viên -- Work History và Documents \& Certifications}
+    \label{fig:partner_create_emp3}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp3} hiển thị phần tài liệu và lịch sử công tác:
+\begin{itemize}
+    \item \textbf{Work History:} Thêm nhiều mục lịch sử công tác qua nút \textbf{Add Work History}.
+    \item \textbf{Documents \& Certifications -- Required:} Giấy phép hành nghề (License/Permit) và Chứng minh nhân thân (Identity Card) -- bắt buộc; hỗ trợ xem (View) và thay thế (Replace).
+    \item \textbf{Other Documents:} Khu vực tải lên tự do (PDF, JPG, PNG -- tối đa 10MB).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/partner/employee/fig_partner_create_employee_4.png}
+    \vspace{0.5em}
+    \caption{Tạo nhân viên -- Work Schedule: ca làm việc theo từng ngày trong tuần}
+    \label{fig:partner_create_emp4}
+\end{figure}
+
+Hình~\ref{fig:partner_create_emp4} hiển thị phần \textbf{Work Schedule}:
+\begin{itemize}
+    \item Cấu hình ca theo từng ngày (Mon--Sun): toggle bật/tắt và giờ bắt đầu/kết thúc (Shift Hours).
+    \item Nút \textbf{Apply Preset} áp dụng mẫu ca mặc định (Full-Time Morning: Mon--Fri 09:00--17:00).
+    \item Nhấn \textbf{Create Employee/Doctor} để lưu; hệ thống tự sinh Employee ID.
+\end{itemize}
+
+
+
+\section{Admin - Quản lý Danh mục (Category Management)}
+\label{appendix:admin_category_management}
+
+Module Category cho phép quản trị viên duy trì cây phân loại dịch vụ trên toàn nền tảng. Danh mục này được đối tác sử dụng khi tạo dịch vụ mới và là tiêu chí phân loại khi xét duyệt Business Type của hồ sơ đăng ký.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/category/fig_admin_category_dashboard.png}
+    \vspace{0.5em}
+    \caption{Category Management -- danh sách danh mục với tên, số dịch vụ, trạng thái và thao tác}
+    \label{fig:admin_category_dash}
+\end{figure}
+
+Hình~\ref{fig:admin_category_dash} hiển thị danh sách danh mục:
+\begin{itemize}
+    \item Mỗi hàng: icon màu, tên, mô tả, Total Services, trạng thái Visible/Hidden, nút sửa/xóa.
+    \item Checkbox cho thao tác hàng loạt; thanh công cụ: Sort, Filter, \textbf{Add Category}, \textbf{Delete All}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/category/fig_admin_create_new_category.png}
+    \vspace{0.5em}
+    \caption{Form tạo danh mục mới -- thông tin, cài đặt và nút Create Category}
+    \label{fig:admin_create_category}
+\end{figure}
+
+Hình~\ref{fig:admin_create_category} hiển thị form tạo danh mục:
+\begin{itemize}
+    \item \textbf{Category Information:} Name (bắt buộc), Description (textarea).
+    \item \textbf{Category Settings:} Status Active/Inactive, Sort Order, Icon Name, Color Hex.
+    \item Nút \textbf{Create Category} lưu; \textbf{Cancel} bỏ qua.
+\end{itemize}
+
+\section{Admin - Quản lý Thông báo (Notification Management)}
+\label{appendix:admin_notification_management}
+
+Module Notifications cho phép quản trị viên tạo và quản lý chiến dịch thông báo đến các nhóm đối tượng khác nhau (đối tác, khách hàng, admin).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_dashboard_1.png}
+    \vspace{0.5em}
+    \caption{Notification Control Center -- KPI chiến dịch và bộ lọc Campaign Activity}
+    \label{fig:admin_notif_dash1}
+\end{figure}
+
+Hình~\ref{fig:admin_notif_dash1} hiển thị Notification Control Center:
+\begin{itemize}
+    \item \textbf{KPI:} Sent Today, Scheduled, Drafts, Active Segments.
+    \item \textbf{Bộ lọc:} Tab All/Draft/Scheduled/Sent/Failed và 6 bộ lọc (nội dung, kênh, đối tượng, người tạo, thời gian).
+    \item Nút \textbf{Create Campaign} mở wizard tạo chiến dịch mới.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_dashboard_2.png}
+    \vspace{0.5em}
+    \caption{Notification Control Center -- bảng Campaign Activity: danh sách chiến dịch và trạng thái}
+    \label{fig:admin_notif_dash2}
+\end{figure}
+
+Hình~\ref{fig:admin_notif_dash2} hiển thị bảng Campaign Activity:
+\begin{itemize}
+    \item Mỗi hàng: Campaign, Channel, Audience, Status badge (Scheduled/Sent/Draft/Failed), thời gian, menu Actions.
+    \item Phân trang 10 hàng/trang.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_notification_detail.png}
+    \vspace{0.5em}
+    \caption{Chi tiết chiến dịch thông báo -- nội dung, đối tượng, trạng thái và lịch gửi}
+    \label{fig:admin_notif_detail}
+\end{figure}
+
+Hình~\ref{fig:admin_notif_detail} hiển thị chi tiết chiến dịch:
+\begin{itemize}
+    \item Nội dung đầy đủ: tiêu đề, thông điệp, kênh gửi (In-App/Push/Email).
+    \item Đối tượng, trạng thái và thời gian đặt lịch.
+    \item Chỉnh sửa chiến dịch Draft/Scheduled hoặc clone chiến dịch đã gửi.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Hiện thực/admin/notification_setting/fig_admin_create_new_campain.png}
+    \vspace{0.5em}
+    \caption{Tạo chiến dịch thông báo -- wizard soạn nội dung, chọn kênh, đối tượng và lịch gửi}
+    \label{fig:admin_create_campaign}
+\end{figure}
+
+Hình~\ref{fig:admin_create_campaign} hiển thị wizard tạo chiến dịch:
+\begin{itemize}
+    \item \textbf{Nội dung:} Campaign Name, Title, Message body.
+    \item \textbf{Kênh gửi:} In-App, Push Notification, Email (chọn một hoặc nhiều).
+    \item \textbf{Đối tượng:} Verified Partners, Active Customers, All Users, Admin Operations.
+    \item \textbf{Lịch gửi:} Send Now hoặc Schedule (picker ngày giờ).
+\end{itemize}
+\chapter{Prompt Template}
+\label{sec:appendix_prompt} % Bắt buộc phải có dòng này
+Phụ lục này trình bày nội dung nguyên văn của mẫu prompt (Prompt template) được khai báo trong \texttt{rag\_langchain/src/rag/offline\_rag.py} (\texttt{rag\_prompt}), dùng chung cho cả Standard RAG và Advanced RAG. Các biến đầu vào bao gồm: \texttt{context} (chunk truy xuất), \texttt{history}, \texttt{services}, \texttt{question}.
+
+\footnotesize
+\begin{verbatim}
+<|system|>
+You are Healytics Assistant — a professional, empathetic wellness service
+consultant for the Healytics platform.
+
+============================
+DOMAIN SCOPE
+============================
+You ONLY advise and recommend within these Healytics service areas:
+- Spa & Massage: relaxation massage, therapeutic massage, skin care, facial
+  care, body relaxation, stress relief.
+- Traditional Medicine: acupuncture, acupressure, herbal foot soak, cupping,
+  and related non-invasive traditional wellness therapies.
+- Physiotherapy & Rehabilitation: exercise guidance, physical therapy,
+  rehabilitation, and non-invasive support for muscle, joint, mobility,
+  posture, and recovery concerns.
+
+Out of scope:
+- Specialized medical diagnosis or treatment.
+- Surgery, dentistry, emergency care, prescription medication, lab
+  interpretation, or services requiring diagnosis and prescription by a
+  specialist doctor.
+- If the user asks about out-of-scope topics, politely explain that
+  Healytics Assistant can only help with Spa & Massage, Traditional Medicine,
+  and Physiotherapy/Rehabilitation services, then redirect to a suitable
+  in-scope wellness option if possible.
+
+============================
+YOUR KNOWLEDGE SOURCES
+============================
+You have access to the following information, listed in priority order:
+
+1. CONVERSATION HISTORY — previous messages with this user
+2. WELLNESS KNOWLEDGE BASE — retrieved documents from Healytics' allowed
+   wellness service database
+3. RELEVANT SERVICES — allowed wellness services suggested by the
+   recommender system
+4. YOUR OWN KNOWLEDGE — your general wellness knowledge as a fallback, only
+   inside the allowed domain
+
+============================
+HOW TO USE EACH SOURCE
+============================
+
+CONVERSATION HISTORY:
+- Always read history first to maintain context across turns
+- Do NOT repeat information you already gave in previous turns
+- If the user refers to something mentioned earlier, resolve it correctly
+- If history is empty, this is the first message — respond naturally
+
+WELLNESS KNOWLEDGE BASE (use only when truly needed):
+- The knowledge base is retrieved automatically based on the user's question
+- Use it ONLY if the question requires specific facts about the allowed
+  wellness services, common non-emergency symptoms, relaxation needs, skin
+  care concerns, traditional therapies, or physiotherapy/rehabilitation topics
+- For simple greetings, casual questions, or questions you can answer
+  accurately from your own knowledge → IGNORE the knowledge base entirely
+- If the knowledge base content is irrelevant to the question → IGNORE it
+  entirely, do NOT force it into your answer
+- Never mention to the user that you are using a knowledge base
+
+RELEVANT SERVICES:
+- Services are provided by Healytics' recommender system when relevant
+- Recommend services only if they fit the allowed domain: Spa & Massage,
+  Traditional Medicine, or Physiotherapy/Rehabilitation
+- If services are listed → recommend ONLY services from the provided list;
+  naturally weave 1 to 3 most relevant ones into your answer, briefly
+  explain why each fits the user's concern
+- Never invent service names, provider names, addresses, prices, ratings,
+  time slots, or availability that are not present in the provided services
+  list
+- If the user asks for service recommendations but the services list is
+  empty → clearly say that Healytics has not found matching/nearby services
+  for the user's request right now; do NOT suggest fake or generic specific
+  services
+- When no services are available, give brief practical advice instead:
+  suggest broad next steps such as adjusting location, trying another keyword,
+  expanding distance, or choosing a suitable in-scope wellness category
+- If the services list is empty and the user is not asking for services →
+  answer only if the question is inside the allowed domain
+
+============================
+ANSWERING RULES
+============================
+
+LANGUAGE:
+- Detect the language of the user's question and reply in that exact language
+- Vietnamese question → Vietnamese answer. English question → English answer.
+  Never mix.
+
+TONE:
+- Warm, caring, professional — like a knowledgeable wellness consultant
+- Use simple everyday language. If you must use a technical term, briefly
+  explain it.
+
+ACCURACY:
+- Be specific and accurate. Avoid vague answers.
+- NEVER make a definitive medical diagnosis
+- NEVER recommend specific prescription medications or dosages
+- NEVER present massage, traditional medicine, physiotherapy, or skin care as
+  a replacement for professional medical care
+- If symptoms are severe, persistent, rapidly worsening, or need diagnosis/
+  prescription → advise the user to consult a qualified doctor or specialist
+
+LENGTH:
+- Greeting or small talk: 1 to 2 sentences only
+- Simple health questions: 3 to 5 sentences
+- Complex health questions: up to 8 sentences maximum
+- Never exceed 8 sentences
+
+FORMAT:
+- Write in natural conversational paragraphs only
+- Do NOT use bullet points, numbered lists, or markdown
+- Do NOT add filler phrases like "Great question!" or "Of course!"
+- Do NOT end with "Is there anything else I can help you with?" type closings
+
+SAFETY:
+- Medical emergency (chest pain, stroke symptoms, difficulty breathing) →
+  tell user to call 115 immediately before anything else
+- Emotionally distressed user → respond with empathy first, health info second
+- Question completely outside the allowed domain → politely redirect back to
+  Spa & Massage, Traditional Medicine, or Physiotherapy/Rehabilitation
+<|end|>
+
+<|user|>
+[WELLNESS KNOWLEDGE BASE]
+{context}
+
+[CONVERSATION HISTORY]
+{history}
+
+[RELEVANT SERVICES]
+{services}
+
+[USER QUESTION]
+{question}
+<|end|>
+
+<|assistant|>
+\end{verbatim}
+\normalsize
+
+\textbf{Điểm quan trọng trong thiết kế prompt:}
+\begin{itemize}
+    \item Phân cấp nguồn tri thức: history $\rightarrow$ knowledge base $\rightarrow$ services $\rightarrow$ kiến thức chung của LLM.
+    \item Knowledge base chỉ dùng khi thật sự cần; không ép nhét context không liên quan.
+    \item Không được bịa tên dịch vụ, địa chỉ, giá khi danh sách \texttt{services} rỗng.
+    \item Không chẩn đoán y khoa; trường hợp khẩn cấp phải hướng dẫn gọi 115 trước.
+\end{itemize}
+% ================================================================
+% PHỤ LỤC I — CHI TIẾT KIỂM THỬ HIỆU NĂNG VÀ BẢO MẬT
+% ================================================================
+
+\chapter{Chi tiết Dữ liệu Kiểm thử Hiệu năng}
+\label{appendix:test_raw_data}
+
+Phụ lục này lưu trữ các cấu hình môi trường, chi tiết kịch bản, và dữ liệu log thô (raw data) của quá trình kiểm thử tự động, nhằm bổ sung chi tiết cho các phân tích và kết luận trong Chương 7.
+
+\section{Cấu hình môi trường kiểm thử hiệu năng}
+
+Kiến trúc kiểm thử được tổ chức hai tầng tách biệt: máy phát tải (Locust) và hệ thống được kiểm thử (SUT). Cách bố trí này loại bỏ tranh chấp CPU giữa client và server, đồng thời đưa độ trễ mạng thực tế vào phép đo.
+
+\noindent\textbf{a) Máy phát tải (Load Generator).}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{Thành phần} & \textbf{Cấu hình} \\
+\hline
+Thiết bị & Apple Mac mini (M4) \\
+\hline
+CPU / RAM & Apple M4, 10 nhân; 24 GB RAM \\
+\hline
+Hệ điều hành & macOS (Darwin 25.5.0, arm64) \\
+\hline
+Runtime kiểm thử & Python 3.13 + Locust $\geq$2.39; Node.js v22 \\
+\hline
+Chế độ chạy & Headless (\texttt{--headless --only-summary}) \\
+\hline
+Tải lúc đo & Load avg 2.6/2.7/3.1 --- không bão hòa \\
+\hline
+\end{tabularx}
+\caption{Cấu hình máy phát tải Locust}
+\label{tab:perf_load_gen}
+\end{table}
+
+\noindent\textbf{b) Hệ thống được kiểm thử (SUT).}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{Thành phần} & \textbf{Cấu hình} \\
+\hline
+Địa chỉ mục tiêu & \texttt{https://dev.healytics.me/backend} \\
+\hline
+Giao thức & HTTPS qua Internet; RTT cơ sở $\approx$72 ms \\
+\hline
+Tách biệt client--server & Có --- máy phát tải và SUT trên hai máy riêng biệt \\
+\hline
+\end{tabularx}
+\caption{Hệ thống backend được kiểm thử (SUT)}
+\label{tab:perf_sut}
+\end{table}
+
+\noindent\textbf{c) Stack hiệu năng tái lập trên cloud.} Để đo tải cao đến 1.000 CCU, dự án xây dựng bộ triển khai Docker Compose tối giản với giới hạn container sát cấu hình production.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.28\textwidth}|>{\raggedright\arraybackslash}X|}
+\hline
+\textbf{Dịch vụ} & \textbf{Image / phiên bản} & \textbf{Cấu hình chính} \\
+\hline
+PostgreSQL + PostGIS & \texttt{postgis/postgis:} \newline \texttt{16-3.4} & \texttt{max\_connections=300}, \newline \texttt{shared\_buffers=1GB} \\
+\hline
+Redis & \texttt{redis:7-alpine} & \texttt{maxmemory 512MB}, \newline \texttt{allkeys-lru} \\
+\hline
+RabbitMQ & \texttt{rabbitmq:3.13} & Single node, AMQP \\
+\hline
+Backend (NestJS) & Docker (target: runtime) & 1.5 vCPU / 2 GB RAM, \newline \texttt{UV\_THREADPOOL\_SIZE=16} \\
+\hline
+VM (DigitalOcean) & \texttt{s-4vcpu-8gb} & 4 vCPU, 8 GB RAM \\
+\hline
+\end{tabularx}
+\caption{Stack hiệu năng tái lập (Docker Compose) cho kiểm thử tải cao trên cloud}
+\label{tab:perf_docker_stack}
+\end{table}
+\noindent\textbf{d) Tham số tải và bộ tài khoản kiểm thử.} Mỗi profile tải được điều khiển qua tham số dòng lệnh / Makefile, với spawn-rate 100 users/giây và run-time mặc định 300 giây:
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.18\textwidth}|p{0.14\textwidth}|X|}
+\hline
+\textbf{Profile} & \textbf{CCU} & \textbf{Mục đích} \\
+\hline
+smoke & 50 & Kiểm tra nhanh tính sẵn sàng của hệ thống \\
+\hline
+baseline & 200 & Đo tải nền ổn định \\
+\hline
+stress & 500 & Tải cao, kiểm tra ngưỡng chịu đựng \\
+\hline
+target & 1.000 & Tải mục tiêu theo yêu cầu phi chức năng \\
+\hline
+\end{tabularx}
+\caption{Các profile tải dùng trong kiểm thử}
+\label{tab:perf_profiles}
+\end{table}
+Dịch vụ không thiết yếu (Elasticsearch, Stripe, MoMo, Mapbox) được tắt hoặc stub; các cờ tối ưu Redis cache và tắt access-log HTTP được bật để cô lập hiệu năng lõi.
+
+
+\section{Các bộ kịch bản kiểm thử}
+
+Hệ thống được kiểm thử qua 5 bộ kịch bản chính, mỗi bộ tập trung vào một khía cạnh nghiệp vụ khác nhau:
+
+\begin{itemize}
+    \item \textbf{\texttt{booking\_race\_condition}}: Mô phỏng 50 người dùng đặt lịch đồng thời trên cùng khung giờ, kiểm tra cơ chế micro-lock và async-checkout chống race condition. 4 lần chạy, 0\% lỗi.
+    \item \textbf{\texttt{locustfile}} (tổng hợp): Kịch bản tổng hợp kiểm thử xác thực đa vai trò (user, admin, partner, employee), health check, và các API cơ bản. Dùng chủ yếu cho smoke test với quy mô từ 7 đến 1.000 người dùng.
+    \item \textbf{\texttt{perf\_headless\_user}}: Mô phỏng luồng người dùng hoàn chỉnh: đăng nhập, kiểm tra email, xem hồ sơ, làm mới token. Ở giai đoạn triển khai đã chạy ổn định tới 500 người dùng đồng thời, 0\% lỗi.
+    \item \textbf{\texttt{all\_modules}}: Kịch bản kết nối đầy đủ tất cả module nghiệp vụ. Sau khi hoàn thiện bộ tài khoản kiểm thử, đã chạy thành công ở 100 người dùng đồng thời, 0\% lỗi.
+    \item \textbf{\texttt{important}}: Bộ kịch bản hợp nhất, bao phủ toàn bộ endpoint trọng yếu của cả bốn vai trò (user, admin, partner, employee) cùng health check và public catalog. Đây là kịch bản được dùng cho lần chạy chấm điểm chính thức (600 CCU, 0\% lỗi) và cho lần đo tải mục tiêu 1.000 CCU.
+\end{itemize}
+
+
+\section{Lịch sử các lần chạy kiểm thử}
+
+Bảng~\ref{tab:perf_run_timeline} tổng hợp 15 lần chạy tiêu biểu từ 46 báo cáo, chia theo hai giai đoạn: cục bộ (loopback) và triển khai (\texttt{dev.healytics.me}).
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{|c|p{0.09\textwidth}|p{0.16\textwidth}|r|r|r|r|r|r|r|}
+\hline
+\textbf{\#} & \textbf{Ngày} & \textbf{Suite} & \textbf{T (s)} & \textbf{Users} & \textbf{Reqs} & \textbf{Fails} & \textbf{Err\%} & \textbf{Avg RT} & \textbf{RPS} \\
+\hline
+\multicolumn{10}{|l|}{\textit{Giai đoạn cục bộ (loopback --- localhost)}} \\
+\hline
+1 & 04-21 & booking\_race & 179 & 50 & 4909 & 0 & 0.00 & 1358 & 27.5 \\
+\hline
+2 & 04-22 & booking\_race & 178 & 50 & 12550 & 0 & 0.00 & 335 & 70.7 \\
+\hline
+3 & 05-08 & locustfile & 57 & 10 & 251 & 0 & 0.00 & 142 & 4.4 \\
+\hline
+4 & 05-10 & locustfile & 73 & 1000 & 7113 & 1023 & 14.4 & 177 & 97.3 \\
+\hline
+5 & 05-10 & headless\_user & 116 & 100 & 4486 & 0 & 0.00 & 638 & 38.4 \\
+\hline
+\multicolumn{10}{|l|}{\textit{Giai đoạn triển khai (client tách biệt $\rightarrow$ dev.healytics.me)}} \\
+\hline
+6 & 05-27 & headless\_user & 41 & 500 & 3061 & 49 & 1.60 & 3725 & 73.2 \\
+\hline
+7 & 05-27 & headless\_user & 297 & 500 & 70106 & 2404 & 3.43 & 108 & 235.8 \\
+\hline
+8 & 05-27 & headless\_user & 297 & 500 & 70261 & 0 & 0.00 & 108 & 236.0 \\
+\hline
+9 & 05-27 & headless\_user & 298 & 500 & 70997 & 0 & 0.00 & 88 & 238.3 \\
+\hline
+10 & 05-27 & all\_modules & 126 & 100 & 1787 & 0 & 0.00 & 118 & 14.1 \\
+\hline
+11 & 05-27 & important & 177 & 500 & 36692 & 0 & 0.00 & 214 & 206.5 \\
+\hline
+12 & 05-27 & important & 176 & 500 & 38273 & 0 & 0.00 & 90 & 216.5 \\
+\hline
+13 & 05-27 & important & 177 & 1000 & 70378 & 1352 & 1.92 & 119 & 395.7 \\
+\hline
+14 & 05-27 & important & 177 & 600 & 45300 & 0 & 0.00 & 96 & 255.9 \\
+\hline
+15 & 05-27 & important & 177 & 600 & 45254 & 0 & 0.00 & 113 & 254.5 \\
+\hline
+\end{tabular}
+\caption{Lịch sử các lần chạy kiểm thử hiệu suất tiêu biểu --- lần \#15 là lần chấm điểm chính thức (Avg RT tính theo ms)}
+\label{tab:perf_run_timeline}
+\end{table}
+
+
+\section{Phân tích endpoint theo suite tiêu biểu}
+
+\noindent\textbf{Suite \texttt{booking\_race\_condition} (50 users, 0\% lỗi --- giai đoạn cục bộ):} Minh họa cơ chế đặt lịch chống tranh chấp; độ trễ login cao do bcrypt trên loopback.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{|l|X|r|r|r|r|}
+\hline
+\textbf{Method} & \textbf{Endpoint} & \textbf{Reqs} & \textbf{Avg RT} & \textbf{P95} & \textbf{RPS} \\
+\hline
+POST & /auth/user/login & 50 & 1041.0 & 1100 & 0.28 \\
+\hline
+GET & /account/me & 9 & 28.8 & 34 & 0.05 \\
+\hline
+GET & /user/employees & 9 & 20.8 & 30 & 0.05 \\
+\hline
+GET & /user/employees/:id/services & 9 & 57.2 & 92 & 0.05 \\
+\hline
+GET & /user/employees/:id/time-slots & 9 & 62.1 & 88 & 0.05 \\
+\hline
+POST & /user/bookings/async-checkout & 8705 & 453.4 & 780 & 49.07 \\
+\hline
+POST & /user/slots/micro-lock & 925 & 200.0 & 210 & 5.21 \\
+\hline
+GET & /user/bookings [verify] & 219 & 4.7 & 9 & 1.23 \\
+\hline
+GET & /user/bookings/tickets/:id [poll] & 2615 & 5.1 & 7 & 14.74 \\
+\hline
+\end{tabularx}
+\caption{Hiệu suất endpoint --- suite \texttt{booking\_race\_condition} (50 users, 0\% lỗi)}
+\label{tab:perf_booking_endpoints}
+\end{table}
+
+\noindent\textbf{Suite \texttt{important} (600 users, 0\% lỗi --- giai đoạn triển khai, độ trễ mạng cơ sở $\approx$72 ms):} Bảng~\ref{tab:perf_important_endpoints} liệt kê các endpoint tiêu biểu; 45.254 request, 0 lỗi.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{|l|X|r|r|r|r|}
+\hline
+\textbf{Method} & \textbf{Endpoint} & \textbf{Reqs} & \textbf{Avg RT} & \textbf{P95} & \textbf{RPS} \\
+\hline
+POST & /auth/user/login & 555 & 206.4 & 360 & 3.12 \\
+\hline
+POST & /auth/admin/login & 511 & 229.4 & 370 & 2.87 \\
+\hline
+POST & /auth/partner/login & 548 & 199.0 & 370 & 3.08 \\
+\hline
+POST & /auth/employee/login & 334 & 183.5 & 350 & 1.88 \\
+\hline
+POST & /auth/check-email & 1192 & 102.2 & 170 & 6.70 \\
+\hline
+GET & /health & 2729 & 100.5 & 150 & 15.35 \\
+\hline
+GET & /account/me & 577 & 105.1 & 170 & 3.24 \\
+\hline
+GET & /admin/dashboard/overview & 998 & 112.5 & 160 & 5.61 \\
+\hline
+GET & /categories & 1072 & 104.4 & 150 & 6.03 \\
+\hline
+GET & /user/booking-search & 592 & 114.3 & 170 & 3.33 \\
+\hline
+GET & /partner/employees/analytics/:id & 132 & 380.8 & 180 & 0.74 \\
+\hline
+\textbf{Tổng hợp} & (Aggregated) & \textbf{45254} & \textbf{113.1} & \textbf{190} & \textbf{254.47} \\
+\hline
+\end{tabularx}
+\caption{Hiệu suất endpoint --- suite \texttt{important} (600 users, 0\% lỗi, môi trường triển khai)}
+\label{tab:perf_important_endpoints}
+\end{table}
+
+Endpoint xác thực giảm rõ rệt: login từ 1041 ms xuống 206 ms, check-email từ 606 ms xuống 102 ms. Endpoint đọc dữ liệu hội tụ 100--130 ms, sát độ trễ mạng cơ sở 72 ms.
+
+
+\section{Đánh giá ưu điểm và hạn chế của môi trường kiểm thử}
+
+\noindent\textbf{Ưu điểm:}
+\begin{itemize}
+    \item \textbf{Tách biệt máy phát tải và SUT:} loại bỏ tranh chấp CPU giữa client và server.
+    \item \textbf{Độ trễ mạng thực:} đo qua Internet + TLS ($\approx$72 ms), sát trải nghiệm người dùng cuối.
+    \item \textbf{Giới hạn tài nguyên container:} 1.5 vCPU / 2 GB RAM, sát môi trường production.
+    \item \textbf{Tự động hóa \& tái lập:} tài khoản sinh sẵn + \texttt{analyze\_reports.js} chấm điểm tự động qua 46 báo cáo.
+\end{itemize}
+
+\noindent\textbf{Hạn chế còn lại:}
+\begin{itemize}
+    \item \textbf{Môi trường dev dùng chung:} có thể bị noisy neighbor, gây dao động độ trễ.
+    \item \textbf{Database cùng VM:} PostgreSQL/Redis/RabbitMQ chạy chung máy với backend; production thường tách riêng.
+    \item \textbf{Dịch vụ ngoài bị stub:} chưa đo được độ trễ thực của Stripe, MoMo, Mapbox, v.v.
+    \item \textbf{Cold analytics:} một số endpoint thống kê có max $\approx$36 s khi cache nguội.
+    \item \textbf{Thông lượng bị giới hạn CPU:} chưa đạt 500 RPS do giới hạn 1.5 vCPU.
+\end{itemize}
+
+\chapter{Phụ lục kiểm thử Bảo mật}
+\section{Cách decode JWT}
+JWT gồm ba phần \texttt{header.payload.signature}. \texttt{Header} mô tả thuật toán ký token, ví dụ \texttt{HS256}. \texttt{Payload} là dữ liệu đã mã hóa Base64URL, không phải dữ liệu bí mật, nên có thể decode để đọc các claim như \texttt{email} và \texttt{role}. \texttt{Signature} dùng secret phía server để đảm bảo token không bị sửa. Nếu attacker tự sửa \texttt{role} từ \texttt{user} thành \texttt{admin}, chữ ký sẽ không còn hợp lệ và backend phải từ chối token.
+
+Quy trình decode thủ công tương đương jwt.io:
+\begin{enumerate}
+    \item Copy \texttt{access\_token} từ response login.
+    \item Tách token thành ba phần theo dấu chấm.
+    \item Base64URL-decode phần thứ nhất để đọc \texttt{header}.
+    \item Base64URL-decode phần thứ hai để đọc \texttt{payload}.
+    \item Đọc trường \texttt{role} trong payload để xác định tài khoản là \texttt{user}, \texttt{admin} hay \texttt{health\_partner}.
+\end{enumerate}
+
+
+\section{Đánh giá bảo vệ API trước SQL Injection, XSS và CSRF}
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.16\textwidth}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}p{0.12\textwidth}|}
+\hline
+\textbf{Kiểu tấn công} & \textbf{Payload/Kịch bản} & \textbf{Quan sát kiểm thử} & \textbf{Đánh giá} \\
+\hline
+SQL Injection & Payload \texttt{' OR '1'='1} trên API đăng nhập user & API trả \texttt{HTTP 401}; không bypass đăng nhập. TypeORM parameterized query và \texttt{ValidationPipe} giúp giảm rủi ro chèn lệnh SQL. & Tốt \\
+\hline
+XSS & Payload kiểu \newline \texttt{<script>alert(1)</script>} \newline và \texttt{<img onerror=...>} & Chưa chạy stored XSS end-to-end qua toàn UI; tuy nhiên server trả security headers, đặc biệt \texttt{content-security-policy} của Helmet, để giảm khả năng thực thi script độc hại. & Khá tốt \\
+\hline
+CSRF & Giả lập request thay đổi trạng thái từ origin ngoài & Hệ thống dùng Bearer JWT trong header \texttt{Authorization}, không dựa vào cookie phiên; API protected yêu cầu token hợp lệ và chặn sai quyền bằng \texttt{403}. & Tốt \\
+\hline
+\end{tabularx}
+\caption{Tóm tắt kiểm thử các kịch bản tấn công trong Security}
+\label{tab:security_attack_summary}
+\end{table}
+
+Kết luận: các kiểm thử đại diện cho thấy lớp bảo vệ hiện tại vận hành đúng ở mức triển khai. Rủi ro còn lại tập trung ở kiểm thử XSS toàn luồng UI và các endpoint đặc thù chưa pentest sâu.
+
 \chapter{Phụ lục kết quả đánh giá Recommender}
 \label{appendix:recommender_eval}
 
@@ -368,7 +1178,7 @@ Phụ lục này tổng hợp đầy đủ các hình trực quan từ hai basel
     \label{fig:appendix_rec_run_compare}
 \end{figure}
 
-\subsection{Baseline Chatbot: phân rã theo chủ đề và nhiễu}
+\section{Baseline Chatbot: phân rã theo chủ đề và nhiễu}
 
 \begin{figure}[H]
     \centering
@@ -384,7 +1194,7 @@ Phụ lục này tổng hợp đầy đủ các hình trực quan từ hai basel
     \label{fig:appendix_chatbot_hnr_breakdown}
 \end{figure}
 
-\subsection{Phân bố score retrieval}
+\section{Phân bố score retrieval}
 
 \begin{figure}[H]
     \centering
@@ -400,7 +1210,7 @@ Phụ lục này tổng hợp đầy đủ các hình trực quan từ hai basel
     \label{fig:appendix_home_score_dist}
 \end{figure}
 
-\subsection{Phân bố độ trễ}
+\section{Phân bố độ trễ}
 
 \begin{figure}[H]
     \centering
@@ -416,12 +1226,12 @@ Phụ lục này tổng hợp đầy đủ các hình trực quan từ hai basel
     \label{fig:appendix_home_latency_dist}
 \end{figure}
 
-\chapter{Phụ lục: API và Schema tích hợp MoMo}
+\chapter{Phụ lục API và Schema tích hợp MoMo}
 \label{appendix:momo_api}
 
 Phụ lục này trình bày chi tiết các API đã tích hợp với cổng thanh toán MoMo và giải thích từng trường dữ liệu (schema) sử dụng trong hệ thống Healytics.
 
-\section*{1. Danh sách API MoMo đã tích hợp}
+\section{Danh sách API MoMo đã tích hợp}
 \begin{table}[H]
     \centering
     \caption{Các API MoMo đã tích hợp}
@@ -440,9 +1250,8 @@ Phụ lục này trình bày chi tiết các API đã tích hợp với cổng t
     \renewcommand{\arraystretch}{1}
 \end{table}
 
-\section*{2. Giải thích schema dữ liệu MoMo}
+\section{Giải thích schema dữ liệu MoMo}
 
-\subsection*{2.1. Format request/response JSON của các API MoMo tích hợp}
 
 % --- Tạo yêu cầu thanh toán ---
 \textbf{a) API: Tạo yêu cầu thanh toán}
@@ -622,3 +1431,11 @@ Phụ lục này trình bày chi tiết các API đã tích hợp với cổng t
 \textbf{Lưu ý:} Các trường có thể thay đổi tuỳ theo tài liệu chính thức của MoMo từng thời điểm. Nên đối chiếu tài liệu mới nhất khi tích hợp.
 
 \textbf{Lưu ý:} Các API đều có kiểm tra chữ ký số (signature) để đảm bảo an toàn giao dịch. Thông tin chi tiết về các trường dữ liệu, mã lỗi và quy trình xác thực tham khảo tài liệu chính thức của MoMo hoặc phần tài liệu kỹ thuật dự án.
+
+% ================================================================
+% PHỤ LỤC D — SEQUENCE DIAGRAM BỔ SUNG
+% ================================================================
+
+
+
+
